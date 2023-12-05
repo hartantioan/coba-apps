@@ -20,8 +20,12 @@ class ProductionScheduleDetail extends Model
         'shift_id',
         'item_id',
         'bom_id',
-        'marketing_order_plan_detail_id',
         'qty',
+        'line_id',
+        'group',
+        'warehouse_id',
+        'note',
+        'status',
     ];
 
     public function productionSchedule()
@@ -41,13 +45,31 @@ class ProductionScheduleDetail extends Model
         return $this->belongsTo('App\Models\Item','item_id','id')->withTrashed();
     }
 
-    public function marketingOrderPlanDetail(){
-        return $this->belongsTo('App\Models\MarketingOrderPlanDetail','marketing_order_plan_detail_id','id')->withTrashed();
+    public function line(){
+        return $this->belongsTo('App\Models\Line','line_id','id')->withTrashed();
+    }
+
+    public function warehouse(){
+        return $this->belongsTo('App\Models\Warehouse','warehouse_id','id')->withTrashed();
     }
 
     public function productionIssueReceiveDetail(){
         return $this->hasMany('App\Models\ProductionIssueReceiveDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('productionIssueReceive',function($query){
             $query->whereIn('status',['2','3']);
         });
+    }
+
+    public function status(){
+        $status = match ($this->status) {
+            '1' => 'Menunggu',
+            '2' => 'Proses',
+            '3' => 'Selesai',
+            '4' => 'Ditolak',
+            '5' => 'Ditutup',
+            '6' => 'Direvisi',
+            default => 'Invalid',
+        };
+
+        return $status;
     }
 }

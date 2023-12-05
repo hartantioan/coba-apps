@@ -31,4 +31,20 @@ class BomDetail extends Model
         return $this->morphTo();
     }
 
+
+    public function item(){
+        if($this->lookable_type == 'items'){
+            return $this->belongsTo('App\Models\Item', 'lookable_id', 'id')->withTrashed();
+        }else{
+            return $this->where('id',-1);
+        }
+    }
+
+    public function coa(){
+        if($this->lookable_type == 'coas'){
+            return $this->belongsTo('App\Models\Coa', 'lookable_id', 'id')->withTrashed();
+        }else{
+            return $this->where('id',-1);
+        }
+    }
 }

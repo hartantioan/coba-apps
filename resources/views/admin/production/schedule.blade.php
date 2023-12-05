@@ -3,6 +3,10 @@
         top:0px !important;
     }
 
+    .modal table.bordered th, table.bordered td {
+        padding: 5px !important;
+    }
+
     .select-wrapper, .select2-container {
         height:3.6rem !important;
     }
@@ -158,7 +162,7 @@
                                         <select class="form-control" id="place_id" name="place_id">
                                             <option value="">--Pilih--</option>
                                             @foreach ($place as $rowplace)
-                                                <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                                <option value="{{ $rowplace->id }}" data-lines="{{ $rowplace->lines() }}">{{ $rowplace->code }}</option>
                                             @endforeach
                                         </select>
                                         <label class="" for="place_id">Plant</label>
@@ -212,14 +216,15 @@
                                                         <th class="center">Qty (Satuan Jual)</th>
                                                         <th class="center">Qty (Satuan UOM)</th>
                                                         <th class="center">Qty (Satuan Pallet)</th>
-                                                        <th class="center">Tgl.Request</th>
                                                         <th class="center">Remark</th>
+                                                        <th class="center">Tgl.Request</th>
+                                                        <th class="center">Urgent</th>
                                                         <th class="center">Hapus</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td class="center-align" colspan="8">
+                                                        <td class="center-align" colspan="9">
                                                             Silahkan tambahkan Marketing Order Plan...
                                                         </td>
                                                     </tr>
@@ -229,7 +234,7 @@
                                                         <td class="right-align" colspan="2">
                                                             Stok RM :
                                                         </td>
-                                                        <td class="" colspan="6" id="data-foot">
+                                                        <td class="" colspan="7" id="data-foot">
                                                             Silahkan tambahkan Marketing Order Plan...
                                                         </td>
                                                     </tr>
@@ -242,31 +247,160 @@
                         </div>
                         <div class="row">
                             <div class="col s12">
-                                <fieldset>
-                                    <legend>4. Detail Shift</legend>
+                                <fieldset style="min-width: 100%;">
+                                    <legend>4. Detail Shift & Target Produksi</legend>
                                     <div class="col m12 s12 step11" style="overflow:auto;width:100% !important;">
-                                        <p class="mt-2 mb-2">
-                                            <table class="bordered">
-                                                <thead>
-                                                    <tr>
-                                                        <th class="center">Tgl.Produksi</th>
-                                                        <th class="center">Shift</th>
-                                                        <th class="center">Item Target FG</th>
-                                                        <th class="center">Qty (Satuan UOM)</th>
-                                                        <th class="center">Satuan</th>
-                                                        <th class="center">Hapus</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="body-item-detail">
-                                                    <tr id="last-row-item-detail">
-                                                        <td class="center-align" colspan="6">
-                                                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addShift();" href="javascript:void(0);">
+                                        <p class="mt-2 mb-2" id="detail-shift">
+                                            <ul class="collapsible">
+                                                <li class="active">
+                                                    <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">event_seat</i>FG</div>
+                                                    <div class="collapsible-body" style="display:block;">
+                                                        <div class="" style="overflow:auto;width:100% !important;">
+                                                            <table class="bordered" style="min-width:2000px;">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="center">Pilih</th>
+                                                                        <th class="center">No</th>
+                                                                        <th class="center" width="300px">Item</th>
+                                                                        <th class="center" width="200px">Qty</th>
+                                                                        <th class="center" width="200px">UoM</th>
+                                                                        <th class="center" width="200px">Gudang</th>
+                                                                        <th class="center" width="200px">Tgl.Produksi</th>
+                                                                        <th class="center" width="300px">Shift</th>
+                                                                        <th class="center" width="200px">Line</th>
+                                                                        <th class="center" width="150px">Group</th>
+                                                                        <th class="center" width="200px">Keterangan</th>
+                                                                        <th class="center" width="75px">Hapus</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody class="body-item-detail" id="body-item-detail4" data-group="4">
+                                                                    <tr class="last-row-item-detail">
+                                                                        <td colspan="12">
+                                                                            Silahkan tambahkan shift
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        <div class="center-align">
+                                                            <a class="waves-effect waves-light cyan btn-small mr-1 mt-1" onclick="addShift(4);" href="javascript:void(0);">
                                                                 <i class="material-icons left">add</i> Shift
                                                             </a>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">filter_3</i>SFG-3</div>
+                                                    <div class="collapsible-body">
+                                                        <div class="" style="overflow:auto;width:100% !important;">
+                                                            <table class="bordered" style="min-width:2000px;">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="center">Pilih</th>
+                                                                        <th class="center">No</th>
+                                                                        <th class="center" width="300px">Item</th>
+                                                                        <th class="center" width="200px">Qty</th>
+                                                                        <th class="center" width="200px">UoM</th>
+                                                                        <th class="center" width="200px">Gudang</th>
+                                                                        <th class="center" width="200px">Tgl.Produksi</th>
+                                                                        <th class="center" width="300px">Shift</th>
+                                                                        <th class="center" width="200px">Line</th>
+                                                                        <th class="center" width="150px">Group</th>
+                                                                        <th class="center" width="200px">Keterangan</th>
+                                                                        <th class="center" width="75px">Hapus</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody class="body-item-detail" id="body-item-detail3" data-group="3">
+                                                                    <tr class="last-row-item-detail">
+                                                                        <td colspan="12">
+                                                                            Silahkan tambahkan shift
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        <div class="center-align">
+                                                            <a class="waves-effect waves-light cyan btn-small mr-1 mt-1" onclick="addShift(3);" href="javascript:void(0);">
+                                                                <i class="material-icons left">add</i> Shift
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">filter_2</i>SFG-2</div>
+                                                    <div class="collapsible-body">
+                                                        <div class="" style="overflow:auto;width:100% !important;">
+                                                            <table class="bordered" style="min-width:2000px;">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="center">Pilih</th>
+                                                                        <th class="center">No</th>
+                                                                        <th class="center" width="300px">Item</th>
+                                                                        <th class="center" width="200px">Qty</th>
+                                                                        <th class="center" width="200px">UoM</th>
+                                                                        <th class="center" width="200px">Gudang</th>
+                                                                        <th class="center" width="200px">Tgl.Produksi</th>
+                                                                        <th class="center" width="300px">Shift</th>
+                                                                        <th class="center" width="200px">Line</th>
+                                                                        <th class="center" width="150px">Group</th>
+                                                                        <th class="center" width="200px">Keterangan</th>
+                                                                        <th class="center" width="75px">Hapus</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody class="body-item-detail" id="body-item-detail2" data-group="2">
+                                                                    <tr class="last-row-item-detail">
+                                                                        <td colspan="12">
+                                                                            Silahkan tambahkan shift
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        <div class="center-align">
+                                                            <a class="waves-effect waves-light cyan btn-small mr-1 mt-1" onclick="addShift(2);" href="javascript:void(0);">
+                                                                <i class="material-icons left">add</i> Shift
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">filter_1</i>SFG-1</div>
+                                                    <div class="collapsible-body">
+                                                        <div class="" style="overflow:auto;width:100% !important;">
+                                                            <table class="bordered" style="min-width:2000px;">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="center">Pilih</th>
+                                                                        <th class="center">No</th>
+                                                                        <th class="center" width="300px">Item</th>
+                                                                        <th class="center" width="200px">Qty</th>
+                                                                        <th class="center" width="200px">UoM</th>
+                                                                        <th class="center" width="200px">Gudang</th>
+                                                                        <th class="center" width="200px">Tgl.Produksi</th>
+                                                                        <th class="center" width="300px">Shift</th>
+                                                                        <th class="center" width="200px">Line</th>
+                                                                        <th class="center" width="150px">Group</th>
+                                                                        <th class="center" width="200px">Keterangan</th>
+                                                                        <th class="center" width="75px">Hapus</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody class="body-item-detail" id="body-item-detail1" data-group="1">
+                                                                    <tr class="last-row-item-detail">
+                                                                        <td colspan="12">
+                                                                            Silahkan tambahkan shift
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        <div class="center-align">
+                                                            <a class="waves-effect waves-light cyan btn-small mr-1 mt-1" onclick="addShift(1);" href="javascript:void(0);">
+                                                                <i class="material-icons left">add</i> Shift
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
                                         </p>
                                     </div>
                                 </fieldset>
@@ -420,6 +554,8 @@
 <!-- END: Page Main-->
 <script>
     
+    var listfgsfg = [];
+
     $(function() {
 
         $('#datatable_serverside').on('click', 'button', function(event) {
@@ -502,6 +638,9 @@
                     }
                     return 'You will lose all changes made since your last save';
                 };
+                $('.collapsible').collapsible({
+                    accordion:true
+                });
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
@@ -518,6 +657,9 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
+                $('#item-fg,#item-sfg1,#item-sfg2,#item-sfg3').empty().append(`
+                    <div align="center" id="no-shift">-- Silahkan pilih MOP --</div>
+                `);
             }
         });
 
@@ -529,9 +671,8 @@
             }
         });
 
-        $('#body-item-detail').on('click', '.delete-data-item-detail', function() {
+        $('.body-item-detail').on('click', '.delete-data-item-detail', function() {
             $(this).closest('tr').remove();
-            countStock();
         });
 
         $('#marketing_order_plan_id').select2({
@@ -709,7 +850,7 @@
                 if($('.row_item').length == 0){
                     $('#body-item').empty().append(`
                         <tr id="last-row-item">
-                            <td class="center-align" colspan="8">
+                            <td class="center-align" colspan="9">
                                 Silahkan tambahkan Marketing Order Plan...
                             </td>
                         </tr>
@@ -732,85 +873,117 @@
 
     function setRow(val){
         if($('#arr_item_detail_id' + val).val()){
-            $('#arr_qty_detail' + val).val($('#arr_item_detail_id' + val).find(":selected").data("qty"));
-            $('#text-unit' + val).text($('#arr_item_detail_id' + val).find(":selected").data("unit"));
-            checkRow(val);
+            $('#item-unit' + val).text($('#arr_item_detail_id' + val).find(":selected").data("unit"));
+            let warehouses = $('#arr_item_detail_id' + val).find(":selected").data("warehouse");
+            let optionWarehouse = `<select class="browser-default" id="arr_warehouse_id` + val + `" name="arr_warehouse_id[]">`;
+            if(warehouses.length > 0){
+                $.each(warehouses, function(i, valkuy) {
+                    optionWarehouse += `<option value="` + valkuy['id'] + `">` + valkuy['name'] + `</option>`;
+                });
+            }else{
+                optionWarehouse += `<option value="">--Maaf, item ini tidak memiliki gudang--</option>`;
+            }
+
+            optionWarehouse += `</select>`;
+            $('#item-warehouse' + val).html(optionWarehouse);
+            let qtyProporsional = parseFloat($('#arr_item_detail_id' + val).find(":selected").data("proporsional").toString().replaceAll(".", "").replaceAll(",","."));
+            let itemGoal = $('#arr_item_detail_id' + val).find(":selected").data("goal");
+            let totalQty = 0;
+            if(itemGoal > 0){
+                if($('select[name^="arr_item_detail_id[]"] option[value="' + itemGoal + '"]').length > 0){
+                    let code = '';
+                    $('select[name^="arr_item_detail_id[]"] option[value="' + itemGoal + '"]').each(function(index){
+                        if($(this).is(':selected')){
+                            code = $(this).data('code');
+                            totalQty += parseFloat($('#arr_qty_detail' + code).val().replaceAll(".", "").replaceAll(",","."));
+                        }
+                    });
+                }
+                $('#arr_qty_detail' + val).val(formatRupiahIni((qtyProporsional * totalQty).toFixed(3).toString().replace('.',',')));
+            }else{
+                $('#arr_qty_detail' + val).val($('#arr_item_detail_id' + val).find(":selected").data("qty"));
+            }
         }else{
             $('#arr_qty_detail' + val).val('0,000');
-            $('#text-unit' + val).text('-');
+            $('#item-unit' + val).html('-');
+            $('#item-warehouse' + val).html('-');
         }
     }
 
-    function checkRow(val){
-        let mopd_id = $('#arr_item_detail_id' + val).find(":selected").data("mopd");
-        let qtyMax = parseFloat($('input[name^="arr_qty[]"][data-mopd="' + mopd_id + '"]').val().toString().replaceAll(".", "").replaceAll(",","."));
-        let qtyRow = parseFloat($('#arr_qty_detail' + val).val().toString().replaceAll(".", "").replaceAll(",","."));
-        let otherQty = 0;
-        $('select[name^="arr_item_detail_id[]"]').each(function(index){
-            if($(this).val()){
-                if($(this).find(":selected").data("mopd") == mopd_id && $(this).attr('id') !== 'arr_item_detail_id' + val){
-                    otherQty += parseFloat($('input[name^="arr_qty_detail[]"]').eq(index).val().toString().replaceAll(".", "").replaceAll(",","."));
-                }
-            }
-        });
-        let qtyTotal = qtyRow + otherQty;
-        let qtyBalance = qtyMax - otherQty;
-        if(qtyTotal > qtyMax && otherQty == 0){
-            $('#arr_qty_detail' + val).val(formatRupiahIni(qtyMax.toFixed(3).toString().replace('.',',')));
-        }else if(otherQty >= qtyMax){
-            $('#arr_qty_detail' + val).val('0,000');
-        }
-
-        if(otherQty > 0 && otherQty < qtyMax && qtyTotal > qtyMax){
-            $('#arr_qty_detail' + val).val(formatRupiahIni(qtyBalance.toFixed(3).toString().replace('.',',')));
-        }
-    }
-
-    function addShift(){
+    function addShift(level){
         if($('.row_item').length > 0){
-            let arrItem = [];
-
-            $('input[name^="arr_item_id[]"]').each(function(index){
-                let arr = {
-                    'mopd_id'   : $('input[name^="arr_id[]"]').eq(index).val(),
-                    'mop_code'  : $('input[name^="arr_code[]"]').eq(index).val(),
-                    'item_id'   : $(this).val(),
-                    'item_name' : $('input[name^="arr_item_name[]"]').eq(index).val() + ' - ' + $('input[name^="arr_code[]"]').eq(index).val() + ' - ' + $('input[name^="arr_qty[]"]').eq(index).val(),
-                    'qty'       : $('input[name^="arr_qty[]"]').eq(index).val(),
-                    'unit'      : $('input[name^="arr_item_unit[]"]').eq(index).val(),
-                };
-
-                arrItem.push(arr);
-            });
 
             var count = makeid(10);
 
+            let line = $('#place_id').find(':selected').data('lines');
+
+            let optionLine = `<select class="browser-default" id="arr_line_id` + count + `" name="arr_line_id[]">`;
+
+            if(line.length > 0){
+                $.each(line, function(i, val) {
+                    optionLine += `<option value="` + val['id'] + `">` + val['code'] + ` - ` + val['name'] + `</option>`;
+                });
+            }else{
+                optionLine += `<option value="">--Maaf, plant ini belum memiliki Line--</option>`;
+            }
+
+            optionLine += `</select>`;
+            
             let optionItem = `<select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="setRow('` + count + `')">`;
             
             optionItem += `<option value="">--Pilih item--</option>`;
 
-            $.each(arrItem, function(i, val) {
-                optionItem += `<option value="` + val['item_id'] + `" data-mopd="` + val['mopd_id'] + `" data-qty="` + val['qty'] + `" data-unit="` + val['unit'] + `">` + val['item_name'] + `</option>`;
+            $.each(listfgsfg, function(i, val) {
+                if(val.item_group == level.toString()){
+                    optionItem += `<option value="` + val['item_id'] + `" data-qty="` + val['item_qty'] + `" data-unit="` + val['item_unit'] + `" data-warehouse='` + JSON.stringify(val['item_warehouse']) + `' data-goal="` + val['item_goal'] + `" data-proporsional="` + val['item_qty_proporsional'] + `" data-code="` + count + `">` + val['item_code'] + ` - ` + val['item_name'] + `</option>`;
+                }
             });
             
             optionItem += `</select>`;
 
-            $('#last-row-item-detail').before(`
+            if($('#body-item-detail' + level + ' > .last-row-item-detail').length > 0){
+                $('#body-item-detail' + level + ' > .last-row-item-detail').remove();
+            }
+
+            let no = $('#body-item-detail' + level + ' > .row_item_detail').length + 1;
+
+            $('#body-item-detail' + level).append(`
                 <tr class="row_item_detail">
+                    <td class="center-align">
+                        <label>
+                            <input type="checkbox" class="checkBoxSelect" name="arr_select[]" id="arr_select` + count + `" value="` + count + `">
+                            <span>&nbsp;</span>
+                        </label>
+                    </td>
+                    <td class="center-align">
+                        ` + no + `.
+                    </td>
+                    <td class="center-align">
+                        ` + optionItem + `
+                    </td>
+                    <td class="center-align">
+                        <input name="arr_qty_detail[]" id="arr_qty_detail` + count + `" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" required style="text-align:right;">
+                    </td>
+                    <td class="center-align" id="item-unit` + count + `">
+                        -
+                    </td>
+                    <td class="center-align" id="item-warehouse` + count + `">
+                        -
+                    </td>
                     <td class="center-align">
                         <input name="arr_date[]" id="arr_date` + count + `" type="date" value="{{ date('Y-m-d') }}" required>
                     </td>
                     <td>
                         <select class="browser-default item-array" id="arr_shift` + count + `" name="arr_shift[]"></select>
                     </td>
-                    <td class="center-align">
-                        ` + optionItem + `
+                    <td class="center-align" id="item-line` + count + `">
+                        ` + optionLine + `
                     </td>
                     <td class="center-align">
-                        <input name="arr_qty_detail[]" id="arr_qty_detail` + count + `" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);checkRow('` + count + `')" required style="text-align:right;">
+                        <input name="arr_group[]" id="arr_group` + count + `" type="text" placeholder="A / B / C / D" required>
                     </td>
-                    <td class="center-align" id="text-unit` + count + `">
-                        -
+                    <td class="center-align">
+                        <input name="arr_note[]" id="arr_note` + count + `" type="text" placeholder="Keterangan" required>
                     </td>
                     <td class="center-align">
                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail" href="javascript:void(0);">
@@ -819,6 +992,7 @@
                     </td>
                 </tr>
             `);
+            M.updateTextFields();
             $('#arr_shift' + count).select2({
                 placeholder: '-- Pilih ya --',
                 minimumInputLength: 1,
@@ -843,73 +1017,11 @@
                     }
                 }
             });
-            /* $("#arr_item_detail_id" + count).select2({
-                dropdownAutoWidth: true,
-                width: '100%',
-            }); */
         }else{
             swal({
                 title: 'Ups! Hayo.',
                 text: 'Silahkan tambahkan satu atau lebih Marketing Order Plan.',
                 icon: 'warning'
-            });
-        }
-    }
-
-    function changeQty(val){
-        let mopd_id = $('#arr_id' + val).val();
-        let qtyUom = parseFloat($('#arr_qty' + val).val().toString().replaceAll(".", "").replaceAll(",","."));
-        let qtyMax = parseFloat($('#arr_qty' + val).data('max').toString().replaceAll(".", "").replaceAll(",","."));
-        if(qtyUom > qtyMax){
-            qtyUom = qtyMax;
-            $('#arr_qty' + val).val(formatRupiahIni(qtyMax.toFixed(3).toString().replace('.',',')));
-        }
-        let sell_convert = parseFloat($('#arr_sell_convert' + val).val());
-        let pallet_convert = parseFloat($('#arr_pallet_convert' + val).val());
-        let qtySell = qtyUom / sell_convert;
-        let qtyPallet = qtySell / pallet_convert;
-        $('#qty_in_sell' + val).text(formatRupiahIni(qtySell.toFixed(3).toString().replace('.',',')));
-        $('#qty_in_pallet' + val).text(formatRupiahIni(qtyPallet.toFixed(3).toString().replace('.',',')));
-        if($('.row_item_detail').length > 0){
-            $('select[name^="arr_item_detail_id[]"]').each(function(index){
-                if($(this).val()){
-                    if($(this).find(":selected").data("mopd") == mopd_id){
-                        $('input[name^="arr_qty_detail[]"]').eq(index).val('0,000');
-                    }
-                }
-            });
-        }
-        countStock();
-    }
-
-    function countStock(){
-        if($('.arr_needed').length > 0){
-            let arrStok = [];
-            $('.arr_stok').each(function(index){
-                arrStok.push({
-                    'item_id'   : $(this).data('item'),
-                    'stock'     : parseFloat($(this).data('stock').replaceAll(".", "").replaceAll(",",".")),
-                });
-            });
-            $('.arr_needed').each(function(index){
-                let qtyUom = parseFloat($('#arr_qty' + $(this).data('id')).val().toString().replaceAll(".", "").replaceAll(",","."));
-                let qtyMax = parseFloat($('#arr_qty' + $(this).data('id')).data('max').toString().replaceAll(".", "").replaceAll(",","."));
-                let bobot = qtyUom / qtyMax;
-                let qtyRow = parseFloat($(this).data('qty').toString().replaceAll(".", "").replaceAll(",",".")) * bobot;
-                let indexGas = -1;
-                for(let j=0;j<arrStok.length;j++){
-                    if(arrStok[j]['item_id'] == $(this).data('item')){
-                        indexGas = j;
-                    }
-                }
-                let qtyStock = arrStok[indexGas]['stock'];
-                $(this).text(formatRupiahIni(qtyRow.toFixed(3).toString().replace('.',',')) + ' ' + $(this).data('unit'));
-                if(qtyRow > qtyStock){
-                    $(this).parent().find('.arr_status').html('<span style="font-weight:800;color:red;">Tidak Cukup</span>');
-                }else{
-                    $(this).parent().find('.arr_status').html('<span style="font-weight:800;color:green;">Cukup</span>');
-                }
-                arrStok[indexGas]['stock'] -= qtyRow;
             });
         }
     }
@@ -950,47 +1062,27 @@
                                 <i class="material-icons close data-used" data-id="` + mop.id + `" onclick="removeUsedData('` + mop.table + `','` + $('#marketing_order_plan_id').val() + `')">close</i>
                             </div>
                         `);
+                        
                         let arrStok = [];
+                        $('#item-fg').empty();
+                        listfgsfg = [];
                         $.each(mop.details, function(i, val) {
-                            var count = makeid(10), checkstok = '';
-                            if(val.stock_check){
-                                let index = -1;
-                                $.each(val.stock_check, function(i, rowcek) {
-                                    for(let i=0;i<arrStok.length;i++){
-                                        if(arrStok[i]['item_id'] == rowcek.item_id){
-                                            index = i;
-                                        }
-                                    }
-                                    if(index < 0){
-                                        arrStok.push({
-                                            'item_id'   : rowcek.item_id,
-                                            'item_name' : rowcek.item_name,
-                                            'stock'     : rowcek.stock,
-                                            'balance'   : parseFloat(rowcek.stock_raw.replaceAll(".", "").replaceAll(",",".")),
-                                            'stock_raw' : rowcek.stock_raw,
-                                        });
-                                    }
-                                });
-                            }
-                            if(val.stock_check){
-                                checkstok += 'Bahan : <ol>';
-                                $.each(val.stock_check, function(i, detail) {
-                                    for(let j=0;j<arrStok.length;j++){
-                                        if(arrStok[j]['item_id'] == detail.item_id){
-                                            let qty = parseFloat(detail.qty_raw.replaceAll(".", "").replaceAll(",","."));
-                                            let statusRow = '';
-                                            if(arrStok[j]['balance'] >= qty){
-                                                statusRow = '<span style="font-weight:800;color:green;">Cukup</span>';
-                                            }else{
-                                                statusRow = '<span style="font-weight:800;color:red;">Tidak Cukup</span>';
-                                            }
-                                            checkstok += '<li>' + detail.item_name + ' Butuh <b class="arr_needed" data-id="' + count + '" data-item="' + detail.item_id + '" data-qty="' + detail.qty_raw + '" data-unit="' + detail.unit + '">' + detail.qty + '</b> Status : <b class="arr_status">' + statusRow + '</b></li>';
-                                            arrStok[j]['balance'] -= qty;
-                                        }
-                                    }
-                                });
-                                checkstok += '</ol>'
-                            }
+                            var count = makeid(10);
+
+                            listfgsfg.push({
+                                item_id                 : val.item_id,
+                                item_code               : val.item_code,
+                                item_name               : val.item_name,
+                                item_qty                : val.qty_in_uom,
+                                item_qty_output         : val.qty_in_uom,
+                                item_unit               : val.unit_uom,
+                                item_group              : val.group,
+                                item_warehouse          : val.warehouses,
+                                item_goal               : 0,
+                                item_qty_proporsional   : "1",
+                                item_bom_id             : val.bom_id,
+                            });
+
                             $('#body-item').append(`
                                 <tr class="row_item" data-id="` + mop.id + `">
                                     <input type="hidden" name="arr_id[]" id="arr_id` + count + `" value="` + val.mopd_id + `">
@@ -1005,25 +1097,27 @@
                                         ` + mop.code + `
                                     </td>
                                     <td>
-                                        ` + val.item_name + `<br>
-                                        ` + ( val.bom_link ? '' : '<span style="color:red;font-weight:800;">Belum memiliki BOM.</span>' ) + `<br>
-                                        ` + ( val.bom_link ? checkstok : '' ) + `
+                                        ` + val.item_code + ` - ` + val.item_name + `
+                                        ` + ( val.bom_link ? '' : '<br><span style="color:red;font-weight:800;">Belum memiliki BOM.</span>' ) + `<br>
                                     </td>
                                     <td class="right-align">
                                         <b id="qty_in_sell` + count + `">` + val.qty_in_sell + `</b> ` + val.unit_sell + `
                                     </td>
                                     <td class="right-align">
-                                        <input name="arr_qty[]" id="arr_qty` + count + `" type="text" value="` + val.qty_in_uom + `" onkeyup="formatRupiahNoMinus(this);changeQty('`+ count +`')" required style="width:75%;text-align:right;" data-mopd="` + val.mopd_id + `" data-max="` + val.qty_in_uom + `">
+                                        <input name="arr_qty[]" id="arr_qty` + count + `" type="text" value="` + val.qty_in_uom + `" onkeyup="formatRupiahNoMinus(this);" required style="width:75%;text-align:right;" data-mopd="` + val.mopd_id + `" data-max="` + val.qty_in_uom + `" readonly>
                                         ` + val.unit_uom + `
                                     </td>
                                     <td class="right-align">
                                         <b id="qty_in_pallet` + count + `">` + val.qty_in_pallet + `</b> ` + val.unit_pallet + `
                                     </td>
+                                    <td class="">
+                                        ` + val.note + `
+                                    </td>
                                     <td class="center-align">
                                         ` + val.request_date + `
                                     </td>
                                     <td class="">
-                                        ` + val.note + `
+                                        ` + val.is_urgent + `
                                     </td>
                                     <td class="center-align">
                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" data-id="` + mop.id + `" href="javascript:void(0);">
@@ -1033,16 +1127,26 @@
                                 </tr>
                             `);
                         });
-                        if(arrStok.length > 0){
-                            $('#data-foot').empty();
-                            let footer = '<ol>';
-                            for(let j=0;j<arrStok.length;j++){
-                                footer += '<li class="arr_stok" data-stock="' + arrStok[j]['stock_raw'] + '" data-item="' + arrStok[j]['item_id'] + '">Item : ' + arrStok[j]['item_name'] + ' Stok : ' + arrStok[j]['stock'] + '</li>';
-                            }
-                            footer += '</ol>';
-                            $('#data-foot').html(footer);
-                        }
-                        $('#marketing_order_plan_id').empty();
+
+                        $.each(mop.composition, function(i, val) {
+                            $.each(val, function(i, value) {
+                                listfgsfg.push({
+                                    item_id                 : value.item_id,
+                                    item_code               : value.item_code,
+                                    item_name               : value.item_name,
+                                    item_qty                : value.qty_in_uom,
+                                    item_qty_output         : value.qty_output,
+                                    item_unit               : value.unit_uom,
+                                    item_group              : value.group,
+                                    item_warehouse          : value.warehouses,
+                                    item_goal               : value.item_goal,
+                                    item_qty_proporsional   : value.qty_proporsional,
+                                    item_bom_id             : value.bom_id,
+                                });
+                            });
+                        });
+
+                        /* $('#marketing_order_plan_id').empty(); */
                     }
                 },
                 error: function() {
@@ -1325,39 +1429,35 @@
         }).then(function (willDelete) {
             if (willDelete) {
                 
-                var formData = new FormData($('#form_data')[0]), passedQty = true, passedBom = true;
+                var formData = new FormData($('#form_data')[0]), passed = true;
 
-                $('select[name^="arr_item_detail_id[]"]').each(function(index){
-                    if($(this).val()){
-                        formData.append('arr_mopd_detail[]',$(this).find(":selected").data("mopd"));
+                formData.delete("arr_item_detail_id[]");
+                formData.delete("arr_qty_detail[]");
+                formData.delete("arr_date[]");
+                formData.delete("arr_shift[]");
+                formData.delete("arr_line_id[]");
+                formData.delete("arr_group[]");
+                formData.delete("arr_warehouse_id[]");
+                formData.delete("arr_note[]");
+
+                $('input[name^="arr_select[]"]').each(function(index){
+                    if($(this).is(':checked')){
+                        let code = $(this).val();
+                        formData.append('arr_item_detail_id[]',$("#arr_item_detail_id" + code).val());
+                        formData.append('arr_qty_detail[]',$("#arr_qty_detail" + code).val());
+                        formData.append('arr_date[]',$("#arr_date" + code).val());
+                        formData.append('arr_shift[]',$("#arr_shift" + code).val());
+                        formData.append('arr_line_id[]',$("#arr_line_id" + code).val());
+                        formData.append('arr_group[]',$("#arr_group" + code).val());
+                        formData.append('arr_warehouse_id[]',$("#arr_warehouse_id" + code).val());
+                        formData.append('arr_note[]',$("#arr_note" + code).val());
+                        if(!$("#arr_item_detail_id" + code).val() || !$("#arr_qty_detail" + code).val() || !$("#arr_date" + code).val() || !$("#arr_shift" + code).val() || !$("#arr_line_id" + code).val() || !$("#arr_group" + code).val() || !$("#arr_warehouse_id" + code).val()){
+                            passed = false;
+                        }
                     }
                 });
 
-                $('.arr_status').each(function(index){
-                    if($(this).text() !== 'Cukup'){
-                        passedQty = false;
-                    }
-                });
-
-                $('input[name^="arr_bom[]"]').each(function(index){
-                    if(!$(this).val()){
-                        passedBom = false;
-                    }
-                });
-
-                if(!passedBom){
-                    swal({
-                        title: 'Ups!',
-                        text: 'Beberapa item target produksi tidak memiliki BOM. Silahkan atur pada Master Data - Produksi - BOM',
-                        icon: 'error'
-                    });
-                }else if(!passedQty){
-                    swal({
-                        title: 'Ups!',
-                        text: 'Beberapa bahan saat ini tidak memiliki stok. Silahkan hubungi pihak Purchasing.',
-                        icon: 'error'
-                    });
-                }else{
+                if(passed){
                     $.ajax({
                         url: '{{ Request::url() }}/create',
                         type: 'POST',
@@ -1421,6 +1521,12 @@
                             });
                         }
                     });
+                }else{
+                    swal({
+                        title: 'Ups!',
+                        text: 'Beberapa informasi item tidak lengkap, silahkan cek form anda.',
+                        icon: 'error'
+                    });
                 }
             }
         });
@@ -1471,45 +1577,6 @@
                     let arrStok = [];
                     $.each(response.targets, function(i, val) {
                         var count = makeid(10), checkstok = '';
-                        if(val.stock_check){
-                            let index = -1;
-                            $.each(val.stock_check, function(i, rowcek) {
-                                for(let i=0;i<arrStok.length;i++){
-                                    if(arrStok[i]['item_id'] == rowcek.item_id){
-                                        index = i;
-                                    }
-                                }
-                                if(index < 0){
-                                    arrStok.push({
-                                        'item_id'   : rowcek.item_id,
-                                        'item_name' : rowcek.item_name,
-                                        'stock'     : rowcek.stock,
-                                        'balance'   : parseFloat(rowcek.stock_raw.replaceAll(".", "").replaceAll(",",".")),
-                                        'stock_raw' : rowcek.stock_raw,
-                                    });
-                                }
-                            });
-                        }
-
-                        if(val.stock_check){
-                            checkstok += 'Bahan : <ol>';
-                            $.each(val.stock_check, function(i, detail) {
-                                for(let j=0;j<arrStok.length;j++){
-                                    if(arrStok[j]['item_id'] == detail.item_id){
-                                        let qty = parseFloat(detail.qty_raw.replaceAll(".", "").replaceAll(",","."));
-                                        let statusRow = '';
-                                        if(arrStok[j]['balance'] >= qty){
-                                            statusRow = '<span style="font-weight:800;color:green;">Cukup</span>';
-                                        }else{
-                                            statusRow = '<span style="font-weight:800;color:red;">Tidak Cukup</span>';
-                                        }
-                                        checkstok += '<li>' + detail.item_name + ' Butuh <b class="arr_needed" data-id="' + count + '" data-item="' + detail.item_id + '" data-qty="' + detail.qty_raw + '" data-unit="' + detail.unit + '">' + detail.qty + '</b> Status : <b class="arr_status">' + statusRow + '</b></li>';
-                                        arrStok[j]['balance'] -= qty;
-                                    }
-                                }
-                            });
-                            checkstok += '</ol>'
-                        }
 
                         $('#body-item').append(`
                             <tr class="row_item" data-id="` + val.id + `">
@@ -1525,25 +1592,27 @@
                                     ` + val.code + `
                                 </td>
                                 <td>
-                                    ` + val.item_name + `<br>
-                                    ` + ( val.bom_link ? '' : '<span style="color:red;font-weight:800;">Belum memiliki BOM.</span>' ) + `<br>
-                                    ` + ( val.bom_link ? checkstok : '' ) + `
+                                    ` + val.item_name + `
+                                    ` + ( val.bom_link ? '' : '<br><span style="color:red;font-weight:800;">Belum memiliki BOM.</span>' ) + `<br>
                                 </td>
                                 <td class="right-align">
                                     <b id="qty_in_sell` + count + `">` + val.qty_in_sell + `</b> ` + val.unit_sell + `
                                 </td>
                                 <td class="right-align">
-                                    <input name="arr_qty[]" id="arr_qty` + count + `" type="text" value="` + val.qty_in_uom + `" onkeyup="formatRupiahNoMinus(this);changeQty('`+ count +`')" required style="width:75%;text-align:right;" data-mopd="` + val.mopd_id + `" data-max="` + val.qty_real + `">
+                                    <input name="arr_qty[]" id="arr_qty` + count + `" type="text" value="` + val.qty_in_uom + `" onkeyup="formatRupiahNoMinus(this);" required style="width:75%;text-align:right;" data-mopd="` + val.mopd_id + `" data-max="` + val.qty_real + `" readonly>
                                     ` + val.unit_uom + `
                                 </td>
                                 <td class="right-align">
                                     <b id="qty_in_pallet` + count + `">` + val.qty_in_pallet + `</b> ` + val.unit_pallet + `
                                 </td>
+                                <td class="">
+                                    ` + val.note + `
+                                </td>
                                 <td class="center-align">
                                     ` + val.request_date + `
                                 </td>
                                 <td class="">
-                                    ` + val.note + `
+                                    ` + val.is_urgent + `
                                 </td>
                                 <td class="center-align">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" data-id="` + val.id + `" href="javascript:void(0);">
@@ -1553,16 +1622,6 @@
                             </tr>
                         `);
                     });
-
-                    if(arrStok.length > 0){
-                        $('#data-foot').empty();
-                        let footer = '<ol>';
-                        for(let j=0;j<arrStok.length;j++){
-                            footer += '<li class="arr_stok" data-stock="' + arrStok[j]['stock_raw'] + '" data-item="' + arrStok[j]['item_id'] + '">Item : ' + arrStok[j]['item_name'] + ' Stok : ' + arrStok[j]['stock'] + '</li>';
-                        }
-                        footer += '</ol>';
-                        $('#data-foot').html(footer);
-                    }
 
                     let arrItem = [];
                     $('input[name^="arr_item_id[]"]').each(function(index){
@@ -1602,7 +1661,7 @@
                                     ` + optionItem + `
                                 </td>
                                 <td class="center-align">
-                                    <input name="arr_qty_detail[]" id="arr_qty_detail` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);checkRow('` + count + `')" required style="text-align:right;">
+                                    <input name="arr_qty_detail[]" id="arr_qty_detail` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" required style="text-align:right;">
                                 </td>
                                 <td class="center-align" id="text-unit` + count + `">
                                     ` + val.unit + `

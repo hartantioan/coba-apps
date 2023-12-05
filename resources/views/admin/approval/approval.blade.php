@@ -306,18 +306,18 @@
             "scrollY": '400px',
             "responsive": false,
             "scrollX": true,
-            "stateSave": true,
+            "stateSave": $('#filter_form').val() ? false : true,
             "serverSide": true,
             "deferRender": true,
             "destroy": true,
             "iDisplayInLength": 10,
-            "order": [[0, 'asc']],
+            "order": [[0, 'desc']],
             ajax: {
                 url: '{{ Request::url() }}/datatable',
                 type: 'GET',
                 data: {
                     status : $('#filter_status').val(),
-                    form : $('#filter_form').val()
+                    type : $('#filter_form').val()
                 },
                 beforeSend: function() {
                     loadingOpen('#datatable_serverside');

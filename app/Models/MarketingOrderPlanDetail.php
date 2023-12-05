@@ -32,13 +32,6 @@ class MarketingOrderPlanDetail extends Model
         return $this->belongsTo('App\Models\Item','item_id','id')->withTrashed();
     }
 
-    public function productionScheduleDetail()
-    {
-        return $this->hasMany('App\Models\ProductionScheduleDetail')->whereHas('productionSchedule',function($query){
-            $query->whereIn('status',['2','3']);
-        });
-    }
-
     public function isUrgent(){
         $is_urgent = match ($this->is_urgent) {
             '1' => 'Ya',
@@ -51,9 +44,9 @@ class MarketingOrderPlanDetail extends Model
     public function totalScheduled()
     {
         $total = 0;
-        foreach($this->productionScheduleDetail as $row){
-            $total += $row->qty;
-        }
+        
+        //logika ter-produksi
+
         return $total;
     }
 

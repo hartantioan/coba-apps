@@ -97,6 +97,7 @@ class ItemGroupController extends Controller
                     $val->parentSub()->exists() ? $val->parentSub->name : 'is Parent',
                     $val->coa->name,
                     $val->listWarehouse(),
+                    $val->productionType(),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -144,11 +145,12 @@ class ItemGroupController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = ItemGroup::find($request->temp);
-                    $query->code        = $request->code;
-                    $query->name        = $request->name;
-                    $query->parent_id   = $request->parent_id ? $request->parent_id : NULL;
-                    $query->coa_id      = $request->coa_id;
-                    $query->status      = $request->status ? $request->status : '2';
+                    $query->code            = $request->code;
+                    $query->name            = $request->name;
+                    $query->parent_id       = $request->parent_id ? $request->parent_id : NULL;
+                    $query->coa_id          = $request->coa_id;
+                    $query->production_type = $request->production_type ? $request->production_type : NULL;
+                    $query->status          = $request->status ? $request->status : '2';
                     $query->save();
 
                     $query->itemGroupWarehouse()->delete();
@@ -161,11 +163,12 @@ class ItemGroupController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = ItemGroup::create([
-                        'code'          => $request->code,
-                        'name'			=> $request->name,
-                        'parent_id'     => $request->parent_id ? $request->parent_id : NULL,
-                        'coa_id'        => $request->coa_id,
-                        'status'        => $request->status ? $request->status : '2'
+                        'code'              => $request->code,
+                        'name'			    => $request->name,
+                        'parent_id'         => $request->parent_id ? $request->parent_id : NULL,
+                        'coa_id'            => $request->coa_id,
+                        'production_type'   => $request->production_type ? $request->production_type : NULL,
+                        'status'            => $request->status ? $request->status : '2',
                     ]);
                     DB::commit();
                 }catch(\Exception $e){

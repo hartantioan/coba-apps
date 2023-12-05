@@ -171,6 +171,12 @@
                     LAIN-LAIN
                 </div>
                 <div class="col s4">
+                    MOP
+                </div>
+                <div class="col s8">
+                    {{ $data->marketingOrderPlan->code }}
+                </div>
+                <div class="col s4">
                     Tgl.Post
                 </div>
                 <div class="col s8">
@@ -198,7 +204,7 @@
                 <tbody>
                     @foreach($data->productionScheduleTarget as $key => $row)
                     <tr>
-                        <td class="center-align">{{ ($key + 1) }}</td>
+                        <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
                         <td class="center-align">{{ $row->marketingOrderPlanDetail->marketingOrderPlan->code }}</td>
                         <td class="center-align">{{ $row->marketingOrderPlanDetail->item->name }}</td>
                         <td class="right-align">{{ number_format($row->qty,3,',','.') }}</td>
@@ -207,7 +213,7 @@
                         <td class="center-align">{{ date('d/m/y',strtotime($row->marketingOrderPlanDetail->request_date)) }}</td>
                     </tr>
                     <tr>
-                        <td colspan="7">Keterangan: {{ $row->marketingOrderPlanDetail->note }}</td>
+                        <td colspan="6">Keterangan: {{ $row->marketingOrderPlanDetail->note }}</td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -218,28 +224,35 @@
             <table class="bordered">
                 <thead>
                     <tr>
-                        <th colspan="7" class="center-align">Daftar Shift & Target Produksi</th>
+                        <th colspan="9" class="center-align">Daftar Shift & Target Produksi</th>
                     </tr>
                     <tr>
                         <th class="center-align">No.</th>
                         <th class="center-align">Tgl.Produksi</th>
                         <th class="center-align">Shift</th>
                         <th class="center-align">Item</th>
-                        <th class="center-align">MOP</th>
                         <th class="center-align">Qty</th>
                         <th class="center-align">Satuan</th>
+                        <th class="center-align">Line</th>
+                        <th class="center-align">Grup</th>
+                        <th class="center-align">Gudang</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($data->productionScheduleDetail as $key => $row)
                     <tr>
-                        <td class="center-align">{{ ($key + 1) }}</td>
+                        <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
                         <td class="center-align">{{ date('d/m/y',strtotime($row->production_date)) }}</td>
                         <td class="center-align">{{ $row->shift->code }}</td>
                         <td class="center-align">{{ $row->item->name }}</td>
-                        <td class="center-align">{{ $row->marketingOrderPlanDetail->marketingOrderPlan->code }}</td>
                         <td class="right-align">{{ number_format($row->qty,3,',','.') }}</td>
                         <td class="center-align">{{ $row->item->uomUnit->code }}</td>
+                        <td class="center-align">{{ $row->line->code }}</td>
+                        <td class="center-align">{{ $row->group }}</td>
+                        <td class="center-align">{{ $row->warehouse->code }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="8">Keterangan : {{ $row->note }}</td>
                     </tr>
                     @endforeach
                 </tbody>

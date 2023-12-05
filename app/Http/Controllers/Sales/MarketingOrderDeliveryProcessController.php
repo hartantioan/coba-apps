@@ -951,30 +951,58 @@ class MarketingOrderDeliveryProcessController extends Controller
             ];
             $string='';
             $no = 1;
+
+            $data = [];
+
             foreach($query->journal as $rowmain){
                 foreach($rowmain->journalDetail()->where(function($query){
-            $query->whereHas('coa',function($query){
-                $query->orderBy('code');
-            })
-            ->orderBy('type');
-        })->get() as $key => $row){
-                    $string .= '<tr>
-                        <td class="center-align">'.$no.'</td>
-                        <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
-                        <td class="center-align">'.$row->coa->company->name.'</td>
-                        <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
-                        <td class="center-align">'.($row->place_id ? $row->place->name : '-').'</td>
-                        <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
-                        <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
-                        <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
-                        <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
-                        <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
-                        <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
-                    </tr>';
+                    $query->whereHas('coa',function($query){
+                        $query->orderBy('code');
+                    })
+                    ->orderBy('type');
+                })->get() as $key => $row){
+
+                    $arr = [
+                        'no'        => $no,
+                        'code'      => $row->coa->code,
+                        'codename'  => $row->coa->code.' - '.$row->coa->name,
+                        'company'   => $row->coa->company->name,
+                        'account'   => $row->account_id ? $row->account->name : '-',
+                        'place'     => $row->place_id ? $row->place->name : '-',
+                        'line'      => $row->line_id ? $row->line->name : '-',
+                        'machine'   => $row->machine_id ? $row->machine->name : '-',
+                        'department'=> $row->department_id ? $row->department->name : '-',
+                        'warehouse' => $row->warehouse_id ? $row->warehouse->name : '-',
+                        'type'      => $row->type,
+                        'debit'     => $row->type == '1' ? number_format($row->nominal,2,',','.') : '',
+                        'credit'    => $row->type == '2' ? number_format($row->nominal,2,',','.') : '',
+                    ];
+
+                    $data[] = $arr;
+
                     $no++;
                 }
             }
-            $response["tbody"] = $string; 
+
+            $collection = collect($data)->sortBy('code')->sortBy('type')->values()->all();
+
+            foreach($collection as $row){
+                $string .= '<tr>
+                    <td class="center-align">'.$row['no'].'</td>
+                    <td>'.$row['codename'].'</td>
+                    <td class="center-align">'.$row['company'].'</td>
+                    <td class="center-align">'.$row['account'].'</td>
+                    <td class="center-align">'.$row['place'].'</td>
+                    <td class="center-align">'.$row['line'].'</td>
+                    <td class="center-align">'.$row['machine'].'</td>
+                    <td class="center-align">'.$row['department'].'</td>
+                    <td class="center-align">'.$row['warehouse'].'</td>
+                    <td class="right-align">'.$row['debit'].'</td>
+                    <td class="right-align">'.$row['credit'].'</td>
+                </tr>';
+            }
+
+            $response["tbody"] = $string;
         }else{
             $response = [
                 'status'  => 500,

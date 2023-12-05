@@ -39,7 +39,7 @@ class ApprovalMatrix extends Model
     }
 
     public function approvalSource(){
-        return $this->belongsTo('App\Models\ApprovalSource', 'approval_source_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\ApprovalSource');
     }
 
     public function statusApproval(){

@@ -177,6 +177,8 @@ class ItemController extends Controller
             'sell_convert'      => 'required',
             'pallet_unit'       => 'required',
             'pallet_convert'    => 'required',
+            'production_unit'   => 'required',
+            'production_convert'=> 'required',
             'tolerance_gr'      => 'required',
             'min_stock'         => 'required',
             'max_stock'         => 'required',
@@ -192,6 +194,8 @@ class ItemController extends Controller
             'sell_convert.required'     => 'Satuan konversi jual ke stok tidak boleh kosong.',
             'pallet_unit.required'      => 'Satuan pallet tidak boleh kosong.',
             'pallet_convert.required'   => 'Satuan konversi pallet ke satuan jual tidak boleh kosong.',
+            'production_unit.required'  => 'Satuan produksi tidak boleh kosong.',
+            'production_convert.required'=> 'Satuan konversi produksi ke satuan stok tidak boleh kosong.',
             'tolerance_gr.required'     => 'Toleransi penerimaan barang tidak boleh kosong.',
             'min_stock.required'        => 'Nilai minimal stock tidak boleh kosong.',
             'max_stock.required'        => 'Nilai maksimal stock tidak boleh kosong.',
@@ -217,6 +221,8 @@ class ItemController extends Controller
                     $query->sell_convert        = str_replace(',','.',str_replace('.','',$request->sell_convert));
                     $query->pallet_unit         = $request->pallet_unit;
                     $query->pallet_convert      = str_replace(',','.',str_replace('.','',$request->pallet_convert));
+                    $query->production_unit     = $request->production_unit;
+                    $query->production_convert  = str_replace(',','.',str_replace('.','',$request->production_convert));
                     $query->tolerance_gr        = str_replace(',','.',str_replace('.','',$request->tolerance_gr));
                     $query->is_inventory_item   = $request->is_inventory_item ? $request->is_inventory_item : NULL;
                     $query->is_sales_item       = $request->is_sales_item ? $request->is_sales_item : NULL;
@@ -246,6 +252,8 @@ class ItemController extends Controller
                         'sell_convert'      => str_replace(',','.',str_replace('.','',$request->sell_convert)),
                         'pallet_unit'       => $request->pallet_unit,
                         'pallet_convert'    => str_replace(',','.',str_replace('.','',$request->pallet_convert)),
+                        'production_unit'   => $request->production_unit,
+                        'production_convert'=> str_replace(',','.',str_replace('.','',$request->production_convert)),
                         'tolerance_gr'      => str_replace(',','.',str_replace('.','',$request->tolerance_gr)),
                         'is_inventory_item' => $request->is_inventory_item ? $request->is_inventory_item : NULL,
                         'is_sales_item'     => $request->is_sales_item ? $request->is_sales_item : NULL,
@@ -308,6 +316,10 @@ class ItemController extends Controller
                                 <th>1 '.$data->sellUnit->code.' = '.number_format($data->sell_convert,3,',','.').' '.$data->uomUnit->code.'</th>
                             </tr>
                             <tr>
+                                <th>Konversi Produksi ke Satuan Stok</th>
+                                <th>1 '.$data->productionUnit->code.' = '.number_format($data->production_convert,3,',','.').' '.$data->uomUnit->code.'</th>
+                            </tr>
+                            <tr>
                                 <th>Konversi Pallet ke Satuan Jual</th>
                                 <th>1 '.$data->palletUnit->code.' = '.number_format($data->pallet_convert,3,',','.').' '.$data->sellUnit->code.'</th>
                             </tr>
@@ -358,6 +370,7 @@ class ItemController extends Controller
         $item['buy_convert'] = number_format($item->buy_convert,3,',','.');
         $item['sell_convert'] = number_format($item->sell_convert,3,',','.');
         $item['pallet_convert'] = number_format($item->pallet_convert,3,',','.');
+        $item['production_convert'] = number_format($item->production_convert,3,',','.');
         $item['tolerance_gr'] = number_format($item->tolerance_gr,2,',','.');
         $item['min_stock'] = number_format($item->min_stock,3,',','.');
         $item['max_stock'] = number_format($item->max_stock,3,',','.');

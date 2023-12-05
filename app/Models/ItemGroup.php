@@ -20,6 +20,7 @@ class ItemGroup extends Model
         'name',
         'parent_id',
         'coa_id',
+        'production_type',
         'status'
     ];
 
@@ -56,5 +57,17 @@ class ItemGroup extends Model
         };
 
         return $status;
+    }
+
+    public function productionType(){
+        $production_type = match ($this->production_type) {
+          '1' => 'SFG-1',
+          '2' => 'SFG-2',
+          '3' => 'SFG-3',
+          '4' => 'FG',
+          default => ' Tidak',
+        };
+
+        return $production_type;
     }
 }

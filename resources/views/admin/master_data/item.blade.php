@@ -138,7 +138,7 @@
     </div>
 </div>
 
-<div id="modal2" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;max-width:90%;min-width:100%;width:100%;">
+<div id="modal2" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;max-width:90%;min-width:90%;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
@@ -281,6 +281,14 @@
                                     <label class="active" for="sell_unit">Satuan Jual</label>
                                 </div>
                                 <div class="input-field col s12">
+                                    <select class="select2 browser-default" id="production_unit" name="production_unit">
+                                        @foreach ($unit as $row)
+                                            <option value="{{ $row->id }}">{{ $row->name.' - '.$row->code }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="active" for="production_unit">Satuan Produksi</label>
+                                </div>
+                                <div class="input-field col s12">
                                     <select class="select2 browser-default" id="pallet_unit" name="pallet_unit">
                                         @foreach ($pallet as $row)
                                             <option value="{{ $row->id }}">{{ $row->name.' - '.$row->code }}</option>
@@ -299,12 +307,16 @@
                                     <label class="active" for="sell_convert">Konversi Satuan Jual ke Stok</label>
                                 </div>
                                 <div class="input-field col s12">
+                                    <input id="production_convert" name="production_convert" type="text" placeholder="Ex: 1 PCS = *0.5* M2 Stok" onkeyup="formatRupiah(this);">
+                                    <label class="active" for="production_convert">Konversi Satuan Produksi ke Stok</label>
+                                </div>
+                                <div class="input-field col s12">
                                     <input id="pallet_convert" name="pallet_convert" type="text" placeholder="Ex: 1 Pallet Kayu = *50* Box Keramik" onkeyup="formatRupiah(this);">
                                     <label class="active" for="pallet_convert">Konversi Pallet ke Satuan Jual</label>
                                 </div>
                             </div>
                             <div class="col s4">
-                                <div class="input-field col s12" style="top: 30px;">
+                                <div class="input-field col s12" style="top: 75px;">
                                     <select class="select2 browser-default" id="uom_unit" name="uom_unit">
                                         @foreach ($unit as $row)
                                             <option value="{{ $row->id }}">{{ $row->name.' - '.$row->code }}</option>
@@ -397,7 +409,6 @@
 
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
-            
         });
 
         $('#form_dataimport').submit(function(event) {
@@ -548,7 +559,7 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
-                $("select").prop("selectedIndex", 0).trigger('change');
+                $("#form_data > select").prop("selectedIndex", 0).trigger('change');
                 M.updateTextFields();
             }
         });
@@ -824,6 +835,8 @@
                 $('#sell_convert').val(response.sell_convert);
                 $('#pallet_unit').val(response.pallet_unit).trigger('change');
                 $('#pallet_convert').val(response.pallet_convert);
+                $('#production_unit').val(response.production_unit).trigger('change');
+                $('#production_convert').val(response.production_convert);
                 $('#warehouse_id').val(response.warehouses).trigger('change');
                 $('#tolerance_gr').val(response.tolerance_gr);
                 $('#min_stock').val(response.min_stock);

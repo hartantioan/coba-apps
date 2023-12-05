@@ -205,14 +205,17 @@ class ProductionScheduleController extends Controller
             'code_place_id'             => 'required',
             'company_id'			    => 'required',
             'place_id'		            => 'required',
+            'marketing_order_plan_id'   => 'required',
             'post_date'		            => 'required',
             'arr_id'                    => 'required|array',
             'arr_qty'                   => 'required|array',
             'arr_date'                  => 'required|array',
             'arr_shift'                 => 'required|array',
             'arr_item_detail_id'        => 'required|array',
+            'arr_line_id'               => 'required|array',
+            'arr_warehouse_id'          => 'required|array',
+            'arr_group'                 => 'required|array',
             'arr_qty_detail'            => 'required|array',
-            'arr_mopd_detail'           => 'required|array',
         ], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
             'code.string'                       => 'Kode harus dalam bentuk string.',
@@ -220,6 +223,7 @@ class ProductionScheduleController extends Controller
             'code.unique'                       => 'Kode telah dipakai',
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
             'place_id.required' 			    => 'Plant tidak boleh kosong.',
+            'marketing_order_plan_id.required'  => 'MOP tidak boleh kosong.',
             'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
             'arr_id.required'                   => 'Marketing Order Plan tidak boleh kosong.',
             'arr_id.array'                      => 'Marketing Order Plan harus array.',
@@ -231,10 +235,14 @@ class ProductionScheduleController extends Controller
             'arr_shift.array'                   => 'Shift harus array.',
             'arr_item_detail_id.required'       => 'Item dan shift tidak boleh kosong.',
             'arr_item_detail_id.array'          => 'Item dan shift harus array.',
+            'arr_line_id.required'              => 'Line tidak boleh kosong.',
+            'arr_line_id.array'                 => 'Line harus array.',
+            'arr_warehouse_id.required'         => 'Gudang tidak boleh kosong.',
+            'arr_warehouse_id.array'            => 'Gudang harus array.',
+            'arr_group.required'                => 'Grup tidak boleh kosong.',
+            'arr_group.array'                   => 'Grup harus array.',
             'arr_qty_detail.required'           => 'Qty shift tidak boleh kosong.',
             'arr_qty_detail.array'              => 'Qty shift harus array.',
-            'arr_mopd_detail.required'          => 'Shift MOP tidak boleh kosong.',
-            'arr_mopd_detail.array'             => 'Shift MOP harus array.',
         ]);
 
         if($validation->fails()) {
@@ -290,6 +298,7 @@ class ProductionScheduleController extends Controller
                         $query->code = $request->code;
                         $query->company_id = $request->company_id;
                         $query->place_id = $request->place_id;
+                        $query->marketing_order_plan_id = $request->marketing_order_plan_id;
                         $query->post_date = $request->post_date;
                         $query->document = $document;
                         $query->status = '1';
@@ -322,6 +331,7 @@ class ProductionScheduleController extends Controller
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $request->company_id,
                         'place_id'	                => $request->place_id,
+                        'marketing_order_plan_id'   => $request->marketing_order_plan_id,
                         'post_date'                 => $request->post_date,
                         'document'                  => $request->file('file') ? $request->file('file')->store('public/production_schedules') : NULL,
                         'status'                    => '1',
@@ -352,8 +362,11 @@ class ProductionScheduleController extends Controller
                             'production_date'               => $request->arr_date[$key],
                             'shift_id'                      => $row,
                             'item_id'                       => $request->arr_item_detail_id[$key],
-                            'marketing_order_plan_detail_id'=> $request->arr_mopd_detail[$key],
                             'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty_detail[$key])),
+                            'line_id'                       => $request->arr_line_id[$key],
+                            'group'                         => $request->arr_group[$key],
+                            'warehouse_id'                  => $request->arr_warehouse_id[$key],
+                            'note'                          => $request->arr_note[$key],
                         ]);
                     }
 
@@ -414,6 +427,7 @@ class ProductionScheduleController extends Controller
                 'qty_real'              => number_format($row->marketingOrderPlanDetail->qty * $row->marketingOrderPlanDetail->item->sell_convert,3,',','.'),
                 'bom_link'              => $cekBom->exists() ? $cekBom->orderByDesc('id')->first()->code : '',
                 'stock_check'           => $cekBom->exists() ? $row->marketingOrderPlanDetail->item->arrRawStock($po->place_id,$row->marketingOrderPlanDetail->qty * $row->MarketingOrderPlanDetail->item->sell_convert) : '',
+                'is_urgent'             => $row->marketingOrderPlanDetail->isUrgent(),
             ];
         }
 
@@ -490,28 +504,39 @@ class ProductionScheduleController extends Controller
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="7">Daftar Shift & Target Produksi</th>
+                                <th class="center-align" colspan="11">Daftar Shift & Target Produksi</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
-                                <th class="center-align">Tgl.Produksi</th>
-                                <th class="center-align">Shift</th>
                                 <th class="center-align">Item</th>
-                                <th class="center-align">MOP</th>
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
+                                <th class="center-align">Gudang</th>
+                                <th class="center-align">Tgl.Produksi</th>
+                                <th class="center-align">Shift</th>
+                                <th class="center-align">Line</th>
+                                <th class="center-align">Grup</th>
+                                <th class="center-align">NO PDO</th>
+                                <th class="center-align">Status</th>
                             </tr>
                         </thead><tbody>';
 
         foreach($data->productionScheduleDetail as $key => $row){
             $string .= '<tr>
-                <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.date('d/m/y',strtotime($row->production_date)).'</td>
-                <td class="center-align">'.$row->shift->code.'</td>
-                <td class="center-align">'.$row->item->name.'</td>
-                <td class="center-align">'.$row->marketingOrderPlanDetail->marketingOrderPlan->code.'</td>
+                <td class="center-align" rowspan="2">'.($key + 1).'</td>
+                <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
                 <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->item->uomUnit->code.'</td>
+                <td class="center-align">'.$row->warehouse->code.'</td>
+                <td class="center-align">'.date('d/m/y',strtotime($row->production_date)).'</td>
+                <td class="center-align">'.$row->shift->code.'</td>
+                <td class="center-align">'.$row->line->code.'</td>
+                <td class="center-align">'.$row->group.'</td>
+                <td class="center-align">-</td>
+                <td class="center-align">'.$row->status().'</td>
+            </tr>
+            <tr>
+                <td colspan="10">Keterangan : '.$row->note.'</td>
             </tr>';
         }
 

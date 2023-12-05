@@ -25,6 +25,8 @@ class Item extends Model
         'sell_convert',
         'pallet_unit',
         'pallet_convert',
+        'production_unit',
+        'production_convert',
         'tolerance_gr',
         'is_inventory_item',
         'is_sales_item',
@@ -66,6 +68,7 @@ class Item extends Model
         foreach($this->itemGroup->itemGroupWarehouse as $row){
             $arr[] = [
                 'id'    => $row->warehouse_id,
+                'code'  => $row->warehouse->code,
                 'name'  => $row->warehouse->name,
             ];
         }
@@ -87,6 +90,10 @@ class Item extends Model
     
     public function sellUnit(){
         return $this->belongsTo('App\Models\Unit', 'sell_unit', 'id')->withTrashed();
+    }
+
+    public function productionUnit(){
+        return $this->belongsTo('App\Models\Unit', 'production_unit', 'id')->withTrashed();
     }
 
     public function status(){
@@ -293,6 +300,18 @@ class Item extends Model
     public function bomPlace($place_id)
     {
         return $this->hasMany('App\Models\Bom','item_id','id')->where('place_id',intval($place_id))->where('status','1');
+    }
+
+    public function bom()
+    {
+        return $this->hasMany('App\Models\Bom','item_id','id')->where('status','1');
+    }
+
+    public function bomDetail()
+    {
+        return $this->hasMany('App\Models\BomDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('bom',function($query){
+            $query->where('status','1');
+        });
     }
 
     public function arrRawStock($place_id,$qty){

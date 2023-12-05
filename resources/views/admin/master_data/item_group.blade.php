@@ -73,6 +73,7 @@
                                                         <th>Parent</th>
                                                         <th>Coa</th>
                                                         <th>Gudang</th>
+                                                        <th>Tipe Produksi</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -155,6 +156,16 @@
                                     Active
                                 </label>
                             </div>
+                        </div>
+                        <div class="input-field col s6">
+                            <select class="browser-default" id="production_type" name="production_type">
+                                <option value="">Bukan Item Produksi</option>
+                                <option value="1">SFG-1</option>
+                                <option value="2">SFG-2</option>
+                                <option value="3">SFG-3</option>
+                                <option value="4">FG</option>
+                            </select>
+                            <label class="active" for="production_type">Tipe Produksi</label>
                         </div>
                         <div class="col s12 mt-3">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
@@ -256,6 +267,7 @@
                 { name: 'parent', className: '' },
                 { name: 'coa', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'warehouse_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'production_type', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -397,6 +409,7 @@
                 $('#name').val(response.name);
                 $('#parent_id').val(response.parent_id).trigger('change');
                 $('#coa_id').val(response.coa_id).trigger('change');
+                $('#production_type').val(response.production_type);
                 $('#warehouse_id').val(response.warehouses).trigger('change');
 
                 if(response.status == '1'){

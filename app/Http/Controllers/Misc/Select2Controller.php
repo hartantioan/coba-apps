@@ -263,6 +263,7 @@ class Select2Controller extends Controller {
                 'code'              => $d->code,
                 'name'              => $d->name,
                 'uom'               => $d->uomUnit->code,
+                'production'        => $d->productionUnit->code,
                 'price_list'        => $d->currentCogs($this->dataplaces),
                 'stock_list'        => $d->currentStock($this->dataplaces,$this->datawarehouses),
                 'list_warehouse'    => $d->warehouseList(),
@@ -2270,12 +2271,14 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             if($d->balanceQty() > 0){
                 $details = [];
+                $composition = [];
 
                 foreach($d->MarketingOrderPlanDetail as $row){
                     $cekBom = $row->item->bomPlace($request->place_id);
                     $details[] = [
                         'mopd_id'           => $row->id,
                         'item_id'           => $row->item_id,
+                        'item_code'         => $row->item->code,
                         'item_name'         => $row->item->name,
                         'qty_in_sell'       => number_format($row->qty,3,',','.'),
                         'qty_in_uom'        => number_format($row->qty * $row->item->sell_convert,3,',','.'),
@@ -2288,8 +2291,14 @@ class Select2Controller extends Controller {
                         'request_date'      => date('d/m/y',strtotime($row->request_date)),
                         'note'              => $row->note,
                         'bom_link'          => $cekBom->exists() ? $cekBom->orderByDesc('id')->first()->code : '',
-                        'stock_check'       => $cekBom->exists() ? $row->item->arrRawStock($request->place_id,$row->qty * $row->item->sell_convert) : '',
+                        'is_urgent'         => $row->isUrgent(),
+                        'group'             => $row->item->itemGroup->production_type,
+                        'warehouses'        => $row->item->warehouseList(),
+                        'bom_id'            => $cekBom->exists() ? $cekBom->orderByDesc('id')->first()->id : '',
                     ];
+                    if($cekBom->exists()){
+                        $composition[] = $cekBom->orderByDesc('id')->first()->arrAvailableComposition();
+                    }
                 }
                 $response[] = [
                     'id'   			=> $d->id,
@@ -2297,6 +2306,7 @@ class Select2Controller extends Controller {
                     'table'         => $d->getTable(),
                     'details'       => $details,
                     'code'          => $d->code,
+                    'composition'   => $composition,
                 ];
             }
         }

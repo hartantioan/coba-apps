@@ -281,7 +281,7 @@
                         <tbody>
                             @foreach($data->productionScheduleTarget as $key => $row)
                             <tr>
-                                <td align="center">{{ ($key + 1) }}</td>
+                                <td align="center" rowspan="2">{{ ($key + 1) }}</td>
                                 <td align="center">{{ $row->marketingOrderPlanDetail->marketingOrderPlan->code }}</td>
                                 <td align="">{{ $row->marketingOrderPlanDetail->item->name }}</td>
                                 <td align="right">{{ number_format($row->qty,3,',','.') }}</td>
@@ -290,7 +290,7 @@
                                 <td align="center">{{ date('d/m/y',strtotime($row->marketingOrderPlanDetail->request_date)) }}</td>
                             </tr>
                             <tr>
-                                <td colspan="7">Keterangan: {{ $row->marketingOrderPlanDetail->note }}</td>
+                                <td colspan="6">Keterangan: {{ $row->marketingOrderPlanDetail->note }}</td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -301,28 +301,35 @@
                     <table class="bordered" border="1" width="100%" class="table-data-item" style="border-collapse:collapse">
                         <thead>
                             <tr>
-                                <th colspan="7" class="center-align">Daftar Shift & Target Produksi</th>
+                                <th colspan="9" class="center-align">Daftar Shift & Target Produksi</th>
                             </tr>
                             <tr>
                                 <th align="center">No.</th>
                                 <th align="center">Tgl.Produksi</th>
                                 <th align="center">Shift</th>
                                 <th align="center">Item</th>
-                                <th align="center">MOP</th>
                                 <th align="center">Qty</th>
                                 <th align="center">Satuan</th>
+                                <th align="center">Line</th>
+                                <th align="center">Grup</th>
+                                <th align="center">Gudang</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($data->productionScheduleDetail as $key => $row)
                             <tr>
-                                <td align="center">{{ ($key + 1) }}</td>
+                                <td align="center" rowspan="2">{{ ($key + 1) }}</td>
                                 <td align="center">{{ date('d/m/y',strtotime($row->production_date)) }}</td>
                                 <td align="center">{{ $row->shift->code }}</td>
                                 <td align="center">{{ $row->item->name }}</td>
-                                <td align="center">{{ $row->marketingOrderPlanDetail->marketingOrderPlan->code }}</td>
                                 <td align="right">{{ number_format($row->qty,3,',','.') }}</td>
                                 <td align="center">{{ $row->item->uomUnit->code }}</td>
+                                <td align="center">{{ $row->line->code }}</td>
+                                <td align="center">{{ $row->group }}</td>
+                                <td align="center">{{ $row->warehouse->code }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="8">Keterangan : {{ $row->note }}</td>
                             </tr>
                             @endforeach
                         </tbody>

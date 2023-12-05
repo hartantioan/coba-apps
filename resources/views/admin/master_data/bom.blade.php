@@ -138,13 +138,13 @@
                         </div>
                         <div class="input-field col s4">
                             <input id="qty_output" name="qty_output" type="text" placeholder="Qty Output" onkeyup="formatRupiah(this)">
-                            <label class="active" for="qty_output">Qty Output</label>
-                            <div class="form-control-feedback uom-unit">-</div>
+                            <label class="active" for="qty_output">Qty Output (Satuan Produksi)</label>
+                            <div class="form-control-feedback production-unit">-</div>
                         </div>
                         <div class="input-field col s4">
                             <input id="qty_planned" name="qty_planned" type="text" placeholder="Rata-rata Qty Produksi" onkeyup="formatRupiah(this)">
-                            <label class="active" for="qty_planned">Rata-rata Qty Produksi</label>
-                            <div class="form-control-feedback uom-unit">-</div>
+                            <label class="active" for="qty_planned">Rata-rata Qty Produksi (Satuan Produksi)</label>
+                            <div class="form-control-feedback production-unit">-</div>
                         </div>
                         <div class="input-field col s4">
                             <select class="form-control" id="type" name="type">
@@ -195,7 +195,7 @@
                                     <tr>
                                         <th class="center">Bahan/Biaya</th>
                                         <th class="center">Qty</th>
-                                        <th class="center">Satuan</th>
+                                        <th class="center">Satuan (Produksi)</th>
                                         <th class="center">Nominal</th>
                                         <th class="center">Total</th>
                                         <th class="center">Deskripsi</th>
@@ -375,7 +375,7 @@
 
     function getRowUnit(val){
         if($("#arr_detail" + val).val()){
-            $('#arr_satuan' + val).text($("#arr_detail" + val).select2('data')[0].uom);
+            $('#arr_satuan' + val).text($("#arr_detail" + val).select2('data')[0].production);
         }else{
             $('#arr_satuan' + val).text('-');
         }
@@ -384,7 +384,7 @@
     function getCodeAndName(){
         $('#code').val($("#item_id").select2('data')[0].code);
         $('#name').val($("#item_id").select2('data')[0].name);
-        $('.uom-unit').text($("#item_id").select2('data')[0].uom);
+        $('.production-unit').text($("#item_id").select2('data')[0].production);
     }
 
     function rowDetail(data) {

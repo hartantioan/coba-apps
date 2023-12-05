@@ -98,8 +98,6 @@
                                 $('#Location').append(response.city+` /`+response.locality);
                                 $('#Province').append(response.principalSubdivision);
                                 location_form = response.city+' / '+response.locality+'  '+response.principalSubdivision;
-                                // loadingClose('#currency_rate');
-                                // $('#currency_rate').val(formatRupiahIni(parseFloat(response.data.IDR).toFixed(2).toString().replace('.',',')));
                             },
                             error: function() {
                                 swal({
@@ -117,7 +115,6 @@
                     marker.bindPopup("You are here!").openPopup();
                 },
                 function (error) {
-                    // Failure: User denied permission or there was an error
                     switch (error.code) {
                         case error.PERMISSION_DENIED:
                             console.error("User denied the request for Geolocation.");
@@ -134,26 +131,29 @@
                     }
                 },
                 { 
-                    enableHighAccuracy: true, // Enable high accuracy mode
-                    maximumAge: 0, // Maximum age of cached position (set to 0 to force a fresh location)
-                    timeout: 10000 // Timeout duration in milliseconds (10 seconds in this case)
+                    enableHighAccuracy: true,
+                    maximumAge: 0, 
+                    timeout: 10000
                 }
             );
         } else {
-            // Geolocation is not supported or denied by the browser
             console.error("Geolocation is not supported by this browser.");
         }
     });
 
-    // Initialize and add the map
-    function updateDateTime() {
-        const now = new Date();
-        const dateTime = now.toLocaleString(); // Get date and time in local time format
-        document.getElementById('liveDateTime').textContent = dateTime;
+    let now = new Date("{{ date('Y/m/d H:i:s') }}");
+
+    /* function updateDateTime() {
+        now.setSeconds(now.getSeconds() + 1000);
+        document.getElementById('liveDateTime').textContent = now.toLocaleString();
     }
 
-    // Update date and time every second
-    setInterval(updateDateTime, 1000);
+    setInterval(updateDateTime, 1000); */
+
+    setInterval(function() {
+        now.setSeconds(now.getSeconds() + 1);
+        document.getElementById('liveDateTime').textContent = now.getHours() +':' + now.getMinutes() + ':' + now.getSeconds();
+    }, 1000);
 
     function save(){
         console.log(location_form +' ' + lat + ' ' + long +'');
@@ -206,8 +206,5 @@
             }
         });
     }
-
-    
-
    
 </script>

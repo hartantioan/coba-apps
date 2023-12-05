@@ -74,6 +74,21 @@ class Place extends Model
         return $this->hasMany('App\Models\Line')->where('status','1');
     }
 
+    public function lines(){
+        $arr = [];
+
+        foreach($this->line as $row){
+            $arr[] = [
+                'id'        => $row->id,
+                'code'      => $row->code,
+                'name'      => $row->name,
+                'note'      => $row->note,
+            ];
+        }
+
+        return json_encode($arr);
+    }
+
     public function machine(){
         $arr = [];
 

@@ -20,6 +20,7 @@ class ProductionSchedule extends Model
         'user_id',
         'company_id',
         'place_id',
+        'marketing_order_plan_id',
         'post_date',
         'document',
         'status',
@@ -31,6 +32,11 @@ class ProductionSchedule extends Model
     public function user()
     {
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
+    }
+
+    public function marketingOrderPlan()
+    {
+        return $this->belongsTo('App\Models\MarketingOrderPlan', 'marketing_order_plan_id', 'id')->withTrashed();
     }
 
     public function voidUser()

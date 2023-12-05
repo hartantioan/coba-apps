@@ -270,9 +270,9 @@ class ApprovalController extends Controller
                     $query->where('status', $request->status);
                 }
 
-                if($request->form){
+                if($request->type){
                     $query->whereHas('approvalSource',function($query)use($request){
-                        $query->where('lookable_type',$request->form);
+                        $query->where('lookable_type',$request->type);
                     });
                 }
             })
@@ -306,9 +306,9 @@ class ApprovalController extends Controller
                     $query->where('status', $request->status);
                 }
 
-                if($request->form){
+                if($request->type){
                     $query->whereHas('approvalSource',function($query)use($request){
-                        $query->where('lookable_type',$request->form);
+                        $query->where('lookable_type',$request->type);
                     });
                 }
             })

@@ -156,7 +156,6 @@
     }, 1000);
 
     function save(){
-        console.log(location_form +' ' + lat + ' ' + long +'');
         $.ajax({
             url: '{{ Request::url() }}/create',
             type: 'POST',

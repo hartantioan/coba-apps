@@ -5,11 +5,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\MarketingOrderPlan;
 use App\Models\MarketingOrderPlanDetail;
-use App\Models\MarketingOrderInvoice;
-use App\Models\IncomingPayment;
-use App\Models\MarketingOrderDownPayment;
-use App\Models\MarketingOrderDelivery;
-use App\Models\MarketingOrder;
 use App\Models\Place;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
@@ -20,6 +15,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
+use App\Models\Menu;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 class MarketingOrderPlanController extends Controller
@@ -36,6 +32,9 @@ class MarketingOrderPlanController extends Controller
     }
     public function index(Request $request)
     {
+        $lastSegment = request()->segment(count(request()->segments()));
+       
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => 'Marketing Order Produksi',
             'content'       => 'admin.production.plan',
@@ -44,7 +43,7 @@ class MarketingOrderPlanController extends Controller
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-            'newcode'       => 'MOPL-'.date('y'),
+            'newcode'       =>  $menu->document_code.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

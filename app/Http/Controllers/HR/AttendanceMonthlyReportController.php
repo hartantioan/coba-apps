@@ -21,7 +21,7 @@ class AttendanceMonthlyReportController extends Controller
             'title'         => 'Rekap Periode',
             'user'          =>  User::where('type','1')->where('status',1)->get(),
             'content'       => 'admin.hr.attendance_monthly_report',
-            'code'          => $request->code ? CustomHelper::decrypt($request->code) : ''
+            'code'          => $code
         ];
         if($code){
             $attendance_period = AttendancePeriod::find($code);

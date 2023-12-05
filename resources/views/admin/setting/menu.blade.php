@@ -105,6 +105,21 @@
                             <label class="active" for="url">Url</label>
                         </div>
                         <div class="input-field col s6">
+                            <input id="document_code" name="document_code" type="text" placeholder="Kode Dokumen">
+                            <label class="active" for="document_code"></label>
+                        </div>
+                        <div class="input-field col s6">
+                            <select class="form-control" id="type" name="type" onchange="needCode()">
+                                
+                                <option value="1">Transaksi</option>
+                                <option value="2">Master Data</option>
+                                <option value="3">Kosong</option>
+                                
+                            </select>
+                            <label class="" for="type">Tipe Menu</label>
+                        </div>
+                        
+                        <div class="input-field col s6">
                             <select class="select2 browser-default" id="parent_id" name="parent_id">
                                 <option value="">Parent (Utama)</option>
                                 @foreach($menus as $m)
@@ -370,6 +385,15 @@
         loadDataTable();
         $('#modal1').modal('close'); */
         location.reload();
+    }
+
+    function needCode(){
+        if( $('#type').val() == 1){
+            $('#document_code').show();
+        }else{
+            $('#document_code').val('');
+            $('#document_code').hide();
+        }
     }
 
     function show(id){

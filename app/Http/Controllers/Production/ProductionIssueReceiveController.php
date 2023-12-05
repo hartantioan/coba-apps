@@ -3,10 +3,18 @@
 namespace App\Http\Controllers\Production;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Models\IncomingPayment;
 use App\Models\MarketingOrderPlan;
 use App\Models\ProductionSchedule;
 use App\Models\ProductionIssueReceive;
 use App\Models\ProductionIssueReceiveDetail;
+use App\Models\Menu;
+use App\Models\MarketingOrder;
+use App\Models\MarketingOrderDelivery;
+use App\Models\MarketingOrderDownPayment;
+use App\Models\MarketingOrderInvoice;
+
+use App\Models\MarketingOrderPlanDetail;
 use App\Models\Place;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
@@ -33,7 +41,9 @@ class ProductionIssueReceiveController extends Controller
     }
     public function index(Request $request)
     {
-
+        $lastSegment = request()->segment(count(request()->segments()));
+       
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => 'Issue Receive',
             'content'       => 'admin.production.issue_receive',
@@ -42,7 +52,7 @@ class ProductionIssueReceiveController extends Controller
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-            'newcode'       => 'PRIR-'.date('y'),
+            'newcode'       =>  $menu->document_code.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -536,14 +546,6 @@ class ProductionIssueReceiveController extends Controller
         $query = ProductionIssueReceive::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
-
-            if(!CustomHelper::checkLockAcc($query->post_date)){
-                return response()->json([
-                    'status'  => 500,
-                    'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
-                ]);
-            }
-
             if(in_array($query->status,['4','5'])){
                 $response = [
                     'status'  => 500,

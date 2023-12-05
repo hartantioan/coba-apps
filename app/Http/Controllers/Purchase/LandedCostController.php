@@ -42,7 +42,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
-
+use App\Models\Menu;
 use App\Models\LandedCostDetail;
 use App\Models\LandedCostFeeDetail;
 use App\Models\PurchaseOrder;
@@ -66,6 +66,9 @@ class LandedCostController extends Controller
     
     public function index(Request $request)
     {
+        $lastSegment = request()->segment(count(request()->segments()));
+       
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => 'Landed Cost',
             'content'       => 'admin.purchase.landed_cost',
@@ -77,7 +80,7 @@ class LandedCostController extends Controller
             'landedcostfee' => LandedCostFee::where('status','1')->get(),
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-            'newcode'       => 'LNDC-'.date('y'),
+            'newcode'       =>  $menu->document_code.date('y'),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
         ];
 

@@ -17,7 +17,7 @@ use App\Models\MarketingOrderHandoverInvoice;
 use Illuminate\Support\Str;
 use App\Models\MarketingOrderInvoiceDetail;
 use App\Models\MarketingOrderMemo;
-
+use App\Models\Menu;
 use App\Models\MarketingOrderReturn;
 use App\Models\Place;
 use Illuminate\Http\Request;
@@ -46,6 +46,9 @@ class MarketingOrderHandoverReceiptController extends Controller
     
     public function index(Request $request)
     {
+        $lastSegment = request()->segment(count(request()->segments()));
+       
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => 'Tanda Terima Kwitansi',
             'content'       => 'admin.sales.handover_receipt',
@@ -54,7 +57,7 @@ class MarketingOrderHandoverReceiptController extends Controller
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-            'newcode'       => 'MOHR-'.date('y'),
+            'newcode'       => $menu->document_code.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

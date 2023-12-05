@@ -22,6 +22,8 @@ class Menu extends Model
         'icon',
         'table_name',
         'parent_id',
+        'type',
+        'document_code',
         'order',
         'status',
         'is_maintenance',

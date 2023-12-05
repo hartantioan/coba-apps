@@ -23,6 +23,7 @@ use App\Models\PurchaseInvoice;
 use App\Models\PurchaseMemo;
 use App\Models\PurchaseOrderDetail;
 use App\Models\UserDateUser;
+use App\Models\Menu;
 use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Date;
@@ -57,7 +58,9 @@ class PurchaseRequestController extends Controller
     }
     public function index(Request $request)
     {
-
+        $lastSegment = request()->segment(count(request()->segments()));
+       
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'     => 'Purchase Request',
             'content'   => 'admin.purchase.request',
@@ -69,7 +72,7 @@ class PurchaseRequestController extends Controller
             'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
-            'newcode'   => 'PRQS-'.date('y'),
+            'newcode'   =>  $menu->document_code.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

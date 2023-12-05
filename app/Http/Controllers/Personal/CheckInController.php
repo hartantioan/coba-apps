@@ -20,6 +20,7 @@ class CheckInController extends Controller
             'title'         => 'Absensi - Personal',
             'content'       => 'admin.personal.check_in',
             'data_user'     => User::find(session('bo_id')),
+            'serverTime' => Carbon::now()->toIso8601String(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -42,11 +43,13 @@ class CheckInController extends Controller
             ];
         }else {
             DB::beginTransaction();
+            $now = Carbon::now();
+            $formattedDateTime = $now->format('Y-m-d\TH:i:s.uP');
             try {
                 $query = Attendances::create([
                     'code'			                => $request->code,
                     'employee_no'		            => session('bo_employee_no'),
-                    'date'                          => Carbon::now(),
+                    'date'                          => $formattedDateTime,
                     'verify_type'	                => '4',
                     'location'                      => $request->location,
                     'latitude'                      => $request->latitude,

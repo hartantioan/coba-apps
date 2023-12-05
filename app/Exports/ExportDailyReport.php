@@ -27,8 +27,7 @@ class ExportDailyReport implements FromView,ShouldAutoSize,WithTitle
         
         $query_data_daily = AttendanceDailyReports::where(function($query)  {
             if($this->period_id) {
-                $query->where('period_id', $this->period_id)
-                ->where('id',1);
+                $query->where('period_id', $this->period_id);
             }
         })
         ->orderBy('id','ASC')

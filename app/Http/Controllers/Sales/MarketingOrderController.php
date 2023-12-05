@@ -32,6 +32,7 @@ use App\Models\Currency;
 use App\Helpers\CustomHelper;
 use App\Models\User;
 use App\Models\Tax;
+use App\Models\Menu;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -54,6 +55,9 @@ class MarketingOrderController extends Controller
     }
     public function index(Request $request)
     {
+        $lastSegment = request()->segment(count(request()->segments()));
+       
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => 'Sales Order',
             'content'       => 'admin.sales.order',
@@ -65,7 +69,7 @@ class MarketingOrderController extends Controller
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-            'newcode'       => 'SORD-'.date('y'),
+            'newcode'       => $menu->document_code.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

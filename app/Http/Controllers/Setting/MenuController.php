@@ -167,20 +167,42 @@ class MenuController extends Controller
     }
 
     public function create(Request $request){
-        $validation = Validator::make($request->all(), [
-			'name' 				=> 'required',
-			'url'			    => $request->temp ? ['required', Rule::unique('menus', 'url')->ignore($request->temp)] : 'required|unique:menus,url',
-			'icon'		        => 'required',
-			'order'		        => 'required',
-            'whitelist'         => $request->maintenance ? 'required' : '',
-		], [
-			'name.required' 					=> 'Nama menu tidak boleh kosong.',
-			'url.required' 					    => 'Url tidak boleh kosong.',
-            'url.unique'                        => 'Url telah terpakai',
-			'icon.required'			            => 'Icon tidak boleh kosong.',
-			'order.required'				    => 'Urutan tidak boleh kosong.',
-            'whitelist.required'                => 'Whitelist IP tidak boleh kosong.',
-		]);
+        if($request->type == 1){
+            $validation = Validator::make($request->all(), [
+                'name' 				=> 'required',
+                'url'			    => $request->temp ? ['required', Rule::unique('menus', 'url')->ignore($request->temp)] : 'required|unique:menus,url',
+                'icon'		        => 'required',
+                'order'		        => 'required',
+                
+                'whitelist'         => $request->maintenance ? 'required' : '',
+            ], [
+                'name.required' 					=> 'Nama menu tidak boleh kosong.',
+                'url.required' 					    => 'Url tidak boleh kosong.',
+                'url.unique'                        => 'Url telah terpakai',
+                'icon.required'			            => 'Icon tidak boleh kosong.',
+                'order.required'				    => 'Urutan tidak boleh kosong.',
+                
+                'whitelist.required'                => 'Whitelist IP tidak boleh kosong.',
+            ]);
+        }else{
+            $validation = Validator::make($request->all(), [
+                'name' 				=> 'required',
+                'url'			    => $request->temp ? ['required', Rule::unique('menus', 'url')->ignore($request->temp)] : 'required|unique:menus,url',
+                'icon'		        => 'required',
+                'order'		        => 'required',
+                'document_code'     => 'required',
+                'whitelist'         => $request->maintenance ? 'required' : '',
+            ], [
+                'name.required' 					=> 'Nama menu tidak boleh kosong.',
+                'url.required' 					    => 'Url tidak boleh kosong.',
+                'url.unique'                        => 'Url telah terpakai',
+                'icon.required'			            => 'Icon tidak boleh kosong.',
+                'order.required'				    => 'Urutan tidak boleh kosong.',
+                'document_code.required'            => 'Kode Dokumen harus diisi',
+                'whitelist.required'                => 'Whitelist IP tidak boleh kosong.',
+            ]);
+        }
+        
 
         if($validation->fails()) {
             $response = [
@@ -271,6 +293,8 @@ class MenuController extends Controller
                     $query->table_name = $request->table_name;
                     $query->parent_id = $request->parent_id ? $request->parent_id : NULL;
                     $query->order = $request->order;
+                    $query->type  = $request->type;
+                    $query->document_code = $request->document_code;
                     $query->status = $request->status ? $request->status : '2';
                     $query->is_maintenance = $request->maintenance ? $request->maintenance : NULL;
                     $query->is_new = $request->new ? $request->new : NULL;
@@ -303,6 +327,8 @@ class MenuController extends Controller
                         'table_name'	    => $request->table_name,
                         'parent_id'	        => $request->parent_id ? $request->parent_id : NULL,
                         'order'             => $request->order,
+                        'type'              => $request->type,
+                        'document_code'     => $request->document_code,
                         'status'            => $request->status ? $request->status : '2',
                         'is_maintenance'    => $request->maintenance ? $request->maintenance : NULL,
                         'is_new'            => $request->new ? $request->new : NULL,

@@ -18,6 +18,7 @@ use App\Models\ProductionScheduleTarget;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
 use App\Models\User;
+use App\Models\Menu;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -41,7 +42,9 @@ class ProductionScheduleController extends Controller
     public function index(Request $request)
     {
         $places = Place::where('status','1')->whereIn('id',$this->dataplaces)->get();
-
+        $lastSegment = request()->segment(count(request()->segments()));
+       
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => 'Jadwal Produksi',
             'content'       => 'admin.production.schedule',
@@ -50,7 +53,7 @@ class ProductionScheduleController extends Controller
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-            'newcode'       => 'PRSC-'.date('y'),
+            'newcode'       =>  $menu->document_code.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

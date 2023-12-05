@@ -7,6 +7,7 @@ use App\Models\ItemCogs;
 use App\Models\ItemStock;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseRequest;
+use App\Models\Task;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -28,7 +29,12 @@ class DashboardController extends Controller
         ];
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
-        
+        if(session('bo_reminder')){
+            $query_reminder = Task::whereIn('id',session('bo_reminder'))->get();
+            if($query_reminder){
+                $data['reminder'] = $query_reminder;
+            }
+        }
         // Calculate the start and end dates
         $startDate = Carbon::create($currentYear, $currentMonth - 1, 21);
         $endDate = Carbon::create($currentYear, $currentMonth, 20);

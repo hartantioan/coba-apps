@@ -13,7 +13,7 @@ use App\Models\MarketingOrderDownPayment;
 use App\Models\MarketingOrderInvoice;
 use Illuminate\Support\Str;
 use App\Models\MarketingOrderDeliveryProcess;
-
+use App\Models\Menu;
 use App\Models\MarketingOrderHandoverInvoice;
 use App\Models\MarketingOrderHandoverReceipt;
 
@@ -49,6 +49,9 @@ class MarketingOrderDeliveryController extends Controller
     
     public function index(Request $request)
     {
+        $lastSegment = request()->segment(count(request()->segments()));
+       
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => 'Marketing Order Delivery',
             'content'       => 'admin.sales.order_delivery',
@@ -57,7 +60,7 @@ class MarketingOrderDeliveryController extends Controller
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-            'newcode'       => 'MORD-'.date('y'),
+            'newcode'       => $menu->document_code.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

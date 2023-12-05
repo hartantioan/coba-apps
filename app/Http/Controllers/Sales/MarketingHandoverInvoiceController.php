@@ -22,6 +22,7 @@ use App\Models\Place;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
 use App\Models\User;
+use App\Models\Menu;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -45,6 +46,9 @@ class MarketingHandoverInvoiceController extends Controller
     
     public function index(Request $request)
     {
+        $lastSegment = request()->segment(count(request()->segments()));
+       
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => 'Tanda Terima Invoice',
             'content'       => 'admin.sales.handover_invoice',
@@ -53,7 +57,7 @@ class MarketingHandoverInvoiceController extends Controller
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-            'newcode'       => 'MOHI-'.date('y'),
+            'newcode'       => $menu->document_code.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

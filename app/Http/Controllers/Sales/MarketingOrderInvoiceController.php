@@ -21,6 +21,7 @@ use App\Models\TaxSeries;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
 use App\Models\User;
+use App\Models\Menu;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -47,6 +48,9 @@ class MarketingOrderInvoiceController extends Controller
     
     public function index(Request $request)
     {
+        $lastSegment = request()->segment(count(request()->segments()));
+       
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => 'AR Invoice',
             'content'       => 'admin.sales.order_invoice',
@@ -55,7 +59,7 @@ class MarketingOrderInvoiceController extends Controller
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-            'newcode'       => 'SINV-'.date('y'),
+            'newcode'       => $menu->document_code.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

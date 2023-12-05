@@ -24,7 +24,7 @@ use App\Models\PurchaseOrderDetail;
 use App\Models\MarketingOrderDeliveryProcess;
 
 use App\Models\Place;
-
+use App\Models\Menu;
 use App\Models\UsedData;
 use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
@@ -62,6 +62,9 @@ class PurchaseOrderController extends Controller
     }
     public function index(Request $request)
     {
+        $lastSegment = request()->segment(count(request()->segments()));
+       
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => 'Purchase Order',
             'content'       => 'admin.purchase.order',
@@ -76,7 +79,7 @@ class PurchaseOrderController extends Controller
             'machine'       => Machine::where('status','1')->get(),
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-            'newcode'       => 'PORD-'.date('y'),
+            'newcode'       => $menu->document_code.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

@@ -35,6 +35,7 @@
                                 <span class="avatar-status avatar-online"><img src="{{ session('bo_photo') }}" alt="avatar"><i></i></span>
                             </a>
                         </li>
+                        
                     </ul>
                     <!-- notifications-dropdown-->
                     <ul class="dropdown-content" id="notifications-dropdown" style="max-height:550px !important;">
@@ -62,6 +63,9 @@
                                     <i class="material-icons" style="margin-right: 0rem !important;width: auto !important;padding:2px 0px 2px 0px !important;margin-top: -20px;">build</i>
                                 </span> --}}
                             </a>
+                        </li>
+                        <li>
+                            <a class="grey-text text-darken-1" href="{{ url('admin/personal/task') }}"><i class="material-icons">add_alert</i> Obrolan</a>
                         </li>
                         <li>
                             <a class="grey-text text-darken-1" href="{{ url('admin/personal/check_in') }}"><i class="material-icons">person_pin_circle</i> Absensi </a>

@@ -18,6 +18,7 @@ use App\Models\MarketingOrderReceipt;
 use App\Models\MarketingOrderReturn;
 use App\Models\MarketingOrderMemoDetail;
 use App\Models\Place;
+use App\Models\Menu;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
 use App\Models\Tax;
@@ -49,6 +50,9 @@ class MarketingOrderMemoController extends Controller
     
     public function index(Request $request)
     {
+        $lastSegment = request()->segment(count(request()->segments()));
+       
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => 'AR Credit Memo',
             'content'       => 'admin.sales.order_memo',
@@ -57,7 +61,7 @@ class MarketingOrderMemoController extends Controller
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-            'newcode'       => 'SMMO-'.date('y'),
+            'newcode'       => $menu->document_code.date('y'),
             'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
         ];
 

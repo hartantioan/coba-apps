@@ -121,7 +121,7 @@ class PlaceController extends Controller
                     $val->type(),
                     $val->province->name,
                     $val->city->name,
-                    $val->district->name,
+                    $val->district->name??'',
                     $val->subdistrict->name,
                     number_format($val->capacity,3,',','.'),
                     $val->status(),

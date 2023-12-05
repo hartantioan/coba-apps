@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use App\Models\Task;
+use Illuminate\Support\Carbon;
 use Redirect;
 
 class AuthController extends Controller
@@ -34,6 +36,16 @@ class AuthController extends Controller
         $user = User::where('employee_no', $request->id_card)->where('type','1')->where('status','1')->first();
 		if($user) {
             if(Hash::check($request->password, $user->password)) {
+                $query_reminder = Task::where('user_id',$user->id)->get();
+                $array_id_task = [];
+                $now = Carbon::now();
+                foreach($query_reminder as $row_reminder){
+                        $end_date = Carbon::parse($row_reminder->end_date);
+                        $daysLeft = $end_date->diffInDays($now);
+                    if($daysLeft <= $row_reminder->age_limit_reminder){
+                        $array_id_task[]=$row_reminder->id;
+                    }
+                }
                 session([
                     'bo_id'             => $user->id,
                     'bo_photo'          => $user->photo(),
@@ -44,6 +56,7 @@ class AuthController extends Controller
                     'bo_department_id'  => $user->department_id,
                     'bo_position_id'    => $user->position_id,
                     'bo_is_lock'        => 0,
+                    'bo_reminder'       => $array_id_task,
                 ]);
                 $token = md5(uniqid());
 
@@ -69,6 +82,70 @@ class AuthController extends Controller
 
         return response()->json($response);
     }
+
+    public function reminder(Request $request){
+        $data = Task::where(function($query) {
+                $query->where(function($query)  {
+                    
+                $query->whereIn('id',session('bo_reminder'))
+                    ->orWhereHas('user',function($query) {
+                        $query->where('id','like',session('bo_id'));
+                    });
+            });
+        })-> get();
+
+        $arr = [];
+      
+        foreach($data as $row){
+                $start_date = Carbon::parse($row->start_date);
+                $end_date = Carbon::parse($row->end_date);
+
+                $now = Carbon::now();
+                $daysPassed = $now->diffInDays($start_date);
+                $totalDays = $end_date->diffInDays($start_date);
+                $daysLeft = $end_date->diffInDays($now);
+
+                $progressPercentage = ($daysLeft / $totalDays) * 100;
+                $color = '#0fdc17';
+                if($progressPercentage < $row->age_limit_reminder){
+                    $color = '#f2d60e';
+                }else if($progressPercentage == 0 / $progressPercentage < 0){
+                    $color = '#ff0505';
+                }
+                $arr[] = [
+                    'note'              => $row->note,
+                    'name'          => $row->name,
+                    'start_date'         =>  $row->start_date,
+                    'end_date'              => $row->end_date,
+                    'age'             => '<div class="progress pink lighten-5 mt-0" style="margin-bottom:unset">
+                                            <div class="determinate" style="width: '.$progressPercentage.'%; background-color: #f2d60e">
+                                                
+                                            </div>
+                                        </div>
+                                        <div style="position: relative;">
+                                            <div style="font-size: xx-small;">
+                                                '.$daysLeft.' Days Left
+                                            </div>
+                                        </div>
+                                        ',
+                    'age_limit_reminder'               => $row->age_limit_reminder,
+                    'status'   => $row->status,
+                    'button' => '
+                    <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 black-text btn-small" data-popup="tooltip" title="Go to" onclick="show_one_time(`' . CustomHelper::encrypt($row->id) . '`)"><i class="material-icons dp48">forward</i></button>
+                    <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy_one_time(`' . CustomHelper::encrypt($row->id) . '`)"><i class="material-icons dp48">delete</i></button>
+                ',
+                ];
+            
+        }
+
+        session([
+            'bo_reminder' => null,
+        ]);
+        return response()->json($arr);
+        
+    }
+
+    
 
     public function logout(){
         session()->flush();

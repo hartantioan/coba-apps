@@ -30,7 +30,7 @@ use App\Http\Controllers\MasterData\LevelController;
 use App\Http\Controllers\MasterData\PunishmentController;
 use App\Http\Controllers\MasterData\UserSpecialController;
 use App\Http\Controllers\Other\MenuIndexController;
-use App\Http\Controllers\Personal\Check_In_Controller;
+use App\Http\Controllers\Personal\TaskController;
 use App\Http\Controllers\Personal\CheckInController;
 use App\Http\Controllers\Purchase\OutStandingAPController;
 use App\Http\Controllers\Purchase\PriceHistoryPOController;
@@ -183,6 +183,10 @@ Route::prefix('admin')->group(function () {
         Route::post('auth',[AuthController::class, 'auth']);
     });
 
+    Route::prefix('reminder')->group(function () {
+        Route::post('/', [AuthController::class, 'reminder']);
+    });
+
     Route::prefix('register')->group(function () {
         Route::get('/', [RegistrationController::class, 'index']);
         Route::post('save',[RegistrationController::class, 'create']);
@@ -320,6 +324,14 @@ Route::prefix('admin')->group(function () {
 
                 Route::prefix('chat')->group(function () {
                     Route::get('/',[ChatController::class, 'index']);
+                });
+
+                Route::prefix('task')->group(function () {
+                    Route::get('/',[TaskController::class, 'index']);
+                    Route::post('create',[TaskController::class, 'create']);
+                    Route::get('datatable',[TaskController::class, 'datatable']);
+                    Route::post('show', [TaskController::class, 'show']);
+                    Route::post('destroy', [TaskController::class, 'destroy']);
                 });
 
                 Route::prefix('check_in')->group(function () {

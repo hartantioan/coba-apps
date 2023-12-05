@@ -36,6 +36,7 @@ use App\Models\MarketingOrderDownPaymentDetail;
 use App\Helpers\CustomHelper;
 use App\Models\User;
 use App\Models\Tax;
+use App\Models\Menu;
 
 class MarketingOrderDownPaymentController extends Controller
 {
@@ -50,6 +51,9 @@ class MarketingOrderDownPaymentController extends Controller
 
     public function index(Request $request)
     {
+        $lastSegment = request()->segment(count(request()->segments()));
+       
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => 'AR Down Payment',
             'content'       => 'admin.sales.down_payment',
@@ -59,7 +63,7 @@ class MarketingOrderDownPaymentController extends Controller
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-            'newcode'       => 'SODP-'.date('y'),
+            'newcode'       => $menu->document_code.date('y'),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
         ];
 

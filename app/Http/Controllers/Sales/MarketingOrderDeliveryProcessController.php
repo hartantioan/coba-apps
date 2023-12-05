@@ -19,7 +19,7 @@ use App\Models\MarketingOrderReturn;
 use App\Models\ItemStock;
 use Illuminate\Support\Str;
 use App\Models\MarketingOrderDeliveryProcessTrack;
-
+use App\Models\Menu;
 use App\Models\Place;
 use App\Models\Tax;
 use App\Models\TaxSeries;
@@ -52,6 +52,9 @@ class MarketingOrderDeliveryProcessController extends Controller
     
     public function index(Request $request)
     {
+        $lastSegment = request()->segment(count(request()->segments()));
+       
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => 'Surat Jalan',
             'content'       => 'admin.sales.order_delivery_process',
@@ -60,7 +63,7 @@ class MarketingOrderDeliveryProcessController extends Controller
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-            'newcode'       => 'DVRY-'.date('y'),
+            'newcode'       => $menu->document_code.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

@@ -13,6 +13,7 @@ use App\Models\Place;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
+use App\Models\Menu;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -39,6 +40,9 @@ class MarketingOrderReturnController extends Controller
     
     public function index(Request $request)
     {
+        $lastSegment = request()->segment(count(request()->segments()));
+       
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => 'AR Retur',
             'content'       => 'admin.sales.order_return',
@@ -47,7 +51,7 @@ class MarketingOrderReturnController extends Controller
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-            'newcode'       => 'DRRT-'.date('y'),
+            'newcode'       => $menu->document_code.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

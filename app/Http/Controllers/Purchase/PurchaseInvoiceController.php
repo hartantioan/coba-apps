@@ -23,7 +23,7 @@ use App\Models\PaymentRequestCross;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseMemo;
-use App\Models\PurchaseOrderDetail;
+use App\Models\Menu;
 use App\Models\Place;
 use App\Models\PurchaseInvoiceDp;
 
@@ -64,6 +64,9 @@ class PurchaseInvoiceController extends Controller
     }
     public function index(Request $request)
     {
+        $lastSegment = request()->segment(count(request()->segments()));
+       
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => 'A/P Invoice',
             'content'       => 'admin.purchase.invoice',
@@ -78,7 +81,7 @@ class PurchaseInvoiceController extends Controller
             'machine'       => Machine::where('status','1')->get(),
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-            'newcode'       => 'PINV-'.date('y'),
+            'newcode'       => $menu->document_code.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

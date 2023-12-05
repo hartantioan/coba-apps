@@ -10,7 +10,7 @@ use App\Models\GoodReturnPO;
 use App\Models\GoodScale;
 use App\Models\InventoryTransferOut;
 use App\Models\Item;
-use App\Models\Line;
+use App\Models\Menu;
 use App\Models\LandedCost;
 use App\Models\Machine;
 use App\Models\MaterialRequest;
@@ -53,6 +53,9 @@ class PurchaseMemoController extends Controller
     }
     public function index(Request $request)
     {
+        $lastSegment = request()->segment(count(request()->segments()));
+       
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => 'AP Memo',
             'content'       => 'admin.purchase.memo',
@@ -62,7 +65,7 @@ class PurchaseMemoController extends Controller
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-            'newcode'       => 'PMMO-'.date('y'),
+            'newcode'       => $menu->document_code.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

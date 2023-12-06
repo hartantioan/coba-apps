@@ -214,7 +214,7 @@
                                                         <th class="center">MOP</th>
                                                         <th class="center">Item</th>
                                                         <th class="center">Qty (Satuan Jual)</th>
-                                                        <th class="center">Qty (Satuan UOM)</th>
+                                                        <th class="center">Qty (Satuan Produksi)</th>
                                                         <th class="center">Qty (Satuan Pallet)</th>
                                                         <th class="center">Remark</th>
                                                         <th class="center">Tgl.Request</th>
@@ -263,7 +263,7 @@
                                                                         <th class="center">No</th>
                                                                         <th class="center" width="300px">Item</th>
                                                                         <th class="center" width="200px">Qty</th>
-                                                                        <th class="center" width="200px">UoM</th>
+                                                                        <th class="center" width="200px">Satuan Produksi</th>
                                                                         <th class="center" width="200px">Gudang</th>
                                                                         <th class="center" width="200px">Tgl.Produksi</th>
                                                                         <th class="center" width="300px">Shift</th>
@@ -300,7 +300,7 @@
                                                                         <th class="center">No</th>
                                                                         <th class="center" width="300px">Item</th>
                                                                         <th class="center" width="200px">Qty</th>
-                                                                        <th class="center" width="200px">UoM</th>
+                                                                        <th class="center" width="200px">Satuan Produksi</th>
                                                                         <th class="center" width="200px">Gudang</th>
                                                                         <th class="center" width="200px">Tgl.Produksi</th>
                                                                         <th class="center" width="300px">Shift</th>
@@ -337,7 +337,7 @@
                                                                         <th class="center">No</th>
                                                                         <th class="center" width="300px">Item</th>
                                                                         <th class="center" width="200px">Qty</th>
-                                                                        <th class="center" width="200px">UoM</th>
+                                                                        <th class="center" width="200px">Satuan Produksi</th>
                                                                         <th class="center" width="200px">Gudang</th>
                                                                         <th class="center" width="200px">Tgl.Produksi</th>
                                                                         <th class="center" width="300px">Shift</th>
@@ -374,7 +374,7 @@
                                                                         <th class="center">No</th>
                                                                         <th class="center" width="300px">Item</th>
                                                                         <th class="center" width="200px">Qty</th>
-                                                                        <th class="center" width="200px">UoM</th>
+                                                                        <th class="center" width="200px">Satuan Produksi</th>
                                                                         <th class="center" width="200px">Gudang</th>
                                                                         <th class="center" width="200px">Tgl.Produksi</th>
                                                                         <th class="center" width="300px">Shift</th>
@@ -657,9 +657,21 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
-                $('#item-fg,#item-sfg1,#item-sfg2,#item-sfg3').empty().append(`
-                    <div align="center" id="no-shift">-- Silahkan pilih MOP --</div>
+                $('.body-item-detail').empty().append(`
+                    <tr class="last-row-item-detail">
+                        <td colspan="12">
+                            Silahkan tambahkan shift
+                        </td>
+                    </tr>
                 `);
+                $('#body-item').empty().append(`
+                    <tr id="last-row-item">
+                        <td class="center-align" colspan="9">
+                            Silahkan tambahkan Marketing Order Plan...
+                        </td>
+                    </tr>
+                `);
+                $('#marketing_order_plan_id').empty();
             }
         });
 
@@ -1063,7 +1075,6 @@
                             </div>
                         `);
                         
-                        let arrStok = [];
                         $('#item-fg').empty();
                         listfgsfg = [];
                         $.each(mop.details, function(i, val) {
@@ -1073,9 +1084,9 @@
                                 item_id                 : val.item_id,
                                 item_code               : val.item_code,
                                 item_name               : val.item_name,
-                                item_qty                : val.qty_in_uom,
-                                item_qty_output         : val.qty_in_uom,
-                                item_unit               : val.unit_uom,
+                                item_qty                : val.qty_in_production,
+                                item_qty_output         : val.qty_in_production,
+                                item_unit               : val.unit_production,
                                 item_group              : val.group,
                                 item_warehouse          : val.warehouses,
                                 item_goal               : 0,
@@ -1089,7 +1100,7 @@
                                     <input type="hidden" name="arr_code[]" id="arr_code` + count + `" value="` + mop.code + `">
                                     <input type="hidden" name="arr_item_id[]" id="arr_item_id` + count + `" value="` + val.item_id + `">
                                     <input type="hidden" name="arr_item_name[]" id="arr_item_name` + count + `" value="` + val.item_name + `">
-                                    <input type="hidden" name="arr_item_unit[]" id="arr_item_unit` + count + `" value="` + val.unit_uom + `">
+                                    <input type="hidden" name="arr_item_unit[]" id="arr_item_unit` + count + `" value="` + val.unit_production + `">
                                     <input type="hidden" name="arr_sell_convert[]" id="arr_sell_convert` + count + `" value="` + val.sell_convert + `">
                                     <input type="hidden" name="arr_pallet_convert[]" id="arr_pallet_convert` + count + `" value="` + val.pallet_convert + `">
                                     <input type="hidden" name="arr_bom[]" id="arr_bom` + count + `" value="` + val.bom_link + `">
@@ -1104,8 +1115,8 @@
                                         <b id="qty_in_sell` + count + `">` + val.qty_in_sell + `</b> ` + val.unit_sell + `
                                     </td>
                                     <td class="right-align">
-                                        <input name="arr_qty[]" id="arr_qty` + count + `" type="text" value="` + val.qty_in_uom + `" onkeyup="formatRupiahNoMinus(this);" required style="width:75%;text-align:right;" data-mopd="` + val.mopd_id + `" data-max="` + val.qty_in_uom + `" readonly>
-                                        ` + val.unit_uom + `
+                                        <input name="arr_qty[]" id="arr_qty` + count + `" type="text" value="` + val.qty_in_production + `" onkeyup="formatRupiahNoMinus(this);" required style="width:75%;text-align:right;" data-mopd="` + val.mopd_id + `" data-max="` + val.qty_in_production + `" readonly>
+                                        ` + val.unit_production + `
                                     </td>
                                     <td class="right-align">
                                         <b id="qty_in_pallet` + count + `">` + val.qty_in_pallet + `</b> ` + val.unit_pallet + `
@@ -1134,9 +1145,9 @@
                                     item_id                 : value.item_id,
                                     item_code               : value.item_code,
                                     item_name               : value.item_name,
-                                    item_qty                : value.qty_in_uom,
+                                    item_qty                : value.qty_in_production,
                                     item_qty_output         : value.qty_output,
-                                    item_unit               : value.unit_uom,
+                                    item_unit               : value.unit_production,
                                     item_group              : value.group,
                                     item_warehouse          : value.warehouses,
                                     item_goal               : value.item_goal,
@@ -1241,7 +1252,7 @@
     function printData(){
         var arr_id_temp=[];
         $.map(window.table.rows('.selected').nodes(), function (item) {
-            var poin = $(item).find('td:nth-child(3)').text().trim();
+            var poin = $(item).find('td:nth-child(2)').text().trim();
             arr_id_temp.push(poin);
         });
         
@@ -1560,6 +1571,11 @@
                 $('#post_date').val(response.post_date);
                 $('#company_id').val(response.company_id).formSelect();
                 $('#place_id').val(response.place_id).formSelect().trigger('change');
+                $('#marketing_order_plan_id').empty().append(`
+                    <option value="` + response.marketing_order_plan_id + `">` + response.marketing_order_plan_code + `</option>
+                `);
+
+                listfgsfg = [];
 
                 if(response.targets.length > 0){
                     $('.row_item').each(function(){
@@ -1574,9 +1590,22 @@
                         $('#last-row-item').remove();
                     }
 
-                    let arrStok = [];
                     $.each(response.targets, function(i, val) {
                         var count = makeid(10), checkstok = '';
+
+                        listfgsfg.push({
+                            item_id                 : val.item_id,
+                            item_code               : val.item_code,
+                            item_name               : val.item_name,
+                            item_qty                : val.qty_in_production,
+                            item_qty_output         : val.qty_in_production,
+                            item_unit               : val.unit_production,
+                            item_group              : val.group,
+                            item_warehouse          : val.warehouses,
+                            item_goal               : 0,
+                            item_qty_proporsional   : "1",
+                            item_bom_id             : val.bom_id,
+                        });
 
                         $('#body-item').append(`
                             <tr class="row_item" data-id="` + val.id + `">
@@ -1584,7 +1613,7 @@
                                 <input type="hidden" name="arr_code[]" id="arr_code` + count + `" value="` + val.code + `">
                                 <input type="hidden" name="arr_item_id[]" id="arr_item_id` + count + `" value="` + val.item_id + `">
                                 <input type="hidden" name="arr_item_name[]" id="arr_item_name` + count + `" value="` + val.item_name + `">
-                                <input type="hidden" name="arr_item_unit[]" id="arr_item_unit` + count + `" value="` + val.unit + `">
+                                <input type="hidden" name="arr_item_unit[]" id="arr_item_unit` + count + `" value="` + val.unit_production + `">
                                 <input type="hidden" name="arr_sell_convert[]" id="arr_sell_convert` + count + `" value="` + val.sell_convert + `">
                                 <input type="hidden" name="arr_pallet_convert[]" id="arr_pallet_convert` + count + `" value="` + val.pallet_convert + `">
                                 <input type="hidden" name="arr_bom[]" id="arr_bom` + count + `" value="` + val.bom_link + `">
@@ -1592,15 +1621,15 @@
                                     ` + val.code + `
                                 </td>
                                 <td>
-                                    ` + val.item_name + `
+                                    ` + val.item_code + ` - ` + val.item_name + `
                                     ` + ( val.bom_link ? '' : '<br><span style="color:red;font-weight:800;">Belum memiliki BOM.</span>' ) + `<br>
                                 </td>
                                 <td class="right-align">
                                     <b id="qty_in_sell` + count + `">` + val.qty_in_sell + `</b> ` + val.unit_sell + `
                                 </td>
                                 <td class="right-align">
-                                    <input name="arr_qty[]" id="arr_qty` + count + `" type="text" value="` + val.qty_in_uom + `" onkeyup="formatRupiahNoMinus(this);" required style="width:75%;text-align:right;" data-mopd="` + val.mopd_id + `" data-max="` + val.qty_real + `" readonly>
-                                    ` + val.unit_uom + `
+                                    <input name="arr_qty[]" id="arr_qty` + count + `" type="text" value="` + val.qty_in_production + `" onkeyup="formatRupiahNoMinus(this);" required style="width:75%;text-align:right;" data-mopd="` + val.mopd_id + `" data-max="` + val.qty_real + `" readonly>
+                                    ` + val.unit_production + `
                                 </td>
                                 <td class="right-align">
                                     <b id="qty_in_pallet` + count + `">` + val.qty_in_pallet + `</b> ` + val.unit_pallet + `
@@ -1623,39 +1652,69 @@
                         `);
                     });
 
-                    let arrItem = [];
-                    $('input[name^="arr_item_id[]"]').each(function(index){
-                        let arr = {
-                            'mopd_id'   : $('input[name^="arr_id[]"]').eq(index).val(),
-                            'mop_code'  : $('input[name^="arr_code[]"]').eq(index).val(),
-                            'item_id'   : $(this).val(),
-                            'item_name' : $('input[name^="arr_item_name[]"]').eq(index).val() + ' - ' + $('input[name^="arr_code[]"]').eq(index).val() + ' - ' + $('input[name^="arr_qty[]"]').eq(index).val(),
-                            'qty'       : $('input[name^="arr_qty[]"]').eq(index).val(),
-                            'unit'      : $('input[name^="arr_item_unit[]"]').eq(index).val(),
-                        };
-
-                        arrItem.push(arr);
+                    $.each(response.compositions, function(i, val) {
+                        $.each(val, function(i, value) {
+                            listfgsfg.push({
+                                item_id                 : value.item_id,
+                                item_code               : value.item_code,
+                                item_name               : value.item_name,
+                                item_qty                : value.qty_in_production,
+                                item_qty_output         : value.qty_output,
+                                item_unit               : value.unit_production,
+                                item_group              : value.group,
+                                item_warehouse          : value.warehouses,
+                                item_goal               : value.item_goal,
+                                item_qty_proporsional   : value.qty_proporsional,
+                                item_bom_id             : value.bom_id,
+                            });
+                        });
                     });
 
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
+
+                        let line = $('#place_id').find(':selected').data('lines');
+
+                        let optionLine = `<select class="browser-default" id="arr_line_id` + count + `" name="arr_line_id[]">`;
+
+                        if(line.length > 0){
+                            $.each(line, function(i, value) {
+                                optionLine += `<option value="` + value['id'] + `" ` + (value['id'] == val.line_id ? 'selected' : '' ) + `>` + value['code'] + ` - ` + value['name'] + `</option>`;
+                            });
+                        }else{
+                            optionLine += `<option value="">--Maaf, plant ini belum memiliki Line--</option>`;
+                        }
+
+                        optionLine += `</select>`;
+                        
                         let optionItem = `<select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="setRow('` + count + `')">`;
                         
                         optionItem += `<option value="">--Pilih item--</option>`;
 
-                        $.each(arrItem, function(i, val) {
-                            optionItem += `<option value="` + val['item_id'] + `" data-mopd="` + val['mopd_id'] + `" data-qty="` + val['qty'] + `" data-unit="` + val['unit'] + `">` + val['item_name'] + `</option>`;
+                        $.each(listfgsfg, function(i, value) {
+                            if(value.item_group.toString() == val.type_production.toString()){
+                                optionItem += `<option value="` + value['item_id'] + `" data-qty="` + value['item_qty'] + `" data-unit="` + value['item_unit'] + `" data-warehouse='` + JSON.stringify(value['item_warehouse']) + `' data-goal="` + value['item_goal'] + `" data-proporsional="` + value['item_qty_proporsional'] + `" data-code="` + count + `">` + value['item_code'] + ` - ` + value['item_name'] + `</option>`;
+                            }
                         });
                         
                         optionItem += `</select>`;
 
-                        $('#last-row-item-detail').before(`
+                        if($('#body-item-detail' + val.type_production + ' > .last-row-item-detail').length > 0){
+                            $('#body-item-detail' + val.type_production + ' > .last-row-item-detail').remove();
+                        }
+
+                        let no = $('#body-item-detail' + val.type_production + ' > .row_item_detail').length + 1;
+
+                        $('#body-item-detail' + val.type_production).append(`
                             <tr class="row_item_detail">
                                 <td class="center-align">
-                                    <input name="arr_date[]" id="arr_date` + count + `" type="date" value="` + val.date + `" required>
+                                    <label>
+                                        <input type="checkbox" class="checkBoxSelect" name="arr_select[]" id="arr_select` + count + `" value="` + count + `" checked>
+                                        <span>&nbsp;</span>
+                                    </label>
                                 </td>
-                                <td>
-                                    <select class="browser-default item-array" id="arr_shift` + count + `" name="arr_shift[]"></select>
+                                <td class="center-align">
+                                    ` + no + `.
                                 </td>
                                 <td class="center-align">
                                     ` + optionItem + `
@@ -1663,8 +1722,26 @@
                                 <td class="center-align">
                                     <input name="arr_qty_detail[]" id="arr_qty_detail` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" required style="text-align:right;">
                                 </td>
-                                <td class="center-align" id="text-unit` + count + `">
+                                <td class="center-align" id="item-unit` + count + `">
                                     ` + val.unit + `
+                                </td>
+                                <td class="center-align" id="item-warehouse` + count + `">
+                                    -
+                                </td>
+                                <td class="center-align">
+                                    <input name="arr_date[]" id="arr_date` + count + `" type="date" value="` + val.date + `" required>
+                                </td>
+                                <td>
+                                    <select class="browser-default item-array" id="arr_shift` + count + `" name="arr_shift[]"></select>
+                                </td>
+                                <td class="center-align" id="item-line` + count + `">
+                                    ` + optionLine + `
+                                </td>
+                                <td class="center-align">
+                                    <input name="arr_group[]" id="arr_group` + count + `" type="text" placeholder="A / B / C / D" value="` + val.group + `" required>
+                                </td>
+                                <td class="center-align">
+                                    <input name="arr_note[]" id="arr_note` + count + `" type="text" placeholder="Keterangan" value="` + val.note + `" required>
                                 </td>
                                 <td class="center-align">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail" href="javascript:void(0);">
@@ -1673,15 +1750,37 @@
                                 </td>
                             </tr>
                         `);
-                        $("#arr_item_detail_id" + count + " option[data-mopd='" + val.mopd_id + "'][value='" + val.item_id + "']").prop("selected", true);
+                        M.updateTextFields();
+                        $('#arr_shift' + count).select2({
+                            placeholder: '-- Pilih ya --',
+                            minimumInputLength: 1,
+                            allowClear: true,
+                            cache: true,
+                            width: 'resolve',
+                            dropdownParent: $('body').parent(),
+                            ajax: {
+                                url: '{{ url("admin/select2/shift_production") }}',
+                                type: 'GET',
+                                dataType: 'JSON',
+                                data: function(params) {
+                                    return {
+                                        search: params.term,
+                                        place_id: $('#place_id').val(),
+                                    };
+                                },
+                                processResults: function(data) {
+                                    return {
+                                        results: data.items
+                                    }
+                                }
+                            }
+                        });
                         $('#arr_shift' + count).append(`
                             <option value="` + val.shift_id + `">` + val.shift_code + `</option>
                         `);
-                        select2ServerSide('#arr_shift' + count, '{{ url("admin/select2/shift") }}');
-                    });
-
-                    $('input[name^="arr_qty[]"]').each(function(index){
-                        $(this).trigger('keyup');
+                        $('#arr_line_id' + count).val(val.line_id);
+                        $('#arr_item_detail_id' + count).val(val.item_id).trigger('change');
+                        $('#arr_warehouse_id' + count).val(val.warehouse_id);
                     });
                 }
                 

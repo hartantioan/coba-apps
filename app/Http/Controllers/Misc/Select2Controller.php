@@ -2269,7 +2269,7 @@ class Select2Controller extends Controller {
         ->get();
 
         foreach($data as $d) {
-            if($d->balanceQty() > 0){
+            if(!$d->productionSchedule()->exists()){
                 $details = [];
                 $composition = [];
 
@@ -2282,11 +2282,14 @@ class Select2Controller extends Controller {
                         'item_name'         => $row->item->name,
                         'qty_in_sell'       => number_format($row->qty,3,',','.'),
                         'qty_in_uom'        => number_format($row->qty * $row->item->sell_convert,3,',','.'),
+                        'qty_in_production' => number_format(($row->qty * $row->item->sell_convert) / $row->item->production_convert,3,',','.'),
                         'qty_in_pallet'     => number_format($row->qty / $row->item->pallet_convert,3,',','.'),
                         'unit_sell'         => $row->item->sellUnit->code,
                         'unit_uom'          => $row->item->uomUnit->code,
+                        'unit_production'   => $row->item->productionUnit->code,
                         'unit_pallet'       => $row->item->palletUnit->code,
                         'sell_convert'      => $row->item->sell_convert,
+                        'production_convert'=> $row->item->production_convert,
                         'pallet_convert'    => $row->item->pallet_convert,
                         'request_date'      => date('d/m/y',strtotime($row->request_date)),
                         'note'              => $row->note,

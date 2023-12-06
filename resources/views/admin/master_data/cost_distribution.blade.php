@@ -69,7 +69,7 @@
                                                         <th>#</th>
                                                         <th>Code</th>
                                                         <th>Nama</th>
-                                                        <th>Coa</th>
+                                                        {{-- <th>Coa</th> --}}
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -348,7 +348,7 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
-                { name: 'coa_id', className: 'center-align' },
+                /* { name: 'coa_id', className: 'center-align' }, */
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],

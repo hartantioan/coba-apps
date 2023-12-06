@@ -36,7 +36,7 @@ class CostDistributionController extends Controller
             'id',
             'code',
             'name',
-            'coa_id',
+            /* 'coa_id', */
             'note',
         ];
 
@@ -88,7 +88,7 @@ class CostDistributionController extends Controller
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->name,
-                    $val->coa_id ? $val->coa->name : '-',
+                    /* $val->coa_id ? $val->coa->name : '-', */
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>

@@ -107,6 +107,7 @@ use App\Http\Controllers\Purchase\DownPaymentController;
 
 use App\Http\Controllers\Production\MarketingOrderPlanController;
 use App\Http\Controllers\Production\ProductionScheduleController;
+use App\Http\Controllers\Production\ProductionOrderController;
 use App\Http\Controllers\Production\ProductionIssueReceiveController;
 
 use App\Http\Controllers\Sales\MarketingOrderController;
@@ -1652,6 +1653,25 @@ Route::prefix('admin')->group(function () {
                     Route::get('print_individual/{id}',[ProductionScheduleController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [ProductionScheduleController::class, 'voidStatus'])->middleware('operation.access:production_schedule,void');
                     Route::post('destroy', [ProductionScheduleController::class, 'destroy'])->middleware('operation.access:production_schedule,delete');
+                });
+
+                Route::prefix('production_order')->middleware('operation.access:production_order,view')->middleware('lockacc')->group(function () {
+                    Route::get('/',[ProductionOrderController::class, 'index']);
+                    Route::get('datatable',[ProductionOrderController::class, 'datatable']);
+                    Route::get('row_detail',[ProductionOrderController::class, 'rowDetail']);
+                    Route::post('show', [ProductionOrderController::class, 'show']);
+                    Route::post('get_code', [ProductionOrderController::class, 'getCode']);
+                    Route::post('print',[ProductionOrderController::class, 'print']);
+                    Route::post('print_by_range',[ProductionOrderController::class, 'printByRange']);
+                    Route::get('export',[ProductionOrderController::class, 'export']);
+                    Route::get('viewstructuretree',[ProductionOrderController::class, 'viewStructureTree']);
+                    Route::post('remove_used_data', [ProductionOrderController::class, 'removeUsedData']);
+                    Route::post('create',[ProductionOrderController::class, 'create'])->middleware('operation.access:production_order,update');
+                    Route::post('send_used_data',[ProductionOrderController::class, 'sendUsedData'])->middleware('operation.access:production_order,update');
+                    Route::get('approval/{id}',[ProductionOrderController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}',[ProductionOrderController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [ProductionOrderController::class, 'voidStatus'])->middleware('operation.access:production_order,void');
+                    Route::post('destroy', [ProductionOrderController::class, 'destroy'])->middleware('operation.access:production_order,delete');
                 });
 
                 Route::prefix('production_issue_receive')->middleware('operation.access:production_issue_receive,view')->middleware('lockacc')->group(function () {

@@ -8,22 +8,29 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
-class ProductionSchedule extends Model
+class ProductionOrder extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'production_schedules';
+    protected $table = 'production_orders';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'code',
         'user_id',
         'company_id',
-        'place_id',
-        'marketing_order_plan_id',
+        'production_schedule_id',
+        'production_schedule_detail_id',
+        'warehouse_id',
         'post_date',
-        'document',
+        'note',
         'status',
+        'actual_item_cost',
+        'actual_resource_cost',
+        'total_product_cost',
+        'planned_qty',
+        'completed_qty',
+        'rejected_qty',
         'void_id',
         'void_note',
         'void_date',
@@ -34,9 +41,14 @@ class ProductionSchedule extends Model
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
     }
 
-    public function marketingOrderPlan()
+    public function productionSchedule()
     {
-        return $this->belongsTo('App\Models\MarketingOrderPlan', 'marketing_order_plan_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\ProductionSchedule', 'production_schedule_id', 'id')->withTrashed();
+    }
+
+    public function productionScheduleDetail()
+    {
+        return $this->belongsTo('App\Models\ProductionScheduleDetail', 'production_schedule_detail_id', 'id')->withTrashed();
     }
 
     public function voidUser()
@@ -49,19 +61,9 @@ class ProductionSchedule extends Model
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
-    public function place()
+    public function warehouse()
     {
-        return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
-    }
-
-    public function productionScheduleDetail()
-    {
-        return $this->hasMany('App\Models\ProductionScheduleDetail');
-    }
-
-    public function productionScheduleTarget()
-    {
-        return $this->hasMany('App\Models\ProductionScheduleTarget');
+        return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
     }
 
     public function used(){
@@ -96,27 +98,10 @@ class ProductionSchedule extends Model
         return $status;
     }
 
-    public function attachment() 
-    {
-        if($this->document !== NULL && Storage::exists($this->document)) {
-            $document = asset(Storage::url($this->document));
-        } else {
-            $document = asset('website/empty.png');
-        }
-
-        return $document;
-    }
-
-    public function deleteFile(){
-		if(Storage::exists($this->document)) {
-            Storage::delete($this->document);
-        }
-	}
-
     public static function generateCode($prefix)
     {
         $cek = substr($prefix,0,7);
-        $query = ProductionSchedule::selectRaw('RIGHT(code, 8) as code')
+        $query = ProductionOrder::selectRaw('RIGHT(code, 8) as code')
             ->whereRaw("code LIKE '$cek%'")
             ->withTrashed()
             ->orderByDesc('id')
@@ -156,16 +141,8 @@ class ProductionSchedule extends Model
         return $ada;
     }
 
-    public function productionOrder(){
-        return $this->hasMany('App\Models\ProductionOrder','production_schedule_id','id');
-    }
-
     public function hasChildDocument(){
         $hasRelation = false;
-
-        if($this->productionOrder()->exists()){
-            $hasRelation = true;
-        }
 
         return $hasRelation;
     }

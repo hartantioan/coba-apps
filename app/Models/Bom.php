@@ -252,18 +252,18 @@ class Bom extends Model
                                                             }
                                                         }
                                                         $arr[] = [
-                                                            'item_id'   => $row3->item->id,
-                                                            'item_code' => $row3->item->code,
-                                                            'item_name' => $row3->item->name,
-                                                            'qty_in_uom'=> number_format($row3->qty,3,',','.'),
-                                                            'unit_uom'  => $row3->item->uomUnit->code,
-                                                            'qty_output'=> number_format($bom3->qty_output,3,',','.'),
-                                                            'bom_id'    => $bom4->id,
-                                                            'materials' => $arr3,
-                                                            'group'     => $row3->item->itemGroup->production_type,
-                                                            'warehouses'=> $row3->item->warehouseList(),
-                                                            'item_goal' => $bom3->item_id,
-                                                            'qty_proporsional' => number_format($row3->qty * $bom3->qty_output,3,',','.'),
+                                                            'item_id'           => $row3->item->id,
+                                                            'item_code'         => $row3->item->code,
+                                                            'item_name'         => $row3->item->name,
+                                                            'qty_in_production' => number_format($row3->qty,3,',','.'),
+                                                            'unit_production'   => $row3->item->productionUnit->code,
+                                                            'qty_output'        => number_format($bom3->qty_output,3,',','.'),
+                                                            'bom_id'            => $bom4->id,
+                                                            'materials'         => $arr3,
+                                                            'group'             => $row3->item->itemGroup->production_type,
+                                                            'warehouses'        => $row3->item->warehouseList(),
+                                                            'item_goal'         => $bom3->item_id,
+                                                            'qty_proporsional'  => number_format($row3->qty * $bom3->qty_output,3,',','.'),
                                                         ];
                                                     }
                                                     $arr2[] = [
@@ -285,18 +285,18 @@ class Bom extends Model
                                                 }
                                             }
                                             $arr[] = [
-                                                'item_id'   => $row2->item->id,
-                                                'item_code' => $row2->item->code,
-                                                'item_name' => $row2->item->name,
-                                                'qty_in_uom'=> number_format($row2->qty,3,',','.'),
-                                                'unit_uom'  => $row2->item->uomUnit->code,
-                                                'qty_output'=> number_format($bom2->qty_output,3,',','.'),
-                                                'bom_id'    => $bom3->id,
-                                                'materials' => $arr2,
-                                                'group'     => $row2->item->itemGroup->production_type,
-                                                'warehouses'=> $row2->item->warehouseList(),
-                                                'item_goal' => $bom2->item_id,
-                                                'qty_proporsional' => number_format($row2->qty * $bom2->qty_output,3,',','.'),
+                                                'item_id'           => $row2->item->id,
+                                                'item_code'         => $row2->item->code,
+                                                'item_name'         => $row2->item->name,
+                                                'qty_in_production' => number_format($row2->qty,3,',','.'),
+                                                'unit_production'   => $row2->item->productionUnit->code,
+                                                'qty_output'        => number_format($bom2->qty_output,3,',','.'),
+                                                'bom_id'            => $bom3->id,
+                                                'materials'         => $arr2,
+                                                'group'             => $row2->item->itemGroup->production_type,
+                                                'warehouses'        => $row2->item->warehouseList(),
+                                                'item_goal'         => $bom2->item_id,
+                                                'qty_proporsional'  => number_format($row2->qty * $bom2->qty_output,3,',','.'),
                                             ];
                                         }
                                         $arr1[] = [
@@ -318,18 +318,18 @@ class Bom extends Model
                                     }
                                 }
                                 $arr[] = [
-                                    'item_id'   => $row1->item->id,
-                                    'item_code' => $row1->item->code,
-                                    'item_name' => $row1->item->name,
-                                    'qty_in_uom'=> number_format($row1->qty,3,',','.'),
-                                    'unit_uom'  => $row1->item->uomUnit->code,
-                                    'qty_output'=> number_format($bom1->qty_output,3,',','.'),
-                                    'bom_id'    => $bom2->id,
-                                    'materials' => $arr1,
-                                    'group'     => $row1->item->itemGroup->production_type,
-                                    'warehouses'=> $row1->item->warehouseList(),
-                                    'item_goal' => $bom1->item_id,
-                                    'qty_proporsional' => number_format($row1->qty * $bom1->qty_output,3,',','.'),
+                                    'item_id'           => $row1->item->id,
+                                    'item_code'         => $row1->item->code,
+                                    'item_name'         => $row1->item->name,
+                                    'qty_in_production' => number_format($row1->qty,3,',','.'),
+                                    'unit_production'   => $row1->item->productionUnit->code,
+                                    'qty_output'        => number_format($bom1->qty_output,3,',','.'),
+                                    'bom_id'            => $bom2->id,
+                                    'materials'         => $arr1,
+                                    'group'             => $row1->item->itemGroup->production_type,
+                                    'warehouses'        => $row1->item->warehouseList(),
+                                    'item_goal'         => $bom1->item_id,
+                                    'qty_proporsional'  => number_format($row1->qty * $bom1->qty_output,3,',','.'),
                                 ];
                             }
                             $arrMain[] = [
@@ -351,18 +351,18 @@ class Bom extends Model
                         }
                     }
                     $arr[] = [
-                        'item_id'   => $row->item->id,
-                        'item_code' => $row->item->code,
-                        'item_name' => $row->item->name,
-                        'qty_in_uom'=> number_format($row->qty,3,',','.'),
-                        'unit_uom'  => $row->item->uomUnit->code,
-                        'qty_output'=> number_format($this->qty_output,3,',','.'),
-                        'bom_id'    => $bom1->id,
-                        'materials' => $arrMain,
-                        'group'     => $row->item->itemGroup->production_type,
-                        'warehouses'=> $row->item->warehouseList(),
-                        'item_goal' => $this->item_id,
-                        'qty_proporsional' => number_format($row->qty * $this->qty_output,3,',','.'),
+                        'item_id'           => $row->item->id,
+                        'item_code'         => $row->item->code,
+                        'item_name'         => $row->item->name,
+                        'qty_in_production' => number_format($row->qty,3,',','.'),
+                        'unit_production'   => $row->item->productionUnit->code,
+                        'qty_output'        => number_format($this->qty_output,3,',','.'),
+                        'bom_id'            => $bom1->id,
+                        'materials'         => $arrMain,
+                        'group'             => $row->item->itemGroup->production_type,
+                        'warehouses'        => $row->item->warehouseList(),
+                        'item_goal'         => $this->item_id,
+                        'qty_proporsional'  => number_format($row->qty * $this->qty_output,3,',','.'),
                     ];
                 }
             }

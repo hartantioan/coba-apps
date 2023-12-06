@@ -57,16 +57,14 @@
         }
     });
     let reminder = {!! json_encode(session('bo_reminder')) !!};
-    console.log(reminder);
     if (reminder!=null && Array.isArray(reminder) && reminder.length > 0) {
         
         loadDataTableReminder();
         $('#modal_reminder').modal('open');
-        
-        
     }
    
- })
+ });
+
  function loadDataTableReminder(){
     $.ajax({
         url: `${window.location.origin}/admin/reminder`,

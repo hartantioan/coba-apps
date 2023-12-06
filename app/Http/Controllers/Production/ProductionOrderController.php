@@ -4,30 +4,27 @@ namespace App\Http\Controllers\Production;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\MarketingOrderPlan;
+use App\Models\MarketingOrderPlanDetail;
+use App\Models\Place;
+use Illuminate\Http\Request;
+use App\Helpers\CustomHelper;
 use App\Models\IncomingPayment;
 use App\Models\MarketingOrder;
 use App\Models\MarketingOrderDelivery;
 use App\Models\MarketingOrderDownPayment;
 use App\Models\MarketingOrderInvoice;
-use App\Models\MarketingOrderPlanDetail;
-use Illuminate\Support\Str;
-use App\Models\ProductionSchedule;
-use App\Models\ProductionScheduleDetail;
-use App\Models\Place;
-use App\Models\ProductionScheduleTarget;
-use Illuminate\Http\Request;
-use App\Helpers\CustomHelper;
 use App\Models\User;
-use App\Models\Menu;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
+use App\Models\Menu;
+use App\Models\ProductionOrder;
 use Illuminate\Support\Facades\Date;
-
-class ProductionScheduleController extends Controller
+use Illuminate\Support\Str;
+class ProductionOrderController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
 
@@ -41,16 +38,14 @@ class ProductionScheduleController extends Controller
     }
     public function index(Request $request)
     {
-        $places = Place::where('status','1')->whereIn('id',$this->dataplaces)->get();
         $lastSegment = request()->segment(count(request()->segments()));
        
         $menu = Menu::where('url', $lastSegment)->first();
 
         $data = [
-            'title'         => 'Jadwal Produksi',
-            'content'       => 'admin.production.schedule',
+            'title'         => 'Order Produksi',
+            'content'       => 'admin.production.order',
             'company'       => Company::where('status','1')->get(),
-            'place'         => $places,
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
@@ -61,7 +56,7 @@ class ProductionScheduleController extends Controller
     }
 
     public function getCode(Request $request){
-        $code = ProductionSchedule::generateCode($request->val);
+        $code = ProductionOrder::generateCode($request->val);
         				
 		return response()->json($code);
     }
@@ -74,6 +69,9 @@ class ProductionScheduleController extends Controller
             'company_id',
             'place_id',
             'post_date',
+            'start_date',
+            'end_date',
+            'type',
         ];
 
         $start  = $request->start;
@@ -82,9 +80,9 @@ class ProductionScheduleController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = ProductionSchedule::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
+        $total_data = MarketingOrderPlan::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
         
-        $query_data = ProductionSchedule::where(function($query) use ($search, $request) {
+        $query_data = MarketingOrderPlan::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -92,15 +90,11 @@ class ProductionScheduleController extends Controller
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
                             })
-                            ->orWhereHas('productionScheduleDetail',function($query) use ($search, $request){
+                            ->orWhereHas('marketingOrderPlanDetail',function($query) use ($search, $request){
                                 $query->whereHas('item',function($query) use ($search, $request){
                                     $query->where('code','like',"%$search%")
                                         ->orWhere('name','like',"%$search%");
                                 });
-                            })
-                            ->orWhereHas('place',function($query) use ($search, $request){
-                                $query->where('name','like',"%$search%")
-                                    ->orWhere('code','like',"%$search%");
                             });
                     });
                 }
@@ -116,6 +110,10 @@ class ProductionScheduleController extends Controller
                     $query->whereDate('post_date','>=', $request->start_date);
                 } else if($request->finish_date) {
                     $query->whereDate('post_date','<=', $request->finish_date);
+                }
+
+                if($request->type){
+                    $query->where('type',$request->type);
                 }
 
             })
@@ -125,7 +123,7 @@ class ProductionScheduleController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = ProductionSchedule::where(function($query) use ($search, $request) {
+        $total_filtered = MarketingOrderPlan::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -133,15 +131,11 @@ class ProductionScheduleController extends Controller
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
                             })
-                            ->orWhereHas('productionScheduleDetail',function($query) use ($search, $request){
+                            ->orWhereHas('marketingOrderPlanDetail',function($query) use ($search, $request){
                                 $query->whereHas('item',function($query) use ($search, $request){
                                     $query->where('code','like',"%$search%")
                                         ->orWhere('name','like',"%$search%");
                                 });
-                            })
-                            ->orWhereHas('place',function($query) use ($search, $request){
-                                $query->where('name','like',"%$search%")
-                                    ->orWhere('code','like',"%$search%");
                             });
                     });
                 }
@@ -157,6 +151,10 @@ class ProductionScheduleController extends Controller
                     $query->whereDate('post_date','>=', $request->start_date);
                 } else if($request->finish_date) {
                     $query->whereDate('post_date','<=', $request->finish_date);
+                }
+
+                if($request->type){
+                    $query->where('type',$request->type);
                 }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
@@ -174,6 +172,7 @@ class ProductionScheduleController extends Controller
                     $val->company->name,
                     $val->place->name,
                     date('d/m/y',strtotime($val->post_date)),
+                    $val->type(),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
                     '
@@ -181,6 +180,7 @@ class ProductionScheduleController extends Controller
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat indigo accent-2 white-text btn-small" data-popup="tooltip" title="Salin" onclick="duplicate(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">content_copy</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
@@ -205,21 +205,16 @@ class ProductionScheduleController extends Controller
     public function create(Request $request){
         
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('production_schedules', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:production_schedules,code',
+            'code'			            => $request->temp ? ['required', Rule::unique('marketing_order_plans', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_plans,code',
             'code_place_id'             => 'required',
             'company_id'			    => 'required',
             'place_id'		            => 'required',
-            'marketing_order_plan_id'   => 'required',
             'post_date'		            => 'required',
-            'arr_id'                    => 'required|array',
+            'type'                      => 'required',
+            'arr_item'                  => 'required|array',
             'arr_qty'                   => 'required|array',
-            'arr_date'                  => 'required|array',
-            'arr_shift'                 => 'required|array',
-            'arr_item_detail_id'        => 'required|array',
-            'arr_line_id'               => 'required|array',
-            'arr_warehouse_id'          => 'required|array',
-            'arr_group'                 => 'required|array',
-            'arr_qty_detail'            => 'required|array',
+            'arr_request_date'          => 'required|array',
+            'arr_note'                  => 'required|array',
         ], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
             'code.string'                       => 'Kode harus dalam bentuk string.',
@@ -227,26 +222,16 @@ class ProductionScheduleController extends Controller
             'code.unique'                       => 'Kode telah dipakai',
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
             'place_id.required' 			    => 'Plant tidak boleh kosong.',
-            'marketing_order_plan_id.required'  => 'MOP tidak boleh kosong.',
             'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
-            'arr_id.required'                   => 'Marketing Order Plan tidak boleh kosong.',
-            'arr_id.array'                      => 'Marketing Order Plan harus array.',
-            'arr_qty.required'                  => 'Qty target tidak boleh kosong.',
-            'arr_qty.array'                     => 'Qty target harus array.',
-            'arr_date.required'                 => 'Tgl.Produksi tidak boleh kosong.',
-            'arr_date.array'                    => 'Tgl.Produksi harus array.',
-            'arr_shift.required'                => 'Shift tidak boleh kosong.',
-            'arr_shift.array'                   => 'Shift harus array.',
-            'arr_item_detail_id.required'       => 'Item dan shift tidak boleh kosong.',
-            'arr_item_detail_id.array'          => 'Item dan shift harus array.',
-            'arr_line_id.required'              => 'Line tidak boleh kosong.',
-            'arr_line_id.array'                 => 'Line harus array.',
-            'arr_warehouse_id.required'         => 'Gudang tidak boleh kosong.',
-            'arr_warehouse_id.array'            => 'Gudang harus array.',
-            'arr_group.required'                => 'Grup tidak boleh kosong.',
-            'arr_group.array'                   => 'Grup harus array.',
-            'arr_qty_detail.required'           => 'Qty shift tidak boleh kosong.',
-            'arr_qty_detail.array'              => 'Qty shift harus array.',
+            'type.required'		                => 'Tipe tidak boleh kosong.',
+            'arr_item.required'                 => 'Item tidak boleh kosong.',
+            'arr_item.array'                    => 'Item harus array.',
+            'arr_qty.required'                  => 'Qty tidak boleh kosong.',
+            'arr_qty.array'                     => 'Qty harus array.',
+            'arr_request_date.required'         => 'Tgl request tidak boleh kosong.',
+            'arr_request_date.array'            => 'Tgl request harus array.',
+            'arr_note.required'                 => 'Catatan item tidak boleh kosong.',
+            'arr_note.array'                    => 'Catatan item harus array.',
         ]);
 
         if($validation->fails()) {
@@ -260,7 +245,7 @@ class ProductionScheduleController extends Controller
 			if($request->temp){
                 DB::beginTransaction();
                 try {
-                    $query = ProductionSchedule::where('code',CustomHelper::decrypt($request->temp))->first();
+                    $query = MarketingOrderPlan::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     $approved = false;
                     $revised = false;
@@ -282,7 +267,7 @@ class ProductionScheduleController extends Controller
                     if($approved && !$revised){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Jadwal Produksi telah diapprove, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Marketing Order Plan telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
 
@@ -293,7 +278,7 @@ class ProductionScheduleController extends Controller
                                     Storage::delete($query->document);
                                 }
                             }
-                            $document = $request->file('file')->store('public/production_schedules');
+                            $document = $request->file('file')->store('public/marketing_order_plans');
                         } else {
                             $document = $query->document;
                         }
@@ -302,18 +287,14 @@ class ProductionScheduleController extends Controller
                         $query->code = $request->code;
                         $query->company_id = $request->company_id;
                         $query->place_id = $request->place_id;
-                        $query->marketing_order_plan_id = $request->marketing_order_plan_id;
                         $query->post_date = $request->post_date;
+                        $query->type = $request->type;
                         $query->document = $document;
                         $query->status = '1';
 
                         $query->save();
                         
-                        foreach($query->productionScheduleDetail as $row){
-                            $row->delete();
-                        }
-
-                        foreach($query->productionScheduleTarget as $row){
+                        foreach($query->marketingOrderPlanDetail as $row){
                             $row->delete();
                         }
 
@@ -321,7 +302,7 @@ class ProductionScheduleController extends Controller
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status Jadwal Produksi sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+					        'message' => 'Status Marketing Order Plan sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                 }catch(\Exception $e){
@@ -330,14 +311,14 @@ class ProductionScheduleController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
-                    $query = ProductionSchedule::create([
+                    $query = MarketingOrderPlan::create([
                         'code'			            => $request->code,
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $request->company_id,
                         'place_id'	                => $request->place_id,
-                        'marketing_order_plan_id'   => $request->marketing_order_plan_id,
                         'post_date'                 => $request->post_date,
-                        'document'                  => $request->file('file') ? $request->file('file')->store('public/production_schedules') : NULL,
+                        'type'                      => $request->type,
+                        'document'                  => $request->file('file') ? $request->file('file')->store('public/marketing_order_plans') : NULL,
                         'status'                    => '1',
                     ]);
 
@@ -352,26 +333,14 @@ class ProductionScheduleController extends Controller
                 DB::beginTransaction();
                 try {
                     
-                    foreach($request->arr_id as $key => $row){
-                        ProductionScheduleTarget::create([
-                            'production_schedule_id'            => $query->id,
-                            'marketing_order_plan_detail_id'    => $row,
-                            'qty'                               => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                        ]);
-                    }
-
-                    foreach($request->arr_shift as $key => $row){
-                        ProductionScheduleDetail::create([
-                            'production_schedule_id'        => $query->id,
-                            'production_date'               => $request->arr_date[$key],
-                            'shift_id'                      => $row,
-                            'item_id'                       => $request->arr_item_detail_id[$key],
-                            'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty_detail[$key])),
-                            'line_id'                       => $request->arr_line_id[$key],
-                            'group'                         => $request->arr_group[$key],
-                            'warehouse_id'                  => $request->arr_warehouse_id[$key],
-                            'note'                          => $request->arr_note[$key],
-                            'status'                        => '1',
+                    foreach($request->arr_item as $key => $row){
+                        MarketingOrderPlanDetail::create([
+                            'marketing_order_plan_id'       => $query->id,
+                            'item_id'                       => $row,
+                            'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                            'request_date'                  => $request->arr_request_date[$key],
+                            'note'                          => $request->arr_note[$key] ? $request->arr_note[$key] : NULL,
+                            'is_urgent'                     => $request->arr_urgent[$key] ? $request->arr_urgent[$key] : NULL,
                         ]);
                     }
 
@@ -380,14 +349,14 @@ class ProductionScheduleController extends Controller
                     DB::rollback();
                 }
 
-                CustomHelper::sendApproval($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external);
-                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Jadwal Produksi No. '.$query->code,'Pengajuan Jadwal Produksi No. '.$query->code,session('bo_id'));
+                CustomHelper::sendApproval('marketing_order_plans',$query->id,$query->note_internal.' - '.$query->note_external);
+                CustomHelper::sendNotification('marketing_order_plans',$query->id,'Pengajuan Marketing Order Plan No. '.$query->code,'Pengajuan Marketing Order Plan No. '.$query->code,session('bo_id'));
 
                 activity()
-                    ->performedOn(new ProductionSchedule())
+                    ->performedOn(new MarketingOrderPlan())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit jadwal produksi plan.');
+                    ->log('Add / edit marketing order plan.');
 
 				$response = [
 					'status'    => 200,
@@ -405,84 +374,40 @@ class ProductionScheduleController extends Controller
     }
 
     public function show(Request $request){
-        $po = ProductionSchedule::where('code',CustomHelper::decrypt($request->id))->first();
+        $po = MarketingOrderPlan::where('code',CustomHelper::decrypt($request->id))->first();
         $po['code_place_id'] = substr($po->code,7,2);
-        $po['marketing_order_plan_code'] = $po->marketingOrderPlan->code;
 
         $arr = [];
-        $arrDetail = [];
         
-        $composition = [];
-
-        foreach($po->productionScheduleTarget as $row){
-            $cekBom = $row->marketingOrderPlanDetail->item->bomPlace($po->place_id);
+        foreach($po->marketingOrderPlanDetail as $row){
             $arr[] = [
-                'id'                    => $row->marketingOrderPlanDetail->marketingOrderPlan->id,
-                'code'                  => $row->marketingOrderPlanDetail->marketingOrderPlan->code,
-                'mopd_id'               => $row->marketing_order_plan_detail_id,
-                'item_id'               => $row->marketingOrderPlanDetail->item_id,
-                'item_code'             => $row->marketingOrderPlanDetail->item->code,
-                'item_name'             => $row->marketingOrderPlanDetail->item->code.' - '.$row->marketingOrderPlanDetail->item->name,
-                'qty_in_sell'           => number_format(($row->qty  * $row->marketingOrderPlanDetail->item->production_convert) / $row->marketingOrderPlanDetail->item->sell_convert,3,',','.'),
-                'qty_in_uom'            => number_format($row->qty * $row->marketingOrderPlanDetail->item->production_convert,3,',','.'),
-                'qty_in_production'     => number_format($row->qty,3,',','.'),
-                'qty_in_pallet'         => number_format((($row->qty * $row->marketingOrderPlanDetail->item->production_convert) / $row->marketingOrderPlanDetail->item->sell_convert) / $row->marketingOrderPlanDetail->item->pallet_convert,3,',','.'),
-                'unit_sell'             => $row->marketingOrderPlanDetail->item->sellUnit->code,
-                'unit_uom'              => $row->marketingOrderPlanDetail->item->uomUnit->code,
-                'unit_production'       => $row->marketingOrderPlanDetail->item->productionUnit->code,
-                'unit_pallet'           => $row->marketingOrderPlanDetail->item->palletUnit->code,
-                'sell_convert'          => $row->marketingOrderPlanDetail->item->sell_convert,
-                'production_convert'    => $row->marketingOrderPlanDetail->item->production_convert,
-                'pallet_convert'        => $row->marketingOrderPlanDetail->item->pallet_convert,
-                'request_date'          => date('d/m/y',strtotime($row->marketingOrderPlanDetail->request_date)),
-                'note'                  => $row->marketingOrderPlanDetail->note,
-                'qty_real'              => number_format($row->marketingOrderPlanDetail->qty * $row->marketingOrderPlanDetail->item->sell_convert,3,',','.'),
-                'bom_link'              => $cekBom->exists() ? $cekBom->orderByDesc('id')->first()->code : '',
-                'stock_check'           => $cekBom->exists() ? $row->marketingOrderPlanDetail->item->arrRawStock($po->place_id,$row->marketingOrderPlanDetail->qty * $row->MarketingOrderPlanDetail->item->sell_convert) : '',
-                'is_urgent'             => $row->marketingOrderPlanDetail->isUrgent(),
-                'group'                 => $row->marketingOrderPlanDetail->item->itemGroup->production_type,
-                'warehouses'            => $row->marketingOrderPlanDetail->item->warehouseList(),
-                'bom_id'                => $cekBom->exists() ? $cekBom->orderByDesc('id')->first()->id : '',
-            ];
-            if($cekBom->exists()){
-                $composition[] = $cekBom->orderByDesc('id')->first()->arrAvailableComposition();
-            }
-        }
-
-        foreach($po->productionScheduleDetail as $row){
-            $arrDetail[] = [
-                'date'              => $row->production_date,
-                'shift_id'          => $row->shift_id,
-                'shift_code'        => $row->shift->code.' - '.$row->shift->name.'|'.$row->shift->time_in.' - '.$row->shift->time_out,
-                'item_id'           => $row->item_id,
-                'qty'               => number_format($row->qty,3,',','.'),
-                'unit'              => $row->item->productionUnit->code,
-                'line_id'           => $row->line_id,
-                'group'             => $row->group,
-                'warehouse_id'      => $row->warehouse_id,
-                'note'              => $row->note,
-                'type_production'   => $row->item->itemGroup->production_type ? $row->item->itemGroup->production_type : '',
+                'id'                    => $row->id,
+                'item_id'               => $row->item_id,
+                'item_name'             => $row->item->code.' - '.$row->item->name,
+                'qty'                   => number_format($row->qty,3,',','.'),
+                'unit'                  => $row->item->sellUnit->code,
+                'request_date'          => $row->request_date,
+                'note'                  => $row->note,
+                'is_urgent'             => $row->is_urgent ? $row->is_urgent : '',
             ];
         }
 
-        $po['targets'] = $arr;
-        $po['details'] = $arrDetail;
-        $po['compositions'] = $composition;
+        $po['details'] = $arr;
         				
 		return response()->json($po);
     }
 
     public function approval(Request $request,$id){
         
-        $pr = ProductionSchedule::where('code',CustomHelper::decrypt($id))->first();
+        $pr = MarketingOrderPlan::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
             $data = [
-                'title'     => 'Jadwal Produksi',
+                'title'     => 'Marketing Order Plan',
                 'data'      => $pr
             ];
 
-            return view('admin.approval.production_schedule', $data);
+            return view('admin.approval.marketing_order_plan', $data);
         }else{
             abort(404);
         }
@@ -490,79 +415,36 @@ class ProductionScheduleController extends Controller
 
     public function rowDetail(Request $request)
     {
-        $data   = ProductionSchedule::where('code',CustomHelper::decrypt($request->id))->first();
+        $data   = MarketingOrderPlan::where('code',CustomHelper::decrypt($request->id))->first();
         
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="8">Daftar Target Berdasarkan Marketing Order Plan</th>
-                            </tr>
-                            <tr>
-                                <th class="center-align">No.</th>
-                                <th class="center-align">MOP</th>
-                                <th class="center-align">Item</th>
-                                <th class="center-align">Qty Target</th>
-                                <th class="center-align">Qty MOP</th>
-                                <th class="center-align">Satuan Produksi</th>
-                                <th class="center-align">Tgl.Request</th>
-                                <th class="center-align">Keterangan</th>
-                            </tr>
-                        </thead><tbody>';
-        
-        foreach($data->productionScheduleTarget as $key => $row){
-            $string .= '<tr>
-                <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$row->marketingOrderPlanDetail->marketingOrderPlan->code.'</td>
-                <td class="center-align">'.$row->marketingOrderPlanDetail->item->name.'</td>
-                <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
-                <td class="right-align">'.number_format(($row->marketingOrderPlanDetail->qty * $row->marketingOrderPlanDetail->item->sell_convert) / $row->marketingOrderPlanDetail->item->production_convert,3,',','.').'</td>
-                <td class="center-align">'.$row->marketingOrderPlanDetail->item->productionUnit->code.'</td>
-                <td class="center-align">'.date('d/m/y',strtotime($row->marketingOrderPlanDetail->request_date)).'</td>
-                <td class="">'.$row->marketingOrderPlanDetail->note.'</td>
-            </tr>';
-        }
-        
-        $string .= '</tbody></table></div>';
-
-        $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">
-                        <thead>
-                            <tr>
-                                <th class="center-align" colspan="11">Daftar Shift & Target Produksi</th>
+                                <th class="center-align" colspan="7">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Item</th>
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
-                                <th class="center-align">Gudang</th>
-                                <th class="center-align">Tgl.Produksi</th>
-                                <th class="center-align">Shift</th>
-                                <th class="center-align">Line</th>
-                                <th class="center-align">Grup</th>
-                                <th class="center-align">NO PDO</th>
-                                <th class="center-align">Status</th>
+                                <th class="center-align">Tgl.Request</th>
+                                <th class="center-align">Keterangan</th>
+                                <th class="center-align">Urgent</th>
                             </tr>
                         </thead><tbody>';
-
-        foreach($data->productionScheduleDetail as $key => $row){
+        
+        foreach($data->marketingOrderPlanDetail as $key => $row){
             $string .= '<tr>
-                <td class="center-align" rowspan="2">'.($key + 1).'</td>
-                <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
-                <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
-                <td class="center-align">'.$row->item->productionUnit->code.'</td>
-                <td class="center-align">'.$row->warehouse->code.'</td>
-                <td class="center-align">'.date('d/m/y',strtotime($row->production_date)).'</td>
-                <td class="center-align">'.$row->shift->code.'</td>
-                <td class="center-align">'.$row->line->code.'</td>
-                <td class="center-align">'.$row->group.'</td>
-                <td class="center-align">-</td>
-                <td class="center-align">'.$row->status().'</td>
-            </tr>
-            <tr>
-                <td colspan="10">Keterangan : '.$row->note.'</td>
+                <td class="center-align">'.($key + 1).'</td>
+                <td class="center-align">'.$row->item->name.'</td>
+                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
+                <td class="center-align">'.$row->item->sellUnit->code.'</td>
+                <td class="center-align">'.date('d/m/y',strtotime($row->request_date)).'</td>
+                <td class="">'.$row->note.'</td>
+                <td class="center-align">'.$row->isUrgent().'</td>
             </tr>';
         }
-
+        
         $string .= '</tbody></table></div>';
 
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">
@@ -619,11 +501,11 @@ class ProductionScheduleController extends Controller
 
     public function printIndividual(Request $request,$id){
         
-        $pr = ProductionSchedule::where('code',CustomHelper::decrypt($id))->first();
+        $pr = MarketingOrderPlan::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
             $data = [
-                'title'     => 'Jadwal Produksi',
+                'title'     => 'Marketing Order Plan',
                 'data'      => $pr
             ];
 
@@ -640,7 +522,7 @@ class ProductionScheduleController extends Controller
             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
             $data["image"]=$path_img;
              
-            $pdf = Pdf::loadView('admin.print.production.schedule_individual', $data)->setPaper('a5', 'landscape');
+            $pdf = Pdf::loadView('admin.print.production.plan_individual', $data)->setPaper('a5', 'landscape');
             // $pdf->render();
     
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
@@ -650,7 +532,7 @@ class ProductionScheduleController extends Controller
             
             $randomString = Str::random(10); 
 
-         
+    
             $filePath = 'public/pdf/' . $randomString . '.pdf';
             
 
@@ -666,7 +548,7 @@ class ProductionScheduleController extends Controller
     }
 
     public function voidStatus(Request $request){
-        $query = ProductionSchedule::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = MarketingOrderPlan::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
 
@@ -696,12 +578,12 @@ class ProductionScheduleController extends Controller
                 ]);
     
                 activity()
-                    ->performedOn(new ProductionSchedule())
+                    ->performedOn(new MarketingOrderPlan())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Void the jadwal produksi data');
+                    ->log('Void the marketing order plan data');
     
-                CustomHelper::sendNotification($query->getTable(),$query->id,'Jadwal Produksi No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Marketing Order Plan No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval($query->getTable(),$query->id);
 
                 $response = [
@@ -720,7 +602,7 @@ class ProductionScheduleController extends Controller
     }
 
     public function destroy(Request $request){
-        $query = ProductionSchedule::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = MarketingOrderPlan::where('code',CustomHelper::decrypt($request->id))->first();
 
         $approved = false;
         $revised = false;
@@ -755,16 +637,15 @@ class ProductionScheduleController extends Controller
         
         if($query->delete()){
 
-            $query->productionScheduleDetail()->delete();
-            $query->productionScheduleTarget()->delete();
+            $query->marketingOrderPlanDetail()->delete();
 
             CustomHelper::removeApproval($query->getTable(),$query->id);
 
             activity()
-                ->performedOn(new ProductionSchedule())
+                ->performedOn(new MarketingOrderPlan())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the jadwal produksi data');
+                ->log('Delete the marketing order plan data');
 
             $response = [
                 'status'  => 200,
@@ -796,14 +677,12 @@ class ProductionScheduleController extends Controller
             $var_link=[];
             $currentDateTime = Date::now();
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
-            $temp_pdf = [];
-            info($request->arr_id);
             foreach($request->arr_id as $key => $row){
-                $pr = ProductionSchedule::where('code',$row)->first();
+                $pr = MarketingOrderPlan::where('code',$row)->first();
                 
                 if($pr){
                     $data = [
-                        'title'     => 'Jadwal Produksi',
+                        'title'     => 'Marketing Order Plan',
                         'data'      => $pr,
                       
                     ];
@@ -813,7 +692,7 @@ class ProductionScheduleController extends Controller
                     $img_base_64 = base64_encode($image_temp);
                     $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                     $data["image"]=$path_img;
-                    $pdf = Pdf::loadView('admin.print.production.schedule_individual', $data)->setPaper('a5', 'landscape');
+                    $pdf = Pdf::loadView('admin.print.production.plan_individual', $data)->setPaper('a5', 'landscape');
                     $pdf->render();
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                     $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -884,10 +763,10 @@ class ProductionScheduleController extends Controller
                     ];
                 }else{   
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
-                        $query = ProductionSchedule::where('Code', 'LIKE', '%'.$nomor)->first();
+                        $query = MarketingOrderPlan::where('Code', 'LIKE', '%'.$nomor)->first();
                         if($query){
                             $data = [
-                                'title'     => 'Jadwal Produksi',
+                                'title'     => 'Marketing Order Plan',
                                 'data'      => $query
                             ];
                             $img_path = 'website/logo_web_fix.png';
@@ -896,7 +775,7 @@ class ProductionScheduleController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.production.schedule_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.production.plan_individual', $data)->setPaper('a5', 'landscape');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -957,10 +836,10 @@ class ProductionScheduleController extends Controller
                     ];
                 }else{
                     foreach($merged as $code){
-                        $query = ProductionSchedule::where('Code', 'LIKE', '%'.$code)->first();
+                        $query = MarketingOrderPlan::where('Code', 'LIKE', '%'.$code)->first();
                         if($query){
                             $data = [
-                                'title'     => 'Jadwal Produksi',
+                                'title'     => 'Marketing Order Plan',
                                 'data'      => $query
                             ];
                             $img_path = 'website/logo_web_fix.png';
@@ -969,7 +848,7 @@ class ProductionScheduleController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.production.schedule_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.production.plan_individual', $data)->setPaper('a5', 'landscape');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -1404,9 +1283,6 @@ class ProductionScheduleController extends Controller
                 return $new_array;
             }
         
-            // foreach($data_go_chart as $row_dg){
-            //     info($row_dg);
-            // }
             $data_go_chart = unique_key($data_go_chart,'name');
             $data_link=unique_key($data_link,'string_link');
 
@@ -1424,27 +1300,4 @@ class ProductionScheduleController extends Controller
         return response()->json($response);
     }
 
-    public function sendUsedData(Request $request){
-        $mop = MarketingOrderPlan::find($request->id);
-       
-        if(!$mop->used()->exists()){
-            CustomHelper::sendUsedData($mop->getTable(),$request->id,'Form Jadwal Produksi');
-            return response()->json([
-                'status'    => 200,
-            ]);
-        }else{
-            return response()->json([
-                'status'    => 500,
-                'message'   => 'Dokumen no. '.$mop->used->lookable->code.' telah dipakai di '.$mop->used->ref.', oleh '.$mop->used->user->name.'.'
-            ]);
-        }
-    }
-
-    public function removeUsedData(Request $request){
-        CustomHelper::removeUsedData($request->type,$request->id);
-        return response()->json([
-            'status'    => 200,
-            'message'   => ''
-        ]);
-    }
 }

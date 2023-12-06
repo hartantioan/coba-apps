@@ -53,10 +53,8 @@ class ProductionScheduleDetail extends Model
         return $this->belongsTo('App\Models\Warehouse','warehouse_id','id')->withTrashed();
     }
 
-    public function productionIssueReceiveDetail(){
-        return $this->hasMany('App\Models\ProductionIssueReceiveDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('productionIssueReceive',function($query){
-            $query->whereIn('status',['2','3']);
-        });
+    public function productionOrder(){
+        return $this->hasMany('App\Models\ProductionOrder','production_schedule_detail_id','id');
     }
 
     public function status(){

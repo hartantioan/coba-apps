@@ -6,7 +6,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 
 use App\Models\Item;
-
+use App\Models\ItemShading;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Validators\ValidationException;
@@ -40,8 +40,25 @@ class ImportItem implements OnEachRow, WithHeadingRow, WithValidation, WithBatch
             'is_purchase_item' => $row['is_purchase_item'],
             'is_service' => $row['is_service'],
             'note' => $row['note'],
-            'status' => $row['status']
+            'status' => $row['status'],
+            'type_id' => $row['type_id'] ? $row['type_id'] : NULL,
+            'size_id' => $row['size_id'] ? $row['size_id'] : NULL,
+            'variety_id' => $row['variety_id'] ? $row['variety_id'] : NULL,
+            'pattern_id' => $row['pattern_id'] ? $row['pattern_id'] : NULL,
+            'color_id' => $row['color_id'] ? $row['color_id'] : NULL,
+            'grade_id' => $row['grade_id'] ? $row['grade_id'] : NULL,
+            'brand_id' => $row['brand_id'] ? $row['brand_id'] : NULL,
         ]);
+
+        if($row['shading']){
+            $arrShading = explode('|',$row['shading']);
+            foreach($arrShading as $rowshading){
+                ItemShading::create([
+                    'item_id'   => $query->id,
+                    'code'      => $rowshading,
+                ]);
+            }
+        }
     }
 
     public function rules(): array
@@ -66,6 +83,14 @@ class ImportItem implements OnEachRow, WithHeadingRow, WithValidation, WithBatch
             '*.is_service' => 'nullable',
             '*.note' => 'nullable',
             '*.status' => 'required',
+            '*.type_id' => 'nullable',
+            '*.size_id' => 'nullable',
+            '*.variety_id' => 'nullable',
+            '*.pattern_id' => 'nullable',
+            '*.color_id' => 'nullable',
+            '*.grade_id' => 'nullable',
+            '*.brand_id' => 'nullable',
+            '*.shading' => 'nullable',
         ];
     }
 

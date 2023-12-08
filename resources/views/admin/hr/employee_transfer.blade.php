@@ -1,9 +1,9 @@
 <script src="{{ url('app-assets/js/dropzone.min.js') }}"></script>
 <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
 <style>
-    /* .modal {
+    .modal {
         top:0px !important;
-    } */
+    }
 
     table > thead > tr > th {
         font-size: 13px !important;

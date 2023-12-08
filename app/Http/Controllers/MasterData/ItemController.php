@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\MasterData;
 use App\Helpers\CustomHelper;
+use App\Models\ItemShading;
 use App\Models\Pallet;
 use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
@@ -133,7 +134,7 @@ class ItemController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
+				$btnShading = $val->is_sales_item ? '<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light '.($val->itemShading()->exists() ? 'green' : 'amber darken-3').' accent-2 white-text btn-small" data-popup="tooltip" title="Shading Item : '.count($val->itemShading).'" onclick="shading(' . $val->id . ',`'.$val->name.'`)"><i class="material-icons dp48">devices_other</i></button>' : '';
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
@@ -141,6 +142,7 @@ class ItemController extends Controller
                     $val->itemGroup->name,
                     $val->uomUnit->code,
                     $val->status(),
+                    $btnShading.
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
@@ -232,6 +234,13 @@ class ItemController extends Controller
                     $query->min_stock           = str_replace(',','.',str_replace('.','',$request->min_stock));
                     $query->max_stock           = str_replace(',','.',str_replace('.','',$request->max_stock));
                     $query->status              = $request->status ? $request->status : '2';
+                    $query->type_id             = $request->type_id ? $request->type_id : NULL;
+                    $query->size_id             = $request->size_id ? $request->size_id : NULL;
+                    $query->variety_id          = $request->variety_id ? $request->variety_id : NULL;
+                    $query->pattern_id          = $request->pattern_id ? $request->pattern_id : NULL;
+                    $query->color_id            = $request->color_id ? $request->color_id : NULL;
+                    $query->grade_id            = $request->grade_id ? $request->grade_id : NULL;
+                    $query->brand_id            = $request->brand_id ? $request->brand_id : NULL;
                     $query->save();
 
                     DB::commit();
@@ -263,6 +272,13 @@ class ItemController extends Controller
                         'min_stock'         => str_replace(',','.',str_replace('.','',$request->min_stock)),
                         'max_stock'         => str_replace(',','.',str_replace('.','',$request->max_stock)),
                         'status'            => $request->status ? $request->status : '2',
+                        'type_id'           => $request->type_id ? $request->type_id : NULL,
+                        'size_id'           => $request->size_id ? $request->size_id : NULL,
+                        'variety_id'        => $request->variety_id ? $request->variety_id : NULL,
+                        'pattern_id'        => $request->pattern_id ? $request->pattern_id : NULL,
+                        'color_id'          => $request->color_id ? $request->color_id : NULL,
+                        'grade_id'          => $request->grade_id ? $request->grade_id : NULL,
+                        'brand_id'          => $request->brand_id ? $request->brand_id : NULL,
                     ]);
                     DB::commit();
                 }catch(\Exception $e){
@@ -293,11 +309,66 @@ class ItemController extends Controller
 		return response()->json($response);
     }
 
+    public function createShading(Request $request){
+        DB::beginTransaction();
+        try {
+            $validation = Validator::make($request->all(), [
+                'tempShading'       => 'required',
+                'shading_code'      => 'required',
+            ], [
+                'tempShading.required'      => 'Id item tidak boleh kosong.',
+                'shading_code.required'     => 'Kode shading tidak boleh kosong.',
+            ]);
+
+            if($validation->fails()) {
+                $response = [
+                    'status' => 422,
+                    'error'  => $validation->errors()
+                ];
+            } else {
+                
+                $item = Item::find(intval($request->tempShading));
+
+                if($item){
+                    $query = ItemShading::create([
+                        'item_id'   => $request->tempShading,
+                        'code'      => $request->shading_code,
+                    ]);
+                }
+
+                if($query) {
+                    activity()
+                        ->performedOn(new ItemShading())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Add / edit item shading data.');
+
+                    $response = [
+                        'status'    => 200,
+                        'message'   => 'Data successfully saved.',
+                    ];
+                } else {
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data failed to save.'
+                    ];
+                }
+            }
+
+            DB::commit();
+            
+            return response()->json($response);
+
+        }catch(\Exception $e){
+            DB::rollback();
+        }
+    }
+
     public function rowDetail(Request $request)
     {
         $data   = Item::where('code',CustomHelper::decrypt($request->id))->first();
 
-        $string = '<table style="min-width:100%;max-width:100%;">
+        $string = '<table style="min-width:50%;max-width:50%;">
                         <thead>
                             <tr>
                                 <th>Satuan Beli</th>
@@ -359,6 +430,34 @@ class ItemController extends Controller
                                 <th>Maksimal Stock</th>
                                 <th>'.number_format($data->max_stock,2,',','.').' '.$data->uomUnit->code.'</th>
                             </tr>
+                            <tr>
+                                <th>Tipe</th>
+                                <th>'.($data->type()->exists() ? $data->type->code.'-'.$data->type->name : '-').'</th>
+                            </tr>
+                            <tr>
+                                <th>Ukuran</th>
+                                <th>'.($data->size()->exists() ? $data->size->code.'-'.$data->size->name : '-').'</th>
+                            </tr>
+                            <tr>
+                                <th>Jenis</th>
+                                <th>'.($data->variety()->exists() ? $data->variety->code.'-'.$data->variety->name : '-').'</th>
+                            </tr>
+                            <tr>
+                                <th>Motif</th>
+                                <th>'.($data->pattern()->exists() ? $data->pattern->code.'-'.$data->pattern->name : '-').'</th>
+                            </tr>
+                            <tr>
+                                <th>Warna</th>
+                                <th>'.($data->color()->exists() ? $data->color->code.'-'.$data->color->name : '-').'</th>
+                            </tr>
+                            <tr>
+                                <th>Grade</th>
+                                <th>'.($data->grade()->exists() ? $data->grade->code.'-'.$data->grade->name : '-').'</th>
+                            </tr>
+                            <tr>
+                                <th>Brand</th>
+                                <th>'.($data->brand()->exists() ? $data->brand->code.'-'.$data->brand->name : '-').'</th>
+                            </tr>
                         </thead>
                     </table>';
 		
@@ -374,6 +473,45 @@ class ItemController extends Controller
         $item['tolerance_gr'] = number_format($item->tolerance_gr,2,',','.');
         $item['min_stock'] = number_format($item->min_stock,3,',','.');
         $item['max_stock'] = number_format($item->max_stock,3,',','.');
+        $item['type_name'] = $item->type()->exists() ? $item->type->code.' - '.$item->type->name : '';
+        $item['type_code'] = $item->type()->exists() ? $item->type->code : '';
+        $item['type_name_real'] = $item->type()->exists() ? $item->type->name : '';
+        $item['size_name'] = $item->size()->exists() ? $item->size->code.' - '.$item->size->name : '';
+        $item['size_code'] = $item->size()->exists() ? $item->size->code : '';
+        $item['size_name_real'] = $item->size()->exists() ? $item->size->name : '';
+        $item['variety_name'] = $item->variety()->exists() ? $item->variety->code.' - '.$item->variety->name : '';
+        $item['variety_code'] = $item->variety()->exists() ? $item->variety->code : '';
+        $item['variety_name_real'] = $item->variety()->exists() ? $item->variety->name : '';
+        $item['pattern_name'] = $item->pattern()->exists() ? $item->pattern->code.' - '.$item->pattern->name : '';
+        $item['pattern_code'] = $item->pattern()->exists() ? $item->pattern->code : '';
+        $item['pattern_name_real'] = $item->pattern()->exists() ? $item->pattern->name : '';
+        $item['color_name'] = $item->color()->exists() ? $item->color->code.' - '.$item->color->name : '';
+        $item['color_code'] = $item->color()->exists() ? $item->color->code : '';
+        $item['color_name_real'] = $item->color()->exists() ? $item->color->name : '';
+        $item['grade_name'] = $item->grade()->exists() ? $item->grade->code.' - '.$item->grade->name : '';
+        $item['grade_code'] = $item->grade()->exists() ? $item->grade->code : '';
+        $item['grade_name_real'] = $item->grade()->exists() ? $item->grade->name : '';
+        $item['brand_name'] = $item->brand()->exists() ? $item->brand->code.' - '.$item->brand->name : '';
+        $item['brand_code'] = $item->brand()->exists() ? $item->brand->code : '';
+        $item['brand_name_real'] = $item->brand()->exists() ? $item->brand->name : '';
+        				
+		return response()->json($item);
+    }
+
+    public function showShading(Request $request){
+        $item = Item::find($request->id);
+        
+        $shadings = [];
+
+        foreach($item->itemShading as $row){
+            $shadings[] = [
+                'id'        => $row->id,
+                'item_id'   => $row->item_id,
+                'code'      => $row->code,
+            ];
+        }
+
+        $item['shadings'] = $shadings;
         				
 		return response()->json($item);
     }
@@ -387,6 +525,45 @@ class ItemController extends Controller
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
                 ->log('Delete the item data');
+
+            $response = [
+                'status'  => 200,
+                'message' => 'Data deleted successfully.'
+            ];
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function destroyShading(Request $request){
+        $query = ItemShading::find($request->id);
+		
+        $passedDelete = true;
+
+        foreach($query->itemStock as $row){
+            if($row->qty > 0){
+                $passedDelete = false;
+            }
+        }
+
+        if(!$passedDelete){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Item shading masih memiliki stok di gudang. Anda tidak bisa menghapusnya.'
+            ]);
+        }
+
+        if($query->delete()) {
+            activity()
+                ->performedOn(new ItemShading())
+                ->causedBy(session('bo_id'))
+                ->withProperties($query)
+                ->log('Delete the item shading data');
 
             $response = [
                 'status'  => 200,

@@ -163,7 +163,7 @@ class EmployeeTransferController extends Controller
             </tr>
             <tr>
                 <td class="center-align" style="font-weight: 700;background: cornsilk;">Manager</td>
-                <td class="">'.($data->manager->name).'</td>
+                <td class="">'.($data->manager()->exists() ? $data->manager->name : '-').'</td>
             </tr>
             <tr>
                 <td class="center-align" style="font-weight: 700;background: cornsilk;">Tanggal Mulai</td>

@@ -6,6 +6,10 @@
     .select-wrapper, .select2-container {
         height:3.6rem !important;
     }
+
+    .modal table.bordered th, table.bordered td {
+        padding: 5px !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -97,12 +101,16 @@
                                                         <th>Code</th>
                                                         <th>Pengguna</th>
                                                         <th>Perusahaan</th>
+                                                        <th>Tgl.Post</th>
+                                                        <th>Keterangan</th>
                                                         <th>Jadwal Produksi</th>
                                                         <th>Item Output</th>
-                                                        <th>Item </th>
-                                                        <th>Tgl.Post</th>
-                                                        <th>Tipe</th>
-                                                        <th>Dokumen</th>
+                                                        <th>Qty Output</th>
+                                                        <th>Satuan</th>
+                                                        <th>Shift</th>
+                                                        <th>Line</th>
+                                                        <th>Grup</th>
+                                                        <th>Gudang</th>
                                                         <th>Status</th>
                                                         <th>Operasi</th>
                                                     </tr>
@@ -141,6 +149,14 @@
                                         <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                                         <label class="active" for="code">No. Dokumen</label>
                                     </div>
+                                    <div class="input-field col m1 s12 step2">
+                                        <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
+                                            <option value="">--Pilih--</option>
+                                            @foreach ($place as $rowplace)
+                                                <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                     <div class="input-field col m3 s12 step3">
                                         <select class="form-control" id="company_id" name="company_id">
                                             @foreach ($company as $row)
@@ -153,31 +169,9 @@
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                         <label class="active" for="post_date">Tgl. Posting</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step6">
-                                        <select class="form-control" id="type" name="type" onchange="loadDataTable()">
-                                            <option value="1">Normal</option>
-                                            <option value="2">Susulan dari Sales</option>
-                                            <option value="2">Susulan dari Produksi</option>
-                                        </select>
-                                        <label for="type">Tipe</label>
-                                    </div>
-                                    <div class="file-field input-field col m3 s12 step7">
-                                        <div class="btn">
-                                            <span>File</span>
-                                            <input type="file" name="file" id="file">
-                                        </div>
-                                        <div class="file-path-wrapper">
-                                            <input class="file-path validate" type="text">
-                                        </div>
-                                    </div>
-                                    <div class="input-field col m3 s12 right-align" style="font-size:15px !important;font-weight:800;">
-                                        Kapasitas Plant :
-                                    </div>
-                                    <div class="input-field col m2 s12 right-align" style="font-size:15px !important;font-weight:800;" id="capacity-nominal">
-                                        0,00
-                                    </div>
-                                    <div class="input-field col m1 s12" style="font-size:15px !important;font-weight:800;">
-                                        M<sup>2</sup>
+                                    <div class="input-field col m3 s12 step5">
+                                        <input id="note" name="note" type="text" placeholder="Keterangan...">
+                                        <label class="active" for="note">Keterangan</label>
                                     </div>
                                 </fieldset>
                             </div>
@@ -185,69 +179,55 @@
                         <div class="row">
                             <div class="col s12">
                                 <fieldset>
-                                    <legend>2. Detail Produk</legend>
+                                    <legend>2. Detail Item</legend>
+                                    <div class="input-field col m4 s12 step7">
+                                        <select class="browser-default" id="production_schedule_id" name="production_schedule_id" onchange="resetProductionSchedule();"></select>
+                                        <label class="active" for="production_schedule_id">Jadwal Produksi</label>
+                                    </div>
+                                    <div class="input-field col m4 s12 step7">
+                                        <select class="browser-default" id="production_schedule_detail_id" name="production_schedule_detail_id" onchange="getProductionSchedule();"></select>
+                                        <label class="active" for="production_schedule_detail_id">Daftar Item</label>
+                                    </div>
+                                    <div class="input-field col m4 s12 step7">
+                                        <select class="browser-default" id="warehouse_id" name="warehouse_id">
+                                            <option value="">Silahkan pilih Jadwal Produksi</option>
+                                        </select>
+                                        <label class="active" for="warehouse_id">Gudang</label>
+                                    </div>
+                                    <div class="col m12">
+                                        <div class="row">
+                                            <div class="col m3 s12">
+                                                Qty Planned : <b id="output-qty">-</b>
+                                            </div>
+                                            <div class="col m3 s12">
+                                                Shift : <b id="output-shift">-</b>
+                                            </div>
+                                            <div class="col m3 s12">
+                                                Grup : <b id="output-group">-</b>
+                                            </div>
+                                            <div class="col m3 s12">
+                                                Line : <b id="output-line">-</b>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="col m12 s12 step8" style="overflow:auto;width:100% !important;">
                                         <p class="mt-2 mb-2">
-                                            <table class="bordered">
+                                            <table class="bordered" id="table-bom">
                                                 <thead>
                                                     <tr>
-                                                        <th class="center">Item</th>
-                                                        <th class="center">Qty (Satuan Jual)</th>
-                                                        <th class="center">Satuan</th>
-                                                        <th class="center">Keterangan</th>
-                                                        <th class="center">Tgl.Request</th>
-                                                        <th class="center">Urgent</th>
+                                                        <th class="center">No</th>
+                                                        <th class="center">Item/Coa</th>
+                                                        <th class="center">Qty (BOM)</th>
+                                                        <th class="center">Satuan (Produksi)</th>
+                                                        <th class="center">Gudang</th>
+                                                        <th class="center">Stok (Produksi)</th>
                                                         <th class="center">Hapus</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-item">
-                                                    <tr class="row_item">
-                                                        <td>
-                                                            <select class="browser-default item-array" id="arr_item0" name="arr_item[]" onchange="getRowUnit(0)" required></select>
-                                                        </td>
-                                                        <td>
-                                                            <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiahNoMinus(this);count();" required>
-                                                        </td>
-                                                        <td class="center">
-                                                            <span id="arr_satuan0">-</span>
-                                                        </td>
-                                                        <td>
-                                                            <input name="arr_note[]" type="text" placeholder="Keterangan barang..." value="-" required>
-                                                        </td>
-                                                        <td>
-                                                            <input name="arr_request_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}" required>
-                                                        </td>
-                                                        <td>
-                                                            <div class="switch mb-1">
-                                                                <label>
-                                                                    <input type="checkbox" id="arr_urgent0" name="arr_urgent[]" value="1">
-                                                                    <span class="lever"></span>
-                                                                </label>
-                                                            </div>
-                                                        </td>
-                                                        <td class="center">
-                                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                                                                <i class="material-icons">delete</i>
-                                                            </a>
-                                                        </td>
-                                                    </tr>
-                                                    <tr id="last-row-item" style="font-size:17px !important;font-weight:800;">
-                                                        <td class="right-align">
-                                                            TOTAL MOP
-                                                        </td>
-                                                        <td class="right-align" id="total-mop">
-                                                            0,000
-                                                        </td>
-                                                        <td class="left-align" colspan="5">
-                                                            {{-- M<sup>2</sup> --}}
-                                                            Box
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
+                                                    <tr id="last-row-item">
                                                         <td colspan="7">
-                                                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
-                                                                <i class="material-icons left">add</i> Tambah
-                                                            </a>
+                                                            Silahkan pilih Jadwal Produksi & Item Target ...
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -483,18 +463,16 @@
                 window.onbeforeunload = function() {
                     return 'You will lose all changes made since your last save';
                 };
-                getCapacity();
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
                 M.updateTextFields();
-                $('#project_id,#warehouse_id').empty();
-                $('.row_item').remove();
+                $('#production_schedule_id').empty();
+                resetProductionSchedule();
                 window.onbeforeunload = function() {
                     return null;
                 };
-                $('#total-mop').text('0,000');
             }
         });
 
@@ -502,8 +480,32 @@
             $(this).closest('tr').remove();
         });
 
-        $('#arr_place0,#arr_department0').formSelect();
-        select2ServerSide('#arr_item0', '{{ url("admin/select2/sales_item") }}');
+        select2ServerSide('#production_schedule_id', '{{ url("admin/select2/production_schedule") }}');
+
+        $('#production_schedule_detail_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/production_schedule_detail") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        production_schedule_id: $('#production_schedule_id').val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
     });
 
     function makeTreeOrg(data,link){
@@ -625,8 +627,75 @@
             nodeDataArray: data,
             linkDataArray: link
         });
-            
-            
+    }
+
+    function resetProductionSchedule(){
+        $('#production_schedule_detail_id').empty().trigger('change');
+    }
+
+    function getProductionSchedule(){
+        $('#body-item').empty();
+        $('#warehouse_id').empty();
+        $('#output-qty,#output-shift,#output-group,#output-line').text('-');
+        if($('#production_schedule_detail_id').val()){
+            let datakuy = $('#production_schedule_detail_id').select2('data')[0];
+            $.each(datakuy.details, function(i, val) {
+                var count = makeid(10);
+                let no = $('.row_item').length + 1;
+                $('#body-item').append(`
+                    <tr class="row_item">
+                        <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
+                        <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
+                        <input type="hidden" name="arr_qty[]" value="` + val.qty + `">
+                        <input type="hidden" name="arr_nominal[]" value="` + val.nominal + `">
+                        <input type="hidden" name="arr_total[]" value="` + val.total + `">
+                        <td class="center-align">
+                            ` + no + `.
+                        </td>
+                        <td>
+                            ` + val.lookable_code + ' - ' + val.lookable_name + `
+                        </td>
+                        <td class="right-align">
+                            ` + val.qty + `
+                        </td>
+                        <td class="center-align">
+                            ` + val.unit + `
+                        </td>
+                        <td>
+                            ` + val.warehouse + `
+                        </td>
+                        <td class="right-align">
+                            ` + val.stock + `
+                        </td>
+                        <td class="center">
+                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item btn-small" href="javascript:void(0);">
+                                <i class="material-icons">delete</i>
+                            </a>
+                        </td>
+                    </tr>
+                `);
+            });
+            $.each(datakuy.warehouses, function(i, val) {
+                $('#warehouse_id').append(`
+                    <option value="` + val.id + `">` + val.name + `</option>
+                `);
+            });
+            $('#output-qty').text(datakuy.qty);
+            $('#output-shift').text(datakuy.shift);
+            $('#output-group').text(datakuy.group);
+            $('#output-line').text(datakuy.line);
+        }else{
+            $('#body-item').append(`
+                <tr id="last-row-item">
+                    <td colspan="7">
+                        Silahkan pilih Jadwal Produksi & Item Target ...
+                    </td>
+                </tr>
+            `);
+            $('#warehouse_id').append(`
+                <option value="">Silahkan pilih Jadwal Produksi</option>
+            `);
+        }
     }
 
     function printMultiSelect(){
@@ -736,7 +805,6 @@
                 });
             }
         });
-        
     }
 
     function viewStructureTree(id){
@@ -770,7 +838,7 @@
         });
     }
 
-     function loadDataTable() {
+    function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
             "scrollCollapse": true,
             "scrollY": '400px',
@@ -814,10 +882,16 @@
                 { name: 'code', className: 'center-align' },
                 { name: 'user_id', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
-                { name: 'place_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
-                { name: 'type', className: '' },
-                { name: 'document', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'note', className: 'center-align' },
+                { name: 'production_schedule_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'production_schedule_detail_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'qty_output', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'unit_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'shift_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'line_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'group', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'warehouse_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -856,14 +930,6 @@
 
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
-
-    function getCapacity(){
-        if($('#place_id').val()){
-            $('#capacity-nominal').text($('#place_id').find(':selected').data('capacity'));
-        }else{
-            $('#capacity-nominal').text('0,000');
-        }
-    }
 
     function rowDetail(data) {
         $.ajax({
@@ -1072,129 +1138,6 @@
         });
     }
 
-    function count(){
-        let total = 0;
-        $('input[name^="arr_qty[]"]').each(function(){
-            total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-        });
-        $('#total-mop').text(
-            (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(3).toString().replace('.',','))
-        );
-    }
-
-    function duplicate(id){
-        swal({
-            title: "Apakah anda yakin ingin salin?",
-            text: "Pastikan item yang ingin anda salin sudah sesuai!",
-            icon: 'warning',
-            dangerMode: true,
-            buttons: {
-            cancel: 'Tidak, jangan!',
-            delete: 'Ya, lanjutkan!'
-            }
-        }).then(function (willDelete) {
-            if (willDelete) {
-                $.ajax({
-                    url: '{{ Request::url() }}/show',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: {
-                        id: id
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        loadingOpen('#main');
-                    },
-                    success: function(response) {
-                        loadingClose('#main');
-                        $('#modal1').modal('open');
-                        
-                        $('#code_place_id').val(response.code_place_id).formSelect();
-                        $('#code').val(response.code);
-                        $('#post_date').val(response.post_date);
-                        $('#company_id').val(response.company_id).formSelect();
-                        $('#place_id').val(response.place_id).formSelect();
-                        $('#type').val(response.type).formSelect();
-
-                        if(response.details.length > 0){
-                            $('.row_item').each(function(){
-                                $(this).remove();
-                            });
-
-                            $.each(response.details, function(i, val) {
-                                var count = makeid(10);
-                                $('#last-row-item').before(`
-                                    <tr class="row_item">
-                                        <td>
-                                            <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" required></select>
-                                        </td>
-                                        <td>
-                                            <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);count();" required>
-                                        </td>
-                                        <td class="center">
-                                            <span id="arr_satuan` + count + `">` + val.unit + `</span>
-                                        </td>
-                                        <td>
-                                            <input name="arr_note[]" type="text" placeholder="Keterangan barang..." value="` + val.note + `" required>
-                                        </td>
-                                        <td>
-                                            <input name="arr_request_date[]" type="date" value="` + val.request_date + `" min="{{ date('Y-m-d') }}" required>
-                                        </td>
-                                        <td>
-                                            <div class="switch mb-1">
-                                                <label>
-                                                    <input type="checkbox" id="arr_urgent` + count + `" name="arr_urgent[]" value="1">
-                                                    <span class="lever"></span>
-                                                </label>
-                                            </div>
-                                        </td>
-                                        <td class="center">
-                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                                                <i class="material-icons">delete</i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                `);
-                                $('#arr_item' + count).append(`
-                                    <option value="` + val.item_id + `">` + val.item_name + `</option>
-                                `);
-                                select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
-                                if(val.is_urgent){
-                                    $('#arr_urgent' + count).prop( "checked", true);
-                                }
-                            });
-                        }
-                        
-                        $('.modal-content').scrollTop(0);
-                        
-                        M.updateTextFields();
-
-                        $('#code_place_id').val(response.code_place_id).formSelect().trigger('change');
-                    },
-                    error: function() {
-                        $('.modal-content').scrollTop(0);
-                        loadingClose('#main');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
-                        });
-                    }
-                });
-            }
-        });
-    }
-
-    function getRowUnit(val){
-        if($("#arr_item" + val).val()){
-            $('#arr_satuan' + val).text($("#arr_item" + val).select2('data')[0].sell_unit);
-        }else{
-            $('#arr_satuan' + val).text('-');
-        }
-    }
-
     function destroy(id){
         swal({
             title: "Apakah anda yakin?",
@@ -1236,43 +1179,6 @@
                 });
             }
         });
-    }
-
-    function addItem(){
-        var count = makeid(10);
-        $('#last-row-item').before(`
-            <tr class="row_item">
-                <td>
-                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" required></select>
-                </td>
-                <td>
-                    <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiahNoMinus(this);count();" required>
-                </td>
-                <td class="center">
-                    <span id="arr_satuan` + count + `">-</span>
-                </td>
-                <td>
-                    <input name="arr_note[]" type="text" placeholder="Keterangan barang..." value="-" required>
-                </td>
-                <td>
-                    <input name="arr_request_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}" required>
-                </td>
-                <td>
-                    <div class="switch mb-1">
-                        <label>
-                            <input type="checkbox" id="arr_urgent` + count + `" name="arr_urgent[]" value="1">
-                            <span class="lever"></span>
-                        </label>
-                    </div>
-                </td>
-                <td class="center">
-                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                        <i class="material-icons">delete</i>
-                    </a>
-                </td>
-            </tr>
-        `);
-        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
     }
 
     String.prototype.replaceAt = function(index, replacement) {

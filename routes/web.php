@@ -88,6 +88,13 @@ use App\Http\Controllers\MasterData\PalletController;
 use App\Http\Controllers\MasterData\TransportationController;
 use App\Http\Controllers\MasterData\OutletController;
 use App\Http\Controllers\MasterData\OutletPriceController;
+use App\Http\Controllers\MasterData\TypeController;
+use App\Http\Controllers\MasterData\SizeController;
+use App\Http\Controllers\MasterData\VarietyController;
+use App\Http\Controllers\MasterData\PatternController;
+use App\Http\Controllers\MasterData\ColorController;
+use App\Http\Controllers\MasterData\GradeController;
+use App\Http\Controllers\MasterData\BrandController;
 
 use App\Http\Controllers\Finance\FundRequestController;
 use App\Http\Controllers\Finance\PaymentRequestController;
@@ -256,6 +263,13 @@ Route::prefix('admin')->group(function () {
                 Route::get('asset_capitalization', [Select2Controller::class, 'assetCapitalization']);
                 Route::get('asset_retirement', [Select2Controller::class, 'assetRetirement']);
                 Route::get('unit', [Select2Controller::class, 'unit']);
+                Route::get('type', [Select2Controller::class, 'type']);
+                Route::get('size', [Select2Controller::class, 'size']);
+                Route::get('variety', [Select2Controller::class, 'variety']);
+                Route::get('pattern', [Select2Controller::class, 'pattern']);
+                Route::get('color', [Select2Controller::class, 'color']);
+                Route::get('grade', [Select2Controller::class, 'grade']);
+                Route::get('brand', [Select2Controller::class, 'brand']);
                 Route::get('coa_cash_bank', [Select2Controller::class, 'coaCashBank']);
                 Route::get('payment_request', [Select2Controller::class, 'paymentRequest']);
                 Route::get('equipment', [Select2Controller::class, 'equipment']);
@@ -302,6 +316,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('punishment_by_plant', [Select2Controller::class, 'punishmentByPlant']);
                 Route::get('punishment_by_user_plant', [Select2Controller::class, 'punishmentByUserPlant']);
                 Route::get('production_schedule', [Select2Controller::class, 'productionSchedule']);
+                Route::get('production_schedule_detail', [Select2Controller::class, 'productionScheduleDetail']);
                 Route::get('form_user', [Select2Controller::class, 'formUser']);
                 Route::get('coa_subsidiary_ledger', [Select2Controller::class, 'coaSubsidiaryLedger']);
                 Route::get('marketing_order_return', [Select2Controller::class, 'marketingOrderReturn']);
@@ -511,6 +526,62 @@ Route::prefix('admin')->group(function () {
                         Route::post('destroy', [UnitController::class, 'destroy'])->middleware('operation.access:unit,delete');
                     });
 
+                    Route::prefix('type')->middleware('operation.access:type,view')->group(function () {
+                        Route::get('/',[TypeController::class, 'index']);
+                        Route::get('datatable',[TypeController::class, 'datatable']);
+                        Route::post('show', [TypeController::class, 'show']);
+                        Route::post('create',[TypeController::class, 'create'])->middleware('operation.access:type,update');
+                        Route::post('destroy', [TypeController::class, 'destroy'])->middleware('operation.access:type,delete');
+                    });
+
+                    Route::prefix('size')->middleware('operation.access:size,view')->group(function () {
+                        Route::get('/',[SizeController::class, 'index']);
+                        Route::get('datatable',[SizeController::class, 'datatable']);
+                        Route::post('show', [SizeController::class, 'show']);
+                        Route::post('create',[SizeController::class, 'create'])->middleware('operation.access:size,update');
+                        Route::post('destroy', [SizeController::class, 'destroy'])->middleware('operation.access:size,delete');
+                    });
+
+                    Route::prefix('variety')->middleware('operation.access:variety,view')->group(function () {
+                        Route::get('/',[VarietyController::class, 'index']);
+                        Route::get('datatable',[VarietyController::class, 'datatable']);
+                        Route::post('show', [VarietyController::class, 'show']);
+                        Route::post('create',[VarietyController::class, 'create'])->middleware('operation.access:variety,update');
+                        Route::post('destroy', [VarietyController::class, 'destroy'])->middleware('operation.access:variety,delete');
+                    });
+
+                    Route::prefix('pattern')->middleware('operation.access:pattern,view')->group(function () {
+                        Route::get('/',[PatternController::class, 'index']);
+                        Route::get('datatable',[PatternController::class, 'datatable']);
+                        Route::post('show', [PatternController::class, 'show']);
+                        Route::post('create',[PatternController::class, 'create'])->middleware('operation.access:pattern,update');
+                        Route::post('destroy', [PatternController::class, 'destroy'])->middleware('operation.access:pattern,delete');
+                    });
+
+                    Route::prefix('color')->middleware('operation.access:color,view')->group(function () {
+                        Route::get('/',[ColorController::class, 'index']);
+                        Route::get('datatable',[ColorController::class, 'datatable']);
+                        Route::post('show', [ColorController::class, 'show']);
+                        Route::post('create',[ColorController::class, 'create'])->middleware('operation.access:color,update');
+                        Route::post('destroy', [ColorController::class, 'destroy'])->middleware('operation.access:color,delete');
+                    });
+
+                    Route::prefix('grade')->middleware('operation.access:grade,view')->group(function () {
+                        Route::get('/',[GradeController::class, 'index']);
+                        Route::get('datatable',[GradeController::class, 'datatable']);
+                        Route::post('show', [GradeController::class, 'show']);
+                        Route::post('create',[GradeController::class, 'create'])->middleware('operation.access:grade,update');
+                        Route::post('destroy', [GradeController::class, 'destroy'])->middleware('operation.access:grade,delete');
+                    });
+
+                    Route::prefix('brand')->middleware('operation.access:brand,view')->group(function () {
+                        Route::get('/',[BrandController::class, 'index']);
+                        Route::get('datatable',[BrandController::class, 'datatable']);
+                        Route::post('show', [BrandController::class, 'show']);
+                        Route::post('create',[BrandController::class, 'create'])->middleware('operation.access:brand,update');
+                        Route::post('destroy', [BrandController::class, 'destroy'])->middleware('operation.access:brand,delete');
+                    });
+
                     Route::prefix('pallet')->middleware('operation.access:pallet,view')->group(function () {
                         Route::get('/',[PalletController::class, 'index']);
                         Route::get('datatable',[PalletController::class, 'datatable']);
@@ -534,12 +605,15 @@ Route::prefix('admin')->group(function () {
                         Route::get('datatable',[ItemController::class, 'datatable']);
                         Route::get('row_detail',[ItemController::class, 'rowDetail']);
                         Route::post('show', [ItemController::class, 'show']);
+                        Route::post('show_shading', [ItemController::class, 'showShading']);
                         Route::post('print',[ItemController::class, 'print']);
                         Route::post('print_barcode',[ItemController::class, 'printBarcode']);
                         Route::get('export',[ItemController::class, 'export']);
                         Route::post('import',[ItemController::class, 'import'])->middleware('operation.access:item,update');
                         Route::post('create',[ItemController::class, 'create'])->middleware('operation.access:item,update');
+                        Route::post('create_shading',[ItemController::class, 'createShading'])->middleware('operation.access:item,update');
                         Route::post('destroy', [ItemController::class, 'destroy'])->middleware('operation.access:item,delete');
+                        Route::post('destroy_shading', [ItemController::class, 'destroyShading'])->middleware('operation.access:item,delete');
                     });
 
                     Route::prefix('warehouse')->middleware('operation.access:warehouse,view')->group(function () {

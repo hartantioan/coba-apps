@@ -167,42 +167,23 @@ class MenuController extends Controller
     }
 
     public function create(Request $request){
-        if($request->type == 1){
-            $validation = Validator::make($request->all(), [
-                'name' 				=> 'required',
-                'url'			    => $request->temp ? ['required', Rule::unique('menus', 'url')->ignore($request->temp)] : 'required|unique:menus,url',
-                'icon'		        => 'required',
-                'order'		        => 'required',
-                
-                'whitelist'         => $request->maintenance ? 'required' : '',
-            ], [
-                'name.required' 					=> 'Nama menu tidak boleh kosong.',
-                'url.required' 					    => 'Url tidak boleh kosong.',
-                'url.unique'                        => 'Url telah terpakai',
-                'icon.required'			            => 'Icon tidak boleh kosong.',
-                'order.required'				    => 'Urutan tidak boleh kosong.',
-                
-                'whitelist.required'                => 'Whitelist IP tidak boleh kosong.',
-            ]);
-        }else{
-            $validation = Validator::make($request->all(), [
-                'name' 				=> 'required',
-                'url'			    => $request->temp ? ['required', Rule::unique('menus', 'url')->ignore($request->temp)] : 'required|unique:menus,url',
-                'icon'		        => 'required',
-                'order'		        => 'required',
-                'document_code'     => 'required',
-                'whitelist'         => $request->maintenance ? 'required' : '',
-            ], [
-                'name.required' 					=> 'Nama menu tidak boleh kosong.',
-                'url.required' 					    => 'Url tidak boleh kosong.',
-                'url.unique'                        => 'Url telah terpakai',
-                'icon.required'			            => 'Icon tidak boleh kosong.',
-                'order.required'				    => 'Urutan tidak boleh kosong.',
-                'document_code.required'            => 'Kode Dokumen harus diisi',
-                'whitelist.required'                => 'Whitelist IP tidak boleh kosong.',
-            ]);
-        }
         
+        $validation = Validator::make($request->all(), [
+            'name' 				=> 'required',
+            'url'			    => $request->temp ? ['required', Rule::unique('menus', 'url')->ignore($request->temp)] : 'required|unique:menus,url',
+            'icon'		        => 'required',
+            'order'		        => 'required',
+            'document_code'     => $request->type == '1' ? 'required' : '',
+            'whitelist'         => $request->maintenance ? 'required' : '',
+        ], [
+            'name.required' 					=> 'Nama menu tidak boleh kosong.',
+            'url.required' 					    => 'Url tidak boleh kosong.',
+            'url.unique'                        => 'Url telah terpakai',
+            'icon.required'			            => 'Icon tidak boleh kosong.',
+            'order.required'				    => 'Urutan tidak boleh kosong.',
+            'document_code.required'            => 'Kode Dokumen harus diisi',
+            'whitelist.required'                => 'Whitelist IP tidak boleh kosong.',
+        ]);
 
         if($validation->fails()) {
             $response = [

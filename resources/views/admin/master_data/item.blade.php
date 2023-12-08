@@ -18,6 +18,10 @@
     .modal {
         top:0px !important;
     }
+
+    #modal3 {
+        top:50px !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -106,6 +110,16 @@
                                     <h4 class="card-title">List Data</h4>
                                     <div class="row">
                                         <div class="col s12">
+                                            <div class="card-alert card green">
+                                                <div class="card-content white-text">
+                                                    <p>Info : Silahkan tekan tombol <a href="javascript:void(0);" class="btn-floating mb-1 btn-flat waves-effect waves-light amber darken-3 accent-2 white-text btn-small" data-popup="tooltip" title="Shading Item"><i class="material-icons dp48">devices_other</i></a> untuk melihat jumlah kode shading item (khusus untuk Item Penjualan).</p>
+                                                </div>
+                                            </div>
+                                            <div class="card-alert card blue">
+                                                <div class="card-content white-text">
+                                                    <p>Info : Khusus untuk Item Penjualan, pengguna harus menentukan <b>Tipe, Ukuran, Jenis, Motif, Warna, Grade, dan Brand </b>, dimana Kode Item dan Nama Item akan otomatis diambil dari gabungan 7 komponen tersebut.</p>
+                                                </div>
+                                            </div>
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
@@ -135,6 +149,45 @@
             </div>
             <div class="content-overlay"></div>
         </div>
+    </div>
+</div>
+
+<div id="modal3" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;max-width:90%;min-width:90%;width:100%;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <h4>Shading Item - <b id="text-shading"></b></h4>
+                <div class="row">
+                    <div class="col s12">
+                        <form class="row" id="form_data_shading" onsubmit="return false;">
+                            <div class="col s12">
+                                <div id="validation_alert_shading" style="display:none;"></div>
+                            </div>
+                            <div class="col s12">
+                                <div class="row">
+                                    <div class="input-field col m2 s2">
+                                        <input type="hidden" id="tempShading" name="tempShading">
+                                        <input id="shading_code" name="shading_code" type="text" placeholder="Kode Shading">
+                                        <label class="active" for="shading_code">Kode Shading</label>
+                                    </div>
+                                    <div class="input-field col m2 s2">
+                                        <button class="btn waves-effect waves-light right submit" onclick="saveShading();">Simpan <i class="material-icons right">send</i></button>
+                                    </div>
+                                    <div class="input-field col m2 s2">
+                                        <h6>Daftar Shading</h6>
+                                    </div>
+                                    <div class="input-field col m6 s6" id="list-shading">
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
 
@@ -326,7 +379,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s4">
                             <div class="switch mb-1">
                                 <label for="is_inventory_item">Item untuk Inventori</label>
                                 <label class="right">
@@ -340,7 +393,7 @@
                                 <label for="is_sales_item">Item untuk Penjualan</label>
                                 <label class="right">
                                     Tidak
-                                    <input type="checkbox" id="is_sales_item" name="is_sales_item" value="1">
+                                    <input type="checkbox" id="is_sales_item" name="is_sales_item" value="1" onclick="showSalesComposition();">
                                     <span class="lever"></span>
                                     Ya
                                 </label>
@@ -362,6 +415,43 @@
                                     <span class="lever"></span>
                                     Ya
                                 </label>
+                            </div>
+                        </div>
+                        <div class="input-field col s8" id="item-sale-show" style="display:none;">
+                            <div class="card-alert card green">
+                                <div class="card-content white-text">
+                                    <p>Info : Kode & nama item akan otomatis terbuat dari gabungan komposisi kode & nama master data dibawah ini.</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col m4 s12">
+                                    <select class="browser-default" id="type_id" name="type_id" onchange="generateCode();"></select>
+                                    <label class="active" for="type_id">Tipe</label>
+                                </div>
+                                <div class="input-field col m4 s12">
+                                    <select class="browser-default" id="size_id" name="size_id" onchange="generateCode();"></select>
+                                    <label class="active" for="size_id">Ukuran</label>
+                                </div>
+                                <div class="input-field col m4 s12">
+                                    <select class="browser-default" id="variety_id" name="variety_id" onchange="generateCode();"></select>
+                                    <label class="active" for="variety_id">Jenis</label>
+                                </div>
+                                <div class="input-field col m4 s12">
+                                    <select class="browser-default" id="pattern_id" name="pattern_id" onchange="generateCode();"></select>
+                                    <label class="active" for="pattern_id">Motif</label>
+                                </div>
+                                <div class="input-field col m4 s12">
+                                    <select class="browser-default" id="color_id" name="color_id" onchange="generateCode();"></select>
+                                    <label class="active" for="color_id">Warna</label>
+                                </div>
+                                <div class="input-field col m4 s12">
+                                    <select class="browser-default" id="grade_id" name="grade_id" onchange="generateCode();"></select>
+                                    <label class="active" for="grade_id">Grade</label>
+                                </div>
+                                <div class="input-field col m4 s12">
+                                    <select class="browser-default" id="brand_id" name="brand_id" onchange="generateCode();"></select>
+                                    <label class="active" for="brand_id">Brand</label>
+                                </div>
                             </div>
                         </div>
                         <div class="col s12 mt-3">
@@ -398,7 +488,7 @@
 
 <!-- END: Page Main-->
 <script>
-    var selected = [];
+    var selected = [], arrCode = [], arrName = [];
     
     $(function() {
         
@@ -545,6 +635,20 @@
                 $('#form_dataimport')[0].reset();
             }
         });
+
+        $('#modal3').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#text-shading').text('');
+                $('#form_data_shading')[0].reset();
+                $('#tempShading').val('');
+                $('#list-shading').html('');
+                loadDataTable();
+            }
+        });
         
         $('#modal1').modal({
             dismissible: false,
@@ -561,6 +665,10 @@
                 $('#form_data')[0].reset();
                 $("#form_data > select").prop("selectedIndex", 0).trigger('change');
                 M.updateTextFields();
+                $('#type_id,#size_id,#variety_id,#pattern_id,#color_id,#grade_id,#brand_id').empty();
+                $('#item-sale-show').hide();
+                arrCode = [];
+                arrName = [];
             }
         });
 
@@ -592,7 +700,118 @@
         $('.buttons-select-none[aria-controls="datatable_serverside"]').on('click', function (e) {
             selectDeselectRow();
         });
+
+        select2ServerSide('#type_id', '{{ url("admin/select2/type") }}');
+        select2ServerSide('#size_id', '{{ url("admin/select2/size") }}');
+        select2ServerSide('#variety_id', '{{ url("admin/select2/variety") }}');
+        select2ServerSide('#pattern_id', '{{ url("admin/select2/pattern") }}');
+        select2ServerSide('#color_id', '{{ url("admin/select2/color") }}');
+        select2ServerSide('#grade_id', '{{ url("admin/select2/grade") }}');
+        select2ServerSide('#brand_id', '{{ url("admin/select2/brand") }}');
+
     });
+
+    function shading(id,name){
+        $('#text-shading').text(name);
+        $('#tempShading').val(id);
+        $('#modal3').modal('open');
+        refreshShading(id);
+    }
+
+    function refreshShading(id){
+        $.ajax({
+            url: '{{ Request::url() }}/show_shading',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                loadingClose('.modal-content');
+
+                $('#list-shading').html('');
+                
+                if(response.shadings.length > 0){
+                    $.each(response.shadings, function(i, val) {
+                        $('#list-shading').append(`
+                            <div class="chip gradient-45deg-purple-deep-orange white-text" style="font-size: 15px !important;line-height: 30px !important;font-weight: 700 !important;">
+                                ` + val.code + `
+                                <i class="material-icons close" onclick="destroyShading(` + val.id + `,` + val.item_id + `,this);return false;">close</i>
+                            </div>
+                        `);
+                    });
+                    $('.chip > .close').click(function() {
+                        return false; 
+                    });
+                }else{
+                    $('#list-shading').html(`
+                        <div class="card-alert card red" style="margin: 0 0 0 0 !important;">
+                            <div class="card-content white-text">
+                                <p>Shading tidak ditemukan.</p>
+                            </div>
+                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                    `);
+                }
+
+                $('.modal-content').scrollTop(0);
+                $('#shading_code').focus();
+                M.updateTextFields();
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    function showSalesComposition(){
+        if($('#is_sales_item').is(':checked')){
+            $('#item-sale-show').show();
+        }else{
+            $('#item-sale-show').hide();
+        }
+    }
+
+    function generateCode(){
+        arrCode = [];
+        arrName = [];
+        if($('#type_id').val() && $('#size_id').val() && $('#variety_id').val() && $('#pattern_id').val() && $('#color_id').val() && $('#grade_id').val() && $('#brand_id').val()){
+            arrCode.push($('#type_id').select2('data')[0].code ? $('#type_id').select2('data')[0].code : $('#type_id').find(":selected").data("code")); 
+            arrCode.push($('#size_id').select2('data')[0].code ? $('#size_id').select2('data')[0].code : $('#size_id').find(":selected").data("code"));
+            arrCode.push($('#variety_id').select2('data')[0].code ? $('#variety_id').select2('data')[0].code : $('#variety_id').find(":selected").data("code")); 
+            arrCode.push($('#pattern_id').select2('data')[0].code ? $('#pattern_id').select2('data')[0].code : $('#pattern_id').find(":selected").data("code")); 
+            arrCode.push($('#color_id').select2('data')[0].code ? $('#color_id').select2('data')[0].code : $('#color_id').find(":selected").data("code")); 
+            arrCode.push($('#grade_id').select2('data')[0].code ? $('#grade_id').select2('data')[0].code : $('#grade_id').find(":selected").data("code")); 
+            arrCode.push($('#brand_id').select2('data')[0].code ? $('#brand_id').select2('data')[0].code : $('#brand_id').find(":selected").data("code"));
+            arrName.push($('#type_id').select2('data')[0].name ? $('#type_id').select2('data')[0].name : $('#type_id').find(":selected").data("name"));
+            arrName.push($('#size_id').select2('data')[0].name ? $('#size_id').select2('data')[0].name : $('#size_id').find(":selected").data("name")),
+            arrName.push($('#variety_id').select2('data')[0].name ? $('#variety_id').select2('data')[0].name : $('#variety_id').find(":selected").data("name"));
+            arrName.push($('#pattern_id').select2('data')[0].name ? $('#pattern_id').select2('data')[0].name : $('#pattern_id').find(":selected").data("name"));
+            arrName.push($('#color_id').select2('data')[0].name ? $('#color_id').select2('data')[0].name : $('#color_id').find(":selected").data("name"));
+            arrName.push($('#grade_id').select2('data')[0].name ? $('#grade_id').select2('data')[0].name : $('#grade_id').find(":selected").data("name"));
+            arrName.push($('#brand_id').select2('data')[0].name ? $('#brand_id').select2('data')[0].name : $('#brand_id').find(":selected").data("name"));
+            let newCode = arrCode.join('.');
+            let newName = arrName.join(' ');
+            $('#code').val(newCode);
+            $('#name').val(newName);
+        }else{
+            $('#code,#name').val('');
+        }
+    }
 
     function selectDeselectRow(){
         $.map(window.table.rows().nodes(), function (item) {
@@ -795,6 +1014,76 @@
         });
     }
 
+    function saveShading(){
+			
+        var formData = new FormData($('#form_data_shading')[0]);
+        
+        $.ajax({
+            url: '{{ Request::url() }}/create_shading',
+            type: 'POST',
+            dataType: 'JSON',
+            data: formData,
+            contentType: false,
+            processData: false,
+            cache: true,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                $('#validation_alert_shading').hide();
+                $('#validation_alert_shading').html('');
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                loadingClose('.modal-content');
+                if(response.status == 200) {
+                    refreshShading($('#tempShading').val());
+                    M.toast({
+                        html: response.message
+                    });
+                    $('#shading_code').val('');
+                } else if(response.status == 422) {
+                    $('#validation_alert_shading').show();
+                    $('.modal-content').scrollTop(0);
+                    
+                    swal({
+                        title: 'Ups! Validation',
+                        text: 'Check your form.',
+                        icon: 'warning'
+                    });
+
+                    $.each(response.error, function(i, val) {
+                        $.each(val, function(i, val) {
+                            $('#validation_alert_shading').append(`
+                                <div class="card-alert card red">
+                                    <div class="card-content white-text">
+                                        <p>` + val + `</p>
+                                    </div>
+                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">×</span>
+                                    </button>
+                                </div>
+                            `);
+                        });
+                    });
+                } else {
+                    M.toast({
+                        html: response.message
+                    });
+                }
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
     function success(){
         loadDataTable();
         $('#modal1').modal('close');
@@ -822,6 +1111,9 @@
             success: function(response) {
                 loadingClose('#main');
                 $('#modal1').modal('open');
+
+                arrCode = [];
+                arrName = [];
                 
                 $('#temp').val(id);
                 $('#code').val(response.code);
@@ -849,7 +1141,42 @@
                 }
 
                 if(response.is_sales_item == '1'){
-                    $('#is_sales_item').prop( "checked", true);
+                    $('#is_sales_item').trigger('click');
+                    if(response.type_name){
+                        $('#type_id').empty().append(`
+                            <option value="` + response.type_id + `" data-code="` + response.type_code + `" data-name="` + response.type_name_real + `">` + response.type_name + `</option>
+                        `);
+                    }
+                    if(response.size_name){
+                        $('#size_id').empty().append(`
+                            <option value="` + response.size_id + `" data-code="` + response.size_code + `" data-name="` + response.size_name_real + `">` + response.size_name + `</option>
+                        `);
+                    }
+                    if(response.variety_name){
+                        $('#variety_id').empty().append(`
+                            <option value="` + response.variety_id + `" data-code="` + response.variety_code + `" data-name="` + response.variety_name_real + `">` + response.variety_name + `</option>
+                        `);
+                    }
+                    if(response.pattern_name){
+                        $('#pattern_id').empty().append(`
+                            <option value="` + response.pattern_id + `" data-code="` + response.pattern_code + `" data-name="` + response.pattern_name_real + `">` + response.pattern_name + `</option>
+                        `);
+                    }
+                    if(response.color_name){
+                        $('#color_id').empty().append(`
+                            <option value="` + response.color_id + `" data-code="` + response.color_code + `" data-name="` + response.color_name_real + `">` + response.color_name + `</option>
+                        `);
+                    }
+                    if(response.grade_name){
+                        $('#grade_id').empty().append(`
+                            <option value="` + response.grade_id + `" data-code="` + response.grade_code + `" data-name="` + response.grade_name_real + `">` + response.grade_name + `</option>
+                        `);
+                    }
+                    if(response.brand_name){
+                        $('#brand_id').empty().append(`
+                            <option value="` + response.brand_id + `" data-code="` + response.brand_code + `" data-name="` + response.brand_name_real + `">` + response.brand_name + `</option>
+                        `);
+                    }
                 }else{
                     $('#is_sales_item').prop( "checked", false);
                 }
@@ -920,6 +1247,50 @@
                     },
                     error: function() {
                         loadingClose('#main');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    function destroyShading(id,item,element){
+        swal({
+            title: "Apakah anda yakin?",
+            text: "Anda tidak bisa mengembalikan data yang terhapus!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                $.ajax({
+                    url: '{{ Request::url() }}/destroy_shading',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: { id : id },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+                        refreshShading(item);
+                        M.toast({
+                            html: response.message
+                        });
+                        $(element).parent().remove();
+                    },
+                    error: function() {
+                        loadingClose('.modal-content');
                         swal({
                             title: 'Ups!',
                             text: 'Check your internet connection.',

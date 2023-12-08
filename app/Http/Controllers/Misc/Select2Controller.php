@@ -6,6 +6,7 @@ use App\Helpers\CustomHelper;
 use App\Models\ApprovalStage;
 use App\Models\Area;
 use App\Models\AttendancePeriod;
+use App\Models\Brand;
 use App\Models\CostDistribution;
 use App\Models\Department;
 use App\Models\EmployeeSchedule;
@@ -13,6 +14,7 @@ use App\Models\FundRequest;
 use App\Models\GoodIssue;
 use App\Models\GoodReceipt;
 use App\Models\GoodScaleDetail;
+use App\Models\Grade;
 use App\Models\HardwareItem;
 use App\Models\HardwareItemGroup;
 use App\Models\InventoryTransferOut;
@@ -34,6 +36,7 @@ use App\Models\Outlet;
 use App\Models\PaymentRequest;
 use App\Models\Position;
 use App\Models\ProductionSchedule;
+use App\Models\ProductionScheduleDetail;
 use App\Models\Punishment;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
@@ -58,7 +61,12 @@ use App\Models\Equipment;
 use App\Models\WorkOrder;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Color;
 use App\Models\DeliveryCost;
+use App\Models\Pattern;
+use App\Models\Size;
+use App\Models\Type;
+use App\Models\Variety;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -999,6 +1007,160 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> $d->code.' - '.$d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function type(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Type::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%");
+                })
+                ->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name,
+                'code'          => $d->code,
+                'name'          => $d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function size(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Size::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%");
+                })
+                ->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name,
+                'code'          => $d->code,
+                'name'          => $d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function variety(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Variety::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%");
+                })
+                ->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name,
+                'code'          => $d->code,
+                'name'          => $d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function pattern(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Pattern::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%");
+                })
+                ->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name,
+                'code'          => $d->code,
+                'name'          => $d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function color(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Color::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%");
+                })
+                ->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name,
+                'code'          => $d->code,
+                'name'          => $d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function grade(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Grade::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%");
+                })
+                ->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name,
+                'code'          => $d->code,
+                'name'          => $d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function brand(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Brand::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%");
+                })
+                ->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name,
+                'code'          => $d->code,
+                'name'          => $d->name,
             ];
         }
 
@@ -2460,32 +2622,57 @@ class Select2Controller extends Controller {
         ->get();
 
         foreach($data as $d) {
-            $details = [];
-
-            foreach($d->productionScheduleDetail as $row){
-                $details[] = [
-                    'id'                => $row->id,
-                    'item_id'           => $row->item_id,
-                    'item_name'         => $row->item->name,
-                    'qty_in_sell'       => number_format($row->qty / $row->item->sell_convert,3,',','.'),
-                    'qty_in_uom'        => number_format($row->qty,3,',','.'),
-                    'qty_in_pallet'     => number_format(($row->qty / $row->item->sell_convert) / $row->item->pallet_convert,3,',','.'),
-                    'unit_sell'         => $row->item->sellUnit->code,
-                    'unit_uom'          => $row->item->uomUnit->code,
-                    'unit_pallet'       => $row->item->palletUnit->code,
-                    'sell_convert'      => $row->item->sell_convert,
-                    'pallet_convert'    => $row->item->pallet_convert,
-                    'production_date'   => date('d/m/y',strtotime($row->production_date)),
-                    'shift_id'          => $row->shift_id,
-                    'shift_code'        => $row->shift->code,
-                ];
-            }
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code.' Tgl.Post '.date('d/m/y',strtotime($d->post_date)).' - Plant : '.$d->place->code.' - Mesin : '.$d->machine->name,
+                'text' 			=> $d->code.' Tgl.Post '.date('d/m/y',strtotime($d->post_date)).' - Plant : '.$d->place->code,
                 'table'         => $d->getTable(),
-                'details'       => $details,
                 'code'          => $d->code,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function productionScheduleDetail(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = ProductionScheduleDetail::where('production_schedule_id',$request->production_schedule_id)->get();
+
+        foreach($data as $d) {
+            $details = [];
+
+            if($d->item->bomPlace($d->productionSchedule->place_id)->exists()){
+                $databom = $d->item->bomPlace($d->productionSchedule->place_id)->first();
+                if($databom){
+                    $bobot = $d->qty / $databom->qty_output;
+                    foreach($databom->bomDetail as $rowdetail){
+                        $details[] = [
+                            'lookable_id'   => $rowdetail->lookable_id,
+                            'lookable_type' => $rowdetail->lookable_type,
+                            'lookable_code' => $rowdetail->lookable->code,
+                            'lookable_name' => $rowdetail->lookable->name,
+                            'warehouse'     => $rowdetail->item()->exists() ? $rowdetail->item->getStockWarehousePlaceArea($d->productionSchedule->place_id) : '-',
+                            'stock'         => $rowdetail->item()->exists() ? number_format($rowdetail->item->getStockPlace($d->productionSchedule->place_id) / $rowdetail->item->production_convert,3,',','.').' '.$rowdetail->item->productionUnit->code : '-',
+                            'qty'           => $rowdetail->item()->exists() ? number_format($bobot * $rowdetail->qty,3,',','.') : '0,000',
+                            'unit'          => $rowdetail->item()->exists() ? $rowdetail->item->productionUnit->code : '-',
+                            'nominal'       => $rowdetail->coa()->exists() ? number_format($bobot * $rowdetail->nominal,2,',','.') : '0,00',
+                            'total'         => $rowdetail->coa()->exists() ? number_format($bobot * $rowdetail->total,2,',','.') : '0,00',
+                            'note'          => $rowdetail->description,
+                        ];
+                    }
+                }
+            }
+
+            $response[] = [
+                'id'   			=> $d->item_id,
+                'text' 			=> $d->item->code.' - '.$d->item->name,
+                'warehouses'    => $d->item->warehouseList(),
+                'details'       => $details,
+                'qty'           => number_format($d->qty,3,',','.').' '.$d->item->productionUnit->code,
+                'shift'         => $d->shift->code.' - '.$d->shift->name,
+                'group'         => $d->group,
+                'line'          => $d->line->code,
             ];
         }
 

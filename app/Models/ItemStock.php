@@ -17,11 +17,16 @@ class ItemStock extends Model
         'warehouse_id',
         'area_id',
         'item_id',
+        'item_shading_id',
         'qty'
     ];
 
     public function item(){
         return $this->belongsTo('App\Models\Item','item_id','id')->withTrashed();
+    }
+
+    public function itemShading(){
+        return $this->belongsTo('App\Models\ItemShading','item_shading_id','id')->withTrashed();
     }
 
     public function place(){

@@ -42,6 +42,14 @@ class ExportItem implements FromCollection, WithTitle, WithHeadings, WithCustomS
         'GUDANG',
         'KETERANGAN',
         'STATUS',
+        'TIPE',
+        'UKURAN',
+        'JENIS',
+        'MOTIF',
+        'WARNA',
+        'GRADE',
+        'BRAND',
+        'SHADING',
     ];
 
     public function collection()
@@ -101,6 +109,14 @@ class ExportItem implements FromCollection, WithTitle, WithHeadings, WithCustomS
                 'warehouses'        => $row->warehouses(),
                 'note'              => $row->note,
                 'status'            => $row->status == '1' ? 'Aktif' : 'Non-Aktif',
+                'type_id'           => $row->type()->exists() ? $row->type->code.' - '.$row->type->name : '',
+                'size_id'           => $row->size()->exists() ? $row->size->code.' - '.$row->size->name : '',
+                'variety_id'        => $row->variety()->exists() ? $row->variety->code.' - '.$row->variety->name : '',
+                'pattern_id'        => $row->pattern()->exists() ? $row->pattern->code.' - '.$row->pattern->name : '',
+                'color_id'          => $row->color()->exists() ? $row->color->code.' - '.$row->color->name : '',
+                'grade_id'          => $row->grade()->exists() ? $row->grade->code.' - '.$row->grade->name : '',
+                'brand_id'          => $row->brand()->exists() ? $row->brand->code.' - '.$row->brand->name : '',
+                'shading'           => $row->listShading(),
             ];
         }
 

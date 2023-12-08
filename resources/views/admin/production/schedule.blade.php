@@ -189,7 +189,7 @@
                                     <legend>2. MOP Terpakai</legend>
                                     <div class="input-field col m3 s12 step7">
                                         <select class="browser-default" id="marketing_order_plan_id" name="marketing_order_plan_id" onchange="checkPlace();"></select>
-                                        <label class="active" for="marketing_order_plan_id">Marketing Order Plan</label>
+                                        <label class="active" for="marketing_order_plan_id">Marketing Order Produksi</label>
                                     </div>
                                     <div class="col m2 s12 step8">
                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 mt-5" onclick="getMarketingOrderPlan();" href="javascript:void(0);">
@@ -225,7 +225,7 @@
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
                                                         <td class="center-align" colspan="9">
-                                                            Silahkan tambahkan Marketing Order Plan...
+                                                            Silahkan tambahkan Marketing Order Produksi...
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -235,7 +235,7 @@
                                                             Stok RM :
                                                         </td>
                                                         <td class="" colspan="7" id="data-foot">
-                                                            Silahkan tambahkan Marketing Order Plan...
+                                                            Silahkan tambahkan Marketing Order Produksi...
                                                         </td>
                                                     </tr>
                                                 </tfoot>
@@ -652,7 +652,7 @@
                     $('.data-used').trigger('click');
                 }
                 $('#data-foot').empty().append(`
-                    Silahkan tambahkan Marketing Order Plan...
+                    Silahkan tambahkan Marketing Order Produksi...
                 `);
                 window.onbeforeunload = function() {
                     return null;
@@ -667,7 +667,7 @@
                 $('#body-item').empty().append(`
                     <tr id="last-row-item">
                         <td class="center-align" colspan="9">
-                            Silahkan tambahkan Marketing Order Plan...
+                            Silahkan tambahkan Marketing Order Produksi...
                         </td>
                     </tr>
                 `);
@@ -863,13 +863,13 @@
                     $('#body-item').empty().append(`
                         <tr id="last-row-item">
                             <td class="center-align" colspan="9">
-                                Silahkan tambahkan Marketing Order Plan...
+                                Silahkan tambahkan Marketing Order Produksi...
                             </td>
                         </tr>
                     `);
                     $('#marketing_order_plan_id').empty();
                     $('#data-foot').empty().append(`
-                        Silahkan tambahkan Marketing Order Plan...
+                        Silahkan tambahkan Marketing Order Produksi...
                     `);
                 }
             },
@@ -1032,7 +1032,7 @@
         }else{
             swal({
                 title: 'Ups! Hayo.',
-                text: 'Silahkan tambahkan satu atau lebih Marketing Order Plan.',
+                text: 'Silahkan tambahkan satu atau lebih Marketing Order Produksi.',
                 icon: 'warning'
             });
         }
@@ -1998,7 +1998,7 @@
                     intro : 'Silahkan unggah file lampiran. Untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
                 },
                 {
-                    title : 'Marketing Order Plan',
+                    title : 'Marketing Order Produksi',
                     element : document.querySelector('.step7'),
                     intro : 'Silahkan pilih MOP yang ingin diproses produksinya. Anda bisa memilih lebih dari satu MOP untuk satu kali transaksi dokumen Jadwal Produksi.' 
                 },

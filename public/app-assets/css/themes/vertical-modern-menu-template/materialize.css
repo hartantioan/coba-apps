@@ -6504,7 +6504,7 @@ small
     line-height: 120%;
 
     position: absolute;
-    z-index: 2000;
+    z-index: 10000;
     top: 0;
     left: 0;
 

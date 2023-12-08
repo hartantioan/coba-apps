@@ -35,11 +35,46 @@ class Item extends Model
         'note',
         'min_stock',
         'max_stock',
-        'status'
+        'status',
+        'type_id',
+        'size_id',
+        'variety_id',
+        'pattern_id',
+        'color_id',
+        'grade_id',
+        'brand_id',
     ];
 
     public function itemGroup(){
         return $this->belongsTo('App\Models\ItemGroup', 'item_group_id', 'id')->withTrashed();
+    }
+
+    public function type(){
+        return $this->belongsTo('App\Models\Type', 'type_id', 'id')->withTrashed();
+    }
+
+    public function size(){
+        return $this->belongsTo('App\Models\Size', 'size_id', 'id')->withTrashed();
+    }
+
+    public function variety(){
+        return $this->belongsTo('App\Models\Variety', 'variety_id', 'id')->withTrashed();
+    }
+
+    public function pattern(){
+        return $this->belongsTo('App\Models\Pattern', 'pattern_id', 'id')->withTrashed();
+    }
+
+    public function color(){
+        return $this->belongsTo('App\Models\Color', 'color_id', 'id')->withTrashed();
+    }
+
+    public function grade(){
+        return $this->belongsTo('App\Models\Grade', 'grade_id', 'id')->withTrashed();
+    }
+
+    public function brand(){
+        return $this->belongsTo('App\Models\Brand', 'brand_id', 'id')->withTrashed();
     }
 
     public function warehouses(){
@@ -290,6 +325,19 @@ class Item extends Model
         return $this->hasMany('App\Models\ItemStock','item_id','id');
     }
 
+    public function itemShading()
+    {
+        return $this->hasMany('App\Models\ItemShading','item_id','id');
+    }
+
+    public function listShading(){
+        $arr = [];
+        foreach($this->itemShading as $row){
+            $arr[] = $row->code;
+        }
+        return implode('|',$arr);
+    }
+
     public function outletPriceDetail()
     {
         return $this->hasMany('App\Models\OutletPriceDetail','item_id','id')->whereHas('outletPrice',function($query){
@@ -376,5 +424,19 @@ class Item extends Model
         $total = $this->itemStock()->where('place_id',$place_id)->sum('qty');
 
         return $total;
+    }
+
+    public function getStockWarehousePlaceArea($place_id){
+        $arr = [];
+
+        $data = $this->itemStock()->whereIn('warehouse_id',$this->arrWarehouse())->where('place_id',$place_id)->get();
+
+        foreach($data as $row){
+            $area = $row->area()->exists() ? $row->area->code : '';
+            $warehouse = $row->warehouse->name;
+            $arr[] = $area.' - '.$warehouse;
+        }
+
+        return implode(', ',$arr);
     }
 }

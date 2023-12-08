@@ -22,6 +22,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
 use App\Models\Menu;
 use App\Models\ProductionOrder;
+use App\Models\ProductionSchedule;
+use App\Models\ProductionScheduleDetail;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 class ProductionOrderController extends Controller
@@ -50,6 +52,7 @@ class ProductionOrderController extends Controller
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
             'newcode'       => $menu->document_code.date('y'),
+            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -80,9 +83,9 @@ class ProductionOrderController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = MarketingOrderPlan::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
+        $total_data = ProductionOrder::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
         
-        $query_data = MarketingOrderPlan::where(function($query) use ($search, $request) {
+        $query_data = ProductionOrder::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -90,7 +93,10 @@ class ProductionOrderController extends Controller
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
                             })
-                            ->orWhereHas('marketingOrderPlanDetail',function($query) use ($search, $request){
+                            ->orWhereHas('productionSchedule',function($query) use ($search, $request){
+                                $query->where('code','like',"%$search%");
+                            })
+                            ->orWhereHas('productionScheduleDetail',function($query) use ($search, $request){
                                 $query->whereHas('item',function($query) use ($search, $request){
                                     $query->where('code','like',"%$search%")
                                         ->orWhere('name','like',"%$search%");
@@ -110,10 +116,6 @@ class ProductionOrderController extends Controller
                     $query->whereDate('post_date','>=', $request->start_date);
                 } else if($request->finish_date) {
                     $query->whereDate('post_date','<=', $request->finish_date);
-                }
-
-                if($request->type){
-                    $query->where('type',$request->type);
                 }
 
             })
@@ -123,7 +125,7 @@ class ProductionOrderController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = MarketingOrderPlan::where(function($query) use ($search, $request) {
+        $total_filtered = ProductionOrder::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -131,7 +133,10 @@ class ProductionOrderController extends Controller
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
                             })
-                            ->orWhereHas('marketingOrderPlanDetail',function($query) use ($search, $request){
+                            ->orWhereHas('productionSchedule',function($query) use ($search, $request){
+                                $query->where('code','like',"%$search%");
+                            })
+                            ->orWhereHas('productionScheduleDetail',function($query) use ($search, $request){
                                 $query->whereHas('item',function($query) use ($search, $request){
                                     $query->where('code','like',"%$search%")
                                         ->orWhere('name','like',"%$search%");
@@ -151,10 +156,6 @@ class ProductionOrderController extends Controller
                     $query->whereDate('post_date','>=', $request->start_date);
                 } else if($request->finish_date) {
                     $query->whereDate('post_date','<=', $request->finish_date);
-                }
-
-                if($request->type){
-                    $query->where('type',$request->type);
                 }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
@@ -170,10 +171,16 @@ class ProductionOrderController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->company->name,
-                    $val->place->name,
                     date('d/m/y',strtotime($val->post_date)),
-                    $val->type(),
-                    '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
+                    $val->note,
+                    $val->productionSchedule->code,
+                    $val->productionScheduleDetail->item->code.' - '.$val->productionScheduleDetail->item->name,
+                    number_format($val->productionScheduleDetail->qty,3,',','.'),
+                    $val->productionScheduleDetail->item->productionUnit->code,
+                    $val->productionScheduleDetail->shift->code.' - '.$val->productionScheduleDetail->shift->name,
+                    $val->productionScheduleDetail->line->code,
+                    $val->productionScheduleDetail->group,
+                    $val->productionScheduleDetail->warehouse->name,
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
@@ -205,33 +212,37 @@ class ProductionOrderController extends Controller
     public function create(Request $request){
         
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('marketing_order_plans', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_plans,code',
-            'code_place_id'             => 'required',
-            'company_id'			    => 'required',
-            'place_id'		            => 'required',
-            'post_date'		            => 'required',
-            'type'                      => 'required',
-            'arr_item'                  => 'required|array',
-            'arr_qty'                   => 'required|array',
-            'arr_request_date'          => 'required|array',
-            'arr_note'                  => 'required|array',
+            'code'			                => $request->temp ? ['required', Rule::unique('production_orders', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:production_orders,code',
+            'code_place_id'                 => 'required',
+            'company_id'			        => 'required',
+            'post_date'		                => 'required',
+            'production_schedule_id'        => 'required',
+            'production_schedule_detail_id' => 'required',
+            'warehouse_id'                  => 'required',
+            'arr_lookable_id'               => 'required|array',
+            'arr_lookable_type'             => 'required|array',
+            'arr_qty'                       => 'required|array',
+            'arr_nominal'                   => 'required|array',
+            'arr_total'                     => 'required|array',
         ], [
-            'code.required' 	                => 'Kode tidak boleh kosong.',
-            'code.string'                       => 'Kode harus dalam bentuk string.',
-            'code.min'                          => 'Kode harus minimal 18 karakter.',
-            'code.unique'                       => 'Kode telah dipakai',
-            'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
-            'place_id.required' 			    => 'Plant tidak boleh kosong.',
-            'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
-            'type.required'		                => 'Tipe tidak boleh kosong.',
-            'arr_item.required'                 => 'Item tidak boleh kosong.',
-            'arr_item.array'                    => 'Item harus array.',
-            'arr_qty.required'                  => 'Qty tidak boleh kosong.',
-            'arr_qty.array'                     => 'Qty harus array.',
-            'arr_request_date.required'         => 'Tgl request tidak boleh kosong.',
-            'arr_request_date.array'            => 'Tgl request harus array.',
-            'arr_note.required'                 => 'Catatan item tidak boleh kosong.',
-            'arr_note.array'                    => 'Catatan item harus array.',
+            'code.required' 	                        => 'Kode tidak boleh kosong.',
+            'code.string'                               => 'Kode harus dalam bentuk string.',
+            'code.min'                                  => 'Kode harus minimal 18 karakter.',
+            'code.unique'                               => 'Kode telah dipakai',
+            'company_id.required' 			            => 'Perusahaan tidak boleh kosong.',
+            'post_date.required' 			            => 'Tanggal posting tidak boleh kosong.',
+            'production_schedule_id.required'           => 'Jadwal Produksi tidak boleh kosong.',
+            'production_schedule_detail_id.required'    => 'Item target tidak boleh kosong.',
+            'arr_lookable_id.required'                  => 'Detail tidak boleh kosong.',
+            'arr_lookable_id.array'                     => 'Detail harus array.',
+            'arr_lookable_type.required'                => 'Detail tidak boleh kosong.',
+            'arr_lookable_type.array'                   => 'Detail harus array.',
+            'arr_qty.required'                          => 'Qty tidak boleh kosong.',
+            'arr_qty.array'                             => 'Qty harus array.',
+            'arr_nominal.required'                      => 'Nominal tidak boleh kosong.',
+            'arr_nominal.array'                         => 'Nominal harus array.',
+            'arr_total.required'                        => 'Total tidak boleh kosong.',
+            'arr_total.array'                           => 'Total harus array.',
         ]);
 
         if($validation->fails()) {
@@ -241,11 +252,17 @@ class ProductionOrderController extends Controller
             ];
         } else {
 
+            $qtyPlanned = 0;
+
+            $pscd = ProductionScheduleDetail::find($request->production_schedule_detail_id);
+            if($pscd){
+                $qtyPlanned = $pscd->qty;
+            }
             
 			if($request->temp){
                 DB::beginTransaction();
                 try {
-                    $query = MarketingOrderPlan::where('code',CustomHelper::decrypt($request->temp))->first();
+                    $query = ProductionOrder::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     $approved = false;
                     $revised = false;
@@ -267,29 +284,21 @@ class ProductionOrderController extends Controller
                     if($approved && !$revised){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Marketing Order Plan telah diapprove, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Order Produksi telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
 
                     if(in_array($query->status,['1','6'])){
-                        if($request->has('file')) {
-                            if($query->document){
-                                if(Storage::exists($query->document)){
-                                    Storage::delete($query->document);
-                                }
-                            }
-                            $document = $request->file('file')->store('public/marketing_order_plans');
-                        } else {
-                            $document = $query->document;
-                        }
 
                         $query->user_id = session('bo_id');
                         $query->code = $request->code;
                         $query->company_id = $request->company_id;
-                        $query->place_id = $request->place_id;
+                        $query->production_schedule_id = $request->production_schedule_id;
+                        $query->production_schedule_detail_id = $request->production_schedule_detail_id;
+                        $query->warehouse_id = $request->warehouse_id;
                         $query->post_date = $request->post_date;
-                        $query->type = $request->type;
-                        $query->document = $document;
+                        $query->note = $request->note;
+                        $query->planned_qty = $qtyPlanned;
                         $query->status = '1';
 
                         $query->save();

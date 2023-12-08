@@ -420,6 +420,7 @@
                 $('#type').val(response.type).formSelect().trigger('change');
                 $('#table_name').val(response.table_name);
                 $('#order').val(response.order);
+                $('#document_code').val(response.document_code);
                 $('#parent_id').val(response.parent_id).trigger('change');
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);

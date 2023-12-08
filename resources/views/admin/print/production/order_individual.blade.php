@@ -191,16 +191,16 @@
                 <div class="card-content invoice-print-area">
                     <table border="0" width="100%" class="tbl-info">
                         <tr>
-                            <td width="30%" class="left-align">
+                            <td width="40%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
-                                        <td width="39%">
+                                        <td width="24%">
                                             Name
                                         </td>
                                         <td width="1%">
                                             :
                                         </td>
-                                        <td width="60%">
+                                        <td width="75%">
                                             {{ $data->user->name }}
                                         </td>
                                     </tr>
@@ -227,67 +227,90 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="39%" style="vertical-align: top;">
+                                        <td width="24%" style="vertical-align: top;">
                                             Plant
                                         </td>
                                         <td width="1%" style="vertical-align: top;">
                                             :
                                         </td>
-                                        <td width="60%" style="vertical-align: top;">
+                                        <td width="75%" style="vertical-align: top;">
                                             {{ $data->productionSchedule->place->code }}
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td width="24%">
+                                            Item
+                                        </td>
+                                        <td width="1%">
+                                            :
+                                        </td>
+                                        <td width="75%">
+                                            {{ $data->productionScheduleDetail->item->code.' - '.$data->productionScheduleDetail->item->name }}
+                                        </td>
+                                    </tr>
+                                    
                                 </table>
                             </td>
-                            <td width="30%" class="left-align">
+                            <td width="40%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
-                                        <td width="39%">
+                                        <td width="24%">
                                             Qty Planned
                                         </td>
                                         <td width="1%">
                                             :
                                         </td>
-                                        <td width="60%">
-                                            {{ number_format($data->productionScheduleDetail->qty,3,',','.').' ' }}
+                                        <td width="75%">
+                                            {{ number_format($data->productionScheduleDetail->qty,3,',','.').' '.$data->productionScheduleDetail->item->productionUnit->code }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            Posisi
+                                            Gudang
                                         </td>
                                         <td width="1%">
                                             :
                                         </td>
                                         <td>
-                                            {{ $data->user->position()->exists() ? $data->user->position->name : '-' }}
+                                            {{ $data->warehouse->name }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            Depart.
+                                            Shift
                                         </td>
                                         <td width="1%">
                                             :
                                         </td>
                                         <td>
-                                            {{ $data->user->position()->exists() ? $data->user->position->division->department->name : '-' }}
+                                            {{ $data->productionScheduleDetail->shift->code.' - '.$data->productionScheduleDetail->shift->name }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="29%" style="vertical-align: top;">
-                                            Plant
+                                        <td width="24%" style="vertical-align: top;">
+                                            Grup
                                         </td>
                                         <td width="1%" style="vertical-align: top;">
                                             :
                                         </td>
-                                        <td width="70%" style="vertical-align: top;">
-                                            {{ $data->productionSchedule->place->code }}
+                                        <td width="75%" style="vertical-align: top;">
+                                            {{ $data->productionScheduleDetail->group }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="24%" style="vertical-align: top;">
+                                            Line
+                                        </td>
+                                        <td width="1%" style="vertical-align: top;">
+                                            :
+                                        </td>
+                                        <td width="75%" style="vertical-align: top;">
+                                            {{ $data->productionScheduleDetail->line->code }}
                                         </td>
                                     </tr>
                                 </table>
                             </td>
-                            <td width="40%" class="left-align">
+                            <td width="20%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
                                         <td>

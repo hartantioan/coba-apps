@@ -409,21 +409,31 @@ class ProductionOrderController extends Controller
     }
 
     public function show(Request $request){
-        $po = MarketingOrderPlan::where('code',CustomHelper::decrypt($request->id))->first();
+        $po = ProductionOrder::where('code',CustomHelper::decrypt($request->id))->first();
+        $po['production_schedule_code'] = $po->productionSchedule->code.' Tgl.Post '.date('d/m/y',strtotime($po->productionSchedule->post_date)).' - Plant : '.$po->productionSchedule->place->code;
+        $po['production_schedule_detail_code'] = $po->productionScheduleDetail->item->code.' - '.$po->productionScheduleDetail->item->name;
+        $po['warehouses'] = $po->productionScheduleDetail->item->warehouseList();
+        $po['qty'] = number_format($po->productionScheduleDetail->qty,3,',','.').' '.$po->productionScheduleDetail->item->productionUnit->code;
+        $po['shift'] = $po->productionScheduleDetail->shift->code.' - '.$po->productionScheduleDetail->shift->name;
+        $po['group'] = $po->productionScheduleDetail->group;
+        $po['line'] = $po->productionScheduleDetail->line->code;
         $po['code_place_id'] = substr($po->code,7,2);
 
         $arr = [];
         
-        foreach($po->marketingOrderPlanDetail as $row){
+        foreach($po->productionOrderDetail as $row){
             $arr[] = [
-                'id'                    => $row->id,
-                'item_id'               => $row->item_id,
-                'item_name'             => $row->item->code.' - '.$row->item->name,
-                'qty'                   => number_format($row->qty,3,',','.'),
-                'unit'                  => $row->item->sellUnit->code,
-                'request_date'          => $row->request_date,
-                'note'                  => $row->note,
-                'is_urgent'             => $row->is_urgent ? $row->is_urgent : '',
+                'id'            => $row->bom_detail_id,
+                'lookable_id'   => $row->lookable_id,
+                'lookable_type' => $row->lookable_type,
+                'lookable_code' => $row->lookable->code,
+                'lookable_name' => $row->lookable->name,
+                'warehouse'     => $row->item()->exists() ? $row->item->getStockWarehousePlaceArea($po->productionSchedule->place_id) : '-',
+                'stock'         => $row->item()->exists() ? number_format($row->item->getStockPlace($po->productionSchedule->place_id) / $row->item->production_convert,3,',','.').' '.$row->item->productionUnit->code : '-',
+                'qty'           => $row->item()->exists() ? number_format($row->qty,3,',','.') : '0,000',
+                'unit'          => $row->item()->exists() ? $row->item->productionUnit->code : '-',
+                'nominal'       => $row->coa()->exists() ? number_format($row->nominal,2,',','.') : '0,00',
+                'total'         => $row->coa()->exists() ? number_format($row->total,2,',','.') : '0,00',
             ];
         }
 
@@ -581,7 +591,7 @@ class ProductionOrderController extends Controller
     }
 
     public function voidStatus(Request $request){
-        $query = MarketingOrderPlan::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = ProductionOrder::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
 
@@ -611,12 +621,12 @@ class ProductionOrderController extends Controller
                 ]);
     
                 activity()
-                    ->performedOn(new MarketingOrderPlan())
+                    ->performedOn(new ProductionOrder())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Void the marketing order plan data');
+                    ->log('Void the production order plan data');
     
-                CustomHelper::sendNotification($query->getTable(),$query->id,'Marketing Order Plan No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Order Produksi No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval($query->getTable(),$query->id);
 
                 $response = [
@@ -635,7 +645,7 @@ class ProductionOrderController extends Controller
     }
 
     public function destroy(Request $request){
-        $query = MarketingOrderPlan::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = ProductionOrder::where('code',CustomHelper::decrypt($request->id))->first();
 
         $approved = false;
         $revised = false;
@@ -670,15 +680,15 @@ class ProductionOrderController extends Controller
         
         if($query->delete()){
 
-            $query->marketingOrderPlanDetail()->delete();
+            $query->productionOrderDetail()->delete();
 
             CustomHelper::removeApproval($query->getTable(),$query->id);
 
             activity()
-                ->performedOn(new MarketingOrderPlan())
+                ->performedOn(new ProductionOrder())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the marketing order plan data');
+                ->log('Delete the production order plan data');
 
             $response = [
                 'status'  => 200,
@@ -707,15 +717,16 @@ class ProductionOrderController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
+            $temp_pdf = [];
             $var_link=[];
             $currentDateTime = Date::now();
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             foreach($request->arr_id as $key => $row){
-                $pr = MarketingOrderPlan::where('code',$row)->first();
+                $pr = ProductionOrder::where('code',$row)->first();
                 
                 if($pr){
                     $data = [
-                        'title'     => 'Marketing Order Plan',
+                        'title'     => 'Order Produksi',
                         'data'      => $pr,
                       
                     ];
@@ -725,7 +736,7 @@ class ProductionOrderController extends Controller
                     $img_base_64 = base64_encode($image_temp);
                     $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                     $data["image"]=$path_img;
-                    $pdf = Pdf::loadView('admin.print.production.plan_individual', $data)->setPaper('a5', 'landscape');
+                    $pdf = Pdf::loadView('admin.print.production.order_individual', $data)->setPaper('a5', 'landscape');
                     $pdf->render();
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                     $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -742,15 +753,14 @@ class ProductionOrderController extends Controller
             $result = $merger->merge();
 
             $randomString = Str::random(10); 
-
          
-                    $filePath = 'public/pdf/' . $randomString . '.pdf';
-                    
+            $filePath = 'public/pdf/' . $randomString . '.pdf';
+            
 
-                    Storage::put($filePath, $result);
-                    
-                    $document_po = asset(Storage::url($filePath));
-                    $var_link=$document_po;
+            Storage::put($filePath, $result);
+            
+            $document_po = asset(Storage::url($filePath));
+            $var_link=$document_po;
 
             $response =[
                 'status'=>200,
@@ -796,10 +806,10 @@ class ProductionOrderController extends Controller
                     ];
                 }else{   
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
-                        $query = MarketingOrderPlan::where('Code', 'LIKE', '%'.$nomor)->first();
+                        $query = ProductionOrder::where('Code', 'LIKE', '%'.$nomor)->first();
                         if($query){
                             $data = [
-                                'title'     => 'Marketing Order Plan',
+                                'title'     => 'Order Produksi',
                                 'data'      => $query
                             ];
                             $img_path = 'website/logo_web_fix.png';
@@ -808,7 +818,7 @@ class ProductionOrderController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.production.plan_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.production.order_individual', $data)->setPaper('a5', 'landscape');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -869,10 +879,10 @@ class ProductionOrderController extends Controller
                     ];
                 }else{
                     foreach($merged as $code){
-                        $query = MarketingOrderPlan::where('Code', 'LIKE', '%'.$code)->first();
+                        $query = ProductionOrder::where('Code', 'LIKE', '%'.$code)->first();
                         if($query){
                             $data = [
-                                'title'     => 'Marketing Order Plan',
+                                'title'     => 'Order Produksi',
                                 'data'      => $query
                             ];
                             $img_path = 'website/logo_web_fix.png';
@@ -881,7 +891,7 @@ class ProductionOrderController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.production.plan_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.production.order_individual', $data)->setPaper('a5', 'landscape');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));

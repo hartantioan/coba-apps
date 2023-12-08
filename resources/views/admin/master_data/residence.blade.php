@@ -579,7 +579,7 @@
         var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), account = $('#filter_account').val();
         arr_id_temp=[];
         $.map(window.table.rows('.selected').nodes(), function (item) {
-            var poin = $(item).find('td:nth-child(3)').text().trim();
+            var poin = $(item).find('td:nth-child(2)').text().trim();
             arr_id_temp.push(poin);
            
            

@@ -165,7 +165,7 @@
                                         </select>
                                         <label class="" for="company_id">Perusahaan</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step5">
+                                    <div class="input-field col m3 s12 step4">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                         <label class="active" for="post_date">Tgl. Posting</label>
                                     </div>
@@ -180,7 +180,7 @@
                             <div class="col s12">
                                 <fieldset>
                                     <legend>2. Detail Item</legend>
-                                    <div class="input-field col m4 s12 step7">
+                                    <div class="input-field col m4 s12 step6">
                                         <select class="browser-default" id="production_schedule_id" name="production_schedule_id" onchange="resetProductionSchedule();"></select>
                                         <label class="active" for="production_schedule_id">Jadwal Produksi</label>
                                     </div>
@@ -188,7 +188,7 @@
                                         <select class="browser-default" id="production_schedule_detail_id" name="production_schedule_detail_id" onchange="getProductionSchedule();"></select>
                                         <label class="active" for="production_schedule_detail_id">Daftar Item</label>
                                     </div>
-                                    <div class="input-field col m4 s12 step7">
+                                    <div class="input-field col m4 s12 step8">
                                         <select class="browser-default" id="warehouse_id" name="warehouse_id">
                                             <option value="">Silahkan pilih Jadwal Produksi</option>
                                         </select>
@@ -210,7 +210,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col m12 s12 step8" style="overflow:auto;width:100% !important;">
+                                    <div class="col m12 s12 step9" style="overflow:auto;width:100% !important;">
                                         <p class="mt-2 mb-2">
                                             <table class="bordered" id="table-bom">
                                                 <thead>
@@ -239,7 +239,7 @@
                         </div>
                         <div class="row">
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step9" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step10" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -776,7 +776,7 @@
     function printData(){
         var arr_id_temp=[];
         $.map(window.table.rows('.selected').nodes(), function (item) {
-            var poin = $(item).find('td:nth-child(3)').text().trim();
+            var poin = $(item).find('td:nth-child(2)').text().trim();
             arr_id_temp.push(poin);
         });
         
@@ -1073,54 +1073,63 @@
                 $('#post_date').val(response.post_date);
                 $('#company_id').val(response.company_id).formSelect();
                 $('#place_id').val(response.place_id).formSelect();
-                $('#type').val(response.type).formSelect();
+                $('#note').val(response.note);
+                $('#production_schedule_id').empty().append(`
+                    <option value="` + response.production_schedule_id + `">` + response.production_schedule_code + `</option>
+                `);
+                $('#production_schedule_detail_id').empty().append(`
+                    <option value="` + response.production_schedule_detail_id + `">` + response.production_schedule_detail_code + `</option>
+                `);
+                $('#body-item').empty();
+                $('#warehouse_id').empty();
+                $('#output-qty,#output-shift,#output-group,#output-line').text('-');
+                $.each(response.warehouses, function(i, val) {
+                    $('#warehouse_id').append(`
+                        <option value="` + val.id + `">` + val.name + `</option>
+                    `);
+                });
+                $('#output-qty').text(response.qty);
+                $('#output-shift').text(response.shift);
+                $('#output-group').text(response.group);
+                $('#output-line').text(response.line);
 
                 if(response.details.length > 0){
-                    $('.row_item').each(function(){
-                        $(this).remove();
-                    });
-
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
-                        $('#last-row-item').before(`
+                        let no = $('.row_item').length + 1;
+                        $('#body-item').append(`
                             <tr class="row_item">
-                                <td>
-                                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" required></select>
+                                <input type="hidden" name="arr_bom_detail_id[]" value="` + val.id + `">
+                                <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
+                                <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
+                                <input type="hidden" name="arr_qty[]" value="` + val.qty + `">
+                                <input type="hidden" name="arr_nominal[]" value="` + val.nominal + `">
+                                <input type="hidden" name="arr_total[]" value="` + val.total + `">
+                                <td class="center-align">
+                                    ` + no + `.
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);count();" required>
+                                    ` + val.lookable_code + ' - ' + val.lookable_name + `
+                                </td>
+                                <td class="right-align">
+                                    ` + val.qty + `
+                                </td>
+                                <td class="center-align">
+                                    ` + val.unit + `
+                                </td>
+                                <td>
+                                    ` + val.warehouse + `
+                                </td>
+                                <td class="right-align">
+                                    ` + val.stock + `
                                 </td>
                                 <td class="center">
-                                    <span id="arr_satuan` + count + `">` + val.unit + `</span>
-                                </td>
-                                <td>
-                                    <input name="arr_note[]" type="text" placeholder="Keterangan barang..." value="` + val.note + `" required>
-                                </td>
-                                <td>
-                                    <input name="arr_request_date[]" type="date" value="` + val.request_date + `" min="{{ date('Y-m-d') }}" required>
-                                </td>
-                                <td>
-                                    <div class="switch mb-1">
-                                        <label>
-                                            <input type="checkbox" id="arr_urgent` + count + `" name="arr_urgent[]" value="1">
-                                            <span class="lever"></span>
-                                        </label>
-                                    </div>
-                                </td>
-                                <td class="center">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item btn-small" href="javascript:void(0);">
                                         <i class="material-icons">delete</i>
                                     </a>
                                 </td>
                             </tr>
                         `);
-                        $('#arr_item' + count).append(`
-                            <option value="` + val.item_id + `">` + val.item_name + `</option>
-                        `);
-                        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
-                        if(val.is_urgent){
-                            $('#arr_urgent' + count).prop( "checked", true);
-                        }
                     });
                 }
                 
@@ -1304,8 +1313,8 @@
             exitOnOverlayClick : false,
             steps: [
                 {
-                    title : 'Marketing Order Plan',
-                    intro : 'Form ini digunakan untuk mengelola data pengajuan produksi dari tim Marketing (normal) / PPIC (susulan) kepada tim PPIC / Produksi.'
+                    title : 'Order Produksi',
+                    intro : 'Form ini digunakan untuk mengelola order produksi yang ditarik dari form Jadwal Produksi. Dokumen yang terbentuk dari Order Produksi akan ditarik (menjadi root dokumen) dari form Transit dan Issue Receive.'
                 },
                 {
                     title : 'Nomor Dokumen',
@@ -1324,27 +1333,37 @@
                 },
                 {
                     title : 'Tgl. Posting',
-                    element : document.querySelector('.step5'),
+                    element : document.querySelector('.step4'),
                     intro : 'Tanggal posting yang akan muncul pada saat dokumen dicetak, difilter atau diproses pada form lainnya.' 
                 },
                 {
-                    title : 'Tipe Produksi',
-                    element : document.querySelector('.step6'),
-                    intro : 'Tipe produksi yang akan dilaksanakan.' 
+                    title : 'Keterangan',
+                    element : document.querySelector('.step5'),
+                    intro : 'Catatan tambahan untuk dokumen.' 
                 },
                 {
-                    title : 'File Lampiran',
+                    title : 'Jadwal Produksi',
+                    element : document.querySelector('.step6'),
+                    intro : 'Silahkan pilih dokumen Jadwal Produksi.' 
+                },
+                {
+                    title : 'Daftar Item Target',
                     element : document.querySelector('.step7'),
-                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
+                    intro : 'Item target output produksi yang diambil dari detail item dokumen Jadwal Produksi sebelumnya.' 
+                },
+                {
+                    title : 'Gudang',
+                    element : document.querySelector('.step8'),
+                    intro : 'Target simpan gudang item output.' 
                 },
                 {
                     title : 'Detail produk',
-                    element : document.querySelector('.step8'),
-                    intro : 'Silahkan tambahkan produk anda disini, lengkap dengan keterangan detail tentang produk tersebut. Qty yang diisikan adalah qty dengan satuan jual.' 
+                    element : document.querySelector('.step9'),
+                    intro : 'Silahkan tambahkan data detail bahan-bahan yang akan digunakan untuk proses produksi dengan memilih Jadwal Produksi, item Target dan gudang tujuan.' 
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step9'),
+                    element : document.querySelector('.step10'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

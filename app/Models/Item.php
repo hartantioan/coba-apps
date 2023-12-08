@@ -207,6 +207,16 @@ class Item extends Model
         return $pricenow;
     }
 
+    public function priceNowProduction($place_id,$date){
+        $pricenow = 0;
+        $price = ItemCogs::where('item_id',$this->id)->where('place_id',$place_id)->whereDate('date','<=',$date)->orderByDesc('date')->orderByDesc('id')->first();
+        if($price){
+            $pricenow = $price->price_final / $this->production_convert;
+        }
+        
+        return $pricenow;
+    }
+
     public function currentStock($dataplaces,$datawarehouses){
         $arrData = [];
 

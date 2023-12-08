@@ -54,6 +54,11 @@ class ProductionOrder extends Model
         return $this->belongsTo('App\Models\ProductionScheduleDetail', 'production_schedule_detail_id', 'id')->withTrashed();
     }
 
+    public function productionOrderDetail()
+    {
+        return $this->hasMany('App\Models\ProductionOrderDetail');
+    }
+
     public function voidUser()
     {
         return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();

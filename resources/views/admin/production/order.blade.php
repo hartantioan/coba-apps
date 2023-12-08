@@ -644,6 +644,7 @@
                 let no = $('.row_item').length + 1;
                 $('#body-item').append(`
                     <tr class="row_item">
+                        <input type="hidden" name="arr_bom_detail_id[]" value="` + val.id + `">
                         <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
                         <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
                         <input type="hidden" name="arr_qty[]" value="` + val.qty + `">

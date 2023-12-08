@@ -2648,6 +2648,7 @@ class Select2Controller extends Controller {
                     $bobot = $d->qty / $databom->qty_output;
                     foreach($databom->bomDetail as $rowdetail){
                         $details[] = [
+                            'id'            => $rowdetail->id,
                             'lookable_id'   => $rowdetail->lookable_id,
                             'lookable_type' => $rowdetail->lookable_type,
                             'lookable_code' => $rowdetail->lookable->code,
@@ -2665,7 +2666,7 @@ class Select2Controller extends Controller {
             }
 
             $response[] = [
-                'id'   			=> $d->item_id,
+                'id'   			=> $d->id,
                 'text' 			=> $d->item->code.' - '.$d->item->name,
                 'warehouses'    => $d->item->warehouseList(),
                 'details'       => $details,

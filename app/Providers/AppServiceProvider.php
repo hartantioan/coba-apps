@@ -87,6 +87,7 @@ class AppServiceProvider extends ServiceProvider
             'material_requests'                     => 'App\Models\MaterialRequest',
             'material_request_details'              => 'App\Models\MaterialRequestDetail',
             'lock_periods'                          => 'App\Models\LockPeriod',
+            'production_orders'                     => 'App\Models\ProductionOrder',
         ]);
     }
 }

@@ -9,6 +9,7 @@ use App\Models\Place;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
 use App\Models\IncomingPayment;
+use App\Models\Item;
 use App\Models\MarketingOrder;
 use App\Models\MarketingOrderDelivery;
 use App\Models\MarketingOrderDownPayment;
@@ -22,6 +23,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
 use App\Models\Menu;
 use App\Models\ProductionOrder;
+use App\Models\ProductionOrderDetail;
 use App\Models\ProductionSchedule;
 use App\Models\ProductionScheduleDetail;
 use Illuminate\Support\Facades\Date;
@@ -187,7 +189,6 @@ class ProductionOrderController extends Controller
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat indigo accent-2 white-text btn-small" data-popup="tooltip" title="Salin" onclick="duplicate(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">content_copy</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
@@ -219,6 +220,7 @@ class ProductionOrderController extends Controller
             'production_schedule_id'        => 'required',
             'production_schedule_detail_id' => 'required',
             'warehouse_id'                  => 'required',
+            'arr_bom_detail_id'             => 'required|array',
             'arr_lookable_id'               => 'required|array',
             'arr_lookable_type'             => 'required|array',
             'arr_qty'                       => 'required|array',
@@ -233,6 +235,8 @@ class ProductionOrderController extends Controller
             'post_date.required' 			            => 'Tanggal posting tidak boleh kosong.',
             'production_schedule_id.required'           => 'Jadwal Produksi tidak boleh kosong.',
             'production_schedule_detail_id.required'    => 'Item target tidak boleh kosong.',
+            'arr_bom_detail_id.required'                => 'BOM detail tidak boleh kosong.',
+            'arr_bom_detail_id.array'                   => 'BOM detail harus array.',
             'arr_lookable_id.required'                  => 'Detail tidak boleh kosong.',
             'arr_lookable_id.array'                     => 'Detail harus array.',
             'arr_lookable_type.required'                => 'Detail tidak boleh kosong.',
@@ -253,11 +257,24 @@ class ProductionOrderController extends Controller
         } else {
 
             $qtyPlanned = 0;
+            $standardItemCost = 0;
+            $standardResourceCost = 0;
+            $standardProductCost = 0;            
 
             $pscd = ProductionScheduleDetail::find($request->production_schedule_detail_id);
             if($pscd){
                 $qtyPlanned = $pscd->qty;
+
+                foreach($request->arr_lookable_type as $key => $row){
+                    if($row == 'items'){
+                        $standardItemCost += Item::find($request->arr_lookable_id[$key])->priceNowProduction($pscd->productionSchedule->place_id,$request->post_date) * str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
+                    }elseif($row == 'coas'){
+                        $standardResourceCost += str_replace(',','.',str_replace('.','',$request->arr_total[$key]));
+                    }
+                }
             }
+
+            $standardProductCost = $standardItemCost + $standardResourceCost;
             
 			if($request->temp){
                 DB::beginTransaction();
@@ -298,6 +315,9 @@ class ProductionOrderController extends Controller
                         $query->warehouse_id = $request->warehouse_id;
                         $query->post_date = $request->post_date;
                         $query->note = $request->note;
+                        $query->standard_item_cost = $standardItemCost;
+                        $query->standard_resource_cost = $standardResourceCost;
+                        $query->standard_product_cost = $standardProductCost;
                         $query->planned_qty = $qtyPlanned;
                         $query->status = '1';
 
@@ -320,15 +340,20 @@ class ProductionOrderController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
-                    $query = MarketingOrderPlan::create([
-                        'code'			            => $request->code,
-                        'user_id'		            => session('bo_id'),
-                        'company_id'                => $request->company_id,
-                        'place_id'	                => $request->place_id,
-                        'post_date'                 => $request->post_date,
-                        'type'                      => $request->type,
-                        'document'                  => $request->file('file') ? $request->file('file')->store('public/marketing_order_plans') : NULL,
-                        'status'                    => '1',
+                    $query = ProductionOrder::create([
+                        'code'			                => $request->code,
+                        'user_id'		                => session('bo_id'),
+                        'company_id'                    => $request->company_id,
+                        'production_schedule_id'	    => $request->production_schedule_id,
+                        'production_schedule_detail_id'	=> $request->production_schedule_detail_id,
+                        'warehouse_id'                  => $request->warehouse_id,
+                        'post_date'                     => $request->post_date,
+                        'note'                          => $request->note,
+                        'standard_item_cost'            => $standardItemCost,
+                        'standard_resource_cost'        => $standardResourceCost,
+                        'standard_product_cost'         => $standardProductCost,
+                        'planned_qty'                   => $qtyPlanned,
+                        'status'                        => '1',
                     ]);
 
                     DB::commit();
@@ -342,14 +367,15 @@ class ProductionOrderController extends Controller
                 DB::beginTransaction();
                 try {
                     
-                    foreach($request->arr_item as $key => $row){
-                        MarketingOrderPlanDetail::create([
-                            'marketing_order_plan_id'       => $query->id,
-                            'item_id'                       => $row,
+                    foreach($request->arr_lookable_id as $key => $row){
+                        ProductionOrderDetail::create([
+                            'production_order_id'           => $query->id,
+                            'bom_detail_id'                 => $request->arr_bom_detail_id[$key],
+                            'lookable_type'                 => $request->arr_lookable_type[$key],
+                            'lookable_id'                   => $row,
                             'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                            'request_date'                  => $request->arr_request_date[$key],
-                            'note'                          => $request->arr_note[$key] ? $request->arr_note[$key] : NULL,
-                            'is_urgent'                     => $request->arr_urgent[$key] ? $request->arr_urgent[$key] : NULL,
+                            'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
+                            'total'                         => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
                         ]);
                     }
 
@@ -358,14 +384,14 @@ class ProductionOrderController extends Controller
                     DB::rollback();
                 }
 
-                CustomHelper::sendApproval('marketing_order_plans',$query->id,$query->note_internal.' - '.$query->note_external);
-                CustomHelper::sendNotification('marketing_order_plans',$query->id,'Pengajuan Marketing Order Plan No. '.$query->code,'Pengajuan Marketing Order Plan No. '.$query->code,session('bo_id'));
+                CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Order Produksi No. '.$query->code,'Pengajuan Order Produksi No. '.$query->code,session('bo_id'));
 
                 activity()
-                    ->performedOn(new MarketingOrderPlan())
+                    ->performedOn(new ProductionOrder())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit marketing order plan.');
+                    ->log('Add / edit production order plan.');
 
 				$response = [
 					'status'    => 200,
@@ -424,7 +450,7 @@ class ProductionOrderController extends Controller
 
     public function rowDetail(Request $request)
     {
-        $data   = MarketingOrderPlan::where('code',CustomHelper::decrypt($request->id))->first();
+        $data   = ProductionOrder::where('code',CustomHelper::decrypt($request->id))->first();
         
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;">
                         <thead>
@@ -433,24 +459,22 @@ class ProductionOrderController extends Controller
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
-                                <th class="center-align">Item</th>
+                                <th class="center-align">Bahan/Biaya</th>
                                 <th class="center-align">Qty</th>
-                                <th class="center-align">Satuan</th>
-                                <th class="center-align">Tgl.Request</th>
-                                <th class="center-align">Keterangan</th>
-                                <th class="center-align">Urgent</th>
+                                <th class="center-align">Satuan (Produksi)</th>
+                                <th class="center-align">Nominal</th>
+                                <th class="center-align">Total</th>
                             </tr>
                         </thead><tbody>';
         
-        foreach($data->marketingOrderPlanDetail as $key => $row){
+        foreach($data->productionOrderDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$row->item->name.'</td>
-                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
-                <td class="center-align">'.$row->item->sellUnit->code.'</td>
-                <td class="center-align">'.date('d/m/y',strtotime($row->request_date)).'</td>
-                <td class="">'.$row->note.'</td>
-                <td class="center-align">'.$row->isUrgent().'</td>
+                <td>'.($row->item()->exists() ? $row->item->code.' - '.$row->item->name : ($row->coa()->exists() ? $row->coa->code.' - '.$row->coa->name : '')).'</td>
+                <td class="right-align">'.($row->item()->exists() ? number_format($row->qty,3,',','.') : '-').'</td>
+                <td class="center-align">'.($row->item()->exists() ? $row->item->productionUnit->code : '-').'</td>
+                <td class="right-align">'.($row->coa()->exists() ? number_format($row->nominal,2,',','.') : '-').'</td>
+                <td class="right-align">'.($row->coa()->exists() ? number_format($row->total,2,',','.') : '-').'</td>
             </tr>';
         }
         
@@ -510,11 +534,11 @@ class ProductionOrderController extends Controller
 
     public function printIndividual(Request $request,$id){
         
-        $pr = MarketingOrderPlan::where('code',CustomHelper::decrypt($id))->first();
+        $pr = ProductionOrder::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
             $data = [
-                'title'     => 'Marketing Order Plan',
+                'title'     => 'Order Produksi',
                 'data'      => $pr
             ];
 
@@ -531,7 +555,7 @@ class ProductionOrderController extends Controller
             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
             $data["image"]=$path_img;
              
-            $pdf = Pdf::loadView('admin.print.production.plan_individual', $data)->setPaper('a5', 'landscape');
+            $pdf = Pdf::loadView('admin.print.production.order_individual', $data)->setPaper('a5', 'landscape');
             // $pdf->render();
     
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");

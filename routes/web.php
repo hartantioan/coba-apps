@@ -1196,7 +1196,7 @@ Route::prefix('admin')->group(function () {
             });
 
             Route::prefix('purchase')->middleware('direct.access')->group(function () {
-                Route::prefix('purchase_request')->middleware('operation.access:purchase_request,view')->middleware('lockacc')->group(function () {
+                Route::prefix('purchase_request')->middleware(['operation.access:purchase_request,view','lockacc'])->group(function () {
                     Route::get('/',[PurchaseRequestController::class, 'index']);
                     Route::get('datatable',[PurchaseRequestController::class, 'datatable']);
                     Route::get('row_detail',[PurchaseRequestController::class, 'rowDetail']);
@@ -1266,7 +1266,7 @@ Route::prefix('admin')->group(function () {
                     });
                 });
 
-                Route::prefix('purchase_order')->middleware('operation.access:purchase_order,view')->middleware('lockacc')->group(function () {
+                Route::prefix('purchase_order')->middleware(['operation.access:purchase_order,view','lockacc'])->group(function () {
                     Route::get('/',[PurchaseOrderController::class, 'index']);
                     Route::get('datatable',[PurchaseOrderController::class, 'datatable']);
                     Route::get('row_detail',[PurchaseOrderController::class, 'rowDetail']);
@@ -1288,7 +1288,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [PurchaseOrderController::class, 'destroy'])->middleware('operation.access:purchase_order,delete');
                 });
 
-                Route::prefix('purchase_down_payment')->middleware('operation.access:purchase_down_payment,view')->middleware('lockacc')->group(function () {
+                Route::prefix('purchase_down_payment')->middleware(['operation.access:purchase_down_payment,view','lockacc'])->group(function () {
                     Route::get('/',[PurchaseDownPaymentController::class, 'index']);
                     Route::post('get_purchase_order', [PurchaseDownPaymentController::class, 'getPurchaseOrder']);
                     Route::get('datatable',[PurchaseDownPaymentController::class, 'datatable']);
@@ -1307,7 +1307,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [PurchaseDownPaymentController::class, 'destroy'])->middleware('operation.access:purchase_down_payment,delete');
                 });
 
-                Route::prefix('landed_cost')->middleware('operation.access:landed_cost,view')->middleware('lockacc')->group(function () {
+                Route::prefix('landed_cost')->middleware(['operation.access:landed_cost,view','lockacc'])->group(function () {
                     Route::get('/',[LandedCostController::class, 'index']);
                     Route::post('get_good_receipt', [LandedCostController::class, 'getGoodReceipt']);
                     Route::post('get_account_data', [LandedCostController::class, 'getAccountData']);
@@ -1330,7 +1330,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('test',[LandedCostController::class, 'test'])->withoutMiddleware('direct.access');
                 });
 
-                Route::prefix('purchase_invoice')->middleware('operation.access:purchase_invoice,view')->middleware('lockacc')->group(function () {
+                Route::prefix('purchase_invoice')->middleware(['operation.access:purchase_invoice,view','lockacc'])->group(function () {
                     Route::get('/',[PurchaseInvoiceController::class, 'index']);
                     Route::post('get_gr_lc', [PurchaseInvoiceController::class, 'getGoodReceiptLandedCost']);
                     Route::post('get_account_data', [PurchaseInvoiceController::class, 'getAccountData']);
@@ -1351,7 +1351,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [PurchaseInvoiceController::class, 'destroy'])->middleware('operation.access:purchase_invoice,delete');
                 });
                 
-                Route::prefix('purchase_memo')->middleware('operation.access:purchase_memo,view')->middleware('lockacc')->group(function () {
+                Route::prefix('purchase_memo')->middleware(['operation.access:purchase_memo,view','lockacc'])->group(function () {
                     Route::get('/',[PurchaseMemoController::class, 'index']);
                     Route::get('datatable',[PurchaseMemoController::class, 'datatable']);
                     Route::get('row_detail',[PurchaseMemoController::class, 'rowDetail']);
@@ -1489,7 +1489,7 @@ Route::prefix('admin')->group(function () {
 
             Route::prefix('inventory')->middleware('direct.access')->group(function () {
 
-                Route::prefix('good_scale')->middleware('operation.access:good_scale,view')->middleware('lockacc')->group(function () {
+                Route::prefix('good_scale')->middleware(['operation.access:good_scale,view','lockacc'])->group(function () {
                     Route::get('/',[GoodScaleController::class, 'index']);
                     Route::get('datatable',[GoodScaleController::class, 'datatable']);
                     Route::get('row_detail',[GoodScaleController::class, 'rowDetail']);
@@ -1513,7 +1513,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [GoodScaleController::class, 'destroy'])->middleware('operation.access:good_scale,delete');
                 });
 
-                Route::prefix('good_receipt_po')->middleware('operation.access:good_receipt_po,view')->middleware('lockacc')->group(function () {
+                Route::prefix('good_receipt_po')->middleware(['operation.access:good_receipt_po,view','lockacc'])->group(function () {
                     Route::get('/',[GoodReceiptPOController::class, 'index']);
                     Route::get('datatable',[GoodReceiptPOController::class, 'datatable']);
                     Route::get('row_detail',[GoodReceiptPOController::class, 'rowDetail']);
@@ -1534,7 +1534,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [GoodReceiptPOController::class, 'destroy'])->middleware('operation.access:good_receipt_po,delete');
                 });
 
-                Route::prefix('good_return_po')->middleware('operation.access:good_return_po,view')->middleware('lockacc')->group(function () {
+                Route::prefix('good_return_po')->middleware(['operation.access:good_return_po,view','lockacc'])->group(function () {
                     Route::get('/',[GoodReturnPOController::class, 'index']);
                     Route::get('view_journal/{id}',[GoodReturnPOController::class, 'viewJournal'])->middleware('operation.access:good_return_po,journal');
                     Route::get('datatable',[GoodReturnPOController::class, 'datatable']);
@@ -1554,7 +1554,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [GoodReturnPOController::class, 'destroy'])->middleware('operation.access:good_return_po,delete');
                 });
 
-                Route::prefix('transfer_out')->middleware('operation.access:transfer_out,view')->middleware('lockacc')->group(function () {
+                Route::prefix('transfer_out')->middleware(['operation.access:transfer_out,view','lockacc'])->group(function () {
                     Route::get('/',[InventoryTransferOutController::class, 'index']);
                     Route::get('datatable',[InventoryTransferOutController::class, 'datatable']);
                     Route::get('row_detail',[InventoryTransferOutController::class, 'rowDetail']);
@@ -1571,7 +1571,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [InventoryTransferOutController::class, 'destroy'])->middleware('operation.access:transfer_out,delete');
                 });
 
-                Route::prefix('transfer_in')->middleware('operation.access:transfer_in,view')->middleware('lockacc')->group(function () {
+                Route::prefix('transfer_in')->middleware(['operation.access:transfer_in,view','lockacc'])->group(function () {
                     Route::get('/',[InventoryTransferInController::class, 'index']);
                     Route::get('datatable',[InventoryTransferInController::class, 'datatable']);
                     Route::get('row_detail',[InventoryTransferInController::class, 'rowDetail']);
@@ -1591,7 +1591,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [InventoryTransferInController::class, 'destroy'])->middleware('operation.access:transfer_in,delete');
                 });
 
-                Route::prefix('good_receive')->middleware('operation.access:good_receive,view')->middleware('lockacc')->group(function () {
+                Route::prefix('good_receive')->middleware(['operation.access:good_receive,view','lockacc'])->group(function () {
                     Route::get('/',[GoodReceiveController::class, 'index']);
                     Route::get('datatable',[GoodReceiveController::class, 'datatable']);
                     Route::get('row_detail',[GoodReceiveController::class, 'rowDetail']);
@@ -1608,7 +1608,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [GoodReceiveController::class, 'destroy'])->middleware('operation.access:good_receive,delete');
                 });
 
-                Route::prefix('good_issue')->middleware('operation.access:good_issue,view')->middleware('lockacc')->group(function () {
+                Route::prefix('good_issue')->middleware(['operation.access:good_issue,view','lockacc'])->group(function () {
                     Route::get('/',[GoodIssueController::class, 'index']);
                     Route::get('datatable',[GoodIssueController::class, 'datatable']);
                     Route::get('row_detail',[GoodIssueController::class, 'rowDetail']);
@@ -1627,7 +1627,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [GoodIssueController::class, 'destroy'])->middleware('operation.access:good_issue,delete');
                 });
 
-                Route::prefix('revaluation')->middleware('operation.access:revaluation,view')->middleware('lockacc')->group(function () {
+                Route::prefix('revaluation')->middleware(['operation.access:revaluation,view','lockacc'])->group(function () {
                     Route::get('/',[InventoryRevaluationController::class, 'index']);
                     Route::get('datatable',[InventoryRevaluationController::class, 'datatable']);
                     Route::get('row_detail',[InventoryRevaluationController::class, 'rowDetail']);
@@ -1644,7 +1644,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [InventoryRevaluationController::class, 'destroy'])->middleware('operation.access:revaluation,delete');
                 });
 
-                Route::prefix('material_request')->middleware('operation.access:material_request,view')->middleware('lockacc')->group(function () {
+                Route::prefix('material_request')->middleware(['operation.access:material_request,view','lockacc'])->group(function () {
                     Route::get('/',[MaterialRequestController::class, 'index']);
                     Route::get('datatable',[MaterialRequestController::class, 'datatable']);
                     Route::get('row_detail',[MaterialRequestController::class, 'rowDetail']);
@@ -1693,7 +1693,7 @@ Route::prefix('admin')->group(function () {
             });
 
             Route::prefix('production')->middleware('direct.access')->group(function () {
-                Route::prefix('marketing_order_production')->middleware('operation.access:marketing_order_production,view')->middleware('lockacc')->group(function () {
+                Route::prefix('marketing_order_production')->middleware(['operation.access:marketing_order_production,view','lockacc'])->group(function () {
                     Route::get('/',[MarketingOrderPlanController::class, 'index']);
                     Route::get('datatable',[MarketingOrderPlanController::class, 'datatable']);
                     Route::get('row_detail',[MarketingOrderPlanController::class, 'rowDetail']);
@@ -1710,7 +1710,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [MarketingOrderPlanController::class, 'destroy'])->middleware('operation.access:marketing_order_production,delete');
                 });
 
-                Route::prefix('production_schedule')->middleware('operation.access:production_schedule,view')->middleware('lockacc')->group(function () {
+                Route::prefix('production_schedule')->middleware(['operation.access:production_schedule,view','lockacc'])->group(function () {
                     Route::get('/',[ProductionScheduleController::class, 'index']);
                     Route::get('datatable',[ProductionScheduleController::class, 'datatable']);
                     Route::get('row_detail',[ProductionScheduleController::class, 'rowDetail']);
@@ -1729,7 +1729,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [ProductionScheduleController::class, 'destroy'])->middleware('operation.access:production_schedule,delete');
                 });
 
-                Route::prefix('production_order')->middleware('operation.access:production_order,view')->middleware('lockacc')->group(function () {
+                Route::prefix('production_order')->middleware(['operation.access:production_order,view','lockacc'])->group(function () {
                     Route::get('/',[ProductionOrderController::class, 'index']);
                     Route::get('datatable',[ProductionOrderController::class, 'datatable']);
                     Route::get('row_detail',[ProductionOrderController::class, 'rowDetail']);
@@ -1748,7 +1748,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [ProductionOrderController::class, 'destroy'])->middleware('operation.access:production_order,delete');
                 });
 
-                Route::prefix('production_issue_receive')->middleware('operation.access:production_issue_receive,view')->middleware('lockacc')->group(function () {
+                Route::prefix('production_issue_receive')->middleware(['operation.access:production_issue_receive,view','lockacc'])->group(function () {
                     Route::get('/',[ProductionIssueReceiveController::class, 'index']);
                     Route::get('datatable',[ProductionIssueReceiveController::class, 'datatable']);
                     Route::get('row_detail',[ProductionIssueReceiveController::class, 'rowDetail']);
@@ -1769,7 +1769,7 @@ Route::prefix('admin')->group(function () {
             });
 
             Route::prefix('sales')->middleware('direct.access')->group(function () {
-                Route::prefix('sales_order')->middleware('operation.access:sales_order,view')->middleware('lockacc')->group(function () {
+                Route::prefix('sales_order')->middleware(['operation.access:sales_order,view','lockacc'])->group(function () {
                     Route::get('/',[MarketingOrderController::class, 'index']);
                     Route::post('datatable',[MarketingOrderController::class, 'datatable']);
                     Route::get('row_detail',[MarketingOrderController::class, 'rowDetail']);
@@ -1785,7 +1785,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [MarketingOrderController::class, 'destroy'])->middleware('operation.access:sales_order,delete');
                 });
 
-                Route::prefix('sales_down_payment')->middleware('operation.access:sales_down_payment,view')->middleware('lockacc')->group(function () {
+                Route::prefix('sales_down_payment')->middleware(['operation.access:sales_down_payment,view','lockacc'])->group(function () {
                     Route::get('/',[MarketingOrderDownPaymentController::class, 'index']);
                     Route::get('datatable',[MarketingOrderDownPaymentController::class, 'datatable']);
                     Route::get('row_detail',[MarketingOrderDownPaymentController::class, 'rowDetail']);
@@ -1805,7 +1805,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [MarketingOrderDownPaymentController::class, 'destroy'])->middleware('operation.access:sales_down_payment,delete');
                 });
 
-                Route::prefix('marketing_order_delivery')->middleware('operation.access:marketing_order_delivery,view')->middleware('lockacc')->group(function () {
+                Route::prefix('marketing_order_delivery')->middleware(['operation.access:marketing_order_delivery,view','lockacc'])->group(function () {
                     Route::get('/',[MarketingOrderDeliveryController::class, 'index']);
                     Route::get('datatable',[MarketingOrderDeliveryController::class, 'datatable']);
                     Route::get('row_detail',[MarketingOrderDeliveryController::class, 'rowDetail']);
@@ -1824,7 +1824,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [MarketingOrderDeliveryController::class, 'destroy'])->middleware('operation.access:marketing_order_delivery,delete');
                 });
 
-                Route::prefix('delivery_order')->middleware('operation.access:delivery_order,view')->middleware('lockacc')->group(function () {
+                Route::prefix('delivery_order')->middleware(['operation.access:delivery_order,view','lockacc'])->group(function () {
                     Route::get('/',[MarketingOrderDeliveryProcessController::class, 'index']);
                     Route::get('datatable',[MarketingOrderDeliveryProcessController::class, 'datatable']);
                     Route::get('row_detail',[MarketingOrderDeliveryProcessController::class, 'rowDetail']);
@@ -1850,7 +1850,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [MarketingOrderDeliveryProcessController::class, 'destroy'])->middleware('operation.access:delivery_order,delete');
                 });
 
-                Route::prefix('marketing_order_return')->middleware('operation.access:marketing_order_return,view')->middleware('lockacc')->group(function () {
+                Route::prefix('marketing_order_return')->middleware(['operation.access:marketing_order_return,view','lockacc'])->group(function () {
                     Route::get('/',[MarketingOrderReturnController::class, 'index']);
                     Route::get('datatable',[MarketingOrderReturnController::class, 'datatable']);
                     Route::get('row_detail',[MarketingOrderReturnController::class, 'rowDetail']);
@@ -1869,7 +1869,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [MarketingOrderReturnController::class, 'destroy'])->middleware('operation.access:marketing_order_return,delete');
                 });
 
-                Route::prefix('marketing_order_invoice')->middleware('operation.access:marketing_order_invoice,view')->middleware('lockacc')->group(function () {
+                Route::prefix('marketing_order_invoice')->middleware(['operation.access:marketing_order_invoice,view','lockacc'])->group(function () {
                     Route::get('/',[MarketingOrderInvoiceController::class, 'index']);
                     Route::get('datatable',[MarketingOrderInvoiceController::class, 'datatable']);
                     Route::get('row_detail',[MarketingOrderInvoiceController::class, 'rowDetail']);
@@ -1889,7 +1889,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [MarketingOrderInvoiceController::class, 'destroy'])->middleware('operation.access:marketing_order_invoice,delete');
                 });
 
-                Route::prefix('marketing_order_memo')->middleware('operation.access:marketing_order_memo,view')->middleware('lockacc')->group(function () {
+                Route::prefix('marketing_order_memo')->middleware(['operation.access:marketing_order_memo,view','lockacc'])->group(function () {
                     Route::get('/',[MarketingOrderMemoController::class, 'index']);
                     Route::get('datatable',[MarketingOrderMemoController::class, 'datatable']);
                     Route::get('row_detail',[MarketingOrderMemoController::class, 'rowDetail']);
@@ -2016,7 +2016,7 @@ Route::prefix('admin')->group(function () {
             });
 
             Route::prefix('finance')->middleware('direct.access')->group(function () {
-                Route::prefix('fund_request')->middleware('operation.access:fund_request,view')->middleware('lockacc')->group(function () {
+                Route::prefix('fund_request')->middleware(['operation.access:fund_request,view','lockacc'])->group(function () {
                     Route::get('/',[FundRequestController::class, 'index']);
                     Route::get('datatable',[FundRequestController::class, 'datatable']);
                     Route::get('row_detail',[FundRequestController::class, 'rowDetail']);
@@ -2043,7 +2043,7 @@ Route::prefix('admin')->group(function () {
                     });
                 });
 
-                Route::prefix('payment_request')->middleware('operation.access:payment_request,view')->middleware('lockacc')->group(function () {
+                Route::prefix('payment_request')->middleware(['operation.access:payment_request,view','lockacc'])->group(function () {
                     Route::get('/',[PaymentRequestController::class, 'index']);
                     Route::post('get_account_data', [PaymentRequestController::class, 'getAccountData']);
                     Route::post('get_account_info', [PaymentRequestController::class, 'getAccountInfo']);
@@ -2066,7 +2066,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [PaymentRequestController::class, 'destroy'])->middleware('operation.access:payment_request,delete');
                 });
 
-                Route::prefix('outgoing_payment')->middleware('operation.access:outgoing_payment,view')->middleware('lockacc')->group(function () {
+                Route::prefix('outgoing_payment')->middleware(['operation.access:outgoing_payment,view','lockacc'])->group(function () {
                     Route::get('/',[OutgoingPaymentController::class, 'index']);
                     Route::get('datatable',[OutgoingPaymentController::class, 'datatable']);
                     Route::get('row_detail',[OutgoingPaymentController::class, 'rowDetail']);
@@ -2085,7 +2085,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [OutgoingPaymentController::class, 'destroy'])->middleware('operation.access:outgoing_payment,delete');
                 });
 
-                Route::prefix('incoming_payment')->middleware('operation.access:incoming_payment,view')->middleware('lockacc')->group(function () {
+                Route::prefix('incoming_payment')->middleware(['operation.access:incoming_payment,view','lockacc'])->group(function () {
                     Route::get('/',[IncomingPaymentController::class, 'index']);
                     Route::get('datatable',[IncomingPaymentController::class, 'datatable']);
                     Route::get('row_detail',[IncomingPaymentController::class, 'rowDetail']);
@@ -2106,7 +2106,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [IncomingPaymentController::class, 'destroy'])->middleware('operation.access:incoming_payment,delete');
                 });
 
-                Route::prefix('close_bill')->middleware('operation.access:close_bill,view')->middleware('lockacc')->group(function () {
+                Route::prefix('close_bill')->middleware(['operation.access:close_bill,view','lockacc'])->group(function () {
                     Route::get('/',[CloseBillController::class, 'index']);
                     Route::get('datatable',[CloseBillController::class, 'datatable']);
                     Route::get('row_detail',[CloseBillController::class, 'rowDetail']);
@@ -2130,7 +2130,7 @@ Route::prefix('admin')->group(function () {
             Route::prefix('accounting')->middleware('direct.access')->group(function () {
 
                 Route::prefix('accounting_asset')->group(function () {
-                    Route::prefix('capitalization')->middleware('operation.access:capitalization,view')->middleware('lockacc')->group(function () {
+                    Route::prefix('capitalization')->middleware(['operation.access:capitalization,view','lockacc'])->group(function () {
                         Route::get('/',[CapitalizationController::class, 'index']);
                         Route::get('datatable',[CapitalizationController::class, 'datatable']);
                         Route::get('row_detail',[CapitalizationController::class, 'rowDetail']);
@@ -2147,7 +2147,7 @@ Route::prefix('admin')->group(function () {
                         Route::post('destroy', [CapitalizationController::class, 'destroy'])->middleware('operation.access:capitalization,delete');
                     });
 
-                    Route::prefix('retirement')->middleware('operation.access:retirement,view')->middleware('lockacc')->group(function () {
+                    Route::prefix('retirement')->middleware(['operation.access:retirement,view','lockacc'])->group(function () {
                         Route::get('/',[RetirementController::class, 'index']);
                         Route::get('datatable',[RetirementController::class, 'datatable']);
                         Route::get('row_detail',[RetirementController::class, 'rowDetail']);
@@ -2164,7 +2164,7 @@ Route::prefix('admin')->group(function () {
                         Route::post('destroy', [RetirementController::class, 'destroy'])->middleware('operation.access:retirement,delete');
                     });
 
-                    Route::prefix('depreciation')->middleware('operation.access:depreciation,view')->middleware('lockacc')->group(function () {
+                    Route::prefix('depreciation')->middleware(['operation.access:depreciation,view','lockacc'])->group(function () {
                         Route::get('/',[DepreciationController::class, 'index']);
                         Route::get('datatable',[DepreciationController::class, 'datatable']);
                         Route::get('row_detail',[DepreciationController::class, 'rowDetail']);
@@ -2194,7 +2194,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [DocumentTaxController::class, 'destroy'])->middleware('operation.access:document_tax,delete');
                 });
                 
-                Route::prefix('journal')->middleware('operation.access:journal,view')->middleware('lockacc')->group(function () {
+                Route::prefix('journal')->middleware(['operation.access:journal,view','lockacc'])->group(function () {
                     Route::get('/',[JournalController::class, 'index']);
                     Route::get('datatable',[JournalController::class, 'datatable']);
                     Route::get('row_detail',[JournalController::class, 'rowDetail']);
@@ -2211,7 +2211,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [JournalController::class, 'destroy'])->middleware('operation.access:journal,delete');
                 });
 
-                Route::prefix('closing_journal')->middleware('operation.access:closing_journal,view')->middleware('lockacc')->group(function () {
+                Route::prefix('closing_journal')->middleware(['operation.access:closing_journal,view','lockacc'])->group(function () {
                     Route::get('/',[ClosingJournalController::class, 'index']);
                     Route::get('datatable',[ClosingJournalController::class, 'datatable']);
                     Route::get('row_detail',[ClosingJournalController::class, 'rowDetail']);

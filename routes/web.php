@@ -324,6 +324,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('material_request_gi', [Select2Controller::class, 'materialRequestGI']);
                 Route::get('marketing_order_delivery_process_po', [Select2Controller::class, 'marketingOrderDeliveryProcessPO']);
                 Route::get('delivery_cost', [Select2Controller::class, 'deliveryCost']);
+                Route::get('production_order', [Select2Controller::class, 'productionOrder']);
             });
 
             Route::prefix('menu')->group(function () {
@@ -1758,6 +1759,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('print_by_range',[ProductionIssueReceiveController::class, 'printByRange']);
                     Route::get('export',[ProductionIssueReceiveController::class, 'export']);
                     Route::get('viewstructuretree',[ProductionIssueReceiveController::class, 'viewStructureTree']);
+                    Route::post('send_used_data',[ProductionIssueReceiveController::class, 'sendUsedData']);
                     Route::post('remove_used_data', [ProductionIssueReceiveController::class, 'removeUsedData']);
                     Route::post('create',[ProductionIssueReceiveController::class, 'create'])->middleware('operation.access:production_issue_receive,update');
                     Route::post('send_used_data',[ProductionIssueReceiveController::class, 'sendUsedData'])->middleware('operation.access:production_issue_receive,update');

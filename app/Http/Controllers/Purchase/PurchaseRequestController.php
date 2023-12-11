@@ -2574,7 +2574,8 @@ class PurchaseRequestController extends Controller
                 $query->whereHas('itemGroupWarehouse',function($query){
                     $query->whereIn('warehouse_id',$this->datawarehouses);
                 });
-            })->get();
+            })
+            ->whereNull('is_sales_item')->get();
     
             $arr = [];
 

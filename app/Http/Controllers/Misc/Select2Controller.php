@@ -64,6 +64,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Color;
 use App\Models\DeliveryCost;
 use App\Models\Pattern;
+use App\Models\ProductionOrder;
 use App\Models\Size;
 use App\Models\Type;
 use App\Models\Variety;
@@ -3054,6 +3055,59 @@ class Select2Controller extends Controller {
                 'tonnage'       => number_format($d->tonnage,2,',','.'),
                 'nominal'       => number_format($d->nominal,2,',','.'),
                 'name'          => $d->code.' - tonase '.number_format($d->tonnage,2,',','.'),
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function productionOrder(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = ProductionOrder::where(function($query) use($search){
+            $query->where('code', 'like', "%$search%")
+                ->orWhereHas('user',function($query) use ($search){
+                    $query->where('name','like',"%$search%")
+                        ->orWhere('employee_no','like',"%$search%");
+                });
+        })
+        ->whereDoesntHave('used')
+        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+        ->whereIn('status',['2','3'])
+        ->get();
+
+        foreach($data as $d) {
+            $detail_issue = [];
+
+            foreach($d->productionOrderDetail as $row){
+                $detail_issue[] = [
+                    'id'                    => $row->id,
+                    'bom_detail_id'         => $row->bom_detail_id,
+                    'lookable_type'         => $row->lookable_type,
+                    'lookable_id'           => $row->lookable_id,
+                    'lookable_code'         => $row->lookable->code,
+                    'lookable_name'         => $row->lookable->name,
+                    'lookable_unit'         => $row->item()->exists() ? $row->item->productionUnit->code : '-',
+                    'qty'                   => number_format($row->qty,3,',','.'),
+                    'nominal'               => number_format($row->nominal,2,',','.'),
+                    'total'                 => number_format($row->total,2,',','.'),
+                ];
+            }
+
+            $response[] = [
+                'id'   			                => $d->id,
+                'text' 			                => $d->code.' Tgl.Post '.date('d/m/y',strtotime($d->post_date)).' - Plant : '.$d->productionSchedule->place->code,
+                'table'                         => $d->getTable(),
+                'code'                          => $d->code,
+                'item_receive_id'               => $d->productionScheduleDetail->item_id,
+                'item_receive_code'             => $d->productionScheduleDetail->item->code,
+                'item_receive_name'             => $d->productionScheduleDetail->item->name,
+                'item_receive_unit_production'  => $d->productionScheduleDetail->item->productionUnit->code,
+                'item_receive_unit_uom'         => $d->productionScheduleDetail->item->uomUnit->code,
+                'item_receive_unit_sell'        => $d->productionScheduleDetail->item->sellUnit->code,
+                'item_receive_qty'              => number_format($d->productionScheduleDetail->qty,3,',','.'),
+                'detail_issue'                  => $detail_issue,
             ];
         }
 

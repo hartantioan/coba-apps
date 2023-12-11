@@ -375,7 +375,7 @@
                                             <option value="{{ $row->id }}">{{ $row->name.' - '.$row->code }}</option>
                                         @endforeach
                                     </select>
-                                    <label class="active" for="uom_unit">Satuan Stok & Produksi</label>
+                                    <label class="active" for="uom_unit">Satuan Stok (UoM)</label>
                                 </div>
                             </div>
                         </div>

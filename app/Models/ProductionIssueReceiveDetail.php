@@ -16,13 +16,16 @@ class ProductionIssueReceiveDetail extends Model
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'production_issue_receive_id',
-        'production_schedule_detail_id',
+        'production_order_detail_id',
         'lookable_type',
         'lookable_id',
+        'shading',
         'bom_id',
+        'qty',
         'nominal',
+        'total',
         'type',
-        'batch_no',
+        'from_item_stock_id',
     ];
 
     public function productionIssueReceive()
@@ -30,8 +33,12 @@ class ProductionIssueReceiveDetail extends Model
         return $this->belongsTo('App\Models\ProductionIssueReceive', 'production_issue_receive_id', 'id')->withTrashed();
     }
 
-    public function productionScheduleDetail(){
-        return $this->belongsTo('App\Models\ProductionScheduleDetail','production_schedule_detail_id','id')->withTrashed();
+    public function productionOrderDetail(){
+        return $this->belongsTo('App\Models\ProductionOrderDetail','production_order_detail_id','id')->withTrashed();
+    }
+
+    public function itemStock(){
+        return $this->belongsTo('App\Models\ItemStock','from_item_stock_id','id')->withTrashed();
     }
 
     public function bom(){

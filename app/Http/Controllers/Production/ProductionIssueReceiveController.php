@@ -18,6 +18,7 @@ use App\Models\MarketingOrderPlanDetail;
 use App\Models\Place;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
+use App\Models\ProductionOrder;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -1292,10 +1293,10 @@ class ProductionIssueReceiveController extends Controller
     }
 
     public function sendUsedData(Request $request){
-        $mop = ProductionSchedule::find($request->id);
+        $mop = ProductionOrder::find($request->id);
        
         if(!$mop->used()->exists()){
-            CustomHelper::sendUsedData($mop->getTable(),$request->id,'Form Issue Receive');
+            CustomHelper::sendUsedData($request->type,$request->id,'Form Issue Receive');
             return response()->json([
                 'status'    => 200,
             ]);

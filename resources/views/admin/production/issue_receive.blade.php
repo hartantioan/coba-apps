@@ -192,24 +192,31 @@
                         <div class="row mt-3" id="sticky" style="z-index:99 !important;background-color: #ffffff !important;border-radius:30px !important;">
                             <div class="col s12">
                                 <fieldset>
-                                    <legend>2. Jadwal Produksi</legend>
+                                    <legend>2. Order Produksi</legend>
                                     <div class="input-field col m3 s12 step8">
-                                        <select class="browser-default" id="production_schedule_id" name="production_schedule_id" onchange="getProductionScheduleShift();"></select>
-                                        <label class="active" for="production_schedule_id">Jadwal Produksi</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step8">
-                                        <select class="select2 browser-default" id="production_schedule_detail_id" name="production_schedule_detail_id">
-                                            <option value="">-- Pilih Jadwal Produksi --</option>
-                                        </select>
-                                        <label class="active" for="production_schedule_detail_id">Shift</label>
+                                        <select class="browser-default" id="production_order_id" name="production_order_id"></select>
+                                        <label class="active" for="production_order_id">Daftar Order Produksi</label>
                                     </div>
                                     <div class="col m2 s12 step9">
-                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 mt-5" onclick="addProductionSchedule();" href="javascript:void(0);">
-                                            <i class="material-icons left">add</i> Jadwal Produksi
+                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 mt-5" onclick="getProductionOrder();" href="javascript:void(0);">
+                                            <i class="material-icons left">add</i> Order Produksi
                                         </a>
                                     </div>
                                     <div class="col m4 s12 step10">
                                         <h6>Data Terpakai : <i id="list-used-data"></i></h6>
+                                    </div>
+                                    <div class="col m12">
+                                        <div class="row">
+                                            <div class="col m4 s12">
+                                                Shift : <b id="output-shift">-</b>
+                                            </div>
+                                            <div class="col m4 s12">
+                                                Grup : <b id="output-group">-</b>
+                                            </div>
+                                            <div class="col m4 s12">
+                                                Line : <b id="output-line">-</b>
+                                            </div>
+                                        </div>
                                     </div>
                                 </fieldset>
                             </div>
@@ -219,28 +226,60 @@
                                 <fieldset>
                                     <legend>3. Detail Item Issue Receive</legend>
                                     <div class="col m12 s12 step12" style="overflow:auto;width:100% !important;">
-                                        <p class="mt-2 mb-2">
-                                            <table class="bordered" style="border: 1px solid;" id="table-detail-item">
-                                                <thead>
-                                                    <tr>
-                                                        <th class="center">No.</th>
-                                                        <th class="center">Tgl.Produksi</th>
-                                                        <th class="center">Shift</th>
-                                                        <th class="center">Item Target FG</th>
-                                                        <th class="center">Qty</th>
-                                                        <th class="center">Satuan UOM</th>
-                                                        <th class="center">Hapus</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="body-item">
-                                                    <tr id="last-row-item">
-                                                        <td class="center-align" colspan="7">
-                                                            Silahkan tambahkan jadwal produksi untuk memulai...
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </p>
+                                        <ul class="tabs">
+                                            <li class="tab col m3"><a class="active step19" href="#issue">Issue (Terpakai)</a></li>
+                                            <li class="tab col m3"><a class="step20" href="#receive">Receive (Terima)</a></li>
+                                        </ul>
+                                        <div class="row step22">
+                                            <div id="issue" class="col s12 active">
+                                                <p class="mt-2 mb-2">
+                                                    <table class="bordered" style="border: 1px solid;" id="table-detail-item-issue">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="center">No.</th>
+                                                                <th class="center">Item/Coa</th>
+                                                                <th class="center">Qty Planned</th>
+                                                                <th class="center">Qty Real</th>
+                                                                <th class="center">Satuan Produksi</th>
+                                                                <th class="center">Plant & Gudang</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="body-item-issue">
+                                                            <tr id="last-row-item-issue">
+                                                                <td class="center-align" colspan="6">
+                                                                    Silahkan tambahkan Order Produksi untuk memulai...
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </p>
+                                            </div>
+                                            <div id="receive" class="col s12">
+                                                <p class="mt-2 mb-2">
+                                                    <table class="bordered" style="border: 1px solid;" id="table-detail-item-receive">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="center" width="5%">No.</th>
+                                                                <th class="center" width="15%">Item/Coa</th>
+                                                                <th class="center" width="10%">Qty Planned</th>
+                                                                <th class="center" width="14%">Qty Real</th>
+                                                                <th class="center" width="13%">Qty UoM</th>
+                                                                <th class="center" width="13%">Qty Jual</th>
+                                                                <th class="center" width="15%">Shading</th>
+                                                                <th class="center" width="15%">Batch</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="body-item-receive">
+                                                            <tr id="last-row-item-receive">
+                                                                <td class="center-align" colspan="8">
+                                                                    Silahkan tambahkan Order Produksi untuk memulai...
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </fieldset>
                             </div>
@@ -470,10 +509,14 @@
                 $('#post_date').attr('max','{{ $maxDate }}');
             },
             onOpenEnd: function(modal, trigger) {
-                $('#name').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
+                $('.tabs').tabs({
+                    onShow: function () {
+                        
+                    }
+                });
                 window.onbeforeunload = function() {
                     if($('.data-used').length > 0){
                         $('.data-used').trigger('click');
@@ -491,33 +534,10 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
-                if($('.delete-data-item').length > 0){
-                    $('.delete-data-item').trigger('click');
-                }
             }
         });
 
-        $('#body-item').on('click', '.delete-data-item', function() {
-            let tr = $(this).closest('tr');
-            tr.next().next().remove();
-            tr.next().remove();
-            tr.remove();
-            let id = $(this).data('id');
-            if($('.row_item[data-id="' + id + '"]').length == 0){
-                $('.data-used[data-id="' + id + '"]').trigger('click');
-            }
-            if($('.row_item').length == 0){
-                $('#body-item').append(`
-                    <tr id="last-row-item">
-                        <td class="center-align" colspan="7">
-                            Silahkan tambahkan jadwal produksi untuk memulai...
-                        </td>
-                    </tr>
-                `);
-            }
-        });
-
-        select2ServerSide('#production_schedule_id', '{{ url("admin/select2/production_schedule") }}');
+        select2ServerSide('#production_order_id', '{{ url("admin/select2/production_order") }}');
     });
 
     function makeTreeOrg(data,link){
@@ -657,17 +677,22 @@
                 
             },
             success: function(response) {
-                $('.row_item[data-id="' + id + '"]').remove();
-                if($('.row_item').length == 0){
-                    $('#body-item').empty().append(`
-                        <tr id="last-row-item">
-                            <td class="center-align" colspan="7">
-                                Silahkan tambahkan jadwal produksi untuk memulai...
-                            </td>
-                        </tr>
-                    `);
-                    $('#production_schedule_id').empty().trigger('change');
-                }
+                $('.row_item_issue[data-id="' + id + '"],.row_item_receive[data-id="' + id + '"]').remove();
+                $('#body-item-issue').empty().append(`
+                    <tr id="last-row-item-issue">
+                        <td class="center-align" colspan="6">
+                            Silahkan tambahkan Order Produksi untuk memulai...
+                        </td>
+                    </tr>
+                `);
+                $('#body-item-receive').empty().append(`
+                    <tr id="last-row-item-receive">
+                        <td class="center-align" colspan="8">
+                            Silahkan tambahkan Order Produksi untuk memulai...
+                        </td>
+                    </tr>
+                `);
+                $('#production_order_id').empty();
             },
             error: function() {
                 swal({
@@ -679,15 +704,16 @@
         });
     }
 
-    function getProductionScheduleShift(){
-        if($('#production_schedule_id').val()){
-            let pci = $('#production_schedule_id').select2('data')[0];
+    function getProductionOrder(){
+        if($('#production_order_id').val()){
+            let datakuy = $('#production_order_id').select2('data')[0];
             $.ajax({
                 url: '{{ Request::url() }}/send_used_data',
                 type: 'POST',
                 dataType: 'JSON',
                 data: {
-                    id: $('#production_schedule_id').val(),
+                    id: $('#production_order_id').val(),
+                    type: datakuy.table,
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -705,23 +731,97 @@
                             icon: 'warning'
                         });
                     }else{
-                        
+
                         $('#list-used-data').append(`
                             <div class="chip purple darken-4 gradient-shadow white-text">
-                                ` + pci.code + `
-                                <i class="material-icons close data-used" data-id="` + pci.id + `" onclick="removeUsedData('` + pci.table + `','` + $('#production_schedule_id').val() + `')">close</i>
+                                ` + datakuy.code + `
+                                <i class="material-icons close data-used" onclick="removeUsedData('` + datakuy.table + `','` + $('#production_order_id').val() + `')">close</i>
                             </div>
                         `);
 
-                        $('#production_schedule_detail_id').empty();
+                        $('.row_item_issue,.row_item_receive').remove();
+                        
+                        $('#last-row-item-issue,#last-row-item-receive').remove();
 
-                        $.each(pci.details, function(i, val) {
+                        let no_issue = $('.row_item_issue').length + 1;
+                        let no_receive = $('.row_item_receive').length + 1;
+
+                        $.each(datakuy.detail_issue, function(i, val) {
                             var count = makeid(10);
-                            $('#production_schedule_detail_id').append(`
-                                <option value="` + val.id + `" data-pci="` + pci.id + `" data-date="` + val.production_date + `" data-shift="` + val.shift_code + `" data-item="` + val.item_name + `" data-unit="` + val.unit_uom + `" data-qty="` + val.qty_in_uom + `">` + val.production_date + ` - ` + val.shift_code + `</option>
+                            $('#body-item-issue').append(`
+                                <tr class="row_item_issue" data-id="` + $('#production_order_id').val() + `">
+                                    <input type="hidden" name="arr_type[]" value="1">
+                                    <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
+                                    <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
+                                    <input type="hidden" name="arr_production_detail_id[]" value="` + val.id + `">
+                                    <input type="hidden" name="arr_bom_detail_id[]" value="` + val.bom_detail_id + `">
+                                    <input type="hidden" name="arr_nominal[]" value="` + val.nominal + `">
+                                    <input type="hidden" name="arr_total[]" value="` + val.total + `">
+                                    <input type="hidden" name="arr_shading[]" value="">
+                                    <td class="center-align">
+                                        ` + no_issue + `
+                                    </td>
+                                    <td>
+                                        ` + val.lookable_code + ` - ` + val.lookable_name + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.qty + `
+                                    </td>
+                                    <td class="center">
+                                        <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100%;" id="rowQty`+ count +`">
+                                    </td>
+                                    <td class="center">
+                                        ` + val.lookable_unit + `
+                                    </td>
+                                    <td class="center">
+                                        -
+                                    </td>
+                                </tr>
                             `);
                         });
 
+                        var count = makeid(10);
+                        $('#body-item-receive').append(`
+                            <tr class="row_item_issue" data-id="` + $('#production_order_id').val() + `">
+                                <input type="hidden" name="arr_type[]" value="2">
+                                <input type="hidden" name="arr_lookable_type[]" value="items">
+                                <input type="hidden" name="arr_lookable_id[]" value="` + datakuy.item_receive_id + `">
+                                <input type="hidden" name="arr_production_detail_id[]" value="">
+                                <input type="hidden" name="arr_bom_detail_id[]" value="">
+                                <input type="hidden" name="arr_nominal[]" value="0,00">
+                                <input type="hidden" name="arr_total[]" value="0,00">
+                                <td class="center-align">
+                                    ` + no_receive + `
+                                </td>
+                                <td>
+                                    ` + datakuy.item_receive_code + ` - ` + datakuy.item_receive_name + `
+                                </td>
+                                <td class="right-align">
+                                    ` + datakuy.item_receive_qty + `
+                                </td>
+                                <td class="center">
+                                    <div class="input-field col s10">
+                                        <input name="arr_qty[]" type="text" value="` + datakuy.item_receive_qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100%;margin: 0 0 0 0 !important;height:inherit !important;font-size:0.9rem !important;" id="rowQty`+ count +`">
+                                        <div class="form-control-feedback production-unit" style="right:-30px;top:-10px;">-</div>
+                                    </div>
+                                </td>
+                                <td class="right-align">
+                                    -
+                                </td>
+                                <td class="center">
+                                    -
+                                </td>
+                                <td class="center">
+                                    <input name="arr_shading[]" class="browser-default" type="text" placeholder="Kode Shading..." style="text-align:right;width:100%;">
+                                </td>
+                                <td class="center">
+                                    -
+                                </td>
+                            </tr>
+                        `);
+
+                        $('#production_order_id').empty();
+                        M.updateTextFields();
                     }
                 },
                 error: function() {
@@ -735,97 +835,20 @@
                 }
             });
         }else{
-            $('#production_schedule_detail_id').empty().append(`
-                <option value="">-- Pilih Jadwal Produksi --</option>
-            `);
-        }
-    }
-
-    function addProductionSchedule(){
-        if($('#production_schedule_detail_id').val()){
-            if($('#last-row-item').length > 0){
-                $('#last-row-item').remove();
-            }
-            let no = $('.row_item').length + 1;
-            let schedule = $('#production_schedule_detail_id').find(":selected");
-            var count = makeid(10);
-            $('#body-item').append(`
-                <tr class="row_item" data-id="` + schedule.data('pci') + `" data-detail="` + $('#production_schedule_detail_id').val() + `">
-                    <th class="center-align" rowspan="3">` + no + `.</th>
-                    <th class="center-align">` + schedule.data('date') + `</th>
-                    <th class="center-align">` + schedule.data('shift') + `</th>
-                    <th class="center-align">` + schedule.data('item') + `</th>
-                    <th class="right-align">` + schedule.data('qty') + `</th>
-                    <th class="center-align">` + schedule.data('unit') + `</th>
-                    <th class="center-align" rowspan="3">
-                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" data-id="` + schedule.data('pci') + `" href="javascript:void(0);">
-                            <i class="material-icons">delete</i>
-                        </a>
-                    </th>
-                </tr>
-                <tr class="row_item_issue">
-                    <td class="center-align" colspan="5" style="background-color:#ff7a7a;">
-                        <h6><b>Issue Item</b></h6>
-                        <table class="bordered" width="100%">
-                            <thead>
-                                <tr>
-                                    <th class="center-align">COA/Item</th>
-                                    <th class="center-align">Harga/Qty</th>
-                                    <th class="center-align">Satuan</th>
-                                    <th class="center-align">Hapus</th>
-                                </tr>
-                            </thead>
-                            <tbody id="body-item-issue-` + count + `" class="body-item-issue">
-                                <tr id="last-row-issue`+ count +`">
-                                    <td class="center-align" colspan="4">
-                                        <a class="waves-effect waves-light teal btn-small mb-1 mr-1" onclick="addItemIssue('1','` + count + `',` + $('#production_schedule_detail_id').val() + `,'coas');" href="javascript:void(0);">
-                                            <i class="material-icons left">add</i> Coa
-                                        </a>
-                                        <a class="waves-effect waves-light teal btn-small mb-1 mr-1" onclick="addItemIssue('1','` + count + `',` + $('#production_schedule_detail_id').val() + `,'items');" href="javascript:void(0);">
-                                            <i class="material-icons left">add</i> Item
-                                        </a>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-                <tr class="row_item_receive">
-                    <td class="center-align" colspan="5" style="background-color:#63ff80;">
-                        <h6><b>Receive Item</b></h6>
-                        <table class="bordered" width="100%">
-                            <thead>
-                                <tr>
-                                    <th class="center-align">Item</th>
-                                    <th class="center-align">Qty</th>
-                                    <th class="center-align">Satuan</th>
-                                    <th class="center-align">Batch No</th>
-                                    <th class="center-align">Hapus</th>
-                                </tr>
-                            </thead>
-                            <tbody id="body-item-receive-` + count + `" class="body-item-receive">
-                                <tr id="last-row-receive`+ count +`">
-                                    <td class="center-align" colspan="5">
-                                        <a class="waves-effect waves-light teal btn-small mb-1 mr-1" onclick="addItem('2','` + count + `',` + $('#production_schedule_detail_id').val() + `);" href="javascript:void(0);">
-                                            <i class="material-icons left">add</i> Item
-                                        </a>    
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+            $('#body-item-issue').empty().append(`
+                <tr id="last-row-item-issue">
+                    <td class="center-align" colspan="6">
+                        Silahkan tambahkan Order Produksi untuk memulai...
                     </td>
                 </tr>
             `);
-
-            $('.modal-content').animate({
-                scrollTop: $('.modal-content').get(0).scrollHeight
-            }, 500);
-        }else{
-            swal({
-                title: 'Ups!',
-                text: 'Jangan lupa pilih Jadwal Produksi dan Shift yang ingin anda masukkan.',
-                icon: 'warning'
-            });
+            $('#body-item-receive').empty().append(`
+                <tr id="last-row-item-receive">
+                    <td class="center-align" colspan="8">
+                        Silahkan tambahkan Order Produksi untuk memulai...
+                    </td>
+                </tr>
+            `);
         }
     }
 

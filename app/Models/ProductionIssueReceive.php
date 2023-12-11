@@ -19,6 +19,7 @@ class ProductionIssueReceive extends Model
         'code',
         'user_id',
         'company_id',
+        'production_order_id',
         'post_date',
         'document',
         'status',
@@ -40,6 +41,11 @@ class ProductionIssueReceive extends Model
     public function company()
     {
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
+    }
+
+    public function productionOrder()
+    {
+        return $this->belongsTo('App\Models\ProductionOrder', 'production_order_id', 'id')->withTrashed();
     }
 
     public function productionIssueReceiveDetail()

@@ -7,8 +7,12 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
+use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
+use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 
-class ExportRegion implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell
+class ExportRegion extends DefaultValueBinder implements WithCustomValueBinder, FromCollection, WithTitle, WithHeadings, WithCustomStartCell
 {
     /**
     * @return \Illuminate\Support\Collection
@@ -58,4 +62,16 @@ class ExportRegion implements FromCollection, WithTitle, WithHeadings, WithCusto
 	{
 		return $this->headings;
 	}
+
+    public function bindValue(Cell $cell, $value)
+    {
+        if ($cell->getColumn() == 'B') {
+            $cell->setValueExplicit($value, DataType::TYPE_STRING);
+
+            return true;
+        }
+
+        // else return default behavior
+        return parent::bindValue($cell, $value);
+    }
 }

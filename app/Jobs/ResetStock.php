@@ -14,7 +14,7 @@ class ResetStock implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $place_id,$warehouse_id,$item_id,$qty,$type;
+    protected $place_id,$warehouse_id, $area_id,$item_id,$qty,$type;
 
     /**
      * Create a new job instance.

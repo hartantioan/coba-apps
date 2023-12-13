@@ -26,6 +26,7 @@ class ProductionIssueReceiveDetail extends Model
         'total',
         'type',
         'from_item_stock_id',
+        'batch_no',
     ];
 
     public function productionIssueReceive()
@@ -38,7 +39,7 @@ class ProductionIssueReceiveDetail extends Model
     }
 
     public function itemStock(){
-        return $this->belongsTo('App\Models\ItemStock','from_item_stock_id','id')->withTrashed();
+        return $this->belongsTo('App\Models\ItemStock','from_item_stock_id','id');
     }
 
     public function bom(){
@@ -57,5 +58,21 @@ class ProductionIssueReceiveDetail extends Model
         };
 
         return $type;
+    }
+
+    public function item(){
+        if($this->lookable_type == 'items'){
+            return $this->belongsTo('App\Models\Item', 'lookable_id', 'id')->withTrashed();
+        }else{
+            return $this->where('id',-1);
+        }
+    }
+
+    public function coa(){
+        if($this->lookable_type == 'coas'){
+            return $this->belongsTo('App\Models\Coa', 'lookable_id', 'id')->withTrashed();
+        }else{
+            return $this->where('id',-1);
+        }
     }
 }

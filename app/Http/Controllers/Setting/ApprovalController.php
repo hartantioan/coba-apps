@@ -419,8 +419,8 @@ class ApprovalController extends Controller
                 if($work_orders_rp == 0){
                     if($query) {
 
-                        DB::beginTransaction();
-                        try {
+                        /* DB::beginTransaction();
+                        try { */
         
                             $query->note = $request->note;
         
@@ -488,10 +488,10 @@ class ApprovalController extends Controller
                                 ]);
                             }
         
-                            DB::commit();
+                            /* DB::commit();
                         }catch(\Exception $e){
                             DB::rollback();
-                        }
+                        } */
         
                         CustomHelper::sendNotification($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,'Pengajuan '.$query->approvalSource->fullName().' No. '.$query->approvalSource->lookable->code.' telah '.$text.' di level '.$query->approvalTemplateStage->approvalStage->level.'.',$query->note,$query->approvalSource->lookable->user_id);
         

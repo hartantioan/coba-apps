@@ -114,6 +114,10 @@
     td {
         padding: 3px 1px;
     }
+    
+    table.bordered th, table.bordered td {
+        padding:3px !important;
+    }
 </style>
 <div class="card">
     <div class="card-content invoice-print-area">
@@ -143,7 +147,7 @@
         <div class="divider mb-1 mt-1"></div>
         <!-- invoice address and contact -->
         <div class="row">
-            <div class="col s6 row mt-2">
+            <div class="col s4 row mt-2">
                 <div class="col s12 center-align">
                     INFO UTAMA
                 </div>
@@ -154,13 +158,48 @@
                     {{ $data->user->name }}
                 </div>
                 <div class="col s4">
-                    Perusahaan
+                    Plant
                 </div>
                 <div class="col s8">
-                    {{ $data->company->name }}
+                    {{ $data->productionOrder->productionSchedule->place->code.' - '.$data->productionOrder->warehouse->name }}
+                </div>
+                <div class="col s4">
+                    No.PROD
+                </div>
+                <div class="col s8">
+                    {{ $data->productionOrder->code }}
+                </div>
+                <div class="col s4">
+                    No.Jadwal
+                </div>
+                <div class="col s8">
+                    {{ $data->productionOrder->productionSchedule->code }}
                 </div>
             </div>
-            <div class="col s6 row mt-2">
+            <div class="col s4 row mt-2">
+                <div class="col s12 center-align">
+                    JADWAL
+                </div>
+                <div class="col s4">
+                    Shift
+                </div>
+                <div class="col s8">
+                    {{ date('d/m/y',strtotime($data->productionOrder->productionScheduleDetail->production_date)).' - '.$data->productionOrder->productionScheduleDetail->shift->code.' - '.$data->productionOrder->productionScheduleDetail->shift->name }}
+                </div>
+                <div class="col s4">
+                    Line
+                </div>
+                <div class="col s8">
+                    {{ $data->productionOrder->productionScheduleDetail->line->code }}
+                </div>
+                <div class="col s4">
+                    Grup
+                </div>
+                <div class="col s8">
+                    {{ $data->productionOrder->productionScheduleDetail->group }}
+                </div>
+            </div>
+            <div class="col s4 row mt-2">
                 <div class="col s12 center-align">
                     LAIN-LAIN
                 </div>
@@ -177,67 +216,64 @@
             <table class="bordered">
                 <thead>
                     <tr>
-                        <th colspan="12" class="center-align">Daftar Coa/Item Issue (Terpakai) dan Receive (Masuk)</th>
+                        <th colspan="6" class="center-align">Daftar Coa/Item Issue (Terpakai)</th>
                     </tr>
                     <tr>
-                        <th class="center-align" rowspan="2">No.</th>
-                        <th class="center-align" rowspan="2">Tgl.Produksi</th>
-                        <th class="center-align" rowspan="2">Shift</th>
-                        <th class="center-align" rowspan="2">Plant</th>
-                        <th class="center-align" rowspan="2">Mesin</th>
-                        <th class="center-align" colspan="3" style="background-color:#ff7a7a;">Issue</th>
-                        <th class="center-align" colspan="4" style="background-color:#63ff80;">Receive</th>
-                    </tr>
-                    <tr>
-                        <th class="center-align">Coa/Item</th>
-                        <th class="center-align">Nominal/Qty</th>
-                        <th class="center-align">UOM</th>
-                        <th class="center-align">Item</th>
-                        <th class="center-align">Qty</th>
-                        <th class="center-align">UOM</th>
-                        <th class="center-align">Batch No.</th>
+                        <th class="center">No.</th>
+                        <th class="center">Item/Coa</th>
+                        <th class="center">Qty Planned</th>
+                        <th class="center">Qty Real</th>
+                        <th class="center">Satuan Produksi</th>
+                        <th class="center">Plant & Gudang</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @php
-                        $arrData = $data->dataView();
-                        $string = '';
-                        foreach($arrData as $key => $row){
-                            $rowspan = count($row['details_issue']) > count($row['details_receive']) ? count($row['details_issue']) : count($row['details_receive']);
-                            $string .= '<tr>
-                                <td class="center-align" rowspan="'.$rowspan.'">'.($key + 1).'</td>
-                                <td class="center-align" rowspan="'.$rowspan.'">'.$row['production_date'].'</td>
-                                <td class="center-align" rowspan="'.$rowspan.'">'.$row['shift'].'</td>
-                                <td class="center-align" rowspan="'.$rowspan.'">'.$row['place_code'].'</td>
-                                <td class="center-align" rowspan="'.$rowspan.'">'.$row['machine_code'].'</td>';
+                    @foreach($data->productionIssueReceiveDetail()->where('type','1')->get() as $key => $row)
+                        <tr>
+                            <td class="center-align">{{ $key+1 }}.</td>
+                            <td>{{ $row->item()->exists() ? $row->item->code.' - '.$row->item->name : $row->coa->code.' - '.$row->coa->name }}</td>
+                            <td class="right-align">{{ $row->item()->exists() ? number_format($row->productionOrderDetail->qty,3,',','.') : '-' }}</td>
+                            <td class="right-align">{{ $row->item()->exists() ? number_format($row->qty,3,',','.') : '-' }}</td>
+                            <td class="center-align">{{ $row->item()->exists() ? $row->item->productionUnit->code : '-' }}</td>
+                            <td>{{ $row->item()->exists() ? $row->itemStock->fullName() : '-' }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
 
-                            for($i=0;$i<$rowspan;$i++){
-                                if(isset($row['details_issue'][$i]['name'])){
-                                    $string .= '<td class="">'.$row['details_issue'][$i]['name'].'</td>';
-                                    $string .= '<td class="right-align">'.$row['details_issue'][$i]['nominal'].'</td>';
-                                    $string .= '<td class="center-align">'.$row['details_issue'][$i]['unit'].'</td>';
-                                }else{
-                                    $string .= '<td class=""></td>';
-                                    $string .= '<td class="center-align"></td>';
-                                    $string .= '<td class="center-align"></td>';
-                                }
-                                if(isset($row['details_receive'][$i]['name'])){
-                                    $string .= '<td class="">'.$row['details_receive'][$i]['name'].'</td>';
-                                    $string .= '<td class="right-align">'.$row['details_receive'][$i]['nominal'].'</td>';
-                                    $string .= '<td class="center-align">'.$row['details_receive'][$i]['unit'].'</td>';
-                                    $string .= '<td class="">'.$row['details_receive'][$i]['batch_no'].'</td>';
-                                    $string .= '</tr>';
-                                }else{
-                                    $string .= '<td class=""></td>';
-                                    $string .= '<td class="right-align"></td>';
-                                    $string .= '<td class="center-align"></td>';
-                                    $string .= '<td class=""></td>';
-                                    $string .= '</tr>';
-                                }
-                            }
-                        }
-                        echo $string;
-                    @endphp
+        <div class="invoice-product-details mt-2" style="overflow:auto;">
+            <table class="bordered">
+                <thead>
+                    <tr>
+                        <th colspan="9" class="center-align">Daftar Item Receive (Diterima)</th>
+                    </tr>
+                    <tr>
+                        <th class="center-align" width="5%">No.</th>
+                        <th class="center-align" width="15%">Item/Coa</th>
+                        <th class="center-align" width="10%">Qty Planned (Prod.)</th>
+                        <th class="center-align" width="10%">Qty Real (Prod.)</th>
+                        <th class="center-align" width="10%">Qty UoM</th>
+                        <th class="center-align" width="10%">Qty Jual</th>
+                        <th class="center-align" width="10%">Qty Pallet</th>
+                        <th class="center-align" width="15%">Shading</th>
+                        <th class="center-align" width="15%">Batch</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($data->productionIssueReceiveDetail()->where('type','2')->get() as $key => $row)
+                        <tr>
+                            <td class="center-align">{{ $key+1 }}</td>
+                            <td>{{ $row->item->code.' - '.$row->item->name }}</td>
+                            <td class="right-align">{{ number_format($data->productionOrder->productionScheduleDetail->qty,3,',','.').' '.$row->item->productionUnit->code }}</td>
+                            <td class="right-align">{{ number_format($row->qty,3,',','.').' '.$row->item->productionUnit->code }}</td>
+                            <td class="right-align">{{ number_format($row->qty * $row->item->production_convert,3,',','.').' '.$row->item->uomUnit->code }}</td>
+                            <td class="right-align">{{ number_format(($row->qty * $row->item->production_convert) / $row->item->sell_convert,3,',','.').' '.$row->item->sellUnit->code }}</td>
+                            <td class="right-align">{{ number_format((($row->qty * $row->item->production_convert) / $row->item->sell_convert) / $row->item->pallet_convert,3,',','.').' '.$row->item->palletUnit->code }}</td>
+                            <td class="center-align">{{ $row->shading }}</td>
+                            <td class="center-align">{{ $row->batch_no }}</td>
+                        </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>

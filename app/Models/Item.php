@@ -321,9 +321,10 @@ class Item extends Model
         foreach($data as $detail){
             $arrData[] = [
                 'id'            => $detail->id,
-                'warehouse'     => $detail->place->name.' - '.$detail->warehouse->name,
+                'warehouse'     => $detail->place->code.' - '.$detail->warehouse->name.($detail->area()->exists() ? ' - '.$detail->area->code : ''),
                 'qty'           => number_format($detail->qty,3,',','.').' '.$this->uomUnit->code,
                 'qty_raw'       => number_format($detail->qty,3,',','.'),
+                'qty_production'=> number_format($detail->qty / $this->production_convert,3,',','.').' '.$this->productionUnit->code,
             ];
         }
         

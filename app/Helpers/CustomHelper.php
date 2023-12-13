@@ -135,7 +135,7 @@ class CustomHelper {
 				'area_id'		=> $area_id,
 				'item_id'		=> $item_id,
 				'qty_in'		=> $qty,
-				'price_in'		=> $qty > 0 ? $total / $qty : 0,
+				'price_in'		=> $qty > 0 ? round($total / $qty,2) : 0,
 				'total_in'		=> $total,
 				'qty_final'		=> $old_data ? $old_data->qty_final + $qty : $qty,
 				'price_final'	=> $old_data ? round((($old_data->total_final + $total) / ($old_data->qty_final + $qty)),2) : ($qty > 0 ? round($total / $qty,2) : 0),
@@ -2647,10 +2647,97 @@ class CustomHelper {
 		}elseif($table_name == 'production_issue_receives'){
 			$pir = ProductionIssueReceive::find($table_id);
 			
-			$rowtotal = 0;
+			$total = 0;
+
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
+				'post_date'		=> $data->post_date,
+				'note'			=> $data->code,
+				'status'		=> '3'
+			]);
+
+			$target = $pir->productionIssueReceiveDetail()->where('type','2')->first();
+
+			foreach($pir->productionIssueReceiveDetail()->where('type','2')->get() as $row){
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $target->item->itemGroup->coa_id,
+					'place_id'		=> $pir->productionOrder->productionSchedule->place_id,
+					'line_id'		=> $pir->productionOrder->productionScheduleDetail->line_id,
+					'item_id'		=> $row->lookable_id,
+					'warehouse_id'	=> $pir->productionOrder->warehouse_id,
+					'type'			=> '1',
+					'nominal'		=> $pir->productionOrder->total_product_cost,
+				]);
+
+				self::sendCogs($table_name,
+					$pir->id,
+					$pir->company_id,
+					$pir->productionOrder->productionSchedule->place_id,
+					$pir->productionOrder->warehouse_id,
+					$row->lookable_id,
+					$row->qty * $row->item->production_convert,
+					$pir->productionOrder->total_product_cost,
+					'IN',
+					$pir->post_date,
+					NULL,
+				);
+
+				self::sendStock(
+					$pir->productionOrder->productionSchedule->place_id,
+					$pir->productionOrder->warehouse_id,
+					$row->lookable_id,
+					$row->qty * $row->item->production_convert,
+					'IN',
+					NULL,
+				);
+			}
+
 			foreach($pir->productionIssueReceiveDetail()->where('type','1')->get() as $row){
-				if($row){
-					
+				if($row->lookable_type == 'items'){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->item->itemGroup->coa_id,
+						'place_id'		=> $row->itemStock->place_id,
+						'line_id'		=> $row->productionOrderDetail->productionOrder->productionScheduleDetail->line_id,
+						'item_id'		=> $row->itemStock->item_id,
+						'warehouse_id'	=> $row->itemStock->warehouse_id,
+						'type'			=> '2',
+						'nominal'		=> $row->total,
+					]);
+	
+					self::sendCogs($table_name,
+						$pir->id,
+						$row->itemStock->place->company_id,
+						$row->itemStock->place_id,
+						$row->itemStock->warehouse_id,
+						$row->itemStock->item_id,
+						$row->qty * $row->item->production_convert,
+						$row->total,
+						'OUT',
+						$pir->post_date,
+						$row->itemStock->area_id ? $row->itemStock->area_id : NULL,
+					);
+	
+					self::sendStock(
+						$row->itemStock->place_id,
+						$row->itemStock->warehouse_id,
+						$row->itemStock->item_id,
+						$row->qty * $row->item->production_convert,
+						'OUT',
+						$row->itemStock->area_id ? $row->itemStock->area_id : NULL,
+					);
+				}elseif($row->lookable_type == 'coas'){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->lookable_id,
+						'line_id'		=> $row->productionOrderDetail->productionOrder->productionScheduleDetail->line_id,
+						'type'			=> '2',
+						'nominal'		=> $row->total,
+					]);
 				}
 			}
 		}elseif($table_name == 'closing_journals'){

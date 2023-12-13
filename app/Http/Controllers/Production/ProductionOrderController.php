@@ -259,7 +259,8 @@ class ProductionOrderController extends Controller
             $qtyPlanned = 0;
             $standardItemCost = 0;
             $standardResourceCost = 0;
-            $standardProductCost = 0;            
+            $standardProductCost = 0;
+            $arrDetailCost = [];
 
             $pscd = ProductionScheduleDetail::find($request->production_schedule_detail_id);
             if($pscd){
@@ -267,9 +268,12 @@ class ProductionOrderController extends Controller
 
                 foreach($request->arr_lookable_type as $key => $row){
                     if($row == 'items'){
-                        $standardItemCost += Item::find($request->arr_lookable_id[$key])->priceNowProduction($pscd->productionSchedule->place_id,$request->post_date) * str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
+                        $rownominal = Item::find($request->arr_lookable_id[$key])->priceNowProduction($pscd->productionSchedule->place_id,$request->post_date) * str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
+                        $standardItemCost += $rownominal;
+                        $arrDetailCost[] = $rownominal;
                     }elseif($row == 'coas'){
                         $standardResourceCost += str_replace(',','.',str_replace('.','',$request->arr_total[$key]));
+                        $arrDetailCost[] = str_replace(',','.',str_replace('.','',$request->arr_total[$key]));
                     }
                 }
             }
@@ -374,8 +378,8 @@ class ProductionOrderController extends Controller
                             'lookable_type'                 => $request->arr_lookable_type[$key],
                             'lookable_id'                   => $row,
                             'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                            'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
-                            'total'                         => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
+                            'nominal'                       => $arrDetailCost[$key],
+                            'total'                         => $arrDetailCost[$key],
                         ]);
                     }
 

@@ -53,6 +53,7 @@ class ResetCogs implements ShouldQueue
 					}else{
 						$finalprice = $row->qty_in > 0 ? round($row->total_in / $row->qty_in,2) : 0;
 						$totalprice = round($finalprice * $row->qty_in,2);
+						$totalprice = $row->total_in;
 						$qtyfinal = $row->qty_in;
 					}
 					$row->update([

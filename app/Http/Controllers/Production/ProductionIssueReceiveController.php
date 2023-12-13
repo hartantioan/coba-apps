@@ -18,7 +18,11 @@ use App\Models\MarketingOrderPlanDetail;
 use App\Models\Place;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
+use App\Models\BomDetail;
+use App\Models\Item;
+use App\Models\ItemCogs;
 use App\Models\ProductionOrder;
+use App\Models\ProductionOrderDetail;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -151,6 +155,11 @@ class ProductionIssueReceiveController extends Controller
                     $val->code,
                     $val->company->name,
                     date('d/m/y',strtotime($val->post_date)),
+                    $val->productionOrder->code,
+                    $val->productionOrder->productionSchedule->code,
+                    date('d/m/y',strtotime($val->productionOrder->productionScheduleDetail->production_date)).' - '.$val->productionOrder->productionScheduleDetail->shift->code.' - '.$val->productionOrder->productionScheduleDetail->shift->name,
+                    $val->productionOrder->productionScheduleDetail->line->code,
+                    $val->productionOrder->productionScheduleDetail->group,
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
                     '
@@ -186,33 +195,46 @@ class ProductionIssueReceiveController extends Controller
             'code_place_id'             => 'required',
             'company_id'			    => 'required',
             'post_date'		            => 'required',
-            'arr_psd'                   => 'required|array',
+            'production_order_id'       => 'required',
             'arr_type'                  => 'required|array',
             'arr_lookable_type'         => 'required|array',
             'arr_lookable_id'           => 'required|array',
+            'arr_production_detail_id'  => 'required|array',
+            'arr_bom_detail_id'         => 'required|array',
             'arr_nominal'               => 'required|array',
-            'arr_batch_no'              => 'required|array',
+            'arr_total'                 => 'required|array',
+            'arr_shading'               => 'required|array',
+            'arr_qty'                   => 'required|array',
+            'arr_batch'                 => 'required|array',
         ], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
             'code.string'                       => 'Kode harus dalam bentuk string.',
             'code.min'                          => 'Kode harus minimal 18 karakter.',
             'code.unique'                       => 'Kode telah dipakai',
+            'code_place_id.required' 			=> 'Kode plant tidak boleh kosong.',
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
-            'place_id.required' 			    => 'Plant tidak boleh kosong.',
-            'machine_id.required' 			    => 'Mesin tidak boleh kosong.',
             'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
-            'arr_psd.required'                  => 'Jadwal kirim tidak boleh kosong.',
-            'arr_psd.array'                     => 'Jadwal kirim harus array.',
+            'production_order_id.required'      => 'Order Produksi tidak boleh kosong.',
             'arr_type.required'                 => 'Tipe tidak boleh kosong.',
             'arr_type.array'                    => 'Tipe harus array.',
             'arr_lookable_type.required'        => 'Coa/item tidak boleh kosong.',
             'arr_lookable_type.array'           => 'Coa/item harus array.',
             'arr_lookable_id.required'          => 'Coa/item tidak boleh kosong.',
             'arr_lookable_id.array'             => 'Coa/item harus array.',
+            'arr_production_detail_id.required' => 'Detail produk tidak boleh kosong.',
+            'arr_production_detail_id.array'    => 'Detail produk harus array.',
+            'arr_bom_detail_id.required'        => 'Bom tidak boleh kosong.',
+            'arr_bom_detail_id.array'           => 'Bom harus array.',
             'arr_nominal.required'              => 'Qty/harga tidak boleh kosong.',
             'arr_nominal.array'                 => 'Qty/harga harus array.',
-            'arr_batch_no.required'             => 'Nomor batch tidak boleh kosong.',
-            'arr_batch_no.array'                => 'Nomor batch harus array.',
+            'arr_total.required'                => 'Total tidak boleh kosong.',
+            'arr_total.array'                   => 'Total harus array.',
+            'arr_shading.required'              => 'Shading tidak boleh kosong.',
+            'arr_shading.array'                 => 'Shading harus array.',
+            'arr_batch.required'                => 'No batch tidak boleh kosong.',
+            'arr_batch.array'                   => 'No batch harus array.',
+            'arr_qty.required'                  => 'Qty tidak boleh kosong.',
+            'arr_qty.array'                     => 'Qty harus array.',
         ]);
 
         if($validation->fails()) {
@@ -266,6 +288,7 @@ class ProductionIssueReceiveController extends Controller
                         $query->user_id = session('bo_id');
                         $query->code = $request->code;
                         $query->company_id = $request->company_id;
+                        $query->production_order_id = $request->production_order_id;
                         $query->post_date = $request->post_date;
                         $query->document = $document;
                         $query->status = '1';
@@ -293,8 +316,9 @@ class ProductionIssueReceiveController extends Controller
                         'code'			            => $request->code,
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $request->company_id,
+                        'production_order_id'       => $request->production_order_id,
                         'post_date'                 => $request->post_date,
-                        'document'                  => $request->file('file') ? $request->file('file')->store('public/production_schedules') : NULL,
+                        'document'                  => $request->file('file') ? $request->file('file')->store('public/production_issue_receives') : NULL,
                         'status'                    => '1',
                     ]);
 
@@ -308,18 +332,68 @@ class ProductionIssueReceiveController extends Controller
 
                 DB::beginTransaction();
                 try {
-
-                    foreach($request->arr_psd as $key => $row){
+                    $totalActualItemCost = 0;
+                    $totalActualResourceCost = 0;
+                    $totalProductCost = 0;
+                    $totalCompletedQty = 0;
+                    foreach($request->arr_type as $key => $row){
+                        if($row == '2'){
+                            $totalCompletedQty += str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
+                        }
+                        $bomId = 0;
+                        if($request->arr_bom_detail_id[$key]){
+                            $bomDetail = BomDetail::find(intval($request->arr_bom_detail_id[$key]));
+                            if($bomDetail){
+                                $bomId = $bomDetail->bom_id;
+                            }
+                        }
+                        $priceStockItem = 0;
+                        $totalStockItem = 0;
+                        if($row == '1' && $request->arr_lookable_type[$key] == 'items'){
+                            $item = Item::find(intval($request->arr_lookable_id[$key]));
+                            if($item){
+                                $priceStockItem = $item->priceNowProduction($query->productionOrder->productionSchedule->place_id,$query->post_date);
+                                $totalStockItem = $priceStockItem * str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
+                                $totalActualItemCost += $totalStockItem;
+                            }
+                        }
+                        if($row == '1' && $request->arr_lookable_type[$key] == 'coas'){
+                            $totalActualResourceCost += str_replace(',','.',str_replace('.','',$request->arr_total[$key]));
+                        }
+                        if($request->arr_production_detail_id[$key]){
+                            $pod = ProductionOrderDetail::find(intval($request->arr_production_detail_id[$key]));
+                            if($pod){
+                                $pod->update([
+                                    'qty_real'      => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                                    'nominal_real'  => $priceStockItem > 0 ? $totalStockItem : str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
+                                    'total_real'    => $priceStockItem > 0 ? $totalStockItem : str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
+                                ]);
+                            }
+                        }
                         ProductionIssueReceiveDetail::create([
                             'production_issue_receive_id'   => $query->id,
-                            'production_schedule_detail_id' => $row,
+                            'production_order_detail_id'    => $request->arr_production_detail_id[$key] ? $request->arr_production_detail_id[$key] : NULL,
                             'lookable_type'                 => $request->arr_lookable_type[$key],
                             'lookable_id'                   => $request->arr_lookable_id[$key],
-                            'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
-                            'type'                          => $request->arr_type[$key],
-                            'batch_no'                      => $request->arr_batch_no[$key],
+                            'shading'                       => $request->arr_shading[$key] ? $request->arr_shading[$key] : NULL,
+                            'bom_id'                        => $bomId > 0 ? $bomId : NULL,
+                            'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                            'nominal'                       => $priceStockItem > 0 ? $priceStockItem : str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
+                            'total'                         => $totalStockItem > 0 ? $totalStockItem : str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
+                            'type'                          => $row,
+                            'from_item_stock_id'            => $request->arr_item_stock_id[$key] ? $request->arr_item_stock_id[$key] : NULL,
+                            'batch_no'                      => $request->arr_batch[$key],
                         ]);
                     }
+
+                    $totalProductCost = $totalActualItemCost + $totalActualResourceCost;
+
+                    $query->productionOrder->update([
+                        'actual_item_cost'      => $totalActualItemCost,
+                        'actual_resource_cost'  => $totalActualResourceCost,
+                        'total_product_cost'    => $totalProductCost,
+                        'completed_qty'         => $totalCompletedQty,
+                    ]);
 
                     DB::commit();
                 }catch(\Exception $e){
@@ -333,7 +407,7 @@ class ProductionIssueReceiveController extends Controller
                     ->performedOn(new ProductionIssueReceive())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit issue receive plan.');
+                    ->log('Add / edit issue receive production.');
 
 				$response = [
 					'status'    => 200,
@@ -351,11 +425,53 @@ class ProductionIssueReceiveController extends Controller
     }
 
     public function show(Request $request){
-        $po = ProductionIssueReceive::where('code',CustomHelper::decrypt($request->id))->first();
-        $po['code_place_id'] = substr($po->code,7,2);
+        $detail_issue = [];
 
-        $po['details'] = $po->dataView();
-        				
+        $po = ProductionIssueReceive::where('code',CustomHelper::decrypt($request->id))->first();
+
+        foreach($po->productionIssueReceiveDetail()->where('type','1')->get() as $row){
+            $detail_issue[] = [
+                'id'                    => $row->production_order_detail_id,
+                'bom_detail_id'         => $row->productionOrderDetail->bom_detail_id,
+                'lookable_type'         => $row->lookable_type,
+                'lookable_id'           => $row->lookable_id,
+                'lookable_code'         => $row->lookable->code,
+                'lookable_name'         => $row->lookable->name,
+                'lookable_unit'         => $row->item()->exists() ? $row->item->productionUnit->code : '-',
+                'list_stock'            => $row->item()->exists() ? $row->item->currentStockPerPlace($po->productionOrder->productionSchedule->place_id) : [],
+                'qty'                   => number_format($row->qty,3,',','.'),
+                'nominal'               => number_format($row->nominal,2,',','.'),
+                'total'                 => number_format($row->total,2,',','.'),
+                'qty_standard'          => number_format($row->productionOrderDetail->qty,3,',','.'),
+                'nominal_standard'      => number_format($row->productionOrderDetail->nominal,3,',','.'),
+                'total_standard'        => number_format($row->productionOrderDetail->total,3,',','.'),
+                'item_stock_id'         => $row->from_item_stock_id,
+                'batch_no'              => $row->batch_no,
+                'type'                  => $row->type,
+            ];
+        }
+
+        $detailReceive = $po->productionIssueReceiveDetail()->where('type','2')->first();
+
+        $po['code_place_id'] = substr($po->code,7,2);
+        $po['production_order_code'] = $po->productionOrder->code.' Tgl.Post '.date('d/m/y',strtotime($po->productionOrder->post_date)).' - Plant : '.$po->productionOrder->productionSchedule->place->code;
+        $po['item_receive_id']                  = $po->productionOrder->productionScheduleDetail->item_id;
+        $po['item_receive_code']                = $po->productionOrder->productionScheduleDetail->item->code;
+        $po['item_receive_name']                = $po->productionOrder->productionScheduleDetail->item->name;
+        $po['item_receive_unit_production']     = $po->productionOrder->productionScheduleDetail->item->productionUnit->code;
+        $po['item_receive_unit_uom']            = $po->productionOrder->productionScheduleDetail->item->uomUnit->code;
+        $po['item_receive_unit_sell']           = $po->productionOrder->productionScheduleDetail->item->sellUnit->code;
+        $po['item_receive_unit_pallet']         = $po->productionOrder->productionScheduleDetail->item->palletUnit->code;
+        $po['item_receive_qty']                 = number_format($po->productionOrder->productionScheduleDetail->qty,3,',','.');
+        $po['qty']                              = number_format($detailReceive->qty,3,',','.');
+        $po['production_convert']               = $po->productionOrder->productionScheduleDetail->item->production_convert;
+        $po['sell_convert']                     = $po->productionOrder->productionScheduleDetail->item->sell_convert;
+        $po['pallet_convert']                   = $po->productionOrder->productionScheduleDetail->item->pallet_convert;
+        $po['detail_issue']                     = $detail_issue;
+        $po['shift']                            = date('d/m/y',strtotime($po->productionOrder->productionScheduleDetail->production_date)).' - '.$po->productionOrder->productionScheduleDetail->shift->code.' - '.$po->productionOrder->productionScheduleDetail->shift->name;
+        $po['group']                            = $po->productionOrder->productionScheduleDetail->group;
+        $po['line']                             = $po->productionOrder->productionScheduleDetail->line->code;
+        
 		return response()->json($po);
     }
 
@@ -379,69 +495,65 @@ class ProductionIssueReceiveController extends Controller
     public function rowDetail(Request $request)
     {
         $data   = ProductionIssueReceive::where('code',CustomHelper::decrypt($request->id))->first();
-
-        $arrData = $data->dataView();
         
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;" class="bordered" id="table-detail-row">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="12" style="font-size:20px !important;">Daftar Coa/Item Issue (Terpakai) dan Receive (Masuk)</th>
+                                <th class="center-align" colspan="12" style="font-size:20px !important;">Daftar Item/Coa Issue (Terpakai)</th>
                             </tr>
                             <tr>
-                                <th class="center-align" rowspan="2">No.</th>
-                                <th class="center-align" rowspan="2">Tgl.Produksi</th>
-                                <th class="center-align" rowspan="2">Shift</th>
-                                <th class="center-align" rowspan="2">Plant</th>
-                                <th class="center-align" rowspan="2">Mesin</th>
-                                <th class="center-align" colspan="3" style="background-color:#ff7a7a;">Issue</th>
-                                <th class="center-align" colspan="4" style="background-color:#63ff80;">Receive</th>
-                            </tr>
-                            <tr>
-                                <th class="center-align">Coa/Item</th>
-                                <th class="center-align">Nominal/Qty</th>
-                                <th class="center-align">UOM</th>
-                                <th class="center-align">Item</th>
-                                <th class="center-align">Qty</th>
-                                <th class="center-align">UOM</th>
-                                <th class="center-align">Batch No.</th>
+                                <th class="center">No.</th>
+                                <th class="center">Item/Coa</th>
+                                <th class="center">Qty Planned</th>
+                                <th class="center">Qty Real</th>
+                                <th class="center">Satuan Produksi</th>
+                                <th class="center">Plant & Gudang</th>
                             </tr>
                         </thead><tbody>';
         
-        foreach($arrData as $key => $row){
-            $rowspan = count($row['details_issue']) > count($row['details_receive']) ? count($row['details_issue']) : count($row['details_receive']);
+        foreach($data->productionIssueReceiveDetail()->where('type','1')->get() as $key => $row){
             $string .= '<tr>
-                <td class="center-align" rowspan="'.$rowspan.'">'.($key + 1).'</td>
-                <td class="center-align" rowspan="'.$rowspan.'">'.$row['production_date'].'</td>
-                <td class="center-align" rowspan="'.$rowspan.'">'.$row['shift'].'</td>
-                <td class="center-align" rowspan="'.$rowspan.'">'.$row['place_code'].'</td>
-                <td class="center-align" rowspan="'.$rowspan.'">'.$row['machine_code'].'</td>';
-
-            for($i=0;$i<$rowspan;$i++){
-                if(isset($row['details_issue'][$i]['name'])){
-                    $string .= '<td class="">'.$row['details_issue'][$i]['name'].'</td>';
-                    $string .= '<td class="right-align">'.$row['details_issue'][$i]['nominal'].'</td>';
-                    $string .= '<td class="center-align">'.$row['details_issue'][$i]['unit'].'</td>';
-                }else{
-                    $string .= '<td class=""></td>';
-                    $string .= '<td class="right-align"></td>';
-                    $string .= '<td class="center-align"></td>';
-                }
-                if(isset($row['details_receive'][$i]['name'])){
-                    $string .= '<td class="">'.$row['details_receive'][$i]['name'].'</td>';
-                    $string .= '<td class="right-align">'.$row['details_receive'][$i]['nominal'].'</td>';
-                    $string .= '<td class="center-align">'.$row['details_receive'][$i]['unit'].'</td>';
-                    $string .= '<td class="">'.$row['details_receive'][$i]['batch_no'].'</td>';
-                    $string .= '</tr>';
-                }else{
-                    $string .= '<td class=""></td>';
-                    $string .= '<td class="right-align"></td>';
-                    $string .= '<td class="center-align"></td>';
-                    $string .= '<td class=""></td>';
-                    $string .= '</tr>';
-                }
-            }
+                <td class="center-align">'.($key+1).'.</td>
+                <td>'.($row->item()->exists() ? $row->item->code.' - '.$row->item->name : $row->coa->code.' - '.$row->coa->name).'</td>
+                <td class="right-align">'.($row->item()->exists() ? number_format($row->productionOrderDetail->qty,3,',','.') : '-').'</td>
+                <td class="right-align">'.($row->item()->exists() ? number_format($row->qty,3,',','.') : '-').'</td>
+                <td class="center-align">'.($row->item()->exists() ? $row->item->productionUnit->code : '-').'</td>
+                <td>'.($row->item()->exists() ? $row->itemStock->fullName() : '-').'</td>
+            </tr>';
         }
         
+        $string .= '</tbody></table></div><div class="col s12 mt-3"><table style="min-width:100%;" class="bordered" id="table-detail-row">
+            <thead>
+                <tr>
+                    <th class="center-align" colspan="9" style="font-size:20px !important;">Item Receive (Diterima)</th>
+                </tr>
+                <tr>
+                    <th class="center" width="5%">No.</th>
+                    <th class="center" width="15%">Item/Coa</th>
+                    <th class="center" width="10%">Qty Planned (Prod.)</th>
+                    <th class="center" width="10%">Qty Real (Prod.)</th>
+                    <th class="center" width="10%">Qty UoM</th>
+                    <th class="center" width="10%">Qty Jual</th>
+                    <th class="center" width="10%">Qty Pallet</th>
+                    <th class="center" width="15%">Shading</th>
+                    <th class="center" width="15%">Batch</th>
+                </tr>
+            </thead><tbody>';
+
+        foreach($data->productionIssueReceiveDetail()->where('type','2')->get() as $key => $row){
+            $string .= '<tr>
+                <td class="center-align">'.($key+1).'.</td>
+                <td>'.$row->item->code.' - '.$row->item->name.'</td>
+                <td class="right-align">'.number_format($data->productionOrder->productionScheduleDetail->qty,3,',','.').' '.$row->item->productionUnit->code.'</td>
+                <td class="right-align">'.number_format($row->qty,3,',','.').' '.$row->item->productionUnit->code.'</td>
+                <td class="right-align">'.number_format($row->qty * $row->item->production_convert,3,',','.').' '.$row->item->uomUnit->code.'</td>
+                <td class="right-align">'.number_format(($row->qty * $row->item->production_convert) / $row->item->sell_convert,3,',','.').' '.$row->item->sellUnit->code.'</td>
+                <td class="right-align">'.number_format((($row->qty * $row->item->production_convert) / $row->item->sell_convert) / $row->item->pallet_convert,3,',','.').' '.$row->item->palletUnit->code.'</td>
+                <td class="center-align">'.$row->shading.'</td>
+                <td class="center-align">'.$row->batch_no.'</td>
+            </tr>';
+        }
+
         $string .= '</tbody></table></div>';
 
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">

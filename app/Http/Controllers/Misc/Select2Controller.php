@@ -2672,7 +2672,7 @@ class Select2Controller extends Controller {
                 'warehouses'    => $d->item->warehouseList(),
                 'details'       => $details,
                 'qty'           => number_format($d->qty,3,',','.').' '.$d->item->productionUnit->code,
-                'shift'         => $d->shift->code.' - '.$d->shift->name,
+                'shift'         => date('d/m/y',strtotime($d->production_date)).' - '.$d->shift->code.' - '.$d->shift->name,
                 'group'         => $d->group,
                 'line'          => $d->line->code,
             ];
@@ -3089,6 +3089,7 @@ class Select2Controller extends Controller {
                     'lookable_code'         => $row->lookable->code,
                     'lookable_name'         => $row->lookable->name,
                     'lookable_unit'         => $row->item()->exists() ? $row->item->productionUnit->code : '-',
+                    'list_stock'            => $row->item()->exists() ? $row->item->currentStockPerPlace($d->productionSchedule->place_id) : [],
                     'qty'                   => number_format($row->qty,3,',','.'),
                     'nominal'               => number_format($row->nominal,2,',','.'),
                     'total'                 => number_format($row->total,2,',','.'),
@@ -3106,8 +3107,15 @@ class Select2Controller extends Controller {
                 'item_receive_unit_production'  => $d->productionScheduleDetail->item->productionUnit->code,
                 'item_receive_unit_uom'         => $d->productionScheduleDetail->item->uomUnit->code,
                 'item_receive_unit_sell'        => $d->productionScheduleDetail->item->sellUnit->code,
+                'item_receive_unit_pallet'      => $d->productionScheduleDetail->item->palletUnit->code,
                 'item_receive_qty'              => number_format($d->productionScheduleDetail->qty,3,',','.'),
+                'production_convert'            => $d->productionScheduleDetail->item->production_convert,
+                'sell_convert'                  => $d->productionScheduleDetail->item->sell_convert,
+                'pallet_convert'                => $d->productionScheduleDetail->item->pallet_convert,
                 'detail_issue'                  => $detail_issue,
+                'shift'                         => date('d/m/y',strtotime($d->productionScheduleDetail->production_date)).' - '.$d->productionScheduleDetail->shift->code.' - '.$d->productionScheduleDetail->shift->name,
+                'group'                         => $d->productionScheduleDetail->group,
+                'line'                          => $d->productionScheduleDetail->line->code,
             ];
         }
 

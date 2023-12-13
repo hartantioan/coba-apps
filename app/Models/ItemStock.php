@@ -135,4 +135,8 @@ class ItemStock extends Model
 
         return $totalUndelivered;
     }
+
+    public function fullName(){
+        return $this->place->code.' - '.$this->warehouse->name.($this->area()->exists() ? ' - '.$this->area->code : '');
+    }
 }

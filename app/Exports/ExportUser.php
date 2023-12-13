@@ -7,8 +7,9 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class ExportUser implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell
+class ExportUser implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell, ShouldAutoSize
 {
     /**
     * @return \Illuminate\Support\Collection
@@ -27,8 +28,25 @@ class ExportUser implements FromCollection, WithTitle, WithHeadings, WithCustomS
         'NAMA',
         'TIPE',
         'ALAMAT',
+        'KELURAHAN',
+        'KECAMATAN',
         'KOTA',
-        'PROVINSI'
+        'PROVINSI',
+        'NO IDENTITAS',
+        'ALAMAT IDENTITAS',
+        'GROUP',
+        'PERUSAHAAN',
+        'PLANT',
+        'POSISI',
+        'NO NPWP',
+        'NAMA NPWP',
+        'ALAMAT NPWP',
+        'NAMA PIC',
+        'NOMOR PIC',
+        'NOMOR KANTOR',
+        'EMAIL',
+        'GENDER',
+        'STATUS KARYAWAN',
     ];
 
     public function collection()
@@ -55,13 +73,30 @@ class ExportUser implements FromCollection, WithTitle, WithHeadings, WithCustomS
 
         foreach($data as $row){
             $arr[] = [
-                'id'        => $row->id,
-                'code'      => $row->employee_no,
-                'name'      => $row->name,
-                'type'      => $row->type(),
-                'address'   => $row->address,
-                'city'      => $row->city->name,
-                'province'  => $row->province->name,
+                'id'                => $row->id,
+                'code'              => $row->employee_no,
+                'name'              => $row->name,
+                'type'              => $row->type(),
+                'address'           => $row->address,
+                'subdistrict'       => $row->subdistrict()->exists() ? $row->subdistrict->name : '-',
+                'district'          => $row->district_id ? $row->district->name : '-',
+                'city'              => $row->city->name,
+                'province'          => $row->province->name,
+                'id_card'           => $row->id_card,
+                'id_card_address'   => $row->id_card_address,
+                'group'             => $row->group()->exists() ? $row->group->name : '-',
+                'company'           => $row->company->name,
+                'plant'             => $row->place()->exists() ? $row->place->code : '-',
+                'position'          => $row->position()->exists() ? $row->position->name : '-',
+                'npwp_no'           => $row->tax_id,
+                'npwp_name'         => $row->tax_name,
+                'npwp_address'      => $row->tax_address,
+                'pic'               => $row->pic,
+                'pic_no'            => $row->pic_no,
+                'office_no'         => $row->office_no,
+                'email'             => $row->email,
+                'gender'            => $row->gender(),
+                'employee_status'   => $row->employeeType(),
             ];
         }
 

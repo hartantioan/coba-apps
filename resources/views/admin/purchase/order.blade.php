@@ -451,7 +451,7 @@
                                 <table width="100%" class="bordered">
                                     <thead>
                                         <tr>
-                                            <td width="50%">Subtotal</td>
+                                            <td width="50%">Subtotal Sblm Diskon</td>
                                             <td width="50%" class="right-align"><span id="subtotal">0,00</span></td>
                                         </tr>
                                         <tr>
@@ -461,7 +461,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Total</td>
+                                            <td>Subtotal Setelah Diskon</td>
                                             <td class="right-align"><span id="total">0,00</span></td>
                                         </tr>
                                         <tr>

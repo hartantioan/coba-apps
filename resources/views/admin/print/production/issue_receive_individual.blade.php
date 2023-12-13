@@ -191,16 +191,16 @@
                 <div class="card-content invoice-print-area">
                     <table border="0" width="100%" class="tbl-info">
                         <tr>
-                            <td width="50%" class="left-align">
+                            <td width="40%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
-                                        <td width="49%">
+                                        <td width="34%">
                                             Name
                                         </td>
                                         <td width="1%">
                                             :
                                         </td>
-                                        <td width="50%">
+                                        <td width="65%">
                                             {{ $data->user->name }}
                                         </td>
                                     </tr>
@@ -226,9 +226,58 @@
                                             {{ $data->user->position()->exists() ? $data->user->position->division->department->name : '-' }}
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td>
+                                            Plant & Gudang
+                                        </td>
+                                        <td>
+                                            :
+                                        </td>
+                                        <td>
+                                            {{ $data->productionOrder->productionSchedule->place->code.' - '.$data->productionOrder->warehouse->name }}
+                                        </td>
+                                    </tr>
                                 </table>
                             </td>
-                            <td width="50%" class="left-align">
+                            <td width="40%" class="left-align">
+                                <table border="0" width="100%">
+                                    
+                                    <tr>
+                                        <td width="34%">
+                                            Shift
+                                        </td>
+                                        <td width="1%">
+                                            :
+                                        </td>
+                                        <td width="65%">
+                                            {{ date('d/m/y',strtotime($data->productionOrder->productionScheduleDetail->production_date)).' - '.$data->productionOrder->productionScheduleDetail->shift->code.' - '.$data->productionOrder->productionScheduleDetail->shift->name }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Line
+                                        </td>
+                                        <td width="1%">
+                                            :
+                                        </td>
+                                        <td>
+                                            {{ $data->productionOrder->productionScheduleDetail->line->code }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Grup
+                                        </td>
+                                        <td width="1%">
+                                            :
+                                        </td>
+                                        <td>
+                                            {{ $data->productionOrder->productionScheduleDetail->group }}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td width="20%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
                                         <td>
@@ -255,67 +304,64 @@
                     <table class="bordered" border="1" width="100%" class="table-data-item" style="border-collapse:collapse">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="12" style="font-size:16px !important;">Daftar Coa/Item Issue (Terpakai) dan Receive (Masuk)</th>
+                                <th align="center" colspan="6" style="font-size:16px !important;">Daftar Item/Coa Issue (Terpakai)</th>
                             </tr>
                             <tr>
-                                <th class="center-align" rowspan="2">No.</th>
-                                <th class="center-align" rowspan="2">Tgl.Produksi</th>
-                                <th class="center-align" rowspan="2">Shift</th>
-                                <th class="center-align" rowspan="2">Plant</th>
-                                <th class="center-align" rowspan="2">Mesin</th>
-                                <th class="center-align" colspan="3" style="background-color:#ff7a7a;">Issue</th>
-                                <th class="center-align" colspan="4" style="background-color:#63ff80;">Receive</th>
-                            </tr>
-                            <tr>
-                                <th class="center-align">Coa/Item</th>
-                                <th class="center-align">Nominal/Qty</th>
-                                <th class="center-align">UOM</th>
-                                <th class="center-align">Item</th>
-                                <th class="center-align">Qty</th>
-                                <th class="center-align">UOM</th>
-                                <th class="center-align">Batch No.</th>
+                                <th align="center">No.</th>
+                                <th align="center">Item/Coa</th>
+                                <th align="center">Qty Planned</th>
+                                <th align="center">Qty Real</th>
+                                <th align="center">Satuan Produksi</th>
+                                <th align="center">Plant & Gudang</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @php
-                                $arrData = $data->dataView();
-                                $string = '';
-                                foreach($arrData as $key => $row){
-                                    $rowspan = count($row['details_issue']) > count($row['details_receive']) ? count($row['details_issue']) : count($row['details_receive']);
-                                    $string .= '<tr>
-                                        <td align="center" rowspan="'.$rowspan.'">'.($key + 1).'</td>
-                                        <td align="center" rowspan="'.$rowspan.'">'.$row['production_date'].'</td>
-                                        <td align="center" rowspan="'.$rowspan.'">'.$row['shift'].'</td>
-                                        <td align="center" rowspan="'.$rowspan.'">'.$row['place_code'].'</td>
-                                        <td align="center" rowspan="'.$rowspan.'">'.$row['machine_code'].'</td>';
+                            @foreach($data->productionIssueReceiveDetail()->where('type','1')->get() as $key => $row)
+                                <tr>
+                                    <td align="center">{{ $key+1 }}.</td>
+                                    <td>{{ $row->item()->exists() ? $row->item->code.' - '.$row->item->name : $row->coa->code.' - '.$row->coa->name }}</td>
+                                    <td align="right">{{ $row->item()->exists() ? number_format($row->productionOrderDetail->qty,3,',','.') : '-' }}</td>
+                                    <td align="right">{{ $row->item()->exists() ? number_format($row->qty,3,',','.') : '-' }}</td>
+                                    <td align="center">{{ $row->item()->exists() ? $row->item->productionUnit->code : '-' }}</td>
+                                    <td>{{ $row->item()->exists() ? $row->itemStock->fullName() : '-' }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
 
-                                    for($i=0;$i<$rowspan;$i++){
-                                        if(isset($row['details_issue'][$i]['name'])){
-                                            $string .= '<td class="">'.$row['details_issue'][$i]['name'].'</td>';
-                                            $string .= '<td align="right">'.$row['details_issue'][$i]['nominal'].'</td>';
-                                            $string .= '<td align="center">'.$row['details_issue'][$i]['unit'].'</td>';
-                                        }else{
-                                            $string .= '<td class=""></td>';
-                                            $string .= '<td align="right"></td>';
-                                            $string .= '<td align="center"></td>';
-                                        }
-                                        if(isset($row['details_receive'][$i]['name'])){
-                                            $string .= '<td class="">'.$row['details_receive'][$i]['name'].'</td>';
-                                            $string .= '<td align="right">'.$row['details_receive'][$i]['nominal'].'</td>';
-                                            $string .= '<td align="center">'.$row['details_receive'][$i]['unit'].'</td>';
-                                            $string .= '<td class="">'.$row['details_receive'][$i]['batch_no'].'</td>';
-                                            $string .= '</tr>';
-                                        }else{
-                                            $string .= '<td class=""></td>';
-                                            $string .= '<td class="right-align"></td>';
-                                            $string .= '<td class="center-align"></td>';
-                                            $string .= '<td class=""></td>';
-                                            $string .= '</tr>';
-                                        }
-                                    }
-                                }
-                                echo $string;
-                            @endphp
+                <div class="invoice-product-details">
+                    <table class="bordered" border="1" width="100%" class="table-data-item" style="border-collapse:collapse">
+                        <thead>
+                            <tr>
+                                <th align="center" colspan="9" style="font-size:16px !important;">Daftar Item Receive (Diterima)</th>
+                            </tr>
+                            <tr>
+                                <th align="center" width="5%">No.</th>
+                                <th align="center" width="15%">Item/Coa</th>
+                                <th align="center" width="10%">Qty Planned (Prod.)</th>
+                                <th align="center" width="10%">Qty Real (Prod.)</th>
+                                <th align="center" width="10%">Qty UoM</th>
+                                <th align="center" width="10%">Qty Jual</th>
+                                <th align="center" width="10%">Qty Pallet</th>
+                                <th align="center" width="15%">Shading</th>
+                                <th align="center" width="15%">Batch</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($data->productionIssueReceiveDetail()->where('type','2')->get() as $key => $row)
+                                <tr>
+                                    <td align="center">{{ $key+1 }}</td>
+                                    <td>{{ $row->item->code.' - '.$row->item->name }}</td>
+                                    <td align="right">{{ number_format($data->productionOrder->productionScheduleDetail->qty,3,',','.').' '.$row->item->productionUnit->code }}</td>
+                                    <td align="right">{{ number_format($row->qty,3,',','.').' '.$row->item->productionUnit->code }}</td>
+                                    <td align="right">{{ number_format($row->qty * $row->item->production_convert,3,',','.').' '.$row->item->uomUnit->code }}</td>
+                                    <td align="right">{{ number_format(($row->qty * $row->item->production_convert) / $row->item->sell_convert,3,',','.').' '.$row->item->sellUnit->code }}</td>
+                                    <td align="right">{{ number_format((($row->qty * $row->item->production_convert) / $row->item->sell_convert) / $row->item->pallet_convert,3,',','.').' '.$row->item->palletUnit->code }}</td>
+                                    <td align="center">{{ $row->shading }}</td>
+                                    <td align="center">{{ $row->batch_no }}</td>
+                                </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>

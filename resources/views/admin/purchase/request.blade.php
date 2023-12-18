@@ -157,10 +157,6 @@
                                     <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting">
                                     <label class="active" for="due_date">Tgl. Kadaluwarsa</label>
                                 </div>
-                                <div class="input-field col m4 s12 step5">
-                                    <input id="required_date" name="required_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting">
-                                    <label class="active" for="required_date">Tgl. Dipakai</label>
-                                </div>
                                 <div class="file-field input-field col m4 s12 step6">
                                     <div class="btn">
                                         <span>File</span>
@@ -177,10 +173,6 @@
                                         @endforeach
                                     </select>
                                     <label class="" for="company_id">Perusahaan</label>
-                                </div>
-                                <div class="input-field col m4 s12 step8">
-                                    <select class="browser-default" id="project_id" name="project_id"></select>
-                                    <label for="project_id" class="active">Link Proyek (Jika ada) :</label>
                                 </div>
                             </div>
                         </fieldset>
@@ -211,7 +203,7 @@
                             <div class="row">
                                 <div class="col m12 s12 step12">
                                     <p class="mt-2 mb-2">
-                                        <table class="bordered" style="width:1800px;">
+                                        <table class="bordered" style="width:2000px;">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Item</th>
@@ -225,6 +217,8 @@
                                                     <th class="center">Mesin</th>
                                                     <th class="center">Gudang Tujuan</th>
                                                     <th class="center">Departemen</th>
+                                                    <th class="center">Requester</th>
+                                                    <th class="center">Proyek</th>
                                                     <th class="center">Hapus</th>
                                                 </tr>
                                             </thead>
@@ -286,6 +280,12 @@
                                                             @endforeach
                                                         </select>    
                                                     </td>
+                                                    <td>
+                                                        <input name="arr_requester[]" type="text" placeholder="Yang meminta barang / requester" required>
+                                                    </td>
+                                                    <td>
+                                                        <select class="browser-default" id="arr_project0" name="arr_project[]"></select>
+                                                    </td>
                                                     <td class="center">
                                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                                             <i class="material-icons">delete</i>
@@ -293,7 +293,7 @@
                                                     </td>
                                                 </tr>
                                                 <tr id="last-row-item">
-                                                    <td colspan="12">
+                                                    <td colspan="14">
                                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> Tambah 1
                                                         </a>
@@ -663,7 +663,7 @@
         $('#arr_place0,#arr_department0').formSelect();
         select2ServerSide('#arr_item0', '{{ url("admin/select2/purchase_item") }}');
         select2ServerSide('#material_request_id', '{{ url("admin/select2/material_request_pr") }}');
-        select2ServerSide('#project_id', '{{ url("admin/select2/project") }}');
+        select2ServerSide('#arr_project0', '{{ url("admin/select2/project") }}');
     });
 
     function makeTreeOrg(data,link){
@@ -1126,12 +1126,16 @@
 
                 formData.delete("arr_line[]");
                 formData.delete("arr_machine[]");
+                formData.delete("arr_project[]");
 
                 $('select[name^="arr_line"]').each(function(index){
                     formData.append('arr_line[]',($(this).val() ? $(this).val() : ''));
                 });
                 $('select[name^="arr_machine"]').each(function(index){
                     formData.append('arr_machine[]',($(this).val() ? $(this).val() : ''));
+                });
+                $('select[name^="arr_project[]"]').each(function(index){
+                    formData.append('arr_project[]',($(this).val() ? $(this).val() : ''));
                 });
 
                 $.ajax({
@@ -1323,13 +1327,6 @@
                 $('#required_date').removeAttr('min');
                 $('#company_id').val(response.company_id).formSelect();
 
-                if(response.project_id){
-                    $('#project_id').empty();
-                    $('#project_id').append(`
-                        <option value="` + response.project_id + `">` + response.project_name + `</option>
-                    `);
-                }
-
                 if(response.details.length > 0){
                     $('.row_item').each(function(){
                         $(this).remove();
@@ -1364,7 +1361,7 @@
                                         @foreach ($place as $rowplace)
                                             <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                         @endforeach
-                                    </select>    
+                                    </select>
                                 </td>
                                 <td>
                                     <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
@@ -1393,6 +1390,12 @@
                                         @endforeach
                                     </select>    
                                 </td>
+                                <td>
+                                    <input name="arr_requester[]" type="text" placeholder="Yang meminta barang / requester" value="` + val.requester + `" required>
+                                </td>
+                                <td>
+                                    <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                                </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                         <i class="material-icons">delete</i>
@@ -1411,6 +1414,12 @@
                         $('#arr_line' + count).val(val.line_id);
                         $('#arr_machine' + count).val(val.machine_id);
                         $('#arr_department' + count).val(val.department_id);
+                        if(val.project_id){
+                            $('#arr_project' + count).append(`
+                                <option value="` + val.project_id + `">` + val.project_name + `</option>
+                            `);
+                        }
+                        select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
                     });
                 }
                 
@@ -1537,6 +1546,12 @@
                                                 @endforeach
                                             </select>    
                                         </td>
+                                        <td>
+                                            <input name="arr_requester[]" type="text" placeholder="Yang meminta barang / requester" value="` + val.requester + `" required>
+                                        </td>
+                                        <td>
+                                            <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                                        </td>
                                         <td class="center">
                                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                                 <i class="material-icons">delete</i>
@@ -1555,6 +1570,12 @@
                                 $('#arr_line' + count).val(val.line_id);
                                 $('#arr_machine' + count).val(val.machine_id);
                                 $('#arr_department' + count).val(val.department_id);
+                                if(val.project_id){
+                                    $('#arr_project' + count).append(`
+                                        <option value="` + val.project_id + `">` + val.project_name + `</option>
+                                    `);
+                                }
+                                select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
                             });
                         }
                         
@@ -1697,6 +1718,12 @@
                                             @endforeach
                                         </select>    
                                     </td>
+                                    <td>
+                                        <input name="arr_requester[]" type="text" placeholder="Yang meminta barang / requester" value="` + val.requester + `" required>
+                                    </td>
+                                    <td>
+                                        <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                                    </td>
                                     <td class="center">
                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                             <i class="material-icons">delete</i>
@@ -1705,6 +1732,9 @@
                                 </tr>
                             `);
                             $('#arr_place' + count).val(val.place_id);
+                            $('#arr_line' + count).val(val.line_id);
+                            $('#arr_machine' + count).val(val.machine_id);
+                            $('#arr_department' + count).val(val.department_id);
                             $('#arr_warehouse' + count).empty();
                             $.each(val.list_warehouse, function(j, value) {
                                 $('#arr_warehouse' + count).append(`
@@ -1715,6 +1745,7 @@
                                 <option value="` + val.item_id + `">` + val.item_name + `</option>
                             `);
                             select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+                            select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
                         });
 
                         $('#material_request_id').empty();
@@ -1864,6 +1895,12 @@
                         @endforeach
                     </select>    
                 </td>
+                <td>
+                    <input name="arr_requester[]" type="text" placeholder="Yang meminta barang / requester" required>
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
@@ -1872,6 +1909,7 @@
             </tr>
         `);
         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+        select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
     }
 
     function useStock(){
@@ -1946,6 +1984,12 @@
                                 @endforeach
                             </select>    
                         </td>
+                        <td>
+                            <input name="arr_requester[]" type="text" placeholder="Yang meminta barang / requester" required>
+                        </td>
+                        <td>
+                            <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                        </td>
                         <td class="center">
                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                 <i class="material-icons">delete</i>
@@ -1954,6 +1998,7 @@
                     </tr>
                 `);
                 select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+                select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
                 $('#arr_item' + count).append(`
                     <option value="` + arr_id[i] + `">` + arr_name[i] + `</option>
                 `);
@@ -2237,11 +2282,6 @@
                     title : 'Tgl. Kadaluarsa',
                     element : document.querySelector('.step4'),
                     intro : 'Tanggal kadaluarsa digunakan untuk menentukan masa berlaku dokumen hingga tanggal ini ditentukan.' 
-                },
-                {
-                    title : 'Tgl. Dipakai',
-                    element : document.querySelector('.step5'),
-                    intro : 'Tanggal dipakai untuk menentukan perkiraan tanggal pakai barang yang ingin dibeli.' 
                 },
                 {
                     title : 'File Lampiran',

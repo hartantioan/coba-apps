@@ -56,7 +56,7 @@ class ItemStock extends Model
         $price = 0;
         $cek = ItemCogs::where('place_id',$this->place_id)->where('item_id',$this->item_id)->orderByDesc('date')->orderByDesc('id')->first();
         if($cek){
-            $price = $cek->price_final;
+            $price = $cek->total_final / $cek->qty_final;
         }
 
         return $price;

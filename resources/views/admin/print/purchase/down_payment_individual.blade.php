@@ -156,7 +156,9 @@
             @page { margin: 5em 3em 6em 3em; }
             header { position: fixed; top: -70px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
                 
-        
+            .preserveLines {
+                white-space: pre-line;
+            }
            
         </style>
     </head>
@@ -167,7 +169,7 @@
                     <td width="83%" class="left-align" >
                         <tr>
                             <td>
-                                <span class="invoice-number mr-1">DOWNPAYMENT # {{ $data->code }}</span>
+                                <span class="invoice-number mr-1"># {{ $data->code }}</span>
                             </td>
                         </tr>
                         <tr>
@@ -177,7 +179,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <h5 class="indigo-text">Purchase Down Payment</h5>
+                                <h3 class="indigo-text">Purchase Down Payment</h3>
                             </td>
                         </tr>
                                 
@@ -204,7 +206,7 @@
                 <div class="card-content invoice-print-area ">
                     <table border="0" width="100%">
                         <tr>
-                            <td width="33%" class="left-align">
+                            <td width="57%" class="left-align">
                                 <table border="0" width="50%" class="tbl-info">
                                     <tr>
                                         <td width="25%">
@@ -240,7 +242,7 @@
                                     </tr>
                                 </table>
                             </td>
-                            <td width="33%" class="left-align">
+                            <td width="10%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
                                         <td align="right">
@@ -347,6 +349,9 @@
                                         <div class="mt-3">
                                             Catatan : {{ $data->note }}
                                         </div>
+                                        <div class="preserveLines" style="text-align:left !important;">
+                                            {{ $data->note_external }}
+                                        </div>
                                         Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal).' '.$data->currency->document_text }}
                                     </td>
                                     
@@ -367,10 +372,18 @@
                                     <td class="right-align" style="padding-right:15px">Total</td>
                                     <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->total,2,',','.') }}</td>
                                 </tr>
+                                @if($data->tax > 0)
                                 <tr class="break-row">
                                     <td class="right-align" style="padding-right:15px">PPN</td>
                                     <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->tax,2,',','.') }}</td>
                                 </tr>
+                                @endif
+                                @if($data->wtax > 0)
+                                <tr class="break-row">
+                                    <td class="right-align" style="padding-right:15px">PPh</td>
+                                    <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->wtax,2,',','.') }}</td>
+                                </tr>
+                                @endif
                                 <tr class="break-row">
                                     <td class="right-align" style="padding-right:15px">Grandtotal</td>
                                     <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->grandtotal,2,',','.') }}</td>

@@ -72,6 +72,7 @@ class PurchaseDownPaymentController extends Controller
             'maxDate'       => $request->get('maxDate'),
             'newcode'       => $menu->document_code.date('y'),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+            'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -89,12 +90,24 @@ class PurchaseDownPaymentController extends Controller
         $details = [];
 
         foreach($data as $row){
+            $list_items = '<ol>';
+
+            foreach($row->purchaseOrderDetail as $key => $rowdetail){
+                $item_code = $rowdetail->item()->exists() ? $rowdetail->item->code : ($rowdetail->coa()->exists() ? $rowdetail->coa->code : '');
+                $item_name = $rowdetail->item()->exists() ? $rowdetail->item->name : ($rowdetail->coa()->exists() ? $rowdetail->coa->name : '');
+                $item_unit = $rowdetail->item()->exists() ? $rowdetail->item->buyUnit->code : '';
+                $list_items .= '<li>'.$item_code.' - '.$item_name.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit.'</li>';
+            }
+
+            $list_items .= '</ol>';
+
             $details[] = [
                 'po_code'       => CustomHelper::encrypt($row->code),
                 'po_no'         => $row->code,
                 'post_date'     => date('d/m/y',strtotime($row->post_date)),
                 'delivery_date' => date('d/m/y',strtotime($row->delivery_date)),
                 'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                'list_items'    => $list_items,
             ];
         }
 
@@ -110,13 +123,21 @@ class PurchaseDownPaymentController extends Controller
             'company_id',
             'type',
             'document',
+            'tax_id',
+            'is_include_tax',
+            'percent_tax',
+            'wtax_id',
+            'percent_wtax',
             'post_date',
-            'due_date',
+            'top',
             'currency_id',
             'currency_rate',
             'note',
             'subtotal',
             'discount',
+            'total',
+            'tax',
+            'wtax',
             'grandtotal'
         ];
 
@@ -133,7 +154,6 @@ class PurchaseDownPaymentController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
-                            ->orWhere('due_date', 'like', "%$search%")
                             ->orWhere('subtotal', 'like', "%$search%")
                             ->orWhere('discount', 'like', "%$search%")
                             ->orWhere('total', 'like', "%$search%")
@@ -204,7 +224,6 @@ class PurchaseDownPaymentController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
-                            ->orWhere('due_date', 'like', "%$search%")
                             ->orWhere('subtotal', 'like', "%$search%")
                             ->orWhere('discount', 'like', "%$search%")
                             ->orWhere('total', 'like', "%$search%")
@@ -284,13 +303,21 @@ class PurchaseDownPaymentController extends Controller
                     $val->company->name,
                     $val->type(),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
+                    $val->taxModel()->exists() ? $val->taxModel->code : '-',
+                    $val->isIncludeTax(),
+                    number_format($val->percent_tax,2,',','.'),
+                    $val->wtaxModel()->exists() ? $val->wtaxModel->code : '-',
+                    number_format($val->percent_wtax,2,',','.'),  
                     date('d/m/y',strtotime($val->post_date)),
-                    date('d/m/y',strtotime($val->due_date)),
+                    $val->top,
                     $val->currency->code,
                     number_format($val->currency_rate,2,',','.'),
                     $val->note,
                     number_format($val->subtotal,2,',','.'),
                     number_format($val->discount,2,',','.'),
+                    number_format($val->total,2,',','.'),
+                    number_format($val->tax,2,',','.'),
+                    number_format($val->wtax,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
                     $val->status(),
                     '
@@ -325,9 +352,9 @@ class PurchaseDownPaymentController extends Controller
             'code'			            => $request->temp ? ['required', Rule::unique('purchase_down_payments', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:purchase_down_payments,code',
 			'supplier_id' 				=> 'required',
 			'type'                      => 'required',
+            'top'                       => 'required',
             'company_id'                => 'required',
             'post_date'                 => 'required',
-            'due_date'                  => 'required',
             'currency_id'               => 'required',
             'currency_rate'             => 'required',
             'subtotal'                  => 'required',
@@ -338,9 +365,9 @@ class PurchaseDownPaymentController extends Controller
             'code.unique'                       => 'Kode telah dipakai',
 			'supplier_id.required' 				=> 'Supplier tidak boleh kosong.',
 			'type.required'                     => 'Tipe tidak boleh kosong',
+            'top.required'                      => 'TOP tidak boleh kosong',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'post_date.required'                => 'Tgl post tidak boleh kosong.',
-            'due_date.required'                 => 'Tgl tenggat tidak boleh kosong.',
             'currency_id.required'              => 'Mata uang tidak boleh kosong.',
             'subtotal.required'                 => 'Subtotal tidak boleh kosong.',
 		]);
@@ -354,14 +381,29 @@ class PurchaseDownPaymentController extends Controller
             
             $total = 0;
             $tax = 0;
+            $wtax = 0;
             $grandtotal = 0;
             $subtotal = str_replace(',','.',str_replace('.','',$request->subtotal));
             $discount = str_replace(',','.',str_replace('.','',$request->discount));
 
             $total = $subtotal - $discount;
 
-            $grandtotal = $total;
+            if($request->percent_tax > 0){
+                if($request->is_include_tax == '1'){
+                    $total = $total / (1 + ($request->percent_tax / 100));
+                }
+                $tax = $total * ($request->percent_tax / 100);
+            }
+    
+            if($request->percent_wtax > 0){
+                $wtax = $total * ($request->percent_wtax / 100);
+            }
 
+            $tax = floor($tax);
+            $wtax = floor($wtax);
+            $total = ceil($total);
+
+            $grandtotal = $total + $tax - $wtax;
 
 			if($request->temp){
                 DB::beginTransaction();
@@ -412,22 +454,25 @@ class PurchaseDownPaymentController extends Controller
                         $query->account_id = $request->supplier_id;
                         $query->type = $request->type;
                         $query->company_id = $request->company_id;
-                        $query->tax_id = 0;
-                        $query->is_tax = NULL;
-                        $query->is_include_tax = '0';
+                        $query->tax_id = $request->tax_id;
+                        $query->is_tax = $request->tax_id > 0 ? '1' : NULL;
+                        $query->is_include_tax = $request->is_incude_tax;
                         $query->percent_tax = $request->percent_tax;
+                        $query->wtax_id = $request->wtax_id;
+                        $query->percent_wtax = $request->percent_wtax;
                         $query->document = $document;
                         $query->currency_id = $request->currency_id;
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                         $query->post_date = $request->post_date;
-                        $query->due_date = $request->due_date;
                         $query->note = $request->note;
-                        $query->subtotal = round($subtotal,3);
+                        $query->subtotal = round($subtotal,2);
                         $query->discount = $discount;
-                        $query->total = round($total,3);
-                        $query->tax = 0;
-                        $query->grandtotal = round($grandtotal,3);
+                        $query->total = round($total,2);
+                        $query->tax = round($tax,2);
+                        $query->wtax = round($wtax,2);
+                        $query->grandtotal = round($grandtotal,2);
                         $query->status = '1';
+                        $query->top = $request->top;
 
                         $query->save();
 
@@ -454,22 +499,25 @@ class PurchaseDownPaymentController extends Controller
                         'account_id'                => $request->supplier_id,
                         'type'	                    => $request->type,
                         'company_id'                => $request->company_id,
-                        'tax_id'                    => 0,
-                        'is_tax'                    => NULL,
-                        'is_include_tax'            => '0',
-                        'percent_tax'               => 0,
+                        'tax_id'                    => $request->tax_id,
+                        'is_tax'                    => $request->tax_id > 0 ? '1' : NULL,
+                        'is_include_tax'            => $request->is_incude_tax,
+                        'percent_tax'               => $request->percent_tax,
+                        'wtax_id'                   => $request->wtax_id,
+                        'percent_wtax'              => $request->percent_wtax,
                         'document'                  => $request->file('document') ? $request->file('document')->store('public/purchase_down_payments') : NULL,
                         'currency_id'               => $request->currency_id,
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
                         'post_date'                 => $request->post_date,
-                        'due_date'                  => $request->due_date,
                         'note'                      => $request->note,
-                        'subtotal'                  => round($subtotal,3),
+                        'subtotal'                  => round($subtotal,2),
                         'discount'                  => $discount,
-                        'total'                     => round($total,3),
-                        'tax'                       => round($tax,3),
-                        'grandtotal'                => round($grandtotal,3),
-                        'status'                    => '1'
+                        'total'                     => round($total,2),
+                        'tax'                       => round($tax,2),
+                        'wtax'                      => round($wtax,2),
+                        'grandtotal'                => round($grandtotal,2),
+                        'status'                    => '1',
+                        'top'                       => $request->top,
                     ]);
 
                     DB::commit();
@@ -485,12 +533,12 @@ class PurchaseDownPaymentController extends Controller
                     try {
                         foreach($request->arr_code as $key => $row){
                             
-                                PurchaseDownPaymentDetail::create([
-                                    'purchase_down_payment_id'      => $query->id,
-                                    'purchase_order_id'             => PurchaseOrder::where('code',CustomHelper::decrypt($row))->first()->id,
-                                    'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
-                                    'note'                          => $request->arr_note[$key]
-                                ]);
+                            PurchaseDownPaymentDetail::create([
+                                'purchase_down_payment_id'      => $query->id,
+                                'purchase_order_id'             => PurchaseOrder::where('code',CustomHelper::decrypt($row))->first()->id,
+                                'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
+                                'note'                          => $request->arr_note[$key]
+                            ]);
                                 
                         }
                         DB::commit();
@@ -640,12 +688,25 @@ class PurchaseDownPaymentController extends Controller
         $pdp['discount'] = number_format($pdp->discount,2,',','.');
         $pdp['total'] = number_format($pdp->total,2,',','.');
         $pdp['tax'] = number_format($pdp->tax,2,',','.');
+        $pdp['wtax'] = number_format($pdp->wtax,2,',','.');
         $pdp['grandtotal'] = number_format($pdp->grandtotal,2,',','.');
-        $pdp['percent_tax'] = number_format($pdp->percent_tax,2,',','.');
+        $pdp['is_include_tax'] = $pdp->is_include_tax ? $pdp->is_include_tax : '0';
 
         $arr = [];
 
         foreach($pdp->purchaseDownPaymentDetail as $row){
+
+            $list_items = '<ol>';
+
+            foreach($row->purchaseOrder->purchaseOrderDetail as $key => $rowdetail){
+                $item_code = $rowdetail->item()->exists() ? $rowdetail->item->code : ($rowdetail->coa()->exists() ? $rowdetail->coa->code : '');
+                $item_name = $rowdetail->item()->exists() ? $rowdetail->item->name : ($rowdetail->coa()->exists() ? $rowdetail->coa->name : '');
+                $item_unit = $rowdetail->item()->exists() ? $rowdetail->item->buyUnit->code : '';
+                $list_items .= '<li>'.$item_code.' - '.$item_name.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit.'</li>';
+            }
+
+            $list_items .= '</ol>';
+
             $arr[] = [
                 'purchase_order_id'         => $row->purchase_order_id,
                 'purchase_order_code'       => $row->purchaseOrder->code,
@@ -654,7 +715,8 @@ class PurchaseDownPaymentController extends Controller
                 'delivery_date'             => date('d/m/y',strtotime($row->purchaseOrder->delivery_date)),
                 'note'                      => $row->note,
                 'total'                     => number_format($row->purchaseOrder->grandtotal,2,',','.'),
-                'total_dp'                  => number_format($row->nominal,2,',','.')
+                'total_dp'                  => number_format($row->nominal,2,',','.'),
+                'list_items'                => $list_items,
             ];
         }
 
@@ -791,7 +853,6 @@ class PurchaseDownPaymentController extends Controller
                     $query->where(function($query) use ($request) {
                         $query->where('code', 'like', "%$request->search%")
                             ->orWhere('post_date', 'like', "%$request->search%")
-                            ->orWhere('due_date', 'like', "%$request->search%")
                             ->orWhere('grandtotal', 'like', "%$request->search%")
                             ->orWhere('note', 'like', "%$request->search%")
                             ->orWhereHas('purchaseDownPaymentDetail',function($query) use($request){

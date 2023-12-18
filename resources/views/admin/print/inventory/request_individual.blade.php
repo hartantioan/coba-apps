@@ -161,14 +161,14 @@
                                 <span class="invoice-number mr-1" style="font-size:1em">Permohonan Pembelian # {{ $data->code }}</span>
                             </td>
                         </tr>
-                        <tr>
+                        {{-- <tr>
                             <td style="margin-top: -2px;">
                                 <small style="font-size:1em">Diajukan: {{ date('d/m/y',strtotime($data->post_date)) }}</small>
                             </td>
-                        </tr>
+                        </tr> --}}
                         <tr>
                             <td>
-                                <h5 style="margin-top: -2px">{{ $title }}</h5>
+                                <h2 style="margin-top: -2px">{{ $title }}</h2>
                             </td>
                         </tr>
                                 
@@ -248,27 +248,35 @@
                     <table class="bordered" border="1" width="100%" class="table-data-item" style="border-collapse:collapse">
                         <thead>
                             <tr>
-                                <th class="center">Item</th>
-                                <th class="center">Jum.</th>
-                                <th class="center">Stok</th>
-                                <th class="center">Sat.</th>
-                                <th class="center">Catatan</th>
-                                <th class="center">Tgl.Dipakai</th>
-                                <th class="center">Plant</th>
-                                <th class="center">Gudang</th>
+                                <th align="center">Item</th>
+                                <th align="center">Jum.</th>
+                                <th align="center">Stok</th>
+                                <th align="center">Sat.</th>
+                                <th align="center">Catatan</th>
+                                <th align="center">Tgl.Dipakai</th>
+                                <th align="center">Plant</th>
+                                <th align="center">Gudang</th>
+                                <th align="center">Line</th>
+                                <th align="center">Machine</th>
+                                <th align="center">Departemen</th>
+                                <th align="center-">Requester</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($data->materialRequestDetail as $row)
                             <tr>
                                 <td>{{ $row->item->name }}</td>
-                                <td class="center" align="right">{{ $row->qty }}</td>
-                                <td class="center" align="right">{{ $row->stock }}</td>
-                                <td class="center">{{ $row->item->buyUnit->code }}</td>
+                                <td align="right">{{ number_format($row->qty,3,',','.') }}</td>
+                                <td align="right">{{ number_format($row->stock,3,',','.') }}</td>
+                                <td align="center">{{ $row->item->buyUnit->code }}</td>
                                 <td>{{ $row->note }}</td>
-                                <td class="indigo-text center">{{ date('d/m/y',strtotime($row->required_date)) }}</td>
-                                <td class="center">{{ $row->place->code }}</td>
-                                <td class="center">{{ $row->warehouse->name }}</td>
+                                <td align="center">{{ date('d/m/y',strtotime($row->required_date)) }}</td>
+                                <td align="center">{{ $row->place->code }}</td>
+                                <td align="center">{{ $row->warehouse->name }}</td>
+                                <td align="center">{{ $row->line()->exists() ? $row->line->code : '-' }}</td>
+                                <td align="center">{{ $row->machine()->exists() ? $row->machine->name : '-' }}</td>
+                                <td align="center">{{ $row->department()->exists() ? $row->department->name : '-' }}</td>
+                                <td align="">{{ $row->requester }}</td>
                             </tr>
                             @endforeach
                         </tbody>

@@ -135,9 +135,11 @@
             }
 
             @page { margin: 5em 3em 6em 3em; }
-            header { position: fixed; top: -70px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
+            header { position: fixed; top: -60px; left: 0px; right: 0px; height: 100px; margin-bottom: 10em }
                 
-        
+            .preserveLines {
+                white-space: pre-line;
+            }
            
         </style>
     </head>
@@ -151,33 +153,25 @@
                                 <span class="invoice-number mr-1" style="font-size:10px;margin-bottom:0px">Order # {{ $data->code }}</span>
                             </td>
                         </tr>
-                        <tr>
+                        {{-- <tr>
                             <td style="margin-top: -2px;">
                                 <small style="font-size:10px">Diajukan:</small>
                                 <span style="font-size:10px;">{{ date('d/m/y',strtotime($data->post_date)) }}</span>
                             </td>
-                        </tr>
+                        </tr> --}}
                         <tr>
                             <td>
                                 <h5 style="margin-top: -2px">Purchase Order</h5>
                             </td>
                         </tr>
-                                
-                        
                     </td>
                     <td width="33%" class="right-align">
-                        
-                        
-                   
-                    </td>
                     
+                    </td>
                     <td width="34%" class="right-align">
-                        
-                            <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
-                            
+                        <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
                     </td>
                 </tr>
-                
             </table>
         </header>
         <main>
@@ -206,7 +200,6 @@
                                         <td >
                                             Telepon: {{ $data->supplier->phone.' / '.$data->supplier->office_no }}
                                         </td>
-                                        
                                     </tr>
                                 </table>
                             </td>
@@ -322,10 +315,13 @@
                             <table style="width:100%">
                                 <tr class="break-row">
                                     <td>
-                                        Rekening :
-                                        {{ $data->supplier->defaultBank() ? $data->supplier->defaultBank() : ' - ' }}
+                                        {{-- Rekening :
+                                        {{ $data->supplier->defaultBank() ? $data->supplier->defaultBank() : ' - ' }} --}}
                                         <div class="mt-3">
                                             Catatan : {{ $data->note }}
+                                        </div>
+                                        <div class="preserveLines" style="text-align:left !important;">
+                                            {{ $data->note_external }}
                                         </div>
                                         Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal).' '.$data->currency->document_text }}
                                     </td>

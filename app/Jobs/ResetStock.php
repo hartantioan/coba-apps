@@ -14,19 +14,20 @@ class ResetStock implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $place_id,$warehouse_id, $area_id,$item_id,$qty,$type;
+    protected $place_id,$warehouse_id, $area_id,$item_id,$shading,$qty,$type;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($place_id,$warehouse_id,$area_id,$item_id,$qty,$type)
+    public function __construct($place_id,$warehouse_id,$area_id,$item_id,$shading,$qty,$type)
     {
         $this->place_id = $place_id;
         $this->warehouse_id = $warehouse_id;
         $this->area_id = $area_id;
         $this->item_id = $item_id;
+        $this->shading = $shading;
         $this->qty = $qty;
         $this->type = $type;
     }
@@ -38,7 +39,7 @@ class ResetStock implements ShouldQueue
      */
     public function handle()
     {
-        $data = ItemStock::where('place_id',$this->place_id)->where('warehouse_id',$this->warehouse_id)->where('area_id',$this->area_id)->where('item_id',$this->item_id)->first();
+        $data = ItemStock::where('place_id',$this->place_id)->where('warehouse_id',$this->warehouse_id)->where('area_id',$this->area_id)->where('item_id',$this->item_id)->where('item_shading_id',$this->shading)->first();
 
 		if($data){
 			$data->update([
@@ -46,10 +47,12 @@ class ResetStock implements ShouldQueue
 			]);
 		}else{
 			ItemStock::create([
-				'place_id'		=> $this->place_id,
-				'warehouse_id'	=> $this->warehouse_id,
-				'item_id'		=> $this->item_id,
-				'qty'			=> $this->type == 'IN' ? 0 - $this->qty : $this->qty,
+				'place_id'		    => $this->place_id,
+				'warehouse_id'	    => $this->warehouse_id,
+                'area_id'           => $this->area_id,
+				'item_id'		    => $this->item_id,
+                'item_shading_id'   => $this->shading,
+				'qty'			    => $this->type == 'IN' ? 0 - $this->qty : $this->qty,
 			]);
 		}
     }

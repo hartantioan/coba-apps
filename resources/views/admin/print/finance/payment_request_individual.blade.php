@@ -214,45 +214,17 @@
             <div class="card">
                 <div class="card-content invoice-print-area ">
                     <table border="0" width="100%">
-                        <tr>
-                            <td width="33%" class="left-align">
-                                <table border="0" width="50%" class="tbl-info">
+                        <tr
+                            <td width="56%" class="left-align" class="tbl-info">
+                                <table border="0" width="100%">
                                     <tr>
                                         <td width="40%">
-                                            Nama
+                                           Tipe Pembayaran
                                         </td>
                                         <td width="60%">
-                                            {{ $data->user->name}}
+                                            {{ $data->paymentType() }}
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td width="50%">
-                                            Posisi
-                                        </td>
-                                        <td width="50%">
-                                            {{ $data->user->position->Level->name }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="50%">
-                                            Depart.
-                                        </td>
-                                        <td width="50%">
-                                            {{ $data->user->position->division->name }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            HP
-                                        </td>
-                                        <td>
-                                            {{$data->user->phone }}
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                            <td width="33%" class="left-align" class="tbl-info">
-                                <table border="0" width="100%">
                                     <tr>
                                         <td width="40%">
                                             Partner Bisnis
@@ -263,18 +235,26 @@
                                     </tr>
                                     <tr>
                                         <td width="40%">
-                                            Rek. Tujuan
+                                            Vendor Bank
                                         </td>
                                         <td width="60%">
-                                            {{ $data->account_bank.' - '.$data->account_no.' - '.$data->account_name }}
+                                            {{ $data->account_bank }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td width="40%">
-                                           Tipe Pembayaran
+                                            Vendor Bank Account No
                                         </td>
                                         <td width="60%">
-                                            {{ $data->paymentType() }}
+                                            {{ $data->account_no }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="40%">
+                                            Vendor Bank Account Name
+                                        </td>
+                                        <td width="60%">
+                                            {{ $data->account_name }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -286,6 +266,9 @@
                                         </td>
                                     </tr>
                                 </table>
+                            </td>
+                            <td width="10%" class="left-align">
+                                
                             </td>
                             <td width="33%" class="left-align">
                                 <table border="0" width="100%">
@@ -333,7 +316,7 @@
                                     <td class="center-align">{{ $row->type() }}</td>
                                     <td>{{ $row->note }}</td>
                                     <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
-                                    <td align="right">{{ number_format($row->nominal,3,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->nominal,2,',','.') }}</td>
                                 </tr>
                                 @php
                                     $total += $row->nominal;
@@ -350,7 +333,6 @@
                                 <table style="width:100%" class="table-bot">
                                     <tr class="break-row">
                                         <td>
-                                            {!! ucwords(strtolower($data->user->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
                                             <div class="mt-3">
                                                 Catatan : {{ $data->note }}
                                             </div>
@@ -364,27 +346,27 @@
                                 <table style="border-collapse:collapse;text-align:right" width="74%" class="table-bot">
                                     <tr class="break-row">
                                         <td class="right-align">Total</td>
-                                        <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->total,3,',','.') }}</td>
+                                        <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->total,2,',','.') }}</td>
                                     </tr>
                                     <tr class="break-row">
                                         <td class="right-align">Pembulatan</td>
-                                        <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->rounding,3,',','.') }}</td>
+                                        <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->rounding,2,',','.') }}</td>
                                     </tr>
                                     <tr class="break-row">
                                         <td class="right-align">Admin</td>
-                                        <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->admin,3,',','.') }}</td>
+                                        <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->admin,2,',','.') }}</td>
                                     </tr class="break-row">
                                     <tr>
                                         <td class="right-align">Grandtotal</td>
-                                        <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->grandtotal,3,',','.') }}</td>
+                                        <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->grandtotal,2,',','.') }}</td>
                                     </tr class="break-row">
                                     <tr>
                                         <td class="right-align">Bayar (Piutang)</td>
-                                        <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->payment,3,',','.') }}</td>
+                                        <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->payment,2,',','.') }}</td>
                                     </tr class="break-row">
                                     <tr>
                                         <td class="right-align">Sisa</td>
-                                        <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->balance,3,',','.') }}</td>
+                                        <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->balance,2,',','.') }}</td>
                                     </tr class="break-row">                              
                                 </table>
                             </div>
@@ -392,8 +374,6 @@
                         <table class="table-bot1" width="100%" border="0">
                             <tr>
                                 <td class="center-align">
-                                    {!! ucwords(strtolower($data->user->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
-                                    <br>
                                     Dibuat oleh,
                                     @if($data->user->signature)
                                         <div>{!! $data->user->signature() !!}</div>

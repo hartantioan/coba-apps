@@ -352,12 +352,17 @@
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
-                $('#coa_purchase_id').empty().append(`
-                    <option value="` + response.coa_purchase_id + `">` + response.coa_purchase_name + `</option>
-                `);
-                $('#coa_sale_id').empty().append(`
-                    <option value="` + response.coa_sale_id + `">` + response.coa_sale_name + `</option>
-                `);
+                $('#coa_purchase_id,#coa_sale_id').empty();
+                if(response.coa_purchase_id){
+                    $('#coa_purchase_id').append(`
+                        <option value="` + response.coa_purchase_id + `">` + response.coa_purchase_name + `</option>
+                    `);
+                }
+                if(response.coa_sale_id){
+                    $('#coa_sale_id').append(`
+                        <option value="` + response.coa_sale_id + `">` + response.coa_sale_name + `</option>
+                    `);
+                }
                 $('#percentage').val(response.percentage);
                 $('#type').val(response.type).formSelect();
                 if(response.is_default_ppn == '1'){

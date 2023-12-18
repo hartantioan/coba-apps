@@ -39,6 +39,7 @@ use App\Models\MaterialRequestDetail;
 use App\Models\User;
 use App\Models\Place;
 use App\Helpers\CustomHelper;
+use App\Models\Department;
 
 class MaterialRequestController extends Controller
 {
@@ -59,6 +60,9 @@ class MaterialRequestController extends Controller
             'content'   => 'admin.inventory.request',
             'company'   => Company::where('status','1')->get(),
             'place'     => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+            'department'=> Department::where('status','1')->get(),
+            'line'      => Line::where('status','1')->get(),
+            'machine'   => Machine::where('status','1')->get(),
             'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
@@ -206,7 +210,7 @@ class MaterialRequestController extends Controller
         $string = '<div class="row pt-1 pb-1"><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="8">Daftar Item (Stok yang tampil adalah stok realtime pada saat dokumen dibuat)</th>
+                                <th class="center-align" colspan="14">Daftar Item (Stok yang tampil adalah stok realtime pada saat dokumen dibuat)</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -218,6 +222,10 @@ class MaterialRequestController extends Controller
                                 <th class="center-align">Tgl.Dipakai</th>
                                 <th class="center-align">Plant</th>
                                 <th class="center-align">Gudang</th>
+                                <th class="center-align">Line</th>
+                                <th class="center-align">Machine</th>
+                                <th class="center-align">Departemen</th>
+                                <th class="center-align">Requester</th>
                                 <th class="center-align">Status</th>
                             </tr>
                         </thead><tbody>';
@@ -233,6 +241,10 @@ class MaterialRequestController extends Controller
                 <td class="center-align">'.date('d/m/y',strtotime($row->required_date)).'</td>
                 <td class="center-align">'.$row->place->code.'</td>
                 <td class="center-align">'.$row->warehouse->name.'</td>
+                <td class="center-align">'.($row->line()->exists() ? $row->line->code : '-').'</td>
+                <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
+                <td class="center-align">'.($row->department()->exists() ? $row->department->name : '-').'</td>
+                <td class="">'.$row->requester.'</td>
                 <td class="center-align" style="font-size:20px !important;">'.$row->status().'</td>
             </tr>';
         }
@@ -535,6 +547,10 @@ class MaterialRequestController extends Controller
                             'required_date'         => $request->arr_required_date[$key],
                             'place_id'              => $request->arr_place[$key],
                             'warehouse_id'          => $request->arr_warehouse[$key],
+                            'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
+                            'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
+                            'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
+                            'requester'             => $request->arr_requester[$key],
                         ]);
                     }
                     MaterialRequest::find($query->id)->update([
@@ -585,6 +601,10 @@ class MaterialRequestController extends Controller
                 'date'              => $row->required_date,
                 'place_id'          => $row->place_id,
                 'warehouse_id'      => $row->warehouse_id,
+                'line_id'           => $row->line_id,
+                'machine_id'        => $row->machine_id,
+                'department_id'     => $row->department_id,
+                'requester'         => $row->requester,
                 'stock_list'        => $row->item->currentStockPurchase($this->dataplacecode,$this->datawarehouses),
                 'list_warehouse'    => $row->item->warehouseList(),
             ];

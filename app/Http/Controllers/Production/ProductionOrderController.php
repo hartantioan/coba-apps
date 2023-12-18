@@ -8,6 +8,7 @@ use App\Models\MarketingOrderPlanDetail;
 use App\Models\Place;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
+use App\Models\Area;
 use App\Models\IncomingPayment;
 use App\Models\Item;
 use App\Models\MarketingOrder;
@@ -26,6 +27,7 @@ use App\Models\ProductionOrder;
 use App\Models\ProductionOrderDetail;
 use App\Models\ProductionSchedule;
 use App\Models\ProductionScheduleDetail;
+use App\Models\Warehouse;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 class ProductionOrderController extends Controller
@@ -55,6 +57,8 @@ class ProductionOrderController extends Controller
             'maxDate'       => $request->get('maxDate'),
             'newcode'       => $menu->document_code.date('y'),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+            'area'          => Area::where('status','1')->get(),
+            'warehouse'     => Warehouse::where('status','1')->whereNotNull('is_transit_warehouse')->first(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -183,6 +187,7 @@ class ProductionOrderController extends Controller
                     $val->productionScheduleDetail->line->code,
                     $val->productionScheduleDetail->group,
                     $val->productionScheduleDetail->warehouse->name,
+                    $val->area()->exists() ? $val->area->name : '-',
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
@@ -220,6 +225,7 @@ class ProductionOrderController extends Controller
             'production_schedule_id'        => 'required',
             'production_schedule_detail_id' => 'required',
             'warehouse_id'                  => 'required',
+            'area_id'                       => $request->isSalesItem ? 'required' : '',
             'arr_bom_detail_id'             => 'required|array',
             'arr_lookable_id'               => 'required|array',
             'arr_lookable_type'             => 'required|array',
@@ -235,6 +241,8 @@ class ProductionOrderController extends Controller
             'post_date.required' 			            => 'Tanggal posting tidak boleh kosong.',
             'production_schedule_id.required'           => 'Jadwal Produksi tidak boleh kosong.',
             'production_schedule_detail_id.required'    => 'Item target tidak boleh kosong.',
+            'warehouse_id.required'                     => 'Gudang target tidak boleh kosong.',
+            'area_id.required'                          => 'Area target tidak boleh kosong.',
             'arr_bom_detail_id.required'                => 'BOM detail tidak boleh kosong.',
             'arr_bom_detail_id.array'                   => 'BOM detail harus array.',
             'arr_lookable_id.required'                  => 'Detail tidak boleh kosong.',
@@ -317,6 +325,7 @@ class ProductionOrderController extends Controller
                         $query->production_schedule_id = $request->production_schedule_id;
                         $query->production_schedule_detail_id = $request->production_schedule_detail_id;
                         $query->warehouse_id = $request->warehouse_id;
+                        $query->area_id = $request->area_id ? $request->area_id : NULL;
                         $query->post_date = $request->post_date;
                         $query->note = $request->note;
                         $query->standard_item_cost = $standardItemCost;
@@ -351,6 +360,7 @@ class ProductionOrderController extends Controller
                         'production_schedule_id'	    => $request->production_schedule_id,
                         'production_schedule_detail_id'	=> $request->production_schedule_detail_id,
                         'warehouse_id'                  => $request->warehouse_id,
+                        'area_id'                       => $request->area_id ? $request->area_id : NULL,
                         'post_date'                     => $request->post_date,
                         'note'                          => $request->note,
                         'standard_item_cost'            => $standardItemCost,
@@ -414,14 +424,18 @@ class ProductionOrderController extends Controller
 
     public function show(Request $request){
         $po = ProductionOrder::where('code',CustomHelper::decrypt($request->id))->first();
+        $warehouse = Warehouse::where('status','1')->whereNotNull('is_transit_warehouse')->first();
         $po['production_schedule_code'] = $po->productionSchedule->code.' Tgl.Post '.date('d/m/y',strtotime($po->productionSchedule->post_date)).' - Plant : '.$po->productionSchedule->place->code;
         $po['production_schedule_detail_code'] = $po->productionScheduleDetail->item->code.' - '.$po->productionScheduleDetail->item->name;
         $po['warehouses'] = $po->productionScheduleDetail->item->warehouseList();
+        $po['warehouse_transit_id'] = $warehouse ? $warehouse->id : '';
+        $po['warehouse_transit_name'] = $warehouse ? $warehouse->name : '';
         $po['qty'] = number_format($po->productionScheduleDetail->qty,3,',','.').' '.$po->productionScheduleDetail->item->productionUnit->code;
         $po['shift'] = $po->productionScheduleDetail->shift->code.' - '.$po->productionScheduleDetail->shift->name;
         $po['group'] = $po->productionScheduleDetail->group;
         $po['line'] = $po->productionScheduleDetail->line->code;
         $po['code_place_id'] = substr($po->code,7,2);
+        $po['is_sales_item'] = $po->productionScheduleDetail->item->is_sales_item ? $po->productionScheduleDetail->item->is_sales_item : '';
 
         $arr = [];
         
@@ -448,15 +462,15 @@ class ProductionOrderController extends Controller
 
     public function approval(Request $request,$id){
         
-        $pr = MarketingOrderPlan::where('code',CustomHelper::decrypt($id))->first();
+        $pr = ProductionOrder::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
             $data = [
-                'title'     => 'Marketing Order Plan',
+                'title'     => 'Order Produksi',
                 'data'      => $pr
             ];
 
-            return view('admin.approval.marketing_order_plan', $data);
+            return view('admin.approval.production_order', $data);
         }else{
             abort(404);
         }

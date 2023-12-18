@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Exports\ExportDownPayment;
+use App\Models\Tax;
 use Maatwebsite\Excel\Facades\Excel;
 
 class DownPaymentController extends Controller

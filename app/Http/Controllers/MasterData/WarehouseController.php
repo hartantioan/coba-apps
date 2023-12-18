@@ -36,7 +36,8 @@ class WarehouseController extends Controller
             'id',
             'code',
             'name',
-            'note'
+            'note',
+            'is_transit_warehouse',
         ];
 
         $start  = $request->start;
@@ -92,6 +93,7 @@ class WarehouseController extends Controller
                     $val->code,
                     $val->name,
                     $val->note,
+                    $val->isTransitWarehouse(),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -138,6 +140,7 @@ class WarehouseController extends Controller
                     $query = Warehouse::find($request->temp);
                     $query->name                = $request->name;
                     $query->note                = $request->note;
+                    $query->is_transit_warehouse= $request->is_transit_warehouse ? $request->is_transit_warehouse : NULL;
                     $query->status              = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
@@ -151,6 +154,7 @@ class WarehouseController extends Controller
                         'code'              => Warehouse::generateCode(),
                         'name'			    => $request->name,
                         'note'			    => $request->note,
+                        'is_transit_warehouse' => $request->is_transit_warehouse ? $request->is_transit_warehouse : NULL,
                         'status'            => $request->status ? $request->status : '2',
                     ]);
                     DB::commit();
@@ -160,6 +164,16 @@ class WarehouseController extends Controller
 			}
 			
 			if($query) {
+
+                if($request->is_transit_warehouse){
+                    $warehouses = Warehouse::where('id','!=',$query->id)->get();
+
+                    foreach($warehouses as $row){
+                        $row->update([
+                            'is_transit_warehouse'  => NULL
+                        ]);
+                    }
+                }
 
                 activity()
                     ->performedOn(new Warehouse())

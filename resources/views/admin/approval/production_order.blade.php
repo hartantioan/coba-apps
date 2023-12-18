@@ -120,7 +120,7 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">Permohonan Pembelian # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">{{ $title }} # {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
@@ -132,114 +132,103 @@
             </div>
         </div>
         <!-- logo and title -->
-        <div class="row mt-3 invoice-logo-title">
+        <div class="row mt-1 invoice-logo-title">
             <div class="col m6 s12">
                 <h5 class="indigo-text">{{ $title }}</h5>
             </div>
-            <div class="col m6 s12">
-                <img src="{{ url('website/logo_web_fix.png') }}" width="80%">
+            <div class="col m6 s12 right-align">
+                <img src="{{ url('website/logo_web_fix.png') }}" width="35%">
             </div>
         </div>
-        <div class="divider mb-3 mt-3"></div>
+        <div class="divider mb-1 mt-1"></div>
         <!-- invoice address and contact -->
-        <div class="row invoice-info">
-            <div class="col m6 s6">
-                <h6 class="invoice-from">Dari</h6>
-                <div class="row">
-                    <div class="col s3">
-                        Name
-                    </div>
-                    <div class="col s9">
-                        {{ $data->user->name }}
-                    </div>
-                    <div class="col s3">
-                        Posisi
-                    </div>
-                    <div class="col s9">
-                        {{ $data->user->position->Level->name }}
-                    </div>
-                    <div class="col s3">
-                        Depart.
-                    </div>
-                    <div class="col s9">
-                        {{ $data->user->position->division->name }}
-                    </div>
-                    <div class="col s3">
-                        HP
-                    </div>
-                    <div class="col s9">
-                        {{ $data->user->phone }}
-                    </div>
+        <div class="row">
+            <div class="col s4 row mt-2">
+                <div class="col s12 center-align">
+                    INFO UTAMA
+                </div>
+                <div class="col s4">
+                    Nama
+                </div>
+                <div class="col s8">
+                    {{ $data->user->name }}
+                </div>
+                <div class="col s4">
+                    Perusahaan
+                </div>
+                <div class="col s8">
+                    {{ $data->company->name }}
+                </div>
+                <div class="col s4">
+                    Plant
+                </div>
+                <div class="col s8">
+                    {{ $data->productionSchedule->place->code }}
+                </div>
+                <div class="col s4">
+                    Item
+                </div>
+                <div class="col s8">
+                    {{ $data->productionScheduleDetail->item->code.' - '.$data->productionScheduleDetail->item->name }}
                 </div>
             </div>
-            <div class="col m6 s6">
-                <h6 class="invoice-from">Lain-lain</h6>
-                <div class="row">
-                    <div class="col s3">
-                        Status
-                    </div>
-                    <div class="col s9">
-                        {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d/m/y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
-                    </div>
+            <div class="col s4 row mt-2">
+                <div class="col s12 center-align">
+                    LAIN-LAIN
+                </div>
+                <div class="col s4">
+                    Qty Planned
+                </div>
+                <div class="col s8">
+                    {{ number_format($data->productionScheduleDetail->qty,3,',','.').' '.$data->productionScheduleDetail->item->productionUnit->code }}
+                </div>
+                <div class="col s4">
+                    Gudang & Area
+                </div>
+                <div class="col s8">
+                    {{ $data->warehouse->name.' - '.($data->area()->exists() ? $data->area->name : '-') }}
                 </div>
             </div>
         </div>
-        <div class="divider mb-3 mt-3"></div>
-        <!-- product details table-->
-        <div class="invoice-product-details" style="min-width: 100%;overflow:auto;">
-            <table class="bordered" style="width:1800px;">
+        
+        <div class="invoice-product-details mt-2" style="overflow:auto;">
+            <table class="bordered">
                 <thead>
                     <tr>
-                        <th class="center-align">Proses</th>
-                        <th class="center-align">Item</th>
-                        <th class="center-align">Req.</th>
-                        <th class="center-align">Stok</th>
-                        <th class="center-align">Sat.</th>
-                        <th class="center-align">Keterangan</th>
-                        <th class="center-align">Tgl.Dipakai</th>
-                        <th class="center-align">Plant</th>
-                        <th class="center-align">Gudang</th>
-                        <th class="center-align">Line</th>
-                        <th class="center-align">Machine</th>
-                        <th class="center-align">Departemen</th>
-                        <th class="center-align">Requester</th>
+                        <th colspan="6" class="center-align">Daftar Komposisi dari BOM Terbaru</th>
+                    </tr>
+                    <tr>
+                        <th class="center-align">No.</th>
+                        <th class="center-align">Bahan/Biaya</th>
+                        <th class="center-align">Qty</th>
+                        <th class="center-align">Satuan (Produksi)</th>
+                        <th class="center-align">Nominal</th>
+                        <th class="center-align">Total</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($data->materialRequestDetail as $key => $row)
+                    @foreach($data->productionOrderDetail as $key => $row)
                     <tr>
-                        <td class="center-align">
-                            <label>
-                                <input type="checkbox" id="arr_status_material_request{{ $key }}" name="arr_status_material_request[]" value="{{ $row->id }}" {{ $row->status ? 'checked' : '' }}>
-                                <span>Pilih</span>
-                            </label>
-                        </td>
-                        <td>{{ $row->item->code.' - '.$row->item->name }}</td>
-                        <td class="right-align">{{ number_format($row->qty,3,',','.') }}</td>
-                        <td class="right-align">{{ number_format($row->stock,3,',','.') }}</td>
-                        <td class="center-align">{{ $row->item->buyUnit->code }}</td>
-                        <td>{{ $row->note }}</td>
-                        <td class="indigo-text center-align">{{ date('d/m/y',strtotime($row->required_date)) }}</td>
-                        <td class="center-align">{{ $row->place->code }}</td>
-                        <td class="center-align">{{ $row->warehouse->name }}</td>
-                        <td class="center-align">{{ $row->line()->exists() ? $row->line->code : '-' }}</td>
-                        <td class="center-align">{{ $row->machine()->exists() ? $row->machine->name : '-' }}</td>
-                        <td class="center-align">{{ $row->department()->exists() ? $row->department->name : '-' }}</td>
-                        <td class="">{{ $row->requester }}</td>
+                        <td class="center-align">{{ ($key + 1) }}</td>
+                        <td class="">{{ $row->item()->exists() ? $row->item->code.' - '.$row->item->name : ($row->coa()->exists() ? $row->coa->code.' - '.$row->coa->name : '') }}</td>
+                        <td class="right-align">{{ $row->item()->exists() ? number_format($row->qty,3,',','.') : '-' }}</td>
+                        <td class="center-align">{{ $row->item()->exists() ? $row->item->productionUnit->code : '-' }}</td>
+                        <td class="right-align">{{ $row->coa()->exists() ? number_format($row->nominal,2,',','.') : '-' }}</td>
+                        <td class="right-align">{{ $row->coa()->exists() ? number_format($row->total,2,',','.') : '-' }}</td>
                     </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
-    <!-- invoice subtotal -->
-    <div class="divider mt-3 mb-3"></div>
-        <div class="invoice-subtotal">
+
+        <!-- invoice subtotal -->
+        <div class="invoice-subtotal mt-2">
             <div class="row">
                 <div class="col m6 s6 l6">
                     {!! ucwords(strtolower($data->user->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
                 </div>
                 <div class="col m6 s6 l6">
-                    Catatan : {{ $data->note }}
+                    
                 </div>
             </div>
             <table class="mt-3" width="100%" border="0">
@@ -250,7 +239,7 @@
                             <div>{!! $data->user->signature() !!}</div>
                         @endif
                         <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $data->user->name }}</div>
-                        <div class="mt-1">{{ $data->user->position->Level->name.' '.$data->user->position->division->name }}</div>
+                        <div class="mt-1">{{ $data->user->position->Level->name.' - '.$data->user->position->division->name }}</div>
                     </td>
                     @if($data->approval())
                         @foreach ($data->approval() as $detail)

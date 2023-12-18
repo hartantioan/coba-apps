@@ -241,7 +241,17 @@
                             </td>
                             <td width="40%" class="left-align">
                                 <table border="0" width="100%">
-                                    
+                                    <tr>
+                                        <td width="34%">
+                                            Area
+                                        </td>
+                                        <td width="1%">
+                                            :
+                                        </td>
+                                        <td width="65%">
+                                            {{ $data->productionOrder->area()->exists() ? $data->productionOrder->area->name : '-' }}
+                                        </td>
+                                    </tr>
                                     <tr>
                                         <td width="34%">
                                             Shift

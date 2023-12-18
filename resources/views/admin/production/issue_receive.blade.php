@@ -123,6 +123,9 @@
                                                         <th>Shift</th>
                                                         <th>Line</th>
                                                         <th>Group</th>
+                                                        <th>Plant</th>
+                                                        <th>Gudang</th>
+                                                        <th>Area</th>
                                                         <th>Dokumen</th>
                                                         <th>Status</th>
                                                         <th>Operasi</th>
@@ -178,11 +181,11 @@
                                         </select>
                                         <label class="" for="company_id">Perusahaan</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step6">
+                                    <div class="input-field col m3 s12 step4">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                         <label class="active" for="post_date">Tgl. Post</label>
                                     </div>
-                                    <div class="file-field input-field col m3 s12 step7">
+                                    <div class="file-field input-field col m3 s12 step5">
                                         <div class="btn">
                                             <span>File</span>
                                             <input type="file" name="file" id="file">
@@ -198,16 +201,16 @@
                             <div class="col s12">
                                 <fieldset>
                                     <legend>2. Order Produksi</legend>
-                                    <div class="input-field col m3 s12 step8">
+                                    <div class="input-field col m3 s12 step6">
                                         <select class="browser-default" id="production_order_id" name="production_order_id"></select>
                                         <label class="active" for="production_order_id">Daftar Order Produksi</label>
                                     </div>
-                                    <div class="col m2 s12 step9">
+                                    <div class="col m2 s12 step7">
                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 mt-5" onclick="getProductionOrder();" href="javascript:void(0);">
                                             <i class="material-icons left">add</i> Order Produksi
                                         </a>
                                     </div>
-                                    <div class="col m4 s12 step10">
+                                    <div class="col m4 s12 step8">
                                         <h6>Data Terpakai : <i id="list-used-data"></i></h6>
                                     </div>
                                     <div class="col m12">
@@ -227,15 +230,15 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col s12">
+                            <div class="col s12 step9">
                                 <fieldset style="min-width: 100%;">
                                     <legend>3. Detail Item Issue Receive</legend>
-                                    <div class="col m12 s12 step12" style="overflow:auto;width:100% !important;">
+                                    <div class="col m12 s12" style="overflow:auto;width:100% !important;">
                                         <ul class="tabs">
-                                            <li class="tab col m3"><a class="active step19" href="#issue">Issue (Terpakai)</a></li>
-                                            <li class="tab col m3"><a class="step20" href="#receive">Receive (Terima)</a></li>
+                                            <li class="tab col m3"><a class="active" href="#issue">Issue (Terpakai)</a></li>
+                                            <li class="tab col m3"><a href="#receive">Receive (Terima)</a></li>
                                         </ul>
-                                        <div class="row step22">
+                                        <div class="row">
                                             <div id="issue" class="col s12 active">
                                                 <p class="mt-2 mb-2">
                                                     <table class="bordered" style="border: 1px solid;" id="table-detail-item-issue">
@@ -292,7 +295,7 @@
                         </div>
                         <div class="row">
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step13" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step10" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -423,6 +426,59 @@
     </div>
 </div>
 
+<div id="modal6" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content">
+        <div class="row" >
+            <div class="col m3 s12">
+                
+            </div>
+            <div class="col m6 s12">
+                <h4 id="title_data" style="text-align:center"></h4>
+                <h5 id="code_data" style="text-align:center"></h5>
+            </div>
+            <div class="col m3 s12 right-align">
+                <img src="{{ url('website/logo_web_fix.png') }}" width="40%" height="60%">
+            </div>
+        </div>
+        <div class="divider mb-1 mt-2"></div>
+        <div class="row">
+            <div class="col" id="user_jurnal">
+            </div>
+            <div class="col" id="post_date_jurnal">
+            </div>
+            <div class="col" id="note_jurnal">
+            </div>
+            <div class="col" id="ref_jurnal">
+            </div>
+        </div>
+        <div class="row mt-2">
+            <table class="bordered Highlight striped">
+                <thead>
+                        <tr>
+                            <th class="center-align">No</th>
+                            <th class="center-align">Coa</th>
+                            <th class="center-align">Perusahaan</th>
+                            <th class="center-align">Partner Bisnis</th>
+                            <th class="center-align">Plant</th>
+                            <th class="center-align">Line</th>
+                            <th class="center-align">Mesin</th>
+                            <th class="center-align">Department</th>
+                            <th class="center-align">Gudang</th>
+                            <th class="center-align">Debit</th>
+                            <th class="center-align">Kredit</th>
+                        </tr>
+                    
+                </thead>
+                <tbody id="body-journal-table">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+    </div>
+</div>
+
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
@@ -488,6 +544,23 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
+            }
+        });
+
+        $('#modal6').modal({
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) { 
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#title_data').empty();
+                $('#code_data').empty();             
+                $('#body-journal-table').empty();
+                $('#user_jurnal').empty();
+                $('#note_jurnal').empty();
+                $('#ref_jurnal').empty();
+                $('#post_date_jurnal').empty();
             }
         });
 
@@ -758,7 +831,7 @@
                             let optionStock = `<select class="browser-default" id="arr_item_stock_id` + count + `" name="arr_item_stock_id[]">`;
                             if(val.list_stock.length > 0){
                                 $.each(val.list_stock, function(i, valkuy) {
-                                    optionStock += `<option value="` + valkuy.id + `">` + valkuy.warehouse + ` - ` + valkuy.qty_production + `</option>`;
+                                    optionStock += `<option value="` + valkuy.id + `" data-qty="` + valkuy.qty_production_raw + `">` + valkuy.warehouse + ` - ` + valkuy.qty_production + `</option>`;
                                 });
                             }else{
                                 optionStock += `<option value="">--Maaf, item ini tidak memiliki stock--</option>`;
@@ -786,7 +859,7 @@
                                         ` + val.qty + `
                                     </td>
                                     <td class="center">
-                                        ` + (val.lookable_type == 'items' ? `<input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100%;" id="rowQty`+ count +`" required>` : '-') + `
+                                        ` + (val.lookable_type == 'items' ? `<input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);checkRowQty('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required>` : '-') + `
                                     </td>
                                     <td class="center">
                                         ` + val.lookable_unit + `
@@ -797,9 +870,19 @@
                                 </tr>
                             `);
                             no_issue++;
+                            $('#rowQty' + count).trigger('keyup');
                         });
 
                         var count = makeid(10);
+
+                        let datalist = `<datalist id="list-shading` + count + `">`;
+                        if(datakuy.list_shading.length > 0){
+                            $.each(datakuy.list_shading, function(i, valkuy) {
+                                datalist += `<option value="` + valkuy.code + `">` + valkuy.code + `</option>`;
+                            });
+                        }
+                        datalist += `</datalist>`;
+
                         $('#body-item-receive').append(`
                             <tr class="row_item_receive" data-id="` + $('#production_order_id').val() + `">
                                 <input type="hidden" name="arr_type[]" value="2">
@@ -834,7 +917,8 @@
                                     <b id="pallet-unit` + count + `">-</b>&nbsp;<b>` + datakuy.item_receive_unit_pallet + `</b>
                                 </td>
                                 <td class="center">
-                                    <input name="arr_shading[]" class="browser-default" type="text" placeholder="Kode Shading..." style="width:100%;" required>
+                                    <input list="list-shading` + count + `" name="arr_shading[]" class="browser-default" id="arr_shading` + count + `" type="text" placeholder="Kode Shading..." style="width:100%;" required>
+                                    ` + datalist + `
                                 </td>
                                 <td class="center">
                                     <input name="arr_batch[]" class="browser-default" type="text" placeholder="Nomor batch..." style="width:100%;" required>
@@ -879,6 +963,18 @@
                     </td>
                 </tr>
             `);
+        }
+    }
+
+    function checkRowQty(val){
+        if($('#arr_item_stock_id' + val).val()){
+            let qtyMax = parseFloat($('#arr_item_stock_id' + val).find(':selected').data('qty').replaceAll(".", "").replaceAll(",","."));
+            let qtyNow = parseFloat($('#rowQty' + val).val().replaceAll(".", "").replaceAll(",","."));
+            if(qtyNow > qtyMax){
+                $('#rowQty' + val).val(
+                    (qtyMax >= 0 ? '' : '-') + formatRupiahIni(qtyMax.toFixed(3).toString().replace('.',','))
+                );
+            }
         }
     }
 
@@ -1099,6 +1195,9 @@
                 { name: 'shift', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'line', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'group', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'plant_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'warehouse_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'area_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
@@ -1289,7 +1388,7 @@
                     let optionStock = `<select class="browser-default" id="arr_item_stock_id` + count + `" name="arr_item_stock_id[]">`;
                     if(val.list_stock.length > 0){
                         $.each(val.list_stock, function(i, valkuy) {
-                            optionStock += `<option value="` + valkuy.id + `" ` + (val.item_stock_id == valkuy.id ? 'selected' : '') + `>` + valkuy.warehouse + ` - ` + valkuy.qty_production + `</option>`;
+                            optionStock += `<option value="` + valkuy.id + `" ` + (val.item_stock_id == valkuy.id ? 'selected' : '') + ` data-qty="` + valkuy.qty_production_raw + `">` + valkuy.warehouse + ` - ` + valkuy.qty_production + `</option>`;
                         });
                     }else{
                         optionStock += `<option value="">--Maaf, item ini tidak memiliki stock--</option>`;
@@ -1317,7 +1416,7 @@
                                 ` + val.qty_standard + `
                             </td>
                             <td class="center">
-                                ` + (val.lookable_type == 'items' ? `<input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100%;" id="rowQty`+ count +`" required>` : '-') + `
+                                ` + (val.lookable_type == 'items' ? `<input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);checkRowQty('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required>` : '-') + `
                             </td>
                             <td class="center">
                                 ` + val.lookable_unit + `
@@ -1560,8 +1659,8 @@
             exitOnOverlayClick : false,
             steps: [
                 {
-                    title : 'Jadwal Produksi',
-                    intro : 'Form ini digunakan untuk mengelola data penjadwalan produksi sesuai .'
+                    title : 'Issue Receive Produksi',
+                    intro : 'Form ini digunakan untuk mengelola data hasil produksi untuk bahan yang digunakan maupun hasil dari produksi. Satu Order Produksi hanya bisa ditarik ke satu dokumen Issue Receive Produksi.'
                 },
                 {
                     title : 'Nomor Dokumen',
@@ -1579,56 +1678,71 @@
                     intro : 'Perusahaan dimana dokumen ini dibuat.' 
                 },
                 {
-                    title : 'Plant',
-                    element : document.querySelector('.step4'),
-                    intro : 'Plant dimana produksi akan dijalankan.' 
-                },
-                {
-                    title : 'Mesin',
-                    element : document.querySelector('.step5'),
-                    intro : 'Mesin yang digunakan dalam proses produksi. Akan otomatis terisi berdasarkan daftar mesin yang menempel pada data Plant terpilih.' 
-                },
-                {
                     title : 'Tgl. Posting',
-                    element : document.querySelector('.step6'),
+                    element : document.querySelector('.step4'),
                     intro : 'Tanggal posting yang akan muncul pada saat dokumen dicetak, difilter atau diproses pada form lainnya.' 
                 },
                 {
                     title : 'File Lampiran',
-                    element : document.querySelector('.step7'),
+                    element : document.querySelector('.step5'),
                     intro : 'Silahkan unggah file lampiran. Untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
                 },
                 {
-                    title : 'Marketing Order Plan',
+                    title : 'Daftar Order Produksi',
+                    element : document.querySelector('.step6'),
+                    intro : 'Silahkan pilih dokumen Order Produksi yang ingin ditarik komposisi bahannya dari BOM untuk diproses.' 
+                },
+                {
+                    title : 'Tombol tambah Order Produksi',
+                    element : document.querySelector('.step7'),
+                    intro : 'Tombol untuk menambahkan data BOM dari Order Produksi terpilih ke dalam tabel Issue dan Receive.' 
+                },
+                {
+                    title : 'Data Order Produksi Terpakai',
                     element : document.querySelector('.step8'),
-                    intro : 'Silahkan pilih MOP yang ingin diproses produksinya. Anda bisa memilih lebih dari satu MOP untuk satu kali transaksi dokumen Jadwal Produksi.' 
+                    intro : 'Data Order Produksi yang terpakai pada saat ditambahkan ke dalam sistem sesuai dengan pengguna aktif saat ini. Silahkan hapus bisa diakses oleh pengguna lainnya.' 
                 },
                 {
-                    title : 'Tombol tambah MOP',
+                    title : 'Detail Issue Item/Resource dan Receive Item',
                     element : document.querySelector('.step9'),
-                    intro : 'Tombol untuk menambahkan data item MOP ke dalam tabel 3 Detail Target Produksi.' 
-                },
-                {
-                    title : 'Data MOP Terpakai',
-                    element : document.querySelector('.step10'),
-                    intro : 'Data MOP yang terpakai pada saat ditambahkan ke dalam sistem sesuai dengan pengguna aktif saat ini. Silahkan hapus agar MOP bisa diakses oleh pengguna lainnya.' 
-                },
-                {
-                    title : 'Detail Target Produksi',
-                    element : document.querySelector('.step11'),
-                    intro : 'Berisi detail produk / item yang ingin dijadikan target proses Produksi.'
-                },
-                {
-                    title : 'Detail Shift',
-                    element : document.querySelector('.step12'),
-                    intro : 'Berisi detail produk / item yang ingin dijadikan target proses Produksi serta shift yang ingin dicatat.'
+                    intro : 'Berisi detail item/resource issue dan receive.'
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step13'),
+                    element : document.querySelector('.step10'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]
         }).start();
+    }
+
+    function viewJournal(id){
+        $.ajax({
+            url: '{{ Request::url() }}/view_journal/' + id,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                if(data.status == '500'){
+                    M.toast({
+                        html: data.message
+                    });
+                }else{
+                    $('#modal6').modal('open');
+                    $('#title_data').append(``+data.title+``);
+                    $('#code_data').append(data.message.code);
+                    $('#body-journal-table').append(data.tbody);
+                    $('#user_jurnal').append(`Pengguna `+data.user);
+                    $('#note_jurnal').append(`Keterangan `+data.message.note);
+                    $('#ref_jurnal').append(`Referensi `+data.reference);
+                    $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
+                }
+            }
+        });
     }
 </script>

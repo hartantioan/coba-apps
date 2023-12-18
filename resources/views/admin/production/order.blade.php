@@ -111,6 +111,7 @@
                                                         <th>Line</th>
                                                         <th>Grup</th>
                                                         <th>Gudang</th>
+                                                        <th>Area</th>
                                                         <th>Status</th>
                                                         <th>Operasi</th>
                                                     </tr>
@@ -146,6 +147,7 @@
                                     <legend>1. Informasi Utama</legend>
                                     <div class="input-field col m2 s12 step1">
                                         <input type="hidden" id="temp" name="temp">
+                                        <input type="hidden" id="isSalesItem" name="isSalesItem">
                                         <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                                         <label class="active" for="code">No. Dokumen</label>
                                     </div>
@@ -180,19 +182,28 @@
                             <div class="col s12">
                                 <fieldset>
                                     <legend>2. Detail Item</legend>
-                                    <div class="input-field col m4 s12 step6">
+                                    <div class="input-field col m3 s12 step6">
                                         <select class="browser-default" id="production_schedule_id" name="production_schedule_id" onchange="resetProductionSchedule();"></select>
                                         <label class="active" for="production_schedule_id">Jadwal Produksi</label>
                                     </div>
-                                    <div class="input-field col m4 s12 step7">
+                                    <div class="input-field col m3 s12 step7">
                                         <select class="browser-default" id="production_schedule_detail_id" name="production_schedule_detail_id" onchange="getProductionSchedule();"></select>
                                         <label class="active" for="production_schedule_detail_id">Daftar Item</label>
                                     </div>
-                                    <div class="input-field col m4 s12 step8">
+                                    <div class="input-field col m3 s12 step8">
                                         <select class="browser-default" id="warehouse_id" name="warehouse_id">
                                             <option value="">Silahkan pilih Jadwal Produksi</option>
                                         </select>
                                         <label class="active" for="warehouse_id">Gudang</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step8">
+                                        <select class="browser-default" id="area_id" name="area_id">
+                                            <option value="">--kosong--</option>
+                                            @foreach ($area as $row)
+                                                <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="active" for="area_id">Area</label>
                                     </div>
                                     <div class="col m12">
                                         <div class="row">
@@ -466,13 +477,14 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
-                $('#temp').val('');
+                $('#temp,#isSalesItem').val('');
                 M.updateTextFields();
                 $('#production_schedule_id').empty();
                 resetProductionSchedule();
                 window.onbeforeunload = function() {
                     return null;
                 };
+                $('#area_id option[value!=""]').hide();
             }
         });
 
@@ -481,6 +493,8 @@
         });
 
         select2ServerSide('#production_schedule_id', '{{ url("admin/select2/production_schedule") }}');
+
+        $('#area_id option[value!=""]').hide();
 
         $('#production_schedule_detail_id').select2({
             placeholder: '-- Kosong --',
@@ -676,11 +690,26 @@
                     </tr>
                 `);
             });
-            $.each(datakuy.warehouses, function(i, val) {
-                $('#warehouse_id').append(`
-                    <option value="` + val.id + `">` + val.name + `</option>
-                `);
-            });
+            
+            if(datakuy.is_sales_item){
+                $('#isSalesItem').val(datakuy.is_sales_item);
+                $('#area_id option[value!=""]').show();
+                @if($warehouse)
+                    $('#warehouse_id').append(`
+                        <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                    `);
+                @else
+                    $('#warehouse_id').append(`
+                        <option value="">Gudang transit tidak ditemukan.</option>
+                    `);
+                @endif
+            }else{
+                $.each(datakuy.warehouses, function(i, val) {
+                    $('#warehouse_id').append(`
+                        <option value="` + val.id + `">` + val.name + `</option>
+                    `);
+                });
+            }
             $('#output-qty').text(datakuy.qty);
             $('#output-shift').text(datakuy.shift);
             $('#output-group').text(datakuy.group);
@@ -696,6 +725,8 @@
             $('#warehouse_id').append(`
                 <option value="">Silahkan pilih Jadwal Produksi</option>
             `);
+            $('#isSalesItem').val('');
+            $('#area_id option[value!=""]').hide();
         }
     }
 
@@ -893,6 +924,7 @@
                 { name: 'line_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'group', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'warehouse_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'area_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -1083,15 +1115,33 @@
                 $('#body-item').empty();
                 $('#warehouse_id').empty();
                 $('#output-qty,#output-shift,#output-group,#output-line').text('-');
-                $.each(response.warehouses, function(i, val) {
-                    $('#warehouse_id').append(`
-                        <option value="` + val.id + `">` + val.name + `</option>
-                    `);
-                });
+                if(response.is_sales_item){
+                    @if($warehouse)
+                        $('#warehouse_id').append(`
+                            <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                        `);
+                    @else
+                        $('#warehouse_id').append(`
+                            <option value="">Gudang transit tidak ditemukan.</option>
+                        `);
+                    @endif
+                }else{
+                    $.each(response.warehouses, function(i, val) {
+                        $('#warehouse_id').append(`
+                            <option value="` + val.id + `">` + val.name + `</option>
+                        `);
+                    });
+                }
                 $('#output-qty').text(response.qty);
                 $('#output-shift').text(response.shift);
                 $('#output-group').text(response.group);
                 $('#output-line').text(response.line);
+
+                if(response.is_sales_item){
+                    $('#isSalesItem').val(response.is_sales_item);
+                    $('#area_id option[value!=""]').show();
+                    $('#area_id').val(response.area_id);
+                }
 
                 if(response.details.length > 0){
                     $.each(response.details, function(i, val) {

@@ -446,6 +446,7 @@ class MarketingOrderDeliveryProcess extends Model
                 'OUT',
                 $modp->post_date,
                 $row->area_id,
+                NULL,
             );
 
             CustomHelper::sendStock(
@@ -455,6 +456,7 @@ class MarketingOrderDeliveryProcess extends Model
                 $row->qty * $row->item->sell_convert,
                 'OUT',
                 $row->area_id,
+                NULL,
             );
         }
     }

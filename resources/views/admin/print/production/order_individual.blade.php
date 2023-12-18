@@ -254,25 +254,25 @@
                             <td width="40%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
-                                        <td width="24%">
+                                        <td width="34%">
                                             Qty Planned
                                         </td>
                                         <td width="1%">
                                             :
                                         </td>
-                                        <td width="75%">
+                                        <td width="65%">
                                             {{ number_format($data->productionScheduleDetail->qty,3,',','.').' '.$data->productionScheduleDetail->item->productionUnit->code }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            Gudang
+                                            Gudang & Area
                                         </td>
                                         <td width="1%">
                                             :
                                         </td>
                                         <td>
-                                            {{ $data->warehouse->name }}
+                                            {{ $data->warehouse->name.' - '.($data->area()->exists() ? $data->area->name : '-') }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -287,24 +287,35 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="24%" style="vertical-align: top;">
-                                            Grup
+                                        <td>
+                                            Tgl.Produksi
                                         </td>
-                                        <td width="1%" style="vertical-align: top;">
+                                        <td width="1%">
                                             :
                                         </td>
-                                        <td width="75%" style="vertical-align: top;">
+                                        <td>
+                                            {{ date('d/m/y',strtotime($data->productionScheduleDetail->production_date)) }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="vertical-align: top;">
+                                            Grup
+                                        </td>
+                                        <td style="vertical-align: top;">
+                                            :
+                                        </td>
+                                        <td style="vertical-align: top;">
                                             {{ $data->productionScheduleDetail->group }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="24%" style="vertical-align: top;">
+                                        <td style="vertical-align: top;">
                                             Line
                                         </td>
-                                        <td width="1%" style="vertical-align: top;">
+                                        <td style="vertical-align: top;">
                                             :
                                         </td>
-                                        <td width="75%" style="vertical-align: top;">
+                                        <td style="vertical-align: top;">
                                             {{ $data->productionScheduleDetail->line->code }}
                                         </td>
                                     </tr>
@@ -337,7 +348,7 @@
                     <table class="bordered" border="1" width="100%" class="table-data-item" style="border-collapse:collapse">
                         <thead>
                             <tr>
-                                <th colspan="6" class="center-align">Daftar Target Berdasarkan Marketing Order Plan</th>
+                                <th colspan="6" class="center-align">Daftar Komposisi dari BOM Terbaru</th>
                             </tr>
                             <tr>
                                 <th align="center">No.</th>

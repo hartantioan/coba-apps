@@ -120,10 +120,10 @@ class TaxController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code' 				=> $request->temp ? ['required', Rule::unique('banks', 'code')->ignore($request->temp)] : 'required|unique:banks,code',
+            'code' 				=> $request->temp ? ['required', Rule::unique('taxes', 'code')->ignore($request->temp)] : 'required|unique:taxes,code',
             'name'              => 'required',
-            'coa_purchase_id'   => 'required',
-            'coa_sale_id'       => 'required',
+            'coa_purchase_id'   => $request->type == '-' || $request->type == '+' ? 'required' : '',
+            'coa_sale_id'       => $request->type == '+' ? 'required' : '',
             'type'              => 'required',
             'percentage'        => 'required',
         ], [
@@ -148,24 +148,24 @@ class TaxController extends Controller
                     $query = Tax::find($request->temp);
                     $query->code            = $request->code;
                     $query->name	        = $request->name;
-                    $query->coa_purchase_id = $request->coa_purchase_id;
-                    $query->coa_sale_id     = $request->coa_sale_id;
+                    $query->coa_purchase_id = $request->coa_purchase_id ? $request->coa_purchase_id : NULL;
+                    $query->coa_sale_id     = $request->coa_sale_id ? $request->coa_sale_id : NULL;
                     $query->type            = $request->type;
                     $query->percentage      = str_replace(',','.',str_replace('.','',$request->percentage));
                     $query->is_default_ppn  = $request->is_default_ppn ? $request->is_default_ppn : '0';
-                    $query->is_default_pph  = $request->is_default_pph ? $request->is_default_pph : '0';
+                    $query->is_default_pph  = $request->is_default_pph ? '1' : '0';
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                 }else{
                     $query = Tax::create([
                         'code'              => $request->code,
                         'name'			    => $request->name,
-                        'coa_purchase_id'   => $request->coa_purchase_id,
-                        'coa_sale_id'       => $request->coa_sale_id,
+                        'coa_purchase_id'   => $request->coa_purchase_id ? $request->coa_purchase_id : NULL,
+                        'coa_sale_id'       => $request->coa_sale_id ? $request->coa_sale_id : NULL,
                         'type'              => $request->type,
                         'percentage'        => str_replace(',','.',str_replace('.','',$request->percentage)),
                         'is_default_ppn'    => $request->is_default_ppn ? $request->is_default_ppn : '0',
-                        'is_default_pph'    => $request->is_default_pph ? $request->is_default_pph : '0',
+                        'is_default_pph'    => $request->is_default_pph ? '1' : '0',
                         'status'            => $request->status ? $request->status : '2'
                     ]);
                 }
@@ -201,8 +201,8 @@ class TaxController extends Controller
     public function show(Request $request){
         $tax = Tax::find($request->id);
         $tax['percentage'] = number_format($tax->percentage,2,',','.');
-        $tax['coa_purchase_name'] = $tax->coa_purchase_id ? $tax->coaPurchase->name.' - '.$tax->coaPurchase->name : '-';
-        $tax['coa_sale_name'] = $tax->coa_sale_id ? $tax->coaSale->name.' - '.$tax->coaSale->name : '-';
+        $tax['coa_purchase_name'] = $tax->coa_purchase_id ? $tax->coaPurchase->name.' - '.$tax->coaPurchase->name : '';
+        $tax['coa_sale_name'] = $tax->coa_sale_id ? $tax->coaSale->name.' - '.$tax->coaSale->name : '';
         				
 		return response()->json($tax);
     }

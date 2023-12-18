@@ -1763,6 +1763,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('remove_used_data', [ProductionIssueReceiveController::class, 'removeUsedData']);
                     Route::post('create',[ProductionIssueReceiveController::class, 'create'])->middleware('operation.access:production_issue_receive,update');
                     Route::post('send_used_data',[ProductionIssueReceiveController::class, 'sendUsedData'])->middleware('operation.access:production_issue_receive,update');
+                    Route::get('view_journal/{id}',[ProductionIssueReceiveController::class, 'viewJournal'])->middleware('operation.access:production_issue_receive,journal');
                     Route::get('approval/{id}',[ProductionIssueReceiveController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::get('print_individual/{id}',[ProductionIssueReceiveController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [ProductionIssueReceiveController::class, 'voidStatus'])->middleware('operation.access:production_issue_receive,void');

@@ -165,12 +165,11 @@
                             <td style="margin-top: -2px;">
                                 <small style="font-size:1em">Diajukan: {{ date('d/m/y',strtotime($data->post_date)) }}</small>
                                 <small style="font-size:1em">Hingga: {{ date('d/m/y',strtotime($data->due_date)) }}</small>
-                                <small style="font-size:1em">Dipakai: {{ date('d/m/y',strtotime($data->required_date)) }}</small>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <h5 style="margin-top: -2px">Purchase Request</h5>
+                                <h3 style="margin-top: -2px">Purchase Request</h3>
                             </td>
                         </tr>
                                 
@@ -250,11 +249,12 @@
                     <table class="bordered" border="1" width="100%" class="table-data-item" style="border-collapse:collapse">
                         <thead>
                             <tr>
+                                <th class="center">No</th>
                                 <th class="center">Item</th>
                                 <th class="center">Jum.</th>
                                 <th class="center">Sat.</th>
-                                <th class="center">Catatan 1</th>
-                                <th class="center">Catatan 2</th>
+                                <th class="center">Ket. 1</th>
+                                <th class="center">Ket. 2</th>
                                 <th class="center">Tgl.Dipakai</th>
                                 <th class="center">Plant</th>
                                 <th class="center">Gudang</th>
@@ -262,17 +262,26 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($data->purchaseRequestDetail as $row)
+                            @foreach($data->purchaseRequestDetail as $key => $row)
                             <tr>
+                                <td align="center" rowspan="2">{{ $key+1 }}.</td>
                                 <td>{{ $row->item->name }}</td>
-                                <td class="center" align="right">{{ $row->qty }}</td>
-                                <td class="center">{{ $row->item->buyUnit->code }}</td>
+                                <td align="right">{{ $row->qty }}</td>
+                                <td align="center">{{ $row->item->buyUnit->code }}</td>
                                 <td>{{ $row->note }}</td>
                                 <td>{{ $row->note2 }}</td>
-                                <td class="indigo-text center">{{ date('d/m/y',strtotime($row->required_date)) }}</td>
-                                <td class="center">{{ $row->place->name.' - '.$row->place->company->name }}</td>
-                                <td class="center">{{ $row->warehouse->name }}</td>
-                                <td class="center">{{ $row->department()->exists() ? $row->department->name : '-' }}</td>
+                                <td align="center">{{ date('d/m/y',strtotime($row->required_date)) }}</td>
+                                <td align="center">{{ $row->place->code }}</td>
+                                <td align="center">{{ $row->warehouse->name }}</td>
+                                <td align="center">{{ $row->department()->exists() ? $row->department->name : '-' }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="9">
+                                    <b>Line</b> : {{ $row->line()->exists() ? $row->line->code : '-' }},  
+                                    <b>Mesin</b> : {{ $row->machine()->exists() ? $row->machine->name : '-' }},
+                                    <b>Requester</b> : {{ $row->requester }},
+                                    <b>Proyek</b> : {{ $row->project()->exists() ? $row->project->name : '-' }}
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>

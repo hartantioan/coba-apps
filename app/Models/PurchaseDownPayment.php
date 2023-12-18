@@ -24,6 +24,9 @@ class PurchaseDownPayment extends Model
         'is_tax',
         'is_include_tax',
         'percent_tax',
+        'wtax_id',
+        'percent_wtax',
+        'top',
         'post_date',
         'due_date',
         'status',
@@ -38,6 +41,7 @@ class PurchaseDownPayment extends Model
         'grandtotal',
         'document',
         'note',
+        'note_external',
         'void_id',
         'void_note',
         'void_date'
@@ -58,9 +62,14 @@ class PurchaseDownPayment extends Model
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
     }
 
-    public function tax()
+    public function taxModel()
     {
         return $this->belongsTo('App\Models\Tax', 'tax_id', 'id')->withTrashed();
+    }
+
+    public function wtaxModel()
+    {
+        return $this->belongsTo('App\Models\Tax', 'wtax_id', 'id')->withTrashed();
     }
 
     public function voidUser()
@@ -74,9 +83,8 @@ class PurchaseDownPayment extends Model
 
     public function isIncludeTax(){
         $type = match ($this->is_include_tax) {
-          '0' => 'Tidak Termasuk',
           '1' => 'Termasuk',
-          default => 'Invalid',
+          default => 'Tidak Termasuk',
         };
 
         return $type;
@@ -95,8 +103,7 @@ class PurchaseDownPayment extends Model
     public function type(){
         $type = match ($this->type) {
           '1' => 'Cash',
-          '2' => 'Transfer',
-          '3' => 'Giro/Check',
+          '2' => 'Credit',
           default => 'Invalid',
         };
 

@@ -72,6 +72,7 @@
                                                         <th>Kode</th>
                                                         <th>Nama</th>
                                                         <th>Keterangan</th>
+                                                        <th>Gudang Transit</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -100,16 +101,27 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s3">
                             <input type="hidden" id="temp" name="temp">
                             <input id="name" name="name" type="text" placeholder="Nama Gudang">
                             <label class="active" for="name">Nama</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s3">
                             <input id="note" name="note" type="text" placeholder="Keterangan">
                             <label class="active" for="note">Keterangan</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s3">
+                            <div class="switch mb-1">
+                                <label for="is_transit_warehouse">Gudang Transit</label>
+                                <label class="right">
+                                    Tidak
+                                    <input type="checkbox" id="is_transit_warehouse" name="is_transit_warehouse" value="1">
+                                    <span class="lever"></span>
+                                    Ya
+                                </label>
+                            </div>
+                        </div>
+                        <div class="input-field col s3">
                             <div class="switch mb-1">
                                 <label for="status">Status</label>
                                 <label class="right">
@@ -199,6 +211,7 @@
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
                 { name: 'note', className: 'center-align' },
+                { name: 'is_transit_warehouse', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -336,6 +349,12 @@
                     $('#status').prop( "checked", true);
                 }else{
                     $('#status').prop( "checked", false);
+                }
+
+                if(response.is_transit_warehouse == '1'){
+                    $('#is_transit_warehouse').prop( "checked", true);
+                }else{
+                    $('#is_transit_warehouse').prop( "checked", false);
                 }
 
                 $('.modal-content').scrollTop(0);

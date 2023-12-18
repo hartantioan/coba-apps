@@ -35,6 +35,7 @@ class PurchaseOrder extends Model
         'post_date',
         'delivery_date',
         'note',
+        'note_external',
         'subtotal',
         'discount',
         'total',

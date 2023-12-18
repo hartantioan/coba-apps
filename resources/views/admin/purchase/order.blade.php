@@ -10,6 +10,10 @@
     .select-wrapper, .select2-container {
         height:auto !important;
     }
+
+    .preserveLines {
+        white-space: pre-line;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -165,7 +169,6 @@
                                                         <th rowspan="2">Pengguna</th>
                                                         <th rowspan="2">Supplier</th>
                                                         <th rowspan="2">Tipe PO</th>
-                                                        <th rowspan="2">Jenis PO</th>
                                                         <th rowspan="2">Pengiriman</th>
                                                         <th rowspan="2">Perusahaan</th>
                                                         <th colspan="2" class="center">Proforma</th>
@@ -252,15 +255,6 @@
                                 </select>
                                 <label class="" for="inventory_type">Tipe Pembelian</label>
                             </div>
-                            <div class="input-field col m3 s12 step5">
-                                <select class="form-control" id="purchasing_type" name="purchasing_type">
-                                    <option value="1">Standart PO</option>
-                                    <option value="2">Planned PO</option>
-                                    <option value="3">Blanked PO</option>
-                                    <option value="4">Contract PO</option>
-                                </select>
-                                <label class="" for="purchasing_type">Kategori PO</label>
-                            </div>
                             <div class="input-field col m3 s12 step6">
                                 <select class="form-control" id="shipping_type" name="shipping_type">
                                     <option value="1">Franco</option>
@@ -269,9 +263,9 @@
                                 <label class="" for="shipping_type">Tipe Pengiriman</label>
                             </div>
                             <div class="input-field col m3 s12 step7">
-                                <select class="form-control" id="company_id" name="company_id">
+                                <select class="form-control" id="company_id" name="company_id" onchange="getCompanyAddress();">
                                     @foreach ($company as $rowcompany)
-                                        <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
+                                        <option value="{{ $rowcompany->id }}" data-address="{{ $rowcompany->address }}">{{ $rowcompany->name }}</option>
                                     @endforeach
                                 </select>
                                 <label class="" for="company_id">Perusahaan</label>
@@ -284,8 +278,6 @@
                                 <select class="form-control" id="payment_type" name="payment_type" onchange="resetTerm()">
                                     <option value="1">Cash</option>
                                     <option value="2">Credit</option>
-                                    <option value="3">CBD</option>
-                                    <option value="4">DP</option>
                                 </select>
                                 <label class="" for="payment_type">Tipe Pembayaran</label>
                             </div>
@@ -315,15 +307,15 @@
                             </div>
                             <div class="input-field col m3 s12 step15">
                                 <input id="receiver_name" name="receiver_name" type="text" placeholder="Nama Penerima">
-                                <label class="active" for="receiver_name">Nama Penerima</label>
+                                <label class="active" for="receiver_name">Nama Penerima (Opsional)</label>
                             </div>
                             <div class="input-field col m3 s12 step16">
                                 <input id="receiver_address" name="receiver_address" type="text" placeholder="Alamat Penerima">
-                                <label class="active" for="receiver_address">Alamat Penerima</label>
+                                <label class="active" for="receiver_address">Alamat Penerima (Opsional)</label>
                             </div>
                             <div class="input-field col m3 s12 step17">
                                 <input id="receiver_phone" name="receiver_phone" type="text" placeholder="Kontak Penerima">
-                                <label class="active" for="receiver_phone">Kontak Penerima</label>
+                                <label class="active" for="receiver_phone">Kontak Penerima (Opsional)</label>
                             </div>
                             <div class="file-field input-field col m3 s12 step18">
                                 <div class="btn">
@@ -335,7 +327,7 @@
                                 </div>
                             </div>
                             <div class="col m12 s12">
-                                <div class="col m3 s3 step19">
+                                <div class="col m3 s3 step19" id="pr-show">
                                     <p class="mt-2 mb-2">
                                         <h5>Purchase Request</h5>
                                         <div class="row">
@@ -351,7 +343,7 @@
                                         </div> 
                                     </p>
                                 </div>
-                                <div class="col m3 s3 step20">
+                                <div class="col m3 s3 step20" id="gi-show">
                                     <p class="mt-2 mb-2">
                                         <h5>Goods Issue / Barang Keluar</h5>
                                         <div class="row">
@@ -367,7 +359,7 @@
                                         </div>
                                     </p>
                                 </div>
-                                <div class="col m3 s3 step20">
+                                <div class="col m3 s3 step20" id="sj-show">
                                     <p class="mt-2 mb-2">
                                         <h5>Surat Jalan / Penjualan</h5>
                                         <div class="row">
@@ -425,12 +417,13 @@
                                                 <th class="center">Mesin</th>
                                                 <th class="center">Departemen</th>
                                                 <th class="center">Gudang</th>
+                                                <th class="center">Requester</th>
                                                 <th class="center">Hapus</th>
                                             </tr>
                                         </thead>
                                         <tbody id="body-item">
                                             <tr id="last-row-item">
-                                                <td colspan="19" class="center">
+                                                <td colspan="20" class="center">
                                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                         <i class="material-icons left">add</i> New Item
                                                     </a>
@@ -444,10 +437,11 @@
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
-                            <div class="input-field col m4 s12">
-
-                            </div>
                             <div class="input-field col m4 s12 step24">
+                                <textarea class="materialize-textarea preserveLines" id="note_external" name="note_external" placeholder="Keterangan Tambahan" rows="3"></textarea>
+                                <label class="active" for="note_external">Keterangan Tambahan (muncul pada printout)</label>
+                            </div>
+                            <div class="input-field col m4 s12 step25">
                                 <table width="100%" class="bordered">
                                     <thead>
                                         <tr>
@@ -482,7 +476,7 @@
                                 </table>
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step25" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step26" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -710,7 +704,9 @@
                 };
                 if(!$('#temp').val()){
                     loadCurrency();
+                    $('#company_id').trigger('change');
                 }
+                $('#pr-show,#gi-show,#sj-show').show();
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
@@ -1111,10 +1107,12 @@
     var tempTerm = 0;
 
     function resetTerm(){
-        if($('#payment_type').val() == '1'){
-            $('#payment_term').val('0');
-        }else{
+        if(tempTerm > 0){
+            $('#payment_type').val('2').formSelect();
             $('#payment_term').val(tempTerm);
+        }else{
+            $('#payment_type').val('1').formSelect();
+            $('#payment_term').val('0');
         }
     }
 
@@ -1127,17 +1125,27 @@
         resetTerm();
     }
 
+    function getCompanyAddress(){
+        if($('#company_id').val()){
+            let address = $('#company_id').find(':selected').data('address');
+            $('#receiver_address').val(address);
+        }
+    }
+
     function getDetails(type){
 
         let nil;
 
         if(type == 'po'){
             nil = $('#purchase_request_id').val();
+            $('#gi-show,#sj-show').hide();
         }else if(type == 'gi'){
             nil = $('#good_issue_id').val();
+            $('#pr-show,#sj-show').hide();
         }else if(type == 'sj'){
             nil = $('#marketing_order_delivery_process_id').val();
             $('#inventory_type').val('2').trigger('change').formSelect();
+            $('#pr-show,#gi-show').hide();
         }
 
         if(mode){
@@ -1286,6 +1294,9 @@
                                             <td class="center">
                                                 -
                                             </td>
+                                            <td>
+                                                <input name="arr_requester[]" type="text" placeholder="Yang meminta barang & jasa / requester" value="` + val.requester + `" required>
+                                            </td>
                                             <td class="center">
                                                 <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                                     <i class="material-icons">delete</i>
@@ -1385,6 +1396,9 @@
                                             </td>
                                             <td>
                                                 <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
+                                            </td>
+                                            <td>
+                                                <input name="arr_requester[]" type="text" placeholder="Yang meminta barang & jasa / requester" value="` + val.requester + `" required>
                                             </td>
                                             <td class="center">
                                                 <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -1539,6 +1553,9 @@
                             <option value="">--Silahkan pilih item--</option>
                         </select>
                     </td>
+                    <td>
+                        <input name="arr_requester[]" type="text" placeholder="Yang meminta barang & jasa / requester" required>
+                    </td>
                     <td class="center">
                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                             <i class="material-icons">delete</i>
@@ -1639,6 +1656,9 @@
                     </td>
                     <td class="center">
                         -
+                    </td>
+                    <td>
+                        <input name="arr_requester[]" type="text" placeholder="Yang meminta barang & jasa / requester" required>
                     </td>
                     <td class="center">
                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -1742,6 +1762,7 @@
                 countAll();
                 if($('.row_item').length == 0){
                     mode = '';
+                    $('#pr-show,#gi-show,#sj-show').show();
                 }
             },
             error: function() {
@@ -1806,7 +1827,6 @@
                 data: {
                     'status' : $('#filter_status').val(),
                     inventory_type : $('#filter_inventory').val(),
-                    purchasing_type : $('#filter_type').val(),
                     shipping_type : $('#filter_shipping').val(),
                     'supplier_id[]' : $('#filter_supplier').val(),
                     company_id : $('#filter_company').val(),
@@ -1838,7 +1858,6 @@
                 { name: 'user_id', className: 'center-align' },
                 { name: 'supplier_id', className: 'center-align' },
                 { name: 'inventory_type', className: 'center-align' },
-                { name: 'purchasing_type', className: 'center-align' },
                 { name: 'shipping_type', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
                 { name: 'document_no', className: 'center-align' },
@@ -2060,7 +2079,6 @@
                     <option value="` + response.account_id + `">` + response.supplier_name + `</option>
                 `);
                 $('#inventory_type').val(response.inventory_type).formSelect();
-                $('#purchasing_type').val(response.purchasing_type).formSelect();
                 $('#shipping_type').val(response.shipping_type).formSelect(); 
                 $('#company_id').val(response.company_id).formSelect();
                 $('#document_no').val(response.document_no);
@@ -2076,6 +2094,8 @@
                 $('#receiver_phone').val(response.receiver_phone);
                 
                 $('#note').val(response.note);
+                $('#note_external').val(response.note_external);
+                M.textareaAutoResize($('#note_external'));
                 $('#subtotal').text(response.subtotal);
                 $('#savesubtotal').val(response.subtotal);
                 $('#discount').val(response.discount);
@@ -2185,6 +2205,9 @@
                                     </td>
                                     <td>
                                         <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
+                                    </td>
+                                    <td>
+                                        <input name="arr_requester[]" type="text" placeholder="Yang meminta barang & jasa / requester" value="` + val.requester + `" required>
                                     </td>
                                     <td class="center">
                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" onclick="removeUsedData('` + val.id + `')">
@@ -2301,6 +2324,9 @@
                                     </td>
                                     <td class="center">
                                         -
+                                    </td>
+                                    <td>
+                                        <input name="arr_requester[]" type="text" placeholder="Yang meminta barang & jasa / requester" value="` + val.requester + `" required>
                                     </td>
                                     <td class="center">
                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -2695,13 +2721,18 @@
                     intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
                 },
                 {
-                    title : 'Diskon',
+                    title : 'Keterangan Eksternal',
                     element : document.querySelector('.step24'),
+                    intro : 'Keterangan tambahan yang hanya muncul pada saat dokumen dicetak.' 
+                },
+                {
+                    title : 'Diskon',
+                    element : document.querySelector('.step25'),
                     intro : 'Nominal diskon, untuk diskon yang ingin dimunculkan di dalam dokumen ketika dicetak. Diskon ini mengurangi subtotal.' 
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step25'),
+                    element : document.querySelector('.step26'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

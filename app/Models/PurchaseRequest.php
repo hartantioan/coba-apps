@@ -18,12 +18,10 @@ class PurchaseRequest extends Model
     protected $fillable = [
         'code',
         'user_id',
-        'project_id',
         'company_id',
         'status',
         'post_date',
         'due_date',
-        'required_date',
         'note',
         'document',
         'void_id',
@@ -44,11 +42,6 @@ class PurchaseRequest extends Model
     public function company()
     {
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
-    }
-
-    public function project()
-    {
-        return $this->belongsTo('App\Models\Project', 'project_id', 'id')->withTrashed();
     }
 
     public function purchaseRequestDetail()

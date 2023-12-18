@@ -128,98 +128,139 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
+                        <fieldset>
+                            <legend>1. Informasi Utama</legend>
+                            <div class="row">
+                                <div class="input-field col m3 s12 step1">
+                                    <input type="hidden" id="temp" name="temp">
+                                    <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
+                                    <label class="active" for="code">No. Dokumen</label>
+                                </div>
+                                <div class="input-field col m1 s12 step2">
+                                    <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
+                                        <option value="">--Pilih--</option>
+                                        @foreach ($place as $rowplace)
+                                            <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="input-field col m4 s12 step3">
+                                    <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
+                                    <label class="active" for="post_date">Tgl. Posting</label>
+                                </div>
+                                <div class="input-field col m4 s12 step4">
+                                    <select class="form-control" id="company_id" name="company_id">
+                                        @foreach ($company as $row)
+                                            <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="" for="company_id">Perusahaan</label>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset style="min-width: 100%;overflow:auto;">
+                            <legend>2. Detail Produk</legend>
+                            <div class="row">
+                                <div class="col m12 s12 step5" style="width:1800px;">
+                                    <p class="mt-2 mb-2">
+                                        <h4>Detail Produk</h4>
+                                        <table class="bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center">Item</th>
+                                                    <th class="center">Stok (Satuan PO)</th>
+                                                    <th class="center">Qty</th>
+                                                    <th class="center">Satuan PO</th>
+                                                    <th class="center">Keterangan</th>
+                                                    <th class="center">Tgl.Dipakai</th>
+                                                    <th class="center">Plant</th>
+                                                    <th class="center">Gudang</th>
+                                                    <th class="center">Line</th>
+                                                    <th class="center">Mesin</th>
+                                                    <th class="center">Departemen</th>
+                                                    <th class="center">Requester</th>
+                                                    <th class="center">Hapus</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="body-item">
+                                                <tr class="row_item">
+                                                    <td>
+                                                        <select class="browser-default item-array" id="arr_item0" name="arr_item[]" onchange="getRowUnit(0)"></select>
+                                                    </td>
+                                                    <td id="arr_stock0" class="center-align">
+                                                        -   
+                                                    </td>
+                                                    <td>
+                                                        <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiahNoMinus(this)">
+                                                    </td>
+                                                    <td class="center">
+                                                        <span id="arr_satuan0">-</span>
+                                                    </td>
+                                                    <td>
+                                                        <input name="arr_note[]" type="text" placeholder="Keterangan barang...">
+                                                    </td>
+                                                    <td>
+                                                        <input name="arr_required_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}">
+                                                    </td>
+                                                    <td>
+                                                        <select class="browser-default" id="arr_place0" name="arr_place[]">
+                                                            @foreach ($place as $rowplace)
+                                                                <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                                            @endforeach
+                                                        </select>    
+                                                    </td>
+                                                    <td>
+                                                        <select class="browser-default" id="arr_warehouse0" name="arr_warehouse[]">
+                                                            <option value="">--Silahkan pilih item--</option>    
+                                                        </select>    
+                                                    </td>
+                                                    <td>
+                                                        <select class="browser-default" id="arr_line0" name="arr_line[]" onchange="changePlace(this);">
+                                                            <option value="">--Kosong--</option>
+                                                            @foreach ($line as $rowline)
+                                                                <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
+                                                            @endforeach
+                                                        </select>    
+                                                    </td>
+                                                    <td>
+                                                        <select class="browser-default" id="arr_machine0" name="arr_machine[]" onchange="changeLine(this);">
+                                                            <option value="">--Kosong--</option>
+                                                            @foreach ($machine as $row)
+                                                                <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                                                            @endforeach    
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <select class="browser-default" id="arr_department0" name="arr_department[]">
+                                                            <option value="">--Kosong--</option>
+                                                            @foreach ($department as $rowdept)
+                                                                <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                                                            @endforeach
+                                                        </select>    
+                                                    </td>
+                                                    <td>
+                                                        <input name="arr_requester[]" type="text" placeholder="Yang meminta barang / requester" required>
+                                                    </td>
+                                                    <td class="center">
+                                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                                            <i class="material-icons">delete</i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                <tr id="last-row-item">
+                                                    <td colspan="13">
+                                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
+                                                            <i class="material-icons left">add</i> Tambah
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </p>
+                                </div>
+                            </div>
+                        </fieldset>
                         <div class="row">
-                            <div class="input-field col m3 s12 step1">
-                                <input type="hidden" id="temp" name="temp">
-                                <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
-                                <label class="active" for="code">No. Dokumen</label>
-                            </div>
-                            <div class="input-field col m1 s12 step2">
-                                <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
-                                    <option value="">--Pilih--</option>
-                                    @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="input-field col m4 s12 step3">
-                                <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
-                                <label class="active" for="post_date">Tgl. Posting</label>
-                            </div>
-                            <div class="input-field col m4 s12 step4">
-                                <select class="form-control" id="company_id" name="company_id">
-                                    @foreach ($company as $row)
-                                        <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="company_id">Perusahaan</label>
-                            </div>
-                            <div class="col m12 s12 step5" style="overflow:auto;width:100% !important;">
-                                <p class="mt-2 mb-2">
-                                    <h4>Detail Produk</h4>
-                                    <table class="bordered">
-                                        <thead>
-                                            <tr>
-                                                <th class="center">Item</th>
-                                                <th class="center">Stok (Satuan PO)</th>
-                                                <th class="center">Qty</th>
-                                                <th class="center">Satuan PO</th>
-                                                <th class="center">Keterangan</th>
-                                                <th class="center">Tgl.Dipakai</th>
-                                                <th class="center">Plant</th>
-                                                <th class="center">Gudang</th>
-                                                <th class="center">Hapus</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="body-item">
-                                            <tr class="row_item">
-                                                <td>
-                                                    <select class="browser-default item-array" id="arr_item0" name="arr_item[]" onchange="getRowUnit(0)"></select>
-                                                </td>
-                                                <td id="arr_stock0" class="center-align">
-                                                    -   
-                                                </td>
-                                                <td>
-                                                    <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiahNoMinus(this)">
-                                                </td>
-                                                <td class="center">
-                                                    <span id="arr_satuan0">-</span>
-                                                </td>
-                                                <td>
-                                                    <input name="arr_note[]" type="text" placeholder="Keterangan barang...">
-                                                </td>
-                                                <td>
-                                                    <input name="arr_required_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}">
-                                                </td>
-                                                <td>
-                                                    <select class="browser-default" id="arr_place0" name="arr_place[]">
-                                                        @foreach ($place as $rowplace)
-                                                            <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                                                        @endforeach
-                                                    </select>    
-                                                </td>
-                                                <td>
-                                                    <select class="browser-default" id="arr_warehouse0" name="arr_warehouse[]">
-                                                        <option value="">--Silahkan pilih item--</option>    
-                                                    </select>    
-                                                </td>
-                                                <td class="center">
-                                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                                                        <i class="material-icons">delete</i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                            <tr id="last-row-item">
-                                                <td colspan="7">
-                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
-                                                        <i class="material-icons left">add</i> Tambah
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </p>
-                            </div>
                             <div class="input-field col m4 s12 step6">
                                 <textarea id="note" name="note" placeholder="Catatan / Keterangan" rows="1" class="materialize-textarea"></textarea>
                                 <label class="active" for="note">Keterangan</label>
@@ -903,6 +944,24 @@
                 
                 var formData = new FormData($('#form_data')[0]);
 
+                formData.delete("arr_line[]");
+                formData.delete("arr_machine[]");
+                formData.delete("arr_department[]");
+                formData.delete("arr_requester[]");
+
+                $('select[name^="arr_line[]"]').each(function(index){
+                    formData.append('arr_line[]',($(this).val() ? $(this).val() : ''));
+                });
+                $('select[name^="arr_machine[]"]').each(function(index){
+                    formData.append('arr_machine[]',($(this).val() ? $(this).val() : ''));
+                });
+                $('select[name^="arr_department[]"]').each(function(index){
+                    formData.append('arr_department[]',($(this).val() ? $(this).val() : ''));
+                });
+                $('input[name^="arr_requester[]"]').each(function(index){
+                    formData.append('arr_requester[]',($(this).val() ? $(this).val() : ''));
+                });
+
                 $.ajax({
                     url: '{{ Request::url() }}/create',
                     type: 'POST',
@@ -1038,6 +1097,33 @@
                                         <option value="">--Silahkan pilih item--</option>    
                                     </select>    
                                 </td>
+                                <td>
+                                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
+                                        <option value="">--Kosong--</option>
+                                        @foreach ($line as $rowline)
+                                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
+                                        @endforeach
+                                    </select>    
+                                </td>
+                                <td>
+                                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                                        <option value="">--Kosong--</option>
+                                        @foreach ($machine as $row)
+                                            <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                                        @endforeach    
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
+                                        <option value="">--Kosong--</option>
+                                        @foreach ($department as $rowdept)
+                                            <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                                        @endforeach
+                                    </select>    
+                                </td>
+                                <td>
+                                    <input name="arr_requester[]" type="text" placeholder="Yang meminta barang / requester" value="` + val.requester + `" required>
+                                </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                         <i class="material-icons">delete</i>
@@ -1050,6 +1136,18 @@
                         `);
                         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
                         $('#arr_place' + count).val(val.place_id);
+                        
+                        if(val.line_id){
+                            $('#arr_line' + count).val(val.line_id);
+                        }
+
+                        if(val.machine_id){
+                            $('#arr_machine' + count).val(val.machine_id);
+                        }
+
+                        if(val.department_id){
+                            $('#arr_department' + count).val(val.department_id);
+                        }
 
                         $('#arr_warehouse' + count).empty();
                         if(val.list_warehouse.length > 0){
@@ -1351,6 +1449,33 @@
                     <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
                         <option value="">--Silahkan pilih item--</option>    
                     </select>    
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
+                        <option value="">--Kosong--</option>
+                        @foreach ($line as $rowline)
+                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
+                        @endforeach
+                    </select>    
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                        <option value="">--Kosong--</option>
+                        @foreach ($machine as $row)
+                            <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                        @endforeach    
+                    </select>
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
+                        <option value="">--Kosong--</option>
+                        @foreach ($department as $rowdept)
+                            <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                        @endforeach
+                    </select>    
+                </td>
+                <td>
+                    <input name="arr_requester[]" type="text" placeholder="Yang meminta barang / requester" required>
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">

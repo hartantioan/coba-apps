@@ -4,9 +4,14 @@ namespace App\Http\Controllers\Purchase;
 
 use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
+use App\Models\Coa;
 use App\Models\Company;
+use App\Models\GoodReceipt;
+use App\Models\LandedCost;
 use App\Models\OutgoingPayment;
 use App\Models\PurchaseInvoice;
+use App\Models\PurchaseOrder;
+use App\Models\Tax;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
@@ -28,7 +33,7 @@ class PurchasePaymentHistoryController extends Controller
             'company'       => Company::where('status','1')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
-            'maxDate'       => $request->get('maxDate'),
+            'maxDate'       => $request->get('maxDate')
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

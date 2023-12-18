@@ -28,13 +28,13 @@ function closeLoader(){
 }
 
 function formatRupiah(angka){
-	let val = angka.value ? angka.value : '0';
+	let val = angka.value ? angka.value : '';
 	var number_string = val.replace(/[^,\d]/g, '').toString()
 	sign = val.charAt(0),
-	split   		= number_string.split(','),
-	sisa     		= split[0].length % 3,
-	rupiah     		= split[0].substr(0, sisa),
-	ribuan     		= split[0].substr(sisa).match(/\d{3}/gi);
+	split   		= number_string.toString().split(','),
+	sisa     		= parseFloat(split[0]).toString().length % 3,
+	rupiah     		= parseFloat(split[0]).toString().substr(0, sisa),
+	ribuan     		= parseFloat(split[0]).toString().substr(sisa).match(/\d{3}/gi);
  
 	if(ribuan){
 		separator = sisa ? '.' : '';
@@ -46,12 +46,12 @@ function formatRupiah(angka){
 }
 
 function formatRupiahNoMinus(angka){
-	let val = angka.value ? angka.value : '0';
+	let val = angka.value ? angka.value : '';
 	var number_string = val.replace(/[^,\d]/g, '').toString()
 	split   		= number_string.split(','),
-	sisa     		= split[0].length % 3,
-	rupiah     		= split[0].substr(0, sisa),
-	ribuan     		= split[0].substr(sisa).match(/\d{3}/gi);
+	sisa     		= parseFloat(split[0]).toString().length % 3,
+	rupiah     		= parseFloat(split[0]).toString().substr(0, sisa),
+	ribuan     		= parseFloat(split[0]).toString().substr(sisa).match(/\d{3}/gi);
  
 	if(ribuan){
 		separator = sisa ? '.' : '';

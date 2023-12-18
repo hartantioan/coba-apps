@@ -98,7 +98,6 @@ class PurchaseOrderController extends Controller
             'user_id',
             'supplier_id',
             'inventory_type',
-            'purchasing_type',
             'shipping_type',
             'company_id',
             'document_no',
@@ -168,10 +167,6 @@ class PurchaseOrderController extends Controller
 
                 if($request->inventory_type){
                     $query->where('inventory_type',$request->inventory_type);
-                }
-
-                if($request->purchasing_type){
-                    $query->where('purchasing_type',$request->type);
                 }
 
                 if($request->shipping_type){
@@ -253,10 +248,6 @@ class PurchaseOrderController extends Controller
                     $query->where('inventory_type',$request->inventory_type);
                 }
 
-                if($request->purchasing_type){
-                    $query->where('purchasing_type',$request->type);
-                }
-
                 if($request->shipping_type){
                     $query->where('shipping_type',$request->shipping_type);
                 }
@@ -303,7 +294,6 @@ class PurchaseOrderController extends Controller
                     $val->user->name,
                     $val->supplier->name,
                     $val->inventoryType(),
-                    $val->purchasingType(),
                     $val->shippingType(),
                     $val->company->name,
                     $val->document_no,
@@ -402,6 +392,7 @@ class PurchaseOrderController extends Controller
                                 'line_id'                       => $row->line_id,
                                 'machine_id'                    => $row->machine_id,
                                 'department_id'                 => $row->department_id,
+                                'requester'                     => $row->requester ? $row->requester : '',
                             ];
                         }
                     }
@@ -422,6 +413,7 @@ class PurchaseOrderController extends Controller
                             'line_id'                       => '',
                             'machine_id'                    => '',
                             'department_id'                 => '',
+                            'requester'                     => '',
                         ];
                     }
                 }elseif($request->type == 'sj'){
@@ -446,7 +438,6 @@ class PurchaseOrderController extends Controller
                 'code'			            => $request->temp ? ['required', Rule::unique('purchase_orders', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:purchase_orders,code',
                 'supplier_id' 				=> 'required',
                 'inventory_type'			=> 'required',
-                'purchasing_type'			=> 'required',
                 'shipping_type'		        => 'required',
                 'payment_type'		        => 'required',
                 'payment_term'		        => 'required',
@@ -454,9 +445,6 @@ class PurchaseOrderController extends Controller
                 'currency_rate'             => 'required',
                 'post_date'                 => 'required',
                 'delivery_date'             => 'required',
-                'receiver_name'             => 'required',
-                'receiver_address'          => 'required',
-                'receiver_phone'            => 'required',
                 'arr_item'                  => 'required|array',
                 'arr_qty'                   => 'required|array',
                 'arr_price'                 => 'required|array',
@@ -471,7 +459,6 @@ class PurchaseOrderController extends Controller
                 'code.unique'                       => 'Kode telah dipakai',
                 'supplier_id.required' 				=> 'Supplier tidak boleh kosong.',
                 'inventory_type.required' 			=> 'Tipe persediaan/jasa tidak boleh kosong.',
-                'purchasing_type.required' 			=> 'Tipe PO tidak boleh kosong.',
                 'shipping_type.required' 			=> 'Tipe pengiriman tidak boleh kosong.',
                 'payment_type.required' 			=> 'Tipe pembayaran tidak boleh kosong.',
                 'payment_term.required'				=> 'Termin pembayaran tidak boleh kosong.',
@@ -502,7 +489,6 @@ class PurchaseOrderController extends Controller
                 'code'			            => $request->temp ? ['required', Rule::unique('purchase_orders', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:purchase_orders,code',
                 'supplier_id' 				=> 'required',
                 'inventory_type'			=> 'required',
-                'purchasing_type'			=> 'required',
                 'shipping_type'		        => 'required',
                 'payment_type'		        => 'required',
                 'payment_term'		        => 'required',
@@ -510,9 +496,6 @@ class PurchaseOrderController extends Controller
                 'currency_rate'             => 'required',
                 'post_date'                 => 'required',
                 'delivery_date'             => 'required',
-                'receiver_name'             => 'required',
-                'receiver_address'          => 'required',
-                'receiver_phone'            => 'required',
                 'arr_coa'                   => 'required|array',
                 'arr_qty'                   => 'required|array',
                 'arr_price'                 => 'required|array',
@@ -527,7 +510,6 @@ class PurchaseOrderController extends Controller
                 'code.unique'                       => 'Kode telah dipakai',
                 'supplier_id.required' 				=> 'Supplier tidak boleh kosong.',
                 'inventory_type.required' 			=> 'Tipe persediaan/jasa tidak boleh kosong.',
-                'purchasing_type.required' 			=> 'Tipe PO tidak boleh kosong.',
                 'shipping_type.required' 			=> 'Tipe pengiriman tidak boleh kosong.',
                 'payment_type.required' 			=> 'Tipe pembayaran tidak boleh kosong.',
                 'payment_term.required'				=> 'Termin pembayaran tidak boleh kosong.',
@@ -637,7 +619,6 @@ class PurchaseOrderController extends Controller
                         $query->code = $request->code;
                         $query->account_id = $request->supplier_id;
                         $query->inventory_type = $request->inventory_type;
-                        $query->purchasing_type = $request->purchasing_type;
                         $query->shipping_type = $request->shipping_type;
                         $query->company_id = $request->company_id;
                         $query->document_no = $request->document_no;
@@ -649,6 +630,7 @@ class PurchaseOrderController extends Controller
                         $query->post_date = $request->post_date;
                         $query->delivery_date = $request->delivery_date;
                         $query->note = $request->note;
+                        $query->note_external = $request->note_external;
                         $query->subtotal = str_replace(',','.',str_replace('.','',$request->savesubtotal));
                         $query->discount = str_replace(',','.',str_replace('.','',$request->discount));
                         $query->total = str_replace(',','.',str_replace('.','',$request->savetotal));
@@ -684,7 +666,6 @@ class PurchaseOrderController extends Controller
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->supplier_id,
                         'inventory_type'	        => $request->inventory_type,
-                        'purchasing_type'	        => $request->purchasing_type,
                         'shipping_type'             => $request->shipping_type,
                         'company_id'                => $request->company_id,
                         'document_no'               => $request->document_no,
@@ -696,6 +677,7 @@ class PurchaseOrderController extends Controller
                         'post_date'                 => $request->post_date,
                         'delivery_date'             => $request->delivery_date,
                         'note'                      => $request->note,
+                        'note_external'             => $request->note_external,
                         'subtotal'                  => str_replace(',','.',str_replace('.','',$request->savesubtotal)),
                         'discount'                  => str_replace(',','.',str_replace('.','',$request->discount)),
                         'total'                     => str_replace(',','.',str_replace('.','',$request->savetotal)),
@@ -768,6 +750,7 @@ class PurchaseOrderController extends Controller
                                     'machine_id'                    => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
                                     'department_id'                 => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
                                     'warehouse_id'                  => $request->arr_warehouse[$key] ? $request->arr_warehouse[$key] : NULL,
+                                    'requester'                     => $request->arr_requester[$key] ? $request->arr_requester[$key] : NULL,
                                 ]);
                                 
                                 if($querydetail->purchaseRequestDetail()->exists()){
@@ -867,7 +850,7 @@ class PurchaseOrderController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="17">Daftar Item</th>
+                                <th class="center-align" colspan="18">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -887,6 +870,7 @@ class PurchaseOrderController extends Controller
                                 <th class="center-align">Departemen</th>
                                 <th class="center-align">Gudang</th>
                                 <th class="center-align">Referensi</th>
+                                <th class="center-align">Requester</th>
                             </tr>
                         </thead><tbody>';
         
@@ -909,6 +893,7 @@ class PurchaseOrderController extends Controller
                 <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
                 <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
                 <td class="center-align">'.($row->purchaseRequestDetail()->exists() ? $row->purchaseRequestDetail->purchaseRequest->code : ($row->goodIssueDetail()->exists() ? $row->goodIssueDetail->goodIssue->code : ' - ')).'</td>
+                <td class="center-align">'.($row->requester ? $row->requester : '-').'</td>
             </tr>';
         }
         
@@ -1010,6 +995,7 @@ class PurchaseOrderController extends Controller
                 'tax_id'                            => $row->tax_id,
                 'wtax_id'                           => $row->wtax_id,
                 'type'                              => $row->purchase_request_detail_id ? 'po' : ($row->good_issue_detail_id ? 'gi' : ''),
+                'requester'                         => $row->requester ? $row->requester : '',
             ];
         }
 
@@ -2786,10 +2772,6 @@ class PurchaseOrderController extends Controller
 
                 if($request->inventory){
                     $query->where('inventory_type',$request->inventory);
-                }
-
-                if($request->type){
-                    $query->where('purchasing_type',$request->type);
                 }
 
                 if($request->shipping){

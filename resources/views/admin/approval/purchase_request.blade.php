@@ -204,6 +204,7 @@
         <table class="bordered">
             <thead>
                 <tr>
+                    <th class="center">No</th>
                     <th class="center">Item</th>
                     <th class="center">Jum.</th>
                     <th class="center">Sat.</th>
@@ -217,8 +218,9 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($data->purchaseRequestDetail as $row)
+                @foreach($data->purchaseRequestDetail as $key => $row)
                 <tr>
+                    <td align="center" rowspan="2">{{ $key+1 }}.</td>
                     <td>{{ $row->item->name }}</td>
                     <td class="center">{{ $row->qty }}</td>
                     <td class="center">{{ $row->item->buyUnit->code }}</td>
@@ -229,6 +231,13 @@
                     <td class="center">{{ $row->line()->exists() ? $row->line->name : '-' }}</td>
                     <td class="center">{{ $row->warehouse->name }}</td>
                     <td class="center">{{ $row->department()->exists() ? $row->department->name : '-' }}</td>
+                </tr>
+                <tr>
+                    <td colspan="10">
+                        <b>Mesin</b> : {{ $row->machine()->exists() ? $row->machine->name : '-' }},
+                        <b>Requester</b> : {{ $row->requester }},
+                        <b>Proyek</b> : {{ $row->project()->exists() ? $row->project->name : '-' }}
+                    </td>
                 </tr>
                 @endforeach
             </tbody>

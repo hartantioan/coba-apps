@@ -22,6 +22,7 @@ class ProductionOrder extends Model
         'production_schedule_id',
         'production_schedule_detail_id',
         'warehouse_id',
+        'area_id',
         'post_date',
         'note',
         'status',
@@ -59,6 +60,11 @@ class ProductionOrder extends Model
         return $this->hasMany('App\Models\ProductionOrderDetail');
     }
 
+    public function productionIssueReceive()
+    {
+        return $this->hasMany('App\Models\ProductionIssueReceive')->whereIn('status',['1','2','3','6']);
+    }
+
     public function voidUser()
     {
         return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
@@ -72,6 +78,11 @@ class ProductionOrder extends Model
     public function warehouse()
     {
         return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
+    }
+
+    public function area()
+    {
+        return $this->belongsTo('App\Models\Area', 'area_id', 'id')->withTrashed();
     }
 
     public function used(){
@@ -151,6 +162,10 @@ class ProductionOrder extends Model
 
     public function hasChildDocument(){
         $hasRelation = false;
+
+        if($this->productionIssueReceive()->exists()){
+            $hasRelation = true;
+        }
 
         return $hasRelation;
     }

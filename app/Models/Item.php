@@ -211,7 +211,7 @@ class Item extends Model
         $pricenow = 0;
         $price = ItemCogs::where('item_id',$this->id)->where('place_id',$place_id)->whereDate('date','<=',$date)->orderByDesc('date')->orderByDesc('id')->first();
         if($price){
-            $pricenow = $price->price_final / $this->production_convert;
+            $pricenow = ($price->total_final / $price->qty_final) / $this->production_convert;
         }
         
         return $pricenow;
@@ -320,11 +320,12 @@ class Item extends Model
         $data = ItemStock::where('item_id',$this->id)->where('place_id',$place_id)->get();
         foreach($data as $detail){
             $arrData[] = [
-                'id'            => $detail->id,
-                'warehouse'     => $detail->place->code.' - '.$detail->warehouse->name.($detail->area()->exists() ? ' - '.$detail->area->code : ''),
-                'qty'           => number_format($detail->qty,3,',','.').' '.$this->uomUnit->code,
-                'qty_raw'       => number_format($detail->qty,3,',','.'),
-                'qty_production'=> number_format($detail->qty / $this->production_convert,3,',','.').' '.$this->productionUnit->code,
+                'id'                    => $detail->id,
+                'warehouse'             => $detail->place->code.' - '.$detail->warehouse->name.($detail->area()->exists() ? ' - '.$detail->area->code : ''),
+                'qty'                   => number_format($detail->qty,3,',','.').' '.$this->uomUnit->code,
+                'qty_raw'               => number_format($detail->qty,3,',','.'),
+                'qty_production'        => number_format($detail->qty / $this->production_convert,3,',','.').' '.$this->productionUnit->code,
+                'qty_production_raw'    => number_format($detail->qty / $this->production_convert,3,',','.'),
             ];
         }
         
@@ -349,6 +350,17 @@ class Item extends Model
         return implode('|',$arr);
     }
 
+    public function arrShading(){
+        $arr = [];
+        foreach($this->itemShading as $row){
+            $arr[] = [
+                'id'    => $row->id,
+                'code'  => $row->code,
+            ];
+        }
+        return $arr;
+    }
+
     public function outletPriceDetail()
     {
         return $this->hasMany('App\Models\OutletPriceDetail','item_id','id')->whereHas('outletPrice',function($query){
@@ -358,7 +370,7 @@ class Item extends Model
 
     public function bomPlace($place_id)
     {
-        return $this->hasMany('App\Models\Bom','item_id','id')->where('place_id',intval($place_id))->where('status','1');
+        return $this->hasMany('App\Models\Bom','item_id','id')->where('place_id',intval($place_id))->where('status','1')->orderByDesc('id');
     }
 
     public function bom()

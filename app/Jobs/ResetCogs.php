@@ -117,7 +117,7 @@ class ResetCogs implements ShouldQueue
 							'total_final'	=> $totalprice
 						]);
 					}else{
-						$prevprice = round(($prevtotal - $row->total_out) / ($prevqty - $row->qty_out),2);
+						$prevprice = ($prevqty - $row->qty_out) > 0 ? round(($prevtotal - $row->total_out) / ($prevqty - $row->qty_out),2) : $data[$key-1]->price_final;
 						$finalprice = $prevprice;
 						$totalprice = $prevtotal - $row->total_out;
 						$row->update([

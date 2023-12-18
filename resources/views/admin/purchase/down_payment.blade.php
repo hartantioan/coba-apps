@@ -18,6 +18,10 @@
     .select-wrapper, .select2-container {
         height:3.6rem !important;
     }
+
+    .preserveLines {
+        white-space: pre-line;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -92,8 +96,7 @@
                                                     <select class="form-control" id="filter_type" onchange="loadDataTable()">
                                                         <option value="">Semua</option>
                                                         <option value="1">Cash</option>
-                                                        <option value="2">Transfer</option>
-                                                        <option value="3">Giro/Check</option>
+                                                        <option value="2">Credit</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -152,18 +155,27 @@
                                                         <th rowspan="2">Perusahaan</th>
                                                         <th rowspan="2">Tipe</th>
                                                         <th rowspan="2">Dokumen</th>
+                                                        <th colspan="5" class="center-align">Pajak</th>
                                                         <th colspan="2" class="center-align">Tanggal</th>
                                                         <th colspan="2" class="center-align">Mata Uang</th>
                                                         <th rowspan="2">Keterangan</th>
                                                         <th rowspan="2">Subtotal</th>
                                                         <th rowspan="2">Diskon</th>
+                                                        <th rowspan="2">Total</th>
+                                                        <th rowspan="2">PPN</th>
+                                                        <th rowspan="2">PPh</th>
                                                         <th rowspan="2">Grandtotal</th>
                                                         <th rowspan="2">Status</th>
                                                         <th rowspan="2">Action</th>
                                                     </tr>
                                                     <tr>
+                                                        <th>PPN</th>
+                                                        <th>Termasuk</th>
+                                                        <th>Prosentase</th>
+                                                        <th>PPh</th>
+                                                        <th>Prosentase</th>
                                                         <th>Post</th>
-                                                        <th>Tenggat</th>
+                                                        <th>TOP</th>
                                                         <th>Kode</th>
                                                         <th>Konversi</th>
                                                     </tr>
@@ -208,14 +220,13 @@
                             </div>
                             <div class="input-field col m3 s12 step3">
                                 <input type="hidden" id="temp" name="temp">
-                                <select class="browser-default" id="supplier_id" name="supplier_id" onchange="getPurchaseOrder(this.value);"></select>
+                                <select class="browser-default" id="supplier_id" name="supplier_id" onchange="getPurchaseOrder(this.value);getTopSupplier();"></select>
                                 <label class="active" for="supplier_id">Supplier</label>
                             </div>
                             <div class="input-field col m3 s12 step4">
                                 <select class="form-control" id="type" name="type">
                                     <option value="1">Cash</option>
-                                    <option value="2">Transfer</option>
-                                    <option value="3">Giro/Check</option>
+                                    <option value="2">Credit</option>
                                 </select>
                                 <label class="" for="type">Tipe</label>
                             </div>
@@ -231,9 +242,9 @@
                                 <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                 <label class="active" for="post_date">Tgl. Posting</label>
                             </div>
-                            <div class="input-field col m3 s12 step7">
-                                <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Kadaluarsa">
-                                <label class="active" for="due_date">Tgl. Kadaluarsa</label>
+                            <div class="input-field col m3 s12 step10">
+                                <input id="top" name="top" type="number" value="0" onchange="addDays();">
+                                <label class="active" for="top">TOP</label>
                             </div>
                             <div class="file-field input-field col m3 s12 step8">
                                 <div class="btn">
@@ -256,6 +267,31 @@
                                 <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                                 <label class="active" for="currency_rate">Konversi</label>
                             </div>
+                            <div class="input-field col m3 s12 step11">
+                                <select id="tax_id" name="tax_id" onchange="countAll();">
+                                    <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
+                                    @foreach ($tax as $row)
+                                        <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
+                                    @endforeach
+                                </select>
+                                <label class="" for="tax_id">PPN</label>
+                            </div>
+                            <div class="input-field col m3 s12 step12">
+                                <select id="is_include_tax" name="is_include_tax" onchange="countAll();">
+                                    <option value="0">--Tidak--</option>
+                                    <option value="1">--Ya--</option>
+                                </select>
+                                <label class="" for="is_include_tax">Termasuk PPN</label>
+                            </div>
+                            <div class="input-field col m3 s12 step11">
+                                <select id="wtax_id" name="wtax_id" onchange="countAll();">
+                                    <option value="0" data-id="0">-- Pilih ini jika non-PPh --</option>
+                                    @foreach ($wtax as $row)
+                                        <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
+                                    @endforeach
+                                </select>
+                                <label class="" for="wtax_id">PPh</label>
+                            </div>
                             <div class="col m12 s12 step11">
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Purchase Order (Centang jika ada)</h4>
@@ -270,6 +306,7 @@
                                                         </label>
                                                     </th>
                                                     <th class="center">PO No.</th>
+                                                    <th class="center">Daftar Item</th>
                                                     <th class="center">Tgl.Post</th>
                                                     <th class="center">Tgl.Kirim</th>
                                                     <th class="center">Keterangan</th>
@@ -279,7 +316,7 @@
                                             </thead>
                                             <tbody id="body-purchase">
                                                 <tr id="empty-purchase">
-                                                    <td colspan="7" class="center">
+                                                    <td colspan="8" class="center">
                                                         Pilih supplier untuk memulai...
                                                     </td>
                                                 </tr>
@@ -292,33 +329,46 @@
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
-                            <div class="input-field col m4 s12">
-
-                            </div>
                             <div class="input-field col m4 s12 step13">
+                                <textarea class="materialize-textarea preserveLines" id="note_external" name="note_external" placeholder="Keterangan Tambahan" rows="3"></textarea>
+                                <label class="active" for="note_external">Keterangan Tambahan (muncul pada printout)</label>
+                            </div>
+                            <div class="input-field col m4 s12 step14">
                                 <table width="100%" class="bordered">
                                     <thead>
                                         <tr>
                                             <td width="50%">Subtotal <b><i>(Masukkan nominal disini jika tanpa PO)</i></b></td>
                                             <td width="50%" class="right-align">
-                                                <input class="browser-default" id="subtotal" name="subtotal" type="text" value="0,000" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
+                                                <input class="browser-default" id="subtotal" name="subtotal" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>Discount</td>
                                             <td class="right-align">
-                                                <input class="browser-default" id="discount" name="discount" type="text" value="0,000" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
+                                                <input class="browser-default" id="discount" name="discount" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
                                             </td>
                                         </tr>
                                         <tr>
+                                            <td>Total</td>
+                                            <td class="right-align"><h6><span id="total">0,00</span></h6></td>
+                                        </tr>
+                                        <tr>
+                                            <td>PPN</td>
+                                            <td class="right-align"><h6><span id="tax">0,00</span></h6></td>
+                                        </tr>
+                                        <tr>
+                                            <td>PPh</td>
+                                            <td class="right-align"><h6><span id="wtax">0,00</span></h6></td>
+                                        </tr>
+                                        <tr>
                                             <td><h6>Grandtotal</h6></td>
-                                            <td class="right-align"><h6><span id="grandtotal">0,000</span></h6></td>
+                                            <td class="right-align"><h6><span id="grandtotal">0,00</span></h6></td>
                                         </tr>
                                     </thead>
                                 </table>
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step14" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step15" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -531,7 +581,6 @@
             onOpenStart: function(modal,trigger) {
                 $('#post_date').attr('min','{{ $minDate }}');
                 $('#post_date').attr('max','{{ $maxDate }}');
-                $('#due_date').attr('min','{{ date("Y-m-d") }}');
             },
             onOpenEnd: function(modal, trigger) {
                 $('#name').focus();
@@ -541,6 +590,12 @@
                 if(!$('#temp').val()){
                     loadCurrency();
                 }
+                window.onbeforeunload = function() {
+                    if($('.data-used').length > 0){
+                        $('.data-used').trigger('click');
+                    }
+                    return 'You will lose all changes made since your last save';
+                };
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
@@ -551,14 +606,18 @@
                 M.updateTextFields();
                 $('#body-purchase').empty().append(`
                     <tr id="empty-purchase">
-                        <td colspan="7" class="center">
+                        <td colspan="8" class="center">
                             Pilih supplier untuk memulai...
                         </td>
                     </tr>
                 `);
                 $('#supplier_id').empty();
-                $('#grandtotal').text('0,000');
-                $('#subtotal').val('0,000');
+                $('#grandtotal,#total,#tax,#wtax').text('0,00');
+                $('#subtotal').val('0,00');
+                window.onbeforeunload = function() {
+                    return null;
+                };
+                tempTerm = 0;
             }
         });
 
@@ -637,6 +696,35 @@
         select2ServerSide('#supplier_id,#filter_supplier', '{{ url("admin/select2/supplier") }}');
     });
 
+    function resetTerm(){
+        if(tempTerm > 0){
+            $('#type').val('2').formSelect();
+            $('#top').val(tempTerm);
+        }else{
+            $('#type').val('1').formSelect();
+            $('#top').val('0');
+        }
+        /* addDays(); */
+    }
+
+    function getTopSupplier(){
+        if($("#supplier_id").val()){
+            tempTerm = parseInt($("#supplier_id").select2('data')[0].top);
+        }else{
+            tempTerm = 0;
+        }
+        resetTerm();
+    }
+
+    /* function addDays(){
+        if(tempTerm > 0){
+            var result = new Date($('#post_date').val());
+            result.setDate(result.getDate() + tempTerm);
+            $('#due_date').val(result.toISOString().split('T')[0]);
+        }else{
+            $('#due_date').val('{{ date("Y-m-d") }}');
+        }
+    } */
 
     function makeTreeOrg(data,link){
         var $ = go.GraphObject.make;
@@ -953,6 +1041,9 @@
                                     <td>
                                         ` + val.po_no + `
                                     </td>
+                                    <td>
+                                        ` + val.list_items + `
+                                    </td>
                                     <td class="center">
                                         ` + val.post_date + `
                                     </td>
@@ -990,7 +1081,7 @@
             $('#empty-purchase').remove();
             $('#body-purchase').append(`
                 <tr id="empty-purchase">
-                    <td colspan="7" class="center">
+                    <td colspan="8" class="center">
                         Pilih supplier untuk memulai...
                     </td>
                 </tr>
@@ -1003,7 +1094,7 @@
 
     function countAll(){
 
-        let subtotal = 0, discount = 0, total = 0, grandtotal = 0, ada = false;
+        let subtotal = 0, discount = 0, total = 0, grandtotal = 0, tax = 0, wtax = 0, ada = false, percent_tax = $('#tax_id').val(), percent_wtax = $('#wtax_id').val();
 
         if($('input[name^="arr_code"]').length > 0){
             $('input[name^="arr_code"]').each(function(){
@@ -1023,7 +1114,34 @@
 
         total = subtotal - parseFloat($('#discount').val().replaceAll(".", "").replaceAll(",","."));
 
-        grandtotal = total;
+        if(percent_tax > 0){
+            if($('#is_include_tax').val() == '1'){
+                total = total / (1 + (percent_tax / 100));
+            }
+            tax = total * (percent_tax / 100);
+        }
+
+        if(percent_wtax > 0){
+            wtax = total * (percent_wtax / 100);
+        }
+
+        tax = Math.floor(tax);
+        wtax = Math.floor(wtax);
+        total = Math.ceil(total);
+
+        $('#total').text(
+            (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
+        );
+
+        $('#tax').text(
+            (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(2).toString().replace('.',','))
+        );
+
+        $('#wtax').text(
+            (wtax >= 0 ? '' : '-') + formatRupiahIni(wtax.toFixed(2).toString().replace('.',','))
+        );
+
+        grandtotal = total + tax - wtax;
 
         $('#grandtotal').text(
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
@@ -1128,13 +1246,21 @@
                 { name: 'company_id', className: 'center-align' },
                 { name: 'type', className: 'center-align' },
                 { name: 'document', className: 'center-align' },
+                { name: 'tax_id', className: 'center-align' },
+                { name: 'is_include', className: 'center-align' },
+                { name: 'percent_tax', className: 'center-align' },
+                { name: 'wtax_id', className: 'center-align' },
+                { name: 'percent_wtax', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
-                { name: 'due_date', className: 'center-align' },
+                { name: 'top', className: 'center-align' },
                 { name: 'currency_id', className: 'center-align' },
                 { name: 'currency_rate', className: 'center-align' },
                 { name: 'note', className: 'center-align' },
                 { name: 'subtotal', className: 'right-align' },
                 { name: 'discount', className: 'right-align' },
+                { name: 'total', className: 'right-align' },
+                { name: 'tax', className: 'right-align' },
+                { name: 'wtax', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
@@ -1185,11 +1311,14 @@
                 var formData = new FormData($('#form_data')[0]);
 
                 formData.delete('tax_id');
+                formData.delete('wtax_id');
                 formData.delete("arr_code[]");
                 formData.delete("arr_nominal[]");
                 formData.delete("arr_note[]");
                 formData.append('tax_id',$('#tax_id').find(':selected').data('id'));
+                formData.append('wtax_id',$('#wtax_id').find(':selected').data('id'));
                 formData.append('percent_tax',$('#tax_id').val());
+                formData.append('percent_wtax',$('#wtax_id').val());
 
                 $('input[name^="arr_code"]').each(function(){
                     if($(this).is(':checked')){
@@ -1318,24 +1447,23 @@
                 `);
                 $('#type').val(response.type).formSelect();
                 $('#company_id').val(response.company_id).formSelect();
+                $('#top').val(response.top);
                 $('#currency_id').val(response.currency_id).formSelect();
                 $('#currency_rate').val(response.currency_rate);
                 $('#post_date').val(response.post_date);
-                $('#due_date').val(response.due_date);
-                $('#percent_tax').val(response.percent_tax);
                 
                 $("#tax_id option[data-id='" + response.tax_id + "']").prop("selected",true);
-
-                if(response.is_include_tax == '1'){
-                    $('#is_include_tax').prop( "checked", true);
-                }else{
-                    $('#is_include_tax').prop( "checked", false);
-                }
+                $("#wtax_id option[data-id='" + response.wtax_id + "']").prop("selected",true);
+                $('#is_include_tax').val(response.is_include_tax).formSelect();
+                $('#tax_id,#wtax_id').formSelect();
                 
                 $('#note').val(response.note);
+                $('#note_external').val(response.note_external);
+                M.textareaAutoResize($('#note_external'));
                 $('#grandtotal').text(response.grandtotal);
                 $('#total').text(response.total);
                 $('#tax').text(response.tax);
+                $('#wtax').text(response.wtax);
                 $('#subtotal').val(response.subtotal);
                 $('#discount').text(response.discount);
                 
@@ -1353,6 +1481,9 @@
                                 </td>
                                 <td>
                                     ` + val.purchase_order_code + `
+                                </td>
+                                <td>
+                                    ` + val.list_items + `
                                 </td>
                                 <td class="center">
                                     ` + val.post_date + `
@@ -1620,13 +1751,18 @@
                     intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
                 },
                 {
-                    title : 'Subtotal & Diskon',
+                    title : 'Keterangan Eksternal',
                     element : document.querySelector('.step13'),
+                    intro : 'Keterangan tambahan yang hanya muncul pada saat dokumen dicetak.' 
+                },
+                {
+                    title : 'Subtotal & Diskon',
+                    element : document.querySelector('.step14'),
                     intro : 'Silahkan isikan nominal Subtotal langsung jika anda tidak menggunakan Purchase Order link, dan jika ada diskon anda bisa menambahkannya di inputan Discount.' 
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step14'),
+                    element : document.querySelector('.step15'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

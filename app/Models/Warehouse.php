@@ -18,6 +18,7 @@ class Warehouse extends Model
         'code',
         'name',
         'note',
+        'is_transit_warehouse',
         'status'
     ];
 
@@ -53,5 +54,18 @@ class Warehouse extends Model
         }
 
         return $status;
+    }
+    
+    public function isTransitWarehouse(){
+        switch($this->is_transit_warehouse) {
+            case '1':
+                $transit = 'Ya';
+                break;
+            default:
+                $transit = 'Tidak';
+                break;
+        }
+
+        return $transit;
     }
 }

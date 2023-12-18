@@ -830,7 +830,7 @@ class FundRequestController extends Controller
 
     public function userCreate(Request $request){
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('fund_requests', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:fund_requests,code',
+            'code'			            => $request->temp ? ['required', Rule::unique('fund_requests', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:fund_requests,code',
             'account_id'                => 'required',
             'type'                      => 'required',
 			'post_date' 				=> 'required',
@@ -848,7 +848,9 @@ class FundRequestController extends Controller
             'arr_total'                 => 'required|array',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
-            'code.unique'                       => 'Kode telah dipakai.',
+            'code.string'                       => 'Kode harus dalam bentuk string.',
+            'code.min'                          => 'Kode harus minimal 18 karakter.',
+            'code.unique'                       => 'Kode telah dipakai',
             'account_id.required'               => 'Target Partner Bisnis tidak boleh kosong',
             'type.required'                     => 'Tipe tidak boleh kosong',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',

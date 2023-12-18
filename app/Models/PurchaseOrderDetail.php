@@ -45,6 +45,7 @@ class PurchaseOrderDetail extends Model
         'department_id',
         'warehouse_id',
         'status',
+        'requester',
     ];
 
     public function isIncludeTax(){

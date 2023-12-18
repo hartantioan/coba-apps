@@ -22,13 +22,32 @@ class MaterialRequestDetail extends Model
         'note',
         'required_date',
         'place_id',
+        'line_id',
+        'machine_id',
+        'department_id',
         'warehouse_id',
         'status',
+        'requester',
     ];
 
     public function materialRequest()
     {
         return $this->belongsTo('App\Models\MaterialRequest', 'material_request_id', 'id')->withTrashed();
+    }
+
+    public function line()
+    {
+        return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();
+    }
+
+    public function machine()
+    {
+        return $this->belongsTo('App\Models\Machine', 'machine_id', 'id')->withTrashed();
+    }
+
+    public function department()
+    {
+        return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
     }
 
     public function item()

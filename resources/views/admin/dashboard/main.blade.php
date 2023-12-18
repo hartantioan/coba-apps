@@ -105,6 +105,7 @@
                                                 <tr>
                                                     <th class="center-align">No.</th>
                                                     <th class="center-align">Item</th>
+                                                    <th class="center-align">Shading</th>
                                                     <th class="center-align">Plant</th>
                                                     <th class="center-align">Gudang</th>
                                                     <th class="center-align">Area</th>
@@ -117,8 +118,9 @@
                                                 @foreach($itemstocks as $key => $row)
                                                     <tr>
                                                         <td class="center-align">{{ ($key + 1) }}</td>
-                                                        <td class="center-align">{{ $row->item->name }}</td>
-                                                        <td class="center-align">{{ $row->place->name.' - '.$row->place->company->name }}</td>
+                                                        <td class="">{{ $row->item->name }}</td>
+                                                        <td class="">{{ $row->itemShading()->exists() ? $row->itemShading->code : '-' }}</td>
+                                                        <td class="">{{ $row->place->code.' - '.$row->place->company->name }}</td>
                                                         <td class="center-align">{{ $row->warehouse->name }}</td>
                                                         <td class="center-align">{{ $row->area()->exists() ? $row->area->name : '-' }}</td>
                                                         <td class="center-align">{{ number_format($row->qty,3,',','.').' '.$row->item->uomUnit->code }}</td>
@@ -147,9 +149,9 @@
                                                 @foreach($itemcogs as $key => $row)
                                                     <tr>
                                                         <td class="center-align">{{ ($key + 1) }}</td>
-                                                        <td class="center-align">{{ $row->lookable->code }}</td>
-                                                        <td class="center-align">{{ $row->item->name }}</td>
-                                                        <td class="center-align">{{ $row->place->name }}</td>
+                                                        <td class="">{{ $row->lookable->code }}</td>
+                                                        <td class="">{{ $row->item->name }}</td>
+                                                        <td class="center-align">{{ $row->place->code }}</td>
                                                         <td class="center-align">{{ $row->warehouse->name }}</td>
                                                         <td class="center-align">{{ date('d/m/y',strtotime($row->date)) }}</td>
                                                         <td class="right-align">{{ number_format($row->total_in,2,',','.') }}</td>

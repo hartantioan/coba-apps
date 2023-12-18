@@ -29,10 +29,17 @@ class PurchaseRequestDetail extends Model
         'lookable_type',
         'lookable_id',
         'status',
+        'requester',
+        'project_id',
     ];
 
     public function lookable(){
         return $this->morphTo();
+    }
+
+    public function project()
+    {
+        return $this->belongsTo('App\Models\Project', 'project_id', 'id')->withTrashed();
     }
 
     public function purchaseRequest()

@@ -161,7 +161,7 @@
                     Plant
                 </div>
                 <div class="col s8">
-                    {{ $data->productionOrder->productionSchedule->place->code.' - '.$data->productionOrder->warehouse->name }}
+                    {{ $data->productionOrder->productionSchedule->place->code.' - '.$data->productionOrder->warehouse->name.($data->productionOrder->area()->exists() ? ' - '.$data->productionOrder->area->name : '') }}
                 </div>
                 <div class="col s4">
                     No.PROD
@@ -181,10 +181,16 @@
                     JADWAL
                 </div>
                 <div class="col s4">
+                    Tgl.
+                </div>
+                <div class="col s8">
+                    {{ date('d/m/y',strtotime($data->productionOrder->productionScheduleDetail->production_date)) }}
+                </div>
+                <div class="col s4">
                     Shift
                 </div>
                 <div class="col s8">
-                    {{ date('d/m/y',strtotime($data->productionOrder->productionScheduleDetail->production_date)).' - '.$data->productionOrder->productionScheduleDetail->shift->code.' - '.$data->productionOrder->productionScheduleDetail->shift->name }}
+                    {{ $data->productionOrder->productionScheduleDetail->shift->code.' - '.$data->productionOrder->productionScheduleDetail->shift->name }}
                 </div>
                 <div class="col s4">
                     Line

@@ -674,7 +674,6 @@ class Select2Controller extends Controller {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('due_date', 'like', "%$search%")
-                            ->orWhere('required_date', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('purchaseRequestDetail',function($query) use($search){
                                 $query->whereHas('item',function($query) use($search){
@@ -2675,6 +2674,7 @@ class Select2Controller extends Controller {
                 'shift'         => date('d/m/y',strtotime($d->production_date)).' - '.$d->shift->code.' - '.$d->shift->name,
                 'group'         => $d->group,
                 'line'          => $d->line->code,
+                'is_sales_item' => $d->item->is_sales_item ? $d->item->is_sales_item : '',
             ];
         }
 
@@ -2826,6 +2826,10 @@ class Select2Controller extends Controller {
                             'date'          => $row->required_date,
                             'place_id'      => $row->place_id,
                             'warehouse_id'  => $row->warehouse_id,
+                            'line_id'       => $row->line_id,
+                            'machine_id'    => $row->machine_id,
+                            'department_id' => $row->department_id,
+                            'requester'     => $row->requester ? $row->requester : '',
                             'qty_balance'   => number_format($row->balancePr(),3,',','.'),
                             'type'          => $row->getTable(),
                             'list_warehouse'=> $row->item->warehouseList(),
@@ -2885,6 +2889,10 @@ class Select2Controller extends Controller {
                             'date'          => $row->required_date,
                             'place_id'      => $row->place_id,
                             'warehouse_id'  => $row->warehouse_id,
+                            'line_id'       => $row->line_id,
+                            'machine_id'    => $row->machine_id,
+                            'department_id' => $row->department_id,
+                            'requester'     => $row->requester ? $row->requester : '',
                             'qty_balance'   => number_format($row->balanceGi(),3,',','.'),
                             'type'          => $row->getTable(),
                             'list_warehouse'=> $row->item->warehouseList(),
@@ -3073,6 +3081,7 @@ class Select2Controller extends Controller {
                 });
         })
         ->whereDoesntHave('used')
+        ->whereDoesntHave('productionIssueReceive')
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
         ->whereIn('status',['2','3'])
         ->get();
@@ -3116,6 +3125,7 @@ class Select2Controller extends Controller {
                 'shift'                         => date('d/m/y',strtotime($d->productionScheduleDetail->production_date)).' - '.$d->productionScheduleDetail->shift->code.' - '.$d->productionScheduleDetail->shift->name,
                 'group'                         => $d->productionScheduleDetail->group,
                 'line'                          => $d->productionScheduleDetail->line->code,
+                'list_shading'                  => $d->productionScheduleDetail->item->arrShading(),
             ];
         }
 

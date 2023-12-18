@@ -226,7 +226,7 @@ class PurchaseRequestController extends Controller
         $string = '<div class="row pt-1 pb-1"><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="11">Daftar Item</th>
+                                <th class="center-align" colspan="13">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -241,6 +241,8 @@ class PurchaseRequestController extends Controller
                                 <th class="center-align">Mesin</th>
                                 <th class="center-align">Gudang</th>
                                 <th class="center-align">Departemen</th>
+                                <th class="center-align">Requester</th>
+                                <th class="center-align">Proyek</th>
                             </tr>
                         </thead><tbody>';
         
@@ -258,6 +260,8 @@ class PurchaseRequestController extends Controller
                 <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
                 <td class="center-align">'.$row->warehouse->name.'</td>
                 <td class="center-align">'.($row->department()->exists() ? $row->department->name : '-').'</td>
+                <td class="center-align">'.$row->requester.'</td>
+                <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
             </tr>';
         }
         
@@ -487,7 +491,6 @@ class PurchaseRequestController extends Controller
             'code'			            => $request->temp ? ['required', Rule::unique('purchase_requests', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:purchase_requests,code',
 			'post_date' 				=> 'required',
 			'due_date'			        => 'required',
-			'required_date'		        => 'required',
             'note'		                => 'required',
             'arr_item'                  => 'required|array',
             'company_id'                => 'required',
@@ -503,7 +506,6 @@ class PurchaseRequestController extends Controller
             'code.unique'                       => 'Kode telah dipakai',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
 			'due_date.required' 				=> 'Tanggal kadaluwarsa tidak boleh kosong.',
-			'required_date.required' 			=> 'Tanggal dipakai tidak boleh kosong.',
 			'note.required'				        => 'Keterangan tidak boleh kosong',
             'arr_item.required'                 => 'Item tidak boleh kosong',
             'arr_item.array'                    => 'Item harus dalam bentuk array.',
@@ -571,10 +573,8 @@ class PurchaseRequestController extends Controller
                         $query->code = $request->code;
                         $query->post_date = $request->post_date;
                         $query->due_date = $request->due_date;
-                        $query->required_date = $request->required_date;
                         $query->note = $request->note;
                         $query->document = $document;
-                        $query->project_id = $request->project_id ? $request->project_id : NULL;
                         $query->company_id = $request->company_id;
                         $query->status = '1';
                         $query->save();
@@ -603,9 +603,7 @@ class PurchaseRequestController extends Controller
                         'status'        => '1',
                         'post_date'     => $request->post_date,
                         'due_date'      => $request->due_date,
-                        'required_date' => $request->required_date,
                         'note'          => $request->note,
-                        'project_id'    => $request->project_id ? $request->project_id : NULL,
                         'document'      => $request->file('file') ? $request->file('file')->store('public/purchase_requests') : NULL,
                     ]);
 
@@ -634,6 +632,8 @@ class PurchaseRequestController extends Controller
                             'warehouse_id'          => $request->arr_warehouse[$key],
                             'lookable_type'         => $request->arr_lookable_type[$key] ? $request->arr_lookable_type[$key] : NULL,
                             'lookable_id'           => $request->arr_lookable_id[$key] ? $request->arr_lookable_id[$key] : NULL,
+                            'requester'             => $request->arr_requester[$key],
+                            'project_id'            => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
                         ]);
                     }
                     DB::commit();
@@ -667,8 +667,6 @@ class PurchaseRequestController extends Controller
 
     public function show(Request $request){
         $pr = PurchaseRequest::where('code',CustomHelper::decrypt($request->id))->first();
-        $pr['project_id'] = $pr->project_id ? $pr->project_id : '';
-        $pr['project_name'] = $pr->project()->exists() ? $pr->project->code.' - '.$pr->project->name : '';
         $pr['code_place_id'] = substr($pr->code,7,2);
 
         $arr = [];
@@ -691,6 +689,9 @@ class PurchaseRequestController extends Controller
                 'lookable_type'     => $row->lookable_type ? $row->lookable_type : '',
                 'lookable_id'       => $row->lookable_id ? $row->lookable_id : '',
                 'reference_id'      => $row->lookable_type ? $row->lookable->materialRequest->id : '',
+                'requester'         => $row->requester ? $row->requester : '',
+                'project_id'        => $row->project_id ? $row->project_id : '',
+                'project_name'      => $row->project_id ? $row->project->name : '',
             ];
         }
 

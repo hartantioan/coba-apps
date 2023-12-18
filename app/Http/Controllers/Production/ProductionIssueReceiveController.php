@@ -148,11 +148,15 @@ class ProductionIssueReceiveController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
+				if($val->journal()->exists()){
+                    $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small" data-popup="tooltip" title="Journal" onclick="viewJournal(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">note</i></button>';
+                }else{
+                    $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light grey darken-3 white-tex btn-small disabled" data-popup="tooltip" title="Journal" ><i class="material-icons dp48">note</i></button>';
+                }
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
-                    $val->user->name,
                     $val->code,
+                    $val->user->name,
                     $val->company->name,
                     date('d/m/y',strtotime($val->post_date)),
                     $val->productionOrder->code,
@@ -160,12 +164,16 @@ class ProductionIssueReceiveController extends Controller
                     date('d/m/y',strtotime($val->productionOrder->productionScheduleDetail->production_date)).' - '.$val->productionOrder->productionScheduleDetail->shift->code.' - '.$val->productionOrder->productionScheduleDetail->shift->name,
                     $val->productionOrder->productionScheduleDetail->line->code,
                     $val->productionOrder->productionScheduleDetail->group,
+                    $val->productionOrder->productionSchedule->place->code,
+                    $val->productionOrder->warehouse->name,
+                    $val->productionOrder->area()->exists() ? $val->productionOrder->area->name : '-',
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
+                        '.$btn_jurnal.'
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
@@ -378,8 +386,8 @@ class ProductionIssueReceiveController extends Controller
                             'shading'                       => $request->arr_shading[$key] ? $request->arr_shading[$key] : NULL,
                             'bom_id'                        => $bomId > 0 ? $bomId : NULL,
                             'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                            'nominal'                       => $priceStockItem > 0 ? $priceStockItem : str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
-                            'total'                         => $totalStockItem > 0 ? $totalStockItem : str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
+                            'nominal'                       => $priceStockItem > 0 ? round($priceStockItem,2) : str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
+                            'total'                         => $totalStockItem > 0 ? round($totalStockItem,2) : str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
                             'type'                          => $row,
                             'from_item_stock_id'            => $request->arr_item_stock_id[$key] ? $request->arr_item_stock_id[$key] : NULL,
                             'batch_no'                      => $request->arr_batch[$key],
@@ -446,6 +454,7 @@ class ProductionIssueReceiveController extends Controller
                 'nominal_standard'      => number_format($row->productionOrderDetail->nominal,3,',','.'),
                 'total_standard'        => number_format($row->productionOrderDetail->total,3,',','.'),
                 'item_stock_id'         => $row->from_item_stock_id,
+                'shading'               => $row->shading,
                 'batch_no'              => $row->batch_no,
                 'type'                  => $row->type,
             ];
@@ -471,6 +480,8 @@ class ProductionIssueReceiveController extends Controller
         $po['shift']                            = date('d/m/y',strtotime($po->productionOrder->productionScheduleDetail->production_date)).' - '.$po->productionOrder->productionScheduleDetail->shift->code.' - '.$po->productionOrder->productionScheduleDetail->shift->name;
         $po['group']                            = $po->productionOrder->productionScheduleDetail->group;
         $po['line']                             = $po->productionOrder->productionScheduleDetail->line->code;
+        $po['shading']                          = $detailReceive->shading;
+        $po['batch_no']                         = $detailReceive->batch_no;
         
 		return response()->json($po);
     }
@@ -676,6 +687,21 @@ class ProductionIssueReceiveController extends Controller
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
+
+                foreach($query->productionIssueReceiveDetail()->whereNotNull('production_order_detail_id')->get() as $row){
+                    $row->productionOrderDetail->update([
+                        'qty_real'      => NULL,
+                        'nominal_real'  => NULL,
+                        'total_real'    => NULL,
+                    ]);
+                }
+
+                $query->productionOrder->update([
+                    'actual_item_cost'      => NULL,
+                    'actual_resource_cost'  => NULL,
+                    'total_product_cost'    => NULL,
+                    'completed_qty'         => NULL,
+                ]);
     
                 activity()
                     ->performedOn(new ProductionIssueReceive())
@@ -685,7 +711,10 @@ class ProductionIssueReceiveController extends Controller
     
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Issue Receive No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval($query->getTable(),$query->id);
-                CustomHelper::removeJournal($query->getTable(),$query->id);
+                if(in_array($query->status,['2','3'])){
+                    CustomHelper::removeJournal($query->getTable(),$query->id);
+                    CustomHelper::removeCogs($query->getTable(),$query->id);
+                }
 
                 $response = [
                     'status'  => 200,
@@ -737,6 +766,14 @@ class ProductionIssueReceiveController extends Controller
         }
         
         if($query->delete()){
+
+            foreach($query->productionIssueReceiveDetail()->whereNotNull('production_order_detail_id')->get() as $row){
+                $row->productionOrderDetail->update([
+                    'qty_real'      => NULL,
+                    'nominal_real'  => NULL,
+                    'total_real'    => NULL,
+                ]);
+            }
 
             $query->productionIssueReceiveDetail()->delete();
 
@@ -1426,5 +1463,46 @@ class ProductionIssueReceiveController extends Controller
             'status'    => 200,
             'message'   => ''
         ]);
+    }
+
+    public function viewJournal(Request $request,$id){
+        $query = ProductionIssueReceive::where('code',CustomHelper::decrypt($id))->first();
+        if($query->journal()->exists()){
+            $response = [
+                'title'     => 'Journal',
+                'status'    => 200,
+                'message'   => $query->journal,
+                'user'      => $query->user->name,
+                'reference' =>  $query->lookable_id ? $query->lookable->code : '-',
+            ];
+            $string='';
+            foreach($query->journal->journalDetail()->where(function($query){
+            $query->whereHas('coa',function($query){
+                $query->orderBy('code');
+            })
+            ->orderBy('type');
+        })->get() as $key => $row){
+                $string .= '<tr>
+                    <td class="center-align">'.($key + 1).'</td>
+                    <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
+                    <td class="center-align">'.$row->coa->company->name.'</td>
+                    <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
+                    <td class="center-align">'.($row->place_id ? $row->place->name : '-').'</td>
+                    <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
+                    <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
+                    <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
+                    <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
+                    <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
+                    <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
+                </tr>';
+            }
+            $response["tbody"] = $string; 
+        }else{
+            $response = [
+                'status'  => 500,
+                'message' => 'Data masih belum di approve.'
+            ]; 
+        }
+        return response()->json($response);
     }
 }

@@ -248,6 +248,7 @@
                     <table class="bordered" border="1" width="100%" class="table-data-item" style="border-collapse:collapse">
                         <thead>
                             <tr>
+                                <th align="center">No</th>
                                 <th align="center">Item</th>
                                 <th align="center">Jum.</th>
                                 <th align="center">Stok</th>
@@ -259,13 +260,15 @@
                                 <th align="center">Line</th>
                                 <th align="center">Machine</th>
                                 <th align="center">Departemen</th>
+                                <th align="center">Proyek</th>
                                 <th align="center-">Requester</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($data->materialRequestDetail as $row)
+                            @foreach($data->materialRequestDetail as $key => $row)
                             <tr>
-                                <td>{{ $row->item->name }}</td>
+                                <td>{{ $key + 1 }}</td>
+                                <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                                 <td align="right">{{ number_format($row->qty,3,',','.') }}</td>
                                 <td align="right">{{ number_format($row->stock,3,',','.') }}</td>
                                 <td align="center">{{ $row->item->buyUnit->code }}</td>
@@ -276,6 +279,7 @@
                                 <td align="center">{{ $row->line()->exists() ? $row->line->code : '-' }}</td>
                                 <td align="center">{{ $row->machine()->exists() ? $row->machine->name : '-' }}</td>
                                 <td align="center">{{ $row->department()->exists() ? $row->department->name : '-' }}</td>
+                                <td align="center">{{ $row->project()->exists() ? $row->project->name : '-' }}</td>
                                 <td align="">{{ $row->requester }}</td>
                             </tr>
                             @endforeach

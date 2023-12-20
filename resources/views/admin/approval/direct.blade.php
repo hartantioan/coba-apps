@@ -121,44 +121,65 @@
             }).then(function (willApprove) {
                 if (willApprove) {
                     if($('#reason').val()){
-                        $.ajax({
-                            url: '{{ URL::to("/") }}/admin/approval/approve',
-                            type: 'POST',
-                            dataType: 'JSON',
-                            data: {
-                                approve_reject_revision: type,
-                                note: $('#reason').val(),
-                                temp: '{{ Request::get("c") }}',
-                            },
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            beforeSend: function() {
-                                loadingOpen('#main');
-                            },
-                            success: function(response) {
-                                loadingClose('#main');
-                                if(response.status == 200) {
-                                    success();
-                                    M.toast({
-                                        html: response.message
-                                    });
-                                } else {
-                                    M.toast({
-                                        html: response.message
+                        var arr_data = [], passed = true, countChecked = 0;
+                        if($('input[name^="arr_status_material_request[]"]').length > 0){
+                            $('input[name^="arr_status_material_request[]"]').each(function(index){
+                                if($(this).is(':checked')){
+                                    arr_data.push($(this).val());
+                                    countChecked++;
+                                }
+                            });
+                            if(countChecked == 0){
+                                passed = false;
+                            }
+                        }
+                        if(passed){
+                            $.ajax({
+                                url: '{{ URL::to("/") }}/admin/approval/approve',
+                                type: 'POST',
+                                dataType: 'JSON',
+                                data: {
+                                    approve_reject_revision: type,
+                                    note: $('#reason').val(),
+                                    temp: '{{ Request::get("c") }}',
+                                    arr_status_material_request: arr_data,
+                                },
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                beforeSend: function() {
+                                    loadingOpen('#main');
+                                },
+                                success: function(response) {
+                                    loadingClose('#main');
+                                    if(response.status == 200) {
+                                        success();
+                                        M.toast({
+                                            html: response.message
+                                        });
+                                    } else {
+                                        M.toast({
+                                            html: response.message
+                                        });
+                                    }
+                                },
+                                error: function(response) {
+                                    $('#main').scrollTop(0);
+                                    loadingClose('#main');
+                                    swal({
+                                        title: 'Ups!',
+                                        text: 'Check your internet connection.',
+                                        icon: 'error'
                                     });
                                 }
-                            },
-                            error: function(response) {
-                                $('#main').scrollTop(0);
-                                loadingClose('#main');
-                                swal({
-                                    title: 'Ups!',
-                                    text: 'Check your internet connection.',
-                                    icon: 'error'
-                                });
-                            }
-                        });
+                            });
+                        }else{
+                            swal({
+                                title: 'Ups!',
+                                text: 'Minimal harus 1 item dipilih / dicentang.',
+                                icon: 'error'
+                            });
+                        }
                     }else{
                         M.toast({
                             html: 'Alasan/keterangan tidak boleh kosong.'

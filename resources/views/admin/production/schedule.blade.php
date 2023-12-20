@@ -208,7 +208,7 @@
                                     <legend>3. Detail Target Produksi</legend>
                                     <div class="col m12 s12 step10" style="overflow:auto;width:100% !important;">
                                         <p class="mt-2 mb-2">
-                                            <table class="bordered">
+                                            <table class="bordered" id="table-detail">
                                                 <thead>
                                                     <tr>
                                                         <th class="center">MOP</th>
@@ -256,7 +256,7 @@
                                                     <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">event_seat</i>FG</div>
                                                     <div class="collapsible-body" style="display:block;">
                                                         <div class="" style="overflow:auto;width:100% !important;">
-                                                            <table class="bordered" style="min-width:2000px;">
+                                                            <table class="bordered" style="min-width:2000px;" id="table-detail2">
                                                                 <thead>
                                                                     <tr>
                                                                         <th class="center">Pilih</th>
@@ -293,7 +293,7 @@
                                                     <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">filter_3</i>SFG-3</div>
                                                     <div class="collapsible-body">
                                                         <div class="" style="overflow:auto;width:100% !important;">
-                                                            <table class="bordered" style="min-width:2000px;">
+                                                            <table class="bordered" style="min-width:2000px;" id="table-detail3">
                                                                 <thead>
                                                                     <tr>
                                                                         <th class="center">Pilih</th>
@@ -330,7 +330,7 @@
                                                     <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">filter_2</i>SFG-2</div>
                                                     <div class="collapsible-body">
                                                         <div class="" style="overflow:auto;width:100% !important;">
-                                                            <table class="bordered" style="min-width:2000px;">
+                                                            <table class="bordered" style="min-width:2000px;" id="table-detail4">
                                                                 <thead>
                                                                     <tr>
                                                                         <th class="center">Pilih</th>
@@ -367,7 +367,7 @@
                                                     <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">filter_1</i>SFG-1</div>
                                                     <div class="collapsible-body">
                                                         <div class="" style="overflow:auto;width:100% !important;">
-                                                            <table class="bordered" style="min-width:2000px;">
+                                                            <table class="bordered" style="min-width:2000px;" id="table-detail5">
                                                                 <thead>
                                                                     <tr>
                                                                         <th class="center">Pilih</th>
@@ -557,6 +557,10 @@
     var listfgsfg = [];
 
     $(function() {
+
+        $("#table-detail th,#table-detail2 th,#table-detail3 th,#table-detail4 th,#table-detail5 th").resizable({
+            minWidth: 100,
+        });
 
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();

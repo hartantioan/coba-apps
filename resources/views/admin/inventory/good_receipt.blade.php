@@ -220,7 +220,7 @@
                                 <p class="mt-2 mb-2">
                                     <h5>Detail Produk</h5>
                                     <div style="overflow:auto;">
-                                        <table class="bordered" style="width:1800px;">
+                                        <table class="bordered" style="width:1800px;" id="table-detail">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Item</th>
@@ -450,6 +450,10 @@
 <!-- END: Page Main-->
 <script>
     $(function() {
+        $("#table-detail th").resizable({
+            minWidth: 100,
+        });
+
         $(".select2").select2({
             dropdownAutoWidth: true,
             width: '100%',

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('lookable_type',155)->nullable()->index();
             $table->bigInteger('lookable_id')->nullable()->index();
             $table->char('value',1)->nullable();
+            $table->string('note')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
         });

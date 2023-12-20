@@ -2829,6 +2829,8 @@ class Select2Controller extends Controller {
                             'line_id'       => $row->line_id,
                             'machine_id'    => $row->machine_id,
                             'department_id' => $row->department_id,
+                            'project_id'    => $row->project()->exists() ? $row->project->id : '',
+                            'project_name'  => $row->project()->exists() ? $row->project->name : '',
                             'requester'     => $row->requester ? $row->requester : '',
                             'qty_balance'   => number_format($row->balancePr(),3,',','.'),
                             'type'          => $row->getTable(),

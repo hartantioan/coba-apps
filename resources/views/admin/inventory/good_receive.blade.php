@@ -196,7 +196,7 @@
                                     <h4>Detail Produk</h4>
                                     Coa debit mengikuti coa pada masing-masing grup item.
                                     <div style="overflow:auto;">
-                                        <table class="bordered" style="min-width:2000px !important;">
+                                        <table class="bordered" style="min-width:2000px !important;" id="table-detail">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Item</th>
@@ -420,7 +420,9 @@
             width: '100%',
         });
 
-        
+        $("#table-detail th").resizable({
+            minWidth: 100,
+        });
 
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();

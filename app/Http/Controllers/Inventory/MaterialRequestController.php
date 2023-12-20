@@ -210,7 +210,7 @@ class MaterialRequestController extends Controller
         $string = '<div class="row pt-1 pb-1"><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="14">Daftar Item (Stok yang tampil adalah stok realtime pada saat dokumen dibuat)</th>
+                                <th class="center-align" colspan="15">Daftar Item (Stok yang tampil adalah stok realtime pada saat dokumen dibuat)</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -225,6 +225,7 @@ class MaterialRequestController extends Controller
                                 <th class="center-align">Line</th>
                                 <th class="center-align">Machine</th>
                                 <th class="center-align">Departemen</th>
+                                <th class="center-align">Proyek</th>
                                 <th class="center-align">Requester</th>
                                 <th class="center-align">Status</th>
                             </tr>
@@ -244,6 +245,7 @@ class MaterialRequestController extends Controller
                 <td class="center-align">'.($row->line()->exists() ? $row->line->code : '-').'</td>
                 <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
                 <td class="center-align">'.($row->department()->exists() ? $row->department->name : '-').'</td>
+                <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
                 <td class="">'.$row->requester.'</td>
                 <td class="center-align" style="font-size:20px !important;">'.$row->status().'</td>
             </tr>';
@@ -550,6 +552,7 @@ class MaterialRequestController extends Controller
                             'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
                             'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
                             'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
+                            'project_id'            => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
                             'requester'             => $request->arr_requester[$key],
                         ]);
                     }
@@ -607,6 +610,8 @@ class MaterialRequestController extends Controller
                 'requester'         => $row->requester,
                 'stock_list'        => $row->item->currentStockPurchase($this->dataplacecode,$this->datawarehouses),
                 'list_warehouse'    => $row->item->warehouseList(),
+                'project_id'        => $row->project()->exists() ? $row->project->id : '',
+                'project_name'      => $row->project()->exists() ? $row->project->name : '',
             ];
         }
 

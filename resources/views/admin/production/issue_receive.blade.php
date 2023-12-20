@@ -496,6 +496,10 @@
     
     $(function() {
 
+        $("#table-detail-item-issue th,#table-detail-item-receive th").resizable({
+            minWidth: 100,
+        });
+
         $(".select2").select2({
             dropdownAutoWidth: true,
             width: '100%',
@@ -614,6 +618,21 @@
                     return null;
                 };
                 $('#output-shift,#output-line,#output-group').text('-');
+                $('#production_order_id').empty();
+                $('#body-item-issue').empty().append(`
+                    <tr id="last-row-item-issue">
+                        <td class="center-align" colspan="6">
+                            Silahkan tambahkan Order Produksi untuk memulai...
+                        </td>
+                    </tr>
+                `);
+                $('#body-item-receive').empty().append(`
+                    <tr id="last-row-item-receive">
+                        <td class="center-align" colspan="9">
+                            Silahkan tambahkan Order Produksi untuk memulai...
+                        </td>
+                    </tr>
+                `);
             }
         });
 

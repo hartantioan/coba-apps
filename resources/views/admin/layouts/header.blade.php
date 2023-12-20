@@ -3,7 +3,8 @@
         <div class="navbar navbar-fixed">
             <nav class="navbar-main navbar-color nav-collapsible sideNav-lock navbar-dark gradient-45deg-indigo-purple no-shadow" style="background: linear-gradient(45deg, #e19e4b, #6d2b17d8) !important;">
                 <div class="nav-wrapper">
-                    <div class="header-search-wrapper hide-on-med-and-down"><i class="material-icons">search</i>
+                    <div class="header-search-wrapper hide-on-med-and-down">
+                        <i class="material-icons">search</i>
                         <input class="header-search-input z-depth-2" type="text" name="Search" placeholder="Cari menu" data-search="template-list">
                         <ul class="search-list collection display-none"></ul>
                     </div>

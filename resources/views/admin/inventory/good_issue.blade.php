@@ -207,7 +207,7 @@
                                         <h5>Detail Produk</h5>
                                         Coa debit mengikuti coa pada masing-masing grup item.
                                         <div style="overflow:auto;">
-                                            <table class="bordered" style="width:100%;">
+                                            <table class="bordered" style="width:100%;" id="table-detail">
                                                 <thead>
                                                     <tr>
                                                         <th class="center">Stok Item (Stok saat ini)</th>
@@ -426,7 +426,9 @@
             width: '100%',
         });
 
-        
+        $("#table-detail th").resizable({
+            minWidth: 100,
+        });
 
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();

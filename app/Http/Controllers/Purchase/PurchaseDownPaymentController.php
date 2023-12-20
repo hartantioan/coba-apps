@@ -42,25 +42,28 @@ use App\Models\Menu;
 use App\Models\PurchaseDownPaymentDetail;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportPurchaseDownPayment;
+use App\Models\ChecklistDocumentList;
 use App\Models\User;
 use App\Models\Tax;
 
 class PurchaseDownPaymentController extends Controller
 {
-    protected $dataplaces, $dataplacecode;
+    protected $dataplaces, $dataplacecode, $url, $menu;
 
     public function __construct(){
         $user = User::find(Session::get('bo_id'));
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
         $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
+        $this->url = request()->segment(3);
+        $this->menu = Menu::where('url', $this->url)->first();
     }
 
     public function index(Request $request)
     {
-        $lastSegment = request()->segment(count(request()->segments()));
        
-        $menu = Menu::where('url', $lastSegment)->first();
+        $menu = $this->menu;
+
         $data = [
             'title'         => 'AP Down Payment',
             'content'       => 'admin.purchase.down_payment',
@@ -73,6 +76,7 @@ class PurchaseDownPaymentController extends Controller
             'newcode'       => $menu->document_code.date('y'),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
+            'menu'          => $menu,
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -108,6 +112,7 @@ class PurchaseDownPaymentController extends Controller
                 'delivery_date' => date('d/m/y',strtotime($row->delivery_date)),
                 'grandtotal'    => number_format($row->grandtotal,2,',','.'),
                 'list_items'    => $list_items,
+                'note'          => $row->note,
             ];
         }
 
@@ -480,6 +485,8 @@ class PurchaseDownPaymentController extends Controller
                             $row->delete();
                         }
 
+                        $query->checklistDocumentList()->delete();
+
                         DB::commit();
                     }else{
                         return response()->json([
@@ -527,24 +534,33 @@ class PurchaseDownPaymentController extends Controller
 			}
 			
 			if($query) {
-                
-                if($request->arr_code){
-                    DB::beginTransaction();
-                    try {
+                DB::beginTransaction();
+                try {
+                    if($request->arr_code){
                         foreach($request->arr_code as $key => $row){
-                            
                             PurchaseDownPaymentDetail::create([
                                 'purchase_down_payment_id'      => $query->id,
                                 'purchase_order_id'             => PurchaseOrder::where('code',CustomHelper::decrypt($row))->first()->id,
                                 'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
                                 'note'                          => $request->arr_note[$key]
                             ]);
-                                
                         }
-                        DB::commit();
-                    }catch(\Exception $e){
-                        DB::rollback();
                     }
+
+                    if($request->arr_checklist_box){
+                        foreach($request->arr_checklist_box as $key => $row){
+                            ChecklistDocumentList::create([
+                                'checklist_document_id'         => $row,
+                                'lookable_type'                 => $query->getTable(),
+                                'lookable_id'                   => $query->id,
+                                'value'                         => '1',
+                                'note'                          => $request->arr_checklist_note[$key],
+                            ]);
+                        }
+                    }
+                    DB::commit();
+                }catch(\Exception $e){
+                    DB::rollback();
                 }
 
                 CustomHelper::sendApproval('purchase_down_payments',$query->id,$query->note);
@@ -574,6 +590,8 @@ class PurchaseDownPaymentController extends Controller
 
     public function rowDetail(Request $request)
     {
+        $menu = $this->menu;
+
         $data   = PurchaseDownPayment::where('code',CustomHelper::decrypt($request->id))->first();
         
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;max-width:100%;">
@@ -610,7 +628,18 @@ class PurchaseDownPaymentController extends Controller
             </tr>';
         }
         
-        $string .= '</tbody></table></div>';
+        $string .= '</tbody></table></div><div class="col s12 mt-2"><h6>Daftar Lampiran</h6>';
+
+        foreach($menu->checklistDocument as $row){
+            $rowceklist = $row->checkDocument($data->getTable(),$data->id);
+            $string .= '<label style="margin: 0 5px 0 0;">
+            <input class="validate" required="" type="checkbox" value="{{ $row->id }}" '.($rowceklist ? 'checked' : '').'>
+            <span>'.$row->title.' ('.$row->type().')'.'</span>
+            '.($rowceklist ? $rowceklist->note : '').'
+            </label>';
+        }
+
+        $string .= '</div>';
 
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
                         <thead>
@@ -693,6 +722,14 @@ class PurchaseDownPaymentController extends Controller
         $pdp['is_include_tax'] = $pdp->is_include_tax ? $pdp->is_include_tax : '0';
 
         $arr = [];
+        $arrChecklist = [];
+
+        foreach($pdp->checklistDocumentList as $row){
+            $arrChecklist[] = [
+                'id'    => $row->checklist_document_id,
+                'note'  => $row->note,
+            ];
+        }
 
         foreach($pdp->purchaseDownPaymentDetail as $row){
 
@@ -721,6 +758,7 @@ class PurchaseDownPaymentController extends Controller
         }
 
         $pdp['details'] = $arr;
+        $pdp['checklist'] = $arrChecklist;
         				
 		return response()->json($pdp);
     }

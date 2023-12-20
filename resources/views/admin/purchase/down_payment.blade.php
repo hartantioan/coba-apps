@@ -199,7 +199,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit {{ $title }}</h4>
+                <h6>Tambah/Edit {{ $title }}</h6>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -294,9 +294,9 @@
                             </div>
                             <div class="col m12 s12 step11">
                                 <p class="mt-2 mb-2">
-                                    <h4>Detail Purchase Order (Centang jika ada)</h4>
+                                    <h6>Detail Purchase Order (Centang jika ada)</h6>
                                     <div style="overflow:auto;">
-                                        <table class="bordered">
+                                        <table class="bordered" id="table-detail">
                                             <thead>
                                                 <tr>
                                                     <th class="center">
@@ -325,13 +325,34 @@
                                     </div>
                                 </p>
                             </div>
-                            <div class="input-field col m4 s12 step12">
-                                <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
-                                <label class="active" for="note">Keterangan</label>
-                            </div>
-                            <div class="input-field col m4 s12 step13">
-                                <textarea class="materialize-textarea preserveLines" id="note_external" name="note_external" placeholder="Keterangan Tambahan" rows="3"></textarea>
-                                <label class="active" for="note_external">Keterangan Tambahan (muncul pada printout)</label>
+                            <div class="col m8 s12 row">
+                                <div class="input-field col m6 s12 step12">
+                                    <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
+                                    <label class="active" for="note">Keterangan</label>
+                                </div>
+                                <div class="input-field col m6 s12 step13">
+                                    <textarea class="materialize-textarea preserveLines" id="note_external" name="note_external" placeholder="Keterangan Tambahan" rows="3"></textarea>
+                                    <label class="active" for="note_external">Keterangan Tambahan (muncul pada printout)</label>
+                                </div>
+                                <div class="col m12 s12 step11">
+                                    <p class="mt-2 mb-2">
+                                        <h6>Checklist Lampiran</h6>
+                                        @foreach ($menu->checklistDocument as $row)
+                                            @if ($row->is_other)
+                                                <br>
+                                            @endif
+                                            <label style="margin: 0 5px 0 0;">
+                                                <input class="validate" required="" type="checkbox" name="arr_checklist_box[]" value="{{ $row->id }}">
+                                                <span>{{ $row->title.' ('.$row->type().')' }}</span>
+                                                @if($row->is_other)
+                                                    <input type="text" name="arr_checklist_note[]" style="width: 200px;height:1.5rem;">
+                                                @else
+                                                    <input type="hidden" name="arr_checklist_note[]">
+                                                @endif
+                                            </label>
+                                        @endforeach
+                                    </p>
+                                </div>
                             </div>
                             <div class="input-field col m4 s12 step14">
                                 <table width="100%" class="bordered">
@@ -368,7 +389,7 @@
                                 </table>
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step15" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                
                             </div>
                         </div>
                     </div>
@@ -377,7 +398,8 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn waves-effect waves-light purple" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+        <button class="btn waves-effect waves-light purple mr-1" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+        <button class="btn waves-effect waves-light step15 mr-1" onclick="save();">Simpan <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -694,6 +716,9 @@
         });
 
         select2ServerSide('#supplier_id,#filter_supplier', '{{ url("admin/select2/supplier") }}');
+        $("#table-detail th").resizable({
+            minWidth: 100,
+        });
     });
 
     function resetTerm(){
@@ -1051,7 +1076,7 @@
                                         ` + val.delivery_date + `
                                     </td>
                                     <td class="center">
-                                        <input name="arr_note[]" class="browser-default" type="text" value="-" style="width:100%;" id="rowNote` + count + `">
+                                        <input name="arr_note[]" class="browser-default" type="text" value="` + val.note + `" style="width:100%;" id="rowNote` + count + `">
                                     </td>
                                     <td class="center">
                                         ` + val.grandtotal + `
@@ -1315,6 +1340,8 @@
                 formData.delete("arr_code[]");
                 formData.delete("arr_nominal[]");
                 formData.delete("arr_note[]");
+                formData.delete("arr_checklist_box[]");
+                formData.delete("arr_checklist_note[]");
                 formData.append('tax_id',$('#tax_id').find(':selected').data('id'));
                 formData.append('wtax_id',$('#wtax_id').find(':selected').data('id'));
                 formData.append('percent_tax',$('#tax_id').val());
@@ -1325,6 +1352,13 @@
                         formData.append('arr_code[]',$(this).val());
                         formData.append('arr_nominal[]',$('#rowNominal' + $(this).data('id')).val());
                         formData.append('arr_note[]',$('#rowNote' + $(this).data('id')).val());
+                    }
+                });
+
+                $('input[name^="arr_checklist_box[]"]').each(function(index){
+                    if($(this).is(':checked')){
+                        formData.append('arr_checklist_box[]',$(this).val());
+                        formData.append('arr_checklist_note[]',$('input[name^="arr_checklist_note[]"]').eq(index).val());
                     }
                 });
 
@@ -1502,6 +1536,16 @@
                                 </td>
                             </tr>
                         `);
+                    });
+                }
+                if(response.checklist.length > 0){
+                    $.each(response.checklist, function(i, val) {
+                        $('input[name^="arr_checklist_box[]"]').each(function(index){
+                            if(val.id == $(this).val()){
+                                $(this).prop( "checked", true);
+                                $('input[name^="arr_checklist_note[]"]').eq(index).val(val.note);
+                            }
+                        });
                     });
                 }
                 $('.modal-content').scrollTop(0);

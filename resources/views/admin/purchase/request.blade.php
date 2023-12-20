@@ -97,7 +97,7 @@
                                                         <th rowspan="2">Code</th>
                                                         <th rowspan="2">Pengguna</th>
                                                         <th rowspan="2">Perusahaan</th>
-                                                        <th colspan="3" class="center-align">Tanggal</th>
+                                                        <th colspan="2" class="center-align">Tanggal</th>
                                                         <th rowspan="2">Keterangan</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Status</th>
@@ -106,7 +106,6 @@
                                                     <tr>
                                                         <th>Pengajuan</th>
                                                         <th>Kadaluwarsa</th>
-                                                        <th>Pemakaian</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -125,7 +124,7 @@
 </div>
 
 <div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;">
-    <div class="modal-content">
+    <div class="modal-content" style="overflow-x:hidden !important;">
         <div class="row">
             <div class="col s12">
                 <h4>Tambah/Edit {{ $title }}</h4>
@@ -203,7 +202,7 @@
                             <div class="row">
                                 <div class="col m12 s12 step12">
                                     <p class="mt-2 mb-2">
-                                        <table class="bordered" style="width:2000px;">
+                                        <table class="bordered" style="width:2000px;" id="table-detail">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Item</th>
@@ -664,6 +663,10 @@
         select2ServerSide('#arr_item0', '{{ url("admin/select2/purchase_item") }}');
         select2ServerSide('#material_request_id', '{{ url("admin/select2/material_request_pr") }}');
         select2ServerSide('#arr_project0', '{{ url("admin/select2/project") }}');
+
+        $("#table-detail th").resizable({
+            minWidth: 100,
+        });
     });
 
     function makeTreeOrg(data,link){
@@ -940,7 +943,6 @@
                 { name: 'company_id', className: 'center-align' },
                 { name: 'date_post', className: 'center-align' },
                 { name: 'date_due', className: 'center-align' },
-                { name: 'date_use', className: 'center-align' },
                 { name: 'note', className: '' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
@@ -1745,6 +1747,11 @@
                                 <option value="` + val.item_id + `">` + val.item_name + `</option>
                             `);
                             select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+                            if(val.project_id){
+                                $('#arr_project' + count).append(`
+                                    <option value="` + val.project_id + `">` + val.project_name + `</option>
+                                `)
+                            }
                             select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
                         });
 

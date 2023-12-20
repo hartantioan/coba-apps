@@ -384,7 +384,7 @@
                             <div class="col m12 s12 step22" style="overflow:auto;width:100% !important;">
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Produk</h4>
-                                    <table class="bordered" style="width:2500px;">
+                                    <table class="bordered" style="width:2500px;" id="table-detail">
                                         <thead>
                                             <tr>
                                                 <th class="center">Item / Coa Jasa</th>
@@ -799,6 +799,10 @@
         select2ServerSide('#purchase_request_id', '{{ url("admin/select2/purchase_request") }}');
         select2ServerSide('#good_issue_id', '{{ url("admin/select2/good_issue") }}');
         select2ServerSide('#marketing_order_delivery_process_id', '{{ url("admin/select2/marketing_order_delivery_process_po") }}');
+
+        $("#table-detail th").resizable({
+            minWidth: 100,
+        });
     });
     
     function printMultiSelect(){

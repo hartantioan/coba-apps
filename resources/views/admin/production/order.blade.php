@@ -397,6 +397,10 @@
 <script>
     $(function() {
 
+        $("#table-bom th").resizable({
+            minWidth: 100,
+        });
+
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
             

@@ -236,4 +236,9 @@ class Menu extends Model
     {
         return $this->hasMany('App\Models\ApprovalSource','lookable_type','table_name');
     }
+
+    public function checklistDocument()
+    {
+        return $this->hasMany('App\Models\ChecklistDocument');
+    }
 }

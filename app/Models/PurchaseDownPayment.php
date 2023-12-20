@@ -323,6 +323,10 @@ class PurchaseDownPayment extends Model
         });
     }
 
+    public function checklistDocumentList(){
+        return $this->hasMany('App\Models\ChecklistDocumentList','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
     public function balanceMemo(){
         $total = str_replace(',','.',str_replace('.','',$this->total));
 

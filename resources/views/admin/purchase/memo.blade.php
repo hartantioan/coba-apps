@@ -239,7 +239,7 @@
                                 <p class="mt-2 mb-2">
                                     <h6>Detail Transaksi</h6>
                                     <div style="overflow:auto;">
-                                        <table class="bordered">
+                                        <table class="bordered" id="table-detail">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Ref.Dokumen / Coa</th>
@@ -642,6 +642,10 @@
                 `);
             }
             countAll();
+        });
+
+        $("#table-detail th").resizable({
+            minWidth: 100,
         });
     });
 

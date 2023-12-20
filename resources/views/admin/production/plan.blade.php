@@ -212,7 +212,7 @@
                                     <legend>2. Detail Produk</legend>
                                     <div class="col m12 s12 step8" style="overflow:auto;width:100% !important;">
                                         <p class="mt-2 mb-2">
-                                            <table class="bordered">
+                                            <table class="bordered" id="table-detail">
                                                 <thead>
                                                     <tr>
                                                         <th class="center">Item</th>
@@ -429,6 +429,10 @@
 <!-- END: Page Main-->
 <script>
     $(function() {
+
+        $("#table-detail th").resizable({
+            minWidth: 100,
+        });
 
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();

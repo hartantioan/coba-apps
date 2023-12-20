@@ -187,7 +187,6 @@ class PurchaseRequestController extends Controller
                     $val->company->name,
                     date('d/m/y',strtotime($val->post_date)),
                     date('d/m/y',strtotime($val->due_date)),
-                    date('d/m/y',strtotime($val->required_date)),
                     $val->note,
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),

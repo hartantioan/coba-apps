@@ -33,7 +33,7 @@
     <!-- END: VENDOR CSS-->
     <!-- BEGIN: Page Level CSS-->
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/themes/vertical-modern-menu-template/materialize.css?v=8') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/themes/vertical-modern-menu-template/style.css?v=7') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/themes/vertical-modern-menu-template/style.css?v=9') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/dashboard-modern.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/intro.css?v=8') }}">
 	<link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/data-tables.css?v=2') }}">
@@ -47,6 +47,8 @@
     <script src="{{ url('app-assets/js/custom/websocket-printer.js') }}"></script>
     <script src="{{ url('app-assets/vendors/introjs/intro.js?v=1') }}"></script>
     <link href="{{ url('app-assets/vendors/introjs/intro.css') }}" rel="stylesheet">
+    <link href="{{ url('app-assets/css/custom/jquery-ui.css') }}" rel="stylesheet">
+    <script src="{{ url('app-assets/js/custom/jquery-ui.js') }}"></script>
 </head>
 <!-- END: Head-->
 

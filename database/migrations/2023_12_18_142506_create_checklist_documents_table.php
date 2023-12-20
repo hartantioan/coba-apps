@@ -16,6 +16,7 @@ return new class extends Migration
             $table->bigInteger('menu_id')->nullable()->index();
             $table->string('title')->nullable();
             $table->char('type',1)->nullable();
+            $table->char('is_other',1)->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
         });

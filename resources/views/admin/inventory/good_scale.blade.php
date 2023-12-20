@@ -281,7 +281,7 @@
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Produk</h4>
                                     <div style="overflow:auto;">
-                                        <table class="bordered" style="width:1800px;">
+                                        <table class="bordered" style="width:1800px;" id="table-detail">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Item</th>
@@ -743,6 +743,10 @@
 
         $('#body-item').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();
+        });
+
+        $("#table-detail th").resizable({
+            minWidth: 100,
         });
     });
 

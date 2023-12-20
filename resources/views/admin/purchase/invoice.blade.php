@@ -302,7 +302,7 @@
                                     <p class="mt-2 mb-2">
                                         <h6>Detail Goods Receipt PO / Landed Cost / Purchase Order Jasa / Coa</h6>
                                         <div style="overflow:auto;">
-                                            <table class="bordered" style="width:2800px !important;">
+                                            <table class="bordered" style="width:3000px !important;" id="table-detail">
                                                 <thead>
                                                     <tr>
                                                         <th class="center">GR/LC/PO/Coa No.</th>
@@ -968,6 +968,10 @@
         });
 
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/supplier_vendor") }}');
+
+        $("#table-detail th").resizable({
+            minWidth: 100,
+        });
     });
 
     String.prototype.replaceAt = function(index, replacement) {

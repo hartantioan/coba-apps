@@ -26,6 +26,7 @@ class MaterialRequestDetail extends Model
         'machine_id',
         'department_id',
         'warehouse_id',
+        'project_id',
         'status',
         'requester',
     ];
@@ -38,6 +39,11 @@ class MaterialRequestDetail extends Model
     public function line()
     {
         return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();
+    }
+
+    public function project()
+    {
+        return $this->belongsTo('App\Models\Project', 'project_id', 'id')->withTrashed();
     }
 
     public function machine()

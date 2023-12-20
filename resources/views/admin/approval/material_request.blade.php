@@ -202,6 +202,7 @@
                         <th class="center-align">Line</th>
                         <th class="center-align">Machine</th>
                         <th class="center-align">Departemen</th>
+                        <th class="center-align">Proyek</th>
                         <th class="center-align">Requester</th>
                     </tr>
                 </thead>
@@ -225,6 +226,7 @@
                         <td class="center-align">{{ $row->line()->exists() ? $row->line->code : '-' }}</td>
                         <td class="center-align">{{ $row->machine()->exists() ? $row->machine->name : '-' }}</td>
                         <td class="center-align">{{ $row->department()->exists() ? $row->department->name : '-' }}</td>
+                        <td class="center-align">{{ $row->project()->exists() ? $row->project->name : '-' }}</td>
                         <td class="">{{ $row->requester }}</td>
                     </tr>
                     @endforeach

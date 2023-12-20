@@ -119,7 +119,7 @@
 </div>
 
 <div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;">
-    <div class="modal-content">
+    <div class="modal-content" style="overflow-x:hidden !important;">
         <div class="row">
             <div class="col s12">
                 <h4>Tambah/Edit {{ $title }}</h4>
@@ -161,10 +161,10 @@
                         <fieldset style="min-width: 100%;overflow:auto;">
                             <legend>2. Detail Produk</legend>
                             <div class="row">
-                                <div class="col m12 s12 step5" style="width:1800px;">
+                                <div class="col m12 s12 step5" style="width:2500px;">
                                     <p class="mt-2 mb-2">
                                         <h4>Detail Produk</h4>
-                                        <table class="bordered">
+                                        <table class="bordered" id="table-detail">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Item</th>
@@ -178,6 +178,7 @@
                                                     <th class="center">Line</th>
                                                     <th class="center">Mesin</th>
                                                     <th class="center">Departemen</th>
+                                                    <th class="center">Proyek</th>
                                                     <th class="center">Requester</th>
                                                     <th class="center">Hapus</th>
                                                 </tr>
@@ -239,6 +240,9 @@
                                                         </select>    
                                                     </td>
                                                     <td>
+                                                        <select class="browser-default" id="arr_project0" name="arr_project[]"></select>
+                                                    </td>
+                                                    <td>
                                                         <input name="arr_requester[]" type="text" placeholder="Yang meminta barang / requester" required>
                                                     </td>
                                                     <td class="center">
@@ -266,7 +270,7 @@
                                 <label class="active" for="note">Keterangan</label>
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step7" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                
                             </div>
                         </div>
                     </div>
@@ -275,8 +279,9 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn waves-effect waves-light purple" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Tutup</a>
+        <button class="btn waves-effect waves-light purple mr-1" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+        <button class="btn waves-effect waves-light step7 mr-1" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat">Tutup</a>
     </div>
 </div>
 
@@ -553,7 +558,11 @@
 
         $('#arr_place0,#arr_department0').formSelect();
         select2ServerSide('#arr_item0', '{{ url("admin/select2/purchase_item") }}');
-        select2ServerSide('#project_id', '{{ url("admin/select2/project") }}');
+        select2ServerSide('#arr_project0', '{{ url("admin/select2/project") }}');
+
+        $("#table-detail th").resizable({
+            minWidth: 100,
+        });
     });
 
     function makeTreeOrg(data,link){
@@ -948,6 +957,7 @@
                 formData.delete("arr_machine[]");
                 formData.delete("arr_department[]");
                 formData.delete("arr_requester[]");
+                formData.delete("arr_project[]");
 
                 $('select[name^="arr_line[]"]').each(function(index){
                     formData.append('arr_line[]',($(this).val() ? $(this).val() : ''));
@@ -957,6 +967,9 @@
                 });
                 $('select[name^="arr_department[]"]').each(function(index){
                     formData.append('arr_department[]',($(this).val() ? $(this).val() : ''));
+                });
+                $('select[name^="arr_project[]"]').each(function(index){
+                    formData.append('arr_project[]',($(this).val() ? $(this).val() : ''));
                 });
                 $('input[name^="arr_requester[]"]').each(function(index){
                     formData.append('arr_requester[]',($(this).val() ? $(this).val() : ''));
@@ -1122,6 +1135,9 @@
                                     </select>    
                                 </td>
                                 <td>
+                                    <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                                </td>
+                                <td>
                                     <input name="arr_requester[]" type="text" placeholder="Yang meminta barang / requester" value="` + val.requester + `" required>
                                 </td>
                                 <td class="center">
@@ -1148,6 +1164,14 @@
                         if(val.department_id){
                             $('#arr_department' + count).val(val.department_id);
                         }
+
+                        if(val.project_id){
+                            $('#arr_project' + count).append(`
+                                <option value="` + val.project_id + `">` + val.project_name + `</option>
+                            `);
+                        }
+
+                        select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
 
                         $('#arr_warehouse' + count).empty();
                         if(val.list_warehouse.length > 0){
@@ -1475,6 +1499,9 @@
                     </select>    
                 </td>
                 <td>
+                    <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                </td>
+                <td>
                     <input name="arr_requester[]" type="text" placeholder="Yang meminta barang / requester" required>
                 </td>
                 <td class="center">
@@ -1485,6 +1512,7 @@
             </tr>
         `);
         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+        select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
     }
 
     function changePlace(element){

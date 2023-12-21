@@ -205,7 +205,7 @@
                             </p>
                         </div>
                         <div class="col s12 step9" style="overflow:auto;">
-                            <table class="bordered" style="width:1500px;">
+                            <table class="bordered" style="width:1500px;" id="table-detail">
                                 <thead>
                                     <tr>
                                         <th class="center">No.</th>
@@ -412,7 +412,9 @@
 <!-- END: Page Main-->
 <script>
     $(function() {
-        
+        $("#table-detail th").resizable({
+            minWidth: 100,
+        });
 
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();

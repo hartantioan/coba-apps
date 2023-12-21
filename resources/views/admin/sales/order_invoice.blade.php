@@ -275,7 +275,7 @@
                                     </div> 
                                     <div class="col m12 s12" style="width:2500px !important;" id="table-item">
                                         <p class="mt-2 mb-2">
-                                            <table class="bordered">
+                                            <table class="bordered" id="table-detail">
                                                 <thead>
                                                     <tr>
                                                         <th class="center">Surat Jalan</th>
@@ -321,7 +321,7 @@
                                     </div> 
                                     <div class="col m12 s12" style="width:1800px !important;" id="table-dp">
                                         <p class="mt-2 mb-2">
-                                            <table class="bordered">
+                                            <table class="bordered" id="table-detail1">
                                                 <thead>
                                                     <tr>
                                                         <th class="center">No.Dokumen</th>
@@ -606,6 +606,10 @@
 <script>
 
     $(function() {
+        $("#table-detail th,#table-detail1 th").resizable({
+            minWidth: 100,
+        });
+
         $(".select2").select2({
             dropdownAutoWidth: true,
             width: '100%',

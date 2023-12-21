@@ -306,85 +306,85 @@
                             <legend>2. Daftar Dokumen Terpakai</legend>
                             <div class="row">
                                 <div class="col m12 s12">
-                                    <ul class="tabs">
-                                        <li class="tab col m6" onclick="changeMode();">
-                                            <a class="active" href="#opdata" id="main-tab">Pembayaran BS / AP DP / AP Invoice / AR Credit Memo</a>
+                                    <ul class="collapsible">
+                                        <li class="active" id="main-tab" onclick="changeMode();">
+                                            <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">library_books</i>Pembayaran BS / AP DP / AP Invoice / AR Credit Memo</div>
+                                            <div class="collapsible-body" style="display:block;">
+                                                <p class="mt-2 mb-2" style="overflow:scroll;width:100% !important;">
+                                                    <h6></h6>
+                                                    <div>
+                                                        <table class="bordered step17" style="max-width:1650px !important;" id="table-detail">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="center" width="10%">
+                                                                        <label>
+                                                                            <input type="checkbox" onclick="chooseAllGas(this)" id="chooseAll">
+                                                                            <span>Semua</span>
+                                                                        </label>
+                                                                    </th>
+                                                                    <th class="center">Referensi</th>
+                                                                    <th class="center">Tgl.Post</th>
+                                                                    <th class="center">Tgl.Tenggat</th>
+                                                                    <th class="center">Total</th>
+                                                                    <th class="center">PPN</th>
+                                                                    <th class="center">PPh</th>
+                                                                    <th class="center">Grandtotal</th>
+                                                                    <th class="center">Potongan/Memo</th>
+                                                                    <th class="center">Bayar</th>
+                                                                    <th class="center">Keterangan</th>
+                                                                    <th class="center">Dist.Biaya</th>
+                                                                    <th class="center">Coa</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody id="body-detail">
+                                                                <tr id="empty-detail">
+                                                                    <td colspan="13" class="center">
+                                                                        Pilih partner bisnis untuk memulai...
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </p>
+                                            </div>
                                         </li>
-                                        <li class="tab col m6" onclick="changeMode();">
-                                            <a href="#costdata" id="cost-tab">Tutup BS dengan Coa Biaya (REKONSILIASI)</a>
+                                        <li id="cost-tab" onclick="changeMode();">
+                                            <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">library_books</i>Tutup BS dengan Coa Biaya (REKONSILIASI)</div>
+                                            <div class="collapsible-body">
+                                                <p class="mt-2 mb-2">
+                                                    <h6>Gunakan fitur ini untuk rekonsiliasi biaya dengan piutang karyawan, pastikan anda menentukan daftar piutang mana yang ingin anda gunakan.</h6>
+                                                    <div>
+                                                        <table class="bordered step19" style="max-width:1650px !important;" id="table-detail1">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="center">Coa</th>
+                                                                    <th class="center">Dist.Biaya</th>
+                                                                    <th class="center">Keterangan</th>
+                                                                    <th class="center">Nominal</th>
+                                                                    <th class="center">Hapus</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody id="body-detail-coa">
+                                                                <tr id="last-row-coa">
+                                                                    <td colspan="5" class="center">
+                                                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addCoa()" href="javascript:void(0);">
+                                                                            <i class="material-icons left">add</i> Tambah Coa
+                                                                        </a>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </p>
+                                            </div>
                                         </li>
                                     </ul>
-                                    <div id="opdata" class="col s12 active">
-                                        <p class="mt-2 mb-2" style="overflow:scroll;width:100% !important;">
-                                            <h6></h6>
-                                            <div>
-                                                <table class="bordered step17" style="max-width:1650px !important;">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="center" width="10%">
-                                                                <label>
-                                                                    <input type="checkbox" onclick="chooseAllGas(this)" id="chooseAll">
-                                                                    <span>Semua</span>
-                                                                </label>
-                                                            </th>
-                                                            <th class="center">Referensi</th>
-                                                            <th class="center">Tgl.Post</th>
-                                                            <th class="center">Tgl.Tenggat</th>
-                                                            <th class="center">Total</th>
-                                                            <th class="center">PPN</th>
-                                                            <th class="center">PPh</th>
-                                                            <th class="center">Grandtotal</th>
-                                                            <th class="center">Potongan/Memo</th>
-                                                            <th class="center">Bayar</th>
-                                                            <th class="center">Keterangan</th>
-                                                            <th class="center">Dist.Biaya</th>
-                                                            <th class="center">Coa</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="body-detail">
-                                                        <tr id="empty-detail">
-                                                            <td colspan="13" class="center">
-                                                                Pilih partner bisnis untuk memulai...
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </p>
-                                    </div>
-                                    <div id="costdata" class="col s12">
-                                        <p class="mt-2 mb-2">
-                                            <h6>Gunakan fitur ini untuk rekonsiliasi biaya dengan piutang karyawan, pastikan anda menentukan daftar piutang mana yang ingin anda gunakan.</h6>
-                                            <div>
-                                                <table class="bordered step19" style="max-width:1650px !important;">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="center">Coa</th>
-                                                            <th class="center">Dist.Biaya</th>
-                                                            <th class="center">Keterangan</th>
-                                                            <th class="center">Nominal</th>
-                                                            <th class="center">Hapus</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="body-detail-coa">
-                                                        <tr id="last-row-coa">
-                                                            <td colspan="5" class="center">
-                                                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addCoa()" href="javascript:void(0);">
-                                                                    <i class="material-icons left">add</i> Tambah Coa
-                                                                </a>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </p>
-                                    </div>
                                 </div>
                                 <div class="col m12 s12 step18">
                                     <p class="mt-2 mb-2 ">
                                         <h6>Dibayar dengan Outgoing Payment Piutang Karyawan (Jika Ada) - <small>Fitur ini akan men-jurnal entrikan hutang/biaya pada piutang yang anda pilih secara otomatis, ketika disetujui.</small></h6>
                                         <div>
-                                            <table class="bordered" style="max-width:1650px !important;">
+                                            <table class="bordered" style="max-width:1650px !important;" id="table-detail2">
                                                 <thead>
                                                     <tr>
                                                         <th class="center" width="10%">
@@ -757,6 +757,11 @@
 <!-- END: Page Main-->
 <script>
     $(function() {
+
+        $("#table-detail th,#table-detail1 th,#table-detail2 th").resizable({
+            minWidth: 100,
+        });
+
         $(".select2").select2({
             dropdownAutoWidth: true,
             width: '100%',
@@ -789,10 +794,6 @@
                 $('#document_date').attr('min','{{ date("Y-m-d") }}');
             },
             onOpenEnd: function(modal, trigger) {
-                $('.tabs').tabs({
-                    onShow: countAll,
-                    duration: 0,
-                });
                 $('#name').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
@@ -815,7 +816,6 @@
                 }
             },
             onCloseEnd: function(modal, trigger){
-                $('ul.tabs').tabs("select", "opdata");
                 $('#form_data')[0].reset();
                 $('#temp').val('');
                 $('.row_purchase').each(function(){

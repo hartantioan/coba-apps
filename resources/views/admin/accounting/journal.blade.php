@@ -137,183 +137,187 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <ul class="tabs">
-                    <li class="tab col m6"><a class="active" href="#inputOne">Input Satu Data</a></li>
-                    <li class="tab col m6"><a href="#inputMulti">Input Multi Data</a></li>
+                <ul class="collapsible">
+                    <li class="active">
+                        <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">library_books</i>Input Satu Data</div>
+                        <div class="collapsible-body" style="display:block;">
+                            <h4 class="mt-2">Tambah/Edit Satu {{ $title }}</h4>
+                            <form class="row" id="form_data" onsubmit="return false;">
+                                <div class="col s12">
+                                    <div id="validation_alert" style="display:none;"></div>
+                                </div>
+                                <div class="col s12">
+                                    <div class="input-field col m2 s12">
+                                        <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
+                                        <label class="active" for="code">No. Dokumen</label>
+                                    </div>
+                                    <div class="input-field col m1 s12">
+                                        <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
+                                            <option value="">--Pilih--</option>
+                                            @foreach ($place as $rowplace)
+                                                <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input type="hidden" id="temp" name="temp">
+                                        <select class="form-control" id="company_id" name="company_id">
+                                            @foreach ($company as $row)
+                                                <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="" for="company_id">Perusahaan</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        
+                                        <input id="note" name="note" type="text" placeholder="Keterangan">
+                                        <label class="active" for="note">Keterangan</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
+                                        <label class="active" for="post_date">Tgl. Posting</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Kadaluarsa">
+                                        <label class="active" for="due_date">Tgl. Kadaluarsa</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="form-control" id="currency_id" name="currency_id">
+                                            @foreach ($currency as $row)
+                                                <option value="{{ $row->id }}">{{ $row->code.' '.$row->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="" for="currency_id">Mata Uang</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
+                                        <label class="active" for="currency_rate">Konversi</label>
+                                    </div>
+                                    <div class="col s12">
+                                        <h5>Tambah dari Distribusi (Opsional)</h5>
+                                        <div class="input-field col s3">
+                                            <select class="browser-default" id="cost_distribution_id" name="cost_distribution_id"></select>
+                                            <label class="active" for="cost_distribution_id">Distribusi Biaya</label>
+                                        </div>
+                                        <div class="input-field col s2">
+                                            <input name="nominal" id="nominal" type="text" value="0" onkeyup="formatRupiah(this);">
+                                            <label class="active" for="nominal">Nominal</label>
+                                        </div>
+                                        <div class="input-field col s2">
+                                            <select class="" id="type" name="type">
+                                                <option value="1">Debit</option>
+                                                <option value="2">Kredit</option>
+                                            </select>
+                                            <label class="" for="type">Tipe</label>
+                                        </div>
+                                        <div class="input-field col s3">
+                                            <a class="waves-effect waves-light green btn mr-1" onclick="addCostDistribution()" href="javascript:void(0);">
+                                                <i class="material-icons left">add</i> Tambah
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="col s12 mt-2" style="overflow:auto;width:100% !important;">
+                                        <h5>Detail Coa</h5>
+                                        <p class="mt-2 mb-2">
+                                            <table class="bordered" style="min-width:1500px;" id="table-detail">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="center">BP</th>
+                                                        <th class="center">Coa</th>
+                                                        <th class="center">Plant</th>
+                                                        <th class="center">Line</th>
+                                                        <th class="center">Mesin</th>
+                                                        <th class="center">Departemen</th>
+                                                        <th class="center">Gudang</th>
+                                                        <th class="center">Debit</th>
+                                                        <th class="center">Kredit</th>
+                                                        <th class="center">Hapus</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="body-coa">
+                                                    <tr id="last-row-coa">
+                                                        <td colspan="10" class="center">
+                                                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addCoa('1')" href="javascript:void(0);">
+                                                                <i class="material-icons left">add</i> Tambah Debit
+                                                            </a>
+                                                            <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addCoa('2')" href="javascript:void(0);">
+                                                                <i class="material-icons left">add</i> Tambah Kredit
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </p>
+                                    </div>
+                                    <div class="col s6 mt-1 center"><h5>Total Debit : <b id="totalDebit">0,000</b></h5></div>
+                                    <div class="col s6 mt-1 center"><h5>Total Credit : <b id="totalCredit">0,000</b></h5></div>
+                                    <div class="col s12 mt-3">
+                                        <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">library_books</i>Input Multi Data</div>
+                        <div class="collapsible-body">
+                            <h4 class="mt-2">Tambah/Edit Multi {{ $title }}</h4>
+                            <form class="row" id="form_data_multi" onsubmit="return false;">
+                                <div class="col s12">
+                                    <div id="validation_alert_multi" style="display:none;"></div>
+                                </div>
+                                <div class="col s12">
+                                    <div class="col s12" style="overflow:auto;width:100% !important;">
+                                        <h6>Anda bisa menggunakan fitur copy paste dari format excel yang telah disediakan. Silahkan klik <a href="{{ asset(Storage::url('format_imports/format_copas_journal.xlsx')) }}" target="_blank">disini</a> untuk mengunduh. Jangan menyalin kolom paling atas (bagian header), dan tempel pada isian paling kiri di tabel di bawah ini.</h6>
+                                        <p class="mt-2 mb-2">
+                                            <table class="bordered" style="min-width:2800px;zoom:0.7;" id="table-detail1">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="center">Kode Jurnal</th>
+                                                        <th class="center" style="width:75px;">Perusahaan</th>
+                                                        <th class="center">Keterangan</th>
+                                                        <th class="center">Tgl.Post</th>
+                                                        <th class="center">Tgl.Tenggat</th>
+                                                        <th class="center">Mata Uang</th>
+                                                        <th class="center" style="width:75px;">Konversi</th>
+                                                        <th class="center" style="width:75px;">BP</th>
+                                                        <th class="center" style="width:75px;">Coa</th>
+                                                        <th class="center" style="width:75px;">Plant</th>
+                                                        <th class="center" style="width:75px;">Line</th>
+                                                        <th class="center" style="width:75px;">Mesin</th>
+                                                        <th class="center" style="width:75px;">Departemen</th>
+                                                        <th class="center" style="width:75px;">Gudang</th>
+                                                        <th class="center">Debit</th>
+                                                        <th class="center">Kredit</th>
+                                                        <th class="center">Keterangan</th>
+                                                        <th class="center">Hapus</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="body-coa-multi">
+                                                    <tr id="last-row-coa-multi">
+                                                        <td colspan="18" class="center">
+                                                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addLine()" href="javascript:void(0);">
+                                                                <i class="material-icons left">add</i> Tambah 1 Baris
+                                                            </a>
+                                                            <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addMulti()" href="javascript:void(0);">
+                                                                <i class="material-icons left">add</i> Tambah Multi Baris
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </p>
+                                    </div>
+                                    <div class="col s6 mt-1 center"><h5>Total Debit : <b id="totalDebitMulti">0,000</b></h5></div>
+                                    <div class="col s6 mt-1 center"><h5>Total Credit : <b id="totalCreditMulti">0,000</b></h5></div>
+                                    <div class="col s12 mt-3">
+                                        <button class="btn waves-effect waves-light right submit" onclick="saveMulti();">Simpan <i class="material-icons right">send</i></button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </li>
                 </ul>
-                <div id="inputOne" class="col s12 active">
-                    <h4 class="mt-2">Tambah/Edit Satu {{ $title }}</h4>
-                    <form class="row" id="form_data" onsubmit="return false;">
-                        <div class="col s12">
-                            <div id="validation_alert" style="display:none;"></div>
-                        </div>
-                        <div class="col s12">
-                            <div class="input-field col m2 s12">
-                                <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
-                                <label class="active" for="code">No. Dokumen</label>
-                            </div>
-                            <div class="input-field col m1 s12">
-                                <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
-                                    <option value="">--Pilih--</option>
-                                    @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input type="hidden" id="temp" name="temp">
-                                <select class="form-control" id="company_id" name="company_id">
-                                    @foreach ($company as $row)
-                                        <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="company_id">Perusahaan</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                
-                                <input id="note" name="note" type="text" placeholder="Keterangan">
-                                <label class="active" for="note">Keterangan</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
-                                <label class="active" for="post_date">Tgl. Posting</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Kadaluarsa">
-                                <label class="active" for="due_date">Tgl. Kadaluarsa</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <select class="form-control" id="currency_id" name="currency_id">
-                                    @foreach ($currency as $row)
-                                        <option value="{{ $row->id }}">{{ $row->code.' '.$row->name }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="currency_id">Mata Uang</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
-                                <label class="active" for="currency_rate">Konversi</label>
-                            </div>
-                            <div class="col s12">
-                                <h5>Tambah dari Distribusi (Opsional)</h5>
-                                <div class="input-field col s3">
-                                    <select class="browser-default" id="cost_distribution_id" name="cost_distribution_id"></select>
-                                    <label class="active" for="cost_distribution_id">Distribusi Biaya</label>
-                                </div>
-                                <div class="input-field col s2">
-                                    <input name="nominal" id="nominal" type="text" value="0" onkeyup="formatRupiah(this);">
-                                    <label class="active" for="nominal">Nominal</label>
-                                </div>
-                                <div class="input-field col s2">
-                                    <select class="" id="type" name="type">
-                                        <option value="1">Debit</option>
-                                        <option value="2">Kredit</option>
-                                    </select>
-                                    <label class="" for="type">Tipe</label>
-                                </div>
-                                <div class="input-field col s3">
-                                    <a class="waves-effect waves-light green btn mr-1" onclick="addCostDistribution()" href="javascript:void(0);">
-                                        <i class="material-icons left">add</i> Tambah
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="col s12 mt-2" style="overflow:auto;width:100% !important;">
-                                <h5>Detail Coa</h5>
-                                <p class="mt-2 mb-2">
-                                    <table class="bordered" style="min-width:1500px;">
-                                        <thead>
-                                            <tr>
-                                                <th class="center">BP</th>
-                                                <th class="center">Coa</th>
-                                                <th class="center">Plant</th>
-                                                <th class="center">Line</th>
-                                                <th class="center">Mesin</th>
-                                                <th class="center">Departemen</th>
-                                                <th class="center">Gudang</th>
-                                                <th class="center">Debit</th>
-                                                <th class="center">Kredit</th>
-                                                <th class="center">Hapus</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="body-coa">
-                                            <tr id="last-row-coa">
-                                                <td colspan="10" class="center">
-                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addCoa('1')" href="javascript:void(0);">
-                                                        <i class="material-icons left">add</i> Tambah Debit
-                                                    </a>
-                                                    <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addCoa('2')" href="javascript:void(0);">
-                                                        <i class="material-icons left">add</i> Tambah Kredit
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </p>
-                            </div>
-                            <div class="col s6 mt-1 center"><h5>Total Debit : <b id="totalDebit">0,000</b></h5></div>
-                            <div class="col s6 mt-1 center"><h5>Total Credit : <b id="totalCredit">0,000</b></h5></div>
-                            <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div id="inputMulti" class="col s12">
-                    <h4 class="mt-2">Tambah/Edit Multi {{ $title }}</h4>
-                    <form class="row" id="form_data_multi" onsubmit="return false;">
-                        <div class="col s12">
-                            <div id="validation_alert_multi" style="display:none;"></div>
-                        </div>
-                        <div class="col s12">
-                            <div class="col s12" style="overflow:auto;width:100% !important;">
-                                <h6>Anda bisa menggunakan fitur copy paste dari format excel yang telah disediakan. Silahkan klik <a href="{{ asset(Storage::url('format_imports/format_copas_journal.xlsx')) }}" target="_blank">disini</a> untuk mengunduh. Jangan menyalin kolom paling atas (bagian header), dan tempel pada isian paling kiri di tabel di bawah ini.</h6>
-                                <p class="mt-2 mb-2">
-                                    <table class="bordered" style="min-width:2800px;zoom:0.7;">
-                                        <thead>
-                                            <tr>
-                                                <th class="center">Kode Jurnal</th>
-                                                <th class="center" style="width:75px;">Perusahaan</th>
-                                                <th class="center">Keterangan</th>
-                                                <th class="center">Tgl.Post</th>
-                                                <th class="center">Tgl.Tenggat</th>
-                                                <th class="center">Mata Uang</th>
-                                                <th class="center" style="width:75px;">Konversi</th>
-                                                <th class="center" style="width:75px;">BP</th>
-                                                <th class="center" style="width:75px;">Coa</th>
-                                                <th class="center" style="width:75px;">Plant</th>
-                                                <th class="center" style="width:75px;">Line</th>
-                                                <th class="center" style="width:75px;">Mesin</th>
-                                                <th class="center" style="width:75px;">Departemen</th>
-                                                <th class="center" style="width:75px;">Gudang</th>
-                                                <th class="center">Debit</th>
-                                                <th class="center">Kredit</th>
-                                                <th class="center">Keterangan</th>
-                                                <th class="center">Hapus</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="body-coa-multi">
-                                            <tr id="last-row-coa-multi">
-                                                <td colspan="18" class="center">
-                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addLine()" href="javascript:void(0);">
-                                                        <i class="material-icons left">add</i> Tambah 1 Baris
-                                                    </a>
-                                                    <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addMulti()" href="javascript:void(0);">
-                                                        <i class="material-icons left">add</i> Tambah Multi Baris
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </p>
-                            </div>
-                            <div class="col s6 mt-1 center"><h5>Total Debit : <b id="totalDebitMulti">0,000</b></h5></div>
-                            <div class="col s6 mt-1 center"><h5>Total Credit : <b id="totalCreditMulti">0,000</b></h5></div>
-                            <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit" onclick="saveMulti();">Simpan <i class="material-icons right">send</i></button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
             </div>
         </div>
     </div>
@@ -438,6 +442,10 @@
 <!-- END: Page Main-->
 <script>
     $(function() {
+        $("#table-detail th,#table-detail1 th").resizable({
+            minWidth: 100,
+        });
+
         $(".select2").select2({
             dropdownAutoWidth: true,
             width: '100%',

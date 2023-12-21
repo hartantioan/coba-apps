@@ -234,61 +234,67 @@
                                 <fieldset style="min-width: 100%;">
                                     <legend>3. Detail Item Issue Receive</legend>
                                     <div class="col m12 s12" style="overflow:auto;width:100% !important;">
-                                        <ul class="tabs">
-                                            <li class="tab col m3"><a class="active" href="#issue">Issue (Terpakai)</a></li>
-                                            <li class="tab col m3"><a href="#receive">Receive (Terima)</a></li>
+                                        <ul class="collapsible">
+                                            <li class="active">
+                                                <div class="collapsible-header red darken-1 text-white" style="color:white;"><i class="material-icons">file_upload</i>ISSUE</div>
+                                                <div class="collapsible-body" style="display:block;">
+                                                    <div class="" style="overflow:auto;width:100% !important;">
+                                                        <p class="mt-2 mb-2">
+                                                            <table class="bordered" style="border: 1px solid;" id="table-detail-item-issue">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="center">No.</th>
+                                                                        <th class="center">Item/Coa</th>
+                                                                        <th class="center">Qty Planned</th>
+                                                                        <th class="center">Qty Real</th>
+                                                                        <th class="center">Satuan Produksi</th>
+                                                                        <th class="center">Plant & Gudang</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody id="body-item-issue">
+                                                                    <tr id="last-row-item-issue">
+                                                                        <td class="center-align" colspan="6">
+                                                                            Silahkan tambahkan Order Produksi untuk memulai...
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="collapsible-header green darken-1 text-white" style="color:white;"><i class="material-icons">file_download</i>RECEIVE</div>
+                                                <div class="collapsible-body">
+                                                    <div class="" style="overflow:auto;width:100% !important;">
+                                                        <p class="mt-2 mb-2">
+                                                            <table class="bordered" style="border: 1px solid;width:1750px !important;" id="table-detail-item-receive">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="center" width="5%">No.</th>
+                                                                        <th class="center" width="15%">Item/Coa</th>
+                                                                        <th class="center" width="10%">Qty Planned (Prod.)</th>
+                                                                        <th class="center" width="10%">Qty Real (Prod.)</th>
+                                                                        <th class="center" width="10%">Qty UoM</th>
+                                                                        <th class="center" width="10%">Qty Jual</th>
+                                                                        <th class="center" width="10%">Qty Pallet</th>
+                                                                        <th class="center" width="15%">Shading</th>
+                                                                        <th class="center" width="15%">Batch</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody id="body-item-receive">
+                                                                    <tr id="last-row-item-receive">
+                                                                        <td class="center-align" colspan="9">
+                                                                            Silahkan tambahkan Order Produksi untuk memulai...
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </li>
                                         </ul>
-                                        <div class="row">
-                                            <div id="issue" class="col s12 active">
-                                                <p class="mt-2 mb-2">
-                                                    <table class="bordered" style="border: 1px solid;" id="table-detail-item-issue">
-                                                        <thead>
-                                                            <tr>
-                                                                <th class="center">No.</th>
-                                                                <th class="center">Item/Coa</th>
-                                                                <th class="center">Qty Planned</th>
-                                                                <th class="center">Qty Real</th>
-                                                                <th class="center">Satuan Produksi</th>
-                                                                <th class="center">Plant & Gudang</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody id="body-item-issue">
-                                                            <tr id="last-row-item-issue">
-                                                                <td class="center-align" colspan="6">
-                                                                    Silahkan tambahkan Order Produksi untuk memulai...
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </p>
-                                            </div>
-                                            <div id="receive" class="col s12" style="overflow:auto;width:100% !important;">
-                                                <p class="mt-2 mb-2">
-                                                    <table class="bordered" style="border: 1px solid;width:1750px !important;" id="table-detail-item-receive">
-                                                        <thead>
-                                                            <tr>
-                                                                <th class="center" width="5%">No.</th>
-                                                                <th class="center" width="15%">Item/Coa</th>
-                                                                <th class="center" width="10%">Qty Planned (Prod.)</th>
-                                                                <th class="center" width="10%">Qty Real (Prod.)</th>
-                                                                <th class="center" width="10%">Qty UoM</th>
-                                                                <th class="center" width="10%">Qty Jual</th>
-                                                                <th class="center" width="10%">Qty Pallet</th>
-                                                                <th class="center" width="15%">Shading</th>
-                                                                <th class="center" width="15%">Batch</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody id="body-item-receive">
-                                                            <tr id="last-row-item-receive">
-                                                                <td class="center-align" colspan="9">
-                                                                    Silahkan tambahkan Order Produksi untuk memulai...
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </p>
-                                            </div>
-                                        </div>
                                     </div>
                                 </fieldset>
                             </div>
@@ -1296,6 +1302,10 @@
             if (willDelete) {
                 
                 var formData = new FormData($('#form_data')[0]);
+
+                /* for (var pair of formData.entries()) {
+                    console.log(pair[0]+ ', ' + pair[1]); 
+                } */
 
                 $.ajax({
                     url: '{{ Request::url() }}/create',

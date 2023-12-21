@@ -3083,7 +3083,7 @@ class Select2Controller extends Controller {
                 });
         })
         ->whereDoesntHave('used')
-        ->whereDoesntHave('productionIssueReceive')
+        /* ->whereDoesntHave('productionIssueReceive') */
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
         ->whereIn('status',['2','3'])
         ->get();

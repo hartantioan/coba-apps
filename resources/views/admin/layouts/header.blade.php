@@ -66,7 +66,7 @@
                             </a>
                         </li>
                         <li>
-                            <a class="grey-text text-darken-1" href="{{ url('admin/personal/task') }}"><i class="material-icons">add_alert</i> Obrolan</a>
+                            <a class="grey-text text-darken-1" href="{{ url('admin/personal/task') }}"><i class="material-icons">add_alert</i> Tugas</a>
                         </li>
                         <li>
                             <a class="grey-text text-darken-1" href="{{ url('admin/personal/check_in') }}"><i class="material-icons">person_pin_circle</i> Absensi </a>

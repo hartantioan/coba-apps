@@ -259,7 +259,7 @@
                                     <p class="mt-2 mb-2">
                                         <h6>Detail AR Invoice / AR Down Payment / AR Credit Memo / BS.Karyawan / Coa</h6>
                                         <div style="overflow:auto;">
-                                            <table class="bordered" style="max-width:1650px !important;">
+                                            <table class="bordered" style="max-width:1650px !important;" id="table-detail">
                                                 <thead>
                                                     <tr>
                                                         <th class="center">Referensi</th>
@@ -581,6 +581,10 @@
 <!-- END: Page Main-->
 <script>
     $(function() {
+        $("#table-detail th").resizable({
+            minWidth: 100,
+        });
+
         $(".select2").select2({
             dropdownAutoWidth: true,
             width: '100%',

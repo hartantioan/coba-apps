@@ -270,7 +270,7 @@
                                 <div class="col m12 s12">
                                     <p class="mt-2 mb-2">
                                         <h4>Detail Produk</h4>
-                                        <table class="bordered">
+                                        <table class="bordered" id="table-detail">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Uraian Barang</th>
@@ -366,6 +366,10 @@
 <!-- END: Page Main-->
 <script>
     $(function() {
+
+        $("#table-detail th").resizable({
+            minWidth: 100,
+        });
 
         loadDataTable();
 

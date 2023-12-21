@@ -41,7 +41,7 @@ class AuthController extends Controller
                 $now = Carbon::now();
                 foreach($query_reminder as $row_reminder){
                         $end_date = Carbon::parse($row_reminder->end_date);
-                        $daysLeft = $end_date->diffInDays($now);
+                        $daysLeft = $now->isAfter($end_date) ? 0 : $end_date->diffInDays($now);
                     if($daysLeft <= $row_reminder->age_limit_reminder){
                         $array_id_task[]=$row_reminder->id;
                     }
@@ -103,7 +103,7 @@ class AuthController extends Controller
                 $now = Carbon::now();
                 $daysPassed = $now->diffInDays($start_date);
                 $totalDays = $end_date->diffInDays($start_date);
-                $daysLeft = $end_date->diffInDays($now);
+                $daysLeft = $now->isAfter($end_date) ? 0 : $end_date->diffInDays($now);
 
                 $progressPercentage = ($daysLeft / $totalDays) * 100;
                 $color = '#0fdc17';

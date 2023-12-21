@@ -2414,6 +2414,27 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function level(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Level::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%");
+                })
+                ->where('status','1')
+                ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function marketingOrderPlan(Request $request)
     {
         $response = [];

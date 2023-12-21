@@ -166,6 +166,35 @@
     </div>
 </div>
 
+<div id="modal_salary_component" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <form class="row" id="form_data_salary_component" onsubmit="return false;">
+                    <table class="bordered">
+                        <tbody id="body-detail">
+                            
+                            <tr id="last-row-item">
+                                
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="salary_component">
+                    
+                        <input type="hidden" id="temp_salary" name="temp_salary">
+                    </div>
+                    <div class="col s12 mt-3">
+                        <button class="btn waves-effect waves-light right submit" onclick="save_salary();">Simpan <i class="material-icons right">send</i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+    </div>
+</div>
+
 <div id="modal4_1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
@@ -252,6 +281,24 @@
             }
         });
 
+        $('#modal_salary_component').modal({
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) { 
+            },
+            onCloseEnd: function(modal, trigger){
+                const tbody = document.getElementById('body-detail');
+
+                const lastRowItem = document.getElementById('last-row-item');
+
+                while (tbody.firstChild !== lastRowItem) {
+                    tbody.removeChild(tbody.firstChild);
+                }
+                $('#form_data_salary_component')[0].reset();
+            }
+        });
+
         $('#modal_calendar').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
@@ -278,6 +325,132 @@
 
     function showEducation(id){
         window.location = "{{ URL::to('/') }}/admin/master_data/master_hr/employee/education?id=" + id;
+    }
+
+    function getSalaryComponent(id){
+        $.ajax({
+            url: '{{ Request::url() }}/salary_component',
+            type: 'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            data: {
+                id: id
+            },
+            success: function(response) {
+                $('#temp_salary').val(id);
+                var count = makeid(10);
+               
+                $.each(response, function(i, val) {
+                    $('#last-row-item').before(`
+                        <tr class="row_item" data-id="">
+                            <td>
+                            `+val['component_name']+`
+                            </td>
+                            <td>
+                                <input id="arr_component` + val['id_component'] + `" name="arr_component[]" type="number"  value="`+val['nominal']+`">
+                                <input type="hidden" id="arr_id_component" name="arr_id_component[]" value="`+val['id_component']+`">
+                            </td>
+                        </tr>
+                    `);
+                });
+                $('#modal_salary_component').modal('open');
+                loadingClose('.modal-content');
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+        
+
+    }
+
+    function save_salary(){
+        swal({
+            title: "Apakah anda yakin ingin simpan?",
+            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                var formData = new FormData($('#form_data_salary_component')[0]);
+
+                $.ajax({
+                    url: '{{ Request::url() }}/save_employee_salary_component',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    cache: true,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#validation_alert').hide();
+                        $('#validation_alert').html('');
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+
+                        if(response.status == 200) {
+                          
+                            
+                            $('#modal_salary_component').modal('close');
+                            M.toast({
+                                html: response.message
+                            });
+                        } else if(response.status == 422) {
+                            $('#validation_alert').show();
+                            $('.modal-content').scrollTop(0);
+                            
+                            swal({
+                                title: 'Ups! Validation',
+                                text: 'Check your form.',
+                                icon: 'warning'
+                            });
+
+                            $.each(response.error, function(i, val) {
+                                $.each(val, function(i, val) {
+                                    $('#validation_alert').append(`
+                                        <div class="card-alert card red">
+                                            <div class="card-content white-text">
+                                                <p>` + val + `</p>
+                                            </div>
+                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    `);
+                                });
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('.modal-content');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
     }
 
     function showFamily(id){

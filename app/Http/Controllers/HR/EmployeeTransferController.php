@@ -65,7 +65,7 @@ class EmployeeTransferController extends Controller
                         ->orWhere('note','like', "%$search%")
                         ->orWhereHas('account', function ($query) use ($search) {
                             $query->where('name', 'like', "%$search%");
-                        });;
+                        });
                     });
                 }
 

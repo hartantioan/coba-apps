@@ -513,6 +513,7 @@
             },
             onOpenEnd: function(modal, trigger) {
                 $('#name').focus();
+                
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
@@ -529,6 +530,8 @@
                 $('.row_purchase').each(function(){
                     $(this).remove();
                 });
+                $('input').css('border', 'none');
+                $('input').css('border-bottom', '0.5px solid black');
                 M.updateTextFields();
                 $('#account_id').empty();
                 $('#total,#tax,#grandtotal').text('0,000');
@@ -1389,7 +1392,8 @@
                         },
                         success: function(response) {
                             loadingClose('.modal-content');
-
+                            $('input').css('border', 'none');
+                        $('input').css('border-bottom', '0.5px solid black');
                             if(response.status == 200) {
                                 success();
                                 M.toast({
@@ -1403,6 +1407,11 @@
                                     title: 'Ups! Validation',
                                     text: 'Check your form.',
                                     icon: 'warning'
+                                });
+                                $.each(response.error, function(field, errorMessage) {
+                                    $('#' + field).addClass('error-input');
+                                    $('#' + field).css('border', '1px solid red');
+                                    
                                 });
 
                                 $.each(response.error, function(i, val) {
@@ -1749,5 +1758,22 @@
                 },
             ]
         }).start();
+    }
+
+    function whatPrinting(code){
+        $.ajax({
+            url: '{{ Request::url() }}/print_individual/' + code,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                window.open(data, '_blank');
+            }
+        });
     }
 </script>

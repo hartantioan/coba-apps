@@ -7,6 +7,7 @@ use App\Http\Controllers\HR\AttendancePresenceReportController;
 use App\Http\Controllers\HR\AttendancePunishmentController;
 use App\Http\Controllers\HR\EmployeeLeaveQuotasController;
 use App\Http\Controllers\HR\EmployeeTransferController;
+use App\Http\Controllers\HR\EmployeeRewardPunishmentController;
 
 use App\Http\Controllers\Accounting\AccountingReportController;
 use App\Http\Controllers\Finance\FinanceReportController;
@@ -47,6 +48,8 @@ use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\RegistrationController;
 
+use App\Http\Controllers\MasterData\HolidayController;
+use App\Http\Controllers\MasterData\OvertimeCostController;
 use App\Http\Controllers\Personal\ChatController;
 use App\Http\Controllers\MasterData\HardwareItemController;
 use App\Http\Controllers\MasterData\ItemController;
@@ -170,6 +173,8 @@ use App\Http\Controllers\Misc\NotificationController;
 
 use App\Http\Controllers\Maintenance\WorkOrderController;
 use App\Http\Controllers\Maintenance\RequestSparepartController;
+use App\Http\Controllers\MasterData\SalaryComponentController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -308,6 +313,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('transportation', [Select2Controller::class, 'transportation']);
                 Route::get('outlet', [Select2Controller::class, 'outlet']);
                 Route::get('position', [Select2Controller::class, 'position']);
+                Route::get('level', [Select2Controller::class, 'level']);
                 Route::get('marketing_order_plan', [Select2Controller::class, 'marketingOrderPlan']);
                 Route::get('leave_type', [Select2Controller::class, 'leaveType']);
                 Route::get('schedule', [Select2Controller::class, 'schedule']);
@@ -741,13 +747,29 @@ Route::prefix('admin')->group(function () {
                         Route::post('create',[ShiftController::class, 'create'])->middleware('operation.access:shift,update');
                         Route::post('destroy', [ShiftController::class, 'destroy'])->middleware('operation.access:shift,delete');
                     });
+
+                    Route::prefix('master_holiday')->middleware('operation.access:master_holiday,view')->group(function () {
+                        Route::get('/',[HolidayController::class, 'index']);
+                        Route::get('datatable',[HolidayController::class, 'datatable']);
+                        Route::post('show', [HolidayController::class, 'show']);
+                        Route::post('create',[HolidayController::class, 'create'])->middleware('operation.access:master_holiday,update');
+                        Route::post('destroy', [HolidayController::class, 'destroy'])->middleware('operation.access:master_holiday,delete');
+                    });
                     
-                    Route::prefix('user_specials')->middleware('operation.access:user_specials,view')->group(function () {
-                        Route::get('/',[UserSpecialController::class, 'index']);
-                        Route::get('datatable',[UserSpecialController::class, 'datatable']);
-                        Route::post('show', [UserSpecialController::class, 'show']);
-                        Route::post('create',[UserSpecialController::class, 'create'])->middleware('operation.access:user_specials,update');
-                        Route::post('destroy', [UserSpecialController::class, 'destroy'])->middleware('operation.access:user_specials,delete');
+                    Route::prefix('overtime_cost')->middleware('operation.access:user_specials,view')->group(function () {
+                        Route::get('/',[OvertimeCostController::class, 'index']);
+                        Route::get('datatable',[OvertimeCostController::class, 'datatable']);
+                        Route::post('show', [OvertimeCostController::class, 'show']);
+                        Route::post('create',[OvertimeCostController::class, 'create'])->middleware('operation.access:user_specials,update');
+                        Route::post('destroy', [OvertimeCostController::class, 'destroy'])->middleware('operation.access:user_specials,delete');
+                    });
+
+                    Route::prefix('salary_component')->middleware('operation.access:salary_component,view')->group(function () {
+                        Route::get('/',[SalaryComponentController::class, 'index']);
+                        Route::get('datatable',[SalaryComponentController::class, 'datatable']);
+                        Route::post('show', [SalaryComponentController::class, 'show']);
+                        Route::post('create',[SalaryComponentController::class, 'create'])->middleware('operation.access:salary_component,update');
+                        Route::post('destroy', [SalaryComponentController::class, 'destroy'])->middleware('operation.access:salary_component,delete');
                     });
 
                     Route::prefix('employee_leave_quota')->middleware('operation.access:employee_leave_quota,view')->group(function () {
@@ -809,9 +831,11 @@ Route::prefix('admin')->group(function () {
                         Route::get('datatable_education',[EmployeeController::class, 'datatableEducation']);
                         Route::get('datatable_work_experience',[EmployeeController::class, 'datatableWorkExperience']);
                         Route::get('row_detail', [EmployeeController::class, 'rowDetail']);
+                        Route::get('salary_component', [EmployeeController::class, 'salaryComponentEmployee']);
                         Route::get('family',[EmployeeController::class, 'indexFamily']);
                         Route::get('education',[EmployeeController::class, 'indexEducation']);
                         Route::get('work_experience',[EmployeeController::class, 'indexWorkExperience']);
+                        Route::post('save_employee_salary_component', [EmployeeController::class, 'saveEmployeeSalaryComponent']);
                         Route::post('show_experience', [EmployeeController::class, 'showWorkExperience']);
                         Route::post('show_family', [EmployeeController::class, 'showFamily']);
                         Route::post('copy_schedule', [EmployeeController::class, 'copySchedule']);
@@ -832,6 +856,7 @@ Route::prefix('admin')->group(function () {
                         Route::post('create',[AttendancePeriodController::class, 'create'])->middleware('operation.access:attendance_period,update');
                         Route::post('show',[AttendancePeriodController::class, 'show']);
                         Route::post('lateness_report',[AttendancePeriodController::class, 'latenessReport']);
+                        Route::post('salary_report',[AttendancePeriodController::class, 'salaryReport']);
                         Route::post('presence_report',[AttendancePeriodController::class, 'presenceReport']);
                         Route::post('punishment_report',[AttendancePeriodController::class, 'punishmentReport']);
                         Route::post('daily_report',[AttendancePeriodController::class, 'dailyReport']);
@@ -1402,6 +1427,24 @@ Route::prefix('admin')->group(function () {
                     Route::post('create',[EmployeeTransferController::class, 'create'])->middleware('operation.access:employee_transfer,update');
                     Route::post('destroy', [EmployeeTransferController::class, 'destroy'])->middleware('operation.access:employee_transfer,delete');
                     Route::get('approval/{id}',[EmployeeTransferController::class, 'approval'])->withoutMiddleware('direct.access');
+                });
+
+                Route::prefix('employee_reward_punishment')->middleware('operation.access:employee_reward_punishment,view')->group(function () {
+                    Route::get('/',[EmployeeRewardPunishmentController::class, 'index']);
+                    Route::get('datatable',[EmployeeRewardPunishmentController::class, 'datatable']);
+                    Route::get('row_detail', [EmployeeRewardPunishmentController::class, 'rowDetail']);
+                    Route::post('show', [EmployeeRewardPunishmentController::class, 'show']);
+                    Route::post('show_from_code', [EmployeeRewardPunishmentController::class, 'showFromCode']);
+                    Route::post('instant_form_code', [EmployeeRewardPunishmentController::class, 'instantFormwCode']);
+                    Route::post('print',[EmployeeRewardPunishmentController::class, 'print']);
+                    Route::post('get_code', [EmployeeRewardPunishmentController::class, 'getCode']);
+                    Route::get('export',[EmployeeRewardPunishmentController::class, 'export']);
+                    Route::post('print_by_range',[EmployeeRewardPunishmentController::class, 'printByRange']);
+                    Route::get('print_individual/{id}',[EmployeeRewardPunishmentController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [EmployeeRewardPunishmentController::class, 'voidStatus'])->middleware('operation.access:employee_reward_punishment,void');
+                    Route::post('create',[EmployeeRewardPunishmentController::class, 'create'])->middleware('operation.access:employee_reward_punishment,update');
+                    Route::post('destroy', [EmployeeRewardPunishmentController::class, 'destroy'])->middleware('operation.access:employee_reward_punishment,delete');
+                    Route::get('approval/{id}',[EmployeeRewardPunishmentController::class, 'approval'])->withoutMiddleware('direct.access');
                 });
 
                 Route::prefix('shift')->middleware('operation.access:employee,view')->group(function () {

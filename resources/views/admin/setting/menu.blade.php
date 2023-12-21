@@ -418,7 +418,9 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
+                $('#document_code').val(response.document_code);
                 $('#name').val(response.name);
+                $('#type').val(response.type).formSelect();
                 $('#url').val(response.url);
                 $('#icon').val(response.icon);
                 $('#type').val(response.type).formSelect().trigger('change');

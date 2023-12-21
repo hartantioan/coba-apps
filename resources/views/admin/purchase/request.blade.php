@@ -6,6 +6,9 @@
     .select-wrapper, .select2-container {
         height:3.6rem !important;
     }
+    .error-input{
+        border: 1px solid red;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -652,6 +655,8 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
+                $('.error-input').css('border', '');
+                $('.error-input').removeClass('error-input');
             }
         });
 
@@ -1157,6 +1162,8 @@
                         loadingOpen('.modal-content');
                     },
                     success: function(response) {
+                        $('input').css('border', 'none');
+                        $('input').css('border-bottom', '0.5px solid black');
                         loadingClose('.modal-content');
                         if(response.status == 200) {
                             success();
@@ -1172,8 +1179,14 @@
                                 text: 'Check your form.',
                                 icon: 'warning'
                             });
+                            $.each(response.error, function(field, errorMessage) {
+                                $('#' + field).addClass('error-input');
+                                $('#' + field).css('border', '1px solid red');
+                                
+                            });
 
                             $.each(response.error, function(i, val) {
+                                
                                 $.each(val, function(i, val) {
                                     $('#validation_alert').append(`
                                         <div class="card-alert card red">
@@ -2337,5 +2350,22 @@
                 },
             ]
         }).start();
+    }
+
+    function whatPrinting(code){
+        $.ajax({
+            url: '{{ Request::url() }}/print_individual/' + code,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                window.open(data, '_blank');
+            }
+        });
     }
 </script>

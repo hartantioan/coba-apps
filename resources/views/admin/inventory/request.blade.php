@@ -1707,4 +1707,21 @@
             ]
         }).start();
     }
+
+    function whatPrinting(code){
+        $.ajax({
+            url: '{{ Request::url() }}/print_individual/' + code,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                window.open(data, '_blank');
+            }
+        });
+    }
 </script>

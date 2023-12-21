@@ -211,6 +211,8 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
+                $('input').css('border', 'none');
+                $('input').css('border-bottom', '0.5px solid black');
                 $('#temp').val('');
                 M.updateTextFields();
             }
@@ -377,6 +379,8 @@
                 loadingOpen('.modal-content');
             },
             success: function(response) {
+                $('input').css('border', 'none');
+                $('input').css('border-bottom', '0.5px solid black');
                 loadingClose('.modal-content');
                 if(response.status == 200) {
                     success();
@@ -386,7 +390,11 @@
                 } else if(response.status == 422) {
                     $('#validation_alert').show();
                     $('.modal-content').scrollTop(0);
-                    
+                    $.each(response.error, function(field, errorMessage) {
+                        $('#' + field).addClass('error-input');
+                        $('#' + field).css('border', '1px solid red');
+                        
+                    });
                     swal({
                         title: 'Ups! Validation',
                         text: 'Check your form.',

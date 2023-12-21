@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\MasterData;
 use App\Models\Company;
 use App\Models\UserDriver;
+use App\Models\SalaryComponent;
+use App\Models\EmployeeSalaryComponent;
 use App\Models\UserPlace;
 use App\Models\UserWarehouse;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -627,6 +629,17 @@ class UserController extends Controller
                         'is_ar_invoice'         => $request->type == '2' ? ($request->is_ar_invoice ? $request->is_ar_invoice : NULL) : NULL,
                         'last_change_password'  => date('Y-m-d H:i:s')
                     ]);
+                    if($request->type == 1){
+                        $query_salary_component = SalaryComponent::where('status',1)->get();
+                        foreach($query_salary_component as $row_salary_component){
+                            $query_save = EmployeeSalaryComponent::create([
+                                'user_id'			        => $query->id,
+                                'salary_component_id'           => $row_salary_component->id,
+                                'nominal'	            => 0
+                            ]);
+                        }
+                    }
+                    
                     DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();

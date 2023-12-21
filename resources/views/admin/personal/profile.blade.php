@@ -260,7 +260,11 @@
                         } else if(response.status == 422) {
                             $('#validation_alert').show();
                             $('#main').scrollTop(0);
-                            
+                            $.each(response.error, function(field, errorMessage) {
+                                $('#' + field).addClass('error-input');
+                                $('#' + field).css('border', '1px solid red');
+                                
+                            });
                             swal({
                                 title: 'Ups! Validation',
                                 text: 'Check your form.',

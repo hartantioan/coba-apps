@@ -88,6 +88,8 @@ class AppServiceProvider extends ServiceProvider
             'material_request_details'              => 'App\Models\MaterialRequestDetail',
             'lock_periods'                          => 'App\Models\LockPeriod',
             'production_orders'                     => 'App\Models\ProductionOrder',
+            'employee_reward_punishments'           => 'App\Models\EmployeeRewardPunishment',
+            'overtime_request'                      => 'App\Models\OvertimeRequest'
         ]);
     }
 }

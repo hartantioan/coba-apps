@@ -821,6 +821,8 @@
                 $('.row_purchase').each(function(){
                     $(this).remove();
                 });
+                $('input').css('border', 'none');
+                $('input').css('border-bottom', '0.5px solid black');
                 $('.row_detail_coa').remove();
                 M.updateTextFields();
                 $('#body-detail').empty().append(`
@@ -1938,7 +1940,8 @@
                         },
                         success: function(response) {
                             loadingClose('.modal-content');
-
+                            $('input').css('border', 'none');
+                            $('input').css('border-bottom', '0.5px solid black');
                             if(response.status == 200) {
                                 success();
                                 M.toast({
@@ -1953,7 +1956,11 @@
                                     text: 'Check your form.',
                                     icon: 'warning'
                                 });
-
+                                $.each(response.error, function(field, errorMessage) {
+                                    $('#' + field).addClass('error-input');
+                                    $('#' + field).css('border', '1px solid red');
+                                    
+                                });
                                 $.each(response.error, function(i, val) {
                                     $.each(val, function(i, val) {
                                         $('#validation_alert').append(`
@@ -2920,5 +2927,22 @@
             }
         })
         .start();
+    }
+
+    function whatPrinting(code){
+        $.ajax({
+            url: '{{ Request::url() }}/print_individual/' + code,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                window.open(data, '_blank');
+            }
+        });
     }
 </script>

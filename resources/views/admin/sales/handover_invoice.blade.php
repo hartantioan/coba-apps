@@ -1066,6 +1066,8 @@
                         },
                         success: function(response) {
                             loadingClose('.modal-content');
+                            $('input').css('border', 'none');
+                            $('input').css('border-bottom', '0.5px solid black');
                             if(response.status == 200) {
                                 success();
                                 M.toast({
@@ -1074,7 +1076,11 @@
                             } else if(response.status == 422) {
                                 $('#validation_alert').show();
                                 $('.modal-content').scrollTop(0);
-                                
+                                $.each(response.error, function(field, errorMessage) {
+                                    $('#' + field).addClass('error-input');
+                                    $('#' + field).css('border', '1px solid red');
+                                    
+                                });
                                 swal({
                                     title: 'Ups! Validation',
                                     text: 'Check your form.',
@@ -1372,5 +1378,22 @@
                 },
             ]
         }).start();
+    }
+
+    function whatPrinting(code){
+        $.ajax({
+            url: '{{ Request::url() }}/print_individual/' + code,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                window.open(data, '_blank');
+            }
+        });
     }
 </script>

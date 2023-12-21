@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Department;
 use App\Models\EmployeeSchedule;
+use App\Models\EmployeeSalaryComponent;
 use App\Models\Group;
 use App\Models\Menu;
 use App\Models\Place;
@@ -110,7 +111,8 @@ class EmployeeController extends Controller
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Family" onclick="showFamily(' . $val->id . ')"><i class="material-icons dp48">recent_actors</i></button>
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light light-blue darken-3 white-text btn-small" data-popup="tooltip" title="Lihat Jadwal" onclick="getSchedule(`' . $val->employee_no . '`)"><i class="material-icons dp48">event</i></button>
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light deep-orange accent-1 white-text btn-small" data-popup="tooltip" title="Copy Schedule" onclick="openCopy(`' . $val->employee_no . '`)"><i class="material-icons dp48">content_copy</i></button>
-                <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-text btn-small" data-popup="tooltip" title="Employee Transfer" onclick="goto(\'' . $url . '\')"><i class="material-icons dp48">settings_ethernet</i></button>';
+                <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-text btn-small" data-popup="tooltip" title="Employee Transfer" onclick="goto(\'' . $url . '\')"><i class="material-icons dp48">settings_ethernet</i></button>
+                <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light indigo darken-1 white-text btn-small" data-popup="tooltip" title="Komponen Gaji" onclick="getSalaryComponent(' . $val->id . ')"><i class="material-icons dp48">wb_iridescent</i></button>';
                 
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->employee_no).'`)"><i class="material-icons">speaker_notes</i></button>',
@@ -422,6 +424,71 @@ class EmployeeController extends Controller
             $response['recordsFiltered'] = $total_filtered;
         }
 
+        return response()->json($response);
+    }
+
+    public function salaryComponentEmployee(Request $request){
+        $query_component_salary=EmployeeSalaryComponent::where('user_id',$request->id)->get();
+        $arr=[];
+        foreach($query_component_salary as $row_component){
+            $arr[] = [
+                'uid' => $row_component->user_id,
+                'id_component'=>$row_component->id,
+                'nominal'=>$row_component->nominal,
+                'component_name'=>$row_component->salaryComponent->name,
+            ];
+        };
+        return response()->json($arr);
+    }
+
+    public function saveEmployeeSalaryComponent (Request $request){
+        $validation = Validator::make($request->all(), [
+            'arr_component'          => 'required',
+            
+        ], [
+            'arr_component.required'         => 'isi dari nominal tidak boleh kosong',
+        ]);
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+           
+			if($request->temp_salary){
+                DB::beginTransaction();
+                try {
+                    foreach ($request->input('arr_component') as $key => $value) {
+                        // Access each value
+                        $dataId = $request->input('arr_id_component')[$key];
+                        $query = EmployeeSalaryComponent::find($dataId);
+                        
+                        $query->nominal = $value;
+                        $query->save();
+                    }
+                    
+                    
+
+                    DB::commit();
+                    $jalan = true;
+                }catch(\Exception $e){
+                    DB::rollback();
+                }
+			}
+			
+			if($jalan) {               
+
+				$response = [
+					'status'    => 200,
+					'message'   => 'Data successfully saved.',
+				];
+			} else {
+				$response = [
+					'status'  => 500,
+					'message' => 'Data failed to save.'
+				];
+			}
+		}
         return response()->json($response);
     }
 

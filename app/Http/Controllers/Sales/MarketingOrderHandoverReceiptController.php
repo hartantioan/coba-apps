@@ -230,6 +230,7 @@ class MarketingOrderHandoverReceiptController extends Controller
                     $val->status(),
                     $val->statusTracking(),
                     '
+                    <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak Kwitansi & Tanda Terima" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <a href="'.request()->segment(3).'/update_document/'.CustomHelper::encrypt($val->code).'?u='.CustomHelper::encrypt($val->account->employee_no).'&c='.CustomHelper::encrypt($val->account->name).'" class="btn-floating btn-small mb-1 btn-flat waves-effect waves-light indigo accent-1 white-text" data-popup="tooltip" title="Update Status Dokumen" target="_blank"><i class="material-icons dp48">streetview</i></a>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>

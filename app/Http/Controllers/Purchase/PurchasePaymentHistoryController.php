@@ -27,6 +27,7 @@ class PurchasePaymentHistoryController extends Controller
 
     public function index(Request $request)
     {
+        
         $data = [
             'title'         => 'Laporan Histori Pembayaran',
             'content'       => 'admin.purchase.purchase_payment_history',

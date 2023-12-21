@@ -201,9 +201,9 @@ class TaskController extends Controller
                 $end_date = Carbon::parse($val->end_date);
 
                 $now = Carbon::now();
-                $daysPassed = $now->diffInDays($start_date);
+                
                 $totalDays = $end_date->diffInDays($start_date);
-                $daysLeft = $end_date->diffInDays($now);
+                $daysLeft = $now->isAfter($end_date) ? 0 : $end_date->diffInDays($now);
 
                 $progressPercentage = ($daysLeft / $totalDays) * 100;
                 $color = '#0fdc17';

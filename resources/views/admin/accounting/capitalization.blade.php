@@ -618,16 +618,16 @@
                         ` + $("#asset_id").select2('data')[0].place_name + `
                     </td>
                     <td class="center">
-                        <input type="text" id="arr_price` + count + `" name="arr_price[]" value="0" onkeyup="formatRupiah(this);count();">
+                        <input type="text" id="arr_price` + count + `" name="arr_price[]" onfocus="emptyThis(this);" value="0" onkeyup="formatRupiah(this);count();">
                     </td>
                     <td class="center">
-                        <input type="text" id="arr_qty` + count + `" name="arr_qty[]" value="1" onkeyup="formatRupiah(this);count();" readonly>
+                        <input type="text" id="arr_qty` + count + `" name="arr_qty[]" onfocus="emptyThis(this);" value="1" onkeyup="formatRupiah(this);count();" readonly>
                     </td>
                     <td class="center">
                         <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>
                     </td>
                     <td class="center">
-                        <input type="text" id="arr_total` + count + `" name="arr_total[]" value="0,000" onkeyup="formatRupiah(this);" readonly>
+                        <input type="text" id="arr_total` + count + `" name="arr_total[]" onfocus="emptyThis(this);" value="0,000" onkeyup="formatRupiah(this);" readonly>
                     </td>
                     <td>
                         <input name="arr_note[]" type="text" placeholder="Keterangan">
@@ -896,16 +896,16 @@
                                 ` + val.place_name + `
                             </td>
                             <td class="center">
-                                <input type="text" id="arr_price` + count + `" name="arr_price[]" value="` + val.price + `" onkeyup="formatRupiah(this);count();">
+                                <input type="text" id="arr_price` + count + `" name="arr_price[]" onfocus="emptyThis(this);" value="` + val.price + `" onkeyup="formatRupiah(this);count();">
                             </td>
                             <td class="center">
-                                <input type="text" id="arr_qty` + count + `" name="arr_qty[]" value="` + val.qty + `" onkeyup="formatRupiah(this);count();" readonly>
+                                <input type="text" id="arr_qty` + count + `" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty + `" onkeyup="formatRupiah(this);count();" readonly>
                             </td>
                             <td class="center">
                                 <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>
                             </td>
                             <td class="center">
-                                <input type="text" id="arr_total` + count + `" name="arr_total[]" value="` + val.total + `" onkeyup="formatRupiah(this);" readonly>
+                                <input type="text" id="arr_total` + count + `" name="arr_total[]" onfocus="emptyThis(this);" value="` + val.total + `" onkeyup="formatRupiah(this);" readonly>
                             </td>
                             <td>
                                 <input name="arr_note[]" type="text" placeholder="Keterangan" value="` + val.note + `">

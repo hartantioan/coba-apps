@@ -987,10 +987,10 @@
                     0
                 </td>
                 <td class="center-align">
-                    <input name="arr_qty_in[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_in` + count + `" data-id="` + count + `" readonly>
+                    <input name="arr_qty_in[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_in` + count + `" data-id="` + count + `" readonly>
                 </td>
                 <td class="center-align">
-                    <input name="arr_qty_out[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_out` + count + `" data-id="` + count + `" readonly>
+                    <input name="arr_qty_out[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_out` + count + `" data-id="` + count + `" readonly>
                 </td>
                 <td class="right-align">
                     <span id="qtyBalance` + count + `">0,000</span>
@@ -1159,10 +1159,10 @@
                                             ` + val.qty + `
                                         </td>
                                         <td class="center-align">
-                                            <input name="arr_qty_in[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_in` + count + `" data-id="` + count + `" readonly>
+                                            <input name="arr_qty_in[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_in` + count + `" data-id="` + count + `" readonly>
                                         </td>
                                         <td class="center-align">
-                                            <input name="arr_qty_out[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_out` + count + `" data-id="` + count + `" readonly>
+                                            <input name="arr_qty_out[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_out` + count + `" data-id="` + count + `" readonly>
                                         </td>
                                         <td class="right-align">
                                             <span id="qtyBalance` + count + `">0,000</span>
@@ -1297,10 +1297,10 @@
                                                     ` + val.qty + `
                                                 </td>
                                                 <td class="center-align">
-                                                    <input name="arr_qty_in[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_in` + count + `" data-id="` + count + `" readonly>
+                                                    <input name="arr_qty_in[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_in` + count + `" data-id="` + count + `" readonly>
                                                 </td>
                                                 <td class="center-align">
-                                                    <input name="arr_qty_out[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_out` + count + `" data-id="` + count + `" readonly>
+                                                    <input name="arr_qty_out[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_out` + count + `" data-id="` + count + `" readonly>
                                                 </td>
                                                 <td class="right-align">
                                                     <span id="qtyBalance` + count + `">0,000</span>
@@ -1622,7 +1622,7 @@
                                     ` + val.qty_in + `
                                 </td>
                                 <td class="center-align">
-                                    <input name="arr_qty_out[]" class="browser-default" type="text" value="` + val.qty_out + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_out` + count + `" data-id="` + count + `" readonly>
+                                    <input name="arr_qty_out[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_out + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_out` + count + `" data-id="` + count + `" readonly>
                                 </td>
                                 <td class="right-align">
                                     <span id="qtyBalance` + count + `">0,000</span>
@@ -1750,10 +1750,10 @@
                                         ` + val.qty_po + `
                                     </td>
                                     <td class="center-align">
-                                        <input name="arr_qty_in[]" class="browser-default" type="text" value="` + val.qty_in + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_in` + count + `" data-id="` + count + `" readonly>
+                                        <input name="arr_qty_in[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_in + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_in` + count + `" data-id="` + count + `" readonly>
                                     </td>
                                     <td class="center-align">
-                                        <input name="arr_qty_out[]" class="browser-default" type="text" value="` + val.qty_out + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_out` + count + `" data-id="` + count + `" readonly>
+                                        <input name="arr_qty_out[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_out + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_out` + count + `" data-id="` + count + `" readonly>
                                     </td>
                                     <td class="right-align">
                                         <span id="qtyBalance` + count + `">` + val.qty_balance + `</span>
@@ -1791,10 +1791,10 @@
                                         0
                                     </td>
                                     <td class="center-align">
-                                        <input name="arr_qty_in[]" class="browser-default" type="text" value="` + val.qty_in + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_in` + count + `" data-id="` + count + `" readonly>
+                                        <input name="arr_qty_in[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_in + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_in` + count + `" data-id="` + count + `" readonly>
                                     </td>
                                     <td class="center-align">
-                                        <input name="arr_qty_out[]" class="browser-default" type="text" value="` + val.qty_out + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_out` + count + `" data-id="` + count + `" readonly>
+                                        <input name="arr_qty_out[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_out + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_out` + count + `" data-id="` + count + `" readonly>
                                     </td>
                                     <td class="right-align">
                                         <span id="qtyBalance` + count + `">` + val.qty_balance + `</span>

@@ -53,6 +53,20 @@ class PurchaseDownPayment extends Model
         });
     }
 
+    public function listCekBG(){
+        $list = [];
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+            $query->whereHas('outgoingPayment');
+        })->get() as $rowpayment){
+            $list[] = $rowpayment->paymentRequest->payment_no;
+        }
+        if(count($list) > 0){
+            return implode(', ',$list);
+        }else{
+            return '-';
+        }   
+    }
+
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }

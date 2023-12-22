@@ -192,7 +192,7 @@
                                                         -   
                                                     </td>
                                                     <td>
-                                                        <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiahNoMinus(this)">
+                                                        <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="0" onkeyup="formatRupiahNoMinus(this)">
                                                     </td>
                                                     <td class="center">
                                                         <span id="arr_satuan0">-</span>
@@ -1087,7 +1087,7 @@
                                     -
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinusNoMinus(this)">
+                                    <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinusNoMinus(this)">
                                 </td>
                                 <td class="center">
                                     <span id="arr_satuan` + count + `">` + val.unit + `</span>
@@ -1269,7 +1269,7 @@
                                             -
                                         </td>
                                         <td>
-                                            <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinusNoMinus(this)">
+                                            <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinusNoMinus(this)">
                                         </td>
                                         <td class="center">
                                             <span id="arr_satuan` + count + `">` + val.unit + `</span>
@@ -1451,7 +1451,7 @@
                     -   
                 </td>
                 <td>
-                    <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiahNoMinus(this)">
+                    <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="0" onkeyup="formatRupiahNoMinus(this)">
                 </td>
                 <td class="center">
                     <span id="arr_satuan` + count + `">-</span>

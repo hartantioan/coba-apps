@@ -232,7 +232,7 @@
                                                         <select class="browser-default item-array" id="arr_item0" name="arr_item[]" onchange="getRowUnit(0)"></select>
                                                     </td>
                                                     <td>
-                                                        <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiahNoMinus(this)">
+                                                        <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="0" onkeyup="formatRupiahNoMinus(this)">
                                                     </td>
                                                     <td class="center">
                                                         <span id="arr_satuan0">-</span>
@@ -1357,7 +1357,7 @@
                                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinusNoMinus(this)">
+                                    <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinusNoMinus(this)">
                                 </td>
                                 <td class="center">
                                     <span id="arr_satuan` + count + `">` + val.unit + `</span>
@@ -1513,7 +1513,7 @@
                                             <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                                         </td>
                                         <td>
-                                            <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinusNoMinus(this)">
+                                            <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinusNoMinus(this)">
                                         </td>
                                         <td class="center">
                                             <span id="arr_satuan` + count + `">` + val.unit + `</span>
@@ -1683,7 +1683,7 @@
                                         <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                                     </td>
                                     <td>
-                                        <input name="arr_qty[]" type="text" value="` + val.qty_balance + `" onkeyup="formatRupiahNoMinus(this)">
+                                        <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty_balance + `" onkeyup="formatRupiahNoMinus(this)">
                                     </td>
                                     <td class="center">
                                         <span id="arr_satuan` + count + `">` + val.unit + `</span>
@@ -1865,7 +1865,7 @@
                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                 </td>
                 <td>
-                    <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiahNoMinus(this)">
+                    <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="0" onkeyup="formatRupiahNoMinus(this)">
                 </td>
                 <td class="center">
                     <span id="arr_satuan` + count + `">-</span>
@@ -1954,7 +1954,7 @@
                             <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                         </td>
                         <td>
-                            <input name="arr_qty[]" type="text" value="` + arr_qty[i] + `" onkeyup="formatRupiahNoMinus(this)">
+                            <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + arr_qty[i] + `" onkeyup="formatRupiahNoMinus(this)">
                         </td>
                         <td class="center">
                             <span id="arr_satuan` + count + `">` + arr_unit[i] + `</span>
@@ -2099,7 +2099,7 @@
                                         ` + val.max_stock + `
                                     </td>
                                     <td class="right-align">
-                                        <input name="arr_qty_order[]" type="text" value="` + val.qty_request + `" onkeyup="formatRupiahNoMinus(this)">
+                                        <input name="arr_qty_order[]" onfocus="emptyThis(this);" type="text" value="` + val.qty_request + `" onkeyup="formatRupiahNoMinus(this)">
                                     </td>
                                 </tr>
                             `);

@@ -134,7 +134,7 @@
 </div>
 
 <div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
-    <div class="modal-content">
+    <div class="modal-content" style="overflow-x: hidden;">
         <div class="row">
             <div class="col s12">
                 <ul class="collapsible">
@@ -661,10 +661,10 @@
                             <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
                         </td>
                         <td>
-                            ` + (type == '1' ? `<input name="arr_nominal[]" type="text" value="` + formatRupiahIni(roundTwoDecimal(nominal).toString().replace('.',',')) + `" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
+                            ` + (type == '1' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="` + formatRupiahIni(roundTwoDecimal(nominal).toString().replace('.',',')) + `" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
                         </td>
                         <td>
-                            ` + (type == '2' ? `<input name="arr_nominal[]" type="text" value="` + formatRupiahIni(roundTwoDecimal(nominal).toString().replace('.',',')) + `" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
+                            ` + (type == '2' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="` + formatRupiahIni(roundTwoDecimal(nominal).toString().replace('.',',')) + `" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
                         </td>
                         <td class="center">
                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" href="javascript:void(0);">
@@ -752,10 +752,10 @@
                     <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
                 </td>
                 <td>
-                    ` + (type == '1' ? `<input name="arr_nominal[]" type="text" value="0" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
+                    ` + (type == '1' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="0" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
                 </td>
                 <td>
-                    ` + (type == '2' ? `<input name="arr_nominal[]" type="text" value="0" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
+                    ` + (type == '2' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="0" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" href="javascript:void(0);">
@@ -1503,10 +1503,10 @@
                                 <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
                             </td>
                             <td>
-                                ` + (val.type == '1' ? `<input name="arr_nominal[]" type="text" value="` + val.nominal + `" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
+                                ` + (val.type == '1' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal + `" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
                             </td>
                             <td>
-                                ` + (val.type == '2' ? `<input name="arr_nominal[]" type="text" value="` + val.nominal + `" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
+                                ` + (val.type == '2' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal + `" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
                             </td>
                             <td class="center">
                                 <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" href="javascript:void(0);">
@@ -1778,6 +1778,23 @@
                     'type': 'INVOICE',
                     'url': data
                 })
+            }
+        });
+    }
+
+    function whatPrinting(code){
+        $.ajax({
+            url: '{{ Request::url() }}/print_individual/' + code,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                window.open(data, '_blank');
             }
         });
     }

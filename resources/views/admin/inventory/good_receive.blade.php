@@ -757,13 +757,13 @@
                     <span id="arr_stock` + count + `">-</span>
                 </td>
                 <td>
-                    <input name="arr_qty[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
+                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
                 </td>
                 <td class="center">
                     <span id="arr_unit` + count + `">-</span>
                 </td>
                 <td class="center">
-                    <input list="tempPrice` + count + `" name="arr_price[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowPrice`+ count +`">
+                    <input list="tempPrice` + count + `" onfocus="emptyThis(this);" name="arr_price[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowPrice`+ count +`">
                     <datalist id="tempPrice` + count + `"></datalist>
                 </td>
                 <td class="right-align">
@@ -960,13 +960,13 @@
                                     <span id="arr_stock` + count + `">-</span>
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
+                                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
                                 </td>
                                 <td class="center">
                                     <span id="arr_unit` + count + `">` + val.unit + `</span>
                                 </td>
                                 <td class="center">
-                                    <input name="arr_price[]" class="browser-default" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowPrice`+ count +`">
+                                    <input name="arr_price[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowPrice`+ count +`">
                                     <datalist id="tempPrice` + count + `"></datalist>
                                 </td>
                                 <td class="right-align">

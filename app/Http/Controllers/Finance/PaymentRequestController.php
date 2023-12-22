@@ -232,6 +232,11 @@ class PaymentRequestController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
+                if($val->journal()->exists()){
+                    $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small" data-popup="tooltip" title="Journal" onclick="viewJournal(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">note</i></button>';
+                }else{
+                    $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light grey darken-3 white-tex btn-small disabled" data-popup="tooltip" title="Journal" ><i class="material-icons dp48">note</i></button>';
+                }
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
@@ -260,6 +265,7 @@ class PaymentRequestController extends Controller
                     $val->balance == 0 ? 'Terbayar' : ($val->status == '2' && !$val->outgoingPayment()->exists() ?
                     '<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small" data-popup="tooltip" title="Bayar" onclick="cashBankOut(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">screen_share</i></button>' : ($val->outgoingPayment()->exists() ? $val->outgoingPayment->code : $val->statusRaw() )),
                     '
+                    '.$btn_jurnal.'
                     <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
@@ -527,6 +533,7 @@ class PaymentRequestController extends Controller
                                 'memo'          => number_format(0,2,',','.'),
                                 'currency_id'   => $data->currency_id,
                                 'currency_rate' => number_format($data->currency_rate,2,',','.'),
+                                'note'          => $data->note,
                             ];
                         }
                     }
@@ -555,6 +562,7 @@ class PaymentRequestController extends Controller
                                 'memo'          => number_format($data->totalMemo(),2,',','.'),
                                 'currency_id'   => $data->currency_id,
                                 'currency_rate' => number_format($data->currency_rate,2,',','.'),
+                                'note'          => $data->note,
                             ];
                         }
                     }
@@ -583,6 +591,7 @@ class PaymentRequestController extends Controller
                                 'memo'          => number_format($data->totalMemo(),2,',','.'),
                                 'currency_id'   => $data->currency()->id,
                                 'currency_rate' => number_format($data->currencyRate(),2,',','.'),
+                                'note'          => $data->invoice_no,
                             ];
                         }
                     }
@@ -611,6 +620,7 @@ class PaymentRequestController extends Controller
                                 'memo'          => number_format($data->totalUsed(),2,',','.'),
                                 'currency_id'   => 1,
                                 'currency_rate' => number_format(1,2,',','.'),
+                                'note'          => $data->note,
                             ];
                         }
                     }
@@ -1289,6 +1299,12 @@ class PaymentRequestController extends Controller
                     $img_base_64 = base64_encode($image_temp);
                     $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                     $data["image"]=$path_img;
+                    $e_banking = 'website/payment_request_e_banking.jpeg';
+                    $extencion_banking = pathinfo($e_banking, PATHINFO_EXTENSION);
+                    $image_temp_banking = file_get_contents($e_banking);
+                    $img_base_64_banking = base64_encode($image_temp_banking);
+                    $path_img_banking = 'data:image/' . $extencion_banking . ';base64,' . $img_base_64_banking;
+                    $data["e_banking"]=$path_img_banking;
                     $pdf = Pdf::loadView('admin.print.finance.payment_request_individual', $data)->setPaper('a5', 'landscape');
                     $pdf->render();
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
@@ -1377,6 +1393,12 @@ class PaymentRequestController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
+                            $e_banking = 'website/payment_request_e_banking.jpeg';
+                            $extencion_banking = pathinfo($e_banking, PATHINFO_EXTENSION);
+                            $image_temp_banking = file_get_contents($e_banking);
+                            $img_base_64_banking = base64_encode($image_temp_banking);
+                            $path_img_banking = 'data:image/' . $extencion_banking . ';base64,' . $img_base_64_banking;
+                            $data["e_banking"]=$path_img_banking;
                             $pdf = Pdf::loadView('admin.print.finance.payment_request_individual', $data)->setPaper('a5', 'landscape');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
@@ -1453,6 +1475,12 @@ class PaymentRequestController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
+                            $e_banking = 'website/payment_request_e_banking.jpeg';
+                            $extencion_banking = pathinfo($e_banking, PATHINFO_EXTENSION);
+                            $image_temp_banking = file_get_contents($e_banking);
+                            $img_base_64_banking = base64_encode($image_temp_banking);
+                            $path_img_banking = 'data:image/' . $extencion_banking . ';base64,' . $img_base_64_banking;
+                            $data["e_banking"]=$path_img_banking;
                             $pdf = Pdf::loadView('admin.print.finance.payment_request_individual', $data)->setPaper('a5', 'landscape');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
@@ -1519,6 +1547,13 @@ class PaymentRequestController extends Controller
             $img_base_64 = base64_encode($image_temp);
             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
             $data["image"]=$path_img;
+
+            $e_banking = 'website/payment_request_e_banking.jpeg';
+            $extencion_banking = pathinfo($e_banking, PATHINFO_EXTENSION);
+            $image_temp_banking = file_get_contents($e_banking);
+            $img_base_64_banking = base64_encode($image_temp_banking);
+            $path_img_banking = 'data:image/' . $extencion_banking . ';base64,' . $img_base_64_banking;
+            $data["e_banking"]=$path_img_banking;
              
             $pdf = Pdf::loadView('admin.print.finance.payment_request_individual', $data)->setPaper('a5', 'landscape');
             $pdf->render();
@@ -1577,7 +1612,7 @@ class PaymentRequestController extends Controller
                 $html = '<div class="row pt-1 pb-1"><div class="col s12"><table>
                         <thead>
                             <tr>
-                                <th class="" colspan="10"><h6>Mata Uang : '.$data->currency->code.', Konversi = '.number_format($data->currency_rate,2,',','.').', Bayar dengan <b>'.$data->coaSource->name.'</b></h6></th>
+                                <th class="" colspan="10"><h6>Mata Uang : '.$data->currency->code.', Konversi = '.number_format($data->currency_rate,2,',','.').', Bayar dengan <b>'.$data->coaSource->name.'</b>, Sisa Tagihan <b>'.$data->currency->symbol.' '.number_format($data->balance,2,',','.').'</b></h6></th>
                             </tr>
                             <tr>
                                 <th class="center-align" colspan="7">Daftar Item</th>
@@ -1764,9 +1799,9 @@ class PaymentRequestController extends Controller
                         'status'                    => '3',
                     ]);
 
-                    $cek->update([
+                    /* $cek->update([
                         'pay_date'                  => $request->pay_date_pay,
-                    ]);
+                    ]); */
 
                     DB::commit();
                     
@@ -2929,6 +2964,47 @@ class PaymentRequestController extends Controller
                 'status'  => 500,
                 'message' => 'Data failed to delete.'
             ];
+        }
+        return response()->json($response);
+    }
+
+    public function viewJournal(Request $request,$id){
+        $query = PaymentRequest::where('code',CustomHelper::decrypt($id))->first();
+        if($query->journal()->exists()){
+            $response = [
+                'title'     => 'Journal',
+                'status'    => 200,
+                'message'   => $query->journal,
+                'user'      => $query->user->name,
+                'reference' =>  $query->lookable_id ? $query->lookable->code : '-',
+            ];
+            $string='';
+            foreach($query->journal->journalDetail()->where(function($query){
+            $query->whereHas('coa',function($query){
+                $query->orderBy('code');
+            })
+            ->orderBy('type');
+        })->get() as $key => $row){
+                $string .= '<tr>
+                    <td class="center-align">'.($key + 1).'</td>
+                    <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
+                    <td class="center-align">'.$row->coa->company->name.'</td>
+                    <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
+                    <td class="center-align">'.($row->place_id ? $row->place->name : '-').'</td>
+                    <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
+                    <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
+                    <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
+                    <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
+                    <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
+                    <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
+                </tr>';
+            }
+            $response["tbody"] = $string; 
+        }else{
+            $response = [
+                'status'  => 500,
+                'message' => 'Data masih belum di approve.'
+            ]; 
         }
         return response()->json($response);
     }

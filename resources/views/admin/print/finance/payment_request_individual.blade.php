@@ -63,7 +63,7 @@
                     font-size:0.7em !important;
                 }
                 .tb-header td{
-                    font-size:0.6em !important;
+                    font-size:0.8em !important;
                 }
                 .tbl-info td{
                     font-size:1em !important;
@@ -166,49 +166,53 @@
     </head>
     <body>
         <header>
-            <table border="0" width="100%" style="font-size:1em" class="tb-header">
+            <table border="0" width="100%" style="" class="tb-header">
                 <tr>
-                    <td width="83%" class="left-align" >
-                        <tr>
-                            <td>
-                                <span class="invoice-number mr-1">Permohonan Dana # {{ $data->code }}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="margin-top: -2px;">
-                                <small>Diajukan:</small>
-                                <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="margin-top: -2px;">
-                                <small>Dibayar:</small>
-                                <span>{{ date('d/m/y',strtotime($data->pay_date)) }}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <h5 class="indigo-text">Permintaan Pembayaran</h5>
-                            </td>
-                        </tr>
-                                
-                        
+                    <td width="33%" class="left-align" >
+                        <table border="0" width="100%">
+                            <tr>
+                                <td>
+                                    <span class="invoice-number mr-1"># {{ $data->code }}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="margin-top: -2px;">
+                                    <small>Diajukan:</small>
+                                    <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="margin-top: -2px;">
+                                    <small>Dibayar:</small>
+                                    <span>
+                                        {{ date('d/m/y',strtotime($data->pay_date)) }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="margin-top: -2px;">
+                                    <small>Outgoing Payment:</small>
+                                    <span>
+                                        @if ($data->outgoingPayment()->exists())
+                                            {{ date('d/m/y',strtotime($data->outgoingPayment->pay_date)) }}
+                                        @else
+                                            -
+                                        @endif
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td width="33%" align="center">
+                        <h2 class="indigo-text">Permintaan Pembayaran</h2>
                     </td>
                     <td width="33%" class="right-align">
-                        
-                        
-                   
-                    </td>
-                    
-                    <td width="34%" class="right-align">
-                        
-                            <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
-                       
+                        <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%;right:0;">
                     </td>
                 </tr>
                 
             </table>
-            <hr style="border-top: 3px solid black; margin-top:-2%">
+            <hr style="border-top: 3px solid black; margin-top:5px">
         </header>
         <main>
             <div class="card">
@@ -273,21 +277,14 @@
                             <td width="33%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
-                                        <td align="right">
+                                        <td align="center">
                                             <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:80%;" height="5%" />
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>
-                                           <br>
+                                        <td align="center">
+                                            <h1>{{ $data->code }}</h1>
                                         </td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <td >
-                                            <br>
-                                        </td>
-                                        
                                     </tr>
                                 </table>
                             </td>
@@ -301,6 +298,7 @@
                                 <tr>
                                     <th class="center">Referensi</th>
                                     <th class="center">Tipe</th>
+                                    <th class="center">Tgl.Tenggat</th>
                                     <th class="center">Keterangan</th>
                                     <th class="center">Coa</th>
                                     <th class="center">Bayar</th>
@@ -313,7 +311,8 @@
                                 @foreach($data->paymentRequestDetail as $row)
                                 <tr>
                                     <td>{{ $row->lookable->code }}</td>
-                                    <td class="center-align">{{ $row->type() }}</td>
+                                    <td align="center">{{ $row->type() }}</td>
+                                    <td align="center">{{ $row->purchaseInvoice() ? date('d/m/y',strtotime($row->lookable->due_date)) : '-' }}</td>
                                     <td>{{ $row->note }}</td>
                                     <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
                                     <td align="right">{{ number_format($row->nominal,2,',','.') }}</td>
@@ -395,8 +394,13 @@
                                         @endforeach
                                     @endforeach
                                 @endif
+                                <td class="center-align">
+                                    @if ($data->payment_type == '2')
+                                        <img src="{{ $e_banking }}" width="50%" style="position: absolute; bottom:0px; width:20%; right:0px;">
+                                    @endif
+                                </td>
                             </tr>
-                        </table>  
+                        </table>
                     </div>
                 </div>
             </div>

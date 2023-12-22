@@ -676,24 +676,6 @@
         });
     }
 
-    function printPreview(code){
-        $.ajax({
-            url: '{{ Request::url() }}/approval/' + code,
-            type:'GET',
-            beforeSend: function() {
-                loadingOpen('.modal-content');
-            },
-            complete: function() {
-                
-            },
-            success: function(data){
-                loadingClose('.modal-content');
-                $('#modal1').modal('open');
-                $('#show_print').html(data);
-            }
-        });
-    }
-
     var printService = new WebSocketPrinter({
         onConnect: function () {
         var document = $('#filter-document').val();

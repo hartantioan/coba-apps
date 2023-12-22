@@ -167,7 +167,7 @@
                     <td width="83%" class="left-align" >
                         <tr>
                             <td>
-                                <span class="invoice-number mr-1">Jurnal Entry # {{ $data->code }}</span>
+                                <span class="invoice-number mr-1"># {{ $data->code }}</span>
                             </td>
                         </tr>
                         <tr>
@@ -186,8 +186,6 @@
                     </td>
                     <td width="33%" class="right-align">
                         
-                        
-                   
                     </td>
                     
                     <td width="34%" class="right-align">                        
@@ -245,21 +243,14 @@
                         <td width="33%" class="left-align">
                             <table border="0" width="100%">
                                 <tr>
-                                    <td align="right">
+                                    <td align="center">
                                         <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:80%;" height="5%" />
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>
-                                       <br>
+                                    <td align="center">
+                                        <h3>{{ $data->code }}</h3>
                                     </td>
-                                    
-                                </tr>
-                                <tr>
-                                    <td >
-                                        <br>
-                                    </td>
-                                    
                                 </tr>
                             </table>
                         </td>

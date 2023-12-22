@@ -980,7 +980,7 @@
                         ` + optionItem + `
                     </td>
                     <td class="center-align">
-                        <input name="arr_qty_detail[]" id="arr_qty_detail` + count + `" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" required style="text-align:right;">
+                        <input name="arr_qty_detail[]" onfocus="emptyThis(this);" onfocus="emptyThis(this);" onfocus="emptyThis(this);" id="arr_qty_detail` + count + `" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" required style="text-align:right;">
                     </td>
                     <td class="center-align" id="item-unit` + count + `">
                         -
@@ -1121,7 +1121,7 @@
                                         <b id="qty_in_sell` + count + `">` + val.qty_in_sell + `</b> ` + val.unit_sell + `
                                     </td>
                                     <td class="right-align">
-                                        <input name="arr_qty[]" id="arr_qty` + count + `" type="text" value="` + val.qty_in_production + `" onkeyup="formatRupiahNoMinus(this);" required style="width:75%;text-align:right;" data-mopd="` + val.mopd_id + `" data-max="` + val.qty_in_production + `" readonly>
+                                        <input name="arr_qty[]" onfocus="emptyThis(this);" id="arr_qty` + count + `" type="text" value="` + val.qty_in_production + `" onkeyup="formatRupiahNoMinus(this);" required style="width:75%;text-align:right;" data-mopd="` + val.mopd_id + `" data-max="` + val.qty_in_production + `" readonly>
                                         ` + val.unit_production + `
                                     </td>
                                     <td class="right-align">
@@ -1179,6 +1179,23 @@
         }else{
 
         }
+    }
+
+    function whatPrinting(code){
+        $.ajax({
+            url: '{{ Request::url() }}/print_individual/' + code,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                window.open(data, '_blank');
+            }
+        });
     }
 
     function printMultiSelect(){
@@ -1640,7 +1657,7 @@
                                     <b id="qty_in_sell` + count + `">` + val.qty_in_sell + `</b> ` + val.unit_sell + `
                                 </td>
                                 <td class="right-align">
-                                    <input name="arr_qty[]" id="arr_qty` + count + `" type="text" value="` + val.qty_in_production + `" onkeyup="formatRupiahNoMinus(this);" required style="width:75%;text-align:right;" data-mopd="` + val.mopd_id + `" data-max="` + val.qty_real + `" readonly>
+                                    <input name="arr_qty[]" onfocus="emptyThis(this);" id="arr_qty` + count + `" type="text" value="` + val.qty_in_production + `" onkeyup="formatRupiahNoMinus(this);" required style="width:75%;text-align:right;" data-mopd="` + val.mopd_id + `" data-max="` + val.qty_real + `" readonly>
                                     ` + val.unit_production + `
                                 </td>
                                 <td class="right-align">
@@ -1732,7 +1749,7 @@
                                     ` + optionItem + `
                                 </td>
                                 <td class="center-align">
-                                    <input name="arr_qty_detail[]" id="arr_qty_detail` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" required style="text-align:right;">
+                                    <input name="arr_qty_detail[]" onfocus="emptyThis(this);" id="arr_qty_detail` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" required style="text-align:right;">
                                 </td>
                                 <td class="center-align" id="item-unit` + count + `">
                                     ` + val.unit + `

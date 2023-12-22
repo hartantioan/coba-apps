@@ -167,7 +167,7 @@
                     <td width="83%" class="left-align" >
                         <tr>
                             <td>
-                                <span class="invoice-number mr-1">Receipt # {{ $data->code }}</span>
+                                <span class="invoice-number mr-1"># {{ $data->code }}</span>
                             </td>
                         </tr>
                         <tr>
@@ -275,21 +275,14 @@
                             <td width="33%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
-                                        <td align="right">
+                                        <td align="center">
                                             <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:80%;" height="5%" />
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>
-                                           <br>
+                                        <td align="center">
+                                            <h1>{{ $data->code }}</h1>
                                         </td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <td >
-                                            <br>
-                                        </td>
-                                        
                                     </tr>
                                 </table>
                             </td>
@@ -323,8 +316,8 @@
                                     <td>{{ $rowdetail->note }}</td>
                                     <td>{{ $rowdetail->note2 }}</td>
                                     <td>{{ $rowdetail->remark }}</td>
-                                    <td class="center">{{ $rowdetail->place->name.' - '.$rowdetail->place->company->name }}</td>
-                                    <td class="center">{{ isset($rowdetail->department->name)?$rowdetail->department->name : '' }}</td>
+                                    <td class="center">{{ $rowdetail->place->code }}</td>
+                                    <td class="center">{{ $rowdetail->department()->exists() ?$rowdetail->department->name : '-' }}</td>
                                     <td class="center">{{ $rowdetail->warehouse->name }}</td>
                                 </tr>
                                 @endforeach

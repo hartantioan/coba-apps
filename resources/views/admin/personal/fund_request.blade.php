@@ -305,25 +305,25 @@
                                             <tr>
                                                 <td>Total</td>
                                                 <td class="right-align">
-                                                    <input class="browser-default" id="total" name="total" type="text" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
+                                                    <input class="browser-default" id="total" name="total" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td>PPN</td>
                                                 <td class="right-align">
-                                                    <input class="browser-default" id="tax" name="tax" type="text" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
+                                                    <input class="browser-default" id="tax" name="tax" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td>PPh</td>
                                                 <td class="right-align">
-                                                    <input class="browser-default" id="wtax" name="wtax" type="text" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
+                                                    <input class="browser-default" id="wtax" name="wtax" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td>Grandtotal</td>
                                                 <td class="right-align">
-                                                    <input class="browser-default" id="grandtotal" name="grandtotal" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
+                                                    <input class="browser-default" id="grandtotal" name="grandtotal" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
                                                 </td>
                                             </tr>
                                         </thead>
@@ -433,6 +433,19 @@
         select2ServerSide('#account_id', '{{ url("admin/select2/employee") }}');
     });
 
+    var printService = new WebSocketPrinter({
+        onConnect: function () {
+        var document = $('#filter-document').val();
+            
+        },
+        onDisconnect: function () {
+           
+        },
+        onUpdate: function (message) {
+            
+        },
+    });
+
     function getRekening(){
         if($('#user_bank_id').val()){
             $('#name_account,#no_account').prop('readonly',true);
@@ -493,13 +506,13 @@
                     <textarea class="materialize-textarea" name="arr_item[]" type="text" placeholder="Keterangan Barang"></textarea>
                 </td>
                 <td>
-                    <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiahNoMinus(this);count();">
+                    <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="0" onkeyup="formatRupiahNoMinus(this);count();">
                 </td>
                 <td class="center">
                     <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>
                 </td>>
                 <td class="center">
-                    <input type="text" id="arr_price` + count + `" name="arr_price[]" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;">
+                    <input type="text" id="arr_price` + count + `" name="arr_price[]" onfocus="emptyThis(this);" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;">
                 </td>
                 <td>
                     <select class="browser-default" id="arr_tax_id` + count + `" name="arr_tax_id[]" onchange="count();">
@@ -524,7 +537,7 @@
                     </select>
                 </td>
                 <td class="center">
-                    <input type="text" id="arr_total` + count + `" name="arr_total[]" value="0,00" onkeyup="formatRupiah(this);" readonly style="text-align:right;">
+                    <input type="text" id="arr_total` + count + `" name="arr_total[]" onfocus="emptyThis(this);" value="0,00" onkeyup="formatRupiah(this);" readonly style="text-align:right;">
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -986,13 +999,13 @@
                                     <textarea class="materialize-textarea" name="arr_item[]" type="text" placeholder="Keterangan Barang">` + val.item + `</textarea>
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);count();">
+                                    <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);count();">
                                 </td>
                                 <td class="center">
                                     <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>
                                 </td>>
                                 <td class="center">
-                                    <input type="text" id="arr_price` + count + `" name="arr_price[]" value="` + val.price + `" onkeyup="formatRupiah(this);count();" style="text-align:right;">
+                                    <input type="text" id="arr_price` + count + `" name="arr_price[]" onfocus="emptyThis(this);" value="` + val.price + `" onkeyup="formatRupiah(this);count();" style="text-align:right;">
                                 </td>
                                 <td>
                                     <select class="browser-default" id="arr_tax_id` + count + `" name="arr_tax_id[]" onchange="count();">
@@ -1017,7 +1030,7 @@
                                     </select>
                                 </td>
                                 <td class="center">
-                                    <input type="text" id="arr_total` + count + `" name="arr_total[]" value="` + val.total + `" onkeyup="formatRupiah(this);" readonly style="text-align:right;">
+                                    <input type="text" id="arr_total` + count + `" name="arr_total[]" onfocus="emptyThis(this);" value="` + val.total + `" onkeyup="formatRupiah(this);" readonly style="text-align:right;">
                                 </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -1096,9 +1109,29 @@
         });
     }
 
+    function printPreview(code){
+        $.ajax({
+            url: window.location.origin + '/admin/finance/fund_request/print_individual/' + code,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                printService.submit({
+                    'type': 'INVOICE',
+                    'url': data
+                })
+            }
+        });
+    }
+
     function whatPrinting(code){
         $.ajax({
-            url: '{{ Request::url() }}/print_individual/' + code,
+            url: window.location.origin + '/admin/finance/fund_request/print_individual/' + code,
             type:'GET',
             beforeSend: function() {
                 loadingOpen('.modal-content');

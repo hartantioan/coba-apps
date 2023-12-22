@@ -167,7 +167,7 @@
                     <td width="83%" class="left-align" >
                         <tr>
                             <td>
-                                <span class="invoice-number mr-1">Depresiasi Aset # {{ $data->code }}</span>
+                                <span class="invoice-number mr-1"># {{ $data->code }}</span>
                             </td>
                         </tr>
                         <tr>
@@ -178,7 +178,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <h5 class="indigo-text">Depresiasi Aset Perusahaan</h5>
+                                <h3 class="indigo-text">Depresiasi Aset Perusahaan</h3>
                             </td>
                         </tr>
                                 
@@ -261,21 +261,14 @@
                         <td width="33%" class="left-align">
                             <table border="0" width="100%">
                                 <tr>
-                                    <td align="right">
+                                    <td align="center">
                                         <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:80%;" height="5%" />
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>
-                                       <br>
+                                    <td align="center">
+                                        <h3>{{ $data->code }}</h3>
                                     </td>
-                                    
-                                </tr>
-                                <tr>
-                                    <td >
-                                        <br>
-                                    </td>
-                                    
                                 </tr>
                             </table>
                         </td>
@@ -296,11 +289,11 @@
                         <tbody>
                             @foreach($data->depreciationDetail as $key => $row)
                                 <tr>
-                                    <td class="center-align">{{ $key + 1 }}</td>
+                                    <td align="center">{{ $key + 1 }}</td>
                                     <td>{{ $row->asset->name }}</td>
                                     <td>{{ $row->asset->code }}</td>
-                                    <td class="center">{{ $row->depreciationNumber().' / '.$row->asset->assetGroup->depreciation_period }}</td>
-                                    <td class="right-align">{{ number_format($row->nominal,3,',','.') }}</td>
+                                    <td align="center">{{ $row->depreciationNumber().' / '.$row->asset->assetGroup->depreciation_period }}</td>
+                                    <td align="right">{{ number_format($row->nominal,3,',','.') }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

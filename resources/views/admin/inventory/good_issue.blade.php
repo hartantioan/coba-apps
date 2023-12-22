@@ -751,7 +751,7 @@
                                         <select class="browser-default item-array" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="setStock('` + count + `')"></select>
                                     </td>
                                     <td>
-                                        <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty_balance + `" onkeyup="formatRupiah(this);setStock('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`">
+                                        <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_balance + `" onkeyup="formatRupiah(this);setStock('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`">
                                     </td>
                                     <td>
                                         <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="`+ val.note +`">
@@ -850,7 +850,7 @@
                     <select class="browser-default item-array" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="setStock('` + count + `')"></select>
                 </td>
                 <td>
-                    <input name="arr_qty[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);setStock('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`">
+                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);setStock('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`">
                 </td>
                 <td>
                     <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ...">
@@ -1078,7 +1078,7 @@
                                     <select class="browser-default item-array" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="setStock('` + count + `')"></select>
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);setStock('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
+                                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);setStock('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
                                 </td>
                                 <td>
                                     <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">

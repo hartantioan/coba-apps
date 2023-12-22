@@ -150,7 +150,7 @@
                     <td width="83%" class="left-align">
                         <tr>
                             <td>
-                                <span class="invoice-number mr-1" style="font-size:10px;margin-bottom:0px">Order # {{ $data->code }}</span>
+                                <span class="invoice-number mr-1" style="font-size:10px;margin-bottom:0px"># {{ $data->code }}</span>
                             </td>
                         </tr>
                         {{-- <tr>
@@ -244,21 +244,14 @@
                             <td width="25%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
-                                        <td>
-                                            <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:100%;" height="5%" />
+                                        <td align="center">
+                                            <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:80%;" height="5%" />
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>
-                                           <br>
+                                        <td align="center">
+                                            <h3>{{ $data->code }}</h3>
                                         </td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <td >
-                                            <br>
-                                        </td>
-                                        
                                     </tr>
                                 </table>
                             </td>
@@ -283,15 +276,15 @@
                             <tbody id="bodybros">
                                     @foreach($data->purchaseOrderDetail as $key => $row)
                                     <tr>
-                                        <td class="center-align" rowspan="3">{{ ($key + 1) }}</td>
-                                        <td class="center-align">{{ $row->item_id ? $row->item->name : $row->coa->name }}</td>
-                                        <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
-                                        <td class="center-align">{{ $row->item_id ? $row->item->buyUnit->code : '-' }}</td>
-                                        <td class="right-align">{{ number_format($row->price,2,',','.') }}</td>
-                                        <td class="center-align">{{ number_format($row->percent_discount_1,2,',','.') }}</td>
-                                        <td class="center-align">{{ number_format($row->percent_discount_2,2,',','.') }}</td>
-                                        <td class="right-align">{{ number_format($row->discount_3,2,',','.') }}</td>
-                                        <td class="right-align">{{ number_format($row->subtotal,2,',','.') }}</td>
+                                        <td align="center" rowspan="3">{{ ($key + 1) }}</td>
+                                        <td align="center">{{ $row->item_id ? $row->item->name : $row->coa->name }}</td>
+                                        <td align="center">{{ number_format($row->qty,3,',','.') }}</td>
+                                        <td align="center">{{ $row->item_id ? $row->item->buyUnit->code : '-' }}</td>
+                                        <td align="right">{{ number_format($row->price,2,',','.') }}</td>
+                                        <td align="center">{{ number_format($row->percent_discount_1,2,',','.') }}</td>
+                                        <td align="center">{{ number_format($row->percent_discount_2,2,',','.') }}</td>
+                                        <td align="right">{{ number_format($row->discount_3,2,',','.') }}</td>
+                                        <td align="right">{{ number_format($row->subtotal,2,',','.') }}</td>
                                     </tr>
                                     <tr>
                                         <td colspan="8">Keterangan 1: {{ $row->note }}</td>

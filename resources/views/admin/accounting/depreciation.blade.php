@@ -606,7 +606,7 @@
                                         ` + val.method_name + `
                                     </td>
                                     <td class="center">
-                                        <input type="text" id="arr_total` + count + `" name="arr_total[]" value="` + val.nominal + `" onkeyup="formatRupiah(this);" readonly>
+                                        <input type="text" id="arr_total` + count + `" name="arr_total[]" onfocus="emptyThis(this);" value="` + val.nominal + `" onkeyup="formatRupiah(this);" readonly>
                                     </td>
                                     <td class="center">
                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
@@ -896,7 +896,7 @@
                                 ` + val.method_name + `
                             </td>
                             <td class="center">
-                                <input type="text" id="arr_total` + count + `" name="arr_total[]" value="` + val.nominal + `" onkeyup="formatRupiah(this);" readonly>
+                                <input type="text" id="arr_total` + count + `" name="arr_total[]" onfocus="emptyThis(this);" value="` + val.nominal + `" onkeyup="formatRupiah(this);" readonly>
                             </td>
                             <td class="center">
                                 <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">

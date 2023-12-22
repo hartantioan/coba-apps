@@ -3,6 +3,14 @@ $(function() {
 	initializeMasking();
 });
 
+function emptyThis(element){
+	if($(element).val()){
+		if(parseFloat($(element).val().replaceAll(".", "").replaceAll(",",".")) == 0){
+			$(element).val('');
+		}
+	}
+}
+
 function initializeMasking(){
 	if($('.npwp').length > 0){
 		$('.npwp').formatter({

@@ -216,8 +216,8 @@
                                 </div>
                                 <div class="input-field col m3 s12 step4">
                                     <select class="form-control" id="payment_type" name="payment_type" onchange="showRekening();">
-                                        <option value="1">Tunai</option>
                                         <option value="2">Transfer</option>
+                                        <option value="1">Tunai</option>
                                         <option value="3">Cek</option>
                                         <option value="4">BG</option>
                                         <option value="5">Rekonsiliasi</option>
@@ -274,7 +274,7 @@
                                     <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                                     <label class="active" for="currency_rate">Konversi</label>
                                 </div>
-                                <div class="col m12" id="rekening-element" style="display:none;">
+                                <div class="col m12" id="rekening-element">
                                     <h6>Rekening (Jika transfer)</h6>
                                     <div class="input-field col m3 s12 step13">
                                         <select class="form-control" id="user_bank_id" name="user_bank_id" onchange="getRekening()">
@@ -302,7 +302,7 @@
                         </fieldset>
                     </div>
                     <div class="col s12">
-                        <fieldset>
+                        <fieldset style="min-width: 100%;">
                             <legend>2. Daftar Dokumen Terpakai</legend>
                             <div class="row">
                                 <div class="col m12 s12">
@@ -310,42 +310,39 @@
                                         <li class="active" id="main-tab" onclick="changeMode();">
                                             <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">library_books</i>Pembayaran BS / AP DP / AP Invoice / AR Credit Memo</div>
                                             <div class="collapsible-body" style="display:block;">
-                                                <p class="mt-2 mb-2" style="overflow:scroll;width:100% !important;">
-                                                    <h6></h6>
-                                                    <div>
-                                                        <table class="bordered step17" style="max-width:1650px !important;" id="table-detail">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th class="center" width="10%">
-                                                                        <label>
-                                                                            <input type="checkbox" onclick="chooseAllGas(this)" id="chooseAll">
-                                                                            <span>Semua</span>
-                                                                        </label>
-                                                                    </th>
-                                                                    <th class="center">Referensi</th>
-                                                                    <th class="center">Tgl.Post</th>
-                                                                    <th class="center">Tgl.Tenggat</th>
-                                                                    <th class="center">Total</th>
-                                                                    <th class="center">PPN</th>
-                                                                    <th class="center">PPh</th>
-                                                                    <th class="center">Grandtotal</th>
-                                                                    <th class="center">Potongan/Memo</th>
-                                                                    <th class="center">Bayar</th>
-                                                                    <th class="center">Keterangan</th>
-                                                                    <th class="center">Dist.Biaya</th>
-                                                                    <th class="center">Coa</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody id="body-detail">
-                                                                <tr id="empty-detail">
-                                                                    <td colspan="13" class="center">
-                                                                        Pilih partner bisnis untuk memulai...
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </p>
+                                                <div class="mt-2 mb-2" style="overflow:scroll;width:100% !important;">
+                                                    <table class="bordered step17" style="max-width:2500px !important;" id="table-detail">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="center" width="10%">
+                                                                    <label>
+                                                                        <input type="checkbox" onclick="chooseAllGas(this)" id="chooseAll">
+                                                                        <span>Semua</span>
+                                                                    </label>
+                                                                </th>
+                                                                <th class="center">Referensi</th>
+                                                                <th class="center">Tgl.Post</th>
+                                                                <th class="center">Tgl.Tenggat</th>
+                                                                <th class="center">Total</th>
+                                                                <th class="center">PPN</th>
+                                                                <th class="center">PPh</th>
+                                                                <th class="center">Grandtotal</th>
+                                                                <th class="center">Potongan/Memo</th>
+                                                                <th class="center">Bayar</th>
+                                                                <th class="center">Keterangan</th>
+                                                                <th class="center">Dist.Biaya</th>
+                                                                <th class="center">Coa</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="body-detail">
+                                                            <tr id="empty-detail">
+                                                                <td colspan="13" class="center">
+                                                                    Pilih partner bisnis untuk memulai...
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </li>
                                         <li id="cost-tab" onclick="changeMode();">
@@ -435,13 +432,13 @@
                                             <tr>
                                                 <td colspan="2">Total</td>
                                                 <td class="right-align">
-                                                    <input class="browser-default" id="total" name="total" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" readonly>
+                                                    <input class="browser-default" id="total" name="total" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" readonly>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td colspan="2">Pembulatan</td>
                                                 <td class="right-align">
-                                                    <input class="browser-default" id="rounding" name="rounding" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
+                                                    <input class="browser-default" id="rounding" name="rounding" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
                                                 </td>
                                             </tr>
                                             <tr>
@@ -450,25 +447,25 @@
                                                     <select class="browser-default" id="cost_distribution_id" name="cost_distribution_id"></select>
                                                 </td>
                                                 <td class="right-align" width="33%">
-                                                    <input class="browser-default" id="admin" name="admin" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
+                                                    <input class="browser-default" id="admin" name="admin" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td colspan="2">Grandtotal</td>
                                                 <td class="right-align">
-                                                    <input class="browser-default" id="grandtotal" name="grandtotal" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" readonly>
+                                                    <input class="browser-default" id="grandtotal" name="grandtotal" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" readonly>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td colspan="2">Bayar dengan Piutang</td>
                                                 <td class="right-align">
-                                                    <input class="browser-default" id="payment" name="payment" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" readonly>
+                                                    <input class="browser-default" id="payment" name="payment" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" readonly>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td colspan="2">Sisa Harus Bayar</td>
                                                 <td class="right-align">
-                                                    <input class="browser-default" id="balance" name="balance" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" readonly>
+                                                    <input class="browser-default" id="balance" name="balance" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" readonly>
                                                 </td>
                                             </tr>
                                         </thead>
@@ -742,6 +739,59 @@
     </div>
 </div>
 
+<div id="modal7" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content">
+        <div class="row" >
+            <div class="col m3 s12">
+                
+            </div>
+            <div class="col m6 s12">
+                <h4 id="title_data" style="text-align:center"></h4>
+                <h5 id="code_data" style="text-align:center"></h5>
+            </div>
+            <div class="col m3 s12 right-align">
+                <img src="{{ url('website/logo_web_fix.png') }}" width="40%" height="60%">
+            </div>
+        </div>
+        <div class="divider mb-1 mt-2"></div>
+        <div class="row">
+            <div class="col" id="user_jurnal">
+            </div>
+            <div class="col" id="post_date_jurnal">
+            </div>
+            <div class="col" id="note_jurnal">
+            </div>
+            <div class="col" id="ref_jurnal">
+            </div>
+        </div>
+        <div class="row mt-2">
+            <table class="bordered Highlight striped">
+                <thead>
+                        <tr>
+                            <th class="center-align">No</th>
+                            <th class="center-align">Coa</th>
+                            <th class="center-align">Perusahaan</th>
+                            <th class="center-align">Partner Bisnis</th>
+                            <th class="center-align">Plant</th>
+                            <th class="center-align">Line</th>
+                            <th class="center-align">Mesin</th>
+                            <th class="center-align">Department</th>
+                            <th class="center-align">Gudang</th>
+                            <th class="center-align">Debit</th>
+                            <th class="center-align">Kredit</th>
+                        </tr>
+                    
+                </thead>
+                <tbody id="body-journal-table">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+    </div>
+</div>
+
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
@@ -774,6 +824,23 @@
         loadDataTable();
 
         window.table.search('{{ $code }}').draw();
+
+        $('#modal7').modal({
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) { 
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#title_data').empty();
+                $('#code_data').empty();             
+                $('#body-journal-table').empty();
+                $('#user_jurnal').empty();
+                $('#note_jurnal').empty();
+                $('#ref_jurnal').empty();
+                $('#post_date_jurnal').empty();
+            }
+        });
 
         $('#modal4_1').modal({
             onOpenStart: function(modal,trigger) {
@@ -837,6 +904,19 @@
                 if($('.data-used').length > 0){
                     $('.data-used').trigger('click');
                 }
+                $('#body-detail-payment').empty().append(`
+                    <tr id="empty-detail-payment">
+                        <td colspan="10" class="center">
+                            Pilih partner bisnis untuk memulai...
+                        </td>
+                    </tr>
+                `);
+                if(!$('#main-tab').hasClass('active')){
+                    $('#main-tab').addClass('active');
+                    $('#main-tab .collapsible-body').css("display", "block");
+                    $('#cost-tab').removeClass('active');
+                    $('#cost-tab .collapsible-body').css("display", "none");
+                }
                 window.onbeforeunload = function() {
                     return null;
                 };
@@ -866,6 +946,9 @@
                     }
                     return 'You will lose all changes made since your last save';
                 };
+                if($('#pay_code_place_id option').length > 1){
+                    $("#pay_code_place_id").val($("#pay_code_place_id option").eq(1).val()).formSelect().trigger('change');
+                }
             },
             onCloseEnd: function(modal, trigger){
                 if($('.data-used-pay').length > 0){
@@ -1162,7 +1245,7 @@
                     <input type="text" id="arr_note_cost` + count + `" name="arr_note_cost[]" placeholder="Keterangan ..." data-id="` + count + `">
                 </td>
                 <td class="center">
-                    <input type="text" id="arr_nominal` + count + `" name="arr_nominal[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                    <input type="text" id="arr_nominal` + count + `" name="arr_nominal[]" onfocus="emptyThis(this);" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" href="javascript:void(0);">
@@ -1444,10 +1527,10 @@
                                                 ` + val.memo + `
                                             </td>
                                             <td class="center">
-                                                <input id="arr_pay` + count + `" name="arr_pay[]" data-grandtotal="` + val.balance + `" class="browser-default" type="text" value="`+ val.balance + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
+                                                <input id="arr_pay` + count + `" name="arr_pay[]" onfocus="emptyThis(this);" data-grandtotal="` + val.balance + `" class="browser-default" type="text" value="`+ val.balance + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
                                             </td>
                                             <td class="center">
-                                                <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:150px;" value="-">
+                                                <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:150px;" value="` + val.note + `">
                                             </td>
                                             <td class="center">
                                                 ` + ( val.coa_id ? `-` : `<select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="applyCoa('` + count + `');"></select>` ) + `
@@ -1522,7 +1605,7 @@
                                                 ` + val.grandtotal + `
                                             </td>
                                             <td class="center-align">
-                                                <input id="arr_payment` + count + `" name="arr_payment[]" data-balance="` + val.balance + `" class="browser-default" type="text" value="`+ val.balance + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
+                                                <input id="arr_payment` + count + `" name="arr_payment[]" onfocus="emptyThis(this);" data-balance="` + val.balance + `" class="browser-default" type="text" value="`+ val.balance + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
                                             </td>
                                         </tr>
                                     `);
@@ -1577,7 +1660,13 @@
     }
 
     function checkTotal(element){
-        var nil = parseFloat($(element).val().replaceAll(".", "").replaceAll(",",".")), max = parseFloat($(element).data('grandtotal').replaceAll(".", "").replaceAll(",","."));
+        var nil = parseFloat($(element).val().replaceAll(".", "").replaceAll(",",".")), max = 0;
+        if($(element).data('grandtotal')){
+            max = parseFloat($(element).data('grandtotal').replaceAll(".", "").replaceAll(",","."));
+        }
+        if($(element).data('balance')){
+            max = parseFloat($(element).data('balance').replaceAll(".", "").replaceAll(",","."));
+        }
         if(nil > max){
             $(element).val($(element).data('grandtotal'));
         }
@@ -1586,7 +1675,7 @@
     function changeMode(){
         setTimeout(function() {
             if($('#main-tab').hasClass('active')){
-                $('#payment_type').val('1').trigger('change').formSelect();
+                $('#payment_type').val('2').trigger('change').formSelect();
             }
             if($('#cost-tab').hasClass('active')){
                 $('#payment_type').val('5').trigger('change').formSelect();
@@ -1828,15 +1917,6 @@
         });
 	}
 
-    function checkTotal(element){
-        let balance = parseFloat($(element).data('balance').replaceAll(".", "").replaceAll(",",".")), val = parseFloat($(element).val().replaceAll(".", "").replaceAll(",","."));
-        if(val > balance){
-            $(element).val(
-                formatRupiahIni(balance.toFixed(2).toString().replace('.',','))
-            );
-        }
-    }
-
     function save(){
 		swal({
             title: "Apakah anda yakin ingin simpan?",
@@ -2041,8 +2121,8 @@
             },
             success: function(response) {
                 loadingClose('#main');
-                $('#modal1').modal('open');
                 $('#temp').val(id);
+                $('#modal1').modal('open');
                 $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#code').val(response.code);
                 $('#account_id').empty().append(`
@@ -2076,7 +2156,12 @@
                 $('#balance').val(response.balance);
                 
                 if(response.is_cost == '1'){
-                    $('ul.tabs').tabs("select", "costdata");
+                    if(!$('#cost-tab').hasClass('active')){
+                        $('#cost-tab').addClass('active');
+                        $('#cost-tab .collapsible-body').css("display", "block");
+                        $('#main-tab').removeClass('active');
+                        $('#main-tab .collapsible-body').css("display", "none");
+                    }
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
                         $('#last-row-coa').before(`
@@ -2091,7 +2176,7 @@
                                     <input type="text" id="arr_note_cost` + count + `" name="arr_note_cost[]" placeholder="Keterangan ..." data-id="` + count + `" value="` + val.note + `">
                                 </td>
                                 <td class="center">
-                                    <input type="text" id="arr_nominal` + count + `" name="arr_nominal[]" value="` + val.nominal + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                    <input type="text" id="arr_nominal` + count + `" name="arr_nominal[]" onfocus="emptyThis(this);" value="` + val.nominal + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
                                 </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" href="javascript:void(0);">
@@ -2110,7 +2195,12 @@
                         select2ServerSide('#arr_coa_cost' + count, '{{ url("admin/select2/coa") }}');
                     });
                 }else{
-                    $('ul.tabs').tabs("select", "opdata");
+                    if(!$('#main-tab').hasClass('active')){
+                        $('#main-tab').addClass('active');
+                        $('#main-tab .collapsible-body').css("display", "block");
+                        $('#cost-tab').removeClass('active');
+                        $('#cost-tab .collapsible-body').css("display", "none");
+                    }
                     if(response.details.length > 0){
                         $('#body-detail').empty();
                         $.each(response.details, function(i, val) {
@@ -2150,7 +2240,7 @@
                                         ` + val.memo + `
                                     </td>
                                     <td class="center">
-                                        <input id="arr_pay` + count + `" name="arr_pay[]" class="browser-default" type="text" value=" `+ val.nominal + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
+                                        <input id="arr_pay` + count + `" name="arr_pay[]" onfocus="emptyThis(this);" class="browser-default" type="text" value=" `+ val.nominal + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
                                     </td>
                                     <td class="center">
                                         <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:150px;" value="` + val.note + `">
@@ -2218,7 +2308,7 @@
                                     ` + val.grandtotal + `
                                 </td>
                                 <td class="center-align">
-                                    <input id="arr_payment` + count + `" name="arr_payment[]" data-balance="` + val.balance + `" class="browser-default" type="text" value="`+ val.nominal + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
+                                    <input id="arr_payment` + count + `" name="arr_payment[]" onfocus="emptyThis(this);" data-balance="` + val.balance + `" class="browser-default" type="text" value="`+ val.nominal + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
                                 </td>
                             </tr>
                         `);
@@ -2942,6 +3032,36 @@
             success: function(data){
                 loadingClose('.modal-content');
                 window.open(data, '_blank');
+            }
+        });
+    }
+
+    function viewJournal(id){
+        $.ajax({
+            url: '{{ Request::url() }}/view_journal/' + id,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                if(data.status == '500'){
+                    M.toast({
+                        html: data.message
+                    });
+                }else{
+                    $('#modal7').modal('open');
+                    $('#title_data').append(``+data.title+``);
+                    $('#code_data').append(data.message.code);
+                    $('#body-journal-table').append(data.tbody);
+                    $('#user_jurnal').append(`Pengguna `+data.user);
+                    $('#note_jurnal').append(`Keterangan `+data.message.note);
+                    $('#ref_jurnal').append(`Referensi `+data.reference);
+                    $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
+                }
             }
         });
     }

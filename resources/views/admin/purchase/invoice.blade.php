@@ -206,7 +206,7 @@
             <div class="col s12">
                 <ul class="tabs">
                     <li class="tab col m6"><a class="active" href="#inputOne">Input Satu Data</a></li>
-                    <li class="tab col m6"><a href="#inputMulti">Input Multi Data</a></li>
+                    {{-- <li class="tab col m6"><a href="#inputMulti">Input Multi Data</a></li> --}}
                 </ul>
                 <div id="inputOne" class="col s12 active">
                     <h4 class="mt-2">Tambah/Edit {{ $title }}</h4>
@@ -391,19 +391,19 @@
                                             <tr>
                                                 <td>PPh</td>
                                                 <td class="right-align">
-                                                    <input class="browser-default" id="wtax" name="wtax" type="text" value="0,00" onkeyup="formatRupiah(this);countGrandtotal(this.value);" style="text-align:right;width:100%;">
+                                                    <input class="browser-default" id="wtax" name="wtax" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countGrandtotal(this.value);" style="text-align:right;width:100%;">
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td>Uang Muka</td>
                                                 <td class="right-align">
-                                                    <input class="browser-default" id="downpayment" name="downpayment" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
+                                                    <input class="browser-default" id="downpayment" name="downpayment" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td>Pembulatan</td>
                                                 <td class="right-align">
-                                                    <input class="browser-default" id="rounding" name="rounding" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
+                                                    <input class="browser-default" id="rounding" name="rounding" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
                                                 </td>
                                             </tr>
                                             <tr>
@@ -421,7 +421,7 @@
                         </div>
                     </form>
                 </div>
-                <div id="inputMulti" class="col s12">
+                {{-- <div id="inputMulti" class="col s12">
                     <h4 class="mt-2">Tambah/Edit Multi {{ $title }}</h4>
                     <form class="row" id="form_data_multi" onsubmit="return false;">
                         <div class="col s12">
@@ -494,7 +494,7 @@
                             </div>
                         </div>
                     </form>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>
@@ -1657,7 +1657,7 @@
                                                     ` + val.qty_returned + `
                                                 </td>
                                                 <td class="center">
-                                                    <input class="browser-default" type="text" name="arr_qty[]" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                                                    <input class="browser-default" type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
                                                 </td>
                                                 <td class="right-align">
                                                     ` + val.price + `
@@ -1757,7 +1757,7 @@
                                                     ` + val.balance + `
                                                 </td>
                                                 <td class="center">
-                                                    <input name="arr_nominal[]" class="browser-default" type="text" value="` + val.balance + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="rowNominal`+ count +`">
+                                                    <input name="arr_nominal[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.balance + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="rowNominal`+ count +`">
                                                 </td>
                                             </tr>
                                         `);
@@ -2021,10 +2021,10 @@
                     -
                 </td>
                 <td class="center">
-                    <input class="browser-default" type="text" name="arr_qty[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                    <input class="browser-default" type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
                 </td>
                 <td class="center">
-                    <input class="browser-default" type="text" name="arr_price[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                    <input class="browser-default" type="text" name="arr_price[]" onfocus="emptyThis(this);" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
                 </td>
                 <td class="center">
                     -
@@ -2800,10 +2800,10 @@
                                         -
                                     </td>
                                     <td class="center">
-                                        <input class="browser-default" type="text" name="arr_qty[]" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="width:75px !important;">
+                                        <input class="browser-default" type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="width:75px !important;">
                                     </td>
                                     <td class="center">
-                                        <input class="browser-default" type="text" name="arr_price[]" value="` + val.price + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                                        <input class="browser-default" type="text" name="arr_price[]" onfocus="emptyThis(this);" value="` + val.price + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
                                     </td>
                                     <td class="center">
                                         -
@@ -2941,7 +2941,7 @@
                                         ` + val.qty_returned + `
                                     </td>
                                     <td class="center">
-                                        <input class="browser-default" type="text" name="arr_qty[]" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                                        <input class="browser-default" type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
                                     </td>
                                     <td class="right-align">
                                         ` + val.price + `
@@ -3037,7 +3037,7 @@
                                     ` + val.nominal + `
                                 </td>
                                 <td class="center">
-                                    <input name="arr_nominal[]" class="browser-default" type="text" value="` + val.nominal + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="rowNominal`+ count +`">
+                                    <input name="arr_nominal[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.nominal + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="rowNominal`+ count +`">
                                 </td>
                             </tr>
                         `);

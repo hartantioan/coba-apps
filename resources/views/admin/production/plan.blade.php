@@ -230,7 +230,7 @@
                                                             <select class="browser-default item-array" id="arr_item0" name="arr_item[]" onchange="getRowUnit(0)" required></select>
                                                         </td>
                                                         <td>
-                                                            <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiahNoMinus(this);count();" required>
+                                                            <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="0" onkeyup="formatRupiahNoMinus(this);count();" required>
                                                         </td>
                                                         <td class="center">
                                                             <span id="arr_satuan0">-</span>
@@ -1058,7 +1058,7 @@
                                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" required></select>
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);count();" required>
+                                    <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);count();" required>
                                 </td>
                                 <td class="center">
                                     <span id="arr_satuan` + count + `">` + val.unit + `</span>
@@ -1168,7 +1168,7 @@
                                             <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" required></select>
                                         </td>
                                         <td>
-                                            <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);count();" required>
+                                            <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);count();" required>
                                         </td>
                                         <td class="center">
                                             <span id="arr_satuan` + count + `">` + val.unit + `</span>
@@ -1283,7 +1283,7 @@
                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" required></select>
                 </td>
                 <td>
-                    <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiahNoMinus(this);count();" required>
+                    <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="0" onkeyup="formatRupiahNoMinus(this);count();" required>
                 </td>
                 <td class="center">
                     <span id="arr_satuan` + count + `">-</span>
@@ -1484,5 +1484,22 @@
                 },
             ]
         }).start();
+    }
+
+    function whatPrinting(code){
+        $.ajax({
+            url: '{{ Request::url() }}/print_individual/' + code,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                window.open(data, '_blank');
+            }
+        });
     }
 </script>

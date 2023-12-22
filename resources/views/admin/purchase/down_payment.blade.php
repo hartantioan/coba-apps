@@ -1085,7 +1085,7 @@
                                         ` + val.grandtotal + `
                                     </td>
                                     <td class="center">
-                                        <input name="arr_nominal[]" class="browser-default" type="text" value="` + val.grandtotal + `" onkeyup="formatRupiah(this);countAll()" style="text-align:right;width:100%;" id="rowNominal` + count + `">
+                                        <input name="arr_nominal[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.grandtotal + `" onkeyup="formatRupiah(this);countAll()" style="text-align:right;width:100%;" id="rowNominal` + count + `">
                                     </td>
                                 </tr>
                             `);
@@ -1540,7 +1540,7 @@
                                     ` + val.total + `
                                 </td>
                                 <td class="center">
-                                    <input name="arr_nominal[]" class="browser-default" type="text" value="` + val.total_dp + `" onkeyup="formatRupiah(this);countAll()" style="text-align:right;width:100%;" id="rowNominal` + count + `">
+                                    <input name="arr_nominal[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.total_dp + `" onkeyup="formatRupiah(this);countAll()" style="text-align:right;width:100%;" id="rowNominal` + count + `">
                                 </td>
                             </tr>
                         `);

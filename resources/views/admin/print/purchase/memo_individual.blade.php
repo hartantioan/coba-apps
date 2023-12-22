@@ -235,21 +235,14 @@
                             <td width="33%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
-                                        <td>
-                                            <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:100%;" height="5%" />
+                                        <td align="center">
+                                            <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:80%;" height="5%" />
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>
-                                           <br>
+                                        <td align="center">
+                                            <h3>{{ $data->code }}</h3>
                                         </td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <td >
-                                            <br>
-                                        </td>
-                                        
                                     </tr>
                                 </table>
                             </td>
@@ -271,13 +264,13 @@
                             <tbody>
                                 @foreach($data->purchaseMemoDetail as $key => $row)
                                 <tr>
-                                    <td class="center-align">{{($key + 1)}}</td>
-                                    <td class="center-align">{{$row->getCode()}}</td>
-                                    <td class="center-align">{{$row->description}}</td>
-                                    <td class="right-align">{{number_format($row->total,2,',','.')}}</td>
-                                    <td class="right-align">{{number_format($row->tax,2,',','.')}}</td>
-                                    <td class="right-align">{{number_format($row->wtax,2,',','.')}}</td>
-                                    <td class="right-align">{{number_format($row->grandtotal,2,',','.')}}</td>
+                                    <td align="center">{{($key + 1)}}</td>
+                                    <td align="center">{{$row->getCode()}}</td>
+                                    <td align="center">{{$row->description}}</td>
+                                    <td align="right">{{number_format($row->total,2,',','.')}}</td>
+                                    <td align="right">{{number_format($row->tax,2,',','.')}}</td>
+                                    <td align="right">{{number_format($row->wtax,2,',','.')}}</td>
+                                    <td align="right">{{number_format($row->grandtotal,2,',','.')}}</td>
                                 </tr>
                                 @endforeach
                                 

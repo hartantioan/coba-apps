@@ -87,6 +87,20 @@ class FundRequest extends Model
         });
     }
 
+    public function listCekBG(){
+        $list = [];
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+            $query->whereHas('outgoingPayment');
+        })->get() as $rowpayment){
+            $list[] = $rowpayment->paymentRequest->payment_no;
+        }
+        if(count($list) > 0){
+            return implode(', ',$list);
+        }else{
+            return '-';
+        }   
+    }
+
     public function totalReceivable(){
         $total = 0;
         if($this->document_status == '3'){

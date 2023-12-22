@@ -701,7 +701,7 @@
                                             ` + val.item_name + `
                                         </td>
                                         <td>
-                                            <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                            <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
                                         </td>
                                         <td class="center">
                                             <span>` + val.unit + `</span>
@@ -1224,7 +1224,7 @@
                                             ` + val.item_name + `
                                         </td>
                                         <td>
-                                            <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                            <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
                                         </td>
                                         <td class="center">
                                             <span>` + val.unit + `</span>
@@ -1412,7 +1412,7 @@
                                     ` + val.item_name + `
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
                                 </td>
                                 <td class="center">
                                     <span>` + val.unit + `</span>

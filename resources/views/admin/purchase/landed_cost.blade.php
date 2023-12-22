@@ -294,7 +294,7 @@
                                                         </td>
                                                         <td class="center-align">
                                                             <input id="arr_temp_nominal{{ $row->id }}" type="hidden" value="0,00">
-                                                            <input id="arr_fee_nominal{{ $row->id }}" name="arr_fee_nominal[]" type="text" value="0,00" onkeyup="formatRupiah(this);countEach({{ $row->id }});" style="height:1.5rem !important;text-align:right;" {{ $row->id == 1 ? 'readonly' : '' }}>
+                                                            <input id="arr_fee_nominal{{ $row->id }}" name="arr_fee_nominal[]" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countEach({{ $row->id }});" style="height:1.5rem !important;text-align:right;" {{ $row->id == 1 ? 'readonly' : '' }}>
                                                         </td>
                                                         <td class="center-align">
                                                             <div class="switch mb-1">
@@ -313,7 +313,7 @@
                                                             </select>
                                                         </td>
                                                         <td class="right-align">
-                                                            <input id="arr_fee_tax_rp{{ $row->id }}" name="arr_fee_tax_rp[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                            <input id="arr_fee_tax_rp{{ $row->id }}" name="arr_fee_tax_rp[]" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
                                                         </td>
                                                         <td class="center-align">
                                                             <select class="browser-default" id="arr_fee_wtax{{ $row->id }}" name="arr_fee_wtax[]" onchange="countEach({{ $row->id }});">
@@ -324,10 +324,10 @@
                                                             </select>
                                                         </td>
                                                         <td class="right-align">
-                                                            <input id="arr_fee_wtax_rp{{ $row->id }}" name="arr_fee_wtax_rp[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                            <input id="arr_fee_wtax_rp{{ $row->id }}" name="arr_fee_wtax_rp[]" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
                                                         </td>
                                                         <td class="center-align">
-                                                            <input id="arr_fee_grandtotal{{ $row->id }}" name="arr_fee_grandtotal[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                            <input id="arr_fee_grandtotal{{ $row->id }}" name="arr_fee_grandtotal[]" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -345,7 +345,7 @@
                                                         </td>
                                                         <td class="center-align">
                                                             <input id="arr_temp_nominal{{ $row->id }}" type="hidden" value="0,00">
-                                                            <input id="arr_fee_nominal{{ $row->id }}" name="arr_fee_nominal[]" type="text" value="0,00" onkeyup="formatRupiah(this);countEach({{ $row->id }});" style="height:1.5rem !important;text-align:right;">
+                                                            <input id="arr_fee_nominal{{ $row->id }}" name="arr_fee_nominal[]" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countEach({{ $row->id }});" style="height:1.5rem !important;text-align:right;">
                                                         </td>
                                                         <td class="center-align">
                                                             <div class="switch mb-1">
@@ -364,7 +364,7 @@
                                                             </select>
                                                         </td>
                                                         <td class="right-align">
-                                                            <input id="arr_fee_tax_rp{{ $row->id }}" name="arr_fee_tax_rp[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                            <input id="arr_fee_tax_rp{{ $row->id }}" name="arr_fee_tax_rp[]" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
                                                         </td>
                                                         <td class="center-align">
                                                             <select class="browser-default" id="arr_fee_wtax{{ $row->id }}" name="arr_fee_wtax[]" onchange="countEach({{ $row->id }});">
@@ -375,10 +375,10 @@
                                                             </select>
                                                         </td>
                                                         <td class="right-align">
-                                                            <input id="arr_fee_wtax_rp{{ $row->id }}" name="arr_fee_wtax_rp[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                            <input id="arr_fee_wtax_rp{{ $row->id }}" name="arr_fee_wtax_rp[]" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
                                                         </td>
                                                         <td class="center-align">
-                                                            <input id="arr_fee_grandtotal{{ $row->id }}" name="arr_fee_grandtotal[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                            <input id="arr_fee_grandtotal{{ $row->id }}" name="arr_fee_grandtotal[]" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -419,7 +419,7 @@
                                 <p class="mt-2 mb-2">
                                     <h5>Detail Harga per Produk</h5>
                                     <div style="overflow:auto;">
-                                        <table class="bordered">
+                                        <table class="bordered" id="table-detail1">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Ref.No</th>
@@ -1067,7 +1067,7 @@
 
         select2ServerSide('#supplier_id', '{{ url("admin/select2/supplier") }}');
 
-        $("#table-detail th").resizable({
+        $("#table-detail th,#table-detail1 th").resizable({
             minWidth: 100,
         });
     });

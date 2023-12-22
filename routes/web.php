@@ -2101,6 +2101,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('get_code_pay', [PaymentRequestController::class, 'getCodePay']);
                     Route::post('print',[PaymentRequestController::class, 'print']);
                     Route::post('print_by_range',[PaymentRequestController::class, 'printByRange']);
+                    Route::get('view_journal/{id}',[PaymentRequestController::class, 'viewJournal'])->middleware('operation.access:payment_request,journal');
                     Route::get('print_individual/{id}',[PaymentRequestController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('export',[PaymentRequestController::class, 'export']);
                     Route::get('viewstructuretree',[PaymentRequestController::class, 'viewStructureTree']);

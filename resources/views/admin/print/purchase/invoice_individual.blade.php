@@ -48,43 +48,43 @@
             @media only screen and (max-width : 992px) {
                 .invoice-print-area {
                     zoom:0.6;
-                    font-size:11px !important;
+                    font-size:9px !important;
                 }
 
                 table > thead > tr > th {
-                    font-size:13px !important;
+                    font-size:11px !important;
                     font-weight: 800 !important;
                 }
                 td{
-                    font-size:0.7em !important;
+                    font-size:0.6em !important;
                 }
                 .tb-header td{
-                    font-size:0.6em !important;
+                    font-size:0.5em !important;
                 }
                 .tbl-info td{
-                    font-size:0.8em !important;
+                    font-size:0.7em !important;
                 }
                 .table-data-item td{
-                    font-size:0.6em !important;
+                    font-size:0.5em !important;
                 }
                 .table-data-item th{
                     border:0.6px solid black;
                 }
                 .table-bot td{
-                    font-size:0.6em !important;
+                    font-size:0.5em !important;
                 }
                 .table-bot1 td{
-                    font-size:0.7em !important;
+                    font-size:0.6em !important;
                 }
             }
         
             @media print {
                 .invoice-print-area {
-                    font-size:13px !important;
+                    font-size:11px !important;
                 }
         
                 table > thead > tr > th {
-                    font-size:15px !important;
+                    font-size:13px !important;
                     font-weight: 800 !important;
                 }
         
@@ -167,17 +167,12 @@
                     <td width="83%" class="left-align" >
                         <tr>
                             <td>
-                                <span class="invoice-number mr-1" style="font-size:1em">A/P Invoice # {{ $data->code }}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="margin-top: -2px;">
-                                <small style="font-size:1em">Diajukan: {{ date('d/m/y',strtotime($data->post_date)) }}</small>
+                                <span class="invoice-number mr-1" style="font-size:1em"># {{ $data->code }}</span>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <h5 style="margin-top: -2px">A/P Invoice</h5>
+                                <h2 style="margin-top: -2px">A/P Invoice</h2>
                             </td>
                         </tr>
                                 
@@ -197,14 +192,14 @@
                 </tr>
                 
             </table>
-            <hr style="border-top: 3px solid black; margin-top:-2%">
+            <hr style="border-top: 3px solid black; margin-top:0px">
         </header>
         <main>
             <div class="card">
                 
                 <table border="0" width="100%" class="tbl-info">
                     <tr>
-                        <td width="33%" class="left-align">
+                        <td width="33%" class="left-align" style="vertical-align: top !important;">
                             <table border="0" width="100%">
                                 <tr>
                                     <td width="50%">
@@ -230,10 +225,50 @@
                                         {{ $data->account->phone.' / '.$data->account->office_no }}
                                     </td>
                                 </tr>
+                                <tr>
+                                    <td width="50%">
+                                        Tgl.Terima
+                                    </td>
+                                    <td width="50%">
+                                        {{ date('d/m/y',strtotime($data->received_date)) }}
+                                    </td>
+                                </tr>
+                                @php
+                                    $startTimeStamp = strtotime($data->received_date);
+                                    $endTimeStamp = strtotime($data->due_date);
+
+                                    $timeDiff = abs($endTimeStamp - $startTimeStamp);
+
+                                    $numberDays = $timeDiff/86400;
+                                @endphp
+                                <tr>
+                                    <td width="50%">
+                                        TOP
+                                    </td>
+                                    <td width="50%">
+                                        {{ $numberDays }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="50%">
+                                        Tgl.Tenggat
+                                    </td>
+                                    <td width="50%">
+                                        {{ date('d/m/y',strtotime($data->due_date)) }}
+                                    </td>
+                                </tr>
                             </table>
                         </td>
-                        <td width="33%" class="left-align">
+                        <td width="33%" class="left-align" style="vertical-align: top !important;">
                             <table border="0" width="100%">
+                                <tr>
+                                    <td width="50%">
+                                        Tgl.Post
+                                    </td>
+                                    <td width="50%">
+                                        {{ date('d/m/y',strtotime($data->post_date)) }}
+                                    </td>
+                                </tr>
                                 <tr>
                                     <td width="50%">
                                         Tipe
@@ -251,30 +286,50 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>
-                                        <br>
+                                    <td width="50%">
+                                        Tgl. Tenggat
+                                    </td>
+                                    <td width="50%">
+                                        {{ date('d/m/y',strtotime($data->due_date)) }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="50%">
+                                        Invoice Vendor
+                                    </td>
+                                    <td width="50%">
+                                        {{ $data->invoice_no }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="50%">
+                                        Faktur Pajak
+                                    </td>
+                                    <td width="50%">
+                                        {{ $data->tax_no }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="50%">
+                                        No. Bukti Potong
+                                    </td>
+                                    <td width="50%">
+                                        {{ $data->tax_cut_no }}
                                     </td>
                                 </tr>
                             </table>
                         </td>
-                        <td width="33%" class="left-align">
+                        <td width="33%" class="left-align" style="vertical-align: top !important;">
                             <table border="0" width="100%">
                                 <tr>
-                                    <td align="right">
+                                    <td align="center">
                                         <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:80%;" height="5%" />
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>
-                                       <br>
+                                    <td align="center">
+                                        <h3>{{ $data->code }}</h3>
                                     </td>
-                                    
-                                </tr>
-                                <tr>
-                                    <td >
-                                        <br>
-                                    </td>
-                                    
                                 </tr>
                             </table>
                         </td>
@@ -285,7 +340,7 @@
                         <thead>
                             <tr>
                                 <th class="center-align" width="5%">No.</th>
-                                <th class="center-align" width="50%">GRPO/LC/PO</th>
+                                <th class="center-align" width="35%">GRPO/LC/PO</th>
                                 <th class="center-align">Ket.1</th>
                                 <th class="center-align">Ket.2</th>
                                 <th class="center-align" width="10%" style="max-width:10%">Total</th>
@@ -325,7 +380,7 @@
                                     <div class="mt-3">
                                         Catatan : {{ $data->note }}
                                     </div>
-                                    Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal) }}
+                                    Terbilang : <i>{{ CustomHelper::terbilang($data->balance) }}
                                 </td>
                                 
                             </tr>
@@ -350,6 +405,22 @@
                             <tr class="break-row">
                                 <td class="right-align" style="padding-right:15px">Grandtotal</td>
                                 <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->grandtotal,2,',','.') }}</td>
+                            </tr>
+                            @if($data->downpayment > 0)
+                            <tr class="break-row">
+                                <td class="right-align" style="padding-right:15px">Downpayment</td>
+                                <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->downpayment,2,',','.') }}</td>
+                            </tr>
+                            @endif
+                            @if($data->rounding > 0)
+                            <tr class="break-row">
+                                <td class="right-align" style="padding-right:15px">Pembulatan</td>
+                                <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->rounding,2,',','.') }}</td>
+                            </tr>
+                            @endif
+                            <tr class="break-row">
+                                <td class="right-align" style="padding-right:15px">Sisa Tagihan</td>
+                                <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->balance,2,',','.') }}</td>
                             </tr>
                         </table>
                     </div>

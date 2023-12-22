@@ -621,6 +621,9 @@ class FundRequestController extends Controller
                 "verify_peer_name"=>false,
                 ),
             );
+
+            $temp_pdf = [];
+
             $img_path = 'website/logo_web_fix.png';
             $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
             $image_temp = file_get_contents($img_path, false, stream_context_create($opciones_ssl));
@@ -637,13 +640,32 @@ class FundRequestController extends Controller
             
             $content = $pdf->download()->getOriginalContent();
             
-            $randomString = Str::random(10); 
+            $temp_pdf[]=$content;
 
+            #surat penjara
+            $pdfjail = Pdf::loadView('admin.print.finance.jail_letter', $data)->setPaper('a5', 'landscape');
+            $pdfjail->render();
+
+            $font = $pdfjail->getFontMetrics()->get_font("helvetica", "bold");
+            $pdfjail->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+            $pdfjail->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+            
+            $contentjail = $pdfjail->download()->getOriginalContent();
+
+            $temp_pdf[]=$contentjail;
+
+            $merger = new Merger();
+            foreach ($temp_pdf as $pdfContent) {
+                $merger->addRaw($pdfContent);
+            }
+
+            $result = $merger->merge();
+            
+            $randomString = Str::random(10); 
          
             $filePath = 'public/pdf/' . $randomString . '.pdf';
             
-
-            Storage::put($filePath, $content);
+            Storage::put($filePath, $result);
             
             $document_po = asset(Storage::url($filePath));
             $var_link=$document_po;
@@ -785,6 +807,8 @@ class FundRequestController extends Controller
                     $val->documentStatus(),
                     $val->status(),
                     '
+                        <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light blue accent-2 white-text" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light orange accent-2 white-text" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light red accent-2 white-text" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
                         '.($val->document_status == '3' && $totalReceivableBalance == 0 && $val->status == '2' ? '<button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light purple accent-2 white-text" data-popup="tooltip" title="Finish" onclick="finish(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">offline_pin</i></button>' : '').'

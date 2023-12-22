@@ -487,7 +487,7 @@
                     <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="getPlaceWarehouse('` + count + `')"></select>
                 </td>
                 <td class="center">
-                    <input name="arr_nominal[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" id="arr_nominal` + count + `">
+                    <input name="arr_nominal[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" id="arr_nominal` + count + `">
                 </td>
                 <td>
                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
@@ -947,7 +947,7 @@
                                     <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="getPlaceWarehouse('` + count + `')"></select>
                                 </td>
                                 <td class="center">
-                                    <input name="arr_nominal[]" class="browser-default" type="text" value="` + val.nominal + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" id="arr_nominal` + count + `">
+                                    <input name="arr_nominal[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.nominal + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" id="arr_nominal` + count + `">
                                 </td>
                                 <td>
                                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>

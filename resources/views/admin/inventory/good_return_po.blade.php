@@ -1044,7 +1044,7 @@
                                             <span>` + val.qty + `</span>
                                         </td>
                                         <td>
-                                            <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                            <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
                                         </td>
                                         <td class="center">
                                             <span>` + val.unit + `</span>
@@ -1179,7 +1179,7 @@
                                     <span>` + val.qty_received + `</span>
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty_returned + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_returned + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
                                 </td>
                                 <td class="center">
                                     <span>` + val.unit + `</span>

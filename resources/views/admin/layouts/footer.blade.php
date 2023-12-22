@@ -24,7 +24,7 @@
     <script src="{{ url('app-assets/js/plugins.js?v=7') }}"></script>
     <script src="{{ url('app-assets/js/search.js?v=11') }}"></script>
     <script src="{{ url('app-assets/vendors/ckeditor/ckeditor.js') }}"></script>
-    <script src="{{ url('app-assets/js/custom/custom-script.js?v=116') }}"></script>
+    <script src="{{ url('app-assets/js/custom/custom-script.js?v=117') }}"></script>
     
     <script src="{{ url('app-assets/js/custom/go-chart.js') }}"></script>
     @if(session('bo_id'))

@@ -774,19 +774,19 @@
                                         <input name="arr_description[]" type="text" placeholder="Keterangan" value="` + response.note + ` - ` + response.account_name + `">
                                     </td>
                                     <td>
-                                        <input type="text" name="arr_nominal[]" value="` + response.balanceformat + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                        <input type="text" name="arr_nominal[]" onfocus="emptyThis(this);" value="` + response.balanceformat + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
                                     </td>
                                     <td>
-                                        <input type="text" name="arr_total[]" value="` + response.balanceformat + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
+                                        <input type="text" name="arr_total[]" onfocus="emptyThis(this);" value="` + response.balanceformat + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
                                     </td>
                                     <td>
-                                        <input type="text" name="arr_tax[]" value="` + response.tax + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;">
+                                        <input type="text" name="arr_tax[]" onfocus="emptyThis(this);" value="` + response.tax + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;">
                                     </td>
                                     <td>
-                                        <input type="text" name="arr_wtax[]" value="` + response.wtax + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;">
+                                        <input type="text" name="arr_wtax[]" onfocus="emptyThis(this);" value="` + response.wtax + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;">
                                     </td>
                                     <td>
-                                        <input type="text" name="arr_grandtotal[]" value="` + response.grandtotal + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
+                                        <input type="text" name="arr_grandtotal[]" onfocus="emptyThis(this);" value="` + response.grandtotal + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
                                     </td>
                                     <td class="center">
                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
@@ -818,19 +818,19 @@
                                             <input name="arr_description[]" type="text" placeholder="Keterangan" value="` + val.note + ` - ` + val.account_name + `">
                                         </td>
                                         <td>
-                                            <input type="text" name="arr_nominal[]" value="` + val.balanceformat + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                            <input type="text" name="arr_nominal[]" onfocus="emptyThis(this);" value="` + val.balanceformat + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
                                         </td>
                                         <td>
-                                            <input type="text" name="arr_total[]" value="` + val.balanceformat + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
+                                            <input type="text" name="arr_total[]" onfocus="emptyThis(this);" value="` + val.balanceformat + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
                                         </td>
                                         <td>
-                                            <input type="text" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
+                                            <input type="text" name="arr_tax[]" onfocus="emptyThis(this);" value="` + val.tax + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
                                         </td>
                                         <td>
-                                            <input type="text" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
+                                            <input type="text" name="arr_wtax[]" onfocus="emptyThis(this);" value="` + val.wtax + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
                                         </td>
                                         <td>
-                                            <input type="text" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
+                                            <input type="text" name="arr_grandtotal[]" onfocus="emptyThis(this);" value="` + val.grandtotal + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
                                         </td>
                                         <td class="center">
                                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
@@ -1532,19 +1532,19 @@
                                     <input name="arr_description[]" type="text" placeholder="Keterangan" value="` + val.note + ` - ` + val.account_name + `">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_nominal[]" value="` + val.total + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                    <input type="text" name="arr_nominal[]" onfocus="emptyThis(this);" value="` + val.total + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_total[]" value="` + val.total + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
+                                    <input type="text" name="arr_total[]" onfocus="emptyThis(this);" value="` + val.total + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
+                                    <input type="text" name="arr_tax[]" onfocus="emptyThis(this);" value="` + val.tax + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
+                                    <input type="text" name="arr_wtax[]" onfocus="emptyThis(this);" value="` + val.wtax + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
+                                    <input type="text" name="arr_grandtotal[]" onfocus="emptyThis(this);" value="` + val.grandtotal + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
                                 </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">

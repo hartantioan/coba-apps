@@ -604,7 +604,7 @@
                             ` + $("#asset_id").select2('data')[0].name + `
                         </td>
                         <td class="center">
-                            <input type="text" id="arr_qty` + count + `" name="arr_qty[]" value="` + $("#asset_id").select2('data')[0].qty_balance + `" onkeyup="formatRupiah(this);" readonly>
+                            <input type="text" id="arr_qty` + count + `" name="arr_qty[]" onfocus="emptyThis(this);" value="` + $("#asset_id").select2('data')[0].qty_balance + `" onkeyup="formatRupiah(this);" readonly>
                         </td>
                         <td class="center">
                             ` + $("#asset_id").select2('data')[0].unit_name + `
@@ -613,7 +613,7 @@
                             ` + $("#asset_id").select2('data')[0].nominal + `
                         </td>
                         <td class="center">
-                            <input type="text" id="arr_total` + count + `" name="arr_total[]" value="0,000" onkeyup="formatRupiah(this);" style="text-align:right !important;">
+                            <input type="text" id="arr_total` + count + `" name="arr_total[]" onfocus="emptyThis(this);" value="0,000" onkeyup="formatRupiah(this);" style="text-align:right !important;">
                         </td>
                         <td>
                             <input name="arr_note[]" type="text" placeholder="Keterangan">
@@ -909,7 +909,7 @@
                                 ` + val.asset_name + `
                             </td>
                             <td class="center">
-                                <input type="text" id="arr_qty` + count + `" name="arr_qty[]" value="` + val.qty + `" onkeyup="formatRupiah(this);" readonly>
+                                <input type="text" id="arr_qty` + count + `" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty + `" onkeyup="formatRupiah(this);" readonly>
                             </td>
                             <td class="center">
                                 ` + val.unit_name + `
@@ -918,7 +918,7 @@
                                 ` + val.asset_nominal + `
                             </td>
                             <td class="center">
-                                <input type="text" id="arr_total` + count + `" name="arr_total[]" value="` + val.retirement_nominal + `" onkeyup="formatRupiah(this);">
+                                <input type="text" id="arr_total` + count + `" name="arr_total[]" onfocus="emptyThis(this);" value="` + val.retirement_nominal + `" onkeyup="formatRupiah(this);">
                             </td>
                             <td>
                                 <input name="arr_note[]" type="text" placeholder="Keterangan" value="` + val.note + `">

@@ -692,7 +692,7 @@
                     </select>
                 </td>
                 <td>
-                    <input name="arr_qty[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);cekRow('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
+                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);cekRow('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
                 </td>
                 <td class="center">
                     <span id="arr_unit` + count + `">-</span>
@@ -1015,7 +1015,7 @@
                                 <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]"></select>
                             </td>
                             <td>
-                                <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);cekRow('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
+                                <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);cekRow('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
                             </td>
                             <td class="center">
                                 <span id="arr_unit` + count + `">` + val.unit + `</span>

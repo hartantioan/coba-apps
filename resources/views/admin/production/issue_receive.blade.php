@@ -886,7 +886,7 @@
                                         ` + val.qty + `
                                     </td>
                                     <td class="center">
-                                        ` + (val.lookable_type == 'items' ? `<input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);checkRowQty('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required>` : '-') + `
+                                        ` + (val.lookable_type == 'items' ? `<input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);checkRowQty('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required>` : '-') + `
                                     </td>
                                     <td class="center">
                                         ` + val.lookable_unit + `
@@ -930,7 +930,7 @@
                                 </td>
                                 <td class="center">
                                     <div class="input-field col s10">
-                                        <input name="arr_qty[]" type="text" value="` + datakuy.item_receive_qty + `" onkeyup="formatRupiah(this);countRow(this);" style="text-align:right;width:100%;margin: 0 0 0 0 !important;height:1.25rem !important;font-size:0.9rem !important;" id="rowQty`+ count +`" data-id="` + count + `" data-production="` + datakuy.production_convert + `" data-sell="` + datakuy.sell_convert + `" data-pallet="` + datakuy.pallet_convert + `" data-qtystandard="` + datakuy.item_receive_qty + `" required>
+                                        <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + datakuy.item_receive_qty + `" onkeyup="formatRupiah(this);countRow(this);" style="text-align:right;width:100%;margin: 0 0 0 0 !important;height:1.25rem !important;font-size:0.9rem !important;" id="rowQty`+ count +`" data-id="` + count + `" data-production="` + datakuy.production_convert + `" data-sell="` + datakuy.sell_convert + `" data-pallet="` + datakuy.pallet_convert + `" data-qtystandard="` + datakuy.item_receive_qty + `" required>
                                         <div class="form-control-feedback" id="production-unit` + count + `" style="right:-30px;top:-10px;">` + datakuy.item_receive_unit_production + `</div>
                                     </div>
                                 </td>
@@ -1453,7 +1453,7 @@
                                 ` + val.qty_standard + `
                             </td>
                             <td class="center">
-                                ` + (val.lookable_type == 'items' ? `<input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);checkRowQty('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required>` : '-') + `
+                                ` + (val.lookable_type == 'items' ? `<input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);checkRowQty('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required>` : '-') + `
                             </td>
                             <td class="center">
                                 ` + val.lookable_unit + `
@@ -1487,7 +1487,7 @@
                         </td>
                         <td class="center">
                             <div class="input-field col s10">
-                                <input name="arr_qty[]" type="text" value="` + response.qty + `" onkeyup="formatRupiah(this);countRow(this);" style="text-align:right;width:100%;margin: 0 0 0 0 !important;height:1.25rem !important;font-size:0.9rem !important;" id="rowQty`+ count +`" data-id="` + count + `" data-production="` + response.production_convert + `" data-sell="` + response.sell_convert + `" data-pallet="` + response.pallet_convert + `" data-qtystandard="` + response.item_receive_qty + `" required>
+                                <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + response.qty + `" onkeyup="formatRupiah(this);countRow(this);" style="text-align:right;width:100%;margin: 0 0 0 0 !important;height:1.25rem !important;font-size:0.9rem !important;" id="rowQty`+ count +`" data-id="` + count + `" data-production="` + response.production_convert + `" data-sell="` + response.sell_convert + `" data-pallet="` + response.pallet_convert + `" data-qtystandard="` + response.item_receive_qty + `" required>
                                 <div class="form-control-feedback" id="production-unit` + count + `" style="right:-30px;top:-10px;">` + response.item_receive_unit_production + `</div>
                             </div>
                         </td>
@@ -1751,6 +1751,23 @@
                 },
             ]
         }).start();
+    }
+
+    function whatPrinting(code){
+        $.ajax({
+            url: '{{ Request::url() }}/print_individual/' + code,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                window.open(data, '_blank');
+            }
+        });
     }
 
     function viewJournal(id){

@@ -193,6 +193,10 @@
                                         <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                                         <label class="active" for="currency_rate">Konversi</label>
                                     </div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="browser-default" id="journal_id" name="journal_id"></select>
+                                        <label class="active" for="journal_id">Journal Referensi (Opsional : Pinjaman Karyawan)</label>
+                                    </div>
                                     <div class="col s12">
                                         <h5>Tambah dari Distribusi (Opsional)</h5>
                                         <div class="input-field col s3">
@@ -543,6 +547,7 @@
         });
 
         select2ServerSide('#cost_distribution_id', '{{ url("admin/select2/cost_distribution") }}');
+        select2ServerSide('#journal_id', '{{ url("admin/select2/journal") }}');
     });
 
     String.prototype.replaceAt = function(index, replacement) {
@@ -765,12 +770,35 @@
             </tr>
         `);
         
-        select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa_journal") }}');
         select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
         select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
         select2ServerSide('#arr_account' + count, '{{ url("admin/select2/business_partner") }}');
         $('#arr_place' + count).formSelect();
         $('#arr_department' + count).formSelect();
+        $('#arr_coa' + count).select2({
+            placeholder: '-- Pilih ya --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/coa_journal") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        account_id: $('#arr_account' + count).val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
     }
 
     function changePlace(element){
@@ -1452,6 +1480,13 @@
                 $('#due_date').val(response.due_date);
                 $('#currency_id').val(response.currency_id).formSelect();
                 $('#currency_rate').val(response.currency_rate);
+                $('#journal_id').empty();
+
+                if(response.journal_id){
+                    $('#journal_id').append(`
+                        <option value="` + response.journal_id + `">` + response.journal_name + `</option>
+                    `);
+                }
 
                 $('.row_coa').remove();
 
@@ -1516,7 +1551,30 @@
                         </tr>
                     `);
                     
-                    select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa_journal") }}');
+                    $('#arr_coa' + count).select2({
+                        placeholder: '-- Pilih ya --',
+                        minimumInputLength: 1,
+                        allowClear: true,
+                        cache: true,
+                        width: 'resolve',
+                        dropdownParent: $('body').parent(),
+                        ajax: {
+                            url: '{{ url("admin/select2/coa_journal") }}',
+                            type: 'GET',
+                            dataType: 'JSON',
+                            data: function(params) {
+                                return {
+                                    search: params.term,
+                                    account_id: $('#arr_account' + count).val(),
+                                };
+                            },
+                            processResults: function(data) {
+                                return {
+                                    results: data.items
+                                }
+                            }
+                        }
+                    });
                     select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
                     select2ServerSide('#arr_account' + count, '{{ url("admin/select2/business_partner") }}');
                     $('#arr_place' + count).val(val.place_id);

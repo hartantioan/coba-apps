@@ -6,7 +6,6 @@ use App\Jobs\ResetCogs;
 use App\Jobs\ResetStock;
 use App\Models\Coa;
 use App\Models\Company;
-use App\Models\DeliveryCost;
 use App\Models\GoodIssue;
 use App\Models\GoodReceipt;
 use App\Models\GoodReturnPO;
@@ -173,26 +172,6 @@ class LandedCostController extends Controller
         return response()->json($account);
     }
 
-    public function getDeliveryCost(Request $request){
-        $vendor = $request->vendor;
-        $subdistrict_from = $request->subdistrict_from;
-        $subdistrict_to = $request->subdistrict_to;
-        $arr = [];
-
-        $data = DeliveryCost::where('account_id',$vendor)->whereDate('valid_from','<=',date('Y-m-d'))->whereDate('valid_to','>=',date('Y-m-d'))->where('status','1')->where('from_subdistrict_id',$subdistrict_from)->where('to_subdistrict_id',$subdistrict_to)->get();
-
-        foreach($data as $row){
-            $arr[] = [
-                'id'        => $row->id,
-                'tonnage'   => number_format($row->tonnage,2,',','.'),
-                'nominal'   => number_format($row->nominal,2,',','.'),
-                'name'      => $row->code.' - tonase '.number_format($row->tonnage,2,',','.'),
-            ];
-        }
-
-        return response()->json($arr);
-    }
-
     public function getGoodReceipt(Request $request){
         $arr_main = [];
 
@@ -202,6 +181,7 @@ class LandedCostController extends Controller
                 $data['lookable_type'] = $data->getTable();
                 $data['from_address'] = $data->account->city->name.' - '.$data->account->subdistrict->name;
                 $data['subdistrict_from_id'] = $data->account->subdistrict_id;
+                $data['code'] = $data->code.' - SJ : '.$data->delivery_no;
             
                 if($data->used()->exists()){
                     $data['status'] = '500';
@@ -538,7 +518,7 @@ class LandedCostController extends Controller
         $validation = Validator::make($request->all(), [
             'code'			            => $request->temp ? ['required', Rule::unique('landed_costs', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:landed_costs,code',
             'company_id' 			    => 'required',
-			'delivery_cost_id'          => 'required',
+			'account_id'                => 'required',
             'post_date'                 => 'required',
             'currency_id'               => 'required',
             'currency_rate'             => 'required',
@@ -554,7 +534,7 @@ class LandedCostController extends Controller
             'code.min'                          => 'Kode harus minimal 18 karakter.',
             'code.unique'                       => 'Kode telah dipakai',
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
-			'delivery_cost_id.required'         => 'Biaya Pengiriman tidak boleh kosong',
+			'account_id.required'               => 'Broker / Ekspeditor tidak boleh kosong',
             'post_date.required'                => 'Tgl post tidak boleh kosong.',
             'currency_id.required'              => 'Mata uang tidak boleh kosong.',
             'total.required'                    => 'Total tagihan tidak boleh kosong.',
@@ -575,8 +555,6 @@ class LandedCostController extends Controller
             ];
         } else {
             
-            $deliverycost = DeliveryCost::find($request->delivery_cost_id);
-
             $total = str_replace(',','.',str_replace('.','',$request->total));
             $tax = str_replace(',','.',str_replace('.','',$request->tax));
             $wtax = str_replace(',','.',str_replace('.','',$request->wtax));
@@ -634,9 +612,8 @@ class LandedCostController extends Controller
                         $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->supplier_id = $request->supplier_id ? $request->supplier_id : NULL;
-                        $query->account_id = $deliverycost->account_id;
+                        $query->account_id = $request->account_id;
                         $query->company_id = $request->company_id;
-                        $query->delivery_cost_id = $request->delivery_cost_id;
                         $query->post_date = $request->post_date;
                         $query->reference = $request->reference;
                         $query->currency_id = $request->currency_id;
@@ -673,9 +650,8 @@ class LandedCostController extends Controller
                         'code'			            => $request->code,
                         'user_id'		            => session('bo_id'),
                         'supplier_id'               => $request->supplier_id ? $request->supplier_id : NULL,
-                        'account_id'                => $deliverycost->account_id,
+                        'account_id'                => $request->account_id,
                         'company_id'                => $request->company_id,
-                        'delivery_cost_id'          => $request->delivery_cost_id,
                         'post_date'                 => $request->post_date,
                         'reference'                 => $request->reference,
                         'currency_id'               => $request->currency_id,
@@ -718,17 +694,19 @@ class LandedCostController extends Controller
                         }
 
                         foreach($request->arr_fee_id as $key => $row){
-                            LandedCostFeeDetail::create([
-                                'landed_cost_id'        => $query->id,
-                                'landed_cost_fee_id'    => $row,
-                                'total'                 => str_replace(',','.',str_replace('.','',$request->arr_fee_nominal[$key])),
-                                'is_include_tax'        => $request->arr_fee_include_tax[$key],
-                                'percent_tax'           => $request->arr_fee_tax[$key],
-                                'percent_wtax'          => $request->arr_fee_wtax[$key],
-                                'tax'                   => str_replace(',','.',str_replace('.','',$request->arr_fee_tax_rp[$key])),
-                                'wtax'                  => str_replace(',','.',str_replace('.','',$request->arr_fee_wtax_rp[$key])),
-                                'grandtotal'            => str_replace(',','.',str_replace('.','',$request->arr_fee_grandtotal[$key])),
-                            ]);
+                            if(str_replace(',','.',str_replace('.','',$request->arr_fee_grandtotal[$key])) > 0){
+                                LandedCostFeeDetail::create([
+                                    'landed_cost_id'        => $query->id,
+                                    'landed_cost_fee_id'    => $row,
+                                    'total'                 => str_replace(',','.',str_replace('.','',$request->arr_fee_nominal[$key])),
+                                    'is_include_tax'        => $request->arr_fee_include_tax[$key],
+                                    'percent_tax'           => $request->arr_fee_tax[$key],
+                                    'percent_wtax'          => $request->arr_fee_wtax[$key],
+                                    'tax'                   => str_replace(',','.',str_replace('.','',$request->arr_fee_tax_rp[$key])),
+                                    'wtax'                  => str_replace(',','.',str_replace('.','',$request->arr_fee_wtax_rp[$key])),
+                                    'grandtotal'            => str_replace(',','.',str_replace('.','',$request->arr_fee_grandtotal[$key])),
+                                ]);
+                            }
                         }
                         DB::commit();
                     }catch(\Exception $e){
@@ -907,15 +885,13 @@ class LandedCostController extends Controller
     public function show(Request $request){
         $lc = LandedCost::where('code',CustomHelper::decrypt($request->id))->first();
         $lc['code_place_id'] = substr($lc->code,7,2);
-        $lc['delivery_cost_name'] = $lc->deliveryCost->account->name.' Dari '.$lc->deliveryCost->fromCity->name.' - '.$lc->deliveryCost->fromSubdistrict->name.' -- Ke -- '.$lc->deliveryCost->toCity->name.' - '.$lc->deliveryCost->toSubdistrict->name.' Tonase : '.$lc->deliveryCost->tonnage.' Nominal : '.number_format($lc->deliveryCost->nominal,2,',','.');
         $lc['supplier_name'] = $lc->supplier()->exists() ? $lc->supplier->name : '';
+        $lc['account_name'] = $lc->vendor()->exists() ? $lc->vendor->name : '';
         $lc['total'] = number_format($lc->total,2,',','.');
         $lc['tax'] = number_format($lc->tax,2,',','.');
         $lc['wtax'] = number_format($lc->wtax,2,',','.');
         $lc['grandtotal'] = number_format($lc->grandtotal,2,',','.');
         $lc['currency_rate'] = number_format($lc->currency_rate,2,',','.');
-        $lc['from_address'] = $lc->supplier()->exists() ? $lc->supplier->city->name.' - '.$lc->supplier->subdistrict->name : $lc->getDetailFromInformation()['from_address'];
-        $lc['subdistrict_from_id'] = $lc->supplier()->exists() ? $lc->supplier->subdistrict_id : $lc->getDetailFromInformation()['subdistrict_id'];
 
         $arr = [];
         $fees = [];
@@ -956,6 +932,7 @@ class LandedCostController extends Controller
                 'total'             => number_format($row->total,2,',','.'),
                 'is_include_tax'    => $row->is_include_tax,
                 'percent_tax'       => $row->percent_tax,
+                'percent_wtax'      => $row->percent_wtax,
                 'tax'               => number_format($row->tax,2,',','.'),
                 'wtax'              => number_format($row->wtax,2,',','.'),
                 'grandtotal'        => number_format($row->grandtotal,2,',','.'),
@@ -1007,7 +984,7 @@ class LandedCostController extends Controller
                     ->withProperties($query)
                     ->log('Void the landed cost data');
     
-                CustomHelper::sendNotification('landed_costs',$query->id,'Purchase Order Down Payment No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::sendNotification('landed_costs',$query->id,'Landed Cost No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval('landed_costs',$query->id);
                 CustomHelper::removeJournal('landed_costs',$query->id);
 

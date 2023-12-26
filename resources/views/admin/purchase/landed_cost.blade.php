@@ -32,6 +32,10 @@
     .select-wrapper, .select2-container {
         height:3.7rem !important;
     }
+
+    .dataTables_scrollHeadInner, .dataTable {
+        width: 100% !important; 
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -208,8 +212,8 @@
                                 <label class="active">&nbsp;</label>
                             </div>
                             <div class="input-field col m3 s12 step5">
-                                <select class="browser-default" id="delivery_cost_id" name="delivery_cost_id" onchange="getDeliveryCost();"></select>
-                                <label class="active" for="delivery_cost_id">Daftar Harga Pengiriman</label>
+                                <select class="browser-default" id="account_id" name="account_id"></select>
+                                <label class="active" for="account_id">Broker</label>
                             </div>
                             <div class="input-field col m3 s12 step6">
                                 <select class="form-control" id="company_id" name="company_id">
@@ -248,20 +252,10 @@
                                 <input id="reference" name="reference" type="text" placeholder="No. Referensi">
                                 <label class="active" for="reference">No. Referensi</label>
                             </div>
-                            <div class="col m12 s12 step13">
-                                <div class="input-field col m3 s12">
-                                    <input type="hidden" id="temp_from_address" name="temp_from_address">
-                                    Dari : <b><span id="from_address">-</span></b>
-                                </div>
-                                <div class="input-field col m3 s12">
-                                    <input type="hidden" id="temp_to_address" name="temp_to_address">
-                                    Tujuan : <b><span id="to_address">-</span></b>
-                                </div>
-                            </div>
-                            <div class="col m12 s12 step14">
+                            <div class="col m12 s12 step12">
                                 <h6><b>GRPO / Inv.Transfer / Landed Cost (Masuk) Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                             </div>
-                            <div class="col m12 s12 step15">
+                            <div class="col m12 s12 step13">
                                 <p class="mt-2 mb-2">
                                     <h5>Rincian Biaya</h5>
                                     <div style="overflow:auto;">
@@ -294,7 +288,7 @@
                                                         </td>
                                                         <td class="center-align">
                                                             <input id="arr_temp_nominal{{ $row->id }}" type="hidden" value="0,00">
-                                                            <input id="arr_fee_nominal{{ $row->id }}" name="arr_fee_nominal[]" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countEach({{ $row->id }});" style="height:1.5rem !important;text-align:right;" {{ $row->id == 1 ? 'readonly' : '' }}>
+                                                            <input id="arr_fee_nominal{{ $row->id }}" name="arr_fee_nominal[]" type="text" value="0,00" onkeyup="formatRupiah(this);setBaseNominal({{ $row->id }});countEach({{ $row->id }});" style="height:1.5rem !important;text-align:right;">
                                                         </td>
                                                         <td class="center-align">
                                                             <div class="switch mb-1">
@@ -308,26 +302,26 @@
                                                             <select class="browser-default" id="arr_fee_tax{{ $row->id }}" name="arr_fee_tax[]" onchange="countEach({{ $row->id }});">
                                                                 <option value="0" data-id="0">-- Non-PPN --</option>
                                                                 @foreach ($tax as $row1)
-                                                                    <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->code.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
+                                                                    <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
                                                                 @endforeach
                                                             </select>
                                                         </td>
                                                         <td class="right-align">
-                                                            <input id="arr_fee_tax_rp{{ $row->id }}" name="arr_fee_tax_rp[]" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                            <input id="arr_fee_tax_rp{{ $row->id }}" name="arr_fee_tax_rp[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
                                                         </td>
                                                         <td class="center-align">
                                                             <select class="browser-default" id="arr_fee_wtax{{ $row->id }}" name="arr_fee_wtax[]" onchange="countEach({{ $row->id }});">
                                                                 <option value="0" data-id="0">-- Non-PPh --</option>
                                                                 @foreach ($wtax as $row2)
-                                                                    <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->code.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
+                                                                    <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
                                                                 @endforeach
                                                             </select>
                                                         </td>
                                                         <td class="right-align">
-                                                            <input id="arr_fee_wtax_rp{{ $row->id }}" name="arr_fee_wtax_rp[]" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                            <input id="arr_fee_wtax_rp{{ $row->id }}" name="arr_fee_wtax_rp[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
                                                         </td>
                                                         <td class="center-align">
-                                                            <input id="arr_fee_grandtotal{{ $row->id }}" name="arr_fee_grandtotal[]" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                            <input id="arr_fee_grandtotal{{ $row->id }}" name="arr_fee_grandtotal[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -345,7 +339,7 @@
                                                         </td>
                                                         <td class="center-align">
                                                             <input id="arr_temp_nominal{{ $row->id }}" type="hidden" value="0,00">
-                                                            <input id="arr_fee_nominal{{ $row->id }}" name="arr_fee_nominal[]" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countEach({{ $row->id }});" style="height:1.5rem !important;text-align:right;">
+                                                            <input id="arr_fee_nominal{{ $row->id }}" name="arr_fee_nominal[]" type="text" value="0,00" onkeyup="formatRupiah(this);setBaseNominal({{ $row->id }});countEach({{ $row->id }});" style="height:1.5rem !important;text-align:right;">
                                                         </td>
                                                         <td class="center-align">
                                                             <div class="switch mb-1">
@@ -359,26 +353,26 @@
                                                             <select class="browser-default" id="arr_fee_tax{{ $row->id }}" name="arr_fee_tax[]" onchange="countEach({{ $row->id }});">
                                                                 <option value="0" data-id="0">-- Non-PPN --</option>
                                                                 @foreach ($tax as $row1)
-                                                                    <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->code }}</option>
+                                                                    <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
                                                                 @endforeach
                                                             </select>
                                                         </td>
                                                         <td class="right-align">
-                                                            <input id="arr_fee_tax_rp{{ $row->id }}" name="arr_fee_tax_rp[]" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                            <input id="arr_fee_tax_rp{{ $row->id }}" name="arr_fee_tax_rp[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
                                                         </td>
                                                         <td class="center-align">
                                                             <select class="browser-default" id="arr_fee_wtax{{ $row->id }}" name="arr_fee_wtax[]" onchange="countEach({{ $row->id }});">
                                                                 <option value="0" data-id="0">-- Non-PPh --</option>
                                                                 @foreach ($wtax as $row2)
-                                                                    <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->code }}</option>
+                                                                    <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
                                                                 @endforeach
                                                             </select>
                                                         </td>
                                                         <td class="right-align">
-                                                            <input id="arr_fee_wtax_rp{{ $row->id }}" name="arr_fee_wtax_rp[]" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                            <input id="arr_fee_wtax_rp{{ $row->id }}" name="arr_fee_wtax_rp[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
                                                         </td>
                                                         <td class="center-align">
-                                                            <input id="arr_fee_grandtotal{{ $row->id }}" name="arr_fee_grandtotal[]" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                            <input id="arr_fee_grandtotal{{ $row->id }}" name="arr_fee_grandtotal[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -415,7 +409,7 @@
                                     </div>
                                 </p>
                             </div>
-                            <div class="col m12 s12 step16">
+                            <div class="col m12 s12 step14">
                                 <p class="mt-2 mb-2">
                                     <h5>Detail Harga per Produk</h5>
                                     <div style="overflow:auto;">
@@ -448,7 +442,7 @@
                                     </div>
                                 </p>
                             </div>
-                            <div class="input-field col m4 s12 step17">
+                            <div class="input-field col m4 s12 step15">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
@@ -459,7 +453,7 @@
                                 
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step18" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step16" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -488,9 +482,11 @@
 
 <div id="modal3" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
-        <div class="col s12" id="show_structure">
-            <div id="myDiagramDiv" style="border: 1px solid black; width: 100%; height: 600px; position: relative; -webkit-tap-highlight-color: rgba(255, 255, 255, 0); cursor: auto;">
+        <div class="row">
+            <div class="col s12" id="show_structure">
+                <div id="myDiagramDiv" style="border: 1px solid black; width: 100%; height: 600px; position: relative; -webkit-tap-highlight-color: rgba(255, 255, 255, 0); cursor: auto;">
 
+                </div>
             </div>
         </div>
     </div>
@@ -513,81 +509,83 @@
 </div>
 
 <div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;">
-    <div class="modal-header ml-2">
-        <h5>Daftar Goods Receipt PO / Landed Cost / Inventori Transfer - Masuk <b id="account_name"></b></h5>
-    </div>
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
+                <h5>Daftar Goods Receipt PO / Landed Cost / Inventori Transfer - Masuk <b id="account_name"></b></h5>
                 <div class="row">
                     <div class="col s12 mt-2">
-                        <ul class="tabs">
-                            <li class="tab col m4"><a class="active step19" href="#goodsreceipt">Goods Receipt PO</a></li>
-                            <li class="tab col m4"><a class="step20" href="#landedcost">Landed Cost</a></li>
-                            <li class="tab col m4"><a class="step21" href="#inventorytransferin">Inventori Transfer Masuk</a></li>
+                        <ul class="collapsible">
+                            <li class="active">
+                                <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">library_books</i>Good Receipt PO</div>
+                                <div class="collapsible-body" style="display:block;">
+                                    <div class="mt-2 mb-2" style="overflow:scroll;width:100% !important;">
+                                        <div id="datatable_buttons_goods_receipt"></div>
+                                        <i class="right">Gunakan *pilih semua* untuk memilih seluruh data yang anda inginkan. Atau pilih baris untuk memilih data yang ingin dipindahkan.</i>
+                                        <table id="table_goods_receipt" class="display" width="100%">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center-align">No. GRPO</th>
+                                                    <th class="center-align">No. SJ</th>
+                                                    <th class="center-align">Tgl.Post</th>
+                                                    <th class="center-align">Total</th>
+                                                    <th class="center-align">PPN</th>
+                                                    <th class="center-align">PPh</th>
+                                                    <th class="center-align">Grandtotal</th>
+                                                    <th class="center-align">Keterangan</th>
+                                                    <th class="center-align">Landed Cost</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="body-detail-goods-receipt"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">library_books</i>Landed Cost</div>
+                                <div class="collapsible-body">
+                                    <div class="mt-2 mb-2" style="overflow:scroll;width:100% !important;">
+                                        <div id="datatable_buttons_landed_cost"></div>
+                                        <i class="right">Khusus untuk Landed Cost, hanya bisa diperbolehkan memilih 1 data saja.</i>
+                                        <table id="table_landed_cost" class="display" width="100%">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center-align">No. LC</th>
+                                                    <th class="center-align">Tgl.Post</th>
+                                                    <th class="center-align">Total</th>
+                                                    <th class="center-align">PPN</th>
+                                                    <th class="center-align">PPh</th>
+                                                    <th class="center-align">Grandtotal</th>
+                                                    <th class="center-align">Keterangan</th>
+                                                    <th class="center-align">Landed Cost</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="body-detail-landed-cost"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">library_books</i>Inventori Transfer Masuk</div>
+                                <div class="collapsible-body">
+                                    <div class="mt-2 mb-2" style="overflow:scroll;width:100% !important;">
+                                        <div id="datatable_buttons_inventory_transfer_in"></div>
+                                        <i class="right">Gunakan *pilih semua* untuk memilih seluruh data yang anda inginkan. Atau pilih baris untuk memilih data yang ingin dipindahkan. ITI = Inventori Transfer Masuk, ITO = Inventori Transfer Keluar</i>
+                                        <table id="table_inventory_transfer_in" class="display" width="100%">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center-align">No. ITI</th>
+                                                    <th class="center-align">No. ITO</th>
+                                                    <th class="center-align">Tgl.Post</th>
+                                                    <th class="center-align">Keterangan</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="body-detail-inventory-transfer-in"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </li>
                         </ul>
-                        <div class="row step22">
-                            <div id="goodsreceipt" class="col s12 active">
-                                <p class="mt-2 mb-2">
-                                    <div id="datatable_buttons_goods_receipt"></div>
-                                    <i class="right">Gunakan *pilih semua* untuk memilih seluruh data yang anda inginkan. Atau pilih baris untuk memilih data yang ingin dipindahkan.</i>
-                                    <table id="table_goods_receipt" class="display" width="100%">
-                                        <thead>
-                                            <tr>
-                                                <th class="center-align">No. GRPO</th>
-                                                <th class="center-align">No. SJ</th>
-                                                <th class="center-align">Tgl.Post</th>
-                                                <th class="center-align">Total</th>
-                                                <th class="center-align">PPN</th>
-                                                <th class="center-align">PPh</th>
-                                                <th class="center-align">Grandtotal</th>
-                                                <th class="center-align">Keterangan</th>
-                                                <th class="center-align">Landed Cost</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="body-detail-goods-receipt"></tbody>
-                                    </table>
-                                </p>
-                            </div>
-                            <div id="landedcost" class="col s12">
-                                <p class="mt-2 mb-2">
-                                    <div id="datatable_buttons_landed_cost"></div>
-                                    <i class="right">Khusus untuk Landed Cost, hanya bisa diperbolehkan memilih 1 data saja.</i>
-                                    <table id="table_landed_cost" class="display" width="100%">
-                                        <thead>
-                                            <tr>
-                                                <th class="center-align">No. LC</th>
-                                                <th class="center-align">Tgl.Post</th>
-                                                <th class="center-align">Total</th>
-                                                <th class="center-align">PPN</th>
-                                                <th class="center-align">PPh</th>
-                                                <th class="center-align">Grandtotal</th>
-                                                <th class="center-align">Keterangan</th>
-                                                <th class="center-align">Landed Cost</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="body-detail-landed-cost"></tbody>
-                                    </table>
-                                </p>
-                            </div>
-                            <div id="inventorytransferin" class="col s12">
-                                <p class="mt-2 mb-2">
-                                    <div id="datatable_buttons_inventory_transfer_in"></div>
-                                    <i class="right">Gunakan *pilih semua* untuk memilih seluruh data yang anda inginkan. Atau pilih baris untuk memilih data yang ingin dipindahkan. ITI = Inventori Transfer Masuk, ITO = Inventori Transfer Keluar</i>
-                                    <table id="table_inventory_transfer_in" class="display" width="100%">
-                                        <thead>
-                                            <tr>
-                                                <th class="center-align">No. ITI</th>
-                                                <th class="center-align">No. ITO</th>
-                                                <th class="center-align">Tgl.Post</th>
-                                                <th class="center-align">Keterangan</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="body-detail-inventory-transfer-in"></tbody>
-                                    </table>
-                                </p>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -801,7 +799,7 @@
                     $('.data-used').trigger('click');
                 }
                 M.updateTextFields();
-                $('#supplier_id,#delivery_cost_id').empty();
+                $('#supplier_id,#account_id').empty();
                 $('#total,#tax,#grandtotal').text('0,000');
                 window.onbeforeunload = function() {
                     return null;
@@ -968,12 +966,10 @@
                 $('select[name="table_goods_receipt_length"]').addClass('browser-default');
                 $('select[name="table_landed_cost_length"]').addClass('browser-default');
                 $('select[name="table_inventory_transfer_in_length"]').addClass('browser-default');
-                $('.tabs').tabs({
-                    onShow: function () {
-                        table_goods_receipt.columns.adjust().draw();
-                        table_landed_cost.columns.adjust().draw();
-                        table_inventory_transfer_in.columns.adjust().draw();
-                    }
+                $('.collapsible').on('shown.bs.collapse', function () {
+                    table_goods_receipt.columns.adjust().draw();
+                    table_landed_cost.columns.adjust().draw();
+                    table_inventory_transfer_in.columns.adjust().draw();
                 });
             },
             onCloseEnd: function(modal, trigger){
@@ -1066,6 +1062,7 @@
         });
 
         select2ServerSide('#supplier_id', '{{ url("admin/select2/supplier") }}');
+        select2ServerSide('#account_id', '{{ url("admin/select2/supplier_vendor") }}');
 
         $("#table-detail th,#table-detail1 th").resizable({
             minWidth: 100,
@@ -1489,7 +1486,7 @@
                                                         <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" style="width: 100%"></select>
                                                     </div>
                                                     <td class="center">
-                                                        <input name="arr_price[]" class="browser-default nominalitem" type="text" value="0" onkeyup="formatRupiah(this);" style="text-align:right;width:100% !important;" id="rowPrice`+ count +`">
+                                                        <input name="arr_price[]" class="browser-default nominalitem" type="text" value="0" onkeyup="formatRupiah(this);" style="text-align:right;width:100% !important;" id="rowPrice`+ count +`" readonly>
                                                     </td>
                                                 </tr>
                                             `);
@@ -1564,17 +1561,6 @@
                 }
             }
         });
-    }
-
-    function getDeliveryCost(){
-        if($('#delivery_cost_id').val()){
-            let datakuy = $('#delivery_cost_id').select2('data')[0];
-            $('#arr_temp_nominal1').val(datakuy.nominal);
-            $('#arr_fee_nominal1').val(datakuy.nominal).trigger('keyup');
-        }else{
-            $('#arr_fee_nominal1').val('0,00').trigger('keyup');
-            $('#arr_temp_nominal1').val('0,00');
-        }
     }
     
     function getAccountData(){
@@ -1711,9 +1697,15 @@
         });
         
     }
+
+    function setBaseNominal(val){
+        $('#arr_temp_nominal' + val).val(
+            $('#arr_fee_nominal' + val).val()
+        );
+    }
     
     function countEach(val){
-        let rowtotal = parseFloat($('#arr_temp_nominal' + val).val().replaceAll(".", "").replaceAll(",",".")), rowtax = 0, rowwtax = 0, rowgrandtotal = 0, rowpercenttax = parseFloat($('#arr_fee_tax' + val).val()), rowpercentwtax = parseFloat($('#arr_fee_wtax' + val).val());
+        let rowtotal = parseFloat($('#arr_fee_nominal' + val).val().replaceAll(".", "").replaceAll(",",".")), rowtax = 0, rowwtax = 0, rowgrandtotal = 0, rowpercenttax = parseFloat($('#arr_fee_tax' + val).val()), rowpercentwtax = parseFloat($('#arr_fee_wtax' + val).val());
 
         if(rowpercenttax !== 0){
             if($('#arr_fee_include_tax' + val).is(':checked')){
@@ -1725,10 +1717,10 @@
                 }
             }else{
                 if(parseFloat($('#arr_fee_tax_rp' + val).val().replaceAll(".", "").replaceAll(",",".")) > 0){
-                    rowtotal = parseFloat($('#arr_temp_nominal' + val).val().replaceAll(".", "").replaceAll(",","."));
                     $('#arr_fee_nominal' + val).val(
                         $('#arr_temp_nominal' + val).val()
                     );
+                    rowtotal = parseFloat($('#arr_temp_nominal' + val).val().replaceAll(".", "").replaceAll(",","."));
                 }
             }
             /* rowtax = Math.floor(rowtotal * (rowpercenttax / 100)); */
@@ -2142,14 +2134,16 @@
                 $('#temp').val(id);
                 $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#code').val(response.code);
-                $('#delivery_cost_id').empty();
-                $('#delivery_cost_id').append(`
-                    <option value="` + response.delivery_cost_id + `">` + response.delivery_cost_name + `</option>
-                `);
                 $('#supplier_id').empty();
                 if(response.supplier_name){
                     $('#supplier_id').append(`
                         <option value="` + response.supplier_id + `">` + response.supplier_name + `</option>
+                    `);
+                }
+                $('#account_id').empty();
+                if(response.account_name){
+                    $('#account_id').append(`
+                        <option value="` + response.account_id + `">` + response.account_name + `</option>
                     `);
                 }
                 $('#reference').val(response.reference);
@@ -2162,11 +2156,6 @@
                 $('#total').val(response.total);
                 $('#tax').val(response.tax);
                 $('#grandtotal').val(response.grandtotal);
-
-                $('#from_address').text(response.from_address);
-                $('#to_address').text(response.to_address);
-                $('#temp_from_address').val(response.subdistrict_from_id);
-                $('#temp_to_address').val(response.subdistrict_to_id);
 
                 var totalproporsional = 0, totalall = 0;
                 
@@ -2234,7 +2223,7 @@
                                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" style="width: 100%"></select>
                                 </div>
                                 <td class="center">
-                                    <input name="arr_price[]" class="browser-default nominalitem" type="text" value="` + val.nominal + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100% !important;" id="rowPrice`+ count +`">
+                                    <input name="arr_price[]" class="browser-default nominalitem" type="text" value="` + val.nominal + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100% !important;" id="rowPrice`+ count +`" readonly>
                                 </td>
                             </tr>
                         `);
@@ -2547,38 +2536,28 @@
                     intro : 'Nomor referensi surat jalan atau dokumen terkait lampiran.'
                 },
                 {
-                    title : 'Tonase & Harga',
-                    element : document.querySelector('.step12'),
-                    intro : 'Tonase dan Harga akan muncul otomatis ketika anda memilih data Landed Cost lalu memilih broker terkait. Tonase dan Harga per broker tujuan dan asal, bisa diatur dari form <b>Master Data - Administrasi - Biaya Kirim</b>. Di form tersebut anda harus mengatur broker, kecamatan asal, kecamatan tujuan, dan harga tonase.'
-                },
-                {
-                    title : 'Dari & Tujuan Pengiriman',
-                    element : document.querySelector('.step13'),
-                    intro : 'Data ini akan otomatis terisi ketika anda memilih dokumen yang ingin diproses disini berdasarkan supplier / vendor terpilih.'
-                },
-                {
                     title : 'GRPO/Inv.Transfer/Landed Cost Terpakai',
-                    element : document.querySelector('.step14'),
-                    intro : 'Daftar dokumen refernsi yang terpakai akan muncul disini jika anda menggunakan GRPO ataupun . Anda bisa menghapus dengan cara menekan tombol x pada masing-masing tombol. Fungsi lain dari fitur ini adalah, agar PR/GI tidak bisa dipakai di form selain form aktif saat ini.' 
+                    element : document.querySelector('.step12'),
+                    intro : 'Daftar dokumen referensi yang terpakai akan muncul disini jika anda menggunakan GRPO ataupun . Anda bisa menghapus dengan cara menekan tombol x pada masing-masing tombol. Fungsi lain dari fitur ini adalah, agar PR/GI tidak bisa dipakai di form selain form aktif saat ini.' 
                 },
                 {
                     title : 'Rincian Biaya',
-                    element : document.querySelector('.step15'),
+                    element : document.querySelector('.step13'),
                     intro : 'Disini rincian biaya bisa dimasukkan sesuai dokumen yang ada. Fitur ini juga mengakomodir PPN dan PPh.' 
                 },
                 {
                     title : 'Detail Harga per Produk',
-                    element : document.querySelector('.step16'),
+                    element : document.querySelector('.step14'),
                     intro : 'Tabel ini berisi informasi pembagian nominal biaya-biaya LC ke produk yang ada berdasarkan harga pro-rata dikalikan qty barang pada waktu Purchase Order (jika GRPO).' 
                 },
                 {
                     title : 'Keterangan',
-                    element : document.querySelector('.step17'),
+                    element : document.querySelector('.step15'),
                     intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step18'),
+                    element : document.querySelector('.step16'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

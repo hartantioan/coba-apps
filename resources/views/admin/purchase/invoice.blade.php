@@ -543,12 +543,10 @@
 </div>
 
 <div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;">
-    <div class="modal-header ml-2">
-        <h5>Daftar Tunggakan Dokumen <b id="account_name"></b></h5>
-    </div>
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
+                <h5>Daftar Tunggakan Dokumen <b id="account_name"></b></h5>
                 <div class="row">
                     <div class="col s12 mt-2">
                         <ul class="collapsible">
@@ -1675,7 +1673,7 @@
                                                     <select class="browser-default" id="arr_percent_tax` + count + `" name="arr_percent_tax[]" data-id="` + count + `" onchange="countAll();">
                                                         <option value="0" data-id="">-- Non-PPN --</option>
                                                         @foreach ($tax as $row1)
-                                                            <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->code.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
+                                                            <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
                                                         @endforeach
                                                     </select>
                                                 </td>
@@ -1692,7 +1690,7 @@
                                                     <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
                                                         <option value="0" data-id="">-- Non-PPh --</option>
                                                         @foreach ($wtax as $row2)
-                                                            <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->code.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
+                                                            <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
                                                         @endforeach
                                                     </select>
                                                 </td>
@@ -1923,7 +1921,7 @@
                         $.each(response.details, function(i, val) {
                             $('#body-detail-multi').append(`
                                 <tr data-type="` + val.type + `" data-id="` + val.id + `">
-                                    <td class="center">
+                                    <td>
                                         ` + val.code + `
                                     </td>
                                     <td class="center">
@@ -1951,7 +1949,7 @@
                             var count = makeid(10);
                             $('#body-detail-dp-multi').append(`
                                 <tr data-type="` + val.type + `" data-id="` + val.id + `">
-                                    <td class="center">
+                                    <td>
                                         ` + val.rawcode + `
                                     </td>
                                     <td class="center">
@@ -2039,7 +2037,7 @@
                     <select class="browser-default" id="arr_percent_tax` + count + `" name="arr_percent_tax[]" data-id="` + count + `" onchange="countAll();">
                         <option value="0" data-id="">-- Non-PPN --</option>
                         @foreach ($tax as $row1)
-                            <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->code.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
+                            <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
                         @endforeach
                     </select>
                 </td>
@@ -2056,7 +2054,7 @@
                     <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
                         <option value="0" data-id="">-- Non-PPh --</option>
                         @foreach ($wtax as $row2)
-                            <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->code.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
+                            <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
                         @endforeach
                     </select>
                 </td>
@@ -2818,7 +2816,7 @@
                                         <select class="browser-default" id="arr_percent_tax` + count + `" name="arr_percent_tax[]" data-id="` + count + `" onchange="countAll();">
                                             <option value="0" data-id="">-- Non-PPN --</option>
                                             @foreach ($tax as $row1)
-                                                <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->code.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
+                                                <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
                                             @endforeach
                                         </select>
                                     </td>
@@ -2835,7 +2833,7 @@
                                         <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
                                             <option value="0" data-id="">-- Non-PPh --</option>
                                             @foreach ($wtax as $row2)
-                                                <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->code.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
+                                                <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
                                             @endforeach
                                         </select>
                                     </td>
@@ -2959,7 +2957,7 @@
                                         <select class="browser-default" id="arr_percent_tax` + count + `" name="arr_percent_tax[]" data-id="` + count + `" onchange="countAll();">
                                             <option value="0">-- Non-PPN --</option>
                                             @foreach ($tax as $row1)
-                                                <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->code.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
+                                                <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
                                             @endforeach
                                         </select>
                                     </td>
@@ -2976,7 +2974,7 @@
                                         <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
                                             <option value="0">-- Non-PPh --</option>
                                             @foreach ($wtax as $row2)
-                                                <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->code.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
+                                                <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
                                             @endforeach
                                         </select>
                                     </td>

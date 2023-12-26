@@ -822,7 +822,8 @@ class CustomHelper {
 			
 			$pr = PaymentRequest::find($table_id);
 			
-			if($pr->paymentRequestCross()->exists() && $pr->balance == 0){
+			/* if($pr->paymentRequestCross()->exists() && $pr->balance == 0){ */
+			if($pr->paymentRequestCross()->exists()){
 				$query = Journal::create([
 					'user_id'		=> session('bo_id'),
 					'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
@@ -895,6 +896,7 @@ class CustomHelper {
 						'type'                          => '2',
 						'nominal'                       => $row->nominal * $pr->currency_rate
 					]);
+					CustomHelper::removeCountLimitCredit($row->lookable->account_id,$row->nominal * $pr->currency_rate);
 				}
 			}
 			
@@ -936,6 +938,9 @@ class CustomHelper {
 				}elseif($row->lookable_type == 'fund_requests'){
 					$mustpay = $row->nominal;
 					$balanceReal = $row->nominal * $row->lookable->currency_rate;
+					if($row->lookable->type == '1' && $row->document_status == '3'){
+						CustomHelper::addCountLimitCredit($row->lookable->account_id,$balanceReal);
+					}
 				}elseif($row->lookable_type == 'coas'){
 					$mustpay = $row->nominal;
 					$balanceReal = $row->nominal;
@@ -1423,38 +1428,17 @@ class CustomHelper {
 							]);
 						}
 					}
+				}
 
-					$arrCost = $rowdetail->getLocalImportCost();
-					
-					if($arrCost['total_local'] > 0){
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $arrCost['coa_local'],
-							'place_id'		=> $rowdetail->place_id,
-							'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
-							'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
-							'account_id'	=> $lc->account_id,
-							'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
-							'warehouse_id'	=> $rowdetail->warehouse_id,
-							'type'			=> '2',
-							'nominal'		=> $arrCost['total_local'] * $lc->currency_rate,
-						]);
-					}
-					
-					if($arrCost['total_import'] > 0){
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $arrCost['coa_import'],
-							'place_id'		=> $rowdetail->place_id,
-							'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
-							'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
-							'account_id'	=> $lc->account_id,
-							'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
-							'warehouse_id'	=> $rowdetail->warehouse_id,
-							'type'			=> '2',
-							'nominal'		=> $arrCost['total_import'] * $lc->currency_rate,
-						]);
-					}
+				foreach($lc->landedCostFeeDetail as $rowdetail){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $rowdetail->landedCostFee->coa_id,
+						'account_id'	=> $lc->account_id,
+						'type'			=> '2',
+						'nominal'		=> $rowdetail->total * $lc->currency_rate,
+						'note'			=> $rowdetail->landedCostFee->name,
+					]);
 				}
 			}
 		}elseif($table_name == 'inventory_revaluations'){
@@ -2394,56 +2378,31 @@ class CustomHelper {
 						$arrNote[] = $pod->purchaseOrder->code;
 					}
 
-				}elseif($row->lookable_type == 'landed_cost_details'){
-					$arrCost = $row->lookable->getLocalImportCost();
-				
-					if($arrCost['total_local'] > 0){
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $arrCost['coa_local'],
-							'place_id'		=> $row->lookable->place_id,
-							'line_id'		=> $row->lookable->line_id ? $row->lookable->line_id : NULL,
-							'machine_id'	=> $row->lookable->machine_id ? $row->lookable->machine_id : NULL,
-							'account_id'	=> $row->lookable->landedCost->account_id,
-							'department_id'	=> $row->lookable->department_id ? $row->lookable->department_id : NULL,
-							'warehouse_id'	=> $row->lookable->warehouse_id,
-							'type'			=> '1',
-							'nominal'		=> $arrCost['total_local'] * $row->lookable->landedCost->currency_rate,
-						]);
-					}
+				}elseif($row->lookable_type == 'landed_costs'){
 					
-					if($arrCost['total_import'] > 0){
+					foreach($row->lookable->landedCostFeeDetail as $rowdetail){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
-							'coa_id'		=> $arrCost['coa_import'],
-							'place_id'		=> $row->lookable->place_id,
-							'line_id'		=> $row->lookable->line_id ? $row->lookable->line_id : NULL,
-							'machine_id'	=> $row->lookable->machine_id ? $row->lookable->machine_id : NULL,
-							'account_id'	=> $row->lookable->lookable->account_id,
-							'department_id'	=> $row->lookable->department_id ? $row->lookable->department_id : NULL,
-							'warehouse_id'	=> $row->lookable->warehouse_id,
+							'coa_id'		=> $rowdetail->landedCostFee->coa_id,
+							'account_id'	=> $row->lookable->account_id,
 							'type'			=> '1',
-							'nominal'		=> $arrCost['total_import'] * $row->lookable->landedCost->currency_rate,
+							'nominal'		=> $rowdetail->total * $row->lookable->currency_rate,
+							'note'			=> $rowdetail->landedCostFee->name,
 						]);
 					}
 
-					$grandtotal += $row->grandtotal * $row->lookable->landedCost->currency_rate;
-					$tax += $row->tax * $row->lookable->landedCost->currency_rate;
-					$wtax += $row->wtax * $row->lookable->landedCost->currency_rate;
-					$currency_rate = $row->lookable->landedCost->currency_rate;
+					$grandtotal += $row->grandtotal * $row->lookable->currency_rate;
+					$tax += $row->tax * $row->lookable->currency_rate;
+					$wtax += $row->wtax * $row->lookable->currency_rate;
+					$currency_rate = $row->lookable->currency_rate;
 
 					if($row->tax_id){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $row->taxMaster->coa_purchase_id,
-							'place_id'		=> $row->place_id ? $row->place_id : NULL,
-							'line_id'		=> $row->line_id ? $row->line_id : NULL,
-							'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
 							'account_id'	=> $account_id,
-							'department_id'	=> $row->department_id ? $row->department_id : NULL,
-							'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
 							'type'			=> '1',
-							'nominal'		=> $row->tax * $row->lookable->landedCost->currency_rate,
+							'nominal'		=> $row->tax * $row->lookable->currency_rate,
 							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date)).' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
 						]);
 					}
@@ -2452,14 +2411,9 @@ class CustomHelper {
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $row->wTaxMaster->coa_purchase_id,
-							'place_id'		=> $row->place_id ? $row->place_id : NULL,
-							'line_id'		=> $row->line_id ? $row->line_id : NULL,
-							'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
 							'account_id'	=> $account_id,
-							'department_id'	=> $row->department_id ? $row->department_id : NULL,
-							'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
 							'type'			=> '2',
-							'nominal'		=> $row->wtax * $row->lookable->landedCost->currency_rate,
+							'nominal'		=> $row->wtax * $row->lookable->currency_rate,
 							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date)).' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
 						]);
 					}
@@ -2467,18 +2421,13 @@ class CustomHelper {
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $coahutangusaha,
-						'place_id'		=> $row->place_id ? $row->place_id : NULL,
-						'line_id'		=> $row->line_id ? $row->line_id : NULL,
-						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
 						'account_id'	=> $account_id,
-						'department_id'	=> $row->department_id ? $row->department_id : NULL,
-						'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
 						'type'			=> '2',
-						'nominal'		=> $row->grandtotal * $row->lookable->landedCost->currency_rate,
+						'nominal'		=> $row->grandtotal * $row->lookable->currency_rate,
 					]);
 
-					if(self::checkArrayRaw($arrNote,$row->lookable->landedCost->code) < 0){
-						$arrNote[] = $row->lookable->landedCost->code;
+					if(self::checkArrayRaw($arrNote,$row->lookable->code) < 0){
+						$arrNote[] = $row->lookable->code;
 					}
 				}else{
 					JournalDetail::create([

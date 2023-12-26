@@ -164,7 +164,7 @@
                                 <div class="input-field col m3 s12">
                                     <select class="form-control" id="type" name="type">
                                         <option value="1">BS</option>
-                                        {{-- <option value="2">OPM</option> --}}
+                                        <option value="2">Pinjaman</option>
                                     </select>
                                     <label class="" for="type">Tipe Permohonan</label>
                                 </div>
@@ -798,7 +798,7 @@
                 
                 var formData = new FormData($('#form_data')[0]), passedLimit = true, limit = parseFloat($('#tempLimit').val()), grandtotal = parseFloat($('#grandtotal').val().replaceAll(".", "").replaceAll(",","."));
 
-                if(grandtotal > limit){
+                if(grandtotal > limit && $('#type').val() == '1'){
                     passedLimit = false;
                 }
 

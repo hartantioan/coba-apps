@@ -514,7 +514,11 @@ class PaymentRequestController extends Controller
                     if($data){
                         if(!$data->used()->exists() && $data->balancePaymentRequest() > 0 && $data->document_status !== '1'){
                             CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Payment Request');
-                            $coa = Coa::where('code','100.01.03.03.02')->where('company_id',$data->place->company_id)->first();
+                            if($data->type == '1'){
+                                $coa = Coa::where('code','100.01.03.03.02')->where('company_id',$data->place->company_id)->first();
+                            }elseif($data->type == '2'){
+                                $coa = Coa::where('code','100.01.03.03.01')->where('company_id',$data->place->company_id)->first();
+                            }
                             $details[] = [
                                 'id'            => $data->id,
                                 'type'          => 'fund_requests',
@@ -528,8 +532,8 @@ class PaymentRequestController extends Controller
                                 'wtax'          => number_format($data->wtax,2,',','.'),
                                 'grandtotal'    => number_format($data->grandtotal,2,',','.'),
                                 'balance'       => number_format($data->balancePaymentRequest(),2,',','.'),
-                                'coa_id'        => $data->document_status == '3' ? ($coa ? $coa->id : '') : '',
-                                'coa_name'      => $data->document_status == '3' ? ($coa ? $coa->code.' - '.$coa->name : '') : '',
+                                'coa_id'        => $data->type == '1' ? ($data->document_status == '3' ? ($coa ? $coa->id : '') : '') : $coa->id,
+                                'coa_name'      => $data->type == '1' ? ($data->document_status == '3' ? ($coa ? $coa->code.' - '.$coa->name : '') : '') : $coa->code.' - '.$coa->name,
                                 'memo'          => number_format(0,2,',','.'),
                                 'currency_id'   => $data->currency_id,
                                 'currency_rate' => number_format($data->currency_rate,2,',','.'),

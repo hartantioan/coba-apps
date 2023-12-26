@@ -214,7 +214,7 @@ class FundRequest extends Model
     public function type(){
         $type = match ($this->type) {
           '1' => 'BS',
-          '2' => 'OPM',
+          '2' => 'Pinjaman',
           default => 'Invalid',
         };
 

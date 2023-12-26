@@ -482,7 +482,7 @@
                     if (e = window.getComputedStyle(i), (!n || "static" !== e.position) && r.test(e.overflow + e.overflowY + e.overflowX)) return i;
                 return document.body
             }(t);
-            e !== document.body && (e.scrollTop = t.offsetTop - e.offsetTop - 85)
+            e !== document.body && (e.scrollTop = t.offsetTop - e.offsetTop - 20)
         }
     }
 
@@ -627,7 +627,7 @@
                     r || !0 !== this._options.showStepNumbers || (e.style.top = "15px"), a.top + o.height > s.height ? (e.style.top = "-".concat(o.height - a.height - 20, "px"), n.className = "introjs-arrow right-bottom") : n.className = "introjs-arrow right", e.style.right = "".concat(a.width + 20, "px");
                     break;
                 case "floating":
-                    n.style.display = "none", e.style.left = "50%", e.style.top = "50%", e.style.marginLeft = "-".concat(o.width / 2, "px"), e.style.marginTop = /* "-".concat(o.height / 2, "px") */ 0;
+                    n.style.display = "none", e.style.left = "50%", e.style.top = "50%", e.style.marginLeft = "-".concat(o.width / 2, "px"), e.style.marginTop = "-".concat(o.height / 2, "px");
                     break;
                 case "bottom-right-aligned":
                     n.className = "introjs-arrow top-right", S(a, h = 0, o, e), e.style.top = "".concat(a.height + 20, "px");

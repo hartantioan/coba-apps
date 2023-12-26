@@ -764,7 +764,7 @@
                                     <select class="browser-default" id="arr_wtax` + count + `" name="arr_wtax[]" onchange="countAll();" style="width:150px;">
                                         <option value="0" data-id="0">-- Pilih ini jika non-PPh --</option>
                                         @foreach ($wtax as $row)
-                                            <option value="{{ $row->percentage }}" {{ $row->is_default_pph ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name }}</option>
+                                            <option value="{{ $row->percentage }}" {{ $row->is_default_pph ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
                                         @endforeach
                                     </select>
                                 </td>

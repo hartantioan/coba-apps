@@ -380,6 +380,8 @@ class JournalController extends Controller
                     if(in_array($query->status,['1','6'])){
 
                         $query->code = $request->code;
+                        $query->lookable_type = $request->journal_id ? 'journals' : NULL;
+                        $query->lookable_id = $request->journal_id ? $request->journal_id : NULL;
                         $query->user_id = session('bo_id');
                         $query->company_id = $request->company_id;
                         $query->currency_id = $request->currency_id;
@@ -404,6 +406,8 @@ class JournalController extends Controller
                 }else{
                     $query = Journal::create([
                         'code'			            => $request->code,
+                        'lookable_type'             => $request->journal_id ? 'journals' : NULL,
+                        'lookable_id'               => $request->journal_id ? $request->journal_id : NULL,
                         'user_id'		            => session('bo_id'),
                         'currency_id'               => $request->currency_id,
                         'company_id'                => $request->company_id,
@@ -612,6 +616,8 @@ class JournalController extends Controller
         $jou = Journal::where('code',CustomHelper::decrypt($request->id))->first();
         $jou['currency_rate'] = number_format($jou->currency_rate,2,',','.');
         $jou['code_place_id'] = substr($jou->code,7,2);
+        $jou['journal_id'] = $jou->lookable_type == 'journals' ? $jou->lookable_id : '';
+        $jou['journal_name'] = $jou->lookable_id ? $jou->lookable->code.' - '.$jou->lookable->note : '';
 
         $arr = [];
         

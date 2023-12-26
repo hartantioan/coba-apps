@@ -331,6 +331,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('marketing_order_delivery_process_po', [Select2Controller::class, 'marketingOrderDeliveryProcessPO']);
                 Route::get('delivery_cost', [Select2Controller::class, 'deliveryCost']);
                 Route::get('production_order', [Select2Controller::class, 'productionOrder']);
+                Route::get('journal', [Select2Controller::class, 'journal']);
             });
 
             Route::prefix('menu')->group(function () {

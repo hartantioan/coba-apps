@@ -1199,7 +1199,7 @@ class FundRequestController extends Controller
     public function userShow(Request $request){
         $fr = FundRequest::where('code',CustomHelper::decrypt($request->id))->first();
         $fr['code_place_id'] = substr($fr->code,7,2);
-        $fr['limit_credit'] = $fr->document_status == '3' ? number_format(floatval($fr->account->limit_credit - $fr->account->count_limit_credit),2,',','.') : number_format(0,2,',','.');
+        $fr['limit_credit'] = number_format(floatval($fr->account->limit_credit - $fr->account->count_limit_credit),2,',','.');
         $fr['account_name'] = $fr->account->name;
         $fr['currency_rate'] = number_format($fr->currency_rate,2,',','.');
         $fr['total'] = number_format($fr->total,2,',','.');

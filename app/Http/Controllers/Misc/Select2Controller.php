@@ -63,6 +63,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Color;
 use App\Models\DeliveryCost;
+use App\Models\Journal;
 use App\Models\Pattern;
 use App\Models\ProductionOrder;
 use App\Models\Size;
@@ -250,6 +251,25 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> $d->code.' - '.$d->name
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function journal(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Journal::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('note', 'like', "%$search%");
+                })->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->note,
             ];
         }
 
@@ -945,7 +965,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->name,
+                'text' 			=> $d->employee_no.' - '.$d->name,
             ];
         }
 
@@ -1398,6 +1418,11 @@ class Select2Controller extends Controller {
                 ->where('status','1')
                 ->whereIn('company_id',$arrCompany)
                 ->whereNotNull('show_journal')
+                ->where(function($query)use($request){
+                    if($request->account_id){
+                        $query->whereNotNull('bp_journal');
+                    }
+                })
                 ->get();
 
         foreach($data as $d) {

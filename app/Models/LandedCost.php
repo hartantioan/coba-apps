@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CustomHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -21,7 +22,6 @@ class LandedCost extends Model
         'supplier_id',
         'account_id',
         'company_id',
-        'delivery_cost_id',
         'post_date',
         'reference',
         'currency_id',
@@ -57,11 +57,6 @@ class LandedCost extends Model
         return $this->belongsTo('App\Models\User', 'account_id', 'id')->withTrashed();
     }
 
-    public function deliveryCost()
-    {
-        return $this->belongsTo('App\Models\DeliveryCost', 'delivery_cost_id', 'id')->withTrashed();
-    }
-
     public function currency()
     {
         return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
@@ -85,6 +80,44 @@ class LandedCost extends Model
     public function landedCostFeeDetail()
     {
         return $this->hasMany('App\Models\LandedCostFeeDetail');
+    }
+
+    public function getPurchaseCode(){
+        $arr = [];
+        
+        foreach($this->landedCostDetail as $row){
+            if($row->goodReceiptDetail()){
+                $index = CustomHelper::checkArrayRaw($arr,$row->lookable->purchaseOrderDetail->purchaseOrder->code);
+                if($index < 0){
+                    $arr[] = $row->lookable->purchaseOrderDetail->purchaseOrder->code;
+                }
+            }
+        }
+
+        if(count($arr) > 0){
+            return implode(', ',$arr);
+        }else{
+            return '-';
+        }
+    }
+
+    public function getListDeliveryNo(){
+        $arr = [];
+
+        foreach($this->landedCostDetail as $row){
+            if($row->goodReceiptDetail()){
+                $index = CustomHelper::checkArrayRaw($arr,$row->lookable->goodReceipt->delivery_no);
+                if($index < 0){
+                    $arr[] = $row->lookable->goodReceipt->delivery_no;
+                }
+            }
+        }
+
+        if(count($arr) > 0){
+            return implode(', ',$arr);
+        }else{
+            return '-';
+        }
     }
 
     public function status(){
@@ -180,8 +213,10 @@ class LandedCost extends Model
     public function getListItem(){
         $html = '<ol>';
 
-        foreach($this->goodReceipt->goodReceiptDetail as $row){
-            $html .= '<li>'.$row->item->code.' - '.$row->item->name.' Qty. '.$row->qty.' '.$row->item->buyUnit->code.'</li>';
+        foreach($this->landedCostDetail as $row){
+            if($row->goodReceiptDetail()){
+                $html .= '<li>'.$row->lookable->item->code.' - '.$row->lookable->item->name.' Qty. '.$row->lookable->qty.' '.$row->lookable->item->buyUnit->code.'</li>';
+            }
         }
 
         $html .= '</ol>';
@@ -277,6 +312,25 @@ class LandedCost extends Model
             'from_address'      => $from_address,
             'subdistrict_id'    => $subdistrict_id,
         ];
+
+        return $arr;
+    }
+
+    public function getLocalImportCost(){
+        $arr = [];
+
+        $totalLocal = $this->landedCostFeeDetail()->whereHas('landedCostFee', function($query){
+            $query->where('type','1');
+        })->sum('total');
+
+        $totalImport = $this->landedCostFeeDetail()->whereHas('landedCostFee', function($query){
+            $query->where('type','2');
+        })->sum('total');
+
+        $arr['total_local'] = $totalLocal;
+        $arr['coa_local'] = Coa::where('code','200.01.05.01.10')->where('company_id',$this->place->company_id)->first()->id;
+        $arr['total_import'] = $totalImport;
+        $arr['coa_import'] = Coa::where('code','200.01.05.01.11')->where('company_id',$this->place->company_id)->first()->id;
 
         return $arr;
     }

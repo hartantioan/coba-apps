@@ -161,98 +161,59 @@
         <header>
             <table border="0" width="100%" style="font-size:1em" class="tb-header">
                 <tr>
-                    <td width="83%" class="left-align" >
-                        <tr>
-                            <td>
-                                <span class="invoice-number mr-1" style="font-size:1em">NO # {{ $data->code }}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="margin-top: -2px;">
-                                <small style="font-size:1em">Diajukan: {{ date('d/m/y',strtotime($data->post_date)) }}</small>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <h5 style="margin-top: -2px">Landed Cost</h5>
-                            </td>
-                        </tr>
-                                
-                        
+                    <td width="33%" class="left-align">
+                        <span class="invoice-number mr-1" style="font-size:1em"># {{ $data->code }}</span>
+                        <br>
+                        <small style="font-size:1em">Diajukan: {{ date('d/m/y',strtotime($data->post_date)) }}</small>
                     </td>
-                    <td width="33%" class="right-align">
-                        
-                        
-                   
+                    <td width="33%" align="center">
+                        <h2>Landed Cost</h2>
                     </td>
-                    
-                    <td width="34%" class="right-align">
-                        
-                            <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
-                       
+                    <td width="34%" align="right">
+                        <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%;right:0;">
                     </td>
                 </tr>
                 
             </table>
-            <hr style="border-top: 3px solid black; margin-top:-2%">
+            <hr style="border-top: 3px solid black; margin-top:5px">
         </header>
         <main>
             <div class="card">
                 <div class="card-content invoice-print-area">
                     <table border="0" width="100%" class="tbl-info">
                         <tr>
-                            <td width="33%" class="left-align" style="vertical-align: top !important;">
+                            <td width="66%" class="left-align" style="vertical-align: top !important;">
                                 <table border="0" width="100%">
                                     <tr>
-                                        <td width="40%">
-                                            Dari
+                                        <td width="20%">
+                                            Broker
                                         </td>
-                                        <td width="60%">
-                                            {{ $data->user->name }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="40%">
-                                            Posisi
-                                        </td>
-                                        <td width="60%">
-                                            {{ $data->user->position->Level->name }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="40%">
-                                            Depart.
-                                        </td>
-                                        <td width="60%">
-                                            {{ $data->user->position->division->name }}
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                            <td width="33%" class="left-align" style="vertical-align: top !important;">
-                                <table border="0" width="100%">
-                                    <tr>
-                                        <td width="40%">
-                                            Vendor
-                                        </td>
-                                        <td width="60%">
+                                        <td width="80%">
                                             {{ $data->vendor->name }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="40%">
+                                        <td>
                                             Alamat
                                         </td>
-                                        <td width="60%">
+                                        <td>
                                             {{ $data->vendor->address }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="40%">
+                                        <td>
                                             Telepon
                                         </td>
-                                        <td width="60%">
+                                        <td>
                                             {{ $data->vendor->phone.' / '.$data->vendor->office_no }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            No. Referensi
+                                        </td>
+                                        <td>
+                                            {{ $data->reference }}
                                         </td>
                                     </tr>
                                 </table>
@@ -278,28 +239,32 @@
                             <thead>
                                 <tr>
                                     <th class="center">No</th>
-                                    <th class="center">Plant</th>
-                                    <th class="center">Departemen</th>
-                                    <th class="center">Gudang</th>
+                                    {{-- <th class="center">Plant</th> --}}
                                     <th class="center">Item</th>
+                                    <th class="center">Plant</th>
+                                    <th class="center">Gudang</th>
+                                    <th class="center">Departemen</th>
                                     <th class="center">Qty</th>
                                     <th class="center">Satuan</th>
+                                    <th class="center">Surat Jalan</th>
                                     <th class="center">Harga Total</th>
-                                    <th class="center">Harga Satuan</th>
+                                    {{-- <th class="center">Harga Satuan</th> --}}
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($data->landedCostDetail as $key => $row)
                                 <tr>
                                     <td class="center" style="text-align: center">{{ ($key + 1) }}</td>
-                                    <td>{{ $row->place->name.' - '.$row->place->company->name }}</td>
-                                    <td>{{ isset($row->department->name) ? $row->department->name: ''  }}</td>
-                                    <td>{{ $row->warehouse->name }}</td>
+                                    {{-- <td>{{ $row->place->code.' - '.$row->place->company->name }}</td> --}}
                                     <td>{{ $row->item->name }}</td>
-                                    <td style="text-align: center">{{ $row->qty }}</td>
-                                    <td style="text-align: center">{{ $row->item->uomUnit->code }}</td>
-                                    <td class="right-align" style="text-align: right">{{ number_format($row->nominal,2,',','.') }}</td>
-                                    <td class="right-align" style="text-align: right">{{ number_format(round($row->nominal / $row->qty,3),2,',','.') }}</td>
+                                    <td>{{ $row->place->code  }}</td>
+                                    <td>{{ $row->warehouse->name }}</td>
+                                    <td>{{ isset($row->department->name) ? $row->department->name: ''  }}</td>
+                                    <td align="right">{{ $row->qty }}</td>
+                                    <td align="center">{{ $row->item->uomUnit->code }}</td>
+                                    <td>{{ $row->goodReceiptDetail() ? $row->lookable->goodReceipt->delivery_no : '-' }}</td>
+                                    <td align="right">{{ number_format($row->nominal,2,',','.') }}</td>
+                                    {{-- <td align="right">{{ number_format(round($row->nominal / $row->qty,3),2,',','.') }}</td> --}}
                                 </tr>
                                 @endforeach
                                 
@@ -329,12 +294,10 @@
                                     <td class="right-align" style="padding-right:15px">PPN</td>
                                     <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->tax,2,',','.') }}</td>
                                 </tr>
-                                @if($data->wtax > 0)
                                 <tr class="break-row">
                                     <td class="right-align" style="padding-right:15px">PPh</td>
                                     <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->wtax,2,',','.') }}</td>
                                 </tr>
-                                @endif
                                 <tr class="break-row">
                                     <td class="right-align" style="padding-right:15px">Grandtotal</td>
                                     <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->grandtotal,2,',','.') }}</td>

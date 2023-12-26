@@ -91,9 +91,9 @@ class PurchaseInvoiceDetail extends Model
         }
     }
     
-    public function landedCostDetail()
+    public function landedCost()
     {
-        if($this->lookable_type == 'landed_cost_details'){
+        if($this->lookable_type == 'landed_costs'){
             return true;
         }else{
             return false;
@@ -119,7 +119,7 @@ class PurchaseInvoiceDetail extends Model
     public function getCode(){
         $code = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->item->code.' - '.$this->lookable->item->name,
-            'landed_cost_details'       => $this->lookable->item->code.' - '.$this->lookable->item->name,
+            'landed_costs'              => $this->lookable->code,
             'purchase_order_details'    => $this->lookable->item_id ? $this->lookable->item->code.' - '.$this->lookable->item->name : $this->lookable->coa->code.' - '.$this->lookable->coa->name,
             'coas'                      => $this->lookable->code.' - '.$this->lookable->name,
             default                     => '-',
@@ -131,7 +131,7 @@ class PurchaseInvoiceDetail extends Model
     public function getHeaderCode(){
         $code = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->goodReceipt->code,
-            'landed_cost_details'       => $this->lookable->landedCost->code,
+            'landed_costs'              => $this->lookable->code,
             'purchase_order_details'    => $this->lookable->purchaseOrder->code,
             'coas'                      => '-',
             default                     => '-',
@@ -143,7 +143,7 @@ class PurchaseInvoiceDetail extends Model
     public function getTop(){
         $code = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->purchaseOrderDetail->purchaseOrder->payment_term,
-            'landed_cost_details'       => isset($this->lookable->lookable->purchaseOrderDetail->purchaseOrder->payment_term) ? $this->lookable->lookable->purchaseOrderDetail->purchaseOrder->payment_term : '0',
+            'landed_costs'              => '0',
             'purchase_order_details'    => $this->lookable->purchaseOrder->payment_term,
             default                     => '-',
         };
@@ -154,7 +154,6 @@ class PurchaseInvoiceDetail extends Model
     public function getUnitCode(){
         $code = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->item->buyUnit->code,
-            'landed_cost_details'       => $this->lookable->item->buyUnit->code,
             'purchase_order_details'    => $this->lookable->item_id ? $this->lookable->item->buyUnit->code : '-',
             default                     => '-',
         };
@@ -165,7 +164,7 @@ class PurchaseInvoiceDetail extends Model
     public function getPostDate(){
         $date = match ($this->lookable_type) {
             'good_receipt_details'      => date('d/m/y',strtotime($this->lookable->goodReceipt->post_date)),
-            'landed_cost_details'       => date('d/m/y',strtotime($this->lookable->landedCost->post_date)),
+            'landed_costs'              => date('d/m/y',strtotime($this->lookable->post_date)),
             'purchase_order_details'    => date('d/m/y',strtotime($this->lookable->purchaseOrder->post_date)),
             default                     => '-',
         };
@@ -176,7 +175,6 @@ class PurchaseInvoiceDetail extends Model
     public function getDueDate(){
         $date = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->goodReceipt->due_date ? date('d/m/y',strtotime($this->lookable->goodReceipt->due_date)) : '-',
-            'landed_cost_details'       => $this->lookable->landedCost->due_date ? date('d/m/y',strtotime($this->lookable->landedCost->due_date)) : '-',
             'purchase_order_details'    => $this->lookable->purchaseOrder->due_date ? date('d/m/y',strtotime($this->lookable->purchaseOrder->due_date)) : '-',
             default                     => '-',
         };
@@ -187,7 +185,7 @@ class PurchaseInvoiceDetail extends Model
     public function getPurchaseCode(){
         $code = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->purchaseOrderDetail->purchaseOrder->code,
-            'landed_cost_details'       => isset($this->lookable->lookable->purchaseOrderDetail->purchaseOrder->code) ? $this->lookable->lookable->purchaseOrderDetail->purchaseOrder->code : '-',
+            'landed_costs'              => $this->lookable->getPurchaseCode(),
             'purchase_order_details'    => $this->lookable->purchaseOrder->code.' - '.$this->lookable->purchaseOrder->code,
             'coas'                      => $this->lookable->code.' - '.$this->lookable->name,
             default                     => '-',
@@ -198,8 +196,8 @@ class PurchaseInvoiceDetail extends Model
 
     public function getDeliveryCode(){
         $code = match ($this->lookable_type) {
-            'good_receipt_details'     => $this->lookable->goodReceipt->delivery_no,
-            'landed_cost_details'      => '-',
+            'good_receipt_details'      => $this->lookable->goodReceipt->delivery_no,
+            'landed_costs'              => $this->lookable->getListDeliveryNo(),
             default => '-',
         };
 
@@ -209,7 +207,7 @@ class PurchaseInvoiceDetail extends Model
     public function getListItem(){
         $list = match ($this->lookable_type) {
             'good_receipts'     => $this->lookable->getListItem(),
-            'landed_costs'      => $this->lookable->goodReceipt->getListItem(),
+            'landed_costs'      => $this->lookable->getListItem(),
             default => '-',
         };
 

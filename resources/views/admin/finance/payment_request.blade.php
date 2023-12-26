@@ -628,7 +628,7 @@
                             </li>
                             <li class="active">
                                 <div class="collapsible-header blue lightrn-1 white-text">
-                                    <i class="material-icons">layers</i> Piutang Karyawan
+                                    <i class="material-icons">layers</i> Piutang Karyawan Yang Sudah Terbayar
                                 </div>
                                 <div class="collapsible-body">
                                     <div id="datatable_buttons_multi_op"></div>

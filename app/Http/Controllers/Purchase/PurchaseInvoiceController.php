@@ -1809,7 +1809,7 @@ class PurchaseInvoiceController extends Controller
                             'to'=>$query->code,
                             'string_link'=>$row_po->code.$query->code
                         ]; 
-                        $data_id_po[]= $row_po->code->id;  
+                        $data_id_po[]= $row_po->id;  
                               
                         foreach($row_po->purchaseOrderDetail as $po_detail){
                             if($po_detail->goodReceiptDetail()->exists()){

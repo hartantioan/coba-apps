@@ -1867,21 +1867,21 @@ class PurchaseInvoiceController extends Controller
                 if($row->landedCost()){
                     $data_lc=[
                         'properties'=> [
-                            ['name'=> "Tanggal :".$row->lookable->landedCost->post_date],
-                            ['name'=> "Nominal : Rp.".number_format($row->lookable->landedCost->grandtotal,2,',','.')]
+                            ['name'=> "Tanggal :".$row->lookable->post_date],
+                            ['name'=> "Nominal : Rp.".number_format($row->lookable->grandtotal,2,',','.')]
                         ],
-                        "key" => $row->lookable->landedCost->code,
-                        "name" => $row->lookable->landedCost->code,
-                        'url'=>request()->root()."/admin/inventory/landed_cost?code=".CustomHelper::encrypt($row->lookable->landedCost->code),
+                        "key" => $row->lookable->code,
+                        "name" => $row->lookable->code,
+                        'url'=>request()->root()."/admin/inventory/landed_cost?code=".CustomHelper::encrypt($row->lookable->code),
                     ];
 
                     $data_go_chart[]=$data_lc;
                     $data_link[]=[
                         'from'=>$query->code,
-                        'to'=>$row->lookable->landedCost->code,
-                        'string_link'=>$query->code.$row->lookable->landedCost->code,
+                        'to'=>$row->lookable->code,
+                        'string_link'=>$query->code.$row->lookable->code,
                     ];
-                    $data_id_lc[] = $row->lookable->landedCost->id;
+                    $data_id_lc[] = $row->lookable->id;
                     
                 }
                 

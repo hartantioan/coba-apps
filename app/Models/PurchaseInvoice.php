@@ -83,8 +83,8 @@ class PurchaseInvoice extends Model
                 $currency = Currency::where('code','IDR')->where('status','1')->first();
             }elseif($row->lookable_type == 'purchase_order_details'){
                 $currency = $row->lookable->purchaseOrder->currency;
-            }elseif($row->lookable_type == 'landed_cost_details'){
-                $currency = $row->lookable->landedCost->currency;
+            }elseif($row->lookable_type == 'landed_costs'){
+                $currency = $row->lookable->currency;
             }else{
                 $currency = $row->lookable->purchaseOrderDetail->purchaseOrder->currency;
             }
@@ -100,8 +100,8 @@ class PurchaseInvoice extends Model
                 $rate = 1;
             }elseif($row->lookable_type == 'purchase_order_details'){
                 $rate = $row->lookable->purchaseOrder->currency_rate;
-            }elseif($row->lookable_type == 'landed_cost_details'){
-                $rate = $row->lookable->landedCost->currency_rate;
+            }elseif($row->lookable_type == 'landed_costs'){
+                $rate = $row->lookable->currency_rate;
             }else{
                 $rate = $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
             }
@@ -127,6 +127,12 @@ class PurchaseInvoice extends Model
     public function hasPaymentRequestDetail(){
         return $this->hasMany('App\Models\PaymentRequestDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('paymentRequest',function($query){
             $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function realPaymentRequestDetail(){
+        return $this->hasMany('App\Models\PaymentRequestDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('paymentRequest',function($query){
+            $query->whereIn('status',['1','2','3']);
         });
     }
 
@@ -330,6 +336,11 @@ class PurchaseInvoice extends Model
         })->get() as $rowpayment){
             $totalAfterMemo -= $rowpayment->nominal;
         }
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+            $query->where('payment_type','5')->whereIn('status',['1','2','3'])->whereDoesntHave('outgoingPayment')->whereNull('coa_source_id');
+        })->get() as $rowpayment){
+            $totalAfterMemo -= $rowpayment->nominal;
+        }
         return $totalAfterMemo;
     }
 
@@ -338,6 +349,11 @@ class PurchaseInvoice extends Model
         $totalAfterMemo = $total - $this->totalMemo();
         foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
             $query->whereHas('outgoingPayment');
+        })->where('id','<>',$prd)->get() as $rowpayment){
+            $totalAfterMemo -= $rowpayment->nominal;
+        }
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+            $query->where('payment_type','5')->whereIn('status',['1','2','3'])->whereDoesntHave('outgoingPayment')->whereNull('coa_source_id');
         })->where('id','<>',$prd)->get() as $rowpayment){
             $totalAfterMemo -= $rowpayment->nominal;
         }
@@ -354,6 +370,11 @@ class PurchaseInvoice extends Model
         })->get() as $rowpayment){
             $total += $rowpayment->nominal;
         }
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query) use($date){
+            $query->where('payment_type','5')->whereIn('status',['1','2','3'])->whereDoesntHave('outgoingPayment')->whereNull('coa_source_id')->whereDate('post_date','<=',$date);
+        })->get() as $rowpayment){
+            $total += $rowpayment->nominal;
+        }
         return $total;
     }
 
@@ -365,6 +386,11 @@ class PurchaseInvoice extends Model
                 $query->whereDate('post_date','<=',$date);
             });
 
+        })->get() as $rowpayment){
+            $totalAfterMemo -= $rowpayment->nominal;
+        }
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query) use($date){
+            $query->where('payment_type','5')->whereIn('status',['1','2','3'])->whereDoesntHave('outgoingPayment')->whereNull('coa_source_id')->whereDate('post_date','<=',$date);
         })->get() as $rowpayment){
             $totalAfterMemo -= $rowpayment->nominal;
         }

@@ -935,6 +935,11 @@ class CustomHelper {
 				if($row->lookable_type == 'purchase_invoices'){
 					$mustpay = $row->lookable->getTotalPaidExcept($row->id);
 					$balanceReal = $row->lookable->getTotalPaidExcept($row->id) * $row->lookable->currencyRate();
+					if($row->lookable->getTotalPaid() <= 0){
+						$row->lookable->update([
+							'status'	=> '3'
+						]);
+					}
 				}elseif($row->lookable_type == 'fund_requests'){
 					$mustpay = $row->nominal;
 					$balanceReal = $row->nominal * $row->lookable->currency_rate;
@@ -947,6 +952,11 @@ class CustomHelper {
 				}elseif($row->lookable_type == 'purchase_down_payments'){
 					$mustpay = $row->lookable->balancePaidExcept($row->id);
 					$balanceReal = $row->lookable->balancePaidExcept($row->id) * $row->lookable->currency_rate;
+					if($row->lookable->getTotalPaid() <= 0){
+						$row->lookable->update([
+							'status'	=> '3'
+						]);
+					}
 				}elseif($row->lookable_type == 'marketing_order_memos'){
 					$rowtotal = $row->lookable->balance();
 					$mustpay = $rowtotal;
@@ -1753,6 +1763,7 @@ class CustomHelper {
 			]);
 
 			$coahutangusaha = Coa::where('code','200.01.03.01.01')->where('company_id',$pm->company_id)->first()->id;
+			$coarounding = Coa::where('code','700.01.01.01.05')->where('company_id',$pm->company_id)->first()->id;
 
 			foreach($pm->purchaseMemoDetail as $row){
 				$coacode = '';
@@ -1765,8 +1776,8 @@ class CustomHelper {
 							$total = -1 * $row->total;
 						}elseif($row->lookable->lookable_type == 'purchase_order_details'){
 							$total = -1 * $row->total * $row->lookable->purchaseOrder->currency_rate;
-						}elseif($row->lookable->lookable_type == 'landed_cost_details'){
-							$total = -1 * $row->total * $row->lookable->lookable->landedCost->currency_rate;
+						}elseif($row->lookable->lookable_type == 'landed_costs'){
+							$total = -1 * $row->total * $row->lookable->lookable->currency_rate;
 						}else{
 							$total = -1 * $row->total * $row->lookable->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
 						}
@@ -1785,8 +1796,8 @@ class CustomHelper {
 							$tax = -1 * $row->tax;
 						}elseif($row->lookable->lookable_type == 'purchase_order_details'){
 							$tax = -1 * $row->tax * $row->lookable->purchaseOrder->currency_rate;
-						}elseif($row->lookable->lookable_type == 'landed_cost_details'){
-							$tax = -1 * $row->tax * $row->lookable->lookable->landedCost->currency_rate;
+						}elseif($row->lookable->lookable_type == 'landed_costs'){
+							$tax = -1 * $row->tax * $row->lookable->lookable->currency_rate;
 						}else{
 							$tax = -1 * $row->tax * $row->lookable->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
 						}
@@ -1805,8 +1816,8 @@ class CustomHelper {
 							$wtax = -1 * $row->wtax;
 						}elseif($row->lookable->lookable_type == 'purchase_order_details'){
 							$wtax = -1 * $row->wtax * $row->lookable->purchaseOrder->currency_rate;
-						}elseif($row->lookable->lookable_type == 'landed_cost_details'){
-							$wtax = -1 * $row->wtax * $row->lookable->lookable->landedCost->currency_rate;
+						}elseif($row->lookable->lookable_type == 'landed_costs'){
+							$wtax = -1 * $row->wtax * $row->lookable->lookable->currency_rate;
 						}else{
 							$wtax = -1 * $row->wtax * $row->lookable->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
 						}
@@ -1825,8 +1836,8 @@ class CustomHelper {
 							$grandtotal = -1 * $row->grandtotal;
 						}elseif($row->lookable->lookable_type == 'purchase_order_details'){
 							$grandtotal = -1 * $row->grandtotal * $row->lookable->purchaseOrder->currency_rate;
-						}elseif($row->lookable->lookable_type == 'landed_cost_details'){
-							$grandtotal = -1 * $row->grandtotal * $row->lookable->lookable->landedCost->currency_rate;
+						}elseif($row->lookable->lookable_type == 'landed_costs'){
+							$grandtotal = -1 * $row->grandtotal * $row->lookable->lookable->currency_rate;
 						}else{
 							$grandtotal = -1 * $row->grandtotal * $row->lookable->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
 						}
@@ -1882,6 +1893,24 @@ class CustomHelper {
 						]);
 					}
 				}
+			}
+
+			if($pm->rounding > 0 || $pm->rounding < 0){
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coarounding,
+					'account_id'	=> $account_id,
+					'type'			=> '1',
+					'nominal'		=> $pm->rounding > 0 ? -1 * $pm->rounding : $pm->rounding,
+				]);
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coahutangusaha,
+					'account_id'	=> $account_id,
+					'type'			=> '2',
+					'nominal'		=> $pm->rounding > 0 ? -1 * $pm->rounding : $pm->rounding,
+				]);
 			}
 
 		}elseif($table_name == 'close_bills'){

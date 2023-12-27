@@ -224,7 +224,7 @@ class Item extends Model
         foreach($data as $detail){
             $arrData[] = [
                 'id'            => $detail->id,
-                'warehouse'     => $detail->place->name.' - '.$detail->warehouse->name.' - '.($detail->area()->exists() ? $detail->area->name : ''),
+                'warehouse'     => $detail->place->code.' - '.$detail->warehouse->name.' - '.($detail->area()->exists() ? $detail->area->name : ''),
                 'warehouse_id'  => $detail->warehouse_id,
                 'place_id'      => $detail->place_id,
                 'qty'           => number_format($detail->qty,3,',','.').' '.$this->uomUnit->code,

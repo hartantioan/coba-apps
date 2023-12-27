@@ -460,7 +460,7 @@ class Select2Controller extends Controller {
                 'buy_unit'          => $d->buyUnit->code,
                 'old_prices'        => $d->oldPrices($this->dataplaces),
                 'list_warehouse'    => $d->warehouseList(),
-                'stock_list'        => $d->currentStockPurchase($this->dataplaces,$this->datawarehouses),
+                'stock_list'        => $d->currentStock($this->dataplaces,$this->datawarehouses),
             ];
         }
 
@@ -1569,6 +1569,54 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function purchaseInvoiceMemo(Request $request)
+    {
+
+        $response = [];
+        $search   = $request->search;
+        $data = PurchaseInvoice::where(function($query) use($search){
+                    $query->where(function($query) use ($search) {
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('total', 'like', "%$search%")
+                            ->orWhere('tax', 'like', "%$search%")
+                            ->orWhere('grandtotal', 'like', "%$search%")
+                            ->orWhere('downpayment', 'like', "%$search%")
+                            ->orWhere('balance', 'like', "%$search%")
+                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhere('tax_no', 'like', "%$search%")
+                            ->orWhere('tax_cut_no', 'like', "%$search%")
+                            ->orWhere('spk_no', 'like', "%$search%")
+                            ->orWhere('invoice_no', 'like', "%$search%")
+                            ->orWhereHas('user',function($query) use($search){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('account',function($query) use($search){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            });
+                    });
+                })
+                ->where(function($query) use($search,$request){
+                    if($request->account_id){
+                        $query->where('account_id',$request->account_id);
+                    }
+                })
+                ->whereDoesntHave('used')
+                ->whereIn('status',['2','3'])->get();
+
+        foreach($data as $d) {
+            if($d->getTotalPaid() > 0){
+                $response[] = [
+                    'id'   			=> $d->id,
+                    'text' 			=> $d->code.' - '.$d->note.' - Saldo '.number_format($d->balance,2,',','.').' - FP : '.$d->tax_no.' - '.$d->account->name,
+                ];
+            }
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function purchaseDownPayment(Request $request)
     {
 
@@ -1604,6 +1652,53 @@ class Select2Controller extends Controller {
                 'id'   			=> $d->id,
                 'text' 			=> $d->code.' - '.$d->note,
             ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function purchaseDownPaymentMemo(Request $request)
+    {
+
+        $response = [];
+        $search   = $request->search;
+        $data = PurchaseDownPayment::where(function($query) use($search){
+                    $query->where(function($query) use ($search) {
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('post_date', 'like', "%$search%")
+                            ->orWhere('due_date', 'like', "%$search%")
+                            ->orWhere('subtotal', 'like', "%$search%")
+                            ->orWhere('discount', 'like', "%$search%")
+                            ->orWhere('total', 'like', "%$search%")
+                            ->orWhere('tax', 'like', "%$search%")
+                            ->orWhere('grandtotal', 'like', "%$search%")
+                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhereHas('purchaseDownPaymentDetail',function($query) use($search){
+                                $query->whereHas('purchaseOrder',function($query) use($search){
+                                    $query->where('code', 'like', "%$search%");
+                                });
+                            })
+                            ->orWhereHas('user',function($query) use($search){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            });
+                    });
+                })
+                ->where(function($query) use($search,$request){
+                    if($request->account_id){
+                        $query->where('account_id',$request->account_id);
+                    }
+                })
+                ->whereDoesntHave('used')
+                ->whereIn('status',['2','3'])->get();
+
+        foreach($data as $d) {
+            if($d->getTotalPaid() > 0){
+                $response[] = [
+                    'id'   			=> $d->id,
+                    'text' 			=> $d->code.' - '.$d->note.' - '.$d->supplier->name,
+                ];
+            }
         }
 
         return response()->json(['items' => $response]);

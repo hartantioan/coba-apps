@@ -162,17 +162,32 @@
                                 {{ $data->account->address }}
                             </td>
                         </tr>
-                        
-                    </table>
-                </td>
-                <td width="50%" class="left-align">
-                    <table border="0" width="100%">
                         <tr>
                             <td width="50%">
                                 Telepon
                             </td>
                             <td width="50%">
                                 {{ $data->account->phone.' / '.$data->account->office_no }}
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td width="50%" class="left-align">
+                    <table border="0" width="100%">
+                        <tr>
+                            <td width="50%">
+                                No. Faktur Pajak Balikan
+                            </td>
+                            <td width="50%">
+                                {{ $data->return_tax_no }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="50%">
+                                Tanggal Retur
+                            </td>
+                            <td width="50%">
+                                {{ date('d/m/y',strtotime($data->return_date)) }}
                             </td>
                         </tr>
                     </table>

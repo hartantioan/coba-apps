@@ -230,7 +230,24 @@
                                 </table>
                             </td>
                             <td width="33%" class="left-align" style="vertical-align: top !important;">
-                                
+                                <table border="0" width="100%">
+                                    <tr>
+                                        <td width="40%">
+                                            No.FP Balikan
+                                        </td>
+                                        <td width="60%">
+                                            {{ $data->return_tax_no }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="40%">
+                                            Tanggal Retur
+                                        </td>
+                                        <td width="60%">
+                                            {{ date('d/m/y',strtotime($data->return_date)) }}
+                                        </td>
+                                    </tr>
+                                </table>
                             </td>
                             <td width="33%" class="left-align">
                                 <table border="0" width="100%">

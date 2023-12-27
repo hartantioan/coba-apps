@@ -666,7 +666,7 @@
                 $("#form_data > select").prop("selectedIndex", 0).trigger('change');
                 M.updateTextFields();
                 $('#type_id,#size_id,#variety_id,#pattern_id,#color_id,#grade_id,#brand_id').empty();
-                $('#item-sale-show').hide();
+                /* $('#item-sale-show').hide(); */
                 arrCode = [];
                 arrName = [];
             }
@@ -779,11 +779,11 @@
     }
 
     function showSalesComposition(){
-        if($('#is_sales_item').is(':checked')){
+        /* if($('#is_sales_item').is(':checked')){
             $('#item-sale-show').show();
         }else{
             $('#item-sale-show').hide();
-        }
+        } */
     }
 
     function generateCode(){

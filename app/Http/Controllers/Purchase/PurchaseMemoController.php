@@ -116,6 +116,7 @@ class PurchaseMemoController extends Controller
                         $details[] = [
                             'id'            => $row->id,
                             'rawcode'       => $row->getCode(),
+                            'tax_no'        => $data->tax_no.' - '.$data->tax_cut_no.' - '.date('d/m/y',strtotime($data->cut_date)).' - '.$data->spk_no.' - '.$data->invoice_no,
                             'code'          => CustomHelper::encrypt($data->code),
                             'type'          => $row->getTable(),
                             'post_date'     => date('d/m/y',strtotime($data->post_date)),
@@ -142,6 +143,7 @@ class PurchaseMemoController extends Controller
                     $data['details'] = $details;
                 }elseif($request->type == 'podp'){
                     $data['rawcode'] = $data->code;
+                    $data['tax_no'] = '-';
                     $data['code'] = CustomHelper::encrypt($data->code);
                     $data['type'] = $data->getTable();
                     $data['post_date'] = date('d/m/y',strtotime($data->post_date));
@@ -182,6 +184,8 @@ class PurchaseMemoController extends Controller
             'tax',
             'wtax',
             'grandtotal',
+            'rounding',
+            'final',
         ];
 
         $start  = $request->start;
@@ -197,6 +201,7 @@ class PurchaseMemoController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
+                            ->orWhere('return_tax_no', 'like', "%$search%")
                             ->orWhere('total', 'like', "%$search%")
                             ->orWhere('tax', 'like', "%$search%")
                             ->orWhere('wtax', 'like', "%$search%")
@@ -242,6 +247,7 @@ class PurchaseMemoController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
+                            ->orWhere('return_tax_no', 'like', "%$search%")
                             ->orWhere('total', 'like', "%$search%")
                             ->orWhere('tax', 'like', "%$search%")
                             ->orWhere('wtax', 'like', "%$search%")
@@ -294,11 +300,15 @@ class PurchaseMemoController extends Controller
                     $val->account->name,
                     $val->company->name,
                     date('d/m/y',strtotime($val->post_date)),
+                    $val->return_tax_no,
+                    date('d/m/y',strtotime($val->return_date)),
                     $val->note,
                     number_format($val->total,2,',','.'),
                     number_format($val->tax,2,',','.'),
                     number_format($val->wtax,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
+                    number_format($val->rounding,2,',','.'),
+                    number_format($val->final,2,',','.'),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
                     '
@@ -377,6 +387,8 @@ class PurchaseMemoController extends Controller
             $tax = 0;
             $wtax = 0;
             $grandtotal = 0;
+            $final = 0;
+            $rounding = str_replace(',','.',str_replace('.','',$request->rounding));
 
             $passed = true;
 
@@ -386,6 +398,8 @@ class PurchaseMemoController extends Controller
                 $wtax += str_replace(',','.',str_replace('.','',$request->arr_wtax[$key]));
                 $grandtotal += str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key]));
             }
+
+            $final = $grandtotal + $rounding;
 
 			if($request->temp){
                 DB::beginTransaction();
@@ -434,10 +448,14 @@ class PurchaseMemoController extends Controller
                         $query->account_id = $request->account_id;
                         $query->company_id = $request->company_id;
                         $query->post_date = $request->post_date;
-                        $query->total = round($total,3);
-                        $query->tax = round($tax,3);
-                        $query->wtax = round($wtax,3);
-                        $query->grandtotal = round($grandtotal,3);
+                        $query->return_tax_no = $request->return_tax_no;
+                        $query->return_date = $request->return_date;
+                        $query->total = round($total,2);
+                        $query->tax = round($tax,2);
+                        $query->wtax = round($wtax,2);
+                        $query->grandtotal = round($grandtotal,2);
+                        $query->rounding = round($rounding,2);
+                        $query->final = round($final,2);
                         $query->document = $document;
                         $query->note = $request->note;
                         $query->status = '1';
@@ -467,10 +485,14 @@ class PurchaseMemoController extends Controller
                         'account_id'                => $request->account_id,
                         'company_id'                => $request->company_id,
                         'post_date'                 => $request->post_date,
-                        'total'                     => round($total,3),
-                        'tax'                       => round($tax,3),
-                        'wtax'                      => round($wtax,3),
-                        'grandtotal'                => round($grandtotal,3),
+                        'return_tax_no'             => $request->return_tax_no,
+                        'return_date'               => $request->return_date,
+                        'total'                     => round($total,2),
+                        'tax'                       => round($tax,2),
+                        'wtax'                      => round($wtax,2),
+                        'grandtotal'                => round($grandtotal,2),
+                        'rounding'                  => round($rounding,2),
+                        'final'                     => round($final,2),
                         'note'                      => $request->note,
                         'document'                  => $request->file('document') ? $request->file('document')->store('public/purchase_memos') : NULL,
                         'status'                    => '1',
@@ -644,6 +666,7 @@ class PurchaseMemoController extends Controller
                 $details[] = [
                     'id'            => $row->lookable_id,
                     'rawcode'       => $row->lookable->getCode(),
+                    'tax_no'        => $row->lookable->purchaseInvoice->tax_no.' - '.$row->lookable->purchaseInvoice->tax_cut_no.' - '.date('d/m/y',strtotime($row->lookable->purchaseInvoice->cut_date)).' - '.$row->lookable->purchaseInvoice->spk_no.' - '.$row->lookable->purchaseInvoice->invoice_no,
                     'code'          => CustomHelper::encrypt($row->lookable->getCode()),
                     'type'          => $row->lookable_type,
                     'post_date'     => date('d/m/y',strtotime($row->lookable->purchaseInvoice->post_date)),
@@ -665,6 +688,7 @@ class PurchaseMemoController extends Controller
                 $details[] = [
                     'id'            => $row->lookable_id,
                     'rawcode'       => $row->lookable->code,
+                    'tax_no'        => '-',
                     'code'          => $row->lookable->code,
                     'type'          => $row->lookable_type,
                     'post_date'     => date('d/m/y',strtotime($row->lookable->post_date)),

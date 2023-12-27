@@ -168,7 +168,7 @@
                                             <thead>
                                                 <tr>
                                                     <th class="center">Item</th>
-                                                    <th class="center">Stok (Satuan PO)</th>
+                                                    <th class="center">Stok (Satuan UoM)</th>
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan PO</th>
                                                     <th class="center">Keterangan</th>

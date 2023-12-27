@@ -123,12 +123,16 @@
                                                         <th>Pengguna</th>
                                                         <th>Partner Bisnis</th>
                                                         <th>Perusahaan</th>
-                                                        <th>Tanggal</th>
+                                                        <th>Tgl.Post</th>
+                                                        <th>No.Pajak Balikan</th>
+                                                        <th>Tgl.Retur</th>
                                                         <th>Keterangan</th>
                                                         <th>Total</th>
                                                         <th>PPN</th>
                                                         <th>PPh</th>
                                                         <th>Grandtotal</th>
+                                                        <th>Pembulatan</th>
+                                                        <th>Final</th>
                                                         <th>Dokumen</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
@@ -189,7 +193,15 @@
                                 <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                 <label class="active" for="post_date">Tgl. Posting</label>
                             </div>
-                            <div class="file-field input-field col m3 s12 step6">
+                            <div class="input-field col m3 s12 step6"> 
+                                <input id="return_tax_no" name="return_tax_no" type="text" placeholder="Nomor Faktur Pajak Balikan">
+                                <label class="active" for="return_tax_no">No. Faktur Pajak Balikan</label>
+                            </div>
+                            <div class="input-field col m3 s12 step7"> 
+                                <input id="return_date" name="return_date" type="date" value="{{ date('Y-m-d') }}">
+                                <label class="active" for="return_date">Tgl. Retur</label>
+                            </div>
+                            <div class="file-field input-field col m3 s12 step8">
                                 <div class="btn">
                                     <span>Lampiran</span>
                                     <input type="file" name="document" id="document">
@@ -198,8 +210,8 @@
                                     <input class="file-path validate" type="text">
                                 </div>
                             </div>
-                            <div class="col m12 s12 step7">
-                                <div class="col m3 s4">
+                            <div class="col m12 s12">
+                                <div class="col m3 s4 step9">
                                     <p class="mt-2 mb-2">
                                         <h6>A/P Invoice</h6>
                                         <div class="row">
@@ -215,7 +227,7 @@
                                         </div> 
                                     </p>
                                 </div>
-                                <div class="col m3 s4 step8">
+                                <div class="col m3 s4 step10">
                                     <p class="mt-2 mb-2">
                                         <h6>Purchase Down Payment (Uang Muka PO)</h6>
                                         <div class="row">
@@ -235,14 +247,15 @@
                                     <h6><b>PI/PODP Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                                 </div>
                             </div>
-                            <div class="col m12 s12 step9">
+                            <div class="col m12 s12 step11">
                                 <p class="mt-2 mb-2">
                                     <h6>Detail Transaksi</h6>
                                     <div style="overflow:auto;">
-                                        <table class="bordered" id="table-detail">
+                                        <table class="bordered" id="table-detail" style="min-width:2000px;">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Ref.Dokumen / Coa</th>
+                                                    <th class="center">FP/BP/Tgl.Potong BP/SPK/Invoice Vendor</th>
                                                     <th class="center">Tgl.Post</th>
                                                     <th class="center">Keterangan</th>
                                                     <th class="center">Edit Nominal</th>
@@ -255,7 +268,7 @@
                                             </thead>
                                             <tbody id="body-detail">
                                                 <tr id="last-row-detail">
-                                                    <td colspan="9" class="center">
+                                                    <td colspan="10" class="center">
                                                         Silahkan pilih A/P Invoice atau A/P Down Payment
                                                     </td>
                                                 </tr>
@@ -264,37 +277,47 @@
                                     </div>
                                 </p>
                             </div>
-                            <div class="input-field col m4 s12 step10">
+                            <div class="input-field col m4 s12 step12">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
                             <div class="input-field col m4 s12">
 
                             </div>
-                            <div class="input-field col m4 s12 step11">
+                            <div class="input-field col m4 s12 step13">
                                 <table width="100%" class="bordered">
                                     <thead>
                                         <tr>
                                             <td>Total</td>
-                                            <td class="right-align"><span id="total">0,000</span></td>
+                                            <td class="right-align"><span id="total">0,00</span></td>
                                         </tr>
                                         <tr>
                                             <td>PPN</td>
-                                            <td class="right-align"><span id="tax">0,000</span></td>
+                                            <td class="right-align"><span id="tax">0,00</span></td>
                                         </tr>
                                         <tr>
                                             <td>PPh</td>
-                                            <td class="right-align"><span id="wtax">0,000</span></td>
+                                            <td class="right-align"><span id="wtax">0,00</span></td>
                                         </tr>
                                         <tr>
-                                            <td><h6>Grandtotal</h6></td>
-                                            <td class="right-align"><h6><span id="grandtotal">0,000</span></h6></td>
+                                            <td>Grandtotal</td>
+                                            <td class="right-align"><span id="grandtotal">0,00</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Pembulatan</td>
+                                            <td class="right-align">
+                                                <input class="browser-default" id="rounding" name="rounding" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><h6>Final</h6></td>
+                                            <td class="right-align"><h6><span id="final">0,00</span></h6></td>
                                         </tr>
                                     </thead>
                                 </table>
                             </div>
                             <div class="col s12 mt-3 ">
-                                <button class="btn waves-effect waves-light right submit step12" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step14" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -544,7 +567,7 @@
                 if($('#last-row-detail').length == 0){
                     $('#body-detail').append(`
                         <tr id="last-row-detail">
-                            <td colspan="9" class="center">
+                            <td colspan="10" class="center">
                                 Silahkan pilih A/P Invoice atau A/P Down Payment
                             </td>
                         </tr>
@@ -629,16 +652,64 @@
             }
         });
 
-        select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/supplier") }}');
-        select2ServerSide('#purchase_invoice_id', '{{ url("admin/select2/purchase_invoice") }}');
-        select2ServerSide('#purchase_down_payment_id', '{{ url("admin/select2/purchase_down_payment") }}');
+        select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/supplier_vendor") }}');
+
+        $('#purchase_invoice_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/purchase_invoice_memo") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        account_id: $('#account_id').val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+
+        $('#purchase_down_payment_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/purchase_down_payment_memo") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        account_id: $('#account_id').val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
 
         $('#body-detail').on('click', '.delete-data-detail', function() {
             $(this).closest('tr').remove();
             if($('.row_detail').length == 0){
                 $('#body-detail').append(`
                     <tr id="last-row-detail">
-                        <td colspan="9" class="center">
+                        <td colspan="10" class="center">
                             Silahkan pilih A/P Invoice atau A/P Down Payment
                         </td>
                     </tr>
@@ -768,6 +839,9 @@
                                         ` + response.rawcode + `
                                     </td>
                                     <td>
+                                        ` + response.tax_no + `
+                                    </td>
+                                    <td>
                                         ` + response.post_date + `
                                     </td>
                                     <td>
@@ -810,6 +884,9 @@
                                         <input type="hidden" name="arr_limit[]" value="` + val.balance + `" data-id="` + count + `">
                                         <td>
                                             ` + response.rawcode + `
+                                        </td>
+                                        <td>
+                                            ` + val.tax_no + `
                                         </td>
                                         <td>
                                             ` + val.post_date + `
@@ -865,7 +942,7 @@
     }
 
     function countAll(){
-        var total = 0, tax = 0, grandtotal = 0, balance = 0, wtax = 0;
+        var total = 0, tax = 0, grandtotal = 0, balance = 0, wtax = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",",".")), final = 0;
         
         if($('input[name^="arr_code"]').length > 0){
             $('input[name^="arr_code"]').each(function(){
@@ -881,39 +958,45 @@
                         (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
                     );
                 }
-                rowtax = Math.floor((percent_tax / 100) * rowtotal);
-                rowwtax = Math.floor((percent_wtax / 100) * rowtotal);
+                rowtax = (percent_tax / 100) * rowtotal;
+                rowwtax = (percent_wtax / 100) * rowtotal;
                 rowgrandtotal = rowtotal + rowtax - rowwtax;
                 total += rowtotal;
                 tax += rowtax;
                 wtax += rowwtax;
                 grandtotal += rowgrandtotal;
                 $('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val(
-                    (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
+                    (rowtotal >= 0 ? '' : '-') + formatRupiahIni(rowtotal.toFixed(2).toString().replace('.',','))
                 );
                 $('input[name^="arr_tax"][data-id="' + element.data('id') + '"]').val(
-                    (rowtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtax).toString().replace('.',','))
+                    (rowtax >= 0 ? '' : '-') + formatRupiahIni(rowtax.toFixed(2).toString().replace('.',','))
                 );
                 $('input[name^="arr_wtax"][data-id="' + element.data('id') + '"]').val(
-                    (rowwtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowwtax).toString().replace('.',','))
+                    (rowwtax >= 0 ? '' : '-') + formatRupiahIni(rowwtax.toFixed(2).toString().replace('.',','))
                 );
                 $('input[name^="arr_grandtotal"][data-id="' + element.data('id') + '"]').val(
-                    (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowgrandtotal).toString().replace('.',','))
+                    (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(rowgrandtotal.toFixed(2).toString().replace('.',','))
                 );
             });
         }
 
         $('#total').text(
-            (total >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(total).toString().replace('.',','))
+            (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
         );
         $('#tax').text(
-            (tax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(tax).toString().replace('.',','))
+            (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(2).toString().replace('.',','))
         );
         $('#wtax').text(
-            (wtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(wtax).toString().replace('.',','))
+            (wtax >= 0 ? '' : '-') + formatRupiahIni(wtax.toFixed(2).toString().replace('.',','))
         );
         $('#grandtotal').text(
-            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',','))
+            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
+        );
+
+        final = grandtotal + rounding;
+
+        $('#final').text(
+            (final >= 0 ? '' : '-') + formatRupiahIni(final.toFixed(2).toString().replace('.',','))
         );
     }
 
@@ -938,7 +1021,7 @@
                 if($('.row_detail').length == 0 || $('#last-row-detail').length == 0){
                     $('#body-detail').append(`
                         <tr id="last-row-detail">
-                            <td colspan="9" class="center">
+                            <td colspan="10" class="center">
                                 Silahkan pilih A/P Invoice atau A/P Down Payment
                             </td>
                         </tr>
@@ -1259,11 +1342,15 @@
                 { name: 'account_id', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
+                { name: 'return_tax_no', className: 'center-align' },
+                { name: 'return_date', className: 'center-align' },
                 { name: 'note', className: 'center-align' },
                 { name: 'total', className: 'right-align' },
                 { name: 'tax', className: 'right-align' },
                 { name: 'wtax', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
+                { name: 'rounding', className: 'right-align' },
+                { name: 'final', className: 'right-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
@@ -1505,6 +1592,8 @@
                 $('#type').val(response.type).formSelect();
                 $('#company_id').val(response.company_id).formSelect();
                 $('#post_date').val(response.post_date);
+                $('#return_tax_no').val(response.return_tax_no);
+                $('#return_date').val(response.return_date);
                 
                 $('#note').val(response.note);
                 
@@ -1524,6 +1613,9 @@
                                 <input type="hidden" name="arr_limit[]" value="` + val.balance + `" data-id="` + count + `">
                                 <td>
                                     ` + val.rawcode + `
+                                </td>
+                                <td>
+                                    ` + val.tax_no + `
                                 </td>
                                 <td>
                                     ` + val.post_date + `
@@ -1722,38 +1814,48 @@
                     intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
                 },
                 {
-                    title : 'File Lampiran',
+                    title : 'Faktur Pajak Balikan',
                     element : document.querySelector('.step6'),
+                    intro : 'Nomor faktur pajak balikan.' 
+                },
+                {
+                    title : 'Tgl. Retur Dokumen Pajak',
+                    element : document.querySelector('.step7'),
+                    intro : 'Tanggal retur dokumen pajak balikan.' 
+                },
+                {
+                    title : 'File Lampiran',
+                    element : document.querySelector('.step8'),
                     intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
                 },
                 {
                     title : 'A/P Invoice',
-                    element : document.querySelector('.step7'),
+                    element : document.querySelector('.step9'),
                     intro : 'Berfungsi untuk menambahkan invoice yang masih memiliki sisa saldo yang perlu dibayar' 
                 },
                 {
                     title : 'Purchase Down Payment',
-                    element : document.querySelector('.step8'),
+                    element : document.querySelector('.step10'),
                     intro : 'Berfungsi untuk menambahkan Down Payment yang belum digunakan sebelumnya untuk ditambahkan di memo.' 
                 },
                 {
                     title : 'Detail Transaksi',
-                    element : document.querySelector('.step9'),
+                    element : document.querySelector('.step11'),
                     intro : 'Menampilkan Invoice dan PODP yang telah ditambahkan pada inputan AP/invoice & PODP',
                 },
                 {
                     title : 'Keterangan',
-                    element : document.querySelector('.step10'),
+                    element : document.querySelector('.step12'),
                     intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.'
                 },
                 {
                     title : 'Total PPN PPh Grandtotal',
-                    element : document.querySelector('.step11'),
+                    element : document.querySelector('.step13'),
                     intro : 'Menampilkan ppn pph total dari semua detail terkait secara terotomasi',
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step12'),
+                    element : document.querySelector('.step14'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

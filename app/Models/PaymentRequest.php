@@ -98,6 +98,11 @@ class PaymentRequest extends Model
         return $this->hasOne('App\Models\OutgoingPayment', 'payment_request_id', 'id')->whereIn('status',['2','3']);
     }
 
+    public function realOutgoingPayment()
+    {
+        return $this->hasOne('App\Models\OutgoingPayment', 'payment_request_id', 'id')->whereIn('status',['1','2','3']);
+    }
+
     public function status(){
         $status = match ($this->status) {
           '1' => '<span class="amber medium-small white-text padding-3">Menunggu</span>',

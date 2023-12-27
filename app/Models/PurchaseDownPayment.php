@@ -53,6 +53,12 @@ class PurchaseDownPayment extends Model
         });
     }
 
+    public function realPaymentRequestDetail(){
+        return $this->hasMany('App\Models\PaymentRequestDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('paymentRequest',function($query){
+            $query->whereIn('status',['1','2','3']);
+        });
+    }
+
     public function listCekBG(){
         $list = [];
         foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
@@ -168,13 +174,19 @@ class PurchaseDownPayment extends Model
     }
 
     public function balancePaymentRequest(){
-        $total = $this->grandtotal - $this->totalMemo();
-
-        foreach($this->hasPaymentRequestDetail as $row){
-            $total -= $row->nominal;
+        $total = $this->grandtotal;
+        $totalAfterMemo = $total - $this->totalMemo();
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+            $query->whereHas('outgoingPayment');
+        })->get() as $rowpayment){
+            $totalAfterMemo -= $rowpayment->nominal;
         }
-
-        return $total;
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+            $query->where('payment_type','5')->whereIn('status',['1','2','3'])->whereDoesntHave('outgoingPayment')->whereNull('coa_source_id');
+        })->get() as $rowpayment){
+            $totalAfterMemo -= $rowpayment->nominal;
+        }
+        return $totalAfterMemo;
     }
 
     public function balancePaymentRequestByDate($date){
@@ -188,6 +200,11 @@ class PurchaseDownPayment extends Model
             $total -= $rowpayment->nominal;
         }
 
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query) use($date){
+            $query->where('payment_type','5')->whereIn('status',['1','2','3'])->whereDoesntHave('outgoingPayment')->whereNull('coa_source_id')->whereDate('post_date','<=',$date);
+        })->get() as $rowpayment){
+            $total += $rowpayment->nominal;
+        }
         return $total;
     }
 
@@ -200,23 +217,39 @@ class PurchaseDownPayment extends Model
         })->get() as $rowpayment){
             $total += $rowpayment->nominal;
         }
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query) use($date){
+            $query->where('payment_type','5')->whereIn('status',['1','2','3'])->whereDoesntHave('outgoingPayment')->whereNull('coa_source_id')->whereDate('post_date','<=',$date);
+        })->get() as $rowpayment){
+            $total += $rowpayment->nominal;
+        }
         return $total;
     }
 
     public function balancePaid(){
         $total = $this->grandtotal;
+        $totalAfterMemo = $total - $this->totalMemo();
         foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
             $query->whereHas('outgoingPayment');
         })->get() as $rowpayment){
-            $total -= $rowpayment->nominal;
+            $totalAfterMemo -= $rowpayment->nominal;
         }
-        return $total;
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+            $query->where('payment_type','5')->whereIn('status',['1','2','3'])->whereDoesntHave('outgoingPayment')->whereNull('coa_source_id');
+        })->get() as $rowpayment){
+            $totalAfterMemo -= $rowpayment->nominal;
+        }
+        return $totalAfterMemo;
     }
 
     public function balancePaidExcept($prd){
         $total = $this->grandtotal;
         foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
             $query->whereHas('outgoingPayment');
+        })->where('id','<>',$prd)->get() as $rowpayment){
+            $total -= $rowpayment->nominal;
+        }
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+            $query->where('payment_type','5')->whereIn('status',['1','2','3'])->whereDoesntHave('outgoingPayment')->whereNull('coa_source_id');
         })->where('id','<>',$prd)->get() as $rowpayment){
             $total -= $rowpayment->nominal;
         }
@@ -381,5 +414,21 @@ class PurchaseDownPayment extends Model
             $total += $rowdetail->grandtotal;
         }
         return $total;
+    }
+
+    public function getTotalPaid(){
+        $total = $this->grandtotal;
+        $totalAfterMemo = $total - $this->totalMemo();
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+            $query->whereHas('outgoingPayment');
+        })->get() as $rowpayment){
+            $totalAfterMemo -= $rowpayment->nominal;
+        }
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+            $query->where('payment_type','5')->whereIn('status',['1','2','3'])->whereDoesntHave('outgoingPayment')->whereNull('coa_source_id');
+        })->get() as $rowpayment){
+            $totalAfterMemo -= $rowpayment->nominal;
+        }
+        return $totalAfterMemo;
     }
 }

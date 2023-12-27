@@ -558,40 +558,68 @@ class PurchaseInvoiceController extends Controller
     }
 
     public function create(Request $request){
-        $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('purchase_invoices', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:purchase_invoices,code',
-			'account_id' 			    => 'required',
-			'type'                      => 'required',
-            'company_id'                => 'required',
-            'post_date'                 => 'required',
-            'received_date'             => 'required',
-            'due_date'                  => 'required',
-            'document_date'             => 'required',
-            'arr_type'                  => 'required|array',
-            'arr_total'                 => 'required|array',
-            'arr_tax'                   => 'required|array',
-            'arr_grandtotal'            => 'required|array'
-		], [
-            'code.required' 	                => 'Kode tidak boleh kosong.',
-            'code.string'                       => 'Kode harus dalam bentuk string.',
-            'code.min'                          => 'Kode harus minimal 18 karakter.',
-            'code.unique'                       => 'Kode telah dipakai',
-			'account_id.required' 			    => 'Supplier/Vendor tidak boleh kosong.',
-			'type.required'                     => 'Tipe invoice tidak boleh kosong',
-            'company_id.required'               => 'Perusahaan tidak boleh kosong.',
-            'post_date.required'                => 'Tanggal posting tidak boleh kosong.',
-            'received_date.required'            => 'Tanggal terima tidak boleh kosong.',
-            'due_date.required'                 => 'Tanggal tenggat tidak boleh kosong.',
-            'document_date.required'            => 'Tanggal dokumen tidak boleh kosong.',
-            'arr_type.required'                 => 'Tipe dokumen tidak boleh kosong.',
-            'arr_type.array'                    => 'Tipe dokumen harus dalam bentuk array.',
-            'arr_total.required'                => 'Nominal total tidak boleh kosong.',
-            'arr_total.array'                   => 'Nominal harus dalam bentuk array.',
-            'arr_tax.required'                  => 'Nominal pajak tidak boleh kosong.',
-            'arr_tax.array'                     => 'Nominal pajak harus dalam bentuk array.',
-            'arr_grandtotal.required'           => 'Grandtotal tidak boleh kosong.',
-            'arr_grandtotal.array'              => 'Grandtotal harus dalam bentuk array.'
-		]);
+        if($request->type_detail == '1'){
+            $validation = Validator::make($request->all(), [
+                'code'			            => $request->temp ? ['required', Rule::unique('purchase_invoices', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:purchase_invoices,code',
+                'account_id' 			    => 'required',
+                'type'                      => 'required',
+                'company_id'                => 'required',
+                'post_date'                 => 'required',
+                'received_date'             => 'required',
+                'due_date'                  => 'required',
+                'document_date'             => 'required',
+                'arr_type'                  => 'required|array',
+                'arr_total'                 => 'required|array',
+                'arr_tax'                   => 'required|array',
+                'arr_grandtotal'            => 'required|array'
+            ], [
+                'code.required' 	                => 'Kode tidak boleh kosong.',
+                'code.string'                       => 'Kode harus dalam bentuk string.',
+                'code.min'                          => 'Kode harus minimal 18 karakter.',
+                'code.unique'                       => 'Kode telah dipakai',
+                'account_id.required' 			    => 'Supplier/Vendor tidak boleh kosong.',
+                'type.required'                     => 'Tipe invoice tidak boleh kosong',
+                'company_id.required'               => 'Perusahaan tidak boleh kosong.',
+                'post_date.required'                => 'Tanggal posting tidak boleh kosong.',
+                'received_date.required'            => 'Tanggal terima tidak boleh kosong.',
+                'due_date.required'                 => 'Tanggal tenggat tidak boleh kosong.',
+                'document_date.required'            => 'Tanggal dokumen tidak boleh kosong.',
+                'arr_type.required'                 => 'Tipe dokumen tidak boleh kosong.',
+                'arr_type.array'                    => 'Tipe dokumen harus dalam bentuk array.',
+                'arr_total.required'                => 'Nominal total tidak boleh kosong.',
+                'arr_total.array'                   => 'Nominal harus dalam bentuk array.',
+                'arr_tax.required'                  => 'Nominal pajak tidak boleh kosong.',
+                'arr_tax.array'                     => 'Nominal pajak harus dalam bentuk array.',
+                'arr_grandtotal.required'           => 'Grandtotal tidak boleh kosong.',
+                'arr_grandtotal.array'              => 'Grandtotal harus dalam bentuk array.'
+            ]);
+        }elseif($request->type_detail == '2'){
+            $validation = Validator::make($request->all(), [
+                'code'			            => $request->temp ? ['required', Rule::unique('purchase_invoices', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:purchase_invoices,code',
+                'account_id' 			    => 'required',
+                'type'                      => 'required',
+                'company_id'                => 'required',
+                'post_date'                 => 'required',
+                'received_date'             => 'required',
+                'due_date'                  => 'required',
+                'document_date'             => 'required',
+                'arr_multi_coa'             => 'required|array',
+            ], [
+                'code.required' 	                => 'Kode tidak boleh kosong.',
+                'code.string'                       => 'Kode harus dalam bentuk string.',
+                'code.min'                          => 'Kode harus minimal 18 karakter.',
+                'code.unique'                       => 'Kode telah dipakai',
+                'account_id.required' 			    => 'Supplier/Vendor tidak boleh kosong.',
+                'type.required'                     => 'Tipe invoice tidak boleh kosong',
+                'company_id.required'               => 'Perusahaan tidak boleh kosong.',
+                'post_date.required'                => 'Tanggal posting tidak boleh kosong.',
+                'received_date.required'            => 'Tanggal terima tidak boleh kosong.',
+                'due_date.required'                 => 'Tanggal tenggat tidak boleh kosong.',
+                'document_date.required'            => 'Tanggal dokumen tidak boleh kosong.',
+                'arr_multi_coa.required'            => 'Coa tidak boleh kosong.',
+                'arr_multi_coa.array'               => 'Coa harus dalam bentuk array.',
+            ]);
+        }
 
         if($validation->fails()) {
             $response = [
@@ -602,20 +630,30 @@ class PurchaseInvoiceController extends Controller
             
             $total = 0;
             $tax = 0;
-            $wtax = 0;
+            $wtax = str_replace(',','.',str_replace('.','',$request->wtax));
             $grandtotal = 0;
             $balance = 0;
             $downpayment = str_replace(',','.',str_replace('.','',$request->downpayment));
             $rounding = str_replace(',','.',str_replace('.','',$request->rounding));
 
-            foreach($request->arr_total as $key => $row){
-                $total += str_replace(',','.',str_replace('.','',$row));
-                $tax += str_replace(',','.',str_replace('.','',$request->arr_tax[$key]));
-                $wtax += str_replace(',','.',str_replace('.','',$request->arr_wtax[$key]));
-                $grandtotal += str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key]));
+            if($request->arr_total){
+                foreach($request->arr_total as $key => $row){
+                    $total += str_replace(',','.',str_replace('.','',$row));
+                    $tax += str_replace(',','.',str_replace('.','',$request->arr_tax[$key]));
+                    $grandtotal += str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key]));
+                }
+            }
+
+            if($request->arr_multi_total){
+                foreach($request->arr_multi_total as $key => $row){
+                    $total += floatval($row);
+                    $tax += floatval($request->arr_multi_ppn[$key]);
+                }
+                $grandtotal = $total + $tax - $wtax;
             }
 
             $balance = $grandtotal - $downpayment + $rounding;
+
             if($request->temp){
                 DB::beginTransaction();
                 try {
@@ -667,13 +705,13 @@ class PurchaseInvoiceController extends Controller
                         $query->due_date = $request->due_date;
                         $query->document_date = $request->document_date;
                         $query->type = $request->type;
-                        $query->total = round($total,3);
-                        $query->tax = round($tax,3);
-                        $query->wtax = round($wtax,3);
-                        $query->grandtotal = round($grandtotal,3);
-                        $query->downpayment = round($downpayment,3);
-                        $query->rounding = round($rounding,3);
-                        $query->balance = round($balance,3);
+                        $query->total = round($total,2);
+                        $query->tax = round($tax,2);
+                        $query->wtax = round($wtax,2);
+                        $query->grandtotal = round($grandtotal,2);
+                        $query->downpayment = round($downpayment,2);
+                        $query->rounding = round($rounding,2);
+                        $query->balance = round($balance,2);
                         $query->document = $document;
                         $query->note = $request->note;
                         $query->tax_no = $request->tax_no;
@@ -716,13 +754,13 @@ class PurchaseInvoiceController extends Controller
                         'due_date'                  => $request->due_date,
                         'document_date'             => $request->document_date,
                         'type'                      => $request->type,
-                        'total'                     => round($total,3),
-                        'tax'                       => round($tax,3),
-                        'wtax'                      => round($wtax,3),
-                        'grandtotal'                => round($grandtotal,3),
-                        'downpayment'               => round($downpayment,3),
-                        'rounding'                  => round($rounding,3),
-                        'balance'                   => round($balance,3),
+                        'total'                     => round($total,2),
+                        'tax'                       => round($tax,2),
+                        'wtax'                      => round($wtax,2),
+                        'grandtotal'                => round($grandtotal,2),
+                        'downpayment'               => round($downpayment,2),
+                        'rounding'                  => round($rounding,2),
+                        'balance'                   => round($balance,2),
                         'note'                      => $request->note,
                         'document'                  => $request->file('document') ? $request->file('document')->store('public/purchase_invoices') : NULL,
                         'status'                    => '1',
@@ -742,34 +780,68 @@ class PurchaseInvoiceController extends Controller
             if($query) {
                 DB::beginTransaction();
                 try {
-                    if($request->arr_type){
+                    if($request->type_detail == '1'){
+                        if($request->arr_type){
                         
-                        foreach($request->arr_type as $key => $row){
+                            foreach($request->arr_type as $key => $row){
+                                PurchaseInvoiceDetail::create([
+                                    'purchase_invoice_id'   => $query->id,
+                                    'lookable_type'         => $row,
+                                    'lookable_id'           => $request->arr_code[$key],
+                                    'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                                    'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
+                                    'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
+                                    'tax_id'                => $request->arr_tax_id[$key] ? $request->arr_tax_id[$key] : NULL,
+                                    'wtax_id'               => $request->arr_wtax_id[$key] ? $request->arr_wtax_id[$key] : NULL,
+                                    'is_include_tax'        => $request->arr_include_tax[$key],
+                                    'percent_tax'           => $request->arr_percent_tax[$key],
+                                    'tax'                   => str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),
+                                    'percent_wtax'          => $request->arr_percent_wtax[$key],
+                                    'wtax'                  => str_replace(',','.',str_replace('.','',$request->arr_wtax[$key])),
+                                    'grandtotal'            => str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key])),
+                                    'note'                  => $request->arr_note[$key],
+                                    'note2'                 => $request->arr_note2[$key],
+                                    'place_id'              => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
+                                    'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
+                                    'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
+                                    'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
+                                    'warehouse_id'          => $request->arr_warehouse[$key] ? $request->arr_warehouse[$key] : NULL,
+                                ]);
+                            }
+                                
+                        }
+                    }elseif($request->type_detail == '2'){
+                        foreach($request->arr_multi_coa as $key => $row){
+                            $coa = Coa::where('code',explode('-',$row)[0])->where('company_id',$request->company_id)->first();
+                            $tax = $request->arr_multi_tax_id[$key] ? Tax::where('code',explode('-',$request->arr_multi_tax_id[$key])[0])->first() : '';
+                            $wtax = $request->arr_multi_wtax_id[$key] ? Tax::where('code',explode('-',$request->arr_multi_wtax_id[$key])[0])->first() : '';
+                            $place = $request->arr_multi_place[$key] ? Place::where('code',explode('-',$request->arr_multi_place[$key])[0])->first() : '';
+                            $line = $request->arr_multi_line[$key] ? Line::where('code',$request->arr_multi_line[$key])->first() : '';
+                            $machine = $request->arr_multi_machine[$key] ? Machine::where('code',explode('|',$request->arr_multi_machine[$key])[1])->first() : '';
+                            $department = $request->arr_multi_department[$key] ? Department::where('code',explode('|',$request->arr_multi_department[$key])[0])->first() : '';
+                            $warehouse = $request->arr_multi_warehouse[$key] ? Warehouse::where('code',explode('|',$request->arr_multi_warehouse[$key])[0])->first() : '';
                             PurchaseInvoiceDetail::create([
                                 'purchase_invoice_id'   => $query->id,
-                                'lookable_type'         => $row,
-                                'lookable_id'           => $request->arr_code[$key],
-                                'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                                'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
-                                'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
-                                'tax_id'                => $request->arr_tax_id[$key] ? $request->arr_tax_id[$key] : NULL,
-                                'wtax_id'               => $request->arr_wtax_id[$key] ? $request->arr_wtax_id[$key] : NULL,
-                                'is_include_tax'        => $request->arr_include_tax[$key],
-                                'percent_tax'           => $request->arr_percent_tax[$key],
-                                'tax'                   => str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),
-                                'percent_wtax'          => $request->arr_percent_wtax[$key],
-                                'wtax'                  => str_replace(',','.',str_replace('.','',$request->arr_wtax[$key])),
-                                'grandtotal'            => str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key])),
-                                'note'                  => $request->arr_note[$key],
-                                'note2'                 => $request->arr_note2[$key],
-                                'place_id'              => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
-                                'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
-                                'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
-                                'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
-                                'warehouse_id'          => $request->arr_warehouse[$key] ? $request->arr_warehouse[$key] : NULL,
+                                'lookable_type'         => 'coas',
+                                'lookable_id'           => $coa->id,
+                                'qty'                   => $request->arr_multi_qty[$key],
+                                'price'                 => $request->arr_multi_price[$key],
+                                'total'                 => $request->arr_multi_total[$key],
+                                'tax'                   => $request->arr_multi_ppn[$key],
+                                'tax_id'                => $tax ? $tax->id : NULL,
+                                'is_include_tax'        => '0',
+                                'wtax_id'               => $wtax ? $wtax->id : NULL,
+                                'wtax'                  => $request->arr_multi_pph[$key],
+                                'grandtotal'            => $request->arr_multi_grandtotal[$key],
+                                'note'                  => $request->arr_multi_note_1[$key],
+                                'note2'                 => $request->arr_multi_note_2[$key],
+                                'place_id'              => $place ? $place->id : NULL,
+                                'line_id'               => $line ? $line->id : NULL,
+                                'machine_id'            => $machine ? $machine->id : NULL,
+                                'department_id'         => $department ? $department->id : NULL,
+                                'warehouse_id'          => $warehouse ? $warehouse->id : NULL,
                             ]);
                         }
-                            
                     }
 
                     if($request->arr_dp_code){
@@ -3259,7 +3331,7 @@ class PurchaseInvoiceController extends Controller
                     <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
                     <td class="center-align">'.$row->coa->company->name.'</td>
                     <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
-                    <td class="center-align">'.($row->place_id ? $row->place->name : '-').'</td>
+                    <td class="center-align">'.($row->place_id ? $row->place->code : '-').'</td>
                     <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
                     <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
                     <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>

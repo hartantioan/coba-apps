@@ -34,9 +34,9 @@
         }
     }
 
-    .select-wrapper, .select2-container {
-        height:3.7rem !important;
-    }
+    /* .select-wrapper, .select2-container {
+        height:3.6rem !important;
+    } */
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -229,6 +229,13 @@
                                         @endforeach
                                     </select>
                                 </div>
+                                <div class="input-field col m3 s12">
+                                    <select class="form-control" id="type_detail" name="type_detail" onchange="viewDetail();">
+                                        <option value="1">Normal</option>
+                                        <option value="2">Multi dari Excel</option>
+                                    </select>
+                                    <label class="" for="type_detail">Tipe Detail</label>
+                                </div>
                                 <div class="input-field col m3 s12 step3">
                                     <input type="hidden" id="temp" name="temp">
                                     <select class="browser-default" id="account_id" name="account_id" onchange="getAccountData(this.value);"></select>
@@ -299,51 +306,96 @@
                                     </div>
                                 </div>
                                 <div class="col m12 s12 step17">
-                                    <p class="mt-2 mb-2">
-                                        <h6>Detail Goods Receipt PO / Landed Cost / Purchase Order Jasa / Coa</h6>
-                                        <div style="overflow:auto;">
-                                            <table class="bordered" style="width:3000px !important;" id="table-detail">
-                                                <thead>
-                                                    <tr>
-                                                        <th class="center">GR/LC/PO/Coa No.</th>
-                                                        <th class="center">NO.PO</th>
-                                                        <th class="center">No.SJ</th>
-                                                        <th class="center">Item / Coa Jasa</th>
-                                                        <th class="center">Satuan</th>
-                                                        <th class="center">Qty Diterima</th>
-                                                        <th class="center">Qty Kembali</th>
-                                                        <th class="center">Qty Sisa</th>
-                                                        <th class="center">Harga@</th>
-                                                        <th class="center">Tgl.Post</th>
-                                                        <th class="center">Tgl.Tenggat</th>
-                                                        <th class="center">Total</th>
-                                                        <th class="center">PPN (%)</th>
-                                                        <th class="center">Termasuk PPN</th>
-                                                        <th class="center">PPN (Rp)</th>
-                                                        <th class="center">PPh (%)</th>
-                                                        <th class="center">PPh (Rp)</th>
-                                                        <th class="center">Grandtotal</th>
-                                                        <th class="center">Keterangan 1</th>
-                                                        <th class="center">Keterangan 2</th>
-                                                        <th class="center">Plant</th>
-                                                        <th class="center">Line</th>
-                                                        <th class="center">Mesin</th>
-                                                        <th class="center">Departemen</th>
-                                                        <th class="center">Gudang</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="body-detail">
-                                                    <tr id="last-row-detail">
-                                                        <td colspan="25">
-                                                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
-                                                                <i class="material-icons left">add</i> Pembulatan Manual
-                                                            </a>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
+                                    <div id="detailOne" class="col s12">
+                                        <p class="mt-2 mb-2">
+                                            <h6>Detail Goods Receipt PO / Landed Cost / Purchase Order Jasa / Coa</h6>
+                                            <div style="overflow:auto;">
+                                                <table class="bordered" style="width:3000px !important;" id="table-detail">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="center">GR/LC/PO/Coa No.</th>
+                                                            <th class="center">NO.PO</th>
+                                                            <th class="center">No.SJ</th>
+                                                            <th class="center">Item / Coa Jasa</th>
+                                                            <th class="center">Satuan</th>
+                                                            <th class="center">Qty Diterima</th>
+                                                            <th class="center">Qty Kembali</th>
+                                                            <th class="center">Qty Sisa</th>
+                                                            <th class="center">Harga@</th>
+                                                            <th class="center">Tgl.Post</th>
+                                                            <th class="center">Tgl.Tenggat</th>
+                                                            <th class="center">Total</th>
+                                                            <th class="center">PPN (%)</th>
+                                                            <th class="center">Termasuk PPN</th>
+                                                            <th class="center">PPN (Rp)</th>
+                                                            <th class="center">PPh (%)</th>
+                                                            <th class="center">PPh (Rp)</th>
+                                                            <th class="center">Grandtotal</th>
+                                                            <th class="center">Keterangan 1</th>
+                                                            <th class="center">Keterangan 2</th>
+                                                            <th class="center">Plant</th>
+                                                            <th class="center">Line</th>
+                                                            <th class="center">Mesin</th>
+                                                            <th class="center">Departemen</th>
+                                                            <th class="center">Gudang</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="body-detail">
+                                                        <tr id="last-row-detail">
+                                                            <td colspan="25">
+                                                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
+                                                                    <i class="material-icons left">add</i> Pembulatan Manual
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </p>
+                                    </div>
+                                    <div id="detailMulti" class="col s12" style="display:none;">
+                                        <div class="col s12" style="overflow:auto;width:100% !important;">
+                                            <h6>Anda bisa menggunakan fitur copy paste dari format excel yang telah disediakan. Silahkan klik <a href="{{ asset(Storage::url('format_imports/format_copas_ap_invoice_2.xlsx')) }}" target="_blank">disini</a> untuk mengunduh. Jangan menyalin kolom paling atas (bagian header), dan tempel pada isian paling kiri di tabel di bawah ini.</h6>
+                                            <h6>Fitur ini hanya untuk transaksi yang langsung menjadi biaya pada hutang usaha.</h6>
+                                            <p class="mt-2 mb-2">
+                                                <table class="bordered" style="min-width:2700px;zoom:0.7;">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="center">Coa</th>
+                                                            <th class="center">Qty</th>
+                                                            <th class="center">Harga Satuan</th>
+                                                            <th class="center">Total</th>
+                                                            <th class="center">ID PPN</th>
+                                                            <th class="center">PPN</th>
+                                                            <th class="center">ID PPh</th>
+                                                            <th class="center">PPh</th>
+                                                            <th class="center">Grandtotal</th>
+                                                            <th class="center">Ket.1</th>
+                                                            <th class="center">Ket.2</th>
+                                                            <th class="center">Plant</th>
+                                                            <th class="center">Line</th>
+                                                            <th class="center">Mesin</th>
+                                                            <th class="center">Departemen</th>
+                                                            <th class="center">Gudang</th>
+                                                            <th class="center">Hapus</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="body-multi">
+                                                        <tr id="last-row-multi">
+                                                            <td colspan="17">
+                                                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 step_2_1 " onclick="addLine()" href="javascript:void(0);">
+                                                                    <i class="material-icons left">add</i> Tambah 1 Baris
+                                                                </a>
+                                                                <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addMulti()" href="javascript:void(0);">
+                                                                    <i class="material-icons left">add</i> Tambah Multi Baris
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </p>
                                         </div>
-                                    </p>
+                                    </div>
                                 </div>
                                 <div class="col m12 s12 step18">
                                     <p class="mt-2 mb-2">
@@ -391,19 +443,19 @@
                                             <tr>
                                                 <td>PPh</td>
                                                 <td class="right-align">
-                                                    <input class="browser-default" id="wtax" name="wtax" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countGrandtotal(this.value);" style="text-align:right;width:100%;">
+                                                    <input class="browser-default" id="wtax" name="wtax" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countGrandtotal();" style="text-align:right;width:100%;">
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td>Uang Muka</td>
                                                 <td class="right-align">
-                                                    <input class="browser-default" id="downpayment" name="downpayment" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
+                                                    <input class="browser-default" id="downpayment" name="downpayment" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" readonly>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td>Pembulatan</td>
                                                 <td class="right-align">
-                                                    <input class="browser-default" id="rounding" name="rounding" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
+                                                    <input class="browser-default" id="rounding" name="rounding" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countGrandtotal();" style="text-align:right;width:100%;">
                                                 </td>
                                             </tr>
                                             <tr>
@@ -421,80 +473,6 @@
                         </div>
                     </form>
                 </div>
-                {{-- <div id="inputMulti" class="col s12">
-                    <h4 class="mt-2">Tambah/Edit Multi {{ $title }}</h4>
-                    <form class="row" id="form_data_multi" onsubmit="return false;">
-                        <div class="col s12">
-                            <div id="validation_alert_multi" style="display:none;"></div>
-                        </div>
-                        <div class="col s12">
-                            <div class="col s12 step_2_1" style="overflow:auto;width:100% !important;">
-                                <h6>Anda bisa menggunakan fitur copy paste dari format excel yang telah disediakan. Silahkan klik <a href="{{ asset(Storage::url('format_imports/format_copas_ap_invoice.xlsx')) }}" target="_blank">disini</a> untuk mengunduh. Jangan menyalin kolom paling atas (bagian header), dan tempel pada isian paling kiri di tabel di bawah ini.</h6>
-                                <h6>Fitur ini hanya untuk transaksi yang langsung menjadi biaya pada hutang usaha.</h6>
-                                <p class="mt-2 mb-2">
-                                    <table class="bordered" style="min-width:2700px;zoom:0.7;">
-                                        <thead>
-                                            <tr>
-                                                <th class="center">Kode A/P Invoice</th>
-                                                <th class="center">Supplier</th>
-                                                <th class="center">Perusahaan</th>
-                                                <th class="center">Tipe</th>
-                                                <th class="center">Keterangan</th>
-                                                <th class="center">Tgl.Post</th>
-                                                <th class="center">Tgl.Terima</th>
-                                                <th class="center">TOP</th>
-                                                <th class="center">Tgl.Tenggat</th>
-                                                <th class="center">Tgl.Dokumen</th>
-                                                <th class="center">No.Faktur Pajak</th>
-                                                <th class="center">No.Bukti Potong</th>
-                                                <th class="center">Tgl.Bukti Potong</th>
-                                                <th class="center">No.SPK</th>
-                                                <th class="center">No.Invoice</th>
-                                                <th class="center">Coa</th>
-                                                <th class="center">Qty</th>
-                                                <th class="center">Harga Satuan</th>
-                                                <th class="center">Total</th>
-                                                <th class="center">ID PPN</th>
-                                                <th class="center">PPN</th>
-                                                <th class="center">ID PPh</th>
-                                                <th class="center">PPh</th>
-                                                <th class="center">Grandtotal</th>
-                                                <th class="center">Ket.1</th>
-                                                <th class="center">Ket.2</th>
-                                                <th class="center">Plant</th>
-                                                <th class="center">Line</th>
-                                                <th class="center">Mesin</th>
-                                                <th class="center">Departemen</th>
-                                                <th class="center">Gudang</th>
-                                                <th class="center">Hapus</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="body-multi">
-                                            <tr id="last-row-multi">
-                                                <td colspan="33">
-                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 step_2_1 " onclick="addLine()" href="javascript:void(0);">
-                                                        <i class="material-icons left">add</i> Tambah 1 Baris
-                                                    </a>
-                                                    <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addMulti()" href="javascript:void(0);">
-                                                        <i class="material-icons left">add</i> Tambah Multi Baris
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </p>
-                            </div>
-                            <div class="col s3 mt-1"><h6>Total : <b id="totalMulti" class="right">0,00</b></h6></div>
-                            <div class="col s3 mt-1"><h6>PPN : <b id="ppnMulti" class="right">0,00</b></h6></div>
-                            <div class="col s3 mt-1"><h6>PPh : <b id="pphMulti" class="right">0,00</b></h6></div>
-                            <div class="col s3 mt-1"><h6>Grandtotal : <b id="grandtotalMulti" class="right">0,00</b></h6></div>
-                            <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light purple" onclick="startIntro2();">Panduan <i class="material-icons right">help_outline</i></button>
-                                <button class="btn waves-effect waves-light right submit" onclick="saveMulti();">Simpan <i class="material-icons right">send</i></button>
-                            </div>
-                        </div>
-                    </form>
-                </div> --}}
             </div>
         </div>
     </div>
@@ -793,6 +771,7 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
+                $('#type_detail').trigger('change').formSelect();
                 $('.row_multi').remove();
                 countAllMulti();
             }
@@ -978,6 +957,18 @@
         return this.substring(0, index) + replacement + this.substring(index + replacement.length);
     };
 
+    function viewDetail(){
+        $('.row_detail,.row_detail_dp,.row_multi').remove();
+        if($('#type_detail').val() == '1'){
+            $('#detailOne').show();
+            $('#detailMulti').hide();
+        }else if($('#type_detail').val() == '2'){
+            $('#detailOne').hide();
+            $('#detailMulti').show();
+        }
+        countAll();
+    }
+
     function getCode(val){
         if(val){
             if($('#temp').val()){
@@ -1032,51 +1023,6 @@
     function addLine(){
         $('#last-row-multi').before(`
             <tr class="row_multi">
-                <td>
-                    <input type="text" name="arr_multi_code[]" placeholder="Kode Jurnal">
-                </td>
-                <td>
-                    <input type="text" name="arr_multi_supplier[]" placeholder="ID Supplier">
-                </td>
-                <td>
-                    <input type="text" name="arr_multi_company[]" placeholder="ID Perusahaan">
-                </td>
-                <td>
-                    <input type="text" name="arr_multi_type[]" placeholder="Tipe Pembayaran">
-                </td>
-                <td>
-                    <input type="text" name="arr_multi_note[]" placeholder="Keterangan">
-                </td>
-                <td>
-                    <input type="text" name="arr_multi_post_date[]" placeholder="Tgl.Post format dd/mm/yy ex:15/12/23">
-                </td>
-                <td>
-                    <input type="text" name="arr_multi_received_date[]" placeholder="Tgl.Terima format dd/mm/yy ex:15/12/23">
-                </td>
-                <td>
-                    <input type="number" name="arr_multi_top[]" placeholder="TOP dalam satuan hari">
-                </td>
-                <td>
-                    <input type="text" name="arr_multi_due_date[]" placeholder="Tgl.Tenggat format dd/mm/yy ex:15/12/23">
-                </td>
-                <td>
-                    <input type="text" name="arr_multi_document_date[]" placeholder="Tgl.Dokumen format dd/mm/yy ex:15/12/23">
-                </td>
-                <td>
-                    <input type="text" name="arr_multi_tax_no[]" placeholder="Nomor Faktur Pajak">
-                </td>
-                <td>
-                    <input type="text" name="arr_multi_tax_cut_no[]" placeholder="Nomor Bukti Potong">
-                </td>
-                <td>
-                    <input type="text" name="arr_multi_cut_date[]" placeholder="Tgl.Bukti Potong format dd/mm/yy ex:15/12/23">
-                </td>
-                <td>
-                    <input type="text" name="arr_multi_spk_no[]" placeholder="Nomor SPK">    
-                </td>
-                <td>
-                    <input type="text" name="arr_multi_invoice_no[]" placeholder="Nomor Invoice Penagihan">
-                </td>
                 <td>
                     <input type="text" name="arr_multi_coa[]" placeholder="ID COA">
                 </td>
@@ -1198,51 +1144,6 @@
                         $('#last-row-multi').before(`
                             <tr class="row_multi">
                                 <td>
-                                    <input type="text" name="arr_multi_code[]" placeholder="Kode Jurnal">
-                                </td>
-                                <td>
-                                    <input type="text" name="arr_multi_supplier[]" placeholder="ID Supplier">
-                                </td>
-                                <td>
-                                    <input type="text" name="arr_multi_company[]" placeholder="ID Perusahaan">
-                                </td>
-                                <td>
-                                    <input type="text" name="arr_multi_type[]" placeholder="Tipe Pembayaran">
-                                </td>
-                                <td>
-                                    <input type="text" name="arr_multi_note[]" placeholder="Keterangan">
-                                </td>
-                                <td>
-                                    <input type="text" name="arr_multi_post_date[]" placeholder="Tgl.Post format dd/mm/yy ex:15/12/23">
-                                </td>
-                                <td>
-                                    <input type="text" name="arr_multi_received_date[]" placeholder="Tgl.Terima format dd/mm/yy ex:15/12/23">
-                                </td>
-                                <td>
-                                    <input type="number" name="arr_multi_top[]" placeholder="TOP dalam satuan hari">
-                                </td>
-                                <td>
-                                    <input type="text" name="arr_multi_due_date[]" placeholder="Tgl.Tenggat format dd/mm/yy ex:15/12/23">
-                                </td>
-                                <td>
-                                    <input type="text" name="arr_multi_document_date[]" placeholder="Tgl.Dokumen format dd/mm/yy ex:15/12/23">
-                                </td>
-                                <td>
-                                    <input type="text" name="arr_multi_tax_no[]" placeholder="Nomor Faktur Pajak">
-                                </td>
-                                <td>
-                                    <input type="text" name="arr_multi_tax_cut_no[]" placeholder="Nomor Bukti Potong">
-                                </td>
-                                <td>
-                                    <input type="text" name="arr_multi_cut_date[]" placeholder="Tgl.Bukti Potong format dd/mm/yy ex:15/12/23">
-                                </td>
-                                <td>
-                                    <input type="text" name="arr_multi_spk_no[]" placeholder="Nomor SPK">    
-                                </td>
-                                <td>
-                                    <input type="text" name="arr_multi_invoice_no[]" placeholder="Nomor Invoice Penagihan">
-                                </td>
-                                <td>
                                     <input type="text" name="arr_multi_coa[]" placeholder="ID COA">
                                 </td>
                                 <td>
@@ -1339,7 +1240,7 @@
     }
 
     function countAllMulti(){
-        let total = 0, ppn = 0, pph = 0, grandtotal = 0;
+        let total = 0, ppn = 0, pph = 0, grandtotal = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",",".")), downpayment = parseFloat($('#downpayment').val().replaceAll(".", "").replaceAll(",",".")), balance = 0;
 
         $('input[name^="arr_multi_total"]').each(function(index){
             total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
@@ -1354,10 +1255,25 @@
             grandtotal += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
         });
 
-        $('#totalMulti').text(formatRupiahIni(total.toFixed(2).toString().replace('.',',')));
+        /* $('#totalMulti').text(formatRupiahIni(total.toFixed(2).toString().replace('.',',')));
         $('#ppnMulti').text(formatRupiahIni(ppn.toFixed(2).toString().replace('.',',')));
         $('#pphMulti').text(formatRupiahIni(pph.toFixed(2).toString().replace('.',',')));
-        $('#grandtotalMulti').text(formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',',')));
+        $('#grandtotalMulti').text(formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))); */
+
+        balance = grandtotal - downpayment + rounding;
+
+        $('#total').text(
+            formatRupiahIni(total.toFixed(2).toString().replace('.',','))
+        );
+        $('#tax').text(
+            formatRupiahIni(ppn.toFixed(2).toString().replace('.',','))
+        );
+        $('#wtax').val(
+            formatRupiahIni(pph.toFixed(2).toString().replace('.',','))
+        );
+        $('#balance').text(
+            formatRupiahIni(balance.toFixed(2).toString().replace('.',','))
+        );
     }
 
     function makeTreeOrg(data,link){
@@ -1779,62 +1695,7 @@
 
                                 /* start count */
 
-                                var total = 0, tax = 0, grandtotal = 0, balance = 0, wtax = 0, downpayment = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",","."));
-        
-                                $('input[name^="arr_code"]').each(function(){
-                                    let element = $(this);
-                                    var rowgrandtotal = 0, rowtotal = 0, rowtax = 0, rowwtax = parseFloat($('input[name^="arr_wtax[]"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), percent_tax = parseFloat($('select[name^="arr_percent_tax"][data-id="' + element.data('id') + '"]').val()), percent_wtax = parseFloat($('select[name^="arr_percent_wtax"][data-id="' + element.data('id') + '"]').val()), rowprice = parseFloat($('input[name^="arr_price"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), rowqty = parseFloat($('input[name^="arr_qty"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
-                                    rowtotal = rowprice * rowqty;
-                                    if(percent_tax > 0 && $('#arr_include_tax' + element.data('id')).val() == '1'){
-                                        rowtotal = rowtotal / (1 + (percent_tax / 100));
-                                    }
-                                    rowtax = Math.floor(rowtotal * (percent_tax / 100));
-                                    $('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val(
-                                        (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
-                                    );
-                                    $('#row_total' + element.data('id')).text(
-                                        (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
-                                    );
-                                    $('input[name^="arr_tax"][data-id="' + element.data('id') + '"]').val(
-                                        (rowtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtax).toString().replace('.',','))
-                                    );
-                                    $('#row_tax' + element.data('id')).text(
-                                        (rowtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtax).toString().replace('.',','))
-                                    );
-                                    total += rowtotal;
-                                    tax += rowtax;
-                                    wtax += rowwtax;
-                                    rowgrandtotal = rowtotal + rowtax - rowwtax;
-                                    grandtotal += rowgrandtotal;
-                                    $('input[name^="arr_grandtotal"][data-id="' + element.data('id') + '"]').val(
-                                        (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowgrandtotal).toString().replace('.',','))
-                                    );
-                                    $('#row_grandtotal' + element.data('id')).text(
-                                        (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowgrandtotal).toString().replace('.',','))
-                                    );
-                                });
-
-                                $('input[name^="arr_dp_code"]').each(function(index){
-                                    downpayment += parseFloat($('input[name^="arr_nominal"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
-                                });
-
-                                balance = grandtotal - downpayment + rounding;
-
-                                $('#downpayment').val(
-                                    (downpayment >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(downpayment).toString().replace('.',','))
-                                );
-                                $('#total').text(
-                                    (total >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(total).toString().replace('.',','))
-                                );
-                                $('#tax').text(
-                                    (tax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(tax).toString().replace('.',','))
-                                );
-                                $('#wtax').val(
-                                    (wtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(wtax).toString().replace('.',','))
-                                );
-                                $('#balance').text(
-                                    (balance >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(balance).toString().replace('.',','))
-                                );
+                                countAll();
 
                                 /* end count */
                             },
@@ -1898,7 +1759,7 @@
     }
 
     function getAccountData(val){
-        if(val){
+        if(val && $('#type_detail').val() == '1'){
             $.ajax({
                 url: '{{ Request::url() }}/get_account_data',
                 type: 'POST',
@@ -2130,128 +1991,158 @@
     }
 
     function countAll(){
-        var total = 0, tax = 0, grandtotal = 0, balance = 0, wtax = 0, downpayment = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",","."));
-        
-        $('input[name^="arr_code"]').each(function(){
-            let element = $(this);
-            var rowgrandtotal = 0, rowtotal = 0, rowtax = 0, rowwtax = 0, percent_tax = parseFloat($('select[name^="arr_percent_tax"][data-id="' + element.data('id') + '"]').val()), percent_wtax = parseFloat($('select[name^="arr_percent_wtax"][data-id="' + element.data('id') + '"]').val()), rowprice = parseFloat($('input[name^="arr_price"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), rowqty = parseFloat($('input[name^="arr_qty"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
-            rowtotal = rowprice * rowqty;
-            if(percent_tax > 0 && $('#arr_include_tax' + element.data('id')).val() == '1'){
-                rowtotal = rowtotal / (1 + (percent_tax / 100));
-            }
-            rowtax = Math.floor(rowtotal * (percent_tax / 100));
-            rowwtax = Math.floor(rowtotal * (percent_wtax / 100));
-            $('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val(
-                (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
-            );
-            $('#row_total' + element.data('id')).text(
-                (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
-            );
-            $('input[name^="arr_tax"][data-id="' + element.data('id') + '"]').val(
-                (rowtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtax).toString().replace('.',','))
-            );
-            $('#row_tax' + element.data('id')).text(
-                (rowtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtax).toString().replace('.',','))
-            );
-            $('input[name^="arr_wtax"][data-id="' + element.data('id') + '"]').val(
-                (rowwtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowwtax).toString().replace('.',','))
-            );
-            $('#row_wtax' + element.data('id')).text(
-                (rowwtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowwtax).toString().replace('.',','))
-            );
-            total += rowtotal;
-            tax += rowtax;
-            wtax += rowwtax;
-            rowgrandtotal = rowtotal + rowtax - rowwtax;
-            grandtotal += rowgrandtotal;
-            $('input[name^="arr_grandtotal"][data-id="' + element.data('id') + '"]').val(
-                (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowgrandtotal).toString().replace('.',','))
-            );
-            $('#row_grandtotal' + element.data('id')).text(
-                (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowgrandtotal).toString().replace('.',','))
-            );
-        });
+        if($('#type_detail').val() == '1'){
+            var total = 0, tax = 0, grandtotal = 0, balance = 0, wtax = 0, downpayment = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",","."));
+            
+            $('input[name^="arr_code"]').each(function(){
+                let element = $(this);
+                var rowgrandtotal = 0, rowtotal = 0, rowtax = 0, rowwtax = 0, percent_tax = parseFloat($('select[name^="arr_percent_tax"][data-id="' + element.data('id') + '"]').val()), percent_wtax = parseFloat($('select[name^="arr_percent_wtax"][data-id="' + element.data('id') + '"]').val()), rowprice = parseFloat($('input[name^="arr_price"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), rowqty = parseFloat($('input[name^="arr_qty"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
+                rowtotal = rowprice * rowqty;
+                if(percent_tax > 0 && $('#arr_include_tax' + element.data('id')).val() == '1'){
+                    rowtotal = rowtotal / (1 + (percent_tax / 100));
+                }
+                rowtax = Math.floor(rowtotal * (percent_tax / 100));
+                rowwtax = Math.floor(rowtotal * (percent_wtax / 100));
+                $('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val(
+                    (rowtotal >= 0 ? '' : '-') + formatRupiahIni(rowtotal.toFixed(2).toString().replace('.',','))
+                );
+                $('#row_total' + element.data('id')).text(
+                    (rowtotal >= 0 ? '' : '-') + formatRupiahIni(rowtotal.toFixed(2).toString().replace('.',','))
+                );
+                $('input[name^="arr_tax"][data-id="' + element.data('id') + '"]').val(
+                    (rowtax >= 0 ? '' : '-') + formatRupiahIni(rowtax.toFixed(2).toString().replace('.',','))
+                );
+                $('#row_tax' + element.data('id')).text(
+                    (rowtax >= 0 ? '' : '-') + formatRupiahIni(rowtax.toFixed(2).toString().replace('.',','))
+                );
+                $('input[name^="arr_wtax"][data-id="' + element.data('id') + '"]').val(
+                    (rowwtax >= 0 ? '' : '-') + formatRupiahIni(rowwtax.toFixed(2).toString().replace('.',','))
+                );
+                $('#row_wtax' + element.data('id')).text(
+                    (rowwtax >= 0 ? '' : '-') + formatRupiahIni(rowwtax.toFixed(2).toString().replace('.',','))
+                );
+                total += rowtotal;
+                tax += rowtax;
+                wtax += rowwtax;
+                rowgrandtotal = rowtotal + rowtax - rowwtax;
+                grandtotal += rowgrandtotal;
+                $('input[name^="arr_grandtotal"][data-id="' + element.data('id') + '"]').val(
+                    (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(rowgrandtotal.toFixed(2).toString().replace('.',','))
+                );
+                $('#row_grandtotal' + element.data('id')).text(
+                    (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(rowgrandtotal.toFixed(2).toString().replace('.',','))
+                );
+            });
 
-        $('input[name^="arr_dp_code"]').each(function(index){
-            downpayment += parseFloat($('input[name^="arr_nominal"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
-        });
+            $('input[name^="arr_dp_code"]').each(function(index){
+                downpayment += parseFloat($('input[name^="arr_nominal"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+            });
 
-        balance = grandtotal - downpayment + rounding;
+            balance = grandtotal - downpayment + rounding;
 
-        $('#downpayment').val(
-            (downpayment >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(downpayment).toString().replace('.',','))
-        );
-        $('#total').text(
-            (total >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(total).toString().replace('.',','))
-        );
-        $('#tax').text(
-            (tax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(tax).toString().replace('.',','))
-        );
-        $('#wtax').val(
-            (wtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(wtax).toString().replace('.',','))
-        );
-        $('#balance').text(
-            (balance >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(balance).toString().replace('.',','))
-        );
+            $('#downpayment').val(
+                (downpayment >= 0 ? '' : '-') + formatRupiahIni(downpayment.toFixed(2).replace('.',','))
+            );
+            $('#total').text(
+                (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
+            );
+            $('#tax').text(
+                (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(2).toString().replace('.',','))
+            );
+            $('#wtax').val(
+                (wtax >= 0 ? '' : '-') + formatRupiahIni(wtax.toFixed(2).toString().replace('.',','))
+            );
+            $('#balance').text(
+                (balance >= 0 ? '' : '-') + formatRupiahIni(balance.toFixed(2).toString().replace('.',','))
+            );
+        }else if($('#type_detail').val() == '2'){
+            countAllMulti();
+        }
     }
 
-    function countGrandtotal(val){
-        let total = parseFloat($('#total').text().replaceAll(".", "").replaceAll(",",".")), tax = parseFloat($('#tax').text().replaceAll(".", "").replaceAll(",",".")), wtax = parseFloat(val.replaceAll(".", "").replaceAll(",",".")), downpayment = 0, balance = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",","."));
-        
-        let grandtotal = total + tax - wtax;
+    function countGrandtotal(){
+        if($('#type_detail').val() == '1'){
+            let total = parseFloat($('#total').text().replaceAll(".", "").replaceAll(",",".")), tax = parseFloat($('#tax').text().replaceAll(".", "").replaceAll(",",".")), wtax = parseFloat($('#wtax').val().replaceAll(".", "").replaceAll(",",".")), downpayment = 0, balance = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",","."));
+            
+            let grandtotal = total + tax - wtax;
 
-        $('input[name^="arr_dp_code"]').each(function(index){
-            downpayment += parseFloat($('input[name^="arr_nominal"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
-        });
+            $('input[name^="arr_dp_code"]').each(function(index){
+                downpayment += parseFloat($('input[name^="arr_nominal"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+            });
 
-        balance = grandtotal - downpayment + rounding;
+            balance = grandtotal - downpayment + rounding;
 
-        $('#balance').text(
-            (balance >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(balance).toString().replace('.',','))
-        );
+            $('#balance').text(
+                (balance >= 0 ? '' : '-') + formatRupiahIni(balance.toFixed(2).toString().replace('.',','))
+            );
 
-        $('input[name^="arr_wtax[]"]').each(function(index){
-            let bobot = parseFloat($('input[name^="arr_total[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) / total;
-            let rowwtax = bobot * wtax;
-            $(this).val(
-                (rowwtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowwtax).toString().replace('.',','))
-            );
-            $('#row_wtax' + $(this).data('id')).text(
-                (rowwtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowwtax).toString().replace('.',','))
-            );
-        });
+            $('input[name^="arr_wtax[]"]').each(function(index){
+                let bobot = parseFloat($('input[name^="arr_total[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) / total;
+                let rowwtax = bobot * wtax;
+                $(this).val(
+                    (rowwtax >= 0 ? '' : '-') + formatRupiahIni(rowwtax.toFixed(2).toString().replace('.',','))
+                );
+                $('#row_wtax' + $(this).data('id')).text(
+                    (rowwtax >= 0 ? '' : '-') + formatRupiahIni(rowwtax.toFixed(2).toString().replace('.',','))
+                );
+            });
 
-        $('input[name^="arr_code"]').each(function(){
-            let element = $(this);
-            var rowgrandtotal = 0, rowtotal = 0, rowtax = 0, rowwtax = parseFloat($('input[name^="arr_wtax[]"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), percent_tax = parseFloat($('select[name^="arr_percent_tax"][data-id="' + element.data('id') + '"]').val()), percent_wtax = parseFloat($('select[name^="arr_percent_wtax"][data-id="' + element.data('id') + '"]').val()), rowprice = parseFloat($('input[name^="arr_price"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), rowqty = parseFloat($('input[name^="arr_qty"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
-            rowtotal = rowprice * rowqty;
-            if(percent_tax > 0 && $('#arr_include_tax' + element.data('id')).val() == '1'){
-                rowtotal = rowtotal / (1 + (percent_tax / 100));
-            }
-            rowtax = Math.floor(rowtotal * (percent_tax / 100));
-            $('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val(
-                (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
+            $('input[name^="arr_code"]').each(function(){
+                let element = $(this);
+                var rowgrandtotal = 0, rowtotal = 0, rowtax = 0, rowwtax = parseFloat($('input[name^="arr_wtax[]"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), percent_tax = parseFloat($('select[name^="arr_percent_tax"][data-id="' + element.data('id') + '"]').val()), percent_wtax = parseFloat($('select[name^="arr_percent_wtax"][data-id="' + element.data('id') + '"]').val()), rowprice = parseFloat($('input[name^="arr_price"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), rowqty = parseFloat($('input[name^="arr_qty"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
+                rowtotal = rowprice * rowqty;
+                if(percent_tax > 0 && $('#arr_include_tax' + element.data('id')).val() == '1'){
+                    rowtotal = rowtotal / (1 + (percent_tax / 100));
+                }
+                rowtax = Math.floor(rowtotal * (percent_tax / 100));
+                $('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val(
+                    (rowtotal >= 0 ? '' : '-') + formatRupiahIni(rowtotal.toFixed(2).toString().replace('.',','))
+                );
+                $('#row_total' + element.data('id')).text(
+                    (rowtotal >= 0 ? '' : '-') + formatRupiahIni(rowtotal.toFixed(2).toString().replace('.',','))
+                );
+                $('input[name^="arr_tax"][data-id="' + element.data('id') + '"]').val(
+                    (rowtax >= 0 ? '' : '-') + formatRupiahIni(rowtax.toFixed(2).toString().replace('.',','))
+                );
+                $('#row_tax' + element.data('id')).text(
+                    (rowtax >= 0 ? '' : '-') + formatRupiahIni(rowtax.toFixed(2).toString().replace('.',','))
+                );
+                $('input[name^="arr_wtax"][data-id="' + element.data('id') + '"]').val(
+                    (rowwtax >= 0 ? '' : '-') + formatRupiahIni(rowwtax.toFixed(2).toString().replace('.',','))
+                );
+                rowgrandtotal = rowtotal + rowtax - rowwtax;
+                $('input[name^="arr_grandtotal"][data-id="' + element.data('id') + '"]').val(
+                    (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(rowgrandtotal.toFixed(2).toString().replace('.',','))
+                );
+                $('#row_grandtotal' + element.data('id')).text(
+                    (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(rowgrandtotal.toFixed(2).toString().replace('.',','))
+                );
+            });
+        }else if($('#type_detail').val() == '2'){
+            let total = 0, ppn = 0, pph = parseFloat($('#wtax').val().replaceAll(".", "").replaceAll(",",".")), grandtotal = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",",".")), downpayment = parseFloat($('#downpayment').val().replaceAll(".", "").replaceAll(",",".")), balance = 0;
+
+            $('input[name^="arr_multi_total"]').each(function(index){
+                total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+            });
+            $('input[name^="arr_multi_ppn"]').each(function(index){
+                ppn += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+            });
+            $('input[name^="arr_multi_grandtotal"]').each(function(index){
+                grandtotal += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+            });
+
+            balance = total + ppn - pph - downpayment + rounding;
+
+            $('#total').text(
+                formatRupiahIni(total.toFixed(2).toString().replace('.',','))
             );
-            $('#row_total' + element.data('id')).text(
-                (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
+            $('#tax').text(
+                formatRupiahIni(ppn.toFixed(2).toString().replace('.',','))
             );
-            $('input[name^="arr_tax"][data-id="' + element.data('id') + '"]').val(
-                (rowtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtax).toString().replace('.',','))
+            $('#balance').text(
+                formatRupiahIni(balance.toFixed(2).toString().replace('.',','))
             );
-            $('#row_tax' + element.data('id')).text(
-                (rowtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtax).toString().replace('.',','))
-            );
-            $('input[name^="arr_wtax"][data-id="' + element.data('id') + '"]').val(
-                (rowwtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowwtax).toString().replace('.',','))
-            );
-            rowgrandtotal = rowtotal + rowtax - rowwtax;
-            $('input[name^="arr_grandtotal"][data-id="' + element.data('id') + '"]').val(
-                (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowgrandtotal).toString().replace('.',','))
-            );
-            $('#row_grandtotal' + element.data('id')).text(
-                (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowgrandtotal).toString().replace('.',','))
-            );
-        });
+        }
     }
 
     function loadDataTable() {
@@ -2404,61 +2295,101 @@
             if (willDelete) {
                 var formData = new FormData($('#form_data')[0]), passedQty = true, passed = true;
 
-                formData.delete("arr_code[]");
-                formData.delete("arr_type[]");
-                formData.delete("arr_total[]");
-                formData.delete("arr_tax[]");
-                formData.delete("arr_wtax[]");
-                formData.delete("arr_grandtotal[]");
-                formData.delete("arr_dp_code[]");
-                formData.delete("arr_nominal[]");
-                formData.delete("arr_note[]");
-                formData.delete("arr_note2[]");
-                formData.delete("arr_place[]");
-                formData.delete("arr_line[]");
-                formData.delete("arr_machine[]");
-                formData.delete("arr_department[]");
-                formData.delete("arr_warehouse[]");
+                if($('#type_detail').val() == '1'){
+                    formData.delete("arr_code[]");
+                    formData.delete("arr_type[]");
+                    formData.delete("arr_total[]");
+                    formData.delete("arr_tax[]");
+                    formData.delete("arr_wtax[]");
+                    formData.delete("arr_grandtotal[]");
+                    formData.delete("arr_dp_code[]");
+                    formData.delete("arr_nominal[]");
+                    formData.delete("arr_note[]");
+                    formData.delete("arr_note2[]");
+                    formData.delete("arr_place[]");
+                    formData.delete("arr_line[]");
+                    formData.delete("arr_machine[]");
+                    formData.delete("arr_department[]");
+                    formData.delete("arr_warehouse[]");
 
-                $('select[name^="arr_percent_tax"]').each(function(){
-                    formData.append('arr_tax_id[]',($(this).find(':selected').data('id') ? $(this).find(':selected').data('id') : ''));
-                });
+                    $('select[name^="arr_percent_tax"]').each(function(){
+                        formData.append('arr_tax_id[]',($(this).find(':selected').data('id') ? $(this).find(':selected').data('id') : ''));
+                    });
 
-                $('select[name^="arr_percent_wtax"]').each(function(){
-                    formData.append('arr_wtax_id[]',($(this).find(':selected').data('id') ? $(this).find(':selected').data('id') : ''));
-                });
+                    $('select[name^="arr_percent_wtax"]').each(function(){
+                        formData.append('arr_wtax_id[]',($(this).find(':selected').data('id') ? $(this).find(':selected').data('id') : ''));
+                    });
 
-                $('input[name^="arr_code"]').each(function(){
-                    passed = true;                    
-                    if($('input[name^="arr_type"][data-id="' + $(this).data('id') + '"]').val() == 'coas'){
-                        if($('#arr_coa' + $(this).data('id')).val()){
-                            formData.append('arr_code[]',$('#arr_coa' + $(this).data('id')).val());
+                    $('input[name^="arr_code"]').each(function(){
+                        passed = true;                    
+                        if($('input[name^="arr_type"][data-id="' + $(this).data('id') + '"]').val() == 'coas'){
+                            if($('#arr_coa' + $(this).data('id')).val()){
+                                formData.append('arr_code[]',$('#arr_coa' + $(this).data('id')).val());
+                            }else{
+                                passed = false;
+                            }
                         }else{
-                            passed = false;
+                            formData.append('arr_code[]',$(this).val());
                         }
-                    }else{
-                        formData.append('arr_code[]',$(this).val());
-                    }
-                    if(passed == true){
-                        formData.append('arr_type[]',$('input[name^="arr_type"][data-id="' + $(this).data('id') + '"]').val());
-                        formData.append('arr_total[]',$('input[name^="arr_total"][data-id="' + $(this).data('id') + '"]').val());
-                        formData.append('arr_tax[]',$('input[name^="arr_tax"][data-id="' + $(this).data('id') + '"]').val());
-                        formData.append('arr_wtax[]',$('input[name^="arr_wtax"][data-id="' + $(this).data('id') + '"]').val());
-                        formData.append('arr_grandtotal[]',$('input[name^="arr_grandtotal"][data-id="' + $(this).data('id') + '"]').val());
-                        formData.append('arr_note[]',$('input[name^="arr_note"][data-id="' + $(this).data('id') + '"]').val());
-                        formData.append('arr_note2[]',$('input[name^="arr_note2"][data-id="' + $(this).data('id') + '"]').val());
-                        formData.append('arr_place[]',$('#arr_place' + $(this).data('id')).val());
-                        formData.append('arr_line[]',($('#arr_line' + $(this).data('id')).val() ? $('#arr_line' + $(this).data('id')).val() : ''));
-                        formData.append('arr_machine[]',($('#arr_machine' + $(this).data('id')).val() ? $('#arr_machine' + $(this).data('id')).val() : ''));
-                        formData.append('arr_department[]',($('#arr_department' + $(this).data('id')).val() ? $('#arr_department' + $(this).data('id')).val() : ''));
-                        formData.append('arr_warehouse[]',($('#arr_warehouse' + $(this).data('id')).val() ? $('#arr_warehouse' + $(this).data('id')).val() : ''));
-                    }
-                    let qtyreal = parseFloat($('input[name^="arr_temp_qty"][data-id="' + $(this).data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), qtynow = parseFloat($('input[name^="arr_qty"][data-id="' + $(this).data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
+                        if(passed == true){
+                            formData.append('arr_type[]',$('input[name^="arr_type"][data-id="' + $(this).data('id') + '"]').val());
+                            formData.append('arr_total[]',$('input[name^="arr_total"][data-id="' + $(this).data('id') + '"]').val());
+                            formData.append('arr_tax[]',$('input[name^="arr_tax"][data-id="' + $(this).data('id') + '"]').val());
+                            formData.append('arr_wtax[]',$('input[name^="arr_wtax"][data-id="' + $(this).data('id') + '"]').val());
+                            formData.append('arr_grandtotal[]',$('input[name^="arr_grandtotal"][data-id="' + $(this).data('id') + '"]').val());
+                            formData.append('arr_note[]',$('input[name^="arr_note"][data-id="' + $(this).data('id') + '"]').val());
+                            formData.append('arr_note2[]',$('input[name^="arr_note2"][data-id="' + $(this).data('id') + '"]').val());
+                            formData.append('arr_place[]',$('#arr_place' + $(this).data('id')).val());
+                            formData.append('arr_line[]',($('#arr_line' + $(this).data('id')).val() ? $('#arr_line' + $(this).data('id')).val() : ''));
+                            formData.append('arr_machine[]',($('#arr_machine' + $(this).data('id')).val() ? $('#arr_machine' + $(this).data('id')).val() : ''));
+                            formData.append('arr_department[]',($('#arr_department' + $(this).data('id')).val() ? $('#arr_department' + $(this).data('id')).val() : ''));
+                            formData.append('arr_warehouse[]',($('#arr_warehouse' + $(this).data('id')).val() ? $('#arr_warehouse' + $(this).data('id')).val() : ''));
+                        }
+                        let qtyreal = parseFloat($('input[name^="arr_temp_qty"][data-id="' + $(this).data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), qtynow = parseFloat($('input[name^="arr_qty"][data-id="' + $(this).data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
 
-                    if(qtynow > qtyreal){
-                        passedQty = false;
-                    }
-                });
+                        if(qtynow > qtyreal){
+                            passedQty = false;
+                        }
+                    });
+                }else if($('#type_detail').val() == '2'){
+                    formData.delete("arr_multi_coa[]");
+                    formData.delete("arr_multi_qty[]");
+                    formData.delete("arr_multi_price[]");
+                    formData.delete("arr_multi_total[]");
+                    formData.delete("arr_multi_tax_id[]");
+                    formData.delete("arr_multi_ppn[]");
+                    formData.delete("arr_multi_wtax_id[]");
+                    formData.delete("arr_multi_pph[]");
+                    formData.delete("arr_multi_grandtotal[]");
+                    formData.delete("arr_multi_note_1[]");
+                    formData.delete("arr_multi_note_2[]");
+                    formData.delete("arr_multi_place[]");
+                    formData.delete("arr_multi_line[]");
+                    formData.delete("arr_multi_machine[]");
+                    formData.delete("arr_multi_department[]");
+                    formData.delete("arr_multi_warehouse[]");
+
+                    $('input[name^="arr_multi_coa[]"]').each(function(index){
+                        if($(this).val()){
+                            formData.append('arr_multi_coa[]',($('input[name^="arr_multi_coa"]').eq(index).val() ? $('input[name^="arr_multi_coa"]').eq(index).val() : ''));
+                            formData.append('arr_multi_qty[]',($('input[name^="arr_multi_qty"]').eq(index).val() ? $('input[name^="arr_multi_qty"]').eq(index).val() : ''));
+                            formData.append('arr_multi_price[]',($('input[name^="arr_multi_price"]').eq(index).val() ? $('input[name^="arr_multi_price"]').eq(index).val() : ''));
+                            formData.append('arr_multi_total[]',($('input[name^="arr_multi_total"]').eq(index).val() ? $('input[name^="arr_multi_total"]').eq(index).val() : ''));
+                            formData.append('arr_multi_tax_id[]',($('input[name^="arr_multi_tax_id"]').eq(index).val() ? $('input[name^="arr_multi_tax_id"]').eq(index).val() : ''));
+                            formData.append('arr_multi_wtax_id[]',($('input[name^="arr_multi_wtax_id"]').eq(index).val() ? $('input[name^="arr_multi_wtax_id"]').eq(index).val() : ''));
+                            formData.append('arr_multi_ppn[]',($('input[name^="arr_multi_ppn"]').eq(index).val() ? $('input[name^="arr_multi_ppn"]').eq(index).val() : ''));
+                            formData.append('arr_multi_pph[]',($('input[name^="arr_multi_pph"]').eq(index).val() ? $('input[name^="arr_multi_pph"]').eq(index).val() : ''));
+                            formData.append('arr_multi_grandtotal[]',($('input[name^="arr_multi_grandtotal"]').eq(index).val() ? $('input[name^="arr_multi_grandtotal"]').eq(index).val() : ''));
+                            formData.append('arr_multi_note_1[]',($('input[name^="arr_multi_note_1"]').eq(index).val() ? $('input[name^="arr_multi_note_1"]').eq(index).val() : ''));
+                            formData.append('arr_multi_note_2[]',($('input[name^="arr_multi_note_2"]').eq(index).val() ? $('input[name^="arr_multi_note_2"]').eq(index).val() : ''));
+                            formData.append('arr_multi_place[]',($('input[name^="arr_multi_place"]').eq(index).val() ? $('input[name^="arr_multi_place"]').eq(index).val() : ''));
+                            formData.append('arr_multi_line[]',($('input[name^="arr_multi_line"]').eq(index).val() ? $('input[name^="arr_multi_line"]').eq(index).val() : ''));
+                            formData.append('arr_multi_machine[]',($('input[name^="arr_multi_machine"]').eq(index).val() ? $('input[name^="arr_multi_machine"]').eq(index).val() : ''));
+                            formData.append('arr_multi_department[]',($('input[name^="arr_multi_department"]').eq(index).val() ? $('input[name^="arr_multi_department"]').eq(index).val() : ''));
+                            formData.append('arr_multi_warehouse[]',($('input[name^="arr_multi_warehouse"]').eq(index).val() ? $('input[name^="arr_multi_warehouse"]').eq(index).val() : ''));
+                        }
+                    });
+                }
 
                 $('input[name^="arr_dp_code"]').each(function(index){
                     formData.append('arr_dp_code[]',$(this).val());

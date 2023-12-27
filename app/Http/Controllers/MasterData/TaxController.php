@@ -120,7 +120,7 @@ class TaxController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code' 				=> $request->temp ? ['required', Rule::unique('taxes', 'code')->ignore($request->temp)] : 'required|unique:taxes,code',
+            'code' 				=> $request->temp ? ['required', Rule::unique('taxes', 'code')->ignore($request->temp),'alpha_num:ascii'] : 'required|unique:taxes,code|alpha_num:ascii',
             'name'              => 'required',
             'coa_purchase_id'   => $request->type == '-' || $request->type == '+' ? 'required' : '',
             'coa_sale_id'       => $request->type == '+' ? 'required' : '',
@@ -129,6 +129,7 @@ class TaxController extends Controller
         ], [
             'code.required' 	        => 'Kode tidak boleh kosong.',
             'code.unique'               => 'Kode telah terpakai.',
+            'code.alpha_num'            => 'Format kode salah. Contoh format kode adalah 123XXX.',
             'name.required'             => 'Nama tidak boleh kosong.',
             'coa_purchase_id.required'  => 'Coa beli tidak boleh kosong.',
             'coa_sale_id.required'      => 'Coa jual tidak boleh kosong.',

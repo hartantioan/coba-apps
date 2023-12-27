@@ -47,8 +47,8 @@
     <script src="{{ url('app-assets/js/custom/websocket-printer.js') }}"></script>
     <script src="{{ url('app-assets/vendors/introjs/intro.js?v=8') }}"></script>
     <link href="{{ url('app-assets/vendors/introjs/intro.css') }}" rel="stylesheet">
-    <link href="{{ url('app-assets/css/custom/jquery-ui.css') }}" rel="stylesheet">
-    <script src="{{ url('app-assets/js/custom/jquery-ui.js') }}"></script>
+    <link href="{{ url('app-assets/vendors/jquery-ui/jquery-ui.css') }}" rel="stylesheet">
+    <script src="{{ url('app-assets/vendors/jquery-ui/jquery-ui.js') }}"></script>
 </head>
 <!-- END: Head-->
 

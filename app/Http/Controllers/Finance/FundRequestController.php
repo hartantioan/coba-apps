@@ -16,6 +16,10 @@ use App\Models\PurchaseInvoice;
 use App\Models\PurchaseMemo;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseRequest;
+use App\Models\GoodScale;
+use App\Models\GoodIssue;
+use App\Models\InventoryTransferOut;
+use App\Models\MaterialRequest;
 use App\Models\Tax;
 use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
@@ -1324,16 +1328,32 @@ class FundRequestController extends Controller
             ];
         $data_go_chart[]=$fr;
         
+        $data_id_good_scale = [];
+        $data_id_good_issue = [];
+        $data_id_mr = [];
         $data_id_dp=[];
         $data_id_po = [];
         $data_id_gr = [];
         $data_id_invoice=[];
         $data_id_pyrs=[];
         $data_id_lc=[];
+        $data_id_inventory_transfer_out=[];
         $data_id_greturns=[];
         $data_id_pr=[];
         $data_id_memo=[];
         $data_id_pyrcs=[];
+
+        $data_id_mo=[];
+        $data_id_mo_delivery = [];
+        $data_id_mo_dp=[];
+        $data_id_hand_over_invoice = [];
+        $data_id_mo_return=[];
+        $data_id_mo_invoice=[];
+        $data_id_mo_memo=[];
+        $data_id_mo_delivery_process=[];
+        $data_id_mo_receipt = [];
+        $data_incoming_payment=[];
+        $data_id_hand_over_receipt=[];
 
         if($query) {
 
@@ -1445,7 +1465,7 @@ class FundRequestController extends Controller
                                     'properties'=> [
                                         ['name'=> "Tanggal :". $goodReturnPODetail->goodReturnPO->post_date],
                                     ],
-                                    'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt( $goodReturnPODetail->goodReturnPO->code),
+                                    'url'=>request()->root()."/admin/inventory/good_return_po?code=".CustomHelper::encrypt( $goodReturnPODetail->goodReturnPO->code),
                                 ];
                                                     
                                 $data_go_chart[] = $good_return_tempura;
@@ -1513,11 +1533,57 @@ class FundRequestController extends Controller
                             }
                         }
 
+                        if($good_receipt_detail->goodScaleDetail()->exists()){
+                            $data_gscale = [
+                                    'properties'=> [
+                                        ['name'=> "Tanggal: ".$good_receipt_detail->goodScaleDetail->goodScale->post_date],
+                                        ['name'=> "Vendor  : ".$good_receipt_detail->goodScaleDetail->goodScale->supplier->name],
+                                        ['name'=> "Nominal : Rp.:".number_format($good_receipt_detail->goodScaleDetail->goodScale->grandtotal,2,',','.')]
+                                    ],
+                                    'key'=>$good_receipt_detail->goodScaleDetail->goodScale->code,
+                                    'name'=>$good_receipt_detail->goodScaleDetail->goodScale->code,
+                                    'url'=>request()->root()."/admin/inventory/good_scale?code=".CustomHelper::encrypt($good_receipt_detail->goodScaleDetail->goodScale->code),
+                                ];
+                                $data_go_chart[]=$data_gscale;
+                                $data_link[]=[
+                                    'from'=>$good_receipt_detail->goodScaleDetail->goodScale->code,
+                                    'to'=>$query_gr->code,
+                                    'string_link'=>$good_receipt_detail->goodScaleDetail->goodScale->code.$query_gr->code
+                                ];
+                                $data_id_good_scale[]= $good_receipt_detail->goodScaleDetail->goodScale->id; 
+                            
+                        }
+
                     }
                 }
 
-
-
+                foreach($data_id_good_scale as $gs_id){
+                    $query_gs = GoodScale::where('id',$gs_id)->first();
+                    
+                    foreach($query_gs->goodScaleDetail as $data_gs){
+                        if($data_gs->goodReceiptDetail->exists()){
+                            $gr = [
+                                'properties'=> [
+                                    ['name'=> "Tanggal: ".$data_gs->goodReceiptDetail->goodReceipt->post_date],
+                                    ['name'=> "Vendor  : ".$data_gs->goodReceiptDetail->goodReceipt->supplier->name],
+                                    ['name'=> "Nominal : Rp.:".number_format($data_gs->goodReceiptDetail->goodReceipt->grandtotal,2,',','.')]
+                                ],
+                                'key'=>$data_gs->goodReceiptDetail->goodReceipt->code,
+                                'name'=>$data_gs->goodReceiptDetail->goodReceipt->code,
+                                'url'=>request()->root()."/admin/inventory/good_scale?code=".CustomHelper::encrypt($data_gs->goodReceiptDetail->goodReceipt->code),
+                            ];
+    
+                            $data_go_chart[]=$gr;
+                            $data_link[]=[
+                                'from'=>$data_gs->goodReceiptDetail->goodReceipt->code,
+                                'to'=>$query_gs->code,
+                                'string_link'=>$data_gs->goodReceiptDetail->goodReceipt->code.$query_gs->code
+                            ];
+                            $data_id_gr[]= $data_gs->goodReceiptDetail->goodReceipt->id; 
+    
+                        }
+                    }
+                }
 
                 //mencari goodreturn foreign
                 foreach($data_id_greturns as $good_return_id){
@@ -1530,7 +1596,7 @@ class FundRequestController extends Controller
                             'properties'=> [
                                 ['name'=> "Tanggal :".$good_return_detail->goodReceiptDetail->goodReceipt->post_date],
                             ],
-                            'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($good_return_detail->goodReceiptDetail->goodReceipt->code),
+                            'url'=>request()->root()."/admin/inventory/good_return_po?code=".CustomHelper::encrypt($good_return_detail->goodReceiptDetail->goodReceipt->code),
                         ];
                         
                         $data_good_receipt[]=$data_good_receipt;
@@ -1625,24 +1691,24 @@ class FundRequestController extends Controller
                             } 
                         }
                         /* melihat apakah ada hubungan lc */
-                        if($row->landedCostDetail()){
+                        if($row->landedCost()){
                             $data_lc=[
                                 'properties'=> [
-                                    ['name'=> "Tanggal :".$row->lookable->landedCost->post_date],
-                                    ['name'=> "Nominal : Rp.".number_format($row->lookable->landedCost->grandtotal,2,',','.')]
+                                    ['name'=> "Tanggal :".$row->lookable->post_date],
+                                    ['name'=> "Nominal : Rp.".number_format($row->lookable->grandtotal,2,',','.')]
                                 ],
-                                "key" => $row->lookable->landedCost->code,
-                                "name" => $row->lookable->landedCost->code,
-                                'url'=>request()->root()."/admin/inventory/landed_cost?code=".CustomHelper::encrypt($row->lookable->landedCost->code),
+                                "key" => $row->lookable->code,
+                                "name" => $row->lookable->code,
+                                'url'=>request()->root()."/admin/inventory/landed_cost?code=".CustomHelper::encrypt($row->lookable->code),
                             ];
 
                             $data_go_chart[]=$data_lc;
                             $data_link[]=[
                                 'from'=>$query_invoice->code,
-                                'to'=>$row->lookable->landedCost->code,
-                                'string_link'=>$query_invoice->code.$row->lookable->landedCost->code,
+                                'to'=>$row->lookable->code,
+                                'string_link'=>$query_invoice->code.$row->lookable->code,
                             ];
-                            $data_id_lc[] = $row->lookable->landedCost->id;
+                            $data_id_lc[] = $row->lookable->id;
                             
                         }
 
@@ -1954,7 +2020,7 @@ class FundRequestController extends Controller
                                 ],
                                 "key" => $row_pyr_detail->lookable->code,
                                 "name" => $row_pyr_detail->lookable->code,
-                                'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
+                                'url'=>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
                             ];
                           
                                    
@@ -2002,6 +2068,7 @@ class FundRequestController extends Controller
                     }
                     
                 }
+
                 foreach($data_id_pyrcs as $payment_request_cross_id){
                     $query_pyrc = PaymentRequestCross::find($payment_request_cross_id);
                     if($query_pyrc->paymentRequest->exists()){
@@ -2011,7 +2078,7 @@ class FundRequestController extends Controller
                             'properties'=> [
                                  ['name'=> "Tanggal: ".date('d/m/y',strtotime($query_pyrc->paymentRequest->post_date))],
                               ],
-                            'url'   =>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($query_pyrc->paymentRequest->code),
+                            'url'   =>request()->root()."/admin/finance/payment_request_cross?code=".CustomHelper::encrypt($query_pyrc->paymentRequest->code),
                             "title" =>$query_pyrc->paymentRequest->code,
                         ];
                         $data_go_chart[]=$data_pyr_tempura;
@@ -2034,7 +2101,7 @@ class FundRequestController extends Controller
                             ],
                             "key" => $query_pyrc->lookable->code,
                             "name" => $query_pyrc->lookable->code,
-                            'url'=>request()->root()."/admin/purchase/payment_request_cross?code=".CustomHelper::encrypt($query_pyrc->lookable->code),  
+                            'url'=>request()->root()."/admin/finance/outgoing_payment?code=".CustomHelper::encrypt($query_pyrc->lookable->code),  
                         ];
     
                         $data_go_chart[]=$outgoing_tempura;
@@ -2045,6 +2112,7 @@ class FundRequestController extends Controller
                         ];
                     }
                 }
+                
                 foreach($data_id_dp as $downpayment_id){
                     $query_dp = PurchaseDownPayment::find($downpayment_id);
                     foreach($query_dp->purchaseDownPaymentDetail as $row){
@@ -2232,6 +2300,54 @@ class FundRequestController extends Controller
                     }
                 }
                 
+                foreach($data_id_good_issue as $good_issue_id){
+                    $query_good_issue = GoodIssue::find($good_issue_id);
+                    foreach($query_good_issue->goodIssueDetail as $data_detail_good_issue){
+                        if($data_detail_good_issue->materialRequestDetail()){
+                            $material_request_tempura = [
+                                "key" => $data_detail_good_issue->materialRequestDetail->materialRequest->code,
+                                "name" => $data_detail_good_issue->materialRequestDetail->materialRequest->code,
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$data_detail_good_issue->materialRequestDetail->materialRequest->post_date],
+                                    ['name'=> "Nominal : Rp.:".number_format($data_detail_good_issue->materialRequestDetail->materialRequest->grandtotal,2,',','.')],
+                                 ],
+                                'url'=>request()->root()."/admin/inventory/material_request?code=".CustomHelper::encrypt($data_detail_good_issue->materialRequestDetail->materialRequest->code),
+                            ];
+
+                            $data_go_chart[]=$material_request_tempura;
+                            $data_link[]=[
+                                'from'=>$data_detail_good_issue->materialRequestDetail->materialRequest->code,
+                                'to'=>$query_good_issue->code,
+                                'string_link'=>$data_detail_good_issue->materialRequestDetail->materialRequest->code.$query_good_issue->code,
+                            ];
+                            $data_id_mr[] = $data_detail_good_issue->materialRequestDetail->materialRequest->id;
+                        }
+
+                        if($data_detail_good_issue->purchaseOrderDetail->exists()){
+                            foreach($data_detail_good_issue->purchaseOrderDetail as $data_purchase_order_detail){
+                                $po_tempura = [
+                                    "key" => $data_purchase_order_detail->purchaseOrder->code,
+                                    "name" => $data_purchase_order_detail->purchaseOrder->code,
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :".$data_purchase_order_detail->purchaseOrder->post_date],
+                                        ['name'=> "Nominal : Rp.:".number_format($data_purchase_order_detail->purchaseOrder->grandtotal,2,',','.')],
+                                     ],
+                                    'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($data_purchase_order_detail->purchaseOrder->code),
+                                ];
+    
+                                $data_go_chart[]=$material_request_tempura;
+                                $data_link[]=[
+                                    'from'=>$query_good_issue->code,
+                                    'to'=>$data_purchase_order_detail->purchaseOrder->code,
+                                    'string_link'=>$query_good_issue->code.$data_purchase_order_detail->purchaseOrder->code,
+                                ];
+                                $data_id_po[] = $data_purchase_order_detail->purchaseOrder->id;
+                            }
+                        }
+                        
+                    }
+                }
+
                 foreach($data_id_lc as $landed_cost_id){
                     $query= LandedCost::find($landed_cost_id);
                     foreach($query->landedCostDetail as $lc_detail ){
@@ -2277,8 +2393,86 @@ class FundRequestController extends Controller
                                 'to'=>$lc_detail->lookable->landedCost->code,
                                 'string_link'=>$query->code.$lc_detail->lookable->landedCost->code,
                             ];
-                            $data_id_lc[] = $lc_detail->lookable->landedCost->id;
+                            if(!in_array($lc_detail->lookable->landedCost->id,$data_id_lc)){
+                                $data_id_lc[] = $lc_detail->lookable->landedCost->id;
+                                $added = true;
+                            }
+                           
                                               
+                        }//??
+                        if($lc_detail->inventoryTransferOutDetail()){
+                            $inventory_transfer_out = [
+                                "key" => $lc_detail->lookable->inventoryTransferOut->code,
+                                "name" => $lc_detail->lookable->inventoryTransferOut->code,
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$lc_detail->lookable->inventoryTransferOut->post_date],
+                                    ['name'=> "Nominal : Rp.:".number_format($lc_detail->lookable->inventoryTransferOut->grandtotal,2,',','.')],
+                                 ],
+                                'url'=>request()->root()."/admin/inventory/inventory_transfer_out?code=".CustomHelper::encrypt($lc_detail->lookable->inventoryTransferOut->code),
+                            ];
+
+                            $data_go_chart[]=$inventory_transfer_out;
+                            $data_link[]=[
+                                'from'=>$query->code,
+                                'to'=>$lc_detail->lookable->inventoryTransferOut->code,
+                                'string_link'=>$query->code.$lc_detail->lookable->inventoryTransferOut->code,
+                            ];
+                            $data_id_inventory_transfer_out[] = $lc_detail->lookable->inventoryTransferOut->id;
+                                              
+                        }
+                    } // inventory transferout detail apakah perlu
+                    if($query->purchaseInvoiceDetail()->exists()){
+                        foreach($query->purchaseInvoiceDetail as $row_invoice_detail){
+                            $data_invoices_tempura = [
+                                'key'   => $row_invoice_detail->purchaseInvoice->code,
+                                "name"  => $row_invoice_detail->purchaseInvoice->code,
+                            
+                                'properties'=> [
+                                    ['name'=> "Tanggal: ".$row_invoice_detail->purchaseInvoice->post_date],
+                                
+                                ],
+                                'url'   =>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($row_invoice_detail->purchaseInvoice->code),
+                            ];
+                            $data_go_chart[]=$data_invoices_tempura;
+                            $data_link[]=[
+                                'from'  =>  $query->code,
+                                'to'    =>  $row_invoice_detail->purchaseInvoice->code,
+                                'string_link'=>$query->code.$row_invoice_detail->purchaseInvoice->code
+                            ];
+                            if(!in_array($row_invoice_detail->purchaseInvoice->id,$data_id_invoice)){
+                                $data_id_invoice[]=$row_invoice_detail->purchaseInvoice->id;
+                                $added = true;
+                            }
+                        }
+                    }
+                }
+
+                foreach($data_id_inventory_transfer_out as $id_transfer_out){
+                    $query_inventory_transfer_out = InventoryTransferOut::find($id_transfer_out);
+                    foreach($query_inventory_transfer_out->inventoryTransferOutDetail as $row_transfer_out_detail){
+                        if($row_transfer_out_detail->landedCostDetail->exists()){
+                            $lc_tempura = [
+                                "key" => $row_transfer_out_detail->landedCostDetail->landedCost->code,
+                                "name" => $row_transfer_out_detail->landedCostDetail->landedCost->code,
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$row_transfer_out_detail->landedCostDetail->landedCost->post_date],
+                                    ['name'=> "Nominal : Rp.:".number_format($row_transfer_out_detail->landedCostDetail->landedCost->grandtotal,2,',','.')],
+                                 ],
+                                'url'=>request()->root()."/admin/inventory/inventory_transfer_out?code=".CustomHelper::encrypt($row_transfer_out_detail->landedCostDetail->landedCost->code),
+                            ];
+
+                            $data_go_chart[]=$lc_tempura;
+                            $data_link[]=[
+                                'from'=>$query->code,
+                                'to'=>$row_transfer_out_detail->landedCostDetail->landedCost->code,
+                                'string_link'=>$query->code.$row_transfer_out_detail->landedCostDetail->landedCost->code,
+                            ];
+                            if(!in_array($row_transfer_out_detail->landedCostDetail->landedCost->id,$data_id_lc)){
+                                $data_id_lc[] = $row_transfer_out_detail->landedCostDetail->landedCost->id;
+                                $added = true;
+                            }
+                           
+                                   
                         }
                     }
                 }
@@ -2288,7 +2482,7 @@ class FundRequestController extends Controller
                     $query_po = PurchaseOrder::find($po_id);
                    
                     foreach($query_po->purchaseOrderDetail as $purchase_order_detail){
-                       
+                        
                         if($purchase_order_detail->purchaseRequestDetail()->exists()){
                         
                             $pr_tempura=[
@@ -2339,6 +2533,82 @@ class FundRequestController extends Controller
                                 }
                             }
                         }
+                        if($purchase_order_detail->goodIssueDetail()->exists()){
+                            $good_issue_tempura=[
+                                'key'   => $purchase_order_detail->goodIssueDetail->goodIssue->code,
+                                "name"  => $purchase_order_detail->goodIssueDetail->goodIssue->code,
+                            
+                                'properties'=> [
+                                    ['name'=> "Tanggal: ".$purchase_order_detail->goodIssueDetail->goodIssue->post_date],
+                                   
+                                ],
+                                'url'   =>request()->root()."/admin/inventory/good_issue?code=".CustomHelper::encrypt($purchase_order_detail->goodIssueDetail->goodIssue->code),
+                            ];
+                    
+                            $data_go_chart[]=$good_issue_tempura;
+                            $data_link[]=[
+                                'from'=>$query_po->code,
+                                'to'=>$purchase_order_detail->goodIssueDetail->goodIssue->code,
+                                'string_link'=>$query_po->code.$purchase_order_detail->goodIssueDetail->goodIssue->code,
+                            ];
+                            
+                            if(!in_array($purchase_order_detail->goodIssueDetail->goodIssue->id,$data_id_good_issue)){
+                                $data_id_good_issue[]=$purchase_order_detail->goodIssueDetail->goodIssue->id;
+                                $added = true;
+                            }
+                            
+                        }
+                        if($purchase_order_detail->purchaseInvoiceDetail()->exists()){
+                            foreach($purchase_order_detail->purchaseInvoiceDetail as $purchase_invoice_detail){
+                                $data_invoices_tempura = [
+                                    'key'   => $purchase_invoice_detail->purchaseInvoice->code,
+                                    "name"  => $purchase_invoice_detail->purchaseInvoice->code,
+                                
+                                    'properties'=> [
+                                        ['name'=> "Tanggal: ".$purchase_invoice_detail->purchaseInvoice->post_date],
+                                    
+                                    ],
+                                    'url'   =>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($purchase_invoice_detail->purchaseInvoice->code),
+                                ];
+                                $data_go_chart[]=$data_invoices_tempura;
+                                $data_link[]=[
+                                    'from'  =>  $purchase_invoice_detail->purchaseInvoice->code,
+                                    'to'    =>  $query_po->code,
+                                    'string_link'=>$purchase_invoice_detail->purchaseInvoice->code.$query_po->code,
+                                ];
+                                if(!in_array($purchase_invoice_detail->purchaseInvoice->id,$data_id_invoice)){
+                                    $data_id_invoice[]=$purchase_invoice_detail->purchaseInvoice->id;
+                                    $added = true;
+                                }
+                              
+                            }
+                        }
+                        if($purchase_order_detail->marketingOrderDeliveryProcess()->exists()){
+                            
+                            $data_marketing_order_delivery_process = [
+                                'key'   => $purchase_order_detail->marketingOrderDeliveryProcess->code,
+                                "name"  => $purchase_order_detail->marketingOrderDeliveryProcess->code,
+                            
+                                'properties'=> [
+                                    ['name'=> "Tanggal: ".$purchase_order_detail->marketingOrderDeliveryProcess->post_date],
+                                
+                                ],
+                                'url'   =>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($purchase_order_detail->marketingOrderDeliveryProcess->code),
+                            ];
+                            $data_go_chart[]=$data_marketing_order_delivery_process;
+                            $data_link[]=[
+                                'from'  =>  $purchase_order_detail->marketingOrderDeliveryProcess->code,
+                                'to'    =>  $query_po->code,
+                                'string_link'=>$purchase_order_detail->marketingOrderDeliveryProcess->code.$query_po->code,
+                            ];
+                            if(!in_array($purchase_order_detail->marketingOrderDeliveryProcess->id,$data_id_mo_delivery_process)){
+                                $data_id_mo_delivery_process[]=$purchase_order_detail->marketingOrderDeliveryProcess->id;
+                                $added = true;
+                            }
+                              
+                            
+                        }
+
                     }
 
                 }
@@ -2372,9 +2642,88 @@ class FundRequestController extends Controller
                             }                     
                            
                         }
+                        if($purchase_request_detail->materialRequestDetail()){
+                            $mr=[
+                                'properties'=> [
+                                    ['name'=> "Tanggal : ".$purchase_request_detail->lookable->materialRequest->post_date],
+                                    ['name'=> "Vendor  : ".$purchase_request_detail->lookable->materialRequest->user->name],
+                                 ],
+                                'key'=>$purchase_request_detail->lookable->materialRequest->code,
+                                'name'=>$purchase_request_detail->lookable->materialRequest->code,
+                                'url'=>request()->root()."/admin/inventory/material_request?code=".CustomHelper::encrypt($purchase_request_detail->lookable->materialRequest->code),
+                            ];
+                            
+                            $data_go_chart[]=$mr;
+                            $data_link[]=[
+                                'from'=>$purchase_request_detail->lookable->materialRequest->code,
+                                'to'=>$query->code,
+                                'string_link'=>$purchase_request_detail->lookable->materialRequest->code.$query->code,
+                            ];
+                            $data_id_mr[]= $purchase_request_detail->lookable->materialRequest->id;  
+                             
+                        }
                     }
                 }
-            }   
+
+                foreach($data_id_mr as $mr_id){
+                    $query_material_request = MaterialRequest::find($mr_id);
+                    foreach($query_material_request->materialRequestDetail as $row_material_request_detail){
+                        if($row_material_request_detail->purchaseRequestDetail()->exists()){
+                        
+                            foreach($row_material_request_detail->purchaseRequestDetail as $row_purchase_request_detail){
+                                $pr_tempura = [
+                                    'properties'=> [
+                                        ['name'=> "Tanggal : ".$row_purchase_request_detail->purchaseRequest->post_date],
+                                        ['name'=> "Vendor  : ".$row_purchase_request_detail->purchaseRequest->user->name],
+                                     ],
+                                    'key'=>$row_purchase_request_detail->purchaseRequest->code,
+                                    'name'=>$row_purchase_request_detail->purchaseRequest->code,
+                                    'url'=>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($row_purchase_request_detail->purchaseRequest->code),
+                                ];
+    
+                                $data_go_chart[]=$pr_tempura;
+                                $data_link[]=[
+                                    'from'=>$query_material_request->code,
+                                    'to'=>$row_purchase_request_detail->purchaseRequest->code,
+                                    'string_link'=>$query_material_request->code.$row_purchase_request_detail->purchaseRequest->code,
+                                ];
+                                if(!in_array($row_purchase_request_detail->purchaseRequest->id,$data_id_pr)){
+                                    $data_id_pr[] = $row_purchase_request_detail->purchaseRequest->id;
+                                    $added = true;
+                                }
+                            }                     
+                           
+                        }
+                        if($row_material_request_detail->goodIssueDetail()->exists()){
+                        
+                            foreach($row_material_request_detail->goodIssueDetail as $good_issue_detail){
+                                $good_issue_tempura = [
+                                    'properties'=> [
+                                        ['name'=> "Tanggal : ".$good_issue_detail->goodIssue->post_date],
+                                        ['name'=> "Vendor  : ".$good_issue_detail->goodIssue->supplier->name],
+                                     ],
+                                    'key'=>$good_issue_detail->goodIssue->code,
+                                    'name'=>$good_issue_detail->goodIssue->code,
+                                    'url'=>request()->root()."/admin/inventory/good_issue?code=".CustomHelper::encrypt($good_issue_detail->goodIssue->code),
+                                ];
+    
+                                $data_go_chart[]=$good_issue_tempura;
+                                $data_link[]=[
+                                    'from'=>$query_material_request->code,
+                                    'to'=>$good_issue_detail->goodIssue->code,
+                                    'string_link'=>$query_material_request->code.$good_issue_detail->goodIssue->code,
+                                ];
+                               
+                                if(!in_array($good_issue_detail->goodIssue->id,$data_id_good_issue)){
+                                    $data_id_good_issue[] = $good_issue_detail->goodIssue->id;
+                                    $added = true;
+                                }
+                            }                     
+                           
+                        }
+                    }
+                }
+            }    
             function unique_key($array,$keyname){
 
                 $new_array = array();

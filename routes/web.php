@@ -8,6 +8,7 @@ use App\Http\Controllers\HR\AttendancePunishmentController;
 use App\Http\Controllers\HR\EmployeeLeaveQuotasController;
 use App\Http\Controllers\HR\EmployeeTransferController;
 use App\Http\Controllers\HR\EmployeeRewardPunishmentController;
+use App\Http\Controllers\HR\OvertimeRequestController;
 
 use App\Http\Controllers\Accounting\AccountingReportController;
 use App\Http\Controllers\Finance\FinanceReportController;
@@ -1432,6 +1433,24 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[EmployeeTransferController::class, 'approval'])->withoutMiddleware('direct.access');
                 });
 
+                Route::prefix('overtime_request')->middleware('operation.access:overtime_request,view')->group(function () {
+                    Route::get('/',[OvertimeRequestController::class, 'index']);
+                    Route::get('datatable',[OvertimeRequestController::class, 'datatable']);
+                    Route::get('row_detail', [OvertimeRequestController::class, 'rowDetail']);
+                    Route::post('show', [OvertimeRequestController::class, 'show']);
+                    Route::post('get_code', [OvertimeRequestController::class, 'getCode']);
+                    Route::post('show_from_code', [OvertimeRequestController::class, 'showFromCode']);
+                    Route::post('instant_form_code', [OvertimeRequestController::class, 'instantFormwCode']);
+                    Route::post('print',[OvertimeRequestController::class, 'print']);
+                    Route::get('export',[OvertimeRequestController::class, 'export']);
+                    Route::post('print_by_range',[OvertimeRequestController::class, 'printByRange']);
+                    Route::get('print_individual/{id}',[OvertimeRequestController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [OvertimeRequestController::class, 'voidStatus'])->middleware('operation.access:overtime_request,void');
+                    Route::post('create',[OvertimeRequestController::class, 'create'])->middleware('operation.access:overtime_request,update');
+                    Route::post('destroy', [OvertimeRequestController::class, 'destroy'])->middleware('operation.access:employee_transfer,delete');
+                    Route::get('approval/{id}',[OvertimeRequestController::class, 'approval'])->withoutMiddleware('direct.access');
+                });
+
                 Route::prefix('employee_reward_punishment')->middleware('operation.access:employee_reward_punishment,view')->group(function () {
                     Route::get('/',[EmployeeRewardPunishmentController::class, 'index']);
                     Route::get('datatable',[EmployeeRewardPunishmentController::class, 'datatable']);
@@ -1502,9 +1521,9 @@ Route::prefix('admin')->group(function () {
                         Route::get('export',[AttendancePunishmentController::class, 'export']);
                         Route::post('print_by_range',[AttendancePunishmentController::class, 'printByRange']);
                         Route::get('print_individual/{id}',[AttendancePunishmentController::class, 'printIndividual'])->withoutMiddleware('direct.access');
-                        Route::post('void_status', [AttendancePunishmentController::class, 'voidStatus'])->middleware('operation.access:employee_transfer,void');
-                        Route::post('create',[AttendancePunishmentController::class, 'create'])->middleware('operation.access:employee_transfer,update');
-                        Route::post('destroy', [AttendancePunishmentController::class, 'destroy'])->middleware('operation.access:employee_transfer,delete');
+                        Route::post('void_status', [AttendancePunishmentController::class, 'voidStatus'])->middleware('operation.access:overtime_request,void');
+                        Route::post('create',[AttendancePunishmentController::class, 'create'])->middleware('operation.access:overtime_request,update');
+                        Route::post('destroy', [AttendancePunishmentController::class, 'destroy'])->middleware('operation.access:overtime_request,delete');
                         Route::get('approval/{id}',[AttendancePunishmentController::class, 'approval'])->withoutMiddleware('direct.access');
                     });
                 });

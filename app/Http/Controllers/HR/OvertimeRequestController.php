@@ -4,7 +4,12 @@ namespace App\Http\Controllers\HR;
 
 use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
-use App\Models\OvertimeRequests;
+use App\Models\Company;
+use App\Models\Place;
+use App\Models\Menu;
+use App\Models\EmployeeSchedule;
+use App\Models\User;
+use App\Models\OvertimeRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -12,11 +17,15 @@ use Illuminate\Support\Facades\Validator;
 class OvertimeRequestController extends Controller
 {
     public function index()
-    {
+    {$lastSegment = request()->segment(count(request()->segments()));
+       
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => 'Ijin Lembur',
-            'content'       => 'admin.master_data.overtime_request',
-            
+            'content'       => 'admin.hr.overtime_request',
+            'company'       => Company::where('status','1')->get(),
+            'place'         => Place::where('status','1')->get(),
+            'newcode'   =>  $menu->document_code.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -24,13 +33,20 @@ class OvertimeRequestController extends Controller
 
     public function datatable(Request $request){
         $column = [
-            'shift_id',
+            'schedule_id',
             'user_id',
+            'account_id',
+            'company_id',
+            'post_date',
+            'note',
             'time_in',
             'time_out',
             'date',
             'code',
             'status',
+            'void_id',
+            'void_note',
+            'void_date',
         ];
 
         $start  = $request->start;
@@ -39,9 +55,9 @@ class OvertimeRequestController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = OvertimeRequests::where('status',1)->count();
+        $total_data = OvertimeRequest::where('status',1)->count();
         
-        $query_data = OvertimeRequests::where(function($query) use ($search, $request) {
+        $query_data = OvertimeRequest::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -63,7 +79,7 @@ class OvertimeRequestController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = OvertimeRequests::where(function($query) use ($search, $request) {
+        $total_filtered = OvertimeRequest::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -98,11 +114,14 @@ class OvertimeRequestController extends Controller
                     $nomor,
                     $val->code,
                     $val->user->name,
-                    $val->shift->name ?? 'tidak memilih shift',
-                    $val->date,
+                    $val->company->name,
+                    $val->account->name,
+                    $val->schedule->shift->name ?? 'tidak memilih shift',
                     $val->time_in,
                     $val->time_out,
-                    
+                    $val->date,
+                    $val->post_date,
+                    $val->note,
                     $val->status(),
                     $btn
                 ];
@@ -124,7 +143,7 @@ class OvertimeRequestController extends Controller
         return response()->json($response);
     }
     public function destroy(Request $request){
-        $query = OvertimeRequests::find($request->id);
+        $query = OvertimeRequest::find($request->id);
 		
         if($query->delete()) {
             
@@ -143,8 +162,14 @@ class OvertimeRequestController extends Controller
         return response()->json($response);
     }
 
+    public function getCode(Request $request){
+        $code = OvertimeRequest::generateCode($request->val);
+       
+		return response()->json($code);
+    }
+
     public function show(Request $request){
-        $project = OvertimeRequests::find($request->id);
+        $project = OvertimeRequest::find($request->id);
         $project['place_name'] = $project->place->name;
         $project['level_name'] = $project->level->name;			
 		return response()->json($project);
@@ -155,16 +180,18 @@ class OvertimeRequestController extends Controller
         $validation = Validator::make($request->all(), [
             
             
-            'user_id'       => 'required',
+            'account_id'       => 'required',
             'time_in'       => 'required',
+            'company_id'    => 'required',
             'time_out'      => 'required',
             'date'          => 'required',
             'code'          => 'required',
             
         ], [
-            'user_id.required' 	            => 'User Tidak boleh kosong',
+            'account_id.required' 	            => 'User Tidak boleh kosong',
             'time_in.required'              => 'Jam masuk Harap Dipilih',
             'time_out.required'             => 'Jam Keluar Harap Dipilih',
+            'company_id.required'             => 'Harap Pilih Perusahaan',
             'date.required'                 => 'Tanggal Tidak Boleh kosong',
             'code.required'                 => 'Kode tidak boleh kosong',
         ]);
@@ -175,10 +202,56 @@ class OvertimeRequestController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
+            $user_q = User::find($request->account_id);
+            $firstRecord = EmployeeSchedule::where(function($query) use($request, $user_q) {
+                $query->where('employee_schedules.user_id', $user_q->employee_no)
+                      ->where('employee_schedules.date', $request->date)
+                      ->where('employee_schedules.status', '1');
+            })
+            ->join('shifts', 'employee_schedules.shift_id', '=', 'shifts.id')
+            ->orderBy('shifts.time_in', 'ASC') // Order by time_in in ascending order
+            ->first(); // Get the first record
+        
+            // Get the last record
+            $lastRecord = EmployeeSchedule::where(function($query) use($request, $user_q) {
+                    $query->where('employee_schedules.user_id', $user_q->employee_no)
+                        ->where('employee_schedules.date', $request->date)
+                        ->where('employee_schedules.status', '1');
+                })
+            ->join('shifts', 'employee_schedules.shift_id', '=', 'shifts.id')
+            ->orderBy('shifts.time_in', 'DESC') // Order by time_in in descending order
+            ->first();
+            if($request->schedule_id){
+                if($request->time_in > $firstRecord->time_in && $request->time_in < $lastRecord->time_out){
+                    $kambing["kambing"][]="jam masuk berada diantara masuk dan keluarnya shift hari itu";
+                    $response = [
+                        'status' => 422,
+                        'error'  => $kambing
+                    ];
+                    return response()->json($response);
+                }
+                if($request->time_out < $lastRecord->time_out && $request->time_out > $firstRecord->time_in ){
+                    $kambing["kambing"][]="jam keluar kurang dari shift yang ada di hari itu ";
+                    $response = [
+                        'status' => 422,
+                        'error'  => $kambing
+                    ];
+                    return response()->json($response);
+                }
+                if($request->time_in<$firstRecord->time_in && $request->time_out > $lastRecord->time_out ){
+                    $kambing["kambing"][]="jam masuk dan keluar seperti menggantikan shift pastikan bahwa sudah benar ";
+                    $response = [
+                        'status' => 422,
+                        'error'  => $kambing
+                    ];
+                    return response()->json($response);
+                }
+            }
+            
 			if($request->temp){
                 DB::beginTransaction();
                 try {
-                    $query = OvertimeRequests::find($request->temp);
+                    $query = OvertimeRequest::find($request->temp);
                     $approved = false;
                     $revised = false;
 
@@ -203,11 +276,15 @@ class OvertimeRequestController extends Controller
                         ]);
                     }
                     if(in_array($query->status,['1','6'])){
-                    $query->user_id                = $request->user_id;
+                    
                     $query->time_in                = $request->time_in;
                     $query->time_out               = $request->time_out;
                     $query->date                   = $request->date;
-                    $query->code                   = $request->code;
+                    $query->account_id             = $request->account_id;
+                    $query->company_id             = $request->company_id;
+                    $query->post_date              = $request->post_date;
+                    $query->schedule_id            = $request->schedule_id;
+                    $query->note                   = $request->note;
                     $query->save();
 
                     DB::commit();
@@ -223,15 +300,21 @@ class OvertimeRequestController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
-                    $query = OvertimeRequests::create([
-                        'shift_id'              => $request->name,
-                        'user_id'			    => $request->place_id,
-                        'time_in'			    => $request->level_id,
-                        'time_out'			    => $request->start_date,
-                        'date'			    => $request->end_date,
-                        'code'			    => $request->type,
-                        
-                        'status'			    => $request->status,
+                    
+                    $query = OvertimeRequest::create([
+                        'schedule_id'           => $request->schedule_id,
+                        'user_id'			    => session('bo_id'),
+                        'account_id'			=> $request->account_id,
+                        'post_date'			    => $request->post_date,
+                        'company_id'			=> $request->company_id,
+                        'time_in'			    => $request->time_in,
+                        'time_out'			    => $request->time_out,
+                        'date'			        => $request->date,
+                        'code'			        => $request->code,
+                        'note'                  => $request->note,
+                        'total'                 => 0,
+                        'grandtotal'            => 0,
+                        'status'                => '1',
                     ]);
                     DB::commit();
                 }catch(\Exception $e){
@@ -244,14 +327,14 @@ class OvertimeRequestController extends Controller
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Purchase Order No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()
-                    ->performedOn(new OvertimeRequests())
+                    ->performedOn(new OvertimeRequest())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Add / edit Ijin Lembur.');
 
              
 				$response = [
-					'status'    => 200,
+					'status'    => 500,
 					'message'   => 'Data successfully saved.',
 				];
 			} else {
@@ -267,7 +350,7 @@ class OvertimeRequestController extends Controller
 
     public function approval(Request $request,$id){
         
-        $pr = OvertimeRequests::where('code',CustomHelper::decrypt($id))->first();
+        $pr = OvertimeRequest::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
             $data = [

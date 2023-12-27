@@ -7,6 +7,7 @@ use App\Models\ApprovalMatrix;
 use App\Models\LockPeriod;
 use App\Models\ApprovalStage;
 use App\Models\ApprovalSource;
+use App\Models\OvertimeRequest;
 use App\Models\ApprovalTemplate;
 use App\Models\ApprovalTemplateMenu;
 use App\Models\Asset;
@@ -1525,7 +1526,20 @@ class CustomHelper {
 			}
 		}elseif($table_name == 'fund_requests'){
 		
-		}elseif($table_name == 'capitalizations'){		
+		}elseif($table_name == 'overtime_requests'){
+			
+			$OR = OvertimeRequest::find($table_id);
+			if($OR->schedule()->exists()){
+				$query_schedule = EmployeeSchedule::find($OR->schedule_id);
+				info('masuk');
+				info($query_schedule);
+				$query_schedule->status = '5';
+
+				$query_schedule->save();
+			}
+			
+		}
+		elseif($table_name == 'capitalizations'){		
 			$arrdata = get_object_vars($data);
 
 			$query = Journal::create([

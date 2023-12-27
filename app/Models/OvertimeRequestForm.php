@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 
-class OvertimeRequest extends Model
+class OvertimeRequestForm extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
@@ -25,9 +25,6 @@ class OvertimeRequest extends Model
         'time_out',
         'date',
         'code',
-        'total',
-        'grandtotal',
-        'nominal_adjust',
         'status',
         'void_id',
         'void_note',
@@ -45,13 +42,13 @@ class OvertimeRequest extends Model
         return $this->belongsTo('App\Models\User','user_id','id')->withTrashed();
     }
     public function company(){
-        return $this->belongsTo('App\Models\Company','company_id','id')->withTrashed();
+        return $this->belongsTo('App\Models\Company','schedule_id','id')->withTrashed();
     }
 
     public static function generateCode($prefix)
     {
         $cek = substr($prefix,0,7);
-        $query = OvertimeRequest::selectRaw('RIGHT(code, 8) as code')
+        $query = OvertimeRequests::selectRaw('RIGHT(code, 8) as code')
             ->whereRaw("code LIKE '$cek%'")
             ->withTrashed()
             ->orderByDesc('id')
@@ -81,14 +78,5 @@ class OvertimeRequest extends Model
         };
 
         return $status;
-    }
-
-    public function approval(){
-        $source = ApprovalSource::where('lookable_type',$this->table)->where('lookable_id',$this->id)->whereHas('approvalMatrix')->get();
-        if($source){
-            return $source;
-        }else{
-            return '';
-        }
     }
 }

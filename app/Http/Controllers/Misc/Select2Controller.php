@@ -2732,7 +2732,7 @@ class Select2Controller extends Controller {
                 $query->whereNotIn('id',$request->shift_request_id);
             }
         })
-        ->whereNotIn('status',['2','3'])
+        ->whereNotIn('status',['2','3','5'])
         ->orderBy('date','DESC')
         ->get();
        

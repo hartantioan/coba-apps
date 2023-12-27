@@ -120,12 +120,7 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">Employee 
-                @if ($data->type == 1)
-                    Reward
-                @else
-                    Punishment
-                @endif # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">Ijin Lembur</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
@@ -139,12 +134,8 @@
         <!-- logo and title -->
         <div class="row mt-3 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">Employee 
-                    @if ($data->type == 1)
-                        Reward
-                    @else
-                        Punishment
-                    @endif
+                <h5 class="indigo-text">
+                    Ijin Lembur
                 </h5>
             </div>
             <div class="col m6 s12 right-align">
@@ -210,33 +201,27 @@
             <div class="row">
                 <div class="col s12 m12 row mt-2">
                     <div class="col s4">
-                       Periode Dimulai
+                        Tanggal Lembur
                     </div>
                     <div class="col s8">
-                        {{ $data->attendancePeriod->code.' - '.$data->attendancePeriod->name }}
+                        {{ $data->date}}
                     </div>
                 </div>
             </div>
             <table border="0" width="100%">
-                <thead>
-                    <tr>
-                        <th class="center-align">NIK</th>
-                        <th class="center-align">Keterangan</th>
-                        <th class="center-align">Nominal</th>
-                        <th class="center-align">Cicilan</th>
-                        <th class="center-align">Nominal Pembayaran</th>
-                    </tr>
-                </thead>
                 <tbody>
-                    @foreach($data->employeeRewardPunishmentDetail as $key => $row)
-                        <tr>
-                            <td class="center-align" >{{$row->user->employee_no.' - '.$row->user->name}}</td>
-                            <td class="center-align">{{ $row->note }}</td>
-                            <td class="center-align">{{ number_format($row->nominal_total,3,',','.') }}</td>
-                            <td class="center-align">{{ $row->instalment }}</td>
-                            <td class="center-align">{{ number_format($row->nominal_payment) }}</td>
-                        </tr>
-                    @endforeach
+                    <tr>
+                        <td class="left-align" >User </td>
+                        <td class="center-align">{{ $data->account->name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="left-align" >Jam Masuk </td>
+                        <td class="center-align">{{ $data->time_in }}</td>
+                    </tr>
+                    <tr>
+                        <td class="left-align" >Jam Keluar </td>
+                        <td class="center-align">{{ $data->time_out }}</td>
+                    </tr>
                 </tbody>
             </table>
         </div>

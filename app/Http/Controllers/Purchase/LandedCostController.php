@@ -1784,7 +1784,7 @@ class LandedCostController extends Controller
                             } 
                         }
                         /* melihat apakah ada hubungan lc */
-                        if($row->landedCostDetail()){
+                        if($row->landedCost()){
                             $data_lc=[
                                 'properties'=> [
                                     ['name'=> "Tanggal :".$row->lookable->landedCost->post_date],
@@ -2514,6 +2514,30 @@ class LandedCostController extends Controller
                                               
                         }
                     } // inventory transferout detail apakah perlu
+                    if($query->purchaseInvoiceDetail()->exists()){
+                        foreach($query->purchaseInvoiceDetail as $row_invoice_detail){
+                            $data_invoices_tempura = [
+                                'key'   => $row_invoice_detail->purchaseInvoice->code,
+                                "name"  => $row_invoice_detail->purchaseInvoice->code,
+                            
+                                'properties'=> [
+                                    ['name'=> "Tanggal: ".$row_invoice_detail->purchaseInvoice->post_date],
+                                
+                                ],
+                                'url'   =>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($row_invoice_detail->purchaseInvoice->code),
+                            ];
+                            $data_go_chart[]=$data_invoices_tempura;
+                            $data_link[]=[
+                                'from'  =>  $query->code,
+                                'to'    =>  $row_invoice_detail->purchaseInvoice->code,
+                                'string_link'=>$query->code.$row_invoice_detail->purchaseInvoice->code
+                            ];
+                            if(!in_array($row_invoice_detail->purchaseInvoice->id,$data_id_invoice)){
+                                $data_id_invoice[]=$row_invoice_detail->purchaseInvoice->id;
+                                $added = true;
+                            }
+                        }
+                    }
                 }
 
                 foreach($data_id_inventory_transfer_out as $id_transfer_out){

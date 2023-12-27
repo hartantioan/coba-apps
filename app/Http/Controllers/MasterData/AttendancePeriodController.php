@@ -19,11 +19,14 @@ use App\Models\SalaryReportTemplate;
 use App\Models\SalaryReportDetail;
 use App\Models\SalaryReportUser;
 use App\Models\Punishment;
+use App\Models\Holiday;
 use App\Models\EmployeeSalaryComponent;
 use App\Models\SalaryComponent;
 use App\Models\EmployeeRewardPunishment;
 use App\Models\EmployeeRewardPunishmentDetail;
 use App\Models\EmployeeRewardPunishmentPayment;
+use App\Models\OvertimeRequest;
+use App\Models\OvertimeCost;
 use App\Models\User;
 use App\Models\UserAbsensiMesin;
 use App\Models\UserSpecial;
@@ -198,7 +201,7 @@ class AttendancePeriodController extends Controller
                 $user_id = $row_user->employee_no;
                 $date = $start_date->copy();
                 $date_leave_req = $start_date->copy();
-                $date_special = $start_date->copy();
+                $date_overtime_no_schedule = $start_date->copy();
                 $counter_effective_day=0;
                 $counter_absent=0;
                 $counter_alpha=0;
@@ -274,7 +277,7 @@ class AttendancePeriodController extends Controller
                     $query_data = EmployeeSchedule::join('shifts', 'employee_schedules.shift_id', '=', 'shifts.id')
                         ->whereDate('employee_schedules.date', $date->toDateString())
                         ->where('employee_schedules.user_id', $row_user->employee_no)
-                        ->whereIn('employee_schedules.status', [1, 4])
+                        ->whereIn('employee_schedules.status', [1, 4 , 5])
                         ->orderBy('shifts.time_in') // Order by next_day (1 comes last)
                         ->select('employee_schedules.*') // Select the columns you need
                         ->get();
@@ -314,14 +317,28 @@ class AttendancePeriodController extends Controller
                     //perhitungan schedule biasa dari user pada tanggal yang ada di loop
                     foreach($query_data as $key=> $row_schedule_filter){
                         
-
+                        $lembur = 0;
                         $time_in = $row_schedule_filter->shift->time_in;
+                        $time_out = $row_schedule_filter->shift->time_out;
+                        if($row_schedule_filter->status == 5){
+                            
+                            $query_lembur = OvertimeRequest::where('schedule_id',$row_schedule_filter->id)->first();
+                            if($time_in < $query_lembur->time_in){
+                                $lembur=1;
+                                $time_in =$query_lembur->time_in;
+                                
+                            }
+                            if($time_out < $query_lembur->time_in){
+                                $time_out = $query_lembur->time_out;
+                            }
+                            //dihitung dari time in lembur dan kapan terakhir orang tsb logout berapa jam yang didapat
+                        }
                         $min_time_in = Carbon::parse($time_in)->subHours($row_schedule_filter->shift->tolerant)->toTimeString();
                         $real_time_in =$date->format('Y-m-d') . ' ' . $time_in;
                         $combinedDateTimeInCarbon = Carbon::parse($real_time_in);
                         $real_min_time_in = $combinedDateTimeInCarbon->copy()->subHours($row_schedule_filter->shift->tolerant);
                        
-                        $time_out = $row_schedule_filter->shift->time_out;
+                       
                         $max_time_out = Carbon::parse($time_out)->addHours($row_schedule_filter->shift->tolerant)->toTimeString();
                         if($time_in>$time_out){
                             $tambah1hari=$date->copy()->addDay();
@@ -335,7 +352,7 @@ class AttendancePeriodController extends Controller
                         $combinedDateTimeOutCarbon = Carbon::parse($real_time_out);
                         
                         $real_max_time_out = $combinedDateTimeOutCarbon->copy()->addHours($row_schedule_filter->shift->tolerant);
-                        if($time_in>$time_out){
+                        if($time_in>$time_out){//ik disek digae op y ooo di buat untuk apabila max time out nya itu di hari yang sama tapi jam 00:00 seperti itu atau kurang dari jam masuknya jadie ditambahi tanggalnya jadi nextday ehey
                             
                             $real_max_time_out->addDay();
                         }
@@ -351,7 +368,8 @@ class AttendancePeriodController extends Controller
                                 
                             $array_masuk[$key]='Cuti Melahirkan';
                             $array_keluar[$key]='Cuti Melahirkan';
-                        }else{
+                        }
+                        else{
                             $exact_in[$key]=0;
                             $exact_out[$key]=0;
                             $counter_effective_day++;
@@ -444,30 +462,33 @@ class AttendancePeriodController extends Controller
                                 $dateAttd = Carbon::parse($row_attendance_filter->date);
                                 
                                 $timePart = $dateAttd->format('H:i:s');
-                               
-                                    if(!$masuk_awal  && $date->toDateString() == $dateAttd->toDateString()){
-                                        
-                                        
-                                        $masuk_awal=$timePart;
-                                        $diffInSeconds = Carbon::parse($timePart)->diffInSeconds($time_in);
+                                //ini tempat kalau tidak ada masuk awal dan pulang 
+                                if(!$masuk_awal  && $date->toDateString() == $dateAttd->toDateString()){
+                                    
+                                    
+                                    $masuk_awal=$timePart;
+                                    $diffInSeconds = Carbon::parse($timePart)->diffInSeconds($time_in);
+                                    $minutes = floor($diffInSeconds / 60);
+                                    $seconds = $diffInSeconds % 60;
+                                    
+                                    
+                                    $different_masuk[$key]=$minutes." menit  ".$seconds." detik";
+                                    
+                                }
+                                if(!$muleh  && $date->toDateString() == $dateAttd->toDateString()){
+                                    if ($timePart >= $time_out && $timePart > $masuk_awal) 
+                                    {
+                                        $muleh=$timePart;
+                                        $diffInSeconds = Carbon::parse($timePart)->diffInSeconds($max_time_out);
                                         $minutes = floor($diffInSeconds / 60);
                                         $seconds = $diffInSeconds % 60;
                                         
-                                        
-                                        $different_masuk[$key]=$minutes." menit  ".$seconds." detik";
-                                        
+                                        $different_keluar[$key]=$minutes." menit  ".$seconds." detik";
                                     }
-                                    if(!$muleh  && $date->toDateString() == $dateAttd->toDateString()){
-                                        if ($timePart >= $time_out && $timePart > $masuk_awal) 
-                                        {
-                                            $muleh=$timePart;
-                                            $diffInSeconds = Carbon::parse($timePart)->diffInSeconds($max_time_out);
-                                            $minutes = floor($diffInSeconds / 60);
-                                            $seconds = $diffInSeconds % 60;
-                                            
-                                            $different_keluar[$key]=$minutes." menit  ".$seconds." detik";
-                                        }
-                                    }
+                                }
+                                //end
+
+                                //perhitungan masuk tepat atau tidak dan pulang tepat atau tidak
                                 if ($dateAttd >= $real_min_time_in && $dateAttd <= $real_time_in) {
                                     $exact_in[$key]= 1 ;
                                     
@@ -484,10 +505,48 @@ class AttendancePeriodController extends Controller
                                         
                                     }
                                     
-                                }if($dateAttd > $real_time_in && $dateAttd < $real_time_out){
+                                }if($dateAttd > $real_time_in && $dateAttd < $real_time_out){// tataru sini bisa haruse utk yang tidak ada ituuu
                                     $diffHoursTimePartMinIn = Carbon::parse($timePart)->diffInHours($time_in);
                                     
-                                    
+                                    if($row_schedule_filter->status == 5){////perhitungan untuk time in dimana lembur tidak masuk tapi ada jadwal lembur yang bergabung dengan jam
+                                        $lembur = 0;
+                                        $time_ind = $row_schedule_filter->shift->time_in;
+                                        $min_time_ind = Carbon::parse($time_ind)->subHours($row_schedule_filter->shift->tolerant)->toTimeString();
+                                        $real_time_ind =$date->format('Y-m-d') . ' ' . $time_ind;
+                                        $combinedDateTimeInCarbond = Carbon::parse($real_time_in);
+                                        $real_min_time_ind = $combinedDateTimeInCarbond->copy()->subHours($row_schedule_filter->shift->tolerant);
+                                        if ($dateAttd >= $real_min_time_ind && $dateAttd <= $real_time_ind) {
+                                            $exact_in[$key]= 1 ;
+                                            
+                                            if(!$login[$key]){
+                                                
+                                                if($masuk_awal==null){
+                                                    $masuk_awal=$timePart;
+                                                }elseif($masuk_awal > $timePart){
+                                                    $masuk_awal=$timePart;
+                                                }
+                                                $login[$key] = $timePart;
+                                                $array_masuk[$key]=$timePart;
+                                                $different_masuk[$key]='';
+                                                
+                                            }
+                                            
+                                        }if($dateAttd > $real_time_ind && $dateAttd < $real_time_out){// tataru sini bisa haruse utk yang tidak ada ituuu
+                                            $diffHoursTimePartMinIn = Carbon::parse($timePart)->diffInHours($time_ind);
+                                            
+                                            //mengetahui apabila jam yang ada melebihi toleransi pada shift.
+                                            if($diffHoursTimePartMinIn<=$row_schedule_filter->shift->tolerant && $exact_in[$key] != 1){
+                                                $exact_in[$key]= 2 ;
+                                                
+                                                $login[$key]= $timePart;
+                                                if (count($query_data) == 3 && $key > 0 ) {
+                                                    $exact_in[$key]= 1 ;
+                                                    $login[$key]= $timePart;
+                                                }
+                                                $array_masuk[$key]=$timePart;
+                                            }                                      
+                                        }
+                                    }
                                     //mengetahui apabila jam yang ada melebihi toleransi pada shift.
                                     if($diffHoursTimePartMinIn<=$row_schedule_filter->shift->tolerant && $exact_in[$key] != 1){
                                         $exact_in[$key]= 2 ;
@@ -526,8 +585,53 @@ class AttendancePeriodController extends Controller
                                 }
                             }
 
-                            if(!$exact_in){
+                            $latestRecord = $query_attendance->last();
+                            if($row_schedule_filter->status == 5){
+                                if($latestRecord->date < Carbon::parse($real_time_out)){
+                                    $timeDifference = Carbon::parse($real_time_out)->diff($latestRecord->date);
+                                    $hoursDifference = $timeDifference->h;
+                                    $query_lembur->total            = $hoursDifference;
+                                    $query_libur = Holiday::where('date',$query_lembur->date)->get();
+                                    if($query_libur){
+                                        $query_cost = OvertimeCost::whereRaw("'$query_lembur->date' BETWEEN start_date AND end_date ")
+                                            ->where('place_id',$row_user->place_id)
+                                            ->where('level_id',$row_user->position->level_id)
+                                            ->where('type','1')
+                                            ->first();
+                                        
+                                    }else{
+                                        $query_cost = OvertimeCost::whereRaw("'$query_lembur->date' BETWEEN start_date AND end_date ")
+                                            ->where('place_id',$row_user->place_id)
+                                            ->where('level_id',$row_user->position->level_id)
+                                            ->where('type','2')
+                                            ->first();
+                                    }
+                                    if($query_cost){
+                                        $query_lembur->nominal          = $hoursDifference * $query_cost->nominal;
+                                        $query_lembur->save();
+                                    }
+                                }
+                                else{
+                                    $timeDifference = Carbon::parse($query_lembur->time_in)->diff(Carbon::parse($query_lembur->time_out));
+                                    $hoursDifference = $timeDifference->h;
+                                    $query_lembur->total            = $hoursDifference;
+                                    $query_cost = OvertimeCost::whereRaw("'$query_lembur->date' BETWEEN start_date AND end_date ")
+                                    ->where('place_id',$row_user->place_id)
+                                    ->where('level_id',$row_user->position->level_id)
+                                    ->where('type','2')
+                                    ->first();
+                                    if($query_cost){
+                                        $query_lembur->nominal          = $hoursDifference * $query_cost->nominal;
+                                        $query_lembur->save();
+                                    } 
+                                }
+                            }
+                            //perhitungan untuk time in dimana lembur tidak masuk tapi ada jadwal lembur yang bergabung dengan jam
+                           
+
+                            if(!$exact_in){// untuk memberi apabila dia tidak masuk memberi tanda kalau tidak ada checkclock
                                 $exact_in[$key]=0;
+                                
                             }
 
                             if(count($exact_in) == 3){
@@ -592,6 +696,7 @@ class AttendancePeriodController extends Controller
                         
                         }
                         
+                        
                         $time_ins[]=$time_in;
                         $time_outs[]=$time_out;
                         $min_time_ins[]=$min_time_in;
@@ -618,7 +723,7 @@ class AttendancePeriodController extends Controller
                                      
                                 }
                             }else{
-                                if($masuk_awal){//perhitungan toleransi punya specialll?
+                                if($masuk_awal && $lembur == 0){//perhitungan toleransi punya specialll?
 
                                     $pembandingdate = Carbon::parse($masuk_awal);
                                     if(count($query_data)==2 && $key == 1){
@@ -1367,7 +1472,10 @@ class AttendancePeriodController extends Controller
                     $date_leave_req->addDay();
                 }
                 
-                
+                while($date_overtime_no_schedule->lte($end_date)){
+                    //ini terakir
+                    $date_overtime_no_schedule->addDay();
+                }
                 
 
                 

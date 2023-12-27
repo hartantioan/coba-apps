@@ -17,6 +17,5 @@ class Holiday extends Model
     protected $fillable = [
         'note',
         'date',
-        
     ];
 }

@@ -888,7 +888,7 @@ class PurchaseOrderController extends Controller
                 <td class="right-align">'.number_format($row->subtotal,2,',','.').'</td>
                 <td class="">'.$row->note.'</td>
                 <td class="">'.$row->note2.'</td>
-                <td class="center-align">'.$row->place->name.'</td>
+                <td class="center-align">'.$row->place->code.'</td>
                 <td class="center-align">'.($row->line()->exists() ? $row->line->name : '-').'</td>
                 <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
                 <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
@@ -1044,11 +1044,11 @@ class PurchaseOrderController extends Controller
             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
             $data["image"]=$path_img;
              
-            $pdf = Pdf::loadView('admin.print.purchase.order_individual', $data)->setPaper('a5', 'landscape');
+            $pdf = Pdf::loadView('admin.print.purchase.order_individual', $data)->setPaper('a4', 'portrait');
             // $pdf->render();
     
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+            $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             
             
             $content = $pdf->download()->getOriginalContent();
@@ -1118,11 +1118,11 @@ class PurchaseOrderController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.purchase.order_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.purchase.order_individual', $data)->setPaper('a4', 'portrait');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(422, 810, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
                            
@@ -1194,11 +1194,11 @@ class PurchaseOrderController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.purchase.order_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.purchase.order_individual', $data)->setPaper('a4', 'portrait');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(422, 810, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
                            
@@ -2739,11 +2739,16 @@ class PurchaseOrderController extends Controller
         if(in_array($query->status,['2','3','4','5'])){
             return response()->json([
                 'status'  => 500,
-                'message' => 'Jurnal sudah dalam progres, anda tidak bisa melakukan perubahan.'
+                'message' => 'Dokumen sudah dalam progres, anda tidak bisa melakukan perubahan.'
             ]);
         }
         
         if($query->delete()) {
+
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
 
             $query->purchaseOrderDetail()->delete();
 
@@ -2835,11 +2840,11 @@ class PurchaseOrderController extends Controller
         $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
         $data["image"]=$path_img;
          
-        $pdf = Pdf::loadView('admin.print.purchase.order', $data)->setPaper('a5', 'landscape');
+        $pdf = Pdf::loadView('admin.print.purchase.order', $data)->setPaper('a4', 'portrait');
         $pdf->render();
 
         $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-        $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+        $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
         
         $content = $pdf->download()->getOriginalContent();
         
@@ -2890,11 +2895,11 @@ class PurchaseOrderController extends Controller
                     $img_base_64 = base64_encode($image_temp);
                     $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                     $data["image"]=$path_img;
-                    $pdf = Pdf::loadView('admin.print.purchase.order_individual', $data)->setPaper('a5', 'landscape');
+                    $pdf = Pdf::loadView('admin.print.purchase.order_individual', $data)->setPaper('a4', 'portrait');
                     $pdf->render();
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                    $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                    $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(422, 810, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                     $content = $pdf->download()->getOriginalContent();
                     $temp_pdf[]=$content;
                 }
@@ -2933,8 +2938,9 @@ class PurchaseOrderController extends Controller
     public function export(Request $request){
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
+        $mode = $request->mode ? $request->mode : '';
 		
-		return Excel::download(new ExportPurchaseOrder($post_date,$end_date), 'purchase_order_'.uniqid().'.xlsx');
+		return Excel::download(new ExportPurchaseOrder($post_date,$end_date,$mode), 'purchase_order_'.uniqid().'.xlsx');
     }
 
     public function removeUsedData(Request $request){

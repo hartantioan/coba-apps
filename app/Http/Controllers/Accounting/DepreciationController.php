@@ -181,7 +181,7 @@ class DepreciationController extends Controller
                     'asset_id'      => $row->id,
                     'asset_code'    => $row->code,
                     'asset_name'    => $row->name,
-                    'asset_place'   => $row->place->name,
+                    'asset_place'   => $row->place->code,
                     'method'        => $row->method,
                     'method_name'   => $row->method(),
                     'nominal'       => number_format($row->nominalDepreciation(),2,',','.'),

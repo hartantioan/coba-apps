@@ -239,7 +239,7 @@
                     @foreach($data->landedCostDetail as $key => $row)
                     <tr>
                         <td class="center">{{ ($key + 1) }}</td>
-                        <td>{{ $row->place->name.' - '.$row->place->company->name }}</td>
+                        <td>{{ $row->place->code.' - '.$row->place->company->name }}</td>
                         <td>{{ $row->department->name }}</td>
                         <td>{{ $row->warehouse->name }}</td>
                         <td>{{ $row->item->name }}</td>

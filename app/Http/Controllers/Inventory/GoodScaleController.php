@@ -18,6 +18,7 @@ use App\Models\User;
 use App\Models\Place;
 use App\Models\Department;
 use App\Helpers\CustomHelper;
+use App\Models\Menu;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -40,6 +41,8 @@ class GoodScaleController extends Controller
 
     public function index(Request $request)
     {
+        $lastSegment = request()->segment(count(request()->segments()));
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'     => 'Timbangan Truk',
             'content'   => 'admin.inventory.good_scale',
@@ -49,7 +52,7 @@ class GoodScaleController extends Controller
             'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
-            'newcode'   => 'TMBG-'.date('y'),
+            'newcode'   => $menu->document_code.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -267,7 +270,7 @@ class GoodScaleController extends Controller
                             'qty'                       => number_format($row->getBalanceReceipt(),3,',','.'),
                             'unit'                      => $row->item->buyUnit->code,
                             'place_id'                  => $row->place_id,
-                            'place_name'                => $row->place->name,
+                            'place_name'                => $row->place->code,
                             'warehouse_id'              => $row->warehouse_id,
                             'warehouse_name'            => $row->warehouse->name,
                             'note'                      => $row->note,
@@ -517,7 +520,7 @@ class GoodScaleController extends Controller
                 <td class="center-align">'.$rowdetail->item->buyUnit->code.'</td>
                 <td class="center-align">'.$rowdetail->note.'</td>
                 <td class="center-align">'.$rowdetail->note2.'</td>
-                <td class="center-align">'.$rowdetail->place->name.'</td>
+                <td class="center-align">'.$rowdetail->place->code.'</td>
                 <td class="center-align">'.$rowdetail->warehouse->name.'</td>
             </tr>';
         }
@@ -608,7 +611,7 @@ class GoodScaleController extends Controller
                 'qty_out'                   => number_format($row->qty_out,3,',','.'),
                 'unit'                      => $row->item->buyUnit->code,
                 'place_id'                  => $row->place_id,
-                'place_name'                => $row->place->code.' - '.$row->place->name,
+                'place_name'                => $row->place->code.' - '.$row->place->code,
                 'warehouse_id'              => $row->warehouse_id,
                 'warehouse_name'            => $row->warehouse->name,
                 'note'                      => $row->note,
@@ -719,7 +722,7 @@ class GoodScaleController extends Controller
                 'qty_balance'               => number_format($row->qty_balance,3,',','.'),
                 'unit'                      => $row->item->buyUnit->code,
                 'place_id'                  => $row->place_id,
-                'place_name'                => $row->place->name,
+                'place_name'                => $row->place->code,
                 'warehouse_id'              => $row->warehouse_id,
                 'warehouse_name'            => $row->warehouse->name,
                 'list_warehouse'            => $row->item->warehouseList(),
@@ -817,6 +820,11 @@ class GoodScaleController extends Controller
         }
         
         if($query->delete()) {
+
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
 
             $query->goodScaleDetail()->delete();
 
@@ -1148,6 +1156,7 @@ class GoodScaleController extends Controller
     public function export(Request $request){
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
-		return Excel::download(new ExportGoodScale($post_date,$end_date), 'good_scale_'.uniqid().'.xlsx');
+        $mode = $request->mode ? $request->mode : '';
+		return Excel::download(new ExportGoodScale($post_date,$end_date,$mode), 'good_scale_'.uniqid().'.xlsx');
     }
 }

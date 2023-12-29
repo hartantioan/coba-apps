@@ -340,12 +340,10 @@
                                     <td class="right-align">PPN</td>
                                     <td class="right-align" align="right" style="border:0.6px solid black;">{{ number_format($data->tax,2,',','.') }}</td>
                                 </tr>
-                                @if($data->wtax > 0)
                                 <tr class="break-row">
                                     <td class="right-align">PPh</td>
                                     <td class="right-align" align="right" style="border:0.6px solid black;">{{ number_format($data->wtax,2,',','.') }}</td>
                                 </tr>
-                                @endif
                                 <tr class="break-row">
                                     <td class="right-align">Grandtotal</td>
                                     <td class="right-align" align="right" style="border:0.6px solid black;">{{ number_format($data->grandtotal,2,',','.') }}</td>
@@ -388,6 +386,14 @@
                                 @endif
                             </tr>
                         </table>  
+                    </div>
+                    <div class="invoice-subtotal break-row">
+                        Remark :
+                        <ol>
+                            <li>Please mentioned PO NO in the DO.</li>
+                            <li>Seller has countersign this PO by at least 3 (three) working days from the date of this PO.</li>
+                            <li>Pihak supplier tidak akan memberikan uang dan/atau hadiah dalam bentuk apapun kepada karyawan/staff {{ $data->company->name }}. Jika melanggar akan diproses secara hukum dan seluruh sisa tagihan dianggap lunas.</li>
+                        </ol>
                     </div>
                 </div>
             </div>

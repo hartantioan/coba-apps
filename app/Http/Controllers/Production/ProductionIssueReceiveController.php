@@ -767,6 +767,11 @@ class ProductionIssueReceiveController extends Controller
         }
         
         if($query->delete()){
+            
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
 
             foreach($query->productionIssueReceiveDetail()->whereNotNull('production_order_detail_id')->get() as $row){
                 $row->productionOrderDetail->update([

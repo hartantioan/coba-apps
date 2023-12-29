@@ -11,6 +11,19 @@
             <th rowspan="2">Dokumen</th>
             <th rowspan="2">Catatan</th>
             <th rowspan="2">Status</th>
+            <th rowspan="2">Deleter</th>
+            <th rowspan="2">Tgl.Delete</th>
+            <th rowspan="2">Ket.Delete</th>
+            <th rowspan="2">Voider</th>
+            <th rowspan="2">Tgl.Void</th>
+            <th rowspan="2">Ket.Void</th>
+            <th rowspan="2">Item</th>
+            <th rowspan="2">Jum.</th>
+            <th rowspan="2">Sat.</th>
+            <th rowspan="2">Catatan</th>
+            <th rowspan="2">Plant</th>
+            <th rowspan="2">Departemen</th>
+            <th rowspan="2">Gudang</th>
         </tr>
         <tr align="center">
             <th>Pengajuan</th>
@@ -19,9 +32,13 @@
         </tr>
     </thead>
     <tbody>
+        @php
+            $no = 1;
+        @endphp
         @foreach($data as $key => $row)
+            @foreach($row->goodReceiptDetail as $keydetail => $rowdetail)
             <tr align="center" style="background-color:#d9d9d9;">
-                <td>{{ $key+1 }}</td>
+                <td>{{ $no }}</td>
                 <td>{{ $row->code }}</td>
                 <td>{{ $row->user->name }}</td>
                 <td>{{ $row->account->name }}</td>
@@ -33,35 +50,29 @@
                 <td><a href="{{ $row->attachment() }}" target="_blank">File</a></td>
                 <td>{{ $row->note }}</td>
                 <td>{!! $row->statusRaw() !!}</td>
-            </tr>
-            <tr align="center">
-                <th></th>
-                <th>No</th>
-                <th>Item</th>
-                <th>Jum.</th>
-                <th>Sat.</th>
-                <th>Catatan</th>
-                <th>Plant</th>
-                <th>Departemen</th>
-                <th>Gudang</th>
-            </tr>
-            @foreach($row->goodReceiptDetail as $keydetail => $rowdetail)
-            <tr>
-                <td></td>
+                <td>{{ $row->deleteUser()->exists() ? $row->deleteUser->name : '' }}</td>
+                <td>{{ $row->deleteUser()->exists() ? date('d/m/y',strtotime($row->deleted_at)) : '' }}</td>
+                <td>{{ $row->deleteUser()->exists() ? $row->delete_note : '' }}</td>
+                <td>{{ $row->voidUser()->exists() ? $row->voidUser->name : '' }}</td>
+                <td>{{ $row->voidUser()->exists() ? date('d/m/y',strtotime($row->void_date)) : '' }}</td>
+                <td>{{ $row->voidUser()->exists() ? $row->void_note : '' }}</td>
                 <td align="center">{{ ($keydetail + 1) }}</td>
                 <td>{{ $rowdetail->item->name }}</td>
                 <td align="center">{{ $rowdetail->qty }}</td>
                 <td align="center">{{ $rowdetail->item->buyUnit->code }}</td>
                 <td>{{ $rowdetail->note }}</td>
-                <td align="center">{{ $rowdetail->place->name.' - '.$rowdetail->place->company->name }}</td>
+                <td align="center">{{ $rowdetail->place->code.' - '.$rowdetail->place->company->name }}</td>
                 <td align="center">{{ $rowdetail->department->name ?? ''  }}</td>
                 <td align="center">{{ $rowdetail->warehouse->name }}</td>
             </tr>
+            @php
+                $no++;
+            @endphp
             @endforeach
         @endforeach
         @if(count($data) == 0)
             <tr>
-                <td colspan="12" align="center">
+                <td colspan="18" align="center">
                     Data tidak ditemukan
                 </td>
             </tr>

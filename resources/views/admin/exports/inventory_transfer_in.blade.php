@@ -11,12 +11,26 @@
             <th>Asal</th>
             <th>Tujuan</th>
             <th>Status</th>
+            <th>Deleter</th>
+            <th>Tgl.Delete</th>
+            <th>Ket.Delete</th>
+            <th>Voider</th>
+            <th>Tgl.Void</th>
+            <th>Ket.Void</th>
+            <th>Item</th>
+            <th>Qty</th>
+            <th>Satuan</th>
+            <th>Keterangan</th>
         </tr>
     </thead>
     <tbody>
+        @php
+            $no = 1;
+        @endphp
         @foreach($data as $key => $row)
+            @foreach($row->inventoryTransferOut->inventoryTransferOutDetail as $key1 => $rowdetail)
             <tr align="center">
-                <td>{{ $key+1 }}</td>
+                <td>{{ $no }}</td>
                 <td>{{ $row->user->name }}</td>
                 <td>{{ $row->code }}</td>
                 <td>{{ $row->company->name }}</td>
@@ -26,22 +40,20 @@
                 <td>{{ $row->inventoryTransferOut->placeFrom->name.' - '.$row->inventoryTransferOut->warehouseFrom->name }}</td>
                 <td>{{ $row->inventoryTransferOut->placeTo->name.' - '.$row->inventoryTransferOut->warehouseTo->name }}</td>
                 <td>{!! $row->status() !!}</td>
+                <td>{{ $row->deleteUser()->exists() ? $row->deleteUser->name : '' }}</td>
+                <td>{{ $row->deleteUser()->exists() ? date('d/m/y',strtotime($row->deleted_at)) : '' }}</td>
+                <td>{{ $row->deleteUser()->exists() ? $row->delete_note : '' }}</td>
+                <td>{{ $row->voidUser()->exists() ? $row->voidUser->name : '' }}</td>
+                <td>{{ $row->voidUser()->exists() ? date('d/m/y',strtotime($row->void_date)) : '' }}</td>
+                <td>{{ $row->voidUser()->exists() ? $row->void_note : '' }}</td>
+                <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name }}</td>
+                <td>{{ number_format($rowdetail->qty,3,',','.') }}</td>
+                <td>{{ $rowdetail->item->uomUnit->code }}</td>
+                <td>{{ $rowdetail->note }}</td>
             </tr>
-            <tr align="center">
-                <th></th>
-                <th>Item</th>
-                <th>Qty</th>
-                <th>Satuan</th>
-                <th>Keterangan</th>
-            </tr>
-            @foreach($row->inventoryTransferOut->inventoryTransferOutDetail as $key1 => $rowdetail)
-                <tr align="center">
-                    <td></td>
-                    <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name }}</td>
-                    <td>{{ number_format($rowdetail->qty,3,',','.') }}</td>
-                    <td>{{ $rowdetail->item->uomUnit->code }}</td>
-                    <td>{{ $rowdetail->note }}</td>
-                </tr>
+            @php
+                $no++;
+            @endphp
             @endforeach
         @endforeach
     </tbody>

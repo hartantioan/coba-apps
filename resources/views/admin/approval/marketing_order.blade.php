@@ -337,7 +337,7 @@
                     </tr>
                     <tr>
                         <td colspan="8">Keterangan: {{ $row->note }}</td>
-                        <td colspan="4">Ambil dari: {{ $row->place->name.' - Gudang '.$row->warehouse->code.' - Area '.$row->area->name 
+                        <td colspan="4">Ambil dari: {{ $row->place->code.' - Gudang '.$row->warehouse->code.' - Area '.$row->area->name 
                         }}</td>
                     </tr>
                     

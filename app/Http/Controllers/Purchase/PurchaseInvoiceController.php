@@ -1255,7 +1255,7 @@ class PurchaseInvoiceController extends Controller
                 'machine_id'    => $row->machine_id ? $row->machine_id : '',
                 'department_id' => $row->department_id ? $row->department_id : '',
                 'warehouse_id'  => $row->warehouse_id ? $row->warehouse_id : '',
-                'place_name'    => $row->place_id ? $row->place->name : '-',
+                'place_name'    => $row->place_id ? $row->place->code : '-',
                 'line_name'     => $row->line_id ? $row->line->name : '-',
                 'machine_name'  => $row->machine_id ? $row->machine->name : '-',
                 'department_name'=> $row->department_id ? $row->department->name : '-',
@@ -1361,6 +1361,11 @@ class PurchaseInvoiceController extends Controller
         }
         
         if($query->delete()) {
+
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
 
             CustomHelper::removeApproval('purchase_requests',$query->id);
             CustomHelper::addDeposit($query->account_id,$query->downpayment);
@@ -1811,7 +1816,8 @@ class PurchaseInvoiceController extends Controller
     public function export(Request $request){
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
-		return Excel::download(new ExportPurchaseInvoice($post_date,$end_date), 'purchase_invoice'.uniqid().'.xlsx');
+        $mode = $request->mode ? $request->mode : '';
+		return Excel::download(new ExportPurchaseInvoice($post_date,$end_date,$mode), 'purchase_invoice'.uniqid().'.xlsx');
     }
 
     public function viewStructureTree(Request $request){

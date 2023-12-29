@@ -470,7 +470,7 @@ class MarketingOrderReturnController extends Controller
                 <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->item->sellUnit->code.'</td>
                 <td class="">'.$row->note.'</td>
-                <td class="center-align">'.$row->place->name.'</td>
+                <td class="center-align">'.$row->place->code.'</td>
                 <td class="center-align">'.$row->warehouse->name.'</td>
             </tr>';
         }
@@ -882,7 +882,7 @@ class MarketingOrderReturnController extends Controller
                 'item_name'                             => $row->item->code.' - '.$row->item->name,
                 'item_warehouse'                        => $row->item->warehouseList(),
                 'place_id'                              => $row->place_id,
-                'place_name'                            => $row->place->name,
+                'place_name'                            => $row->place->code,
                 'warehouse_id'                          => $row->warehouse_id,
                 'warehouse_name'                        => $row->warehouse->name,
                 'area_id'                               => $row->area_id,
@@ -997,6 +997,11 @@ class MarketingOrderReturnController extends Controller
         }
         
         if($query->delete()) {
+
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
 
             $query->marketingOrderReturnDetail()->delete();
 

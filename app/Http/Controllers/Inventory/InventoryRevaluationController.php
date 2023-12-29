@@ -26,6 +26,7 @@ use App\Models\User;
 use App\Models\Company;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportInventoryTransferOut;
+use App\Models\Menu;
 
 class InventoryRevaluationController extends Controller
 {
@@ -41,6 +42,8 @@ class InventoryRevaluationController extends Controller
 
     public function index(Request $request)
     {
+        $lastSegment = request()->segment(count(request()->segments()));
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'     => 'Revaluasi Inventori',
             'content'   => 'admin.inventory.revaluation',
@@ -49,7 +52,7 @@ class InventoryRevaluationController extends Controller
             'warehouse' => Warehouse::where('status','1')->whereIn('id',$this->datawarehouses)->get(),
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
-            'newcode'   => 'INRV-'.date('y'),
+            'newcode'   => $menu->document_code.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -390,7 +393,7 @@ class InventoryRevaluationController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->item->name.'</td>
-                <td class="center-align">'.$row->place->name.'</td>
+                <td class="center-align">'.$row->place->code.'</td>
                 <td class="center-align">'.$row->warehouse->name.'</td>
                 <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->item->uomUnit->code.'</td>
@@ -789,7 +792,8 @@ class InventoryRevaluationController extends Controller
     public function export(Request $request){
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
-		return Excel::download(new ExportInventoryRevaluation($post_date,$end_date), 'inventory_revaluation_'.uniqid().'.xlsx');
+        $mode = $request->mode ? $request->mode : '';
+		return Excel::download(new ExportInventoryRevaluation($post_date,$end_date,$mode), 'inventory_revaluation_'.uniqid().'.xlsx');
     }
 
     public function voidStatus(Request $request){
@@ -881,6 +885,11 @@ class InventoryRevaluationController extends Controller
         }
         
         if($query->delete()) {
+
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
 
             $query->inventoryRevaluationDetail()->delete();
 

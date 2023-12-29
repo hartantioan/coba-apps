@@ -17,11 +17,13 @@ class ExportPurchaseInvoice implements FromCollection, WithTitle, WithHeadings, 
     * @return \Illuminate\Support\Collection
     */
 
-    public function __construct(string $start_date, string $end_date)
+    protected $start_date, $end_date, $mode;
+
+    public function __construct(string $start_date, string $end_date, string $mode)
     {
         $this->start_date = $start_date ? $start_date : '';
 		$this->end_date = $end_date ? $end_date : '';
-
+        $this->mode = $mode ? $mode : '';
     }
 
     private $headings = [
@@ -33,39 +35,64 @@ class ExportPurchaseInvoice implements FromCollection, WithTitle, WithHeadings, 
         'Document Date',
         'Received Date',
         'Due Date',
-        'Downpayment',
         'Cut Date',
+        'Total',
+        'PPN',
+        'PPh',
+        'Grandtotal',
+        'Downpayment',
         'Rounding',
         'Balance',
         'Status',
-        
+        'Voider',
+        'Tgl.Void',
+        'Ket.Void',
+        'Deleter',
+        'Tgl.Delete',
+        'Ket.Delete',
     ];
 
     public function collection()
     {
-        $data = PurchaseInvoice::where( function($query) {
-            $query->where('post_date', '>=',$this->start_date)
-                  ->where('post_date', '<=', $this->end_date);
-        })->get();
+        if($this->mode == '1'){
+            $data = PurchaseInvoice::where( function($query) {
+                $query->where('post_date', '>=',$this->start_date)
+                    ->where('post_date', '<=', $this->end_date);
+            })->get();
+        }elseif($this->mode == '2'){
+            $data = PurchaseInvoice::withTrashed()->where( function($query) {
+                $query->where('post_date', '>=',$this->start_date)
+                    ->where('post_date', '<=', $this->end_date);
+            })->get();
+        }
 
         $arr = [];
 
         foreach($data as $key => $row){
             $arr[] = [
-                '1'                => ($key + 1),
-                '2'              => date('d/m/y',strtotime($row->post_date)),
+                '1'                 => ($key + 1),
+                '2'                 => date('d/m/y',strtotime($row->post_date)),
                 '3'                 => $row->code,
-                '4'         => $row->account->employee_no,
-                '5'          => $row->account->name,
-                '6'              => date('d/m/y',strtotime($row->document_date)),
-                '7'               => date('d/m/y',strtotime($row->received_date)),
-                '8'              => date('d/m/y',strtotime($row->due_date)),
-                '9'           => $row->downpayment,
-                '11'         => date('d/m/y',strtotime($row->cut_date)),
-                '12'              => $row->rounding,
-                '13'              => $row->balance,
-                '14'              => $row->statusRaw(),
-
+                '4'                 => $row->account->employee_no,
+                '5'                 => $row->account->name,
+                '6'                 => date('d/m/y',strtotime($row->document_date)),
+                '7'                 => date('d/m/y',strtotime($row->received_date)),
+                '8'                 => date('d/m/y',strtotime($row->due_date)),
+                '11'                => date('d/m/y',strtotime($row->cut_date)),
+                'total'             => number_format($row->total,2,',','.'),
+                'tax'               => number_format($row->tax,2,',','.'),
+                'wtax'              => number_format($row->wtax,2,',','.'),
+                'grandtotal'        => number_format($row->grandtotal,2,',','.'),
+                'downpayment'       => number_format($row->downpayment,2,',','.'),
+                '12'                => number_format($row->rounding,2,',','.'),
+                '13'                => number_format($row->balance,2,',','.'),
+                '14'                => $row->statusRaw(),
+                'voider'            => $row->voidUser()->exists() ? $row->voidUser->name : '',
+                'void_date'         => $row->voidUser()->exists() ? $row->void_date : '',
+                'void_note'         => $row->voidUser()->exists() ? $row->void_note : '',
+                'deleter'           => $row->deleteUser()->exists() ? $row->deleteUser->name : '',
+                'delete_date'       => $row->deleteUser()->exists() ? $row->deleted_at : '',
+                'delete_note'       => $row->deleteUser()->exists() ? $row->delete_note : '',
             ];
             
         }

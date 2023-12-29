@@ -38,7 +38,7 @@ class ExportEmployeeReceivable implements FromView , WithEvents
                 $results[] = [
                     'code'          => $row->code,
                     'employee_name' => $row->account->name,
-                    'plant'         => $row->place->name,
+                    'plant'         => $row->place->code,
                     'post_date'     => date('d/m/y',strtotime($row->post_date)),
                     'required_date' => date('d/m/y',strtotime($row->required_date)),
                     'note'          => $row->note,

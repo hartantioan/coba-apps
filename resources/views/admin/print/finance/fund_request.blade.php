@@ -160,7 +160,7 @@
                             <td>{{ $key+1 }}</td>
                             <td>{{ $row->user->name }}</td>
                             <td>{{ $row->code }}</td>
-                            <td>{{ $row->place->name.' - '.$row->place->company->name }}</td>
+                            <td>{{ $row->place->code.' - '.$row->place->company->name }}</td>
                             <td>{{ $row->department->name }}</td>
                             <td>{{ $row->account->name }}</td>
 							<td>{{ $row->type() }}</td>

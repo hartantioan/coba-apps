@@ -79,7 +79,7 @@ class LandedCostController extends Controller
             'landedcostfee' => LandedCostFee::where('status','1')->get(),
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-            'newcode'       =>  $menu->document_code.date('y'),
+            'newcode'       => $menu->document_code.date('y'),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
         ];
 
@@ -771,7 +771,7 @@ class LandedCostController extends Controller
                     <td class="center-align">'.$row->item->uomUnit->code.'</td>
                     <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
                     <td class="right-align">'.number_format(round($row->nominal / $row->qty,3),2,',','.').'</td>
-                    <td class="center-align">'.$row->place->name.'</td>
+                    <td class="center-align">'.$row->place->code.'</td>
                     <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
                     <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
                     <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
@@ -905,7 +905,7 @@ class LandedCostController extends Controller
                 'qty'                       => number_format($row->qty,3,',','.'),
                 'nominal'                   => number_format($row->nominal,2,',','.'),
                 'unit'                      => $row->item->uomUnit->code,
-                'place_name'                => $row->place->name,
+                'place_name'                => $row->place->code,
                 'department_name'           => $row->department_id ? $row->department->name : '-',
                 'warehouse_name'            => $row->warehouse->name,
                 'place_id'                  => $row->place_id,
@@ -1038,6 +1038,10 @@ class LandedCostController extends Controller
         }
         
         if($query->delete()) {
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
 
             CustomHelper::removeApproval('landed_costs',$query->id);
             
@@ -1401,8 +1405,9 @@ class LandedCostController extends Controller
     public function export(Request $request){
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
+        $mode = $request->mode ? $request->mode : '';
 		
-		return Excel::download(new ExportLandedCost($post_date,$end_date), 'landed_cost'.uniqid().'.xlsx');
+		return Excel::download(new ExportLandedCost($post_date,$end_date,$mode), 'landed_cost'.uniqid().'.xlsx');
     }
     
     public function removeUsedData(Request $request){

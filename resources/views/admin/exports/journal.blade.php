@@ -50,7 +50,7 @@
                     <td></td>
                     <td>{{ $rowdetail->coa->name }}</td>
                     <td align="center"></td>
-                    <td align="center">{{ ($rowdetail->place_id ? $rowdetail->place->name.' - '.$rowdetail->place->company->name : '-') }}</td>
+                    <td align="center">{{ ($rowdetail->place_id ? $rowdetail->place->code.' - '.$rowdetail->place->company->name : '-') }}</td>
                     <td align="center">{{ ($rowdetail->account_id ? $rowdetail->account->name : '-') }}</td>
                     <td align="center">{{ ($rowdetail->item_id ? $rowdetail->item->name : '-') }}</td>
                     <td align="center">{{ ($rowdetail->department_id ? $rowdetail->department->name : '-') }}</td>

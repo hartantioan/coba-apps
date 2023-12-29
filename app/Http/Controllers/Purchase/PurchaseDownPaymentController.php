@@ -858,6 +858,11 @@ class PurchaseDownPaymentController extends Controller
         
         if($query->delete()) {
 
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
+
             CustomHelper::removeDeposit($query->account_id,$query->grandtotal);
             CustomHelper::removeApproval('purchase_down_payments',$query->id);
 
@@ -1257,7 +1262,9 @@ class PurchaseDownPaymentController extends Controller
     public function export(Request $request){
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
-		return Excel::download(new ExportPurchaseDownPayment($post_date,$end_date), 'purchase_down_payment_'.uniqid().'.xlsx');
+        $mode = $request->mode ? $request->mode : '';
+
+		return Excel::download(new ExportPurchaseDownPayment($post_date,$end_date,$mode), 'purchase_down_payment_'.uniqid().'.xlsx');
     }
 
     public function viewStructureTree(Request $request){

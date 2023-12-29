@@ -23,6 +23,7 @@ use App\Models\User;
 use App\Models\Company;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportInventoryTransferOut;
+use App\Models\Menu;
 use Illuminate\Support\Str;
 class InventoryTransferOutController extends Controller
 {
@@ -38,6 +39,8 @@ class InventoryTransferOutController extends Controller
 
     public function index(Request $request)
     {
+        $lastSegment = request()->segment(count(request()->segments()));
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'     => 'Transfer Antar Gudang - Keluar',
             'content'   => 'admin.inventory.transfer_out',
@@ -46,7 +49,7 @@ class InventoryTransferOutController extends Controller
             'warehouse' => Warehouse::where('status','1')->whereIn('id',$this->datawarehouses)->get(),
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
-            'newcode'   => 'ITOU-'.date('y'),
+            'newcode'   => $menu->document_code.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -187,9 +190,9 @@ class InventoryTransferOutController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->company->name,
-                    $val->placeFrom->name,
+                    $val->placeFrom->code,
                     $val->warehouseFrom->name,
-                    $val->placeTo->name,
+                    $val->placeTo->code,
                     $val->warehouseTo->name,
                     date('d/m/y',strtotime($val->post_date)),
                     $val->note,
@@ -675,6 +678,11 @@ class InventoryTransferOutController extends Controller
         
         if($query->delete()) {
 
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
+
             $query->inventoryTransferDetail()->delete();
 
             CustomHelper::removeApproval('inventory_transfer_outs',$query->id);
@@ -1007,7 +1015,8 @@ class InventoryTransferOutController extends Controller
     public function export(Request $request){
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
-		return Excel::download(new ExportInventoryTransferOut($post_date,$end_date), 'inventory_transfer_out_'.uniqid().'.xlsx');
+        $mode = $request->mode ? $request->mode : '';
+		return Excel::download(new ExportInventoryTransferOut($post_date,$end_date,$mode), 'inventory_transfer_out_'.uniqid().'.xlsx');
     }
 
     public function viewJournal(Request $request,$id){

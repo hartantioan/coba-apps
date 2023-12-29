@@ -10,6 +10,22 @@
             <th rowspan="2">Keterangan</th>
             <th rowspan="2">Dokumen</th>
             <th rowspan="2">Status</th>
+            <th rowspan="2">Deleter</th>
+            <th rowspan="2">Tgl.Delete</th>
+            <th rowspan="2">Ket.Delete</th>
+            <th rowspan="2">Voider</th>
+            <th rowspan="2">Tgl.Void</th>
+            <th rowspan="2">Ket.Void</th>
+            <th rowspan="2">Item</th>
+            <th rowspan="2">Qty</th>
+            <th rowspan="2">Satuan</th>
+            <th rowspan="2">Harga Satuan</th>
+            <th rowspan="2">Harga Total</th>
+            <th rowspan="2">Keterangan</th>
+            <th rowspan="2">Coa</th>
+            <th rowspan="2">Plant</th>
+            <th rowspan="2">Departemen</th>
+            <th rowspan="2">Gudang</th>
         </tr>
         <tr align="center">
             <th>Kode</th>
@@ -17,9 +33,13 @@
         </tr>
     </thead>
     <tbody>
+        @php
+            $no = 1;
+        @endphp
         @foreach($data as $key => $row)
+            @foreach($row->goodReceiveDetail as $key1 => $rowdetail)
             <tr align="center">
-                <td>{{ $key+1 }}</td>
+                <td>{{ $no }}</td>
                 <td>{{ $row->user->name }}</td>
                 <td>{{ $row->code }}</td>
                 <td>{{ $row->company->name }}</td>
@@ -29,23 +49,12 @@
                 <td>{{ $row->note }}</td>
                 <td><a href="{{ $row->attachment() }}">File</a></td>
                 <td>{!! $row->status() !!}</td>
-            </tr>
-            <tr align="center">
-                <th></th>
-                <th>Item</th>
-                <th>Qty</th>
-                <th>Satuan</th>
-                <th>Harga Satuan</th>
-                <th>Harga Total</th>
-                <th>Keterangan</th>
-                <th>Coa</th>
-                <th>Plant</th>
-                <th>Departemen</th>
-                <th>Gudang</th>
-            </tr>
-            @foreach($row->goodReceiveDetail as $key1 => $rowdetail)
-            <tr align="center">
-                <td></td>
+                <td>{{ $row->deleteUser()->exists() ? $row->deleteUser->name : '' }}</td>
+                <td>{{ $row->deleteUser()->exists() ? date('d/m/y',strtotime($row->deleted_at)) : '' }}</td>
+                <td>{{ $row->deleteUser()->exists() ? $row->delete_note : '' }}</td>
+                <td>{{ $row->voidUser()->exists() ? $row->voidUser->name : '' }}</td>
+                <td>{{ $row->voidUser()->exists() ? date('d/m/y',strtotime($row->void_date)) : '' }}</td>
+                <td>{{ $row->voidUser()->exists() ? $row->void_note : '' }}</td>
                 <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name }}</td>
                 <td>{{ number_format($rowdetail->qty,3,',','.') }}</td>
                 <td>{{ $rowdetail->item->uomUnit->code }}</td>
@@ -53,10 +62,13 @@
                 <td align="right">{{ number_format($rowdetail->total,3,',','.') }}</td>
                 <td>{{ $rowdetail->note }}</td>
                 <td>{{ $rowdetail->coa->code.' - '.$rowdetail->coa->name }}</td>
-                <td>{{ $rowdetail->place->name.' - '.$rowdetail->place->company->name }}</td>
-                <td>{{ $rowdetail->department->name }}</td>
+                <td>{{ $rowdetail->place->code.' - '.$rowdetail->place->company->name }}</td>
+                <td>{{ $rowdetail->department()->exists() ? $rowdetail->department->name : '' }}</td>
                 <td>{{ $rowdetail->warehouse->name }}</td>
             </tr>
+            @php
+                $no++;
+            @endphp
             @endforeach
         @endforeach
     </tbody>

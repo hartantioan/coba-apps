@@ -213,7 +213,7 @@
 								<tr align="center">
 									<td>{{ $key+1 }}</td>
 									<td>{{ $row->code }}</td>
-									<td>{{ $row->place->code.' - '.$row->place->name }}</td>
+									<td>{{ $row->place->code.' - '.$row->place->code }}</td>
 									<td>{{ $row->name }}</td>
 									<td>{{ $row->note }}</td>
 								</tr>

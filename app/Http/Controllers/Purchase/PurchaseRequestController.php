@@ -198,7 +198,7 @@ class PurchaseRequestController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat indigo accent-2 white-text btn-small" data-popup="tooltip" title="Salin" onclick="duplicate(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">content_copy</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat red accent-2 white-text btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat yellow accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
 
@@ -255,7 +255,7 @@ class PurchaseRequestController extends Controller
                 <td class="">'.$row->note.'</td>
                 <td class="">'.$row->note2.'</td>
                 <td class="center-align">'.date('d/m/y',strtotime($row->required_date)).'</td>
-                <td class="center-align">'.$row->place->name.'</td>
+                <td class="center-align">'.$row->place->code.'</td>
                 <td class="center-align">'.($row->line()->exists() ? $row->line->name : '-').'</td>
                 <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
                 <td class="center-align">'.$row->warehouse->name.'</td>
@@ -482,8 +482,9 @@ class PurchaseRequestController extends Controller
     public function export(Request $request){
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
+        $mode = $request->mode ? $request->mode : '';
 		
-		return Excel::download(new ExportPurchaseRequest($post_date,$end_date,$this->dataplaces), 'purchase_request_'.uniqid().'.xlsx');
+		return Excel::download(new ExportPurchaseRequest($post_date,$end_date,$this->dataplaces,$mode), 'purchase_request_'.uniqid().'.xlsx');
     }
 
     public function create(Request $request){
@@ -749,6 +750,10 @@ class PurchaseRequestController extends Controller
         }
 
         if($query->delete()) {
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
             
             $query->purchaseRequestDetail()->delete();
             CustomHelper::removeApproval('purchase_requests',$query->id);

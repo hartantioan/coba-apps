@@ -242,7 +242,7 @@
                                     <td>{{ $row->item->name }}</td>
                                     <td align="right">{{ number_format($row->qty,3,',','.') }}</td>
                                     <td align="center">{{ $row->item->sellUnit->code }}</td>
-                                    <td align="center">{{ $row->place->name.' - '.$row->warehouse->code }}</td>
+                                    <td align="center">{{ $row->place->code.' - '.$row->warehouse->code }}</td>
                                 </tr>
                                 <tr>
                                     <td colspan="6">Keterangan: {{ $row->note }}</td>

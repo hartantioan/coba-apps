@@ -219,7 +219,7 @@
 									<td>{{ $key+1 }}</td>
 									<td>{{ $row->code }}</td>
 									<td>{{ $row->name }}</td>
-									<td>{{ $row->place->name }}</td>
+									<td>{{ $row->place->code }}</td>
 									<td>{{ $row->department->name }}</td>
 									<td>{{ date('H:i',strtotime($row->min_time_in)) }}</td>
 									<td>{{ date('H:i',strtotime($row->time_in)) }}</td>

@@ -34,7 +34,14 @@ class InventoryTransferOut extends Model
         'void_id',
         'void_note',
         'void_date',
+        'delete_id',
+        'delete_note',
     ];
+
+    public function deleteUser()
+    {
+        return $this->belongsTo('App\Models\User', 'delete_id', 'id')->withTrashed();
+    }
 
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);

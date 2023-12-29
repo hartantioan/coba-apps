@@ -210,7 +210,7 @@
                             <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
                             <td class="center-align">{{ $row->place_id ? $row->place->company->name : '-' }}</td>
                             <td class="center-align">{{ $row->account_id ? $row->account->name : '-' }}</td>
-                            <td class="center-align">{{ $row->place_id ? $row->place->name : '-' }}</td>
+                            <td class="center-align">{{ $row->place_id ? $row->place->code : '-' }}</td>
                             <td class="center-align">{{ $row->line_id ? $row->line->name : '-' }}</td>
                             <td class="center-align">{{ $row->department_id ? $row->department->name : '-' }}</td>
                             <td class="center-align">{{ $row->warehouse_id ? $row->warehouse->name : '-' }}</td>

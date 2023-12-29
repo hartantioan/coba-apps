@@ -326,7 +326,7 @@
                                     <td align="right">{{ number_format($row->qty_out,3,',','.') }}</td>
                                     <td align="right">{{ number_format($row->qty_balance,3,',','.') }}</td>
                                     <td class="center-align">{{ $row->item->uomUnit->code }}</td>
-                                    <td class="center-align">{{ $row->place->name }}</td>
+                                    <td class="center-align">{{ $row->place->code }}</td>
                                     <td class="center-align">{{ $row->warehouse->name }}</td>
                                 </tr>
                                 <tr>

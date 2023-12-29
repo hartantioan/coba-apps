@@ -219,7 +219,7 @@
 									<td>{{ $row->code }}</td>
 									<td>{{ $row->name }}</td>
 									<td>{{ $row->item->name }}</td>
-									<td>{{ $row->place->name }}</td>
+									<td>{{ $row->place->code }}</td>
 									<td>{{ number_format($row->qty_output,3,',','.') }}</td>
 									<td>{{ number_format($row->qty_planned,3,',','.') }}</td>
 									<td>{{ $row->type() }}</td>

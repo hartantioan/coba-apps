@@ -128,7 +128,7 @@ class LandedCostFeeController extends Controller
         foreach($data->costDistributionDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$row->place->code.' - '.$row->place->name.'</td>
+                <td class="center-align">'.$row->place->code.' - '.$row->place->code.'</td>
                 <td class="center-align">'.($row->line_id ? $row->line->code.' - '.$row->line->name : '-').'</td>
                 <td class="center-align">'.($row->machine_id ? $row->machine->code.' - '.$row->machine->name : '-').'</td>
                 <td class="center-align">'.($row->department_id ? $row->department->code.' - '.$row->department->name : '-').'</td>

@@ -61,7 +61,7 @@ class ExportFundRequest implements FromCollection, WithTitle, WithHeadings, With
                 'id'            => ($key + 1),
                 'name'          => $row->user->name,
                 'code'          => $row->code,
-                'place_id'      => $row->place->name.' - '.$row->place->company->name,
+                'place_id'      => $row->place->code.' - '.$row->place->company->name,
                 'department'    => $row->department->name,
                 'bp'            => $row->account->name,
                 'type'          => $row->type(),

@@ -197,7 +197,7 @@
 													<td align="right">{{ number_format($rowdetail->percent_discount_2,2,',','.') }}</td>
 													<td align="right">{{ number_format($rowdetail->discount_3,2,',','.') }}</td>
 													<td align="right">{{ number_format($rowdetail->subtotal,2,',','.') }}</td>
-													<td>{{ $rowdetail->place->name }}</td>
+													<td>{{ $rowdetail->place->code }}</td>
 													<td>{{ $rowdetail->department->name }}</td>
 													<td>{{ $rowdetail->warehouse_id ? $rowdetail->warehouse->name : '-' }}</td>
 												</tr>

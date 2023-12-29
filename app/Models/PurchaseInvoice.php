@@ -40,11 +40,13 @@ class PurchaseInvoice extends Model
         'void_id',
         'void_note',
         'void_date',
+        'delete_id',
+        'delete_note',
         'tax_no',
         'tax_cut_no',
         'cut_date',
         'spk_no',
-        'invoice_no'
+        'invoice_no',
     ];
 
     public function user()
@@ -55,6 +57,11 @@ class PurchaseInvoice extends Model
     public function voidUser()
     {
         return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
+    }
+
+    public function deleteUser()
+    {
+        return $this->belongsTo('App\Models\User', 'delete_id', 'id')->withTrashed();
     }
 
     public function account(){

@@ -29,6 +29,7 @@ use App\Models\Company;
 use App\Models\Department;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportGoodIssue;
+use App\Models\Menu;
 
 class GoodIssueController extends Controller
 {
@@ -43,6 +44,8 @@ class GoodIssueController extends Controller
 
     public function index(Request $request)
     {
+        $lastSegment = request()->segment(count(request()->segments()));
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'     => 'Barang Keluar',
             'content'   => 'admin.inventory.good_issue',
@@ -51,7 +54,7 @@ class GoodIssueController extends Controller
             'department'=> Department::where('status','1')->get(),
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
-            'newcode'   => 'GISS-'.date('y'),
+            'newcode'   => $menu->document_code.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -619,6 +622,11 @@ class GoodIssueController extends Controller
         
         if($query->delete()) {
 
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
+
             CustomHelper::removeJournal('good_issues',$query->id);
             CustomHelper::removeCogs('good_issues',$query->id);
 
@@ -953,7 +961,8 @@ class GoodIssueController extends Controller
     public function export(Request $request){
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
-		return Excel::download(new ExportGoodIssue($post_date,$end_date), 'good_issue_'.uniqid().'.xlsx');
+        $mode = $request->mode ? $request->mode : '';
+		return Excel::download(new ExportGoodIssue($post_date,$end_date,$mode), 'good_issue_'.uniqid().'.xlsx');
     }
 
     public function viewJournal(Request $request,$id){

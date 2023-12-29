@@ -301,7 +301,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 foreach($data->marketingOrderDeliveryDetail as $row){
                     $details[] = [
                         'item_name'     => $row->item->code.' - '.$row->item->name,
-                        'place_name'    => $row->place->name,
+                        'place_name'    => $row->place->code,
                         'warehouse_name'=> $row->warehouse->name,
                         'qty'           => number_format($row->qty,3,',','.'),
                         'unit'          => $row->item->sellUnit->code,
@@ -972,7 +972,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                         'codename'  => $row->coa->code.' - '.$row->coa->name,
                         'company'   => $row->coa->company->name,
                         'account'   => $row->account_id ? $row->account->name : '-',
-                        'place'     => $row->place_id ? $row->place->name : '-',
+                        'place'     => $row->place_id ? $row->place->code : '-',
                         'line'      => $row->line_id ? $row->line->name : '-',
                         'machine'   => $row->machine_id ? $row->machine->name : '-',
                         'department'=> $row->department_id ? $row->department->name : '-',
@@ -1053,7 +1053,7 @@ class MarketingOrderDeliveryProcessController extends Controller
         foreach($po->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
             $arr[] = [
                 'item_name'     => $row->item->code.' - '.$row->item->name,
-                'place_name'    => $row->place->name,
+                'place_name'    => $row->place->code,
                 'warehouse_name'=> $row->warehouse->name,
                 'qty'           => number_format($row->qty,3,',','.'),
                 'unit'          => $row->item->sellUnit->code,
@@ -1322,6 +1322,11 @@ class MarketingOrderDeliveryProcessController extends Controller
         }
         
         if($query->delete()) {
+
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
 
             $query->marketingOrderDeliveryProcessTrack()->delete();
 

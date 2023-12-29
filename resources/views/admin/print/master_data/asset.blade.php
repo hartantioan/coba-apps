@@ -221,7 +221,7 @@
 									<td>{{ $loop->iteration }}</td>
 									<td>{{ $row->code }}</td>
 									<td>{{ $row->name }}</td>
-									<td>{{ $row->place->name }}</td>
+									<td>{{ $row->place->code }}</td>
 									<td>{{ $row->assetGroup->name }}</td>
 									<td>{{ date('d/m/y',strtotime($row->date)) }}</td>
 									<td>{{ number_format($row->nominal,2,',','.') }}</td>

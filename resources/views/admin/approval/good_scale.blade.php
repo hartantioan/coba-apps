@@ -241,7 +241,7 @@
                     <td class="center-align">{{ number_format($row->qty_out,3,',','.') }}</td>
                     <td class="center-align">{{ number_format($row->qty_balance,3,',','.') }}</td>
                     <td class="center-align">{{ $row->item->uomUnit->code }}</td>
-                    <td class="center-align">{{ $row->place->name.' - '.$row->place->company->name }}</td>
+                    <td class="center-align">{{ $row->place->code.' - '.$row->place->company->name }}</td>
                     <td class="center-align">{{ $row->warehouse->name }}</td>
                 </tr>
                 <tr>

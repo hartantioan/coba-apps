@@ -183,7 +183,7 @@ class LedgerController extends Controller
                 <td>'.$row->journal->note.'</td>
                 <td>'.$row->note.'</td>
                 <td>'.($row->account_id ? $row->account->name : '-').'</td>
-                <td>'.($row->place_id ? $row->place->name : '-').'</td>
+                <td>'.($row->place_id ? $row->place->code : '-').'</td>
                 <td>'.($row->line_id ? $row->line->name : '-').'</td>
                 <td>'.($row->machine_id ? $row->machine->name : '-').'</td>
                 <td>'.($row->department_id ? $row->department->name : '-').'</td>

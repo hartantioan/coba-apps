@@ -189,7 +189,7 @@
                                     <tbody>
                                         @foreach($row->landedCostDetail as $key => $rowdetail)
                                         <tr align="center">
-											<td>{{ $rowdetail->place->name.' - '.$rowdetail->place->company->name }}</td>
+											<td>{{ $rowdetail->place->code.' - '.$rowdetail->place->company->name }}</td>
 											<td>{{ $rowdetail->line_id ? $rowdetail->line->name : '-' }}</td>
 											<td>{{ $rowdetail->department_id ? $rowdetail->department->name : '-' }}</td>
 											<td>{{ $rowdetail->warehouse->name }}</td>

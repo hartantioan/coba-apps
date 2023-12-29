@@ -42,6 +42,7 @@ use App\Models\User;
 use App\Models\GoodReturnPODetail;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportGoodReturnPO;
+use App\Models\Menu;
 
 class GoodReturnPOController extends Controller
 {
@@ -56,6 +57,8 @@ class GoodReturnPOController extends Controller
 
     public function index(Request $request)
     {
+        $lastSegment = request()->segment(count(request()->segments()));
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'     => 'Pengembalian Barang PO',
             'content'   => 'admin.inventory.good_return_po',
@@ -63,7 +66,7 @@ class GoodReturnPOController extends Controller
             'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
-            'newcode'   => 'GRRT-'.date('y'),
+            'newcode'   => $menu->document_code.date('y'),
             'place'     => Place::whereIn('id',$this->dataplaces)->where('status','1')->get(),
         ];
 
@@ -227,7 +230,7 @@ class GoodReturnPOController extends Controller
                             'qty'                       => number_format($row->qty,3,',','.'),
                             'unit'                      => $row->item->buyUnit->code,
                             'place_id'                  => $row->place_id,
-                            'place_name'                => $row->place->name,
+                            'place_name'                => $row->place->code,
                             'line_id'                   => $row->line_id ? $row->line_id : '',
                             'line_name'                 => $row->line_id ? $row->line->name : '-',
                             'machine_id'                => $row->machine_id ? $row->machine_id : '',
@@ -712,6 +715,11 @@ class GoodReturnPOController extends Controller
         
         if($query->delete()) {
 
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
+
             CustomHelper::removeApproval('good_returns',$query->id);
 
             $query->goodReceiptDetail()->delete();
@@ -1025,7 +1033,8 @@ class GoodReturnPOController extends Controller
     public function export(Request $request){
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
-		return Excel::download(new ExportGoodReturnPO($post_date,$end_date), 'good_return_po_'.uniqid().'.xlsx');
+        $mode = $request->mode ? $request->mode : '';
+		return Excel::download(new ExportGoodReturnPO($post_date,$end_date,$mode), 'good_return_po_'.uniqid().'.xlsx');
     }
     
     public function viewStructureTree(Request $request){

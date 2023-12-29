@@ -806,6 +806,11 @@ class PurchaseMemoController extends Controller
         
         if($query->delete()) {
 
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
+
             CustomHelper::removeApproval('purchase_memos',$query->id);
 
             $query->purchaseMemoDetail()->delete();
@@ -2591,6 +2596,7 @@ class PurchaseMemoController extends Controller
     public function export(Request $request){
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
-		return Excel::download(new ExportPurchaseMemo($post_date,$end_date), 'purchase_memo'.uniqid().'.xlsx');
+        $mode = $request->mode ? $request->mode : '';
+		return Excel::download(new ExportPurchaseMemo($post_date,$end_date,$mode), 'purchase_memo'.uniqid().'.xlsx');
     }
 }

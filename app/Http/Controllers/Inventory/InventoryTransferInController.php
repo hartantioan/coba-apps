@@ -26,6 +26,7 @@ use App\Models\User;
 use App\Models\Company;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportInventoryTransferIn;
+use App\Models\Menu;
 
 class InventoryTransferInController extends Controller
 {
@@ -40,13 +41,15 @@ class InventoryTransferInController extends Controller
 
     public function index(Request $request)
     {
+        $lastSegment = request()->segment(count(request()->segments()));
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'     => 'Transfer Antar Gudang - Masuk',
             'content'   => 'admin.inventory.transfer_in',
             'company'   => Company::where('status','1')->get(),
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
-            'newcode'   => 'ITIN-'.date('y'),
+            'newcode'   => $menu->document_code.date('y'),
             'place'     => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
         ];
 
@@ -216,9 +219,9 @@ class InventoryTransferInController extends Controller
                     $val->note,
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->inventoryTransferOut->code,
-                    $val->inventoryTransferOut->placeFrom->name,
+                    $val->inventoryTransferOut->placeFrom->code,
                     $val->inventoryTransferOut->warehouseFrom->name,
-                    $val->inventoryTransferOut->placeTo->name,
+                    $val->inventoryTransferOut->placeTo->code,
                     $val->inventoryTransferOut->warehouseTo->name,
                     $val->status(),
                     '
@@ -615,6 +618,11 @@ class InventoryTransferInController extends Controller
         
         if($query->delete()) {
 
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
+
             CustomHelper::removeApproval('inventory_transfer_ins',$query->id);
 
             activity()
@@ -944,6 +952,7 @@ class InventoryTransferInController extends Controller
     public function export(Request $request){
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
-		return Excel::download(new ExportInventoryTransferIn($post_date,$end_date), 'inventory_transfer_in_'.uniqid().'.xlsx');
+        $mode = $request->mode ? $request->mode : '';
+		return Excel::download(new ExportInventoryTransferIn($post_date,$end_date,$mode), 'inventory_transfer_in_'.uniqid().'.xlsx');
     }
 }

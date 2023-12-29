@@ -16,11 +16,13 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, Shoul
     * @return \Illuminate\Support\Collection
     */
 
-    public function __construct(string $start_date, string $end_date)
+    protected $start_date, $end_date, $mode;
+
+    public function __construct(string $start_date, string $end_date, string $mode)
     {
         $this->start_date = $start_date ? $start_date : '';
 		$this->end_date = $end_date ? $end_date : '';
-
+        $this->mode = $mode ? $mode : '';
     }
 
 
@@ -39,15 +41,29 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, Shoul
         'PERUSAHAAN',
         'WAREHOUSE',
         'STATUS',
+        'VOIDER',
+        'TGL.VOID',
+        'KET.VOID',
+        'DELETER',
+        'TGL.DELETE',
+        'KET.DELETE',
     ];
 
     public function collection()
     {
-        $data = LandedCostDetail::whereHas('landedCost',function ($query) {
-            $query->where('post_date', '>=',$this->start_date)
-            ->where('post_date', '<=', $this->end_date);
-        })
-        ->get();
+        if($this->mode == '1'){
+            $data = LandedCostDetail::whereHas('landedCost',function ($query) {
+                $query->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+        }elseif($this->mode == '2'){
+            $data = LandedCostDetail::withTrashed()->whereHas('landedCost',function ($query) {
+                $query->withTrashed()->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+        }
 
         $arr = [];
 
@@ -64,11 +80,17 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, Shoul
                     'item_code'     => $row->item->code,
                     'item_name'     => $row->item->name,
                     'qty'           => $row->qty,
-                    'unit'          => $row->item->buyUnit,
+                    'unit'          => $row->item->buyUnit->code,
                     'user'          => $row->landedCost->user->name,
                     'company'       => $row->landedCost->company->name,
-                    'warehouse'     => $row->place->name,
-                    'status'        => $row->landedCost->statusRaw()
+                    'warehouse'     => $row->place->code,
+                    'status'        => $row->landedCost->statusRaw(),
+                    'voider'        => $row->landedCost->voidUser()->exists() ? $row->landedCost->voidUser->name : '',
+                    'void_date'     => $row->landedCost->voidUser()->exists() ? $row->landedCost->void_date : '',
+                    'void_note'     => $row->landedCost->voidUser()->exists() ? $row->landedCost->void_note : '',
+                    'deleter'       => $row->landedCost->deleteUser()->exists() ? $row->landedCost->deleteUser->name : '',
+                    'delete_date'   => $row->landedCost->deleteUser()->exists() ? $row->landedCost->deleted_at : '',
+                    'delete_note'   => $row->landedCost->deleteUser()->exists() ? $row->landedCost->delete_note : '',
                 ];
             }else{
                 $arr[] = [
@@ -81,11 +103,17 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, Shoul
                     'item_code'     => $row->item->code,
                     'item_name'     => $row->item->name,
                     'qty'           => $row->qty,
-                    'unit'          => $row->item->buyUnit,
+                    'unit'          => $row->item->buyUnit->code,
                     'user'          => $row->landedCost->user->name,
                     'company'       => $row->landedCost->company->name,
-                    'warehouse'     => $row->place->name,
-                    'status'        => $row->landedCost->statusRaw()
+                    'warehouse'     => $row->place->code,
+                    'status'        => $row->landedCost->statusRaw(),
+                    'voider'        => $row->landedCost->voidUser()->exists() ? $row->landedCost->voidUser->name : '',
+                    'void_date'     => $row->landedCost->voidUser()->exists() ? $row->landedCost->void_date : '',
+                    'void_note'     => $row->landedCost->voidUser()->exists() ? $row->landedCost->void_note : '',
+                    'deleter'       => $row->landedCost->deleteUser()->exists() ? $row->landedCost->deleteUser->name : '',
+                    'delete_date'   => $row->landedCost->deleteUser()->exists() ? $row->landedCost->deleted_at : '',
+                    'delete_note'   => $row->landedCost->deleteUser()->exists() ? $row->landedCost->delete_note : '',
                 ];
             }
             

@@ -230,7 +230,7 @@
                         <td>{{ $rowdetail->note }}</td>
                         <td>{{ $rowdetail->note2 }}</td>
                         <td>{{ $rowdetail->remark }}</td>
-                        <td class="center">{{ $rowdetail->place->name.' - '.$rowdetail->place->company->name }}</td>
+                        <td class="center">{{ $rowdetail->place->code.' - '.$rowdetail->place->company->name }}</td>
                         <td class="center">{{ $rowdetail->department->name }}</td>
                         <td class="center">{{ $rowdetail->warehouse->name }}</td>
                     </tr>

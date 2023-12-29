@@ -188,7 +188,7 @@
 											<td>{{ $rowdetail->note }}</td>
 											<td>{{ $rowdetail->note2 }}</td>
 											<td>{{ $rowdetail->remark }}</td>
-											<td align="center">{{ $rowdetail->place->name }}</td>
+											<td align="center">{{ $rowdetail->place->code }}</td>
 											<td align="center">{{ $rowdetail->line()->exists() ? $rowdetail->line->name : '-' }}</td>
 											<td align="center">{{ $rowdetail->department->name }}</td>
 											<td align="center">{{ $rowdetail->warehouse->name }}</td>

@@ -176,7 +176,7 @@
                                         @foreach($employees as $row)
                                             <tr>
                                                 <td>{{ $row->name }}</td>
-                                                <td>{{ $row->place_id ? $row->place->name : '-' }}</td>
+                                                <td>{{ $row->place_id ? $row->place->code : '-' }}</td>
                                                 <td>{{ $row->department_id ? $row->department->name : '-' }}</td>
                                                 <td class="center">
                                                     <label>

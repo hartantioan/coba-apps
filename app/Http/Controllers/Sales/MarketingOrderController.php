@@ -834,7 +834,7 @@ class MarketingOrderController extends Controller
                 <td class="center-align">'.number_format($row->percent_discount_2,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->discount_3,2,',','.').'</td>
                 <td class="">'.$row->note.'</td>
-                <td class="center-align">'.$row->place->name.' - '.$row->warehouse->name.' - '.$row->area->name.'</td>
+                <td class="center-align">'.$row->place->code.' - '.$row->warehouse->name.' - '.$row->area->name.'</td>
                 <td class="right-align">'.number_format($row->other_fee,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->price_after_discount,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->total,2,',','.').'</td>
@@ -1061,6 +1061,11 @@ class MarketingOrderController extends Controller
         }
         
         if($query->delete()) {
+
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
 
             $query->marketingOrderDetail()->delete();
 

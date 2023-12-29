@@ -1087,6 +1087,11 @@ class MarketingOrderMemoController extends Controller
         
         if($query->delete()) {
 
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
+
             foreach($query->marketingOrderMemoDetail as $row){
                 if($row->lookable_type == 'marketing_order_invoice_details'){
                     if($row->downpayment > 0){

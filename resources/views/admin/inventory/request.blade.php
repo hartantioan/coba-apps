@@ -1397,23 +1397,62 @@
         }
     }
 
-    function destroy(id){
+    function voidStatus(id){
+        var msg = '';
         swal({
-            title: "Apakah anda yakin?",
-            text: "Anda tidak bisa mengembalikan data yang terhapus!",
-            icon: 'warning',
-            dangerMode: true,
-            buttons: {
-            cancel: 'Tidak, jangan!',
-            delete: 'Ya, lanjutkan!'
+            title: "Alasan mengapa anda menutup!",
+            text: "Anda tidak bisa mengembalikan data yang telah ditutup.",
+            buttons: true,
+            content: "input",
+        })
+        .then(message => {
+            if (message != "" && message != null) {
+                $.ajax({
+                    url: '{{ Request::url() }}/void_status',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: { id : id, msg : message },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('#main');
+                    },
+                    success: function(response) {
+                        loadingClose('#main');
+                        M.toast({
+                            html: response.message
+                        });
+                        loadDataTable();
+                    },
+                    error: function() {
+                        loadingClose('#main');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
             }
-        }).then(function (willDelete) {
-            if (willDelete) {
+        });
+    }
+
+    function destroy(id){
+        var msg = '';
+        swal({
+            title: "Alasan mengapa anda menghapus!",
+            text: "Anda tidak bisa mengembalikan data yang telah dihapus.",
+            buttons: true,
+            content: "input",
+        })
+        .then(message => {
+            if (message != "" && message != null) {
                 $.ajax({
                     url: '{{ Request::url() }}/destroy',
                     type: 'POST',
                     dataType: 'JSON',
-                    data: { id : id },
+                    data: { id : id, msg : message },
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
@@ -1584,47 +1623,6 @@
             $('#code').val(newcode);
             $('#code_place_id').trigger('change');
         }
-    }
-
-    function voidStatus(id){
-        var msg = '';
-        swal({
-            title: "Alasan mengapa anda menutup!",
-            text: "Anda tidak bisa mengembalikan data yang telah ditutup.",
-            buttons: true,
-            content: "input",
-        })
-        .then(message => {
-            if (message != "" && message != null) {
-                $.ajax({
-                    url: '{{ Request::url() }}/void_status',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: { id : id, msg : message },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        loadingOpen('#main');
-                    },
-                    success: function(response) {
-                        loadingClose('#main');
-                        M.toast({
-                            html: response.message
-                        });
-                        loadDataTable();
-                    },
-                    error: function() {
-                        loadingClose('#main');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
-                        });
-                    }
-                });
-            }
-        });
     }
 
     function printPreview(code){

@@ -40,7 +40,9 @@ class MarketingOrderDownPayment extends Model
         'note',
         'void_id',
         'void_note',
-        'void_date'
+        'void_date',
+        'delete_id',
+        'delete_note',
     ];
 
     public function used(){
@@ -50,6 +52,11 @@ class MarketingOrderDownPayment extends Model
     public function user()
     {
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
+    }
+
+    public function deleteUser()
+    {
+        return $this->belongsTo('App\Models\User', 'delete_id', 'id')->withTrashed();
     }
 
     public function account()

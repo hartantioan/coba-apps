@@ -971,6 +971,11 @@ class MarketingOrderDownPaymentController extends Controller
         
         if($query->delete()) {
 
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
+
             CustomHelper::removeApproval('marketing_order_down_payments',$query->id);
 
             activity()

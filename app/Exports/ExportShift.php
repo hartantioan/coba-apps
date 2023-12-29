@@ -59,7 +59,7 @@ class ExportShift implements FromCollection, WithTitle, WithHeadings, WithCustom
                 'id'            => ($key + 1),
                 'code'          => $row->code,
                 'name'          => $row->name,
-                'place'         => $row->place->name,
+                'place'         => $row->place->code,
                 'department'    => $row->department->name,
                 'min_time_in'   => date('H:i',strtotime($row->min_time_in)),
                 'time_in'       => date('H:i',strtotime($row->time_in)),

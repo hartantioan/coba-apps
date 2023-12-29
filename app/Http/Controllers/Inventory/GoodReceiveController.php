@@ -22,6 +22,7 @@ use App\Models\Company;
 use App\Models\Department;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportGoodReceive;
+use App\Models\Menu;
 use Illuminate\Support\Str;
 class GoodReceiveController extends Controller
 {
@@ -36,6 +37,8 @@ class GoodReceiveController extends Controller
 
     public function index(Request $request)
     {
+        $lastSegment = request()->segment(count(request()->segments()));
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'     => 'Barang Masuk',
             'content'   => 'admin.inventory.good_receive',
@@ -45,7 +48,7 @@ class GoodReceiveController extends Controller
             'department'=> Department::where('status','1')->get(),
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
-            'newcode'   => 'GRCV-'.date('y'),
+            'newcode'   => $menu->document_code.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -451,7 +454,7 @@ class GoodReceiveController extends Controller
                 <td class="center-align">'.number_format($row->total,3,',','.').'</td>
                 <td class="center-align">'.$row->note.'</td>
                 <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
-                <td class="center-align">'.$row->place->name.' - '.$row->place->company->name.'</td>
+                <td class="center-align">'.$row->place->code.' - '.$row->place->company->name.'</td>
                 <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
                 <td class="center-align">'.$row->warehouse->name.'</td>
                 <td class="center-align">'.($row->area()->exists() ? $row->area->name : '').'</td>
@@ -634,7 +637,12 @@ class GoodReceiveController extends Controller
 
             $query->goodReceiveDetail()->delete();
 
-            CustomHelper::removeApproval('good_receives',$query->id);
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
+
+            CustomHelper::removeApproval($query->getTable(),$query->id);
 
             activity()
                 ->performedOn(new GoodReceive())
@@ -964,7 +972,8 @@ class GoodReceiveController extends Controller
     public function export(Request $request){
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
-		return Excel::download(new ExportGoodReceive($post_date,$end_date), 'good_receive_'.uniqid().'.xlsx');
+        $mode = $request->mode ? $request->mode : '';
+		return Excel::download(new ExportGoodReceive($post_date,$end_date,$mode), 'good_receive_'.uniqid().'.xlsx');
     }
 
     public function viewJournal(Request $request,$id){

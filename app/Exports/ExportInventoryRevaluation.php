@@ -12,21 +12,33 @@ class ExportInventoryRevaluation implements FromView
     /**
     * @return \Illuminate\Support\Collection
     */
+    protected $start_date, $end_date, $mode;
 
-    public function __construct(string $start_date, string $end_date)
+    public function __construct(string $start_date, string $end_date, string $mode)
     {
         $this->start_date = $start_date ? $start_date : '';
 		$this->end_date = $end_date ? $end_date : '';
+        $this->mode = $mode ? $mode : '';
     }
 
     public function view(): View
     {
-        return view('admin.exports.inventory_revaluation', [
-            'data' => InventoryRevaluation::where(function($query) {
-                $query->where('post_date', '>=',$this->start_date)
-                ->where('post_date', '<=', $this->end_date);
-            })
-            ->get()
-        ]);
+        if($this->mode == '1'){
+            return view('admin.exports.inventory_revaluation', [
+                'data' => InventoryRevaluation::where(function($query) {
+                    $query->where('post_date', '>=',$this->start_date)
+                    ->where('post_date', '<=', $this->end_date);
+                })
+                ->get()
+            ]);
+        }elseif($this->mode == '2'){
+            return view('admin.exports.inventory_revaluation', [
+                'data' => InventoryRevaluation::withTrashed()->where(function($query) {
+                    $query->where('post_date', '>=',$this->start_date)
+                    ->where('post_date', '<=', $this->end_date);
+                })
+                ->get()
+            ]);
+        }
     }
 }

@@ -69,7 +69,7 @@ class ExportAsset implements FromCollection, WithTitle, WithHeadings, WithCustom
                 'id'            => $row->id,
                 'code'          => $row->code,
                 'name'          => $row->name,
-                'plant'         => $row->place->name,
+                'plant'         => $row->place->code,
                 'group'         => $row->assetGroup->name,
                 'date_cap'      => date('d/m/y',strtotime($row->date)),
                 'nominal'       => number_format($row->nominal,2,',','.'),

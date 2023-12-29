@@ -270,7 +270,7 @@ class MarketingOrderDeliveryController extends Controller
                         'item_id'       => $row->item_id,
                         'item_name'     => $row->item->code.' - '.$row->item->name,
                         'place_id'      => $row->place_id,
-                        'place_name'    => $row->place->name,
+                        'place_name'    => $row->place->code,
                         'warehouse_id'  => $row->warehouse_id,
                         'warehouse_name'=> $row->warehouse->name,
                         'area_id'       => $row->area_id,
@@ -599,7 +599,7 @@ class MarketingOrderDeliveryController extends Controller
                 'place_id'              => $row->place_id,
                 'warehouse_id'          => $row->warehouse_id,
                 'area_id'               => $row->area_id,
-                'place_name'            => $row->place->name,
+                'place_name'            => $row->place->code,
                 'warehouse_name'        => $row->warehouse->name,
                 'area_name'             => $row->area->name,
             ];
@@ -1075,6 +1075,11 @@ class MarketingOrderDeliveryController extends Controller
         }
         
         if($query->delete()) {
+
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
 
             $query->marketingOrderDeliveryDetail()->delete();
 

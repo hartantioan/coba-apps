@@ -182,7 +182,7 @@
                                             <td align="right">{{ number_format($rowdetail->total,3,',','.') }}</td>
                                             <td>{{ $rowdetail->note }}</td>
                                             <td>{{ $rowdetail->coa->code.' - '.$rowdetail->coa->name }}</td>
-											<td>{{ $rowdetail->place->name.' - '.$rowdetail->place->company->name }}</td>
+											<td>{{ $rowdetail->place->code.' - '.$rowdetail->place->company->name }}</td>
 											<td>{{ $rowdetail->department_id ? $rowdetail->department->name : '-' }}</td>
                                             <td>{{ $rowdetail->warehouse->name }}</td>
                                         </tr>

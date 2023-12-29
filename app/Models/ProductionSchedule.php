@@ -27,7 +27,14 @@ class ProductionSchedule extends Model
         'void_id',
         'void_note',
         'void_date',
+        'delete_id',
+        'delete_note',
     ];
+
+    public function deleteUser()
+    {
+        return $this->belongsTo('App\Models\User', 'delete_id', 'id')->withTrashed();
+    }
 
     public function user()
     {

@@ -699,6 +699,11 @@ class ProductionOrderController extends Controller
         
         if($query->delete()){
 
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
+
             $query->productionOrderDetail()->delete();
 
             CustomHelper::removeApproval($query->getTable(),$query->id);

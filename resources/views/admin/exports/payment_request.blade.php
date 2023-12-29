@@ -34,7 +34,7 @@
                 <td>{{ $row->code }}</td>
                 <td>{{ $row->user->name }}</td>
                 <td>{{ $row->account->name }}</td>
-                <td>{{ $row->place->name.' - '.$row->place->company->name }}</td>
+                <td>{{ $row->place->code.' - '.$row->place->company->name }}</td>
                 <td>{{ $row->coaSource->name }}</td>
                 <td>{{ $row->paymentType() }}</td>
                 <td>{{ $row->payment_no }}</td>

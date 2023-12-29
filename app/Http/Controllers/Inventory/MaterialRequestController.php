@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Inventory;
+
+use App\Exports\ExportMaterialRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\GoodIssue;
@@ -40,6 +42,7 @@ use App\Models\User;
 use App\Models\Place;
 use App\Helpers\CustomHelper;
 use App\Models\Department;
+use App\Models\Menu;
 
 class MaterialRequestController extends Controller
 {
@@ -54,7 +57,8 @@ class MaterialRequestController extends Controller
     }
     public function index(Request $request)
     {
-
+        $lastSegment = request()->segment(count(request()->segments()));
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'     => 'Material Request',
             'content'   => 'admin.inventory.request',
@@ -66,7 +70,7 @@ class MaterialRequestController extends Controller
             'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
-            'newcode'   => 'MRQS-'.date('y'),
+            'newcode'   => $menu->document_code.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -669,6 +673,10 @@ class MaterialRequestController extends Controller
         }
 
         if($query->delete()) {
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
             
             $query->materialRequestDetail()->delete();
             CustomHelper::removeApproval($query->getTable(),$query->id);
@@ -2348,5 +2356,12 @@ class MaterialRequestController extends Controller
             }
         }
         return response()->json($response);
+    }
+
+    public function export(Request $request){
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $mode = $request->mode ? $request->mode : '';
+		return Excel::download(new ExportMaterialRequest($post_date,$end_date,$mode), 'material_request_'.uniqid().'.xlsx');
     }
 }

@@ -55,7 +55,7 @@ class ExportLine implements FromCollection, WithTitle, WithHeadings, WithCustomS
             $arr[] = [
                 'id'            => $row->id,
                 'code'          => $row->code,
-                'place_id'      => $row->place->code.' - '.$row->place->name,
+                'place_id'      => $row->place->code.' - '.$row->place->code,
                 'name'          => $row->name,
                 'note'          => $row->note,
                 'status'        => $row->statusRaw(),

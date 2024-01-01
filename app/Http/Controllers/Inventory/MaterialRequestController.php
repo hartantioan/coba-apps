@@ -239,7 +239,7 @@ class MaterialRequestController extends Controller
         foreach($data->materialRequestDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td>'.$row->item->name.'</td>
+                <td>'.$row->item->code.' - '.$row->item->name.'</td>
                 <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="right-align">'.number_format($row->stock,3,',','.').'</td>
                 <td class="center-align">'.$row->item->buyUnit->code.'</td>

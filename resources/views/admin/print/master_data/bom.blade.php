@@ -218,7 +218,7 @@
 									<td>{{ $key+1 }}</td>
 									<td>{{ $row->code }}</td>
 									<td>{{ $row->name }}</td>
-									<td>{{ $row->item->name }}</td>
+									<td>{{ $row->item->code.' - '.$row->item->name }}</td>
 									<td>{{ $row->place->code }}</td>
 									<td>{{ number_format($row->qty_output,3,',','.') }}</td>
 									<td>{{ number_format($row->qty_planned,3,',','.') }}</td>

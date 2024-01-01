@@ -291,7 +291,7 @@
                         <tbody>
                             @foreach($data->marketingOrderPlanDetail as $row)
                             <tr>
-                                <td>{{ $row->item->name }}</td>
+                                <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                                 <td align="center">{{ $row->qty }}</td>
                                 <td align="center">{{ $row->item->sellUnit->code }}</td>
                                 <td align="center">{{ date('d/m/y',strtotime($row->request_date)) }}</td>

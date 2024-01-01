@@ -314,7 +314,7 @@
                                                     <thead>
                                                         <tr>
                                                             <th class="center">GR/LC/PO/Coa No.</th>
-                                                            <th class="center">NO.PO</th>
+                                                            <th class="center">NO.PO/GRPO</th>
                                                             <th class="center">No.SJ</th>
                                                             <th class="center">Item / Coa Jasa</th>
                                                             <th class="center">Satuan</th>

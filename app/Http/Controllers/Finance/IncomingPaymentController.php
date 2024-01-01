@@ -901,6 +901,11 @@ class IncomingPaymentController extends Controller
         
         if($query->delete()) {
 
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
+
             foreach($query->incomingPaymentDetail as $row){
                 if($row->lookable_type == 'outgoing_payments'){
                     CustomHelper::addCountLimitCredit($query->account_id,$row->total);
@@ -933,7 +938,8 @@ class IncomingPaymentController extends Controller
     public function export(Request $request){
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
-		return Excel::download(new ExportIncomingPayment($post_date,$end_date), 'incoming_payment_'.uniqid().'.xlsx');
+        $mode = $request->mode ? $request->mode : '';
+		return Excel::download(new ExportIncomingPayment($post_date,$end_date,$mode), 'incoming_payment_'.uniqid().'.xlsx');
     }
 
     public function viewJournal(Request $request,$id){

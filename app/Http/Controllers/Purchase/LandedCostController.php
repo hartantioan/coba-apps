@@ -210,6 +210,8 @@ class LandedCostController extends Controller
                             'line_id'                   => $row->line_id ? $row->line_id : '',
                             'machine_name'              => $row->machine_id ? $row->machine->name : '-',
                             'machine_id'                => $row->machine_id ? $row->machine_id : '',
+                            'project_name'              => $row->purchaseOrderDetail->purchaseRequestDetail()->exists() ? ($row->purchaseOrderDetail->purchaseRequestDetail->project()->exists() ? $row->purchaseOrderDetail->purchaseRequestDetail->project->name : '') : '-',
+                            'project_id'              => $row->purchaseOrderDetail->purchaseRequestDetail()->exists() ? ($row->purchaseOrderDetail->purchaseRequestDetail->project()->exists() ? $row->purchaseOrderDetail->purchaseRequestDetail->project_id : '') : '',
                             'lookable_id'               => $row->id,
                             'lookable_type'             => $row->getTable(),
                             'stock'                     => $row->item->getStockPlace($row->place_id),
@@ -263,6 +265,8 @@ class LandedCostController extends Controller
                             'machine_id'                => $row->machine_id ? $row->machine_id : '',
                             'department_id'             => $row->department_id ? $row->department_id : '',
                             'warehouse_id'              => $row->warehouse_id,
+                            'project_name'              => $row->project()->exists() ? $row->project->name : '-',
+                            'project_id'                => $row->project()->exists() ? $row->project_id : '',
                             'lookable_id'               => $row->id,
                             'lookable_type'             => $row->getTable(),
                             'stock'                     => $row->item->getStockPlace($row->place_id),
@@ -318,6 +322,8 @@ class LandedCostController extends Controller
                             'machine_id'                => '',
                             'department_id'             => '',
                             'warehouse_id'              => $row->inventoryTransferOut->warehouse_to,
+                            'project_name'              => '-',
+                            'project_id'                => '',
                             'lookable_id'               => $row->id,
                             'lookable_type'             => $row->getTable(),
                             'stock'                     => $row->qty,
@@ -688,6 +694,7 @@ class LandedCostController extends Controller
                                 'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
                                 'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
                                 'warehouse_id'          => $request->arr_warehouse[$key],
+                                'project_id'            => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
                                 'lookable_type'         => $request->arr_lookable_type[$key],
                                 'lookable_id'           => $request->arr_lookable_id[$key],
                             ]);
@@ -745,7 +752,7 @@ class LandedCostController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="11">Daftar Order Pembelian</th>
+                                <th class="center-align" colspan="12">Daftar Order Pembelian</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -759,6 +766,7 @@ class LandedCostController extends Controller
                                 <th class="center-align">Mesin</th>
                                 <th class="center-align">Departemen</th>
                                 <th class="center-align">Gudang</th>
+                                <th class="center-align">Proyek</th>
                             </tr>
                         </thead><tbody>';
         
@@ -776,11 +784,12 @@ class LandedCostController extends Controller
                     <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
                     <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
                     <td class="center-align">'.$row->warehouse->name.'</td>
+                    <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
                 </tr>';
             }
         }else{
             $string .= '<tr>
-                <td class="center-align" colspan="10">Data item tidak ditemukan.</td>
+                <td class="center-align" colspan="12">Data item tidak ditemukan.</td>
             </tr>';
         }
         
@@ -908,6 +917,7 @@ class LandedCostController extends Controller
                 'place_name'                => $row->place->code,
                 'department_name'           => $row->department_id ? $row->department->name : '-',
                 'warehouse_name'            => $row->warehouse->name,
+                'project_name'              => $row->project()->exists() ? $row->project->name : '-',
                 'place_id'                  => $row->place_id,
                 'line_id'                   => $row->line_id ? $row->line_id : '',
                 'line_name'                 => $row->line_id ? $row->line->name : '-',
@@ -915,6 +925,7 @@ class LandedCostController extends Controller
                 'machine_name'              => $row->machine_id ? $row->machine->name : '-',
                 'department_id'             => $row->department_id ? $row->department_id : '',
                 'warehouse_id'              => $row->warehouse_id,
+                'project_id'                => $row->project()->exists() ? $row->project_id : '',
                 'lookable_type'             => $row->lookable_type,
                 'lookable_id'               => $row->lookable_id,
                 'coa_id'                    => $row->coa_id ? $row->coa_id : '',
@@ -1149,11 +1160,11 @@ class LandedCostController extends Controller
                     $img_base_64 = base64_encode($image_temp);
                     $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                     $data["image"]=$path_img;
-                    $pdf = Pdf::loadView('admin.print.purchase.landed_cost_individual', $data)->setPaper('a5', 'landscape');
+                    $pdf = Pdf::loadView('admin.print.purchase.landed_cost_individual', $data)->setPaper('a4', 'portrait');
                     $pdf->render();
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                    $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                    $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(422, 810, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                     $content = $pdf->download()->getOriginalContent();
                     $temp_pdf[]=$content;
                 }
@@ -1236,11 +1247,11 @@ class LandedCostController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.purchase.landed_cost_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.purchase.landed_cost_individual', $data)->setPaper('a4', 'portrait');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(422, 810, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
                            
@@ -1312,11 +1323,11 @@ class LandedCostController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.purchase.landed_cost_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.purchase.landed_cost_individual', $data)->setPaper('a4', 'portrait');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(422, 810, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
                            
@@ -1375,11 +1386,11 @@ class LandedCostController extends Controller
             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
             $data["image"]=$path_img;
              
-            $pdf = Pdf::loadView('admin.print.purchase.landed_cost_individual', $data)->setPaper('a5', 'landscape');
+            $pdf = Pdf::loadView('admin.print.purchase.landed_cost_individual', $data)->setPaper('a4', 'portrait');
             $pdf->render();
     
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+            $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             
             
             $content = $pdf->download()->getOriginalContent();

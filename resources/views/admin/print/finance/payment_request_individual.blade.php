@@ -314,7 +314,7 @@
                                     <td align="center">{{ $row->type() }}</td>
                                     <td align="center">{{ $row->purchaseInvoice() ? date('d/m/y',strtotime($row->lookable->due_date)) : '-' }}</td>
                                     <td>{{ $row->note }}</td>
-                                    <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
+                                    <td>{{ $row->coa->name }}</td>
                                     <td align="right">{{ number_format($row->nominal,2,',','.') }}</td>
                                 </tr>
                                 @php
@@ -396,7 +396,7 @@
                                 @endif
                                 <td class="center-align">
                                     @if ($data->payment_type == '2')
-                                        <img src="{{ $e_banking }}" width="50%" style="position: absolute; bottom:0px; width:20%; right:0px;">
+                                        <img src="{{ $e_banking }}" width="50%" style="position: absolute; width:20%; right:0px;">
                                     @endif
                                 </td>
                             </tr>

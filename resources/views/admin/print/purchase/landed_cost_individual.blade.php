@@ -222,7 +222,7 @@
                                 <table border="0" width="100%">
                                     <tr>
                                         <td align="center">
-                                            <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:80%;" height="5%" />
+                                            <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:80%;" height="2%" />
                                         </td>
                                     </tr>
                                     <tr>
@@ -238,36 +238,65 @@
                         <table class="bordered table-data-item" border="1" style="border-collapse:collapse;" width="100%">
                             <thead>
                                 <tr>
+                                    <th align="center" colspan="9">Daftar Item</th>
+                                </tr>
+                                <tr>
                                     <th class="center">No</th>
-                                    {{-- <th class="center">Plant</th> --}}
                                     <th class="center">Item</th>
                                     <th class="center">Plant</th>
                                     <th class="center">Gudang</th>
-                                    <th class="center">Departemen</th>
                                     <th class="center">Qty</th>
                                     <th class="center">Satuan</th>
                                     <th class="center">Surat Jalan</th>
-                                    <th class="center">Harga Total</th>
-                                    {{-- <th class="center">Harga Satuan</th> --}}
+                                    <th class="center">Landed Cost</th>
+                                    <th class="center">Grandtotal</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($data->landedCostDetail as $key => $row)
                                 <tr>
                                     <td class="center" style="text-align: center">{{ ($key + 1) }}</td>
-                                    {{-- <td>{{ $row->place->code.' - '.$row->place->company->name }}</td> --}}
-                                    <td>{{ $row->item->name }}</td>
+                                    <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                                     <td>{{ $row->place->code  }}</td>
                                     <td>{{ $row->warehouse->name }}</td>
-                                    <td>{{ isset($row->department->name) ? $row->department->name: ''  }}</td>
                                     <td align="right">{{ $row->qty }}</td>
                                     <td align="center">{{ $row->item->uomUnit->code }}</td>
                                     <td>{{ $row->goodReceiptDetail() ? $row->lookable->goodReceipt->delivery_no : '-' }}</td>
                                     <td align="right">{{ number_format($row->nominal,2,',','.') }}</td>
-                                    {{-- <td align="right">{{ number_format(round($row->nominal / $row->qty,3),2,',','.') }}</td> --}}
+                                    <td align="right">{{ number_format($row->priceFinalCogs() * $row->qty,2,',','.') }}</td>
                                 </tr>
                                 @endforeach
                                 
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="invoice-product-details" style="margin-top:25px;">
+                        <table class="bordered table-data-item" border="1" style="border-collapse:collapse;" width="100%">
+                            <thead>
+                                <tr>
+                                    <th align="center" colspan="6">Daftar Biaya</th>
+                                </tr>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Deskripsi</th>
+                                    <th>Total</th>
+                                    <th>PPN</th>
+                                    <th>PPh</th>
+                                    <th>Grandtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($data->landedCostFeeDetail as $key => $row)
+                                <tr>
+                                    <td align="center">{{ $key + 1 }}</td>
+                                    <td>{{ $row->landedCostFee->name }}</td>
+                                    <td align="right">{{ number_format($row->total,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->tax,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->wtax,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->grandtotal,2,',','.') }}</td>
+                                </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>

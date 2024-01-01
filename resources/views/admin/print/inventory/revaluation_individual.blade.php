@@ -178,7 +178,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <h5 class="indigo-text">Revaluation</h5>
+                                <h2 class="indigo-text">Revaluation</h2>
                             </td>
                         </tr>
                                 
@@ -198,7 +198,7 @@
                 </tr>
                 
             </table>
-            <hr style="border-top: 3px solid black; margin-top:-2%">
+            <hr style="border-top: 3px solid black; margin-top:-20px">
         </header>
         <main>
             <div class="card">
@@ -279,14 +279,14 @@
                             <tbody>
                                 @foreach($data->inventoryRevaluationDetail as $keydetail => $rowdetail)
                                 <tr>
-                                    <td class="center">{{ ($keydetail + 1) }}</td>
-                                    <td>{{ $rowdetail->item->name }}</td>
-                                    <td class="center">{{ $rowdetail->place->code }}</td>
-                                    <td class="center">{{ $rowdetail->warehouse->name }}</td>
-                                    <td class="center">{{ $rowdetail->qty }}</td>
-                                    <td class="center">{{ $rowdetail->item->buyUnit->code }}</td>
+                                    <td align="center">{{ ($keydetail + 1) }}</td>
+                                    <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name }}</td>
+                                    <td align="center">{{ $rowdetail->place->code }}</td>
+                                    <td align="center">{{ $rowdetail->warehouse->name }}</td>
+                                    <td align="center">{{ $rowdetail->qty }}</td>
+                                    <td align="center">{{ $rowdetail->item->buyUnit->code }}</td>
                                     <td>{{ $rowdetail->coa->name }}</td>
-                                    <td class="center">{{ $rowdetail->nominal }}</td>
+                                    <td align="center">{{ number_format($rowdetail->nominal,2,',','.') }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>

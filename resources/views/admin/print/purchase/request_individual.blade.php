@@ -258,7 +258,7 @@
                             @foreach($data->purchaseRequestDetail as $key => $row)
                             <tr>
                                 <td align="center" rowspan="2">{{ $key+1 }}.</td>
-                                <td>{{ $row->item->name }}</td>
+                                <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                                 <td align="right">{{ $row->qty }}</td>
                                 <td align="center">{{ $row->item->buyUnit->code }}</td>
                                 <td>{{ $row->note }}</td>

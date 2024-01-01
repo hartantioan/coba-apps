@@ -164,30 +164,23 @@
         <header>
             <table border="0" width="100%" style="font-size:1em" class="tb-header">
                 <tr>
-                    <td width="83%" class="left-align" >
+                    <td width="33%" class="left-align" >
                         <tr>
                             <td>
                                 <span class="invoice-number mr-1" style="font-size:1em"># {{ $data->code }}</span>
                             </td>
                         </tr>
+                    </td>
+                    <td width="33%" align="center">
                         <tr>
                             <td>
                                 <h2 style="margin-top: -2px">A/P Invoice</h2>
                             </td>
                         </tr>
-                                
-                        
-                    </td>
-                    <td width="33%" class="right-align">
-                        
-                        
-                   
                     </td>
                     
                     <td width="34%" class="right-align">
-                        
-                            <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
-                       
+                        <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
                     </td>
                 </tr>
                 
@@ -323,7 +316,7 @@
                             <table border="0" width="100%">
                                 <tr>
                                     <td align="center">
-                                        <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:80%;" height="5%" />
+                                        <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:80%;" height="2%" />
                                     </td>
                                 </tr>
                                 <tr>
@@ -340,7 +333,7 @@
                         <thead>
                             <tr>
                                 <th class="center-align" width="5%">No.</th>
-                                <th class="center-align" width="35%">GRPO/LC/PO</th>
+                                <th class="center-align" width="35%">Referensi/Item/Jasa</th>
                                 <th class="center-align">Ket.1</th>
                                 <th class="center-align">Ket.2</th>
                                 <th class="center-align" width="10%" style="max-width:10%">Total</th>
@@ -396,28 +389,22 @@
                                 <td class="right-align" style="padding-right:15px">PPN</td>
                                 <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->tax,2,',','.') }}</td>
                             </tr>
-                            @if($data->wtax > 0)
                             <tr class="break-row">
                                 <td class="right-align" style="padding-right:15px">PPh</td>
                                 <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->wtax,2,',','.') }}</td>
                             </tr>
-                            @endif
-                            <tr class="break-row">
-                                <td class="right-align" style="padding-right:15px">Grandtotal</td>
-                                <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->grandtotal,2,',','.') }}</td>
-                            </tr>
-                            @if($data->downpayment > 0)
-                            <tr class="break-row">
-                                <td class="right-align" style="padding-right:15px">Downpayment</td>
-                                <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->downpayment,2,',','.') }}</td>
-                            </tr>
-                            @endif
-                            @if($data->rounding > 0)
                             <tr class="break-row">
                                 <td class="right-align" style="padding-right:15px">Pembulatan</td>
                                 <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->rounding,2,',','.') }}</td>
                             </tr>
-                            @endif
+                            <tr class="break-row">
+                                <td class="right-align" style="padding-right:15px">Grandtotal</td>
+                                <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->grandtotal,2,',','.') }}</td>
+                            </tr>
+                            <tr class="break-row">
+                                <td class="right-align" style="padding-right:15px">Downpayment</td>
+                                <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->downpayment,2,',','.') }}</td>
+                            </tr>
                             <tr class="break-row">
                                 <td class="right-align" style="padding-right:15px">Sisa Tagihan</td>
                                 <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->balance,2,',','.') }}</td>

@@ -293,7 +293,7 @@
                                 @foreach($data->marketingOrderDeliveryDetail as $key => $row)
                                 <tr>
                                     <td align="center">{{ ($key + 1) }}</td>
-                                    <td>{{ $row->item->name }}</td>
+                                    <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                                     <td>{{ $row->itemStock->place->name.' - '.$row->itemStock->warehouse->name.' - '.$row->itemStock->area->name }}</td>
                                     <td align="right">{{ number_format($row->qty,3,',','.') }}</td>
                                     <td align="center">{{ $row->item->sellUnit->code }}</td>

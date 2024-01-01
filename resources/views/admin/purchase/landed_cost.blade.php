@@ -425,6 +425,7 @@
                                                     <th class="center">Mesin</th>
                                                     <th class="center">Departemen</th>
                                                     <th class="center">Gudang</th>
+                                                    <th class="center">Proyek</th>
                                                     <th class="center">Qty x Harga</th>
                                                     <th class="center">Proporsional</th>
                                                     <th class="center">Coa Biaya (Stock 0)</th>
@@ -433,7 +434,7 @@
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
-                                                    <td colspan="13" class="center">
+                                                    <td colspan="14" class="center">
                                                         Silahkan pilih supplier untuk memulai...
                                                     </td>
                                                 </tr>
@@ -789,7 +790,7 @@
                 if($('#last-row-item').length == 0){
                     $('#body-item').append(`
                         <tr id="last-row-item">
-                            <td colspan="13" class="center">
+                            <td colspan="14" class="center">
                                 Silahkan pilih supplier untuk memulai...
                             </td>
                         </tr>
@@ -1447,6 +1448,7 @@
                                                     <input type="hidden" name="arr_machine[]" value="` + valdetail.machine_id + `">
                                                     <input type="hidden" name="arr_department[]" value="` + valdetail.department_id + `">
                                                     <input type="hidden" name="arr_warehouse[]" value="` + valdetail.warehouse_id + `">
+                                                    <input type="hidden" name="arr_project[]" value="` + valdetail.project_id + `">
                                                     <input type="hidden" name="arr_lookable_id[]" value="` + valdetail.lookable_id + `">
                                                     <input type="hidden" name="arr_lookable_type[]" value="` + valdetail.lookable_type + `">
                                                     <td>
@@ -1475,6 +1477,9 @@
                                                     </td>
                                                     <td class="center">
                                                         ` + valdetail.warehouse_name + `
+                                                    </td>
+                                                    <td class="center">
+                                                        ` + valdetail.project_name + `
                                                     </td>
                                                     <td class="right-align">
                                                         ` + formatRupiahIni(roundTwoDecimal(valdetail.totalrow).toString().replace('.',',')) + `
@@ -2185,6 +2190,7 @@
                                 <input type="hidden" name="arr_machine[]" value="` + val.machine_id + `">
                                 <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
                                 <input type="hidden" name="arr_warehouse[]" value="` + val.warehouse_id + `">
+                                <input type="hidden" name="arr_project[]" value="` + val.project_id + `">
                                 <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
                                 <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
                                 <td>
@@ -2213,6 +2219,9 @@
                                 </td>
                                 <td class="center">
                                     ` + val.warehouse_name + `
+                                </td>
+                                <td class="center">
+                                    ` + val.project_name + `
                                 </td>
                                 <td class="right-align">
                                     ` + formatRupiahIni(roundTwoDecimal(val.totalrow).toString().replace('.',',')) + `
@@ -2422,7 +2431,7 @@
                     $('#temp_from_address,#temp_to_address').val('');
                     $('#body-item').append(`
                         <tr id="last-row-item">
-                            <td colspan="13" class="center">
+                            <td colspan="14" class="center">
                                 Silahkan pilih supplier untuk memulai...
                             </td>
                         </tr>

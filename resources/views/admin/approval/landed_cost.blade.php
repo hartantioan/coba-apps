@@ -242,7 +242,7 @@
                         <td>{{ $row->place->code.' - '.$row->place->company->name }}</td>
                         <td>{{ $row->department->name }}</td>
                         <td>{{ $row->warehouse->name }}</td>
-                        <td>{{ $row->item->name }}</td>
+                        <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                         <td class="center">{{ $row->qty }}</td>
                         <td class="center">{{ $row->item->uomUnit->code }}</td>
                         <td class="right-align">{{ number_format($row->nominal,2,',','.') }}</td>

@@ -20,7 +20,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\ExportRetirement;
+use App\Exports\ExportClosingJournal;
 use App\Helpers\CustomHelper;
 
 class ClosingJournalController extends Controller
@@ -598,6 +598,11 @@ class ClosingJournalController extends Controller
         
         if($query->delete()) {
 
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
+
             CustomHelper::removeApproval($query->getTable(),$query->id);
             
             foreach($query->closingJournalDetail as $row){
@@ -860,7 +865,8 @@ class ClosingJournalController extends Controller
     public function export(Request $request){
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
-		return Excel::download(new ExportRetirement($post_date,$end_date), 'retirement_'.uniqid().'.xlsx');
+        $mode = $request->mode ? $request->mode : '';
+		return Excel::download(new ExportClosingJournal($post_date,$end_date,$mode), 'closing_journal_'.uniqid().'.xlsx');
     }
 
     public function approval(Request $request,$id){

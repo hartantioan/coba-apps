@@ -29,7 +29,19 @@ class Journal extends Model
         'void_id',
         'void_note',
         'void_date',
+        'delete_id',
+        'delete_note',
     ];
+
+    public function voidUser()
+    {
+        return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
+    }
+
+    public function deleteUser()
+    {
+        return $this->belongsTo('App\Models\User', 'delete_id', 'id')->withTrashed();
+    }
 
     public function user(){
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();

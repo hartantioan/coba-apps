@@ -17,10 +17,13 @@ class ExportOutgoingPayment implements FromCollection, WithTitle, WithHeadings, 
     * @return \Illuminate\Support\Collection
     */
 
-    public function __construct(string $start_date, string $end_date)
+    protected $start_date, $end_date, $mode;
+
+    public function __construct(string $start_date, string $end_date, string $mode)
     {
         $this->start_date = $start_date ? $start_date : '';
 		$this->end_date = $end_date ? $end_date : '';
+        $this->mode = $mode ? $mode : '';
     }
 
     private $headings = [
@@ -31,15 +34,29 @@ class ExportOutgoingPayment implements FromCollection, WithTitle, WithHeadings, 
         'KETERANGAN',
         'GRANDTOTAL',
         'STATUS',
+        'VOIDER',
+        'TGL.VOID',
+        'KET.VOID',
+        'DELETER',
+        'TGL.DELETE',
+        'KET.DELETE',
     ];
 
     public function collection()
     {
-        $data = OutgoingPayment::where(function ($query) {
-            $query->where('post_date', '>=',$this->start_date)
-            ->where('post_date', '<=', $this->end_date);
-        })
-        ->get();
+        if($this->mode == '1'){
+            $data = OutgoingPayment::where(function ($query) {
+                $query->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+        }elseif($this->mode == '2'){
+            $data = OutgoingPayment::withTrashed()->where(function ($query) {
+                $query->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+        }
 
         $arr = [];
 
@@ -50,9 +67,15 @@ class ExportOutgoingPayment implements FromCollection, WithTitle, WithHeadings, 
                 '2'                 => $row->post_date,
                 '3'                 => $row->account->employee_no??'',
                 '4'                 => $row->account->name??'',
-                '6'              => $row->note,
-                '8'              => $row->grandtotal,
-                '14'              => $row->statusRaw(),
+                '6'                 => $row->note,
+                '8'                 => $row->grandtotal,
+                '14'                => $row->statusRaw(),
+                'voider'            => $row->voidUser()->exists() ? $row->voidUser->name : '',
+                'void_date'         => $row->voidUser()->exists() ? $row->void_date : '',
+                'void_note'         => $row->voidUser()->exists() ? $row->void_note : '',
+                'deleter'           => $row->deleteUser()->exists() ? $row->deleteUser->name : '',
+                'delete_date'       => $row->deleteUser()->exists() ? $row->deleted_at : '',
+                'delete_note'       => $row->deleteUser()->exists() ? $row->delete_note : '',
             ];
             
         }

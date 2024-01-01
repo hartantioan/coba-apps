@@ -120,8 +120,8 @@ class PurchaseInvoiceDetail extends Model
         $code = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->item->code.' - '.$this->lookable->item->name,
             'landed_costs'              => $this->lookable->code,
-            'purchase_order_details'    => $this->lookable->item_id ? $this->lookable->item->code.' - '.$this->lookable->item->name : $this->lookable->coa->code.' - '.$this->lookable->coa->name,
-            'coas'                      => $this->lookable->code.' - '.$this->lookable->name,
+            'purchase_order_details'    => $this->lookable->item_id ? $this->lookable->item->code.' - '.$this->lookable->item->name : $this->lookable->coa->name,
+            'coas'                      => $this->lookable->name,
             default                     => '-',
         };
 

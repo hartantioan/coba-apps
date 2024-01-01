@@ -218,7 +218,7 @@
 									<td>{{ $row->name }}</td>
 									<td>{{ $row->place->code }}</td>
 									<td>{{ $row->area->name }}</td>
-									<td>{{ $row->item()->exists() ? $row->item->name : '-' }}</td>
+									<td>{{ $row->item()->exists() ? $row->item->code.' - '.$row->item->name : '-' }}</td>
 									<td>{!! $row->status() !!}</td>
 								</tr>
 								<tr>

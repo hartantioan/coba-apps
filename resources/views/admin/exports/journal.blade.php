@@ -12,12 +12,38 @@
             <th>Tgl. Tenggat</th>
             <th>Keterangan</th>
             <th>Status</th>
+            <th>Deleter</th>
+            <th>Tgl.Delete</th>
+            <th>Ket.Delete</th>
+            <th>Voider</th>
+            <th>Tgl.Void</th>
+            <th>Ket.Void</th>
+            <th>Coa</th>
+            <th>Plant</th>
+            <th>Partner Bisnis</th>
+            <th>Item</th>
+            <th>Departemen</th>
+            <th>Gudang</th>
+            <th>Debit</th>
+            <th>Kredit</th>
         </tr>
     </thead>
     <tbody>
+        @php
+            $no = 1;
+        @endphp
         @foreach($data as $key => $row)
+            @foreach($row->journalDetail()->where(function($query){
+                $query->whereHas('coa',function($query){
+                    $query->orderBy('code');
+                })
+                ->orderBy('type');
+            })->get() as $rowdetail)
+            @php
+                info($row->code);
+            @endphp
             <tr align="center" style="background-color:#d6d5d5;">
-                <td>{{ $key+1 }}</td>
+                <td>{{ $no }}</td>
                 <td>{{ $row->user->name}}</td>
                 <td>{{ $row->company->name ?? '' }}</td>
                 <td>{{ $row->code }}</td>
@@ -28,36 +54,24 @@
                 <td>{{ date('d/m/y',strtotime($row->due_date)) }}</td>
                 <td>{{ $row->note }}</td>
                 <td>{!! $row->status() !!}</td>
+                <td>{{ $row->deleteUser()->exists() ? $row->deleteUser->name : '' }}</td>
+                <td>{{ $row->deleteUser()->exists() ? date('d/m/y',strtotime($row->deleted_at)) : '' }}</td>
+                <td>{{ $row->deleteUser()->exists() ? $row->delete_note : '' }}</td>
+                <td>{{ $row->voidUser()->exists() ? $row->voidUser->name : '' }}</td>
+                <td>{{ $row->voidUser()->exists() ? date('d/m/y',strtotime($row->void_date)) : '' }}</td>
+                <td>{{ $row->voidUser()->exists() ? $row->void_note : '' }}</td>
+                <td>{{ $rowdetail->coa->name }}</td>
+                <td align="center">{{ ($rowdetail->place()->exists() ? $rowdetail->place->code.' - '.$rowdetail->place->company->name : '-') }}</td>
+                <td align="center">{{ ($rowdetail->account()->exists() ? $rowdetail->account->name : '-') }}</td>
+                <td align="center">{{ ($rowdetail->item()->exists() ? $rowdetail->item->code.' - '.$rowdetail->item->name : '-') }}</td>
+                <td align="center">{{ ($rowdetail->department()->exists() ? $rowdetail->department->name : '-') }}</td>
+                <td align="center">{{ ($rowdetail->warehouse()->exists() ? $rowdetail->warehouse->name : '-') }}</td>
+                <td align="right">{{ ($rowdetail->type == '1' ? number_format($rowdetail->nominal,3,',','.') : '') }}</td>
+                <td align="right">{{ ($rowdetail->type == '2' ? number_format($rowdetail->nominal,3,',','.') : '') }}</td>
             </tr>
-            <tr align="center">
-                <th></th>
-                <th>Coa</th>
-                <th>Plant</th>
-                <th>Partner Bisnis</th>
-                <th>Item</th>
-                <th>Departemen</th>
-                <th>Gudang</th>
-                <th>Debit</th>
-                <th>Kredit</th>
-            </tr>
-            @foreach($row->journalDetail()->where(function($query){
-            $query->whereHas('coa',function($query){
-                $query->orderBy('code');
-            })
-            ->orderBy('type');
-        })->get() as $rowdetail)
-                <tr>
-                    <td></td>
-                    <td>{{ $rowdetail->coa->name }}</td>
-                    <td align="center"></td>
-                    <td align="center">{{ ($rowdetail->place_id ? $rowdetail->place->code.' - '.$rowdetail->place->company->name : '-') }}</td>
-                    <td align="center">{{ ($rowdetail->account_id ? $rowdetail->account->name : '-') }}</td>
-                    <td align="center">{{ ($rowdetail->item_id ? $rowdetail->item->name : '-') }}</td>
-                    <td align="center">{{ ($rowdetail->department_id ? $rowdetail->department->name : '-') }}</td>
-                    <td align="center">{{ ($rowdetail->warehouse_id ? $rowdetail->warehouse->name : '-') }}</td>
-                    <td align="right">{{ ($rowdetail->type == '1' ? number_format($rowdetail->nominal,3,',','.') : '') }}</td>
-                    <td align="right">{{ ($rowdetail->type == '2' ? number_format($rowdetail->nominal,3,',','.') : '') }}</td>
-                </tr>
+            @php
+                $no++;
+            @endphp
             @endforeach
         @endforeach
     </tbody>

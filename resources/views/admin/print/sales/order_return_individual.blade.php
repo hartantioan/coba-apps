@@ -239,7 +239,7 @@
                                 <tr>
                                     <td align="center">{{ ($key + 1) }}</td>
                                     <td>{{ $row->marketingOrderDeliveryDetail->marketingOrderDelivery->marketingOrderDeliveryProcess->code }}</td>
-                                    <td>{{ $row->item->name }}</td>
+                                    <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                                     <td align="right">{{ number_format($row->qty,3,',','.') }}</td>
                                     <td align="center">{{ $row->item->sellUnit->code }}</td>
                                     <td align="center">{{ $row->place->code.' - '.$row->warehouse->code }}</td>

@@ -181,7 +181,7 @@
                                                 <td align="center"></td>
 												<td align="center">{{ ($rowdetail->place_id ? $rowdetail->place->code.' - '.$rowdetail->place->company->name : '-') }}</td>
 												<td align="center">{{ ($rowdetail->account_id ? $rowdetail->account->name : '-') }}</td>
-                                                <td align="center">{{ ($rowdetail->item_id ? $rowdetail->item->name : '-') }}</td>
+                                                <td align="center">{{ ($rowdetail->item_id ? $rowdetail->item->code.' - '.$rowdetail->item->name : '-') }}</td>
                                                 <td align="center">{{ ($rowdetail->department_id ? $rowdetail->department->name : '-') }}</td>
                                                 <td align="center">{{ ($rowdetail->warehouse_id ? $rowdetail->warehouse->name : '-') }}</td>
                                                 <td align="right">{{ ($rowdetail->type == '1' ? number_format($rowdetail->nominal,3,',','.') : '') }}</td>

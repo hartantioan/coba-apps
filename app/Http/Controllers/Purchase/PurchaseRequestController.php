@@ -249,7 +249,7 @@ class PurchaseRequestController extends Controller
         foreach($data->purchaseRequestDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$row->item->name.'</td>
+                <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
                 <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->item->buyUnit->code.'</td>
                 <td class="">'.$row->note.'</td>
@@ -336,7 +336,7 @@ class PurchaseRequestController extends Controller
                     'status'  => 500,
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
                 ];
-            }elseif($query->purchaseOrderDetailComposition()->exists()){
+            }elseif($query->hasChildDocument()){
                 $response = [
                     'status'  => 500,
                     'message' => 'Data telah digunakan pada Purchase Order.'
@@ -348,6 +348,8 @@ class PurchaseRequestController extends Controller
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
+
+                $query->updateRootDocumentStatusProcess();
     
                 activity()
                     ->performedOn(new PurchaseRequest())
@@ -676,7 +678,7 @@ class PurchaseRequestController extends Controller
         foreach($pr->purchaseRequestDetail as $row){
             $arr[] = [
                 'item_id'           => $row->item_id,
-                'item_name'         => $row->item->name,
+                'item_name'         => $row->item->code.' - '.$row->item->name,
                 'qty'               => number_format($row->qty,3,',','.'),
                 'unit'              => $row->item->buyUnit->code,
                 'note'              => $row->note,
@@ -2465,7 +2467,7 @@ class PurchaseRequestController extends Controller
             $arr[] = [
                 'id'                => $row->id,
                 'item_id'           => $row->item_id,
-                'item_name'         => $row->item->name,
+                'item_name'         => $row->item->code.' - '.$row->item->name,
                 'qty'               => number_format($row->qty,3,',','.'),
                 'unit'              => $row->item->buyUnit->code,
                 'qty_balance'       => number_format($row->qtyBalance(),3,',','.'),
@@ -2578,7 +2580,7 @@ class PurchaseRequestController extends Controller
                     <td class="center-align">'.date('d/m/y',strtotime($row->purchaseRequest->post_date)).'</td>
                     <td class="">'.$row->purchaseRequest->note.'</td>
                     <td class="center-align">'.$row->purchaseRequest->status().'</td>
-                    <td class="">'.$row->item->name.'</td>
+                    <td class="">'.$row->item->code.' - '.$row->item->name.'</td>
                     <td class="center-align">'.$row->item->buyUnit->code.'</td>
                     <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
                     <td class="right-align">'.number_format($row->qtyPO(),3,',','.').'</td>

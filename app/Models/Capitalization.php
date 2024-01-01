@@ -27,11 +27,18 @@ class Capitalization extends Model
         'grandtotal',
         'void_id',
         'void_note',
-        'void_date'
+        'void_date',
+        'delete_id',
+        'delete_note',
     ];
 
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
+    public function deleteUser()
+    {
+        return $this->belongsTo('App\Models\User', 'delete_id', 'id')->withTrashed();
     }
 
     public function user()

@@ -254,4 +254,24 @@ class GoodReceipt extends Model
 
         return implode(', ',$result);
     }
+
+    public function updateRootDocumentStatusProcess(){
+        foreach($this->goodReceiptDetail()->whereHas('purchaseOrderDetail')->get() as $row){
+            if(!$row->purchaseOrderDetail->purchaseOrder->hasBalance()){
+                $row->purchaseOrderDetail->purchaseOrder->update([
+                    'status'	=> '2'
+                ]);
+            }
+        }
+    }
+
+    public function updateRootDocumentStatusDone(){
+        foreach($this->goodReceiptDetail()->whereHas('purchaseOrderDetail')->get() as $row){
+            if(!$row->purchaseOrderDetail->purchaseOrder->hasBalance()){
+                $row->purchaseOrderDetail->purchaseOrder->update([
+                    'status'	=> '3'
+                ]);
+            }
+        }
+    }
 }

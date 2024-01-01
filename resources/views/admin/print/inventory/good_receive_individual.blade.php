@@ -178,7 +178,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <h5 class="indigo-text">Barang Masuk</h5>
+                                <h2 class="indigo-text">Barang Masuk</h2>
                             </td>
                         </tr>
                                 
@@ -198,7 +198,7 @@
                 </tr>
                 
             </table>
-            <hr style="border-top: 3px solid black; margin-top:-2%">
+            <hr style="border-top: 3px solid black; margin-top:-20px">
         </header>
         <main>
             <div class="card">
@@ -302,8 +302,8 @@
                                     <td class="center-align">{{ $row->item->uomUnit->code }}</td>
                                     <td class="right-align">{{ number_format($row->price,3,',','.') }}</td>
                                     <td class="right-align">{{ number_format($row->total,3,',','.') }}</td>
-                                    <td class="center-align">{{ $row->coa->code.' - '.$row->coa->name }}</td>
-                                    <td class="center-align">{{ $row->place->code.' - '.$row->place->company->name }}</td>
+                                    <td class="center-align">{{ $row->coa->name }}</td>
+                                    <td class="center-align">{{ $row->place->code }}</td>
                                     <td class="center-align">{{ $row->department_id ? $row->department->name : '-' }}</td>
                                     <td class="center-align">{{ $row->warehouse->name }}</td>
                                     <td>{{ $row->note }}</td>

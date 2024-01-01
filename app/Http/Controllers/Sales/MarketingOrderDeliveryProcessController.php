@@ -591,7 +591,7 @@ class MarketingOrderDeliveryProcessController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->marketingOrderDetail->marketingOrder->code.'</td>
-                <td class="center-align">'.$row->item->name.'</td>
+                <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
                 <td class="center-align">'.$row->itemStock->place->name.' - '.$row->itemStock->warehouse->name.'</td>
                 <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->item->sellUnit->code.'</td>

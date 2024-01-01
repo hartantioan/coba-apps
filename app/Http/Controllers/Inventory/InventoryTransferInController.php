@@ -403,7 +403,7 @@ class InventoryTransferInController extends Controller
         foreach($data->inventoryTransferOut->inventoryTransferOutDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$row->item->name.'</td>
+                <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
                 <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->item->uomUnit->code.'</td>
                 <td class="center-align">'.$row->note.'</td>
@@ -474,7 +474,7 @@ class InventoryTransferInController extends Controller
 
         foreach($iti->inventoryTransferOut->inventoryTransferOutDetail as $row){
             $details[] = [
-                'name'      => $row->item->name,
+                'name'      => $row->item->code.' - '.$row->item->name,
                 'origin'    => $row->itemStock->place->name.' - '.$row->itemStock->warehouse->name,
                 'qty'       => number_format($row->qty,3,',','.'),
                 'unit'      => $row->item->uomUnit->code,

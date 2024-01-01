@@ -640,6 +640,11 @@ class OutgoingPaymentController extends Controller
         
         if($query->delete()) {
 
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
+
             CustomHelper::removeApproval('outgoing_payments',$query->id);
 
             activity()
@@ -954,7 +959,9 @@ class OutgoingPaymentController extends Controller
     public function export(Request $request){
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
-		return Excel::download(new ExportOutgoingPayment($post_date,$end_date), 'outgoing_payment'.uniqid().'.xlsx');
+        $mode = $request->mode ? $request->mode : '';
+
+		return Excel::download(new ExportOutgoingPayment($post_date,$end_date,$mode), 'outgoing_payment'.uniqid().'.xlsx');
     }
 
     public function viewStructureTree(Request $request){

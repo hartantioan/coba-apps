@@ -684,8 +684,9 @@ class FundRequestController extends Controller
     public function export(Request $request){
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
+        $mode = $request->mode ? $request->mode : '';
 		
-		return Excel::download(new ExportFundRequest($post_date,$end_date), 'fund_request_'.uniqid().'.xlsx');
+		return Excel::download(new ExportFundRequest($post_date,$end_date,$mode), 'fund_request_'.uniqid().'.xlsx');
     }
 
     public function userIndex(Request $request)
@@ -1272,6 +1273,11 @@ class FundRequestController extends Controller
         }
 
         if($query->delete()) {
+
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
             
             $query->fundRequestDetail()->delete();
             CustomHelper::removeApproval('fund_requests',$query->id);

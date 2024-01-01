@@ -825,7 +825,7 @@ class MarketingOrderController extends Controller
         foreach($data->marketingOrderDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$row->item->name.'</td>
+                <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
                 <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->item->sellUnit->code.'</td>
                 <td class="right-align">'.number_format($row->price,2,',','.').'</td>

@@ -554,7 +554,7 @@
                     ajax: {
                         url: '{{ Request::url() }}/datatable_user_schedule',
                         type: 'GET',
-                        data: {//smpesini
+                        data: {
                             department_id : $('#department_id').val(),
                         },
                         beforeSend: function() {
@@ -859,7 +859,7 @@
             ajax: {
                 url: '{{ Request::url() }}/datatable_user_schedule',
                 type: 'GET',
-                data: {//smpesini
+                data: {
                     department_id : $('#department_id').val(),
                 },
                 beforeSend: function() {

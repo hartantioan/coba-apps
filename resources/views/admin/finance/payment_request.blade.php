@@ -274,6 +274,13 @@
                                     <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                                     <label class="active" for="currency_rate">Konversi</label>
                                 </div>
+                                <div class="input-field col m3 s12 step4">
+                                    <select class="form-control" id="is_reimburse" name="is_reimburse">
+                                        <option value="2">Tidak</option>
+                                        <option value="1">Ya</option>
+                                    </select>
+                                    <label class="" for="is_reimburse">Apakah Reimburse?</label>
+                                </div>
                                 <div class="col m12" id="rekening-element">
                                     <h6>Rekening (Jika transfer)</h6>
                                     <div class="input-field col m3 s12 step13">
@@ -541,13 +548,13 @@
                                 <textarea class="materialize-textarea" id="notePay" name="notePay" placeholder="Catatan / Keterangan" rows="1"></textarea>
                                 <label class="active" for="notePay">Keterangan</label>
                             </div>
-                            <div class="input-field col m12 s12">
-                                <h6><b>Data Terpakai</b> : <i id="list-used-data-pay"></i></h6>
+                            <div class="col s12 mt-3">
+                                <h6>
+                                    <b>Data Terpakai</b> : <i id="list-used-data-pay"></i>
+                                    <button class="btn waves-effect waves-light right submit" onclick="savePay();">Simpan <i class="material-icons right">send</i></button>
+                                </h6>
                             </div>
                             <div class="col s12" id="displayDetail">
-                            </div>
-                            <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit" onclick="savePay();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -990,7 +997,6 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                
             }
         });
 
@@ -2404,22 +2410,20 @@
     }
 
     function destroy(id){
+        var msg = '';
         swal({
-            title: "Apakah anda yakin?",
-            text: "Anda tidak bisa mengembalikan data yang terhapus!",
-            icon: 'warning',
-            dangerMode: true,
-            buttons: {
-            cancel: 'Tidak, jangan!',
-            delete: 'Ya, lanjutkan!'
-            }
-        }).then(function (willDelete) {
-            if (willDelete) {
+            title: "Alasan mengapa anda menghapus!",
+            text: "Anda tidak bisa mengembalikan data yang telah dihapus.",
+            buttons: true,
+            content: "input",
+        })
+        .then(message => {
+            if (message != "" && message != null) {
                 $.ajax({
                     url: '{{ Request::url() }}/destroy',
                     type: 'POST',
                     dataType: 'JSON',
-                    data: { id : id },
+                    data: { id : id, msg : message },
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },

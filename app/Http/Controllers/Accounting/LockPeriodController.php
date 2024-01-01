@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Accounting;
+
+use App\Exports\ExportLockPeriod;
 use App\Http\Controllers\Controller;
 use App\Models\Coa;
 use App\Models\Company;
@@ -493,6 +495,11 @@ class LockPeriodController extends Controller
         
         if($query->delete()) {
 
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
+
             CustomHelper::removeApproval($query->getTable(),$query->id);
             
             $query->lockPeriodDetail()->delete();
@@ -585,5 +592,12 @@ class LockPeriodController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function export(Request $request){
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $mode = $request->mode ? $request->mode : '';
+		return Excel::download(new ExportLockPeriod($post_date,$end_date,$mode), 'lock_period_'.uniqid().'.xlsx');
     }
 }

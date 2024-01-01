@@ -177,7 +177,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <h5 class="indigo-text">Barang Masuk</h5>
+                                <h2 class="indigo-text">Barang Masuk</h2>
                             </td>
                         </tr>
                                 
@@ -197,17 +197,17 @@
                 </tr>
                 
             </table>
-            <hr style="border-top: 3px solid black; margin-top:-2%">
+            <hr style="border-top: 3px solid black; margin-top:-20px">
         </header>
         <main>
             <div class="card">
                 <div class="card-content invoice-print-area ">
                     <table border="0" width="100%">
                         <tr>
-                            <td width="33%" class="left-align">
+                            <td width="66%" class="left-align">
                                 <table border="0" width="50%" class="tbl-info">
                                     <tr>
-                                        <td width="25%">
+                                        <td width="50%">
                                             Name
                                         </td>
                                         <td width="50%">
@@ -237,25 +237,6 @@
                                         <td width="50%">
                                             {{ $data->user->phone }}
                                         </td>
-                                    </tr>
-                                </table>
-                            </td>
-                            <td width="33%" class="left-align">
-                                <table border="0" width="100%">
-                                    <tr>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                           <br>
-                                        </td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <td >
-                                            <br>
-                                        </td>
-                                        
                                     </tr>
                                 </table>
                             </td>
@@ -296,8 +277,8 @@
                                     <td>{{ $row->itemStock->item->code.' - '.$row->itemStock->item->name }}</td>
                                     <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
                                     <td class="center-align">{{ $row->itemStock->item->uomUnit->code }}</td>
-                                    <td class="center-align">{{ $row->coa->code.' - '.$row->coa->name }}</td>
-                                    <td class="center-align">{{ $row->itemStock->place->name }}</td>
+                                    <td class="center-align">{{ $row->coa->name }}</td>
+                                    <td class="center-align">{{ $row->itemStock->place->code }}</td>
                                     <td class="center-align">{{ $row->itemStock->warehouse->name }}</td>
                                     <td>{{ $row->note }}</td>
                                 </tr>

@@ -1839,7 +1839,7 @@ class Select2Controller extends Controller {
 
                 foreach($d->inventoryTransferOutDetail as $row){
                     $details[] = [
-                        'name'      => $row->item->name,
+                        'name'      => $row->item->code.' - '.$row->item->name,
                         'origin'    => $row->itemStock->place->name.' - '.$row->itemStock->warehouse->name.' - '.($row->itemStock->area->exists() ? $row->itemStock->area->name : ''),
                         'qty'       => number_format($row->qty,3,',','.'),
                         'unit'      => $row->item->uomUnit->code,
@@ -2219,7 +2219,7 @@ class Select2Controller extends Controller {
                     $arrDetail[] = [
                         'id'                => $row->id,
                         'item_id'           => $row->item_id,
-                        'item_name'         => $row->item->name.' - '.$row->itemStock->place->code.' - '.$row->itemStock->warehouse->name.' - '.$row->itemStock->area->name,
+                        'item_name'         => $row->item->code.' - '.$row->item->name.' - '.$row->itemStock->place->code.' - '.$row->itemStock->warehouse->name.' - '.$row->itemStock->area->name,
                         'item_warehouse'    => $row->item->warehouseList(),
                         'unit'              => $row->item->sellUnit->code,
                         'code'              => $d->code,
@@ -3111,7 +3111,7 @@ class Select2Controller extends Controller {
                     $arrDetail[] = [
                         'id'                => $row->id,
                         'item_id'           => $row->item_id,
-                        'item_name'         => $row->item->name.' - '.$row->itemStock->place->code.' - '.$row->itemStock->warehouse->name.' - '.$row->itemStock->area->name,
+                        'item_name'         => $row->item->code.' - '.$row->item->name.' - '.$row->itemStock->place->code.' - '.$row->itemStock->warehouse->name.' - '.$row->itemStock->area->name,
                         'item_warehouse'    => $row->item->warehouseList(),
                         'unit'              => $row->item->sellUnit->code,
                         'code'              => $d->code,

@@ -14,6 +14,8 @@ class ExportAssetGroup implements FromCollection, WithTitle, WithHeadings, WithC
     * @return \Illuminate\Support\Collection
     */
 
+    protected $search, $status;
+
     public function __construct(string $search, string $status)
     {
         $this->search = $search ? $search : '';

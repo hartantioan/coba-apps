@@ -308,7 +308,7 @@
                                 @foreach($data->goodReturnPODetail as $keydetail => $rowdetail)
                                 <tr>
                                     <td class="center">{{ ($keydetail + 1) }}</td>
-                                    <td>{{ $rowdetail->item->name }}</td>
+                                    <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name }}</td>
                                     <td class="center">{{ $rowdetail->goodReceiptDetail->goodReceipt->account->name }}</td>
                                     <td class="center">{{ $rowdetail->goodReceiptDetail->qty }}</td>
                                     <td class="center">{{ $rowdetail->qty }}</td>

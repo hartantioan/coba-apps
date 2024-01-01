@@ -959,6 +959,11 @@ class MarketingOrderReceiptController extends Controller
         
         if($query->delete()) {
 
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
+
             $query->marketingOrderReceiptDetail()->delete();
 
             CustomHelper::removeApproval($query->getTable(),$query->id);

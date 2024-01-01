@@ -15,11 +15,13 @@ class ExportFundRequest implements FromCollection, WithTitle, WithHeadings, With
     /**
     * @return \Illuminate\Support\Collection
     */
+    protected $start_date, $end_date, $mode;
 
-    public function __construct(string $start_date, string $end_date)
+    public function __construct(string $start_date, string $end_date, string $mode)
     {
         $this->start_date = $start_date ? $start_date : '';
 		$this->end_date = $end_date ? $end_date : '';
+        $this->mode = $mode ? $mode : '';
     }
 
     private $headings = [
@@ -44,15 +46,29 @@ class ExportFundRequest implements FromCollection, WithTitle, WithHeadings, With
         'PPh',
         'GRANDTOTAL',
         'STATUS',
+        'VOIDER',
+        'TGL.VOID',
+        'KET.VOID',
+        'DELETER',
+        'TGL.DELETE',
+        'KET.DELETE',
     ];
 
     public function collection()
     {
-        $data = FundRequest::where(function($query) {
-            $query->where('post_date', '>=',$this->start_date)
-            ->where('post_date', '<=', $this->end_date); 
-        })
-        ->get();
+        if($this->mode == '1'){
+            $data = FundRequest::where(function($query) {
+                $query->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->end_date); 
+            })
+            ->get();
+        }elseif($this->mode == '2'){
+            $data = FundRequest::withTrashed()->where(function($query) {
+                $query->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->end_date); 
+            })
+            ->get();
+        }
 
         $arr = [];
 
@@ -79,6 +95,12 @@ class ExportFundRequest implements FromCollection, WithTitle, WithHeadings, With
                 'pph'           => $row->wtax,
                 'grandtotal'    => $row->grandtotal,
                 'status'        => $row->statusRaw(),
+                'voider'        => $row->voidUser()->exists() ? $row->voidUser->name : '',
+                'void_date'     => $row->voidUser()->exists() ? $row->void_date : '',
+                'void_note'     => $row->voidUser()->exists() ? $row->void_note : '',
+                'deleter'       => $row->deleteUser()->exists() ? $row->deleteUser->name : '',
+                'delete_date'   => $row->deleteUser()->exists() ? $row->deleted_at : '',
+                'delete_note'   => $row->deleteUser()->exists() ? $row->delete_note : '',
             ];
         }
 

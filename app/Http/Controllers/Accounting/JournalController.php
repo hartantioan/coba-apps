@@ -686,6 +686,11 @@ class JournalController extends Controller
         
         if($query->delete()) {
 
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
+
             $query->journalDetail()->delete();
 
             CustomHelper::removeApproval('journals',$query->id);
@@ -991,7 +996,8 @@ class JournalController extends Controller
     public function export(Request $request){
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
-		return Excel::download(new ExportJournal($post_date,$end_date), 'journal_'.uniqid().'.xlsx');
+        $mode = $request->mode ? $request->mode : '';
+		return Excel::download(new ExportJournal($post_date,$end_date,$mode), 'journal_'.uniqid().'.xlsx');
     }
 
     public function printIndividual(Request $request,$id){

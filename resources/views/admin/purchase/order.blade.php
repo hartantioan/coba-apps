@@ -384,7 +384,7 @@
                             <div class="col m12 s12 step22" style="overflow:auto;width:100% !important;">
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Produk</h4>
-                                    <table class="bordered" style="width:2500px;" id="table-detail">
+                                    <table class="bordered" style="width:2800px;" id="table-detail">
                                         <thead>
                                             <tr>
                                                 <th class="center">Item / Coa Jasa</th>
@@ -418,12 +418,13 @@
                                                 <th class="center">Departemen</th>
                                                 <th class="center">Gudang</th>
                                                 <th class="center">Requester</th>
+                                                <th class="center">Proyek</th>
                                                 <th class="center">Hapus</th>
                                             </tr>
                                         </thead>
                                         <tbody id="body-item">
                                             <tr id="last-row-item">
-                                                <td colspan="20" class="center">
+                                                <td colspan="21" class="center">
                                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                         <i class="material-icons left">add</i> New Item
                                                     </a>
@@ -1305,6 +1306,9 @@
                                             <td>
                                                 <input name="arr_requester[]" type="text" placeholder="Yang meminta barang & jasa / requester" value="` + val.requester + `" required>
                                             </td>
+                                            <td>
+                                                <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                                            </td>
                                             <td class="center">
                                                 <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                                     <i class="material-icons">delete</i>
@@ -1408,6 +1412,9 @@
                                             <td>
                                                 <input name="arr_requester[]" type="text" placeholder="Yang meminta barang & jasa / requester" value="` + val.requester + `" required>
                                             </td>
+                                            <td>
+                                                <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                                            </td>
                                             <td class="center">
                                                 <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                                     <i class="material-icons">delete</i>
@@ -1442,6 +1449,14 @@
                                         });
                                     }
                                 }
+
+                                if(val.project_id){
+                                    $('#arr_project' + count).append(`
+                                        <option value="` + val.project_id + `">` + val.project_name + `</option>
+                                    `);
+                                }
+
+                                select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
                             });
                         }
                     }
@@ -1564,6 +1579,9 @@
                     <td>
                         <input name="arr_requester[]" type="text" placeholder="Yang meminta barang & jasa / requester" required>
                     </td>
+                    <td>
+                        <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                    </td>
                     <td class="center">
                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                             <i class="material-icons">delete</i>
@@ -1668,6 +1686,9 @@
                     <td>
                         <input name="arr_requester[]" type="text" placeholder="Yang meminta barang & jasa / requester" required>
                     </td>
+                    <td>
+                        <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                    </td>
                     <td class="center">
                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                             <i class="material-icons">delete</i>
@@ -1677,6 +1698,7 @@
             `);
             select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
         }
+        select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
     }
 
     function changePlace(element){
@@ -1977,6 +1999,7 @@
                 formData.delete("arr_note2[]");
                 formData.delete("arr_warehouse[]");
                 formData.delete("arr_line[]");
+                formData.delete("arr_project[]");
 
                 $('select[name^="arr_tax"]').each(function(index){
                     formData.append('arr_tax[]',$(this).val());
@@ -1988,6 +2011,7 @@
                     formData.append('arr_note2[]',($('input[name^="arr_note2"]').eq(index).val() ? $('input[name^="arr_note2"]').eq(index).val() : ''));
                     formData.append('arr_line[]',($('select[name^="arr_line"]').eq(index).val() ? $('select[name^="arr_line"]').eq(index).val() : ''));
                     formData.append('arr_warehouse[]',($('select[name^="arr_warehouse"]').eq(index).val() ? $('select[name^="arr_warehouse"]').eq(index).val() : ''));
+                    formData.append('arr_project[]',($('select[name^="arr_project[]"]').eq(index).val() ? $('select[name^="arr_project[]"]').eq(index).val() : ''));
                 });
 
                 $.ajax({
@@ -2224,6 +2248,9 @@
                                     <td>
                                         <input name="arr_requester[]" type="text" placeholder="Yang meminta barang & jasa / requester" value="` + val.requester + `" required>
                                     </td>
+                                    <td>
+                                        <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                                    </td>
                                     <td class="center">
                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" onclick="removeUsedData('` + val.id + `')">
                                             <i class="material-icons">delete</i>
@@ -2343,6 +2370,9 @@
                                     <td>
                                         <input name="arr_requester[]" type="text" placeholder="Yang meminta barang & jasa / requester" value="` + val.requester + `" required>
                                     </td>
+                                    <td>
+                                        <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                                    </td>
                                     <td class="center">
                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                             <i class="material-icons">delete</i>
@@ -2365,6 +2395,14 @@
                             $("#arr_tax" + count + " option[data-id='" + val.tax_id + "']").prop("selected",true);
                             $("#arr_wtax" + count + " option[data-id='" + val.wtax_id + "']").prop("selected",true);
                         }
+
+                        if(val.project_id){
+                            $('#arr_project' + count).append(`
+                                <option value="` + val.project_id + `">` + val.project_name + `</option>
+                            `);
+                        }
+
+                        select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
                     });
                 }
                 

@@ -511,7 +511,7 @@ class GoodReturnPOController extends Controller
         foreach($data->goodReturnPODetail as $key => $rowdetail){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$rowdetail->item->name.'</td>
+                <td class="center-align">'.$rowdetail->item->code.' - '.$rowdetail->item->name.'</td>
                 <td class="center-align">'.$rowdetail->goodReceiptDetail->goodReceipt->account->name.'</td>
                 <td class="center-align">'.number_format($rowdetail->goodReceiptDetail->qty,3,',','.').'</td>
                 <td class="center-align">'.number_format($rowdetail->qty,3,',','.').'</td>
@@ -609,7 +609,7 @@ class GoodReturnPOController extends Controller
                 'id'                        => $row->goodReceiptDetail->good_receipt_id,
                 'good_receipt_detail_id'    => $row->good_receipt_detail_id,
                 'item_id'                   => $row->item_id,
-                'item_name'                 => $row->item->name,
+                'item_name'                 => $row->item->code.' - '.$row->item->name,
                 'qty_returned'              => number_format($row->qty,3,',','.'),
                 'qty_received'              => number_format($row->goodReceiptDetail->qty,3,',','.'),
                 'unit'                      => $row->item->buyUnit->code,

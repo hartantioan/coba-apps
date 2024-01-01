@@ -394,6 +394,8 @@ class PurchaseOrderController extends Controller
                                 'machine_id'                    => $row->machine_id,
                                 'department_id'                 => $row->department_id,
                                 'requester'                     => $row->requester ? $row->requester : '',
+                                'project_id'                    => $row->project()->exists() ? $row->project->id : '',
+                                'project_name'                  => $row->project()->exists() ? $row->project->name : '-',
                             ];
                         }
                     }
@@ -415,6 +417,8 @@ class PurchaseOrderController extends Controller
                             'machine_id'                    => '',
                             'department_id'                 => '',
                             'requester'                     => '',
+                            'project_id'                    => '',
+                            'project_name'                  => '-',
                         ];
                     }
                 }elseif($request->type == 'sj'){
@@ -752,6 +756,7 @@ class PurchaseOrderController extends Controller
                                     'department_id'                 => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
                                     'warehouse_id'                  => $request->arr_warehouse[$key] ? $request->arr_warehouse[$key] : NULL,
                                     'requester'                     => $request->arr_requester[$key] ? $request->arr_requester[$key] : NULL,
+                                    'project_id'                    => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
                                 ]);
                                 
                                 if($querydetail->purchaseRequestDetail()->exists()){
@@ -810,6 +815,8 @@ class PurchaseOrderController extends Controller
                                     'line_id'                               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
                                     'machine_id'                            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
                                     'department_id'                         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
+                                    'requester'                             => $request->arr_requester[$key] ? $request->arr_requester[$key] : NULL,
+                                    'project_id'                            => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
                                 ]);
                             }
                         }
@@ -872,6 +879,7 @@ class PurchaseOrderController extends Controller
                                 <th class="center-align">Gudang</th>
                                 <th class="center-align">Referensi</th>
                                 <th class="center-align">Requester</th>
+                                <th class="center-align">Proyek</th>
                             </tr>
                         </thead><tbody>';
         
@@ -895,6 +903,7 @@ class PurchaseOrderController extends Controller
                 <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
                 <td class="center-align">'.($row->purchaseRequestDetail()->exists() ? $row->purchaseRequestDetail->purchaseRequest->code : ($row->goodIssueDetail()->exists() ? $row->goodIssueDetail->goodIssue->code : ' - ')).'</td>
                 <td class="center-align">'.($row->requester ? $row->requester : '-').'</td>
+                <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
             </tr>';
         }
         
@@ -971,7 +980,7 @@ class PurchaseOrderController extends Controller
                 'reference_id'                      => $row->purchase_request_detail_id ? $row->purchase_request_detail_id : ($row->good_issue_detail_id ? $row->good_issue_detail_id : '0' ),
                 'item_id'                           => $row->item_id,
                 'coa_id'                            => $row->coa_id,
-                'item_name'                         => $row->item_id ? $row->item->name : '',
+                'item_name'                         => $row->item_id ? $row->item->code.' - '.$row->item->name : '',
                 'coa_name'                          => $row->coa_id ? $row->coa->name : '',
                 'qty'                               => number_format($row->qty,3,',','.'),
                 'unit'                              => $row->item_id ? $row->item->buyUnit->code : '-',
@@ -997,6 +1006,8 @@ class PurchaseOrderController extends Controller
                 'wtax_id'                           => $row->wtax_id,
                 'type'                              => $row->purchase_request_detail_id ? 'po' : ($row->good_issue_detail_id ? 'gi' : ''),
                 'requester'                         => $row->requester ? $row->requester : '',
+                'project_id'                        => $row->purchaseRequestDetail()->exists() ? ($row->purchaseRequestDetail->project()->exists() ? $row->purchaseRequestDetail->project->id : '') : '',
+                'project_name'                      => $row->purchaseRequestDetail()->exists() ? ($row->purchaseRequestDetail->project()->exists() ? $row->purchaseRequestDetail->project->name : '-') : '-',
             ];
         }
 
@@ -1263,6 +1274,8 @@ class PurchaseOrderController extends Controller
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
+
+                $query->updateRootDocumentStatusProcess();
     
                 activity()
                     ->performedOn(new PurchaseOrder())
@@ -1270,8 +1283,8 @@ class PurchaseOrderController extends Controller
                     ->withProperties($query)
                     ->log('Void the purchase order data');
     
-                CustomHelper::sendNotification('purchase_orders',$query->id,'Purchase Order No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
-                CustomHelper::removeApproval('purchase_orders',$query->id);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Purchase Order No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::removeApproval($query->getTable(),$query->id);
 
                 $response = [
                     'status'  => 200,
@@ -2967,7 +2980,7 @@ class PurchaseOrderController extends Controller
             $arr[] = [
                 'id'                => $row->id,
                 'item_id'           => $row->item_id,
-                'item_name'         => $row->item->name,
+                'item_name'         => $row->item->code.' - '.$row->item->name,
                 'qty'               => number_format($row->qty,3,',','.'),
                 'unit'              => $row->item->buyUnit->code,
                 'qty_balance'       => number_format($row->getBalanceReceipt(),3,',','.'),
@@ -3080,7 +3093,7 @@ class PurchaseOrderController extends Controller
                     <td class="center-align">'.date('d/m/y',strtotime($row->purchaseOrder->post_date)).'</td>
                     <td class="">'.$row->purchaseOrder->note.'</td>
                     <td class="center-align">'.$row->purchaseOrder->status().'</td>
-                    <td class="">'.$row->item->name.'</td>
+                    <td class="">'.$row->item->code.' - '.$row->item->name.'</td>
                     <td class="center-align">'.$row->item->buyUnit->code.'</td>
                     <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
                     <td class="right-align">'.number_format($row->qtyGR(),3,',','.').'</td>

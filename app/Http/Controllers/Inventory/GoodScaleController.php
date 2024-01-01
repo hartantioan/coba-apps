@@ -513,7 +513,7 @@ class GoodScaleController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.($rowdetail->purchase_order_detail_id ? $rowdetail->purchaseOrderDetail->purchaseOrder->code : '-').'</td>
-                <td class="center-align">'.$rowdetail->item->name.'</td>
+                <td class="center-align">'.$rowdetail->item->code.' - '.$rowdetail->item->name.'</td>
                 <td class="center-align">'.number_format($rowdetail->qty_in,3,',','.').'</td>
                 <td class="center-align">'.number_format($rowdetail->qty_out,3,',','.').'</td>
                 <td class="center-align">'.number_format($rowdetail->qty_balance,3,',','.').'</td>

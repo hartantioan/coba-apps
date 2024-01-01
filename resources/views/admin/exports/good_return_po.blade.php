@@ -46,7 +46,7 @@
                 <td>{{ $row->voidUser()->exists() ? $row->voidUser->name : '' }}</td>
                 <td>{{ $row->voidUser()->exists() ? date('d/m/y',strtotime($row->void_date)) : '' }}</td>
                 <td>{{ $row->voidUser()->exists() ? $row->void_note : '' }}</td>
-                <td>{{ $rowdetail->item->name }}</td>
+                <td>{{ $rowdetail->item->name.' - '.$rowdetail->item->name }}</td>
                 <td align="center">{{ $rowdetail->goodReceiptDetail->qty }}</td>
                 <td align="center">{{ $rowdetail->qty }}</td>
                 <td align="center">{{ $rowdetail->item->buyUnit->code }}</td>

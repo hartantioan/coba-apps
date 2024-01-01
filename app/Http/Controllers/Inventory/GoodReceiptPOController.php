@@ -609,7 +609,7 @@ class GoodReceiptPOController extends Controller
         foreach($data->goodReceiptDetail as $key => $rowdetail){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$rowdetail->item->name.'</td>
+                <td class="center-align">'.$rowdetail->item->code.' - '.$rowdetail->item->name.'</td>
                 <td class="center-align">'.number_format($rowdetail->qty,3,',','.').'</td>
                 <td class="center-align">'.$rowdetail->item->buyUnit->code.'</td>
                 <td class="center-align">'.$rowdetail->note.'</td>
@@ -762,6 +762,8 @@ class GoodReceiptPOController extends Controller
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
+
+                $query->updateRootDocumentStatusProcess();
 
                 CustomHelper::removeJournal('good_receipts',$query->id);
                 CustomHelper::removeCogs('good_receipts',$query->id);

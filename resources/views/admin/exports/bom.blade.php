@@ -18,7 +18,7 @@
                 <td style="background-color:#adaaaa;">{{ $key+1 }}.</td>
                 <td style="background-color:#adaaaa;">{{ $row->code }}</td>
                 <td style="background-color:#adaaaa;">{{ $row->name }}</td>
-                <td style="background-color:#adaaaa;">{{ $row->item->name }}</td>
+                <td style="background-color:#adaaaa;">{{ $row->item->code.' - '.$row->item->name }}</td>
                 <td style="background-color:#adaaaa;">{{ $row->place->code }}</td>
                 <td style="background-color:#adaaaa;">{{ number_format($row->qty_output,3,',','.') }}</td>
                 <td style="background-color:#adaaaa;">{{ number_format($row->qty_planned,3,',','.') }}</td>

@@ -244,7 +244,7 @@
                         <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
                         <td class="center-align">{{ date('d/m/y',strtotime($row->production_date)) }}</td>
                         <td class="center-align">{{ $row->shift->code }}</td>
-                        <td class="center-align">{{ $row->item->name }}</td>
+                        <td class="center-align">{{ $row->item->code.' - '.$row->item->name }}</td>
                         <td class="right-align">{{ number_format($row->qty,3,',','.') }}</td>
                         <td class="center-align">{{ $row->item->uomUnit->code }}</td>
                         <td class="center-align">{{ $row->line->code }}</td>

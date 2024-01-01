@@ -269,7 +269,7 @@ class User extends Authenticatable
         $bank = '';
 
         foreach(UserBank::where('user_id',$this->id)->where('is_default','1')->get() as $row){
-            $bank = $row->name.' Rek. '.$row->no;
+            $bank = $row->bank->name.' A/N '.$row->name.' Rek. '.$row->no;
         }
 
         return $bank;

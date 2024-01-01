@@ -305,4 +305,24 @@ class PurchaseOrder extends Model
 
         return $total;
     }
+
+    public function updateRootDocumentStatusProcess(){
+        foreach($this->purchaseOrderDetail()->whereHas('purchaseRequestDetail')->get() as $row){
+            if(!$row->purchaseRequestDetail->purchaseRequest->hasBalance()){
+                $row->purchaseRequestDetail->purchaseRequest->update([
+                    'status'	=> '2'
+                ]);
+            }
+        }
+    }
+
+    public function updateRootDocumentStatusDone(){
+        foreach($this->purchaseOrderDetail()->whereHas('purchaseRequestDetail')->get() as $row){
+            if(!$row->purchaseRequestDetail->purchaseRequest->hasBalance()){
+                $row->purchaseRequestDetail->purchaseRequest->update([
+                    'status'	=> '3'
+                ]);
+            }
+        }
+    }
 }

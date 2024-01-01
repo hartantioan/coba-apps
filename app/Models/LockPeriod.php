@@ -26,7 +26,14 @@ class LockPeriod extends Model
         'void_id',
         'void_note',
         'void_date',
+        'delete_id',
+        'delete_note',
     ];
+
+    public function deleteUser()
+    {
+        return $this->belongsTo('App\Models\User', 'delete_id', 'id')->withTrashed();
+    }
 
     public function user()
     {
@@ -46,6 +53,16 @@ class LockPeriod extends Model
     public function lockPeriodDetail()
     {
         return $this->hasMany('App\Models\LockPeriodDetail');
+    }
+
+    public function listEmployee(){
+        $arr = [];
+
+        foreach($this->lockPeriodDetail as $row){
+            $arr[] = $row->user->name;
+        }
+
+        return implode(', ',$arr);
     }
 
     public function used(){

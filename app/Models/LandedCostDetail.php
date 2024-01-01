@@ -25,6 +25,7 @@ class LandedCostDetail extends Model
         'machine_id',
         'department_id',
         'warehouse_id',
+        'project_id',
         'lookable_type',
         'lookable_id',
     ];
@@ -41,6 +42,11 @@ class LandedCostDetail extends Model
     public function place()
     {
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
+    }
+
+    public function project()
+    {
+        return $this->belongsTo('App\Models\Project', 'project_id', 'id')->withTrashed();
     }
 
     public function line()
@@ -130,5 +136,11 @@ class LandedCostDetail extends Model
         $grandtotal = $this->nominal + $this->getTax() - $this->getWtax();
 
         return $grandtotal;
+    }
+
+    public function priceFinalCogs(){
+        $item_cogs = ItemCogs::where('lookable_type',$this->landedCost->getTable())->where('lookable_id',$this->landedCost->id)->where('item_id',$this->item_id)->first();
+
+        return $item_cogs->price_final;
     }
 }

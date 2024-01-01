@@ -18,7 +18,7 @@
                 <td>{{ $row->name }}</td>
                 <td>{{ $row->place->code }}</td>
                 <td>{{ $row->area->name }}</td>
-                <td>{{ $row->item()->exists() ? $row->item->name : '-' }}</td>
+                <td>{{ $row->item()->exists() ? $row->item->code.' - '.$row->item->name : '-' }}</td>
                 <td>{{ $row->status == '1' ? 'Active' : 'Non-active' }}</td>
             </tr>
             @foreach ($row->equipmentPart as $rowp)

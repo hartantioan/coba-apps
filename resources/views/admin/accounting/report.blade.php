@@ -21,7 +21,7 @@
                                 </div>
                                 <div class="col s12">
                                     <div class="row">
-                                        <div class="input-field col m4 s12">
+                                        <div class="input-field col m3 s12">
                                             <select class="form-control" id="type" name="type">
                                                 @foreach ($menus as $row)
                                                     <option value="{{ $row->fullUrl() }}">{{ $row->name }}</option>
@@ -29,11 +29,18 @@
                                             </select>
                                             <label class="" for="type">Tipe Module Purchase</label>
                                         </div>
-                                        <div class="input-field col m4 s12">
+                                        <div class="input-field col m3 s12">
+                                            <select class="form-control" id="mode" name="mode">
+                                                <option value="1">Tanpa Data Terhapus</option>
+                                                <option value="2">Dengan Data Terhapus</option>
+                                            </select>
+                                            <label class="" for="mode">Mode Data</label>
+                                        </div>
+                                        <div class="input-field col m3 s12">
                                             <input id="start_date" name="start_date" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                             <label class="active" for="start_date">Tanggal Awal</label>
                                         </div>
-                                        <div class="input-field col m4 s12">
+                                        <div class="input-field col m3 s12">
                                             <input id="end_date" name="end_date"  type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                             <label class="active" for="end_date">Tanggal Akhir</label>
                                         </div>
@@ -58,13 +65,15 @@
     function exportExcel(){
         var tipe = $('#type').val();
         if(tipe == 'accounting/document_tax'){
-            start_date= $('#start_date').val();
-            finish_date= $('#end_date').val();
-            window.location = "{{ URL::to('/') }}/admin/"+tipe+"/export?start_date=" + start_date + "&finish_date=" + finish_date;
+            var start_date= $('#start_date').val();
+            var finish_date= $('#end_date').val();
+            var mode = $('#mode').val();
+            window.location = "{{ URL::to('/') }}/admin/"+tipe+"/export?start_date=" + start_date + "&finish_date=" + finish_date + "&mode=" + mode;
         }else{
             var search = $('#start_date').val();
             var status = $('#end_date').val();
-            window.location = "{{ URL::to('/') }}/admin/"+tipe+"/export?start_date=" + search + "&end_date=" + status;
+            var mode = $('#mode').val();
+            window.location = "{{ URL::to('/') }}/admin/"+tipe+"/export?start_date=" + search + "&end_date=" + status + "&mode=" + mode;
         }
         
         

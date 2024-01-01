@@ -58,6 +58,7 @@ use App\Models\ItemCogs;
 use App\Models\ItemShading;
 use App\Models\ItemStock;
 use App\Models\PurchaseDownPayment;
+use App\Models\PurchaseRequest;
 use App\Models\UsedData;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -546,6 +547,8 @@ class CustomHelper {
 			$journal = Journal::find($query->id);
 			$journal->note = $journal->note.' - '.implode(', ',$arrNote);
 			$journal->save();
+
+			$gr->updateRootDocumentStatusDone();
 		}elseif($table_name == 'shift_requests'){
 			$sr = ShiftRequest::find($table_id);
 			
@@ -2814,6 +2817,18 @@ class CustomHelper {
 				}
 
 				self::sendTrialBalance($cj->company_id, $cj->month, $cj);
+			}
+		}elseif($table_name == 'purchase_orders'){
+			$po = PurchaseOrder::find($table_id);
+
+			if($po){
+				$po->updateRootDocumentStatusDone();
+			}
+		}elseif($table_name == 'purchase_requests'){
+			$pr = PurchaseRequest::find($table_id);
+
+			if($pr){
+				$pr->updateRootDocumentStatusDone();
 			}
 		}
 		/* else{

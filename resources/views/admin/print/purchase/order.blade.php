@@ -188,7 +188,7 @@
 											<tbody>
 												@foreach($row->purchaseOrderDetail as $key => $rowdetail)
 												<tr>
-													<td>{{ $rowdetail->item_id ? $rowdetail->item->name : $rowdetail->coa->name }}</td>
+													<td>{{ $rowdetail->item_id ? $rowdetail->item->code.' - '.$rowdetail->item->name : $rowdetail->coa->code.' - '.$rowdetail->coa->name }}</td>
 													<td>{{ number_format($rowdetail->qty,3,',','.') }}</td>
 													<td>{{ $rowdetail->item_id ? $rowdetail->item->buyUnit->code : '-' }}</td>
 													<td>{{ $rowdetail->note }}</td>

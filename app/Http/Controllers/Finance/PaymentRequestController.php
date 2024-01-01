@@ -1247,6 +1247,11 @@ class PaymentRequestController extends Controller
         
         if($query->delete()) {
 
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
+
             foreach($query->paymentRequestDetail as $row){
                 if($row->lookable_type == 'fund_requests'){
                     if($row->lookable->document_status == '3'){
@@ -1320,11 +1325,11 @@ class PaymentRequestController extends Controller
                     $img_base_64_banking = base64_encode($image_temp_banking);
                     $path_img_banking = 'data:image/' . $extencion_banking . ';base64,' . $img_base_64_banking;
                     $data["e_banking"]=$path_img_banking;
-                    $pdf = Pdf::loadView('admin.print.finance.payment_request_individual', $data)->setPaper('a5', 'landscape');
+                    $pdf = Pdf::loadView('admin.print.finance.payment_request_individual', $data)->setPaper('a4', 'portrait');
                     $pdf->render();
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                    $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                    $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(422, 810, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                     $content = $pdf->download()->getOriginalContent();
                     $temp_pdf[]=$content;
                 }
@@ -1414,11 +1419,11 @@ class PaymentRequestController extends Controller
                             $img_base_64_banking = base64_encode($image_temp_banking);
                             $path_img_banking = 'data:image/' . $extencion_banking . ';base64,' . $img_base_64_banking;
                             $data["e_banking"]=$path_img_banking;
-                            $pdf = Pdf::loadView('admin.print.finance.payment_request_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.finance.payment_request_individual', $data)->setPaper('a4', 'portrait');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(422, 810, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
                            
@@ -1496,11 +1501,11 @@ class PaymentRequestController extends Controller
                             $img_base_64_banking = base64_encode($image_temp_banking);
                             $path_img_banking = 'data:image/' . $extencion_banking . ';base64,' . $img_base_64_banking;
                             $data["e_banking"]=$path_img_banking;
-                            $pdf = Pdf::loadView('admin.print.finance.payment_request_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.finance.payment_request_individual', $data)->setPaper('a4', 'portrait');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(422, 810, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
                            
@@ -1570,12 +1575,12 @@ class PaymentRequestController extends Controller
             $path_img_banking = 'data:image/' . $extencion_banking . ';base64,' . $img_base_64_banking;
             $data["e_banking"]=$path_img_banking;
              
-            $pdf = Pdf::loadView('admin.print.finance.payment_request_individual', $data)->setPaper('a5', 'landscape');
+            $pdf = Pdf::loadView('admin.print.finance.payment_request_individual', $data)->setPaper('a4', 'portrait');
             $pdf->render();
     
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+            $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+            $pdf->getCanvas()->page_text(422, 810, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
             
             $content = $pdf->download()->getOriginalContent();
             
@@ -1598,7 +1603,11 @@ class PaymentRequestController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportPaymentRequest($request->search,$request->status,$request->company,$request->account,$request->currency,$this->dataplaces), 'payment_request'.uniqid().'.xlsx');
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $mode = $request->mode ? $request->mode : '';
+		
+		return Excel::download(new ExportPaymentRequest($post_date,$end_date,$mode), 'payment_request'.uniqid().'.xlsx');
     }
     
     public function approval(Request $request,$id){
@@ -1751,7 +1760,7 @@ class PaymentRequestController extends Controller
             }elseif($data->outgoingPayment()->exists()){
                 return response()->json([
                     'status'    => 500,
-                    'message'   => 'Permintaan Pembayaran '.$data->used->lookable->code.' telah memiliki kas bank out.'
+                    'message'   => 'Permintaan Pembayaran '.$data->outgoingPayment->code.' telah memiliki kas bank out.'
                 ]);
             }else{
                 return response()->json([
@@ -3351,7 +3360,7 @@ class PaymentRequestController extends Controller
                     <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
                     <td class="center-align">'.$row->coa->company->name.'</td>
                     <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
-                    <td class="center-align">'.($row->place_id ? $row->place->code : '-').'</td>
+                    <td class="center-align">'.($row->place()->exists() ? $row->place->code : '-').'</td>
                     <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
                     <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
                     <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>

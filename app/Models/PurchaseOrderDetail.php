@@ -46,6 +46,7 @@ class PurchaseOrderDetail extends Model
         'warehouse_id',
         'status',
         'requester',
+        'project_id',
     ];
 
     public function isIncludeTax(){
@@ -105,6 +106,10 @@ class PurchaseOrderDetail extends Model
 
     public function department(){
         return $this->belongsTo('App\Models\Department','department_id','id')->withTrashed();
+    }
+
+    public function project(){
+        return $this->belongsTo('App\Models\Project','project_id','id')->withTrashed();
     }
 
     public function tax(){

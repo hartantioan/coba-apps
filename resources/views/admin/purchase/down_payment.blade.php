@@ -338,18 +338,16 @@
                                     <p class="mt-2 mb-2">
                                         <h6>Checklist Lampiran</h6>
                                         @foreach ($menu->checklistDocument as $row)
-                                            @if ($row->is_other)
-                                                <br>
-                                            @endif
                                             <label style="margin: 0 5px 0 0;">
                                                 <input class="validate" required="" type="checkbox" name="arr_checklist_box[]" value="{{ $row->id }}">
-                                                <span>{{ $row->title.' ('.$row->type().')' }}</span>
+                                                <span>{{ $row->title.' '.$row->type() }}</span>
                                                 @if($row->is_other)
                                                     <input type="text" name="arr_checklist_note[]" style="width: 200px;height:1.5rem;">
                                                 @else
                                                     <input type="hidden" name="arr_checklist_note[]">
                                                 @endif
                                             </label>
+                                            <br>
                                         @endforeach
                                     </p>
                                 </div>
@@ -1134,11 +1132,7 @@
             });
         }
 
-        if(ada == true){
-            $('#subtotal').val(formatRupiahIni(subtotal.toFixed(2).toString().replace('.',',')));
-        }else{
-            subtotal = parseFloat($('#subtotal').val().replaceAll(".", "").replaceAll(",","."));
-        }        
+        $('#subtotal').val(formatRupiahIni(subtotal.toFixed(2).toString().replace('.',',')));
 
         total = subtotal - parseFloat($('#discount').val().replaceAll(".", "").replaceAll(",","."));
 

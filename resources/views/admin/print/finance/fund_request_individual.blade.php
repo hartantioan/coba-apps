@@ -53,7 +53,7 @@
         
             @media only screen and (max-width : 992px) {
                 .invoice-print-area {
-                    zoom:0.6;
+                    zoom:0.8;
                     font-size:11px !important;
                 }
 
@@ -62,16 +62,16 @@
                     font-weight: 800 !important;
                 }
                 td{
-                    font-size:0.7em !important;
+                    font-size:0.9em !important;
                 }
                 .tb-header td{
-                    font-size:0.6em !important;
+                    font-size:0.8em !important;
                 }
                 .tbl-info td{
                     font-size:1em !important;
                 }
                 .table-data-item td{
-                    font-size:0.6em !important;
+                    font-size:0.8em !important;
                 }
                 .table-data-item th{
                     border:0.6px solid black;
@@ -170,25 +170,15 @@
         <header>
             <table border="0" width="100%" style="font-size:1em" class="tb-header">
                 <tr>
-                    <td width="83%" class="left-align" >
+                    <td width="33%" class="left-align" >
                         <tr>
                             <td>
                                 <span class="invoice-number mr-1">Permohonan Dana # {{ $data->code }}</span>
                             </td>
                         </tr>
                         <tr>
-                            <td style="margin-top: -2px;">
-                                <small style="font-size:1em"> <small>Diajukan:</small>
-                                <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span></small>
-                                <small>|| Request Pembayaran:</small>
-                                <span>{{ date('d/m/y',strtotime($data->required_date)) }}</span>
-                            </td>
-                                
-                           
-                        </tr>
-                        <tr>
                             <td>
-                                <h5 class="indigo-text">Permohonan Dana</h5>
+                                <h2 class="indigo-text">Permohonan Dana</h2>
                             </td>
                         </tr>
                                 
@@ -200,57 +190,81 @@
                    
                     </td>
                     
-                    <td width="34%" class="right-align">
+                    <td width="34%" align="right">
                         
-                            <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
+                            <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%;right:0;">
                        
                     </td>
                 </tr>
                 
             </table>
-            <hr style="border-top: 3px solid black; margin-top:-2%">
+            <hr style="border-top: 3px solid black; margin-top:-20px">
         </header>
-        <main>
+        <main style="margin-top:20px;">
             <div class="card">
-                <div class="card-content invoice-print-area ">
+                <div class="card-content invoice-print-area">
                     <table border="0" width="100%">
                         <tr>
-                            <td width="33%" class="left-align">
-                                <table border="0" width="50%" class="tbl-info">
+                            <td width="33%" class="left-align" style="vertical-align:top;">
+                                <table border="0" width="100%" class="tbl-info">
                                     <tr>
                                         <td width="40%">
                                             Nama
                                         </td>
                                         <td width="60%">
-                                            {{ $data->user->name.' - '.$data->user->phone }}
+                                            : {{ $data->user->name }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="50%">
+                                        <td width="40%">
+                                            Telp.
+                                        </td>
+                                        <td width="60%">
+                                            : {{ $data->user->phone }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="40%">
                                             Posisi
                                         </td>
-                                        <td width="50%">
-                                            {{ $data->user->position->Level->name }}
+                                        <td width="60%">
+                                            : {{ $data->user->position->Level->name }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="50%">
+                                        <td width="40%">
                                             Depart.
                                         </td>
-                                        <td width="50%">
-                                            {{ $data->user->position->division->name }}
+                                        <td width="60%">
+                                            : {{ $data->user->position->division->name }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="40%">
+                                            Tgl.Pengajuan
+                                        </td>
+                                        <td width="60%">
+                                            : {{ date('d/m/y',strtotime($data->post_date)) }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="40%">
+                                            Req.Pembayaran
+                                        </td>
+                                        <td width="60%">
+                                            : {{ date('d/m/y',strtotime($data->required_date)) }}
                                         </td>
                                     </tr>
                                 </table>
                             </td>
-                            <td width="33%" class="left-align">
+                            <td width="33%" class="left-align" style="vertical-align:top;">
                                 <table border="0" width="100%">
                                     <tr>
                                         <td width="40%">
                                             Partner Bisnis
                                         </td>
                                         <td width="60%">
-                                            {{ $data->account->name }}
+                                            : {{ $data->account->name }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -258,7 +272,7 @@
                                             Rek. Penerima
                                         </td>
                                         <td width="60%">
-                                            {{ $data->name_account }}
+                                            : {{ $data->name_account }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -266,7 +280,7 @@
                                             No. Rekening
                                         </td>
                                         <td width="60%">
-                                            {{ $data->no_account }}
+                                            : {{ $data->no_account }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -274,12 +288,12 @@
                                             Tipe
                                         </td>
                                         <td width="60%">
-                                            {{ $data->type() }}
+                                            : {{ $data->type() }}
                                         </td>
                                     </tr>
                                 </table>
                             </td>
-                            <td width="33%" class="left-align">
+                            <td width="33%" class="left-align" style="vertical-align:top;">
                                 <table border="0" width="100%">
                                     <tr>
                                         <td align="center">
@@ -335,7 +349,6 @@
                             <table style="width:100%">
                                 <tr class="break-row">
                                     <td>
-                                        {!! ucwords(strtolower($data->user->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
                                         <div class="mt-3">
                                             Catatan : {{ $data->note }}
                                         </div>

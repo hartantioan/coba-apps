@@ -34,7 +34,9 @@
             display: table;
             }
 
-            
+            td {
+                vertical-align: top;
+            }
 
             @media only screen and (max-width : 768px) {
                 .invoice-print-area {
@@ -147,29 +149,14 @@
         <header>
             <table border="0" width="100%">
                 <tr>
-                    <td width="83%" class="left-align">
-                        <tr>
-                            <td>
-                                <span class="invoice-number mr-1" style="font-size:10px;margin-bottom:0px"># {{ $data->code }}</span>
-                            </td>
-                        </tr>
-                        {{-- <tr>
-                            <td style="margin-top: -2px;">
-                                <small style="font-size:10px">Diajukan:</small>
-                                <span style="font-size:10px;">{{ date('d/m/y',strtotime($data->post_date)) }}</span>
-                            </td>
-                        </tr> --}}
-                        <tr>
-                            <td>
-                                <h5 style="margin-top: -2px">Purchase Order</h5>
-                            </td>
-                        </tr>
+                    <td width="33%" class="left-align">
+                        <span class="invoice-number mr-1" style="font-size:10px;margin-bottom:0px"># {{ $data->code }}</span>
                     </td>
-                    <td width="33%" class="right-align">
-                    
+                    <td width="33%" align="center">
+                        <h2 style="margin-top: 5px">Purchase Order</h2>
                     </td>
                     <td width="34%" class="right-align">
-                        <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
+                        <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%;right:0px;">
                     </td>
                 </tr>
             </table>
@@ -180,63 +167,100 @@
                     <!-- header section -->
                     <table border="0" width="100%">
                         <tr>
-                            <td width="25%" class="left-align">
+                            <td width="38%" style="vertical-align:top;">
                                 <table border="0" width="100%">
                                     <tr>
-                                        <td>
-                                            Supplier: {{ $data->supplier->name }}
+                                        <td width="30%" style="vertical-align:top;">
+                                            Supplier
                                         </td>
-                                        <td >
-                                            
+                                        <td width="1%">:</td>
+                                        <td>
+                                            {{ $data->supplier->name }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>
-                                            Alamat: {{ $data->supplier->address }}
+                                        <td style="vertical-align:top;">
+                                            Alamat
                                         </td>
-                                        
+                                        <td width="1%">:</td>
+                                        <td>
+                                            {{ $data->supplier->address }}
+                                        </td>
                                     </tr>
                                     <tr>
-                                        <td >
-                                            Telepon: {{ $data->supplier->phone.' / '.$data->supplier->office_no }}
+                                        <td style="vertical-align:top;">
+                                            Telepon
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td>
+                                            {{ $data->supplier->phone.' / '.$data->supplier->office_no }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="vertical-align:top;">
+                                            NO. NPWP
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td>
+                                            {{ $data->supplier->tax_id ? $data->supplier->tax_id : '-' }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="vertical-align:top;">
+                                            Tipe Bayar
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td>
+                                            {{ $data->paymentType() }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="vertical-align:top;">
+                                            Termin
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td>
+                                            {{ $data->payment_term }} hari
                                         </td>
                                     </tr>
                                 </table>
                             </td>
-                            <td width="25%" class="left-align">
+                            <td width="37%" style="vertical-align:top;">
                                 <table border="0" width="100%">
                                     <tr>
+                                        <td width="30%" style="vertical-align:top;">
+                                            Penerima
+                                        </td>
+                                        <td width="1%">:</td>
                                         <td>
-                                            Penerima: {{ $data->receiver_name }}
+                                            {{ $data->receiver_name }}
                                         </td>
                                     </tr>
                                     <tr>
+                                        <td style="vertical-align:top;">
+                                            Alamat
+                                        </td>
+                                        <td width="1%">:</td>
                                         <td>
-                                            Alamat:  {{ $data->receiver_address }}
+                                            {{ $data->receiver_address }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="50%">
-                                            Kontak: {{ $data->receiver_phone }}
+                                        <td style="vertical-align:top;">
+                                            Kontak
                                         </td>
-                                    </tr>
-                                </table>
-                            </td>
-                            <td width="25%" class="left-align">
-                                <table border="0" width="100%">
-                                    <tr>
+                                        <td width="1%">:</td>
                                         <td>
-                                            Tipe Pembayaran: {{ $data->paymentType() }}
+                                            {{ $data->receiver_phone }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>
-                                            Termin: {{ $data->payment_term }} hari
+                                        <td style="vertical-align:top;">
+                                            Tgl. Kirim
                                         </td>
-                                    </tr>
-                                    <tr>
+                                        <td width="1%">:</td>
                                         <td>
-                                            Tgl. Kirim: {{ date('d/m/y',strtotime($data->delivery_date)) }}
+                                            {{ date('d/m/y',strtotime($data->delivery_date)) }}
                                         </td>
                                     </tr>
                                 </table>
@@ -245,7 +269,7 @@
                                 <table border="0" width="100%">
                                     <tr>
                                         <td align="center">
-                                            <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:80%;" height="5%" />
+                                            <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:80%;" height="2%" />
                                         </td>
                                     </tr>
                                     <tr>
@@ -274,29 +298,26 @@
                             </thead>
                             
                             <tbody id="bodybros">
-                                    @foreach($data->purchaseOrderDetail as $key => $row)
-                                    <tr>
-                                        <td align="center" rowspan="3">{{ ($key + 1) }}</td>
-                                        <td align="center">{{ $row->item_id ? $row->item->name : $row->coa->name }}</td>
-                                        <td align="center">{{ number_format($row->qty,3,',','.') }}</td>
-                                        <td align="center">{{ $row->item_id ? $row->item->buyUnit->code : '-' }}</td>
-                                        <td align="right">{{ number_format($row->price,2,',','.') }}</td>
-                                        <td align="center">{{ number_format($row->percent_discount_1,2,',','.') }}</td>
-                                        <td align="center">{{ number_format($row->percent_discount_2,2,',','.') }}</td>
-                                        <td align="right">{{ number_format($row->discount_3,2,',','.') }}</td>
-                                        <td align="right">{{ number_format($row->subtotal,2,',','.') }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="8">Keterangan 1: {{ $row->note }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="8">Keterangan 2: {{ $row->note2 }}</td>
-                                    </tr>
-                                    @endforeach
-                                    
+                                @foreach($data->purchaseOrderDetail as $key => $row)
+                                <tr>
+                                    <td align="center" rowspan="3">{{ ($key + 1) }}</td>
+                                    <td align="center">{{ $row->item_id ? $row->item->code.' - '.$row->item->name : $row->coa->name }}</td>
+                                    <td align="center">{{ number_format($row->qty,3,',','.') }}</td>
+                                    <td align="center">{{ $row->item_id ? $row->item->buyUnit->code : '-' }}</td>
+                                    <td align="right">{{ number_format($row->price,2,',','.') }}</td>
+                                    <td align="center">{{ number_format($row->percent_discount_1,2,',','.') }}</td>
+                                    <td align="center">{{ number_format($row->percent_discount_2,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->discount_3,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->subtotal,2,',','.') }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="8">Keterangan 1: {{ $row->note }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="8">Keterangan 2: {{ $row->note2 }}</td>
+                                </tr>
+                                @endforeach
                             </tbody>
-                           
-                            
                         </table>
                         
                     </div>
@@ -362,7 +383,7 @@
                         </div>
                         <table class="mt-3" width="100%" border="0">
                             <tr>
-                                <td class="center-align">
+                                <td align="center">
                                     Dibuat oleh,
                                     @if($data->user->signature)
                                         <div>{!! $data->user->signature() !!}</div>
@@ -373,7 +394,7 @@
                                 @if($data->approval())
                                     @foreach ($data->approval() as $detail)
                                         @foreach ($detail->approvalMatrix()->where('status','2')->get() as $row)
-                                            <td class="center-align">
+                                            <td align="center">
                                                 {{ $row->approvalTemplateStage->approvalStage->approval->document_text }}
                                                 @if($row->user->signature)
                                                     <div>{!! $row->user->signature() !!}</div>
@@ -384,15 +405,20 @@
                                         @endforeach
                                     @endforeach
                                 @endif
+                                <td align="center">
+                                    Supplier,
+                                    <br><br><br><br>
+                                    (......................................)
+                                </td>
                             </tr>
                         </table>  
                     </div>
                     <div class="invoice-subtotal break-row">
                         Remark :
                         <ol>
-                            <li>Please mentioned PO NO in the DO.</li>
-                            <li>Seller has countersign this PO by at least 3 (three) working days from the date of this PO.</li>
-                            <li>Pihak supplier tidak akan memberikan uang dan/atau hadiah dalam bentuk apapun kepada karyawan/staff {{ $data->company->name }}. Jika melanggar akan diproses secara hukum dan seluruh sisa tagihan dianggap lunas.</li>
+                            <li>Harap cantumkan Nomor PO di dokumen DO.</li>
+                            <li>Penjual harus menandatangani PO ini paling lambat 3 (tiga) hari kerja dari tanggal PO.</li>
+                            <li>Pihak supplier tidak diperbolehkan memberikan uang dan/atau hadiah dalam bentuk apapun kepada karyawan/staff {{ $data->company->name }}. Jika melanggar akan diproses secara hukum dan seluruh sisa tagihan dianggap lunas.</li>
                         </ol>
                     </div>
                 </div>

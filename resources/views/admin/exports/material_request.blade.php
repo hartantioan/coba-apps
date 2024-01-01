@@ -50,7 +50,7 @@
                     <td>{{ $rowdetail->materialRequest->voidUser()->exists() ? $rowdetail->materialRequest->voidUser->name : '' }}</td>
                     <td>{{ $rowdetail->materialRequest->voidUser()->exists() ? date('d/m/y',strtotime($rowdetail->materialRequest->void_date)) : '' }}</td>
                     <td>{{ $rowdetail->materialRequest->voidUser()->exists() ? $rowdetail->materialRequest->void_note : '' }}</td>
-                    <td>{{ $rowdetail->item->name }}</td>
+                    <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name }}</td>
                     <td>{{ number_format($rowdetail->qty,3,',','.') }}</td>
                     <td>{{ number_format($rowdetail->stock,3,',','.') }}</td>
                     <td>{{ $rowdetail->item->buyUnit->code }}</td>

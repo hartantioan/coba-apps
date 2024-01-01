@@ -23,10 +23,10 @@ class ChecklistDocument extends Model
 
     public function type(){
         $type = match ($this->type) {
-            '1' => 'Wajib',
-            '2' => 'Bila Ada',
-            '3' => 'Wajib Bila Jasa',
-            '4' => 'Wajib Bila Pekerjaan Sipil',
+            '1' => '',
+            '2' => '(Bila Ada)',
+            '3' => '(Wajib Bila Jasa)',
+            '4' => '(Wajib Bila Pekerjaan Sipil)',
             default => 'Invalid',
         };
 

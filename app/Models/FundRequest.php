@@ -40,7 +40,9 @@ class FundRequest extends Model
         'status',
         'void_id',
         'void_note',
-        'void_date'
+        'void_date',
+        'delete_id',
+        'delete_note'
     ];
 
     public function user()
@@ -60,6 +62,11 @@ class FundRequest extends Model
     public function voidUser()
     {
         return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
+    }
+
+    public function deleteUser()
+    {
+        return $this->belongsTo('App\Models\User', 'delete_id', 'id')->withTrashed();
     }
 
     public function place()

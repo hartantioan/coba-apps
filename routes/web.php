@@ -2307,6 +2307,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[LockPeriodController::class, 'rowDetail']);
                     Route::post('show', [LockPeriodController::class, 'show']);
                     Route::post('get_code', [LockPeriodController::class, 'getCode']);
+                    Route::get('export',[LockPeriodController::class, 'export']);
                     Route::post('create',[LockPeriodController::class, 'create'])->middleware('operation.access:lock_period,update');
                     Route::post('update_status',[LockPeriodController::class, 'updateStatus'])->middleware('operation.access:lock_period,update');
                     Route::get('approval/{id}',[LockPeriodController::class, 'approval'])->withoutMiddleware('direct.access');

@@ -2414,28 +2414,28 @@ class PurchaseDownPaymentController extends Controller
                     if($query->landedCostFeeDetail()->exists()){
                         foreach($query->landedCostFeeDetail as $row_landedfee_detail){
                             foreach($row_landedfee_detail->purchaseInvoiceDetail as $row_invoice_detail){
+                                $data_invoices_tempura = [
+                                    'key'   => $row_invoice_detail->purchaseInvoice->code,
+                                    "name"  => $row_invoice_detail->purchaseInvoice->code,
                                 
+                                    'properties'=> [
+                                        ['name'=> "Tanggal: ".$row_invoice_detail->purchaseInvoice->post_date],
+                                    
+                                    ],
+                                    'url'   =>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($row_invoice_detail->purchaseInvoice->code),
+                                ];
+                                $data_go_chart[]=$data_invoices_tempura;
+                                $data_link[]=[
+                                    'from'  =>  $query->code,
+                                    'to'    =>  $row_invoice_detail->purchaseInvoice->code,
+                                    'string_link'=>$query->code.$row_invoice_detail->purchaseInvoice->code
+                                ];
+                                if(!in_array($row_invoice_detail->purchaseInvoice->id,$data_id_invoice)){
+                                    $data_id_invoice[]=$row_invoice_detail->purchaseInvoice->id;
+                                    $added = true;
+                                }
                             }
-                            $data_invoices_tempura = [
-                                'key'   => $row_invoice_detail->purchaseInvoice->code,
-                                "name"  => $row_invoice_detail->purchaseInvoice->code,
-                            
-                                'properties'=> [
-                                    ['name'=> "Tanggal: ".$row_invoice_detail->purchaseInvoice->post_date],
-                                
-                                ],
-                                'url'   =>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($row_invoice_detail->purchaseInvoice->code),
-                            ];
-                            $data_go_chart[]=$data_invoices_tempura;
-                            $data_link[]=[
-                                'from'  =>  $query->code,
-                                'to'    =>  $row_invoice_detail->purchaseInvoice->code,
-                                'string_link'=>$query->code.$row_invoice_detail->purchaseInvoice->code
-                            ];
-                            if(!in_array($row_invoice_detail->purchaseInvoice->id,$data_id_invoice)){
-                                $data_id_invoice[]=$row_invoice_detail->purchaseInvoice->id;
-                                $added = true;
-                            }
+                           
                         }
                     }
                 }
@@ -2649,8 +2649,8 @@ class PurchaseDownPaymentController extends Controller
                             $data_go_chart[]=$mr;
                             $data_link[]=[
                                 'from'=>$purchase_request_detail->lookable->materialRequest->code,
-                                'to'=>$query->code,
-                                'string_link'=>$purchase_request_detail->lookable->materialRequest->code.$query->code,
+                                'to'=>$query_pr->code,
+                                'string_link'=>$purchase_request_detail->lookable->materialRequest->code.$query_pr->code,
                             ];
                             $data_id_mr[]= $purchase_request_detail->lookable->materialRequest->id;  
                              
@@ -2716,7 +2716,7 @@ class PurchaseDownPaymentController extends Controller
                         }
                     }
                 }
-            }  
+            } 
             function unique_key($array,$keyname){
 
                 $new_array = array();

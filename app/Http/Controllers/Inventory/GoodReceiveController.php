@@ -22,6 +22,8 @@ use App\Models\Company;
 use App\Models\Department;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportGoodReceive;
+use App\Models\Line;
+use App\Models\Machine;
 use App\Models\Menu;
 use Illuminate\Support\Str;
 class GoodReceiveController extends Controller
@@ -49,7 +51,9 @@ class GoodReceiveController extends Controller
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
             'newcode'   => $menu->document_code.date('y'),
-            'menucode'  => $menu->document_code
+            'menucode'  => $menu->document_code,
+            'line'      => Line::where('status','1')->get(),
+            'machine'   => Machine::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -385,8 +389,11 @@ class GoodReceiveController extends Controller
                             'coa_id'                => $request->arr_coa[$key],
                             'warehouse_id'          => $request->arr_warehouse[$key],
                             'place_id'              => $request->arr_place[$key],
+                            'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
+                            'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
                             'department_id'         => isset($request->arr_department[$key]) ? $request->arr_department[$key] : NULL,
                             'area_id'               => $request->arr_area[$key] ? $request->arr_area[$key] : NULL,
+                            'project_id'            => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
                         ]);
 
                     }
@@ -427,7 +434,7 @@ class GoodReceiveController extends Controller
                     <table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="12">Daftar Item</th>
+                                <th class="center-align" colspan="15">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -439,9 +446,12 @@ class GoodReceiveController extends Controller
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Coa</th>
                                 <th class="center-align">Plant</th>
+                                <th class="center-align">Line</th>
+                                <th class="center-align">Mesin</th>
                                 <th class="center-align">Departemen</th>
                                 <th class="center-align">Gudang</th>
                                 <th class="center-align">Area</th>
+                                <th class="center-align">Proyek</th>
                             </tr>
                         </thead><tbody>';
         
@@ -455,10 +465,13 @@ class GoodReceiveController extends Controller
                 <td class="center-align">'.number_format($row->total,3,',','.').'</td>
                 <td class="center-align">'.$row->note.'</td>
                 <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
-                <td class="center-align">'.$row->place->code.' - '.$row->place->company->name.'</td>
+                <td class="center-align">'.$row->place->code.'</td>
+                <td class="center-align">'.($row->line()->exists() ? $row->line->name : '-').'</td>
+                <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
                 <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
                 <td class="center-align">'.$row->warehouse->name.'</td>
                 <td class="center-align">'.($row->area()->exists() ? $row->area->name : '').'</td>
+                <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
             </tr>';
         }
         
@@ -534,11 +547,15 @@ class GoodReceiveController extends Controller
                 'coa_id'            => $row->coa_id,
                 'coa_name'          => $row->coa->code.' - '.$row->coa->name,
                 'place_id'          => $row->place_id,
+                'line_id'           => $row->line_id,
+                'machine_id'        => $row->machine_id,
                 'department_id'     => $row->department_id,
                 'warehouse_id'      => $row->warehouse_id,
                 'warehouse_name'    => $row->warehouse->name,
                 'area_id'           => $row->area_id ? $row->area_id : '',
                 'area_name'         => $row->area()->exists() ? $row->area->name : '',
+                'project_id'        => $row->project()->exists() ? $row->project->id : '',
+                'project_name'      => $row->project()->exists() ? $row->project->name : '',
                 'note'              => $row->note,
             ];
         }

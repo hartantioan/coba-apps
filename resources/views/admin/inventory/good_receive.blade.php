@@ -196,7 +196,7 @@
                                     <h4>Detail Produk</h4>
                                     Coa debit mengikuti coa pada masing-masing grup item.
                                     <div style="overflow:auto;">
-                                        <table class="bordered" style="min-width:2000px !important;" id="table-detail">
+                                        <table class="bordered" style="min-width:2500px !important;" id="table-detail">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Item</th>
@@ -208,15 +208,18 @@
                                                     <th class="center">Keterangan</th>
                                                     <th class="center">Coa Kredit</th>
                                                     <th class="center">Plant</th>
+                                                    <th class="center">Line</th>
+                                                    <th class="center">Mesin</th>
                                                     <th class="center">Departemen</th>
                                                     <th class="center">Gudang</th>
                                                     <th class="center">Area</th>
+                                                    <th class="center">Proyek</th>
                                                     <th class="center">Hapus</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
-                                                    <td colspan="13" class="center">
+                                                    <td colspan="16" class="center">
                                                         <button class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> Tambah Item
                                                         </button>
@@ -801,6 +804,22 @@
                     </select>    
                 </td>
                 <td>
+                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
+                        <option value="">--Kosong--</option>
+                        @foreach ($line as $rowline)
+                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
+                        @endforeach
+                    </select>    
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                        <option value="">--Kosong--</option>
+                        @foreach ($machine as $row)
+                            <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                        @endforeach    
+                    </select>
+                </td>
+                <td>
                     <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
                         <option value="">--Kosong--</option>
                         @foreach ($department as $rowdept)
@@ -816,6 +835,9 @@
                 <td class="center" id="area` + count + `">
                     -
                 </td>
+                <td>
+                    <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
@@ -825,9 +847,26 @@
         `);
         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+        select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
         $('#arr_place' + count).formSelect();
         $('#arr_department' + count).formSelect();
         M.updateTextFields();
+    }
+
+    function changePlace(element){
+        if($(element).val()){
+            $(element).parent().prev().find('select[name="arr_place[]"]').val($(element).find(':selected').data('place'));
+        }else{
+            $(element).parent().prev().find('select[name="arr_place[]"]').val($(element).parent().prev().find('select[name="arr_place[]"] option:first').val());
+        }
+    }
+
+    function changeLine(element){
+        if($(element).val()){
+            $(element).parent().prev().find('select[name="arr_line[]"]').val($(element).find(':selected').data('line')).trigger('change');
+        }else{
+            $(element).parent().prev().find('select[name="arr_line[]"]').val($(element).parent().prev().find('select[name="arr_line[]"] option:first').val()).trigger('change');
+        }
     }
 
     function countRow(id){
@@ -855,9 +894,15 @@
                 var formData = new FormData($('#form_data')[0]);
 
                 formData.delete("arr_area[]");
+                formData.delete("arr_line[]");
+                formData.delete("arr_machine[]");
+                formData.delete("arr_project[]");
 
                 $('select[name^="arr_item[]"]').each(function(index){
                     formData.append('arr_area[]',($('#arr_area' + $(this).data('id')).length > 0 ? ($('#arr_area' + $(this).data('id')).val() ? $('#arr_area' + $(this).data('id')).val() : '' )  : ''));
+                    formData.append('arr_line[]',($('#arr_line' + $(this).data('id')).val() ? $('#arr_line' + $(this).data('id')).val() : '' ));
+                    formData.append('arr_machine[]',($('#arr_machine' + $(this).data('id')).val() ? $('#arr_machine' + $(this).data('id')).val() : '' ));
+                    formData.append('arr_project[]',($('#arr_project' + $(this).data('id')).val() ? $('#arr_project' + $(this).data('id')).val() : '' ));
                 });
         
                 $.ajax({
@@ -1004,6 +1049,22 @@
                                     </select>    
                                 </td>
                                 <td>
+                                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
+                                        <option value="">--Kosong--</option>
+                                        @foreach ($line as $rowline)
+                                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
+                                        @endforeach
+                                    </select>    
+                                </td>
+                                <td>
+                                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                                        <option value="">--Kosong--</option>
+                                        @foreach ($machine as $row)
+                                            <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                                        @endforeach    
+                                    </select>
+                                </td>
+                                <td>
                                     <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
                                         <option value="">--Kosong--</option>
                                         @foreach ($department as $rowdept)
@@ -1016,6 +1077,9 @@
                                 </td>
                                 <td class="center" id="area` + count + `">
                                     ` + ( val.area_id ? '<select class="browser-default" id="arr_area' + count + '" name="arr_area[]"></select>' : '-' ) + `
+                                </td>
+                                <td>
+                                    <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
                                 </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -1043,6 +1107,12 @@
                             `);
                             select2ServerSide('#arr_area' + count, '{{ url("admin/select2/area") }}');
                         }
+                        if(val.project_id){
+                            $('#arr_project' + count).append(`
+                                <option value="` + val.project_id + `">` + val.project_name + `</option>
+                            `);
+                        }
+                        select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
                     });
                 }
                 

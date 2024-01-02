@@ -1840,11 +1840,11 @@ class Select2Controller extends Controller {
                 foreach($d->inventoryTransferOutDetail as $row){
                     $details[] = [
                         'name'      => $row->item->code.' - '.$row->item->name,
-                        'origin'    => $row->itemStock->place->name.' - '.$row->itemStock->warehouse->name.' - '.($row->itemStock->area->exists() ? $row->itemStock->area->name : ''),
+                        'origin'    => $row->itemStock->place->name.' - '.$row->itemStock->warehouse->name.' - '.($row->itemStock->area()->exists() ? $row->itemStock->area->name : ''),
                         'qty'       => number_format($row->qty,3,',','.'),
                         'unit'      => $row->item->uomUnit->code,
                         'note'      => $row->note,
-                        'area'      => $row->area->exists() ? $row->area->name : '-',
+                        'area'      => $row->area()->exists() ? $row->area->name : '-',
                     ];
                 }
     

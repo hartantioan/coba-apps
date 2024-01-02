@@ -23,8 +23,11 @@ class GoodReceiveDetail extends Model
         'note',
         'coa_id',
         'place_id',
+        'line_id',
+        'machine_id',
         'department_id',
         'warehouse_id',
+        'project_id',
         'area_id',
     ];
 
@@ -43,9 +46,24 @@ class GoodReceiveDetail extends Model
         return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
     }
 
+    public function line()
+    {
+        return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();
+    }
+
+    public function machine()
+    {
+        return $this->belongsTo('App\Models\Machine', 'machine_id', 'id')->withTrashed();
+    }
+
     public function area()
     {
         return $this->belongsTo('App\Models\Area', 'area_id', 'id')->withTrashed();
+    }
+
+    public function project()
+    {
+        return $this->belongsTo('App\Models\Project', 'project_id', 'id')->withTrashed();
     }
 
     public function place()

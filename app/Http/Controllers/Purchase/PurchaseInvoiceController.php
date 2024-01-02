@@ -47,6 +47,7 @@ use App\Models\PurchaseInvoiceDetail;
 
 use App\Helpers\CustomHelper;
 use App\Exports\ExportPurchaseInvoice;
+use App\Models\LandedCostFeeDetail;
 use App\Models\User;
 use App\Models\Tax;
 use Illuminate\Database\Eloquent\Builder;
@@ -1797,7 +1798,7 @@ class PurchaseInvoiceController extends Controller
                                     ->orWhere('employee_no','like',"%$request->search%");
                             })
                             ->orWhereHas('purchaseInvoiceDetail',function($query) use($request){
-                                $query->whereHasMorph('lookable',[PurchaseOrder::class,PurchaseInvoice::class,LandedCost::class,GoodReceipt::class,Coa::class],function (Builder $query) use ($request) {
+                                $query->whereHasMorph('lookable',[PurchaseOrder::class,PurchaseInvoice::class,LandedCostFeeDetail::class,GoodReceipt::class,Coa::class],function (Builder $query) use ($request) {
                                     $query->where('code','like',"%$request->search%");
                                 });
                             });

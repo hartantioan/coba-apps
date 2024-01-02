@@ -256,6 +256,14 @@ class LandedCost extends Model
         return $total;
     }
 
+    public function hasBalanceInvoice(){
+        if($this->balanceInvoice() > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public function getArrayDetail(){
         $arrInfo = [];
         

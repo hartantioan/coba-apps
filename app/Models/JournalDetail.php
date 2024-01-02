@@ -24,6 +24,7 @@ class JournalDetail extends Model
         'account_id',
         'department_id',
         'warehouse_id',
+        'project_id',
         'item_id',
         'type',
         'nominal',
@@ -56,6 +57,10 @@ class JournalDetail extends Model
 
     public function warehouse(){
         return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
+    }
+
+    public function project(){
+        return $this->belongsTo('App\Models\Project', 'project_id', 'id')->withTrashed();
     }
 
     public function account(){

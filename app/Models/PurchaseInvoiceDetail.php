@@ -36,6 +36,7 @@ class PurchaseInvoiceDetail extends Model
         'machine_id',
         'department_id',
         'warehouse_id',
+        'project_id',
     ];
 
     public function lookable(){
@@ -65,6 +66,11 @@ class PurchaseInvoiceDetail extends Model
     public function line()
     {
         return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();
+    }
+
+    public function project()
+    {
+        return $this->belongsTo('App\Models\Project', 'project_id', 'id')->withTrashed();
     }
 
     public function machine()

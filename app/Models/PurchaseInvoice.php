@@ -417,6 +417,12 @@ class PurchaseInvoice extends Model
                     'status'    => '2'
                 ]);
             }
+
+            if($row->landedCostFeeDetail()){
+                $row->lookable->landedCost->update([
+                    'status'    => '2'
+                ]);
+            }
         }
     }
 
@@ -425,7 +431,7 @@ class PurchaseInvoice extends Model
             if($row->purchaseOrderDetail()){
                 if(!$row->lookable->purchaseOrder->hasBalanceInvoice()){
                     $row->lookable->purchaseOrder->update([
-                        'status'    => '2'
+                        'status'    => '3'
                     ]);
                 }
             }
@@ -433,6 +439,14 @@ class PurchaseInvoice extends Model
             if($row->goodReceiptDetail()){
                 if(!$row->lookable->goodReceipt->hasBalanceInvoice()){
                     $row->lookable->goodReceipt->update([
+                        'status'    => '3'
+                    ]);
+                }
+            }
+
+            if($row->landedCostFeeDetail()){
+                if(!$row->lookable->landedCost->hasBalanceInvoice()){
+                    $row->lookable->landedCost->update([
                         'status'    => '3'
                     ]);
                 }

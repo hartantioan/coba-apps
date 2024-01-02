@@ -223,7 +223,7 @@
                                     <div class="col s12 mt-2" style="overflow:auto;width:100% !important;">
                                         <h5>Detail Coa</h5>
                                         <p class="mt-2 mb-2">
-                                            <table class="bordered" style="min-width:1500px;" id="table-detail">
+                                            <table class="bordered" style="min-width:2500px;" id="table-detail">
                                                 <thead>
                                                     <tr>
                                                         <th class="center">BP</th>
@@ -233,6 +233,8 @@
                                                         <th class="center">Mesin</th>
                                                         <th class="center">Departemen</th>
                                                         <th class="center">Gudang</th>
+                                                        <th class="center">Proyek</th>
+                                                        <th class="center">Keterangan</th>
                                                         <th class="center">Debit</th>
                                                         <th class="center">Kredit</th>
                                                         <th class="center">Hapus</th>
@@ -240,7 +242,7 @@
                                                 </thead>
                                                 <tbody id="body-coa">
                                                     <tr id="last-row-coa">
-                                                        <td colspan="10" class="center">
+                                                        <td colspan="12">
                                                             <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addCoa('1')" href="javascript:void(0);">
                                                                 <i class="material-icons left">add</i> Tambah Debit
                                                             </a>
@@ -682,6 +684,12 @@
                             <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
                         </td>
                         <td>
+                            <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                        </td>
+                        <td>
+                            <input name="arr_note[]" type="text" placeholder="Keterangan...">
+                        </td>
+                        <td>
                             ` + (type == '1' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="` + formatRupiahIni(roundTwoDecimal(nominal).toString().replace('.',',')) + `" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
                         </td>
                         <td>
@@ -706,7 +714,7 @@
                         <option value="` + $('#cost_distribution_id').select2('data')[0].coa_id + `">` + $('#cost_distribution_id').select2('data')[0].coa_name + `</option>
                     `);
                 }
-                
+                select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
                 select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa_journal") }}');
                 select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
                 select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
@@ -773,6 +781,12 @@
                     <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
                 </td>
                 <td>
+                    <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                </td>
+                <td>
+                    <input name="arr_note[]" type="text" placeholder="Keterangan...">
+                </td>
+                <td>
                     ` + (type == '1' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="0" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
                 </td>
                 <td>
@@ -789,6 +803,7 @@
         select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
         select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
         select2ServerSide('#arr_account' + count, '{{ url("admin/select2/business_partner") }}');
+        select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
         $('#arr_place' + count).formSelect();
         $('#arr_department' + count).formSelect();
         $('#arr_coa' + count).select2({
@@ -1232,6 +1247,8 @@
                     formData.delete("arr_item[]");
                     formData.delete("arr_department[]");
                     formData.delete("arr_warehouse[]");
+                    formData.delete("arr_project[]");
+                    formData.delete("arr_note[]");
                     formData.delete("arr_nominal[]");
 
                     $('input[name^="arr_type"]').each(function(index){
@@ -1245,6 +1262,8 @@
                         formData.append('arr_item[]',($('select[name^="arr_item"]').eq(index).val() ? $('select[name^="arr_item"]').eq(index).val() : 'NULL'));
                         formData.append('arr_department[]',$('select[name^="arr_department"]').eq(index).val());
                         formData.append('arr_warehouse[]',($('select[name^="arr_warehouse"]').eq(index).val() ? $('select[name^="arr_warehouse"]').eq(index).val() : 'NULL'));
+                        formData.append('arr_project[]',($('select[name^="arr_project[]"]').eq(index).val() ? $('select[name^="arr_project[]"]').eq(index).val() : 'NULL'));
+                        formData.append('arr_note[]',($('input[name^="arr_note[]"]').eq(index).val() ? $('input[name^="arr_note[]"]').eq(index).val() : ''));
                         formData.append('arr_nominal[]',($('input[name^="arr_nominal"]').eq(index).val() ? $('input[name^="arr_nominal"]').eq(index).val() : 'NULL'));
                     });
                     
@@ -1554,6 +1573,12 @@
                                 <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
                             </td>
                             <td>
+                                <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                            </td>
+                            <td>
+                                <input name="arr_note[]" type="text" placeholder="Keterangan..." value="` + val.note + `">
+                            </td>
+                            <td>
                                 ` + (val.type == '1' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal + `" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
                             </td>
                             <td>
@@ -1600,6 +1625,12 @@
                     `);
                     $('#arr_line' + count).val(val.line_id);
                     $('#arr_machine' + count).val(val.machine_id);
+                    if(val.project_id){
+                        $('#arr_project' + count).append(`
+                            <option value="` + val.project_id + `">` + val.project_name + `</option>
+                        `);
+                    }
+                    select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
                     if(val.account_id){
                         $('#arr_account' + count).append(`
                             <option value="` + val.account_id + `">` + val.account_name + `</option>

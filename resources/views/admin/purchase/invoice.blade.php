@@ -338,11 +338,12 @@
                                                             <th class="center">Mesin</th>
                                                             <th class="center">Departemen</th>
                                                             <th class="center">Gudang</th>
+                                                            <th class="center">Proyek</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="body-detail">
                                                         <tr id="last-row-detail">
-                                                            <td colspan="25">
+                                                            <td colspan="26">
                                                                 <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                                     <i class="material-icons left">add</i> Pembulatan Manual
                                                                 </a>
@@ -710,6 +711,8 @@
                             <th class="center-align">Mesin</th>
                             <th class="center-align">Department</th>
                             <th class="center-align">Gudang</th>
+                            <th class="center-align">Proyek</th>
+                            <th class="center-align">Keterangan</th>
                             <th class="center-align">Debit</th>
                             <th class="center-align">Kredit</th>
                         </tr>
@@ -1087,6 +1090,9 @@
                 <td>
                     <input type="text" name="arr_multi_warehouse[]" placeholder="ID Gudang">
                 </td>
+                <td>
+                    <input type="text" name="arr_multi_project[]" placeholder="ID Gudang">
+                </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-multi" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
@@ -1206,6 +1212,9 @@
                                 </td>
                                 <td>
                                     <input type="text" name="arr_multi_warehouse[]" placeholder="ID Gudang">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_project[]" placeholder="ID Proyek">
                                 </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-multi" href="javascript:void(0);">
@@ -1584,6 +1593,7 @@
                                                 <input type="hidden" id="arr_machine` + count + `" name="arr_machine[]" value="` + val.machine_id + `" data-id="` + count + `">
                                                 <input type="hidden" id="arr_department` + count + `" name="arr_department[]" value="` + val.department_id + `" data-id="` + count + `">
                                                 <input type="hidden" id="arr_warehouse` + count + `" name="arr_warehouse[]" value="` + val.warehouse_id + `" data-id="` + count + `">
+                                                <input type="hidden" id="arr_project` + count + `" name="arr_project[]" value="` + val.project_id + `" data-id="` + count + `">
                                                 <input type="hidden" name="arr_code[]" value="` + val.id + `" data-id="` + count + `">
                                                 <input type="hidden" name="arr_temp_qty[]" value="` + val.qty_balance + `" data-id="` + count + `">
                                                 <td class="center">
@@ -1673,6 +1683,9 @@
                                                 </td>
                                                 <td class="center">
                                                     ` + val.warehouse_name + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.project_name + `
                                                 </td>
                                             </tr>
                                         `);
@@ -2006,9 +2019,13 @@
                         @endforeach
                     </select>
                 </td>
+                <td class="center">
+                    <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                </td>
             </tr>
         `);
         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+        select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
     }
 
     function changePlace(element){
@@ -2348,6 +2365,7 @@
                     formData.delete("arr_machine[]");
                     formData.delete("arr_department[]");
                     formData.delete("arr_warehouse[]");
+                    formData.delete("arr_project[]");
 
                     $('select[name^="arr_percent_tax"]').each(function(){
                         formData.append('arr_tax_id[]',($(this).find(':selected').data('id') ? $(this).find(':selected').data('id') : ''));
@@ -2381,6 +2399,7 @@
                             formData.append('arr_machine[]',($('#arr_machine' + $(this).data('id')).val() ? $('#arr_machine' + $(this).data('id')).val() : ''));
                             formData.append('arr_department[]',($('#arr_department' + $(this).data('id')).val() ? $('#arr_department' + $(this).data('id')).val() : ''));
                             formData.append('arr_warehouse[]',($('#arr_warehouse' + $(this).data('id')).val() ? $('#arr_warehouse' + $(this).data('id')).val() : ''));
+                            formData.append('arr_project[]',($('#arr_project' + $(this).data('id')).val() ? $('#arr_project' + $(this).data('id')).val() : ''));
                         }
                         let qtyreal = parseFloat($('input[name^="arr_temp_qty"][data-id="' + $(this).data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), qtynow = parseFloat($('input[name^="arr_qty"][data-id="' + $(this).data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
 
@@ -2405,6 +2424,7 @@
                     formData.delete("arr_multi_machine[]");
                     formData.delete("arr_multi_department[]");
                     formData.delete("arr_multi_warehouse[]");
+                    formData.delete("arr_multi_project[]");
 
                     $('input[name^="arr_multi_coa[]"]').each(function(index){
                         if($(this).val()){
@@ -2424,6 +2444,7 @@
                             formData.append('arr_multi_machine[]',($('input[name^="arr_multi_machine"]').eq(index).val() ? $('input[name^="arr_multi_machine"]').eq(index).val() : ''));
                             formData.append('arr_multi_department[]',($('input[name^="arr_multi_department"]').eq(index).val() ? $('input[name^="arr_multi_department"]').eq(index).val() : ''));
                             formData.append('arr_multi_warehouse[]',($('input[name^="arr_multi_warehouse"]').eq(index).val() ? $('input[name^="arr_multi_warehouse"]').eq(index).val() : ''));
+                            formData.append('arr_multi_project[]',($('input[name^="arr_multi_project"]').eq(index).val() ? $('input[name^="arr_multi_project"]').eq(index).val() : ''));
                         }
                     });
                 }
@@ -2869,6 +2890,17 @@
                                             @endforeach
                                         </select>
                                     </td>
+                                    <td class="center">
+                                        <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                                            <option value="">--Kosong--</option>
+                                            @foreach ($warehouse as $row)
+                                                <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                    <td class="center">
+                                        <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                                    </td>
                                 </tr>
                             `);
                             $('#arr_percent_wtax' + count).val(val.percent_wtax);
@@ -2883,6 +2915,12 @@
                                 <option value="` + val.lookable_id + `">` + val.name + `</option>
                             `);
                             select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+                            if(val.project_id){
+                                $('#arr_project' + count).append(`
+                                    <option value="` + val.project_id + `">` + project_name + `</option>
+                                `);
+                            }
+                            select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
                         }else{
                             $('#last-row-detail').before(`
                                 <tr class="row_detail">
@@ -2897,6 +2935,7 @@
                                     <input type="hidden" id="arr_machine` + count + `" name="arr_machine[]" value="` + val.machine_id + `" data-id="` + count + `">
                                     <input type="hidden" id="arr_department` + count + `" name="arr_department[]" value="` + val.department_id + `" data-id="` + count + `">
                                     <input type="hidden" id="arr_warehouse` + count + `" name="arr_warehouse[]" value="` + val.warehouse_id + `" data-id="` + count + `">
+                                    <input type="hidden" id="arr_project` + count + `" name="arr_project[]" value="` + val.project_id + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_code[]" value="` + val.id + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_temp_qty[]" value="` + val.qty_balance + `" data-id="` + count + `">
                                     <td class="center">
@@ -2986,6 +3025,9 @@
                                     </td>
                                     <td class="center">
                                         ` + val.warehouse_name + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.project_name + `
                                     </td>
                                 </tr>
                             `);

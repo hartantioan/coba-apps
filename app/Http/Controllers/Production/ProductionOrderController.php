@@ -59,6 +59,7 @@ class ProductionOrderController extends Controller
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'area'          => Area::where('status','1')->get(),
             'warehouse'     => Warehouse::where('status','1')->whereNotNull('is_transit_warehouse')->first(),
+            'menucode'      => $menu->document_code
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

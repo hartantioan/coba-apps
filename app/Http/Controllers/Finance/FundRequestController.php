@@ -57,13 +57,14 @@ class FundRequestController extends Controller
         $lastSegment = request()->segment(count(request()->segments()));
         $menu = Menu::where('url', $lastSegment)->first();
         $data = [
-            'title'     => 'Permohonan Dana',
-            'content'   => 'admin.finance.fund_request',
-            'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
-            'tax'       => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
-            'wtax'      => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
+            'title'         => 'Permohonan Dana',
+            'content'       => 'admin.finance.fund_request',
+            'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
+            'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
+            'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
             'newcode'       => $menu->document_code.date('y'),
             'menucode'      => $menu->document_code,
+            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -708,6 +709,7 @@ class FundRequestController extends Controller
     {
         $url = 'fund_request';
         $cekDate = $this->datauser->cekMinMaxPostDate($url);
+        $menu = Menu::where('url', $url)->first();
 
         $data = [
             'title'         => 'Pengajuan Permohonan Dana - Pengguna',
@@ -719,7 +721,8 @@ class FundRequestController extends Controller
             'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
             'minDate'       => $cekDate ? date('Y-m-d', strtotime('-'.$cekDate->userDate->count_backdate.' days')) : date('Y-m-d'),
             'maxDate'       => $cekDate ? date('Y-m-d', strtotime(date('Y-m-d'). ' + '.$cekDate->userDate->count_futuredate.' days')) : date('Y-m-d'),
-            'newcode'       => 'FREQ-'.date('y'),
+            'newcode'       => $menu->document_code.date('y'),
+            'menucode'      => $menu->document_code,
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -803,7 +806,7 @@ class FundRequestController extends Controller
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
-                    $val->place->name.' - '.$val->place->company->name,
+                    $val->place->code,
                     $val->department->name,
                     $val->account->name,
                     $val->type(),

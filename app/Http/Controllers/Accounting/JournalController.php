@@ -213,6 +213,7 @@ class JournalController extends Controller
                                 <th class="center-align">Mesin</th>
                                 <th class="center-align">Departemen</th>
                                 <th class="center-align">Gudang</th>
+                                <th class="center-align">Proyek</th>
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Debit</th>
                                 <th class="center-align">Kredit</th>
@@ -236,6 +237,7 @@ class JournalController extends Controller
                 <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
                 <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
                 <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
+                <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
                 <td class="">'.$row->note.'</td>
                 <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
                 <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
@@ -437,6 +439,8 @@ class JournalController extends Controller
                                 'account_id'                    => $request->arr_account[$key] == 'NULL' ? NULL : $request->arr_account[$key],
                                 'department_id'                 => $request->arr_department[$key],
                                 'warehouse_id'                  => $request->arr_warehouse[$key] == 'NULL' ? NULL : $request->arr_warehouse[$key],
+                                'project_id'                    => $request->arr_project[$key] == 'NULL' ? NULL : $request->arr_project[$key],
+                                'note'                          => $request->arr_note[$key] == '' ? NULL : $request->arr_note[$key],
                                 'type'                          => $row,
                                 'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
                             ]);
@@ -641,10 +645,15 @@ class JournalController extends Controller
                 'account_name'                  => $row->account_id ? $row->account->name : '',
                 'line_id'                       => $row->line_id ? $row->line_id : '',
                 'line_name'                     => $row->line_id ? $row->line->code.' - '.$row->line->name : '',
+                'machine_id'                    => $row->machine()->exists() ? $row->machine_id : '',
+                'machine_name'                  => $row->machine()->exists() ? $row->machine->name : '',
                 'department_id'                 => $row->department_id ? $row->department_id : '',
                 'warehouse_id'                  => $row->warehouse_id ? $row->warehouse_id : '',
                 'warehouse_name'                => $row->warehouse_id ? $row->warehouse->name : '',
-                'nominal'                       => number_format($row->nominal,2,',','.')
+                'project_id'                    => $row->project()->exists() ? $row->project_id : '',
+                'project_name'                  => $row->project()->exists() ? $row->project->name : '',
+                'nominal'                       => number_format($row->nominal,2,',','.'),
+                'note'                          => $row->note ? $row->note : '',
             ];
         }
 

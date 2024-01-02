@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportRetirement;
 use App\Helpers\CustomHelper;
+use App\Models\Menu;
 
 class LockPeriodController extends Controller
 {
@@ -39,13 +40,16 @@ class LockPeriodController extends Controller
 
     public function index(Request $request)
     {
+        $lastSegment = request()->segment(count(request()->segments()));
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => 'Kunci Periode',
             'content'       => 'admin.accounting.lock_period',
             'company'       => Company::where('status','1')->get(),
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-            'newcode'       => 'LOPR-'.date('y'),
+            'newcode'       => $menu->document_code.date('y'),
+            'menucode'      => $menu->document_code,
             'place'         => Place::whereIn('id',$this->dataplaces)->where('status','1')->get(),
         ];
 

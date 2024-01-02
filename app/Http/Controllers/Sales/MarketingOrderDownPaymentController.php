@@ -65,6 +65,7 @@ class MarketingOrderDownPaymentController extends Controller
             'maxDate'       => $request->get('maxDate'),
             'newcode'       => $menu->document_code.date('y'),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+            'menucode'      => $menu->document_code
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -932,6 +933,8 @@ class MarketingOrderDownPaymentController extends Controller
                     <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
                     <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
                     <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
+                    <td class="center-align">'.($row->project_id ? $row->project->name : '-').'</td>
+                    <td class="center-align">'.($row->note ? $row->note : '').'</td>
                     <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
                     <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
                 </tr>';

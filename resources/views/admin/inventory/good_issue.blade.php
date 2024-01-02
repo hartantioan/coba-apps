@@ -407,6 +407,8 @@
                             <th class="center-align">Mesin</th>
                             <th class="center-align">Department</th>
                             <th class="center-align">Gudang</th>
+                            <th class="center-align">Proyek</th>
+                            <th class="center-align">Keterangan</th>
                             <th class="center-align">Debit</th>
                             <th class="center-align">Kredit</th>
                         </tr>

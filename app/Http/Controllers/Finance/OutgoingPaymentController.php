@@ -33,6 +33,7 @@ use App\Models\Currency;
 use App\Models\Menu;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportOutgoingPayment;
+use App\Models\Place;
 
 class OutgoingPaymentController extends Controller
 {
@@ -57,6 +58,7 @@ class OutgoingPaymentController extends Controller
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'newcode'       => $menu->document_code.date('y'),
             'menucode'      => $menu->document_code,
+            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -2453,6 +2455,8 @@ class OutgoingPaymentController extends Controller
                     <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
                     <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
                     <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
+                    <td class="center-align">'.($row->project_id ? $row->project->name : '-').'</td>
+                    <td class="center-align">'.($row->note ? $row->note : '').'</td>
                     <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
                     <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
                 </tr>';

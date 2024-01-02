@@ -48,6 +48,7 @@ use App\Models\PurchaseInvoiceDetail;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportPurchaseInvoice;
 use App\Models\LandedCostFeeDetail;
+use App\Models\Project;
 use App\Models\User;
 use App\Models\Tax;
 use Illuminate\Database\Eloquent\Builder;
@@ -230,11 +231,13 @@ class PurchaseInvoiceController extends Controller
                             'machine_id'    => $rowdetail->machine_id ? $rowdetail->machine_id : '',
                             'department_id' => $rowdetail->department_id ? $rowdetail->department_id : '',
                             'warehouse_id'  => $rowdetail->warehouse_id ? $rowdetail->warehouse_id : '',
+                            'project_id'    => $rowdetail->project_id ? $rowdetail->project_id : '',
                             'place_name'    => $rowdetail->place_id ? $rowdetail->place->code : '-',
                             'line_name'     => $rowdetail->line_id ? $rowdetail->line->name : '-',
                             'machine_name'  => $rowdetail->machine_id ? $rowdetail->machine->name : '-',
                             'department_name' => $rowdetail->department_id ? $rowdetail->department->name : '-',
                             'warehouse_name'=> $rowdetail->warehouse_id ? $rowdetail->warehouse->name : '-',
+                            'project_name'  => $rowdetail->project_id ? $rowdetail->project->name : '-',
                         ];
                     }
                 }
@@ -280,11 +283,13 @@ class PurchaseInvoiceController extends Controller
                             'machine_id'    => $rowdetail->machine_id ? $rowdetail->machine_id : '',
                             'department_id' => $rowdetail->department_id ? $rowdetail->department_id : '',
                             'warehouse_id'  => $rowdetail->warehouse_id ? $rowdetail->warehouse_id : '',
+                            'project_id'    => $rowdetail->purchaseOrderDetail->project_id ? $rowdetail->purchaseOrderDetail->project_id : '',
                             'place_name'    => $rowdetail->place_id ? $rowdetail->place->code : '-',
                             'line_name'     => $rowdetail->line_id ? $rowdetail->line->name : '-',
                             'machine_name'  => $rowdetail->machine_id ? $rowdetail->machine->name : '-',
                             'department_name' => $rowdetail->department_id ? $rowdetail->department->name : '-',
                             'warehouse_name'=> $rowdetail->warehouse_id ? $rowdetail->warehouse->name : '-',
+                            'project_name'  => $rowdetail->purchaseOrderDetail->project_id ? $rowdetail->purchaseOrderDetail->project->name : '-',
                         ];
                     }
                 }
@@ -323,11 +328,13 @@ class PurchaseInvoiceController extends Controller
                             'machine_id'    => '',
                             'department_id' => '',
                             'warehouse_id'  => '',
+                            'project_id'    => '',
                             'place_name'    => '-',
                             'line_name'     => '-',
                             'machine_name'  => '-',
                             'department_name' => '-',
                             'warehouse_name'=> '-',
+                            'project_name'  => '-',
                         ];
                     }
                 }
@@ -810,6 +817,7 @@ class PurchaseInvoiceController extends Controller
                                     'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
                                     'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
                                     'warehouse_id'          => $request->arr_warehouse[$key] ? $request->arr_warehouse[$key] : NULL,
+                                    'project_id'            => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
                                 ]);
                             }
                                 
@@ -824,6 +832,7 @@ class PurchaseInvoiceController extends Controller
                             $machine = $request->arr_multi_machine[$key] ? Machine::where('code',explode('|',$request->arr_multi_machine[$key])[1])->first() : '';
                             $department = $request->arr_multi_department[$key] ? Department::where('code',explode('|',$request->arr_multi_department[$key])[0])->first() : '';
                             $warehouse = $request->arr_multi_warehouse[$key] ? Warehouse::where('code',explode('|',$request->arr_multi_warehouse[$key])[0])->first() : '';
+                            $project = $request->arr_multi_project[$key] ? Project::where('code',explode('|',$request->arr_multi_project[$key])[0])->first() : '';
                             PurchaseInvoiceDetail::create([
                                 'purchase_invoice_id'   => $query->id,
                                 'lookable_type'         => 'coas',
@@ -844,6 +853,7 @@ class PurchaseInvoiceController extends Controller
                                 'machine_id'            => $machine ? $machine->id : NULL,
                                 'department_id'         => $department ? $department->id : NULL,
                                 'warehouse_id'          => $warehouse ? $warehouse->id : NULL,
+                                'project_id'            => $project ? $project->id : NULL,
                             ]);
                         }
                     }
@@ -1259,11 +1269,13 @@ class PurchaseInvoiceController extends Controller
                 'machine_id'    => $row->machine_id ? $row->machine_id : '',
                 'department_id' => $row->department_id ? $row->department_id : '',
                 'warehouse_id'  => $row->warehouse_id ? $row->warehouse_id : '',
+                'project_id'    => $row->project_id ? $row->project_id : '',
                 'place_name'    => $row->place_id ? $row->place->code : '-',
                 'line_name'     => $row->line_id ? $row->line->name : '-',
                 'machine_name'  => $row->machine_id ? $row->machine->name : '-',
                 'department_name'=> $row->department_id ? $row->department->name : '-',
                 'warehouse_name'=> $row->warehouse_id ? $row->warehouse->name : '-',
+                'project_name'  => $row->project_id ? $row->project->name : '-',
             ];
         }
 
@@ -1303,6 +1315,8 @@ class PurchaseInvoiceController extends Controller
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
+
+                $query->updateRootDocumentStatusProcess();
 
                 activity()
                     ->performedOn(new PurchaseInvoice())
@@ -3356,6 +3370,8 @@ class PurchaseInvoiceController extends Controller
                     <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
                     <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
                     <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
+                    <td class="center-align">'.($row->project_id ? $row->project->name : '-').'</td>
+                    <td class="center-align">'.($row->note ? $row->note : '').'</td>
                     <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
                     <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
                 </tr>';

@@ -27,6 +27,7 @@ class OvertimeRequestController extends Controller
             'company'       => Company::where('status','1')->get(),
             'place'         => Place::where('status','1')->get(),
             'newcode'   =>  $menu->document_code.date('y'),
+            'menucode'      => $menu->document_code,
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

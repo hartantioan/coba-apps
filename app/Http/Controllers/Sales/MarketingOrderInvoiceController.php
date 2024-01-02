@@ -1349,7 +1349,7 @@ class MarketingOrderInvoiceController extends Controller
             $data_id_mo_invoice[]=$query->id;
 
             $added=true;
-            while($added){
+            while($added){ // beda tree
                 $added=false;
                 
                 // mencaari incoming payment

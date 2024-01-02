@@ -1474,7 +1474,7 @@ class MarketingOrderDeliveryProcessController extends Controller
             $data_go_chart[]= $data_mo_delivery;
             $data_id_mo_delivery[]=$query->id;
             $added=true;
-            while($added){
+            while($added){// beda tree
                 $added=false;
                 
                 // mencaari incoming payment

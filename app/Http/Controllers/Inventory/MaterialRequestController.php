@@ -1066,24 +1066,24 @@ class MaterialRequestController extends Controller
                             } 
                         }
                         /* melihat apakah ada hubungan lc */
-                        if($row->landedCost()){
+                        if($row->landedCostFeeDetail()){
                             $data_lc=[
                                 'properties'=> [
-                                    ['name'=> "Tanggal :".$row->lookable->post_date],
-                                    ['name'=> "Nominal : Rp.".number_format($row->lookable->grandtotal,2,',','.')]
+                                    ['name'=> "Tanggal :".$row->lookable->landedCost->post_date],
+                                    ['name'=> "Nominal : Rp.".number_format($row->lookable->landedCost->grandtotal,2,',','.')]
                                 ],
-                                "key" => $row->lookable->code,
-                                "name" => $row->lookable->code,
-                                'url'=>request()->root()."/admin/inventory/landed_cost?code=".CustomHelper::encrypt($row->lookable->code),
+                                "key" => $row->lookable->landedCost->code,
+                                "name" => $row->lookable->landedCost->code,
+                                'url'=>request()->root()."/admin/inventory/landed_cost?code=".CustomHelper::encrypt($row->lookable->landedCost->code),
                             ];
 
                             $data_go_chart[]=$data_lc;
                             $data_link[]=[
-                                'from'=>$query_invoice->code,
-                                'to'=>$row->lookable->code,
-                                'string_link'=>$query_invoice->code.$row->lookable->code,
+                                'from'=>$row->lookable->landedCost->code,
+                                'to'=>$query_invoice->code,
+                                'string_link'=>$row->lookable->landedCost->code.$query_invoice->code,
                             ];
-                            $data_id_lc[] = $row->lookable->id;
+                            $data_id_lc[] = $row->lookable->landedCost->id;
                             
                         }
 
@@ -1796,8 +1796,11 @@ class MaterialRequestController extends Controller
                                               
                         }
                     } // inventory transferout detail apakah perlu
-                    if($query->purchaseInvoiceDetail()->exists()){
-                        foreach($query->purchaseInvoiceDetail as $row_invoice_detail){
+                    if($query->landedCostFeeDetail()->exists()){
+                        foreach($query->landedCostFeeDetail as $row_landedfee_detail){
+                            foreach($row_landedfee_detail->purchaseInvoiceDetail as $row_invoice_detail){
+                                
+                            }
                             $data_invoices_tempura = [
                                 'key'   => $row_invoice_detail->purchaseInvoice->code,
                                 "name"  => $row_invoice_detail->purchaseInvoice->code,
@@ -2098,7 +2101,7 @@ class MaterialRequestController extends Controller
                         }
                     }
                 }
-            }    
+            }     
             
             function unique_key($array,$keyname){
 

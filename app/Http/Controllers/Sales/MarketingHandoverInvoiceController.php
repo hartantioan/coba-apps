@@ -1008,7 +1008,7 @@ class MarketingHandoverInvoiceController extends Controller
                 ]; 
             }
             $added = true;
-            while($added){
+            while($added){//beda struktur
                 $added=false;
                 
                 // mencaari incoming payment

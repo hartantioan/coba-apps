@@ -611,7 +611,7 @@ class AttendancePeriodController extends Controller
                                             ->first();
                                     }
                                     if($query_cost){
-                                        $query_lembur->nominal          = $hoursDifference * $query_cost->nominal;
+                                        $query_lembur->grandtotal         = $hoursDifference * $query_cost->nominal;
                                         $query_lembur->save();
                                     }
                                 }
@@ -625,7 +625,7 @@ class AttendancePeriodController extends Controller
                                     ->where('type','2')
                                     ->first();
                                     if($query_cost){
-                                        $query_lembur->nominal          = $hoursDifference * $query_cost->nominal;
+                                        $query_lembur->grandtotal         = $hoursDifference * $query_cost->nominal;
                                         $query_lembur->save();
                                     } 
                                 }
@@ -1510,6 +1510,8 @@ class AttendancePeriodController extends Controller
                             ->where('employee_no',$cleanedNik);
                     })->orderBy('date')->get();
                     foreach($query_data_overtime as $key=>$row_overtime){
+                        $exact_in[$key]= 0 ;
+                        $exact_out[$key]= 0 ;
                         $time_in = $row_overtime->time_in;
                         $time_out = $row_overtime->time_out;
                         $login[$key] = null;
@@ -1547,13 +1549,19 @@ class AttendancePeriodController extends Controller
                         
                         $last_attendance = $query_attendance->last();
                        
-                        if($last_attendance){
+                        if($last_attendance&&$exact_in[$key]==1){
+                            
                             $dateAttd = Carbon::parse($last_attendance->date);
                            
                             $timePartlast = $dateAttd->format('H:i:s');
                             $attendance_detail[$row_user->id][$counter_overtime_date]['jam_keluar'][]=  $timePartlast;
-                            if($last_attendance->date >= $real_time_out){
-                                $timeDifference = Carbon::parse($real_time_out)->diff($latestRecord->date);
+                            if($last_attendance->date >= $combinedDateTimeOutCarbon){
+                                info($row_overtime->time_in);
+                                info($row_overtime->time_out);
+                                info($combinedDateTimeOutCarbon);
+                                info($last_attendance->date);
+                                $timeDifference = Carbon::parse($row_overtime->time_in)->diff(Carbon::parse($row_overtime->time_out));
+                               
                                 $hoursDifference = $timeDifference->h;
                                 $row_overtime->total            = $hoursDifference;
                                 $query_libur = Holiday::where('date',$row_overtime->date)->get();
@@ -1565,6 +1573,8 @@ class AttendancePeriodController extends Controller
                                         ->first();
                                     
                                 }else{
+                                    info($row_overtime->time_in);
+                                    info($row_overtime->time_out);
                                     $query_cost = OvertimeCost::whereRaw("'$row_overtime->date' BETWEEN start_date AND end_date ")
                                         ->where('place_id',$row_user->place_id)
                                         ->where('level_id',$row_user->position->level_id)
@@ -1572,11 +1582,12 @@ class AttendancePeriodController extends Controller
                                         ->first();
                                 }
                                 if($query_cost){
-                                    $row_overtime->nominal          = $hoursDifference * $query_cost->nominal;
+                                    $row_overtime->grandtotal         = $hoursDifference * $query_cost->nominal;
                                     $row_overtime->save();
                                 }
-                            }else{
-                                $timeDifference = Carbon::parse($row_overtime->time_in)->diff(Carbon::parse($row_overtime->time_out));
+                            }if($last_attendance->date <= $combinedDateTimeOutCarbon && $last_attendance->date >= $combinedDateTimeInCarbon){
+                                $timeDifference = Carbon::parse($combinedDateTimeInCarbon)->diff($latestRecord->date);
+                               
                                 $hoursDifference = $timeDifference->h;
                                 $row_overtime->total            = $hoursDifference;
                                 $query_cost = OvertimeCost::whereRaw("'$row_overtime->date' BETWEEN start_date AND end_date ")
@@ -1585,7 +1596,7 @@ class AttendancePeriodController extends Controller
                                 ->where('type','2')
                                 ->first();
                                 if($query_cost){
-                                    $row_overtime->nominal          = $hoursDifference * $query_cost->nominal;
+                                    $row_overtime->grandtotal         = $hoursDifference * $query_cost->nominal;
                                     $row_overtime->save();
                                 }
                             }

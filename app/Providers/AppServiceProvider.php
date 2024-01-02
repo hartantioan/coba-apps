@@ -55,6 +55,7 @@ class AppServiceProvider extends ServiceProvider
             'good_receipt_details'                  => 'App\Models\GoodReceiptDetail',
             'purchase_order_details'                => 'App\Models\PurchaseOrderDetail',
             'landed_cost_details'                   => 'App\Models\LandedCostDetail',
+            'landed_cost_fee_details'               => 'App\Models\LandedCostFeeDetail',
             'purchase_invoice_details'              => 'App\Models\PurchaseInvoiceDetail',
             'inventory_revaluations'                => 'App\Models\InventoryRevaluation',
             'incoming_payments'                     => 'App\Models\IncomingPayment',

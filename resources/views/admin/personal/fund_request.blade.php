@@ -1107,24 +1107,38 @@
         });
     }
 
-    function printPreview(code){
-        $.ajax({
-            url: window.location.origin + '/admin/finance/fund_request/print_individual/' + code,
-            type:'GET',
-            beforeSend: function() {
-                loadingOpen('.modal-content');
-            },
-            complete: function() {
-                
-            },
-            success: function(data){
-                loadingClose('.modal-content');
-                printService.submit({
-                    'type': 'INVOICE',
-                    'url': data
-                })
+    function printPreview(code,aslicode){
+        swal({
+            title: "Apakah Anda ingin mengeprint dokumen ini?",
+            text: "Dengan Kode "+aslicode,
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                $.ajax({
+                    url: '{{ Request::url() }}/print_individual/' + code,
+                    type:'GET',
+                    beforeSend: function() {
+                        loadingOpen('.modal-content');
+                    },
+                    complete: function() {
+                        
+                    },
+                    success: function(data){
+                        loadingClose('.modal-content');
+                        printService.submit({
+                            'type': 'INVOICE',
+                            'url': data
+                        })
+                    }
+                });  
             }
         });
+        
     }
 
     function whatPrinting(code){

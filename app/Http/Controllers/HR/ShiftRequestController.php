@@ -323,9 +323,37 @@ class ShiftRequestController extends Controller
 
     public function destroy(Request $request){
         $query = ShiftRequest::find($request->id);
-		
+        $approved = false;
+        $revised = false;
+		if($query->approval()){
+            foreach ($query->approval() as $detail){
+                foreach($detail->approvalMatrix as $row){
+                    if($row->approved){
+                        $approved = true;
+                    }
+
+                    if($row->revised){
+                        $revised = true;
+                    }
+                }
+            }
+        }
+
+        if($approved && !$revised){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Pertukaran shift tidak dapat dihapus karena sudah di approve harap melakukan void untuk membatalkan.'
+            ]);
+        }
         if($query->delete()) {
-           
+            CustomHelper::removeApproval('shift_requests',$query->id);
+
+       
+            activity()
+            ->performedOn(new ShiftRequest())
+            ->causedBy(session('bo_id'))
+            ->withProperties($query)
+            ->log('Delete the purchase memo data');
             $response = [
                 'status'  => 200,
                 'message' => 'Data deleted successfully.'

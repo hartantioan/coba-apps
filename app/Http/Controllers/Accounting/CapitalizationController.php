@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Currency;
 use App\Models\Department;
+use App\Models\Menu;
 use App\Models\Place;
 use App\Models\User;
 use App\Models\Asset;
@@ -38,6 +39,8 @@ class CapitalizationController extends Controller
 
     public function index(Request $request)
     {
+        $lastSegment = request()->segment(count(request()->segments()));
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => 'Kapitalisasi Aset',
             'content'       => 'admin.accounting.capitalization',
@@ -45,8 +48,11 @@ class CapitalizationController extends Controller
             'currency'      => Currency::where('status','1')->get(),
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-            'newcode'       => 'CAPT-'.date('y'),
+            
+            'newcode'       => $menu->document_code.date('y'),
+            'menucode'      => $menu->document_code,
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -155,7 +161,7 @@ class CapitalizationController extends Controller
                     $val->status(),
                     '
                     <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         '.$btn_jurnal.'
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
@@ -679,8 +685,17 @@ class CapitalizationController extends Controller
                     ];
                 }else{   
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
-                        $etNumbersArray = explode(',', $request->tabledata);
-                        $query = Capitalization::where('Code', 'LIKE', '%'.$etNumbersArray[$nomor-1])->first();
+                        $lastSegment = $request->lastsegment;
+                      
+                        $menu = Menu::where('url', $lastSegment)->first();
+                        $nomorLength = strlen($nomor);
+                        
+                        // Calculate the number of zeros needed for padding
+                        $paddingLength = max(0, 8 - $nomorLength);
+                        // Pad $nomor with leading zeros to ensure it has at least 8 digits
+                        $nomorPadded = str_repeat('0', $paddingLength) . $nomor;
+                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
+                        $query = Capitalization::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
                             $data = [
                                 'title'     => 'Kapitalisasi',

@@ -2331,7 +2331,18 @@ class PurchaseRequestController extends Controller
                     ];
                 }else{   
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
-                        $query = PurchaseRequest::where('Code', 'LIKE', '%'.$etNumbersArray[$nomor-1])->first();
+                        $lastSegment = $request->lastsegment;
+                      
+                        $menu = Menu::where('url', $lastSegment)->first();
+                        $nomorLength = strlen($nomor);
+                        
+                        // Calculate the number of zeros needed for padding
+                        $paddingLength = max(0, 8 - $nomorLength);
+
+                        // Pad $nomor with leading zeros to ensure it has at least 8 digits
+                        $nomorPadded = str_repeat('0', $paddingLength) . $nomor;
+                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
+                        $query = PurchaseRequest::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
                             $data = [
                                 'title'     => 'Print Purchase Request',

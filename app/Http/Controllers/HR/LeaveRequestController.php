@@ -519,9 +519,38 @@ class LeaveRequestController extends Controller
 
     public function destroy(Request $request){
         $query = LeaveRequest::find($request->id);
-		
+        $approved = false;
+        $revised = false;
+		if($query->approval()){
+            foreach ($query->approval() as $detail){
+                foreach($detail->approvalMatrix as $row){
+                    if($row->approved){
+                        $approved = true;
+                    }
+
+                    if($row->revised){
+                        $revised = true;
+                    }
+                }
+            }
+        }
+
+        if($approved && !$revised){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'leave_requests telah diapprove, anda tidak bisa melakukan perubahan.'
+            ]);
+        }
         if($query->delete()) {
-           
+            CustomHelper::removeApproval('leave_requests',$query->id);
+
+            $query->purchaseMemoDetail()->delete();
+
+            activity()
+            ->performedOn(new LeaveRequest())
+            ->causedBy(session('bo_id'))
+            ->withProperties($query)
+            ->log('Delete the leave_requests data');
             $response = [
                 'status'  => 200,
                 'message' => 'Data deleted successfully.'

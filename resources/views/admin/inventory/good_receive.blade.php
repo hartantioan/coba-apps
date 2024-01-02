@@ -300,16 +300,32 @@
                         <div id="range-tabs" style="display: block;" class="">                           
                             <div class="row ml-2 mt-2">
                                 <div class="row">
-                                    <div class="input-field col m4 s12">
+                                    <div class="input-field col m2 s12">
+                                        <p>{{ $menucode }}</p>
+                                    </div>
+                                    <div class="input-field col m2 s12">
+                                        <select class="form-control" id="code_place_range" name="code_place_range">
+                                            <option value="">--Pilih--</option>
+                                            @foreach ($place as $rowplace)
+                                                <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="" for="code_place_range">Plant / Place</label>
+                                    </div>
+                                    <div class="input-field col m2 s12">
+                                        <input id="year_range" name="year_range" min="0" type="number" placeholder="23">
+                                        <label class="active" for="year_range">Tahun</label>
+                                    </div>
+                                    <div class="input-field col m1 s12">
                                         <input id="range_start" name="range_start" min="0" type="number" placeholder="1">
                                         <label class="" for="range_end">No Awal</label>
                                     </div>
                                     
-                                    <div class="input-field col m4 s12">
+                                    <div class="input-field col m1 s12">
                                         <input id="range_end" name="range_end" min="0" type="number" placeholder="1">
                                         <label class="active" for="range_end">No akhir</label>
                                     </div>
-                                    <div class="input-field col m4 s12">
+                                    <div class="input-field col m2 s12">
                                         <label>
                                             <input name="type_date" type="radio" checked value="1"/>
                                             <span>Dengan range biasa</span>
@@ -322,7 +338,7 @@
                                     <label class="" for="range_end">Masukkan angka dengan koma</label>
                                 </div>
                                
-                                <div class="input-field col m4 s12">
+                                <div class="input-field col m1 s12">
                                     <label>
                                         <input name="type_date" type="radio" value="2"/>
                                         <span>Dengan Range koma</span>
@@ -1197,94 +1213,129 @@
         var table = $('#datatable_serverside').DataTable();
         var data = table.data().toArray();
         var etNumbers = data.map(item => item[1]);
+        var path = window.location.pathname;
+        path = path.replace(/^\/|\/$/g, '');
+
+        // Split the path by slashes and get the last segment
+        var segments = path.split('/');
+        var lastSegment = segments[segments.length - 1];
         formData.append('tabledata',etNumbers);
-        $.ajax({
-            url: '{{ Request::url() }}/print_by_range',
-            type: 'POST',
-            dataType: 'JSON',
-            data: formData,
-            contentType: false,
-            processData: false,
-            cache: true,
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                $('#validation_alert_multi').html('');
-                loadingOpen('.modal-content');
-            },
-            success: function(response) {
-                loadingClose('.modal-content');
-                if(response.status == 200) {
-                    $('#modal5').modal('close');
-                   /*  printService.submit({
-                        'type': 'INVOICE',
-                        'url': response.message
-                    }) */
-                    M.toast({
-                        html: response.message
-                    });
-                } else if(response.status == 422) {
-                    $('#validation_alert_multi').show();
-                    $('.modal-content').scrollTop(0);
-                    
-                    swal({
-                        title: 'Ups! Validation',
-                        text: 'Check your form.',
-                        icon: 'warning'
-                    });
-                    
-                    $.each(response.error, function(i, val) {
-                        $.each(val, function(i, val) {
-                            $('#validation_alert_multi').append(`
-                                <div class="card-alert card red">
-                                    <div class="card-content white-text">
-                                        <p>` + val + `</p>
-                                    </div>
-                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">×</span>
-                                    </button>
-                                </div>
-                            `);
+        formData.append('lastsegment',lastSegment);
+        swal({
+            title: "Apakah Anda ingin mengeprint dokumen ini?",
+            text: "pastikan bahwa isian sudah benar.",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                    $.ajax({
+                    url: '{{ Request::url() }}/print_by_range',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    cache: true,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#validation_alert_multi').html('');
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+                        if(response.status == 200) {
+                            $('#modal5').modal('close');
+                        /*  printService.submit({
+                                'type': 'INVOICE',
+                                'url': response.message
+                            }) */
+                            M.toast({
+                                html: response.message
+                            });
+                        } else if(response.status == 422) {
+                            $('#validation_alert_multi').show();
+                            $('.modal-content').scrollTop(0);
+                            
+                            swal({
+                                title: 'Ups! Validation',
+                                text: 'Check your form.',
+                                icon: 'warning'
+                            });
+                            
+                            $.each(response.error, function(i, val) {
+                                $.each(val, function(i, val) {
+                                    $('#validation_alert_multi').append(`
+                                        <div class="card-alert card red">
+                                            <div class="card-content white-text">
+                                                <p>` + val + `</p>
+                                            </div>
+                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    `);
+                                });
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('.modal-content');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
                         });
-                    });
-                } else {
-                    M.toast({
-                        html: response.message
-                    });
-                }
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('.modal-content');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
+                    }
+                    
                 });
             }
-            
         });
+        
     }
 
-    function printPreview(code){
-        $.ajax({
-            url: '{{ Request::url() }}/print_individual/' + code,
-            type:'GET',
-            beforeSend: function() {
-                loadingOpen('.modal-content');
-            },
-            complete: function() {
-                
-            },
-            success: function(data){
-                loadingClose('.modal-content');
-                printService.submit({
-                    'type': 'INVOICE',
-                    'url': data
-                })
+    function printPreview(code,aslicode){
+        swal({
+            title: "Apakah Anda ingin mengeprint dokumen ini?",
+            text: "Dengan Kode "+aslicode,
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                $.ajax({
+                    url: '{{ Request::url() }}/print_individual/' + code,
+                    type:'GET',
+                    beforeSend: function() {
+                        loadingOpen('.modal-content');
+                    },
+                    complete: function() {
+                        
+                    },
+                    success: function(data){
+                        loadingClose('.modal-content');
+                        printService.submit({
+                            'type': 'INVOICE',
+                            'url': data
+                        })
+                    }
+                });  
             }
         });
+        
     }
 
 

@@ -80,6 +80,7 @@ class PurchaseOrderController extends Controller
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
             'newcode'       => $menu->document_code.date('y'),
+            'menucode'      => $menu->document_code
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -317,7 +318,7 @@ class PurchaseOrderController extends Controller
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) .'`,`'.$val->code.'`)"><i class="material-icons dp48">local_printshop</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
@@ -1089,9 +1090,11 @@ class PurchaseOrderController extends Controller
             $validation = Validator::make($request->all(), [
                 'range_start'                => 'required',
                 'range_end'                  => 'required',
+                'year_range'                 => 'required'
             ], [
                 'range_start.required'       => 'Isi code awal yang ingin di pilih menjadi awal range',
                 'range_end.required'         => 'Isi code terakhir yang menjadi akhir range',
+                'year_range'                 => 'Harap Isi kolom tahun'
             ]);
             if($validation->fails()) {
                 $response = [
@@ -1116,8 +1119,22 @@ class PurchaseOrderController extends Controller
                     ];
                 }else{   
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
-                        $etNumbersArray = explode(',', $request->tabledata);
-                        $query = PurchaseOrder::where('Code', 'LIKE', '%'.$etNumbersArray[$nomor-1])->first();
+                    
+
+                        $lastSegment = $request->lastsegment;
+                      
+                        $menu = Menu::where('url', $lastSegment)->first();
+                        $nomorLength = strlen($nomor);
+                        
+                        // Calculate the number of zeros needed for padding
+                        $paddingLength = max(0, 8 - $nomorLength);
+
+                        // Pad $nomor with leading zeros to ensure it has at least 8 digits
+                        $nomorPadded = str_repeat('0', $paddingLength) . $nomor;
+                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
+                        
+                        $query = PurchaseOrder::where('Code', 'LIKE', '%'.$x)->first();
+
                         if($query){
                             $data = [
                                 'title'     => 'Print Purchase Order',

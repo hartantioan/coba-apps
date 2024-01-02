@@ -6,6 +6,7 @@ use App\Models\ApprovalMatrix;
 use App\Models\ApprovalSource;
 use App\Models\Currency;
 use App\Models\GoodReceipt;
+use App\Models\Menu;
 use App\Models\GoodReturnPO;
 use App\Models\JournalDetail;
 use App\Models\LandedCost;
@@ -53,12 +54,16 @@ class FundRequestController extends Controller
 
     public function index(Request $request)
     {
+        $lastSegment = request()->segment(count(request()->segments()));
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'     => 'Permohonan Dana',
             'content'   => 'admin.finance.fund_request',
             'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
             'tax'       => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
             'wtax'      => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
+            'newcode'       => $menu->document_code.date('y'),
+            'menucode'      => $menu->document_code,
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -478,8 +483,18 @@ class FundRequestController extends Controller
                     ];
                 }else{   
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
-                        $etNumbersArray = explode(',', $request->tabledata);
-                        $query = FundRequest::where('Code', 'LIKE', '%'.$etNumbersArray[$nomor-1])->first();
+                        $lastSegment = $request->lastsegment;
+                      
+                        $menu = Menu::where('url', $lastSegment)->first();
+                        $nomorLength = strlen($nomor);
+                        
+                        // Calculate the number of zeros needed for padding
+                        $paddingLength = max(0, 8 - $nomorLength);
+
+                        // Pad $nomor with leading zeros to ensure it has at least 8 digits
+                        $nomorPadded = str_repeat('0', $paddingLength) . $nomor;
+                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
+                        $query = FundRequest::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
                             $data = [
                                 'title'     => 'Fund Request',

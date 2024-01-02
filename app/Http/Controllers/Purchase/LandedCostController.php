@@ -79,7 +79,7 @@ class LandedCostController extends Controller
             'landedcostfee' => LandedCostFee::where('status','1')->get(),
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-            'newcode'       => $menu->document_code.date('y'),
+            'newcode'       =>  $menu->document_code.date('y'),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
         ];
 
@@ -494,7 +494,7 @@ class LandedCostController extends Controller
                     $val->status(),
                     '
                     <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         '.$btn_jurnal.'
@@ -779,7 +779,7 @@ class LandedCostController extends Controller
                     <td class="center-align">'.$row->item->uomUnit->code.'</td>
                     <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
                     <td class="right-align">'.number_format(round($row->nominal / $row->qty,3),2,',','.').'</td>
-                    <td class="center-align">'.$row->place->code.'</td>
+                    <td class="center-align">'.$row->place->name.'</td>
                     <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
                     <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
                     <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
@@ -914,7 +914,7 @@ class LandedCostController extends Controller
                 'qty'                       => number_format($row->qty,3,',','.'),
                 'nominal'                   => number_format($row->nominal,2,',','.'),
                 'unit'                      => $row->item->uomUnit->code,
-                'place_name'                => $row->place->code,
+                'place_name'                => $row->place->name,
                 'department_name'           => $row->department_id ? $row->department->name : '-',
                 'warehouse_name'            => $row->warehouse->name,
                 'project_name'              => $row->project()->exists() ? $row->project->name : '-',
@@ -1049,10 +1049,6 @@ class LandedCostController extends Controller
         }
         
         if($query->delete()) {
-            $query->update([
-                'delete_id'     => session('bo_id'),
-                'delete_note'   => $request->msg,
-            ]);
 
             CustomHelper::removeApproval('landed_costs',$query->id);
             
@@ -1234,8 +1230,18 @@ class LandedCostController extends Controller
                     ];
                 }else{   
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
-                        $etNumbersArray = explode(',', $request->tabledata);
-                        $query = LandedCost::where('Code', 'LIKE', '%'.$etNumbersArray[$nomor-1])->first();
+                        $lastSegment = $request->lastsegment;
+                      
+                        $menu = Menu::where('url', $lastSegment)->first();
+                        $nomorLength = strlen($nomor);
+                        
+                        // Calculate the number of zeros needed for padding
+                        $paddingLength = max(0, 8 - $nomorLength);
+
+                        // Pad $nomor with leading zeros to ensure it has at least 8 digits
+                        $nomorPadded = str_repeat('0', $paddingLength) . $nomor;
+                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
+                        $query = LandedCost::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
                             $data = [
                                 'title'     => 'Print Landed Cost',
@@ -1416,9 +1422,8 @@ class LandedCostController extends Controller
     public function export(Request $request){
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
-        $mode = $request->mode ? $request->mode : '';
 		
-		return Excel::download(new ExportLandedCost($post_date,$end_date,$mode), 'landed_cost'.uniqid().'.xlsx');
+		return Excel::download(new ExportLandedCost($post_date,$end_date), 'landed_cost'.uniqid().'.xlsx');
     }
     
     public function removeUsedData(Request $request){
@@ -1803,21 +1808,21 @@ class LandedCostController extends Controller
                         if($row->landedCost()){
                             $data_lc=[
                                 'properties'=> [
-                                    ['name'=> "Tanggal :".$row->lookable->landedCost->post_date],
-                                    ['name'=> "Nominal : Rp.".number_format($row->lookable->landedCost->grandtotal,2,',','.')]
+                                    ['name'=> "Tanggal :".$row->lookable->post_date],
+                                    ['name'=> "Nominal : Rp.".number_format($row->lookable->grandtotal,2,',','.')]
                                 ],
-                                "key" => $row->lookable->landedCost->code,
-                                "name" => $row->lookable->landedCost->code,
-                                'url'=>request()->root()."/admin/inventory/landed_cost?code=".CustomHelper::encrypt($row->lookable->landedCost->code),
+                                "key" => $row->lookable->code,
+                                "name" => $row->lookable->code,
+                                'url'=>request()->root()."/admin/inventory/landed_cost?code=".CustomHelper::encrypt($row->lookable->code),
                             ];
 
                             $data_go_chart[]=$data_lc;
                             $data_link[]=[
                                 'from'=>$query_invoice->code,
-                                'to'=>$row->lookable->landedCost->code,
-                                'string_link'=>$query_invoice->code.$row->lookable->landedCost->code,
+                                'to'=>$row->lookable->code,
+                                'string_link'=>$query_invoice->code.$row->lookable->code,
                             ];
-                            $data_id_lc[] = $row->lookable->landedCost->id;
+                            $data_id_lc[] = $row->lookable->id;
                             
                         }
 
@@ -2890,7 +2895,7 @@ class LandedCostController extends Controller
                     <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
                     <td class="center-align">'.$row->coa->company->name.'</td>
                     <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
-                    <td class="center-align">'.($row->place_id ? $row->place->code : '-').'</td>
+                    <td class="center-align">'.($row->place_id ? $row->place->name : '-').'</td>
                     <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
                     <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
                     <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>

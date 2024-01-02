@@ -2202,7 +2202,7 @@ class MaterialRequestController extends Controller
 
     public function printByRange(Request $request){
         $currentDateTime = Date::now();
-        $etNumbersArray = explode(',', $request->tabledata);
+
         $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
         if($request->type_date == 1){
             $validation = Validator::make($request->all(), [
@@ -2235,7 +2235,18 @@ class MaterialRequestController extends Controller
                     ];
                 }else{   
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
-                        $query = MaterialRequest::where('code', 'LIKE', '%'.$etNumbersArray[$nomor-1])->first();
+                        $lastSegment = $request->lastsegment;
+                      
+                        $menu = Menu::where('url', $lastSegment)->first();
+                        $nomorLength = strlen($nomor);
+                        
+                        // Calculate the number of zeros needed for padding
+                        $paddingLength = max(0, 8 - $nomorLength);
+
+                        // Pad $nomor with leading zeros to ensure it has at least 8 digits
+                        $nomorPadded = str_repeat('0', $paddingLength) . $nomor;
+                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
+                        $query = MaterialRequest::where('code', 'LIKE', '%'.$x)->first();
                         if($query){
                             $data = [
                                 'title'     => 'Material Request',
@@ -2306,7 +2317,7 @@ class MaterialRequestController extends Controller
                     ];
                 }else{
                     foreach($merged as $code){
-                        $query = MaterialRequest::where('code', 'LIKE', '%'.$etNumbersArray[$code-1])->first();
+                        $query = MaterialRequest::where('code', 'LIKE', '%'.$merged)->first();
                         if($query){
                             $data = [
                                 'title'     => 'Material Request',

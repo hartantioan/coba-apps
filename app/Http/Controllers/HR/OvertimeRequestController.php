@@ -10,6 +10,7 @@ use App\Models\Menu;
 use App\Models\EmployeeSchedule;
 use App\Models\User;
 use App\Models\OvertimeRequest;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -144,9 +145,38 @@ class OvertimeRequestController extends Controller
     }
     public function destroy(Request $request){
         $query = OvertimeRequest::find($request->id);
-		
+        
+        $approved = false;
+        $revised = false;
+		if($query->approval()){
+            foreach ($query->approval() as $detail){
+                foreach($detail->approvalMatrix as $row){
+                    if($row->approved){
+                        $approved = true;
+                    }
+
+                    if($row->revised){
+                        $revised = true;
+                    }
+                }
+            }
+        }
+
+        if($approved && !$revised){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Lembur telah diapprove, anda tidak bisa melakukan perubahan.'
+            ]);
+        }
         if($query->delete()) {
-            
+            CustomHelper::removeApproval('overtime_requests',$query->id);
+
+       
+            activity()
+            ->performedOn(new OvertimeRequest())
+            ->causedBy(session('bo_id'))
+            ->withProperties($query)
+            ->log('Delete the overtime Request data');
 
             $response = [
                 'status'  => 200,
@@ -201,8 +231,37 @@ class OvertimeRequestController extends Controller
                 'status' => 422,
                 'error'  => $validation->errors()
             ];
-        } else {
+        }else {
             $user_q = User::find($request->account_id);
+            $CountSchedule = EmployeeSchedule::where(function($query) use($request, $user_q) {
+                $query->where('employee_schedules.user_id', $user_q->employee_no)
+                      ->where('employee_schedules.date', $request->date)
+                      ->where('employee_schedules.status', '1');
+            })
+            ->join('shifts', 'employee_schedules.shift_id', '=', 'shifts.id')
+            ->orderBy('shifts.time_in', 'ASC') // Order by time_in in ascending order
+            ->count();
+
+            
+
+            if($request->time_in > $request->time_out){
+                $kambing["kambing"][]="Jam masuk lebih besar dari pada jam keluar... Apabila berbeda hari harap buat lembur di tanggal yang berbeda";
+                $response = [
+                    'status' => 422,
+                    'error'  => $kambing
+                ];
+                return response()->json($response);
+            }
+
+            if($CountSchedule > 2){
+                $kambing["kambing"][]="Schedule pada hari itu lebih dari 3 jadi tak bisa menambah lembur";
+                $response = [
+                    'status' => 422,
+                    'error'  => $kambing
+                ];
+                return response()->json($response);
+            }
+
             $firstRecord = EmployeeSchedule::where(function($query) use($request, $user_q) {
                 $query->where('employee_schedules.user_id', $user_q->employee_no)
                       ->where('employee_schedules.date', $request->date)
@@ -221,37 +280,70 @@ class OvertimeRequestController extends Controller
             ->join('shifts', 'employee_schedules.shift_id', '=', 'shifts.id')
             ->orderBy('shifts.time_in', 'DESC') // Order by time_in in descending order
             ->first();
-            if($request->schedule_id){
-                if($request->time_in > $firstRecord->time_in && $request->time_in < $lastRecord->time_out){
-                    $kambing["kambing"][]="jam masuk berada diantara masuk dan keluarnya shift hari itu";
-                    $response = [
-                        'status' => 422,
-                        'error'  => $kambing
-                    ];
-                    return response()->json($response);
+            if($firstRecord){
+                $first_time_out =Carbon::parse($request->date)->format('Y-m-d') . ' ' . $firstRecord->time_out;
+                $last_time_in =Carbon::parse($request->date)->format('Y-m-d') . ' ' . $lastRecord->time_in;
+                $timeDifference = Carbon::parse($first_time_out)->diff(Carbon::parse($last_time_in));
+                $hoursDifference = $timeDifference->h;
+                if($hoursDifference > 1 && $CountSchedule > 1){
+                    
+                    $hoursDifferenceRequest =  Carbon::parse($first_time_out)->diff(Carbon::parse( $last_time_in));
+                    
+                    if($hoursDifference<$hoursDifferenceRequest){
+                        $kambing["kambing"][]="Inputan Time In dan Timeout melebihi schedule yang ada atau berselisihan";
+                        $response = [
+                            'status' => 422,
+                            'error'  => $kambing
+                        ];
+                        return response()->json($response);
+                    }
+                }else{
+                    if($request->time_in > $firstRecord->time_in && $request->time_in < $lastRecord->time_out){
+                        $kambing["kambing"][]="jam masuk berada diantara masuk dan keluarnya shift hari itu";
+                        $response = [
+                            'status' => 422,
+                            'error'  => $kambing
+                        ];
+                        return response()->json($response);
+                    }
+                    if($request->time_out < $lastRecord->time_out && $request->time_out > $firstRecord->time_in ){
+                        $kambing["kambing"][]="jam keluar kurang dari shift yang ada di hari itu ";
+                        $response = [
+                            'status' => 422,
+                            'error'  => $kambing
+                        ];
+                        return response()->json($response);
+                    }
+                    if($request->time_in<$firstRecord->time_in && $request->time_out > $lastRecord->time_out ){
+                        $kambing["kambing"][]="jam masuk dan keluar seperti menggantikan shift pastikan bahwa sudah benar ";
+                        $response = [
+                            'status' => 422,
+                            'error'  => $kambing
+                        ];
+                        return response()->json($response);
+                    }
                 }
-                if($request->time_out < $lastRecord->time_out && $request->time_out > $firstRecord->time_in ){
-                    $kambing["kambing"][]="jam keluar kurang dari shift yang ada di hari itu ";
-                    $response = [
-                        'status' => 422,
-                        'error'  => $kambing
-                    ];
-                    return response()->json($response);
-                }
-                if($request->time_in<$firstRecord->time_in && $request->time_out > $lastRecord->time_out ){
-                    $kambing["kambing"][]="jam masuk dan keluar seperti menggantikan shift pastikan bahwa sudah benar ";
-                    $response = [
-                        'status' => 422,
-                        'error'  => $kambing
-                    ];
-                    return response()->json($response);
-                }
+                
+                
             }
             
 			if($request->temp){
+                
                 DB::beginTransaction();
                 try {
                     $query = OvertimeRequest::find($request->temp);
+                    if($request->schedule_id != $query->schedule_id){
+                        $exist_schedule_id = OvertimeRequest::where('schedule_id', $request->schedule_id)
+                        ->whereIn('status',['1','2','6'])->exists();
+                        if($exist_schedule_id){
+                            $kambing["kambing"][]="Schedule telah digunakan ";
+                            $response = [
+                                'status' => 422,
+                                'error'  => $kambing
+                            ];
+                            return response()->json($response);
+                        }
+                    }
                     $approved = false;
                     $revised = false;
 
@@ -298,6 +390,18 @@ class OvertimeRequestController extends Controller
                     DB::rollback();
                 }
 			}else{
+                if($request->schedule_id){
+                    $exist_schedule_id = OvertimeRequest::where('schedule_id', $request->schedule_id)
+                    ->whereIn('status',['1','2','6'])->exists();
+                    if($exist_schedule_id){
+                        $kambing["kambing"][]="Schedule telah digunakan ";
+                        $response = [
+                            'status' => 422,
+                            'error'  => $kambing
+                        ];
+                        return response()->json($response);
+                    }
+                }
                 DB::beginTransaction();
                 try {
                     
@@ -334,7 +438,7 @@ class OvertimeRequestController extends Controller
 
              
 				$response = [
-					'status'    => 500,
+					'status'    => 200,
 					'message'   => 'Data successfully saved.',
 				];
 			} else {

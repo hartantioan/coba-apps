@@ -10,6 +10,7 @@ use App\Models\Place;
 use App\Models\Position;
 use App\Models\User;
 use App\Models\Warehouse;
+use App\Models\Menu;
 use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
 use Illuminate\Http\Request;
@@ -22,6 +23,8 @@ class EmployeeTransferController extends Controller
 {
     public function index(Request $request)
     {
+        $lastSegment = request()->segment(count(request()->segments()));
+        $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => '',
             'place'         => Place::where('status','1')->get(),
@@ -32,6 +35,8 @@ class EmployeeTransferController extends Controller
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'employee_code' => $request->employee_code ? CustomHelper::decrypt($request->code) : '',
             'position'      => Position::where('status','1')->get(),
+            'newcode'       => $menu->document_code.date('y'),
+            'menucode'      => $menu->document_code,
             'content'       => 'admin.hr.employee_transfer'
         ];
 
@@ -109,7 +114,7 @@ class EmployeeTransferController extends Controller
             foreach($query_data as $val) {
 				
                 $btn = 
-                ' <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
+                ' <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->id) . '`)"><i class="material-icons dp48">create</i></button>
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->id) . '`)"><i class="material-icons dp48">delete</i></button>';
@@ -555,8 +560,18 @@ class EmployeeTransferController extends Controller
                     ];
                 }else{   
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
-                        $etNumbersArray = explode(',', $request->tabledata);
-                        $query = EmployeeTransfer::where('code', 'LIKE', '%'.$etNumbersArray[$nomor-1])->first();
+                        $lastSegment = $request->lastsegment;
+                      
+                        $menu = Menu::where('url', $lastSegment)->first();
+                        $nomorLength = strlen($nomor);
+                        
+                        // Calculate the number of zeros needed for padding
+                        $paddingLength = max(0, 8 - $nomorLength);
+
+                        // Pad $nomor with leading zeros to ensure it has at least 8 digits
+                        $nomorPadded = str_repeat('0', $paddingLength) . $nomor;
+                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
+                        $query = EmployeeTransfer::where('code', 'LIKE', '%'.$x)->first();
                         
                         if($query){
                             $data = [

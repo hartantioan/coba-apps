@@ -91,9 +91,9 @@ class PurchaseInvoiceDetail extends Model
         }
     }
     
-    public function landedCost()
+    public function landedCostFeeDetail()
     {
-        if($this->lookable_type == 'landed_costs'){
+        if($this->lookable_type == 'landed_cost_fee_details'){
             return true;
         }else{
             return false;
@@ -119,7 +119,7 @@ class PurchaseInvoiceDetail extends Model
     public function getCode(){
         $code = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->item->code.' - '.$this->lookable->item->name,
-            'landed_costs'              => $this->lookable->code,
+            'landed_cost_fee_details'   => $this->lookable->landedCostFee->name,
             'purchase_order_details'    => $this->lookable->item_id ? $this->lookable->item->code.' - '.$this->lookable->item->name : $this->lookable->coa->name,
             'coas'                      => $this->lookable->name,
             default                     => '-',
@@ -131,7 +131,7 @@ class PurchaseInvoiceDetail extends Model
     public function getHeaderCode(){
         $code = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->goodReceipt->code,
-            'landed_costs'              => $this->lookable->code,
+            'landed_cost_fee_details'   => $this->lookable->landedCost->code,
             'purchase_order_details'    => $this->lookable->purchaseOrder->code,
             'coas'                      => '-',
             default                     => '-',
@@ -143,7 +143,7 @@ class PurchaseInvoiceDetail extends Model
     public function getTop(){
         $code = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->purchaseOrderDetail->purchaseOrder->payment_term,
-            'landed_costs'              => '0',
+            'landed_cost_fee_details'   => '0',
             'purchase_order_details'    => $this->lookable->purchaseOrder->payment_term,
             default                     => '-',
         };
@@ -164,7 +164,7 @@ class PurchaseInvoiceDetail extends Model
     public function getPostDate(){
         $date = match ($this->lookable_type) {
             'good_receipt_details'      => date('d/m/y',strtotime($this->lookable->goodReceipt->post_date)),
-            'landed_costs'              => date('d/m/y',strtotime($this->lookable->post_date)),
+            'landed_cost_fee_details'   => date('d/m/y',strtotime($this->lookable->landedCost->post_date)),
             'purchase_order_details'    => date('d/m/y',strtotime($this->lookable->purchaseOrder->post_date)),
             default                     => '-',
         };
@@ -185,7 +185,7 @@ class PurchaseInvoiceDetail extends Model
     public function getPurchaseCode(){
         $code = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->purchaseOrderDetail->purchaseOrder->code,
-            'landed_costs'              => $this->lookable->getPurchaseCode(),
+            'landed_cost_fee_details'   => $this->lookable->landedCost->getPurchaseCode(),
             'purchase_order_details'    => $this->lookable->purchaseOrder->code.' - '.$this->lookable->purchaseOrder->code,
             'coas'                      => $this->lookable->code.' - '.$this->lookable->name,
             default                     => '-',
@@ -197,7 +197,7 @@ class PurchaseInvoiceDetail extends Model
     public function getDeliveryCode(){
         $code = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->goodReceipt->delivery_no,
-            'landed_costs'              => $this->lookable->getListDeliveryNo(),
+            'landed_cost_fee_details'   => $this->lookable->landedCost->getListDeliveryNo(),
             default => '-',
         };
 
@@ -206,8 +206,8 @@ class PurchaseInvoiceDetail extends Model
 
     public function getListItem(){
         $list = match ($this->lookable_type) {
-            'good_receipts'     => $this->lookable->getListItem(),
-            'landed_costs'      => $this->lookable->getListItem(),
+            'good_receipts'             => $this->lookable->getListItem(),
+            'landed_cost_fee_details'   => $this->lookable->landedCost->getListItem(),
             default => '-',
         };
 

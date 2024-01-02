@@ -77,6 +77,7 @@ class PurchaseDownPaymentController extends Controller
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
             'menu'          => $menu,
+            'menucode'      => $menu->document_code
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

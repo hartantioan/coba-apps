@@ -82,6 +82,7 @@ class PurchaseInvoiceController extends Controller
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
             'newcode'       => $menu->document_code.date('y'),
+            'menucode'      => $menu->document_code,
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -290,42 +291,44 @@ class PurchaseInvoiceController extends Controller
                 $datalc = LandedCost::find(intval($request->arr_id[$key]));
 
                 if($datalc->balanceInvoice() > 0){
-                    $details[] = [
-                        'type'          => $datalc->getTable(),
-                        'id'            => $datalc->id,
-                        'name'          => $datalc->code,
-                        'qty_received'  => 1,
-                        'qty_returned'  => 0,
-                        'qty_balance'   => 1,
-                        'price'         => number_format($datalc->total,2,',','.'),
-                        'buy_unit'      => '-',
-                        'rawcode'       => $datalc->code,
-                        'post_date'     => date('d/m/y',strtotime($datalc->post_date)),
-                        'due_date'      => date('d/m/y',strtotime($datalc->post_date)),
-                        'total'         => number_format($datalc->total,2,',','.'),
-                        'tax'           => number_format($datalc->tax,2,',','.'),
-                        'wtax'          => number_format($datalc->wtax,2,',','.'),
-                        'grandtotal'    => number_format($datalc->grandtotal,2,',','.'),
-                        'info'          => $datalc->code,
-                        'note'          => $datalc->note,
-                        'note2'         => '',
-                        'top'           => 0,
-                        'delivery_no'   => $datalc->getListDeliveryNo(),
-                        'purchase_no'   => $datalc->getPurchaseCode(),
-                        'percent_tax'   => 0,
-                        'percent_wtax'  => 0,
-                        'include_tax'   => 0,
-                        'place_id'      => '',
-                        'line_id'       => '',
-                        'machine_id'    => '',
-                        'department_id' => '',
-                        'warehouse_id'  => '',
-                        'place_name'    => '-',
-                        'line_name'     => '-',
-                        'machine_name'  => '-',
-                        'department_name' => '-',
-                        'warehouse_name'=> '-',
-                    ];
+                    foreach($datalc->landedCostFeeDetail as $rowdetail){
+                        $details[] = [
+                            'type'          => $rowdetail->getTable(),
+                            'id'            => $rowdetail->id,
+                            'name'          => $rowdetail->landedCostFee->name,
+                            'qty_received'  => 1,
+                            'qty_returned'  => 0,
+                            'qty_balance'   => 1,
+                            'price'         => number_format($rowdetail->total,2,',','.'),
+                            'buy_unit'      => '-',
+                            'rawcode'       => $datalc->code,
+                            'post_date'     => date('d/m/y',strtotime($datalc->post_date)),
+                            'due_date'      => date('d/m/y',strtotime($datalc->post_date)),
+                            'total'         => number_format($rowdetail->total,2,',','.'),
+                            'tax'           => number_format($rowdetail->tax,2,',','.'),
+                            'wtax'          => number_format($rowdetail->wtax,2,',','.'),
+                            'grandtotal'    => number_format($rowdetail->grandtotal,2,',','.'),
+                            'info'          => $datalc->code,
+                            'note'          => $datalc->note,
+                            'note2'         => '',
+                            'top'           => 0,
+                            'delivery_no'   => $datalc->getListDeliveryNo(),
+                            'purchase_no'   => $datalc->getPurchaseCode(),
+                            'percent_tax'   => $rowdetail->percent_tax,
+                            'percent_wtax'  => $rowdetail->percent_wtax,
+                            'include_tax'   => $rowdetail->is_include_tax,
+                            'place_id'      => '',
+                            'line_id'       => '',
+                            'machine_id'    => '',
+                            'department_id' => '',
+                            'warehouse_id'  => '',
+                            'place_name'    => '-',
+                            'line_name'     => '-',
+                            'machine_name'  => '-',
+                            'department_name' => '-',
+                            'warehouse_name'=> '-',
+                        ];
+                    }
                 }
             }
         }

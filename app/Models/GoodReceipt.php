@@ -237,6 +237,22 @@ class GoodReceipt extends Model
         return $total;
     }
 
+    public function hasBalanceInvoice(){
+        $total = $this->grandtotal;
+
+        foreach($this->goodReceiptDetail()->whereHas('purchaseInvoiceDetail')->get() as $row){
+            foreach($row->purchaseInvoiceDetail as $rowinvoice){
+                $total -= $rowinvoice->grandtotal;
+            }
+        }
+
+        if($total > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public function journal(){
         return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
     }
@@ -257,11 +273,9 @@ class GoodReceipt extends Model
 
     public function updateRootDocumentStatusProcess(){
         foreach($this->goodReceiptDetail()->whereHas('purchaseOrderDetail')->get() as $row){
-            if(!$row->purchaseOrderDetail->purchaseOrder->hasBalance()){
-                $row->purchaseOrderDetail->purchaseOrder->update([
-                    'status'	=> '2'
-                ]);
-            }
+            $row->purchaseOrderDetail->purchaseOrder->update([
+                'status'	=> '2'
+            ]);
         }
     }
 

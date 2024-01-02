@@ -258,6 +258,22 @@ class PurchaseOrder extends Model
         }
     }
 
+    public function hasBalanceInvoice(){
+        $total = $this->grandtotal;
+
+        foreach($this->purchaseOrderDetail()->whereHas('purchaseInvoiceDetail')->get() as $row){
+            foreach($row->purchaseInvoiceDetail as $rowinvoice){
+                $total -= $rowinvoice->grandtotal;
+            }
+        }
+
+        if($total > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public function percentBalance(){
         $qtyBalance = 0;
         $totalQty = 0;
@@ -307,8 +323,8 @@ class PurchaseOrder extends Model
     }
 
     public function updateRootDocumentStatusProcess(){
-        foreach($this->purchaseOrderDetail()->whereHas('purchaseRequestDetail')->get() as $row){
-            if(!$row->purchaseRequestDetail->purchaseRequest->hasBalance()){
+        if($this->inventory_type == '1'){
+            foreach($this->purchaseOrderDetail()->whereHas('purchaseRequestDetail')->get() as $row){
                 $row->purchaseRequestDetail->purchaseRequest->update([
                     'status'	=> '2'
                 ]);
@@ -317,11 +333,13 @@ class PurchaseOrder extends Model
     }
 
     public function updateRootDocumentStatusDone(){
-        foreach($this->purchaseOrderDetail()->whereHas('purchaseRequestDetail')->get() as $row){
-            if(!$row->purchaseRequestDetail->purchaseRequest->hasBalance()){
-                $row->purchaseRequestDetail->purchaseRequest->update([
-                    'status'	=> '3'
-                ]);
+        if($this->inventory_type == '1'){
+            foreach($this->purchaseOrderDetail()->whereHas('purchaseRequestDetail')->get() as $row){
+                if(!$row->purchaseRequestDetail->purchaseRequest->hasBalance()){
+                    $row->purchaseRequestDetail->purchaseRequest->update([
+                        'status'	=> '3'
+                    ]);
+                }
             }
         }
     }

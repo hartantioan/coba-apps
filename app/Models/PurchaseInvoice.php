@@ -403,4 +403,40 @@ class PurchaseInvoice extends Model
         }
         return $totalAfterMemo;
     }
+
+    public function updateRootDocumentStatusProcess(){
+        foreach($this->purchaseInvoiceDetail as $row){
+            if($row->purchaseOrderDetail()){
+                $row->lookable->purchaseOrder->update([
+                    'status'    => '2'
+                ]);
+            }
+
+            if($row->goodReceiptDetail()){
+                $row->lookable->goodReceipt->update([
+                    'status'    => '2'
+                ]);
+            }
+        }
+    }
+
+    public function updateRootDocumentStatusDone(){
+        foreach($this->purchaseInvoiceDetail as $row){
+            if($row->purchaseOrderDetail()){
+                if(!$row->lookable->purchaseOrder->hasBalanceInvoice()){
+                    $row->lookable->purchaseOrder->update([
+                        'status'    => '2'
+                    ]);
+                }
+            }
+
+            if($row->goodReceiptDetail()){
+                if(!$row->lookable->goodReceipt->hasBalanceInvoice()){
+                    $row->lookable->goodReceipt->update([
+                        'status'    => '3'
+                    ]);
+                }
+            }
+        }
+    }
 }

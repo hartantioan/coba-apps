@@ -234,25 +234,23 @@ class LandedCost extends Model
     public function hasChildDocument(){
         $hasRelation = false;
 
-        if($this->purchaseInvoiceDetail()->exists()){
-            $hasRelation = true;
+        foreach($this->landedCostFeeDetail as $row){
+            if($row->purchaseInvoiceDetail()->exists()){
+                $hasRelation = true;
+            }
         }
+        
 
         return $hasRelation;
-    }
-
-    public function purchaseInvoiceDetail()
-    {
-        return $this->hasMany('App\Models\PurchaseInvoiceDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('purchaseInvoice',function($query){
-            $query->whereIn('status',['2','3']);
-        });
     }
 
     public function balanceInvoice(){
         $total = round($this->grandtotal,2);
 
-        foreach($this->purchaseInvoiceDetail as $row){
-            $total -= $row->grandtotal;
+        foreach($this->landedCostFeeDetail as $row){
+            foreach($row->purchaseInvoiceDetail as $rowinvoice){
+                $total -= $rowinvoice->grandtotal;
+            }
         }
 
         return $total;
@@ -282,8 +280,10 @@ class LandedCost extends Model
     public function totalInvoice(){
         $total = 0;
 
-        foreach($this->purchaseInvoiceDetail as $row){
-            $total += $row->grandtotal;
+        foreach($this->landedCostFeeDetail as $row){
+            foreach($row->purchaseInvoiceDetail as $rowinvoice){
+                $total += $rowinvoice->grandtotal;
+            }
         }
 
         return $total;

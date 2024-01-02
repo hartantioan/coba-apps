@@ -36,6 +36,13 @@ class LandedCostFeeDetail extends Model
         return $this->belongsTo('App\Models\LandedCostFee', 'landed_cost_fee_id', 'id')->withTrashed();
     }
 
+    public function purchaseInvoiceDetail()
+    {
+        return $this->hasMany('App\Models\PurchaseInvoiceDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('purchaseInvoice',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
     public function isIncludeTax(){
         $type = match ($this->is_include_tax) {
           '0' => 'Tidak',

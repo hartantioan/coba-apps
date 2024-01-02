@@ -2424,18 +2424,16 @@ class CustomHelper {
 						$arrNote[] = $pod->purchaseOrder->code;
 					}
 
-				}elseif($row->lookable_type == 'landed_costs'){
+				}elseif($row->lookable_type == 'landed_cost_fee_details'){
 					
-					foreach($row->lookable->landedCostFeeDetail as $rowdetail){
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $rowdetail->landedCostFee->coa_id,
-							'account_id'	=> $row->lookable->account_id,
-							'type'			=> '1',
-							'nominal'		=> $rowdetail->total * $row->lookable->currency_rate,
-							'note'			=> $rowdetail->landedCostFee->name,
-						]);
-					}
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->lookable->landedCostFee->coa_id,
+						'account_id'	=> $row->lookable->landedCost->account_id,
+						'type'			=> '1',
+						'nominal'		=> $row->lookable->total * $row->lookable->landedCost->currency_rate,
+						'note'			=> $row->lookable->landedCostFee->name,
+					]);
 
 					$grandtotal += $row->grandtotal * $row->lookable->currency_rate;
 					$tax += $row->tax * $row->lookable->currency_rate;

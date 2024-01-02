@@ -179,11 +179,9 @@ class PurchaseRequest extends Model
     public function updateRootDocumentStatusProcess(){
         foreach($this->purchaseRequestDetail as $row){
             if($row->materialRequestDetail()){
-                if(!$row->lookable->materialRequest->hasBalanceQtyPr()){
-                    $row->lookable->materialRequest->update([
-                        'status'    => '2'
-                    ]);
-                }
+                $row->lookable->materialRequest->update([
+                    'status'    => '2'
+                ]);
             }
         }
     }

@@ -81,6 +81,7 @@ class LandedCostController extends Controller
             'maxDate'       => $request->get('maxDate'),
             'newcode'       =>  $menu->document_code.date('y'),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+            'menucode'      => $menu->document_code,
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -1422,8 +1423,9 @@ class LandedCostController extends Controller
     public function export(Request $request){
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
+        $mode = $request->mode ? $request->mode : '';
 		
-		return Excel::download(new ExportLandedCost($post_date,$end_date), 'landed_cost'.uniqid().'.xlsx');
+		return Excel::download(new ExportLandedCost($post_date,$end_date,$mode), 'landed_cost'.uniqid().'.xlsx');
     }
     
     public function removeUsedData(Request $request){

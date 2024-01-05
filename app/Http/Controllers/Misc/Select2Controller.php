@@ -68,6 +68,7 @@ use App\Models\Pattern;
 use App\Models\ProductionOrder;
 use App\Models\Size;
 use App\Models\Type;
+use App\Models\UserBank;
 use App\Models\Variety;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -297,6 +298,7 @@ class Select2Controller extends Controller {
                 'stock_list'        => $d->currentStock($this->dataplaces,$this->datawarehouses),
                 'list_warehouse'    => $d->warehouseList(),
                 'is_sales_item'     => $d->is_sales_item ? $d->is_sales_item : '',
+                'list_shading'      => $d->arrShading(),
             ];
         }
 
@@ -847,6 +849,63 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function userBankByAccount(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $account_id = $request->account_id;
+        $data = UserBank::where(function($query) use($search){
+                    $query->where('name', 'like', "%$search%")
+                        ->orWhere('no', 'like', "%$search%")
+                        ->orWhere('branch', 'like', "%$search%")
+                        ->orWhereHas('bank',function($query) use($search){
+                            $query->where('name','like',"%$search%");
+                        });
+                })
+                ->where('user_id',$account_id)
+                ->orderByDesc('is_default')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->name.' - '.$d->bank->name.' - '.$d->no.' - '.$d->branch,
+                'name'          => $d->name,
+                'bank'          => $d->bank->name,
+                'no'            => $d->no,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function allUserBank(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = UserBank::where(function($query) use($search){
+                    $query->where('name', 'like', "%$search%")
+                        ->orWhere('no', 'like', "%$search%")
+                        ->orWhere('branch', 'like', "%$search%")
+                        ->orWhereHas('user',function($query) use($search){
+                            $query->where('employee_no','like',"%$search%")
+                                ->orWhere('name','like',"%$search%");
+                        });
+                })
+                ->orderByDesc('is_default')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->user->name.' - '.$d->name.' - '.$d->bank->name.' - '.$d->no.' - '.$d->branch,
+                'name'          => $d->name,
+                'bank'          => $d->bank->name,
+                'no'            => $d->no,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function businessPartner(Request $request)
     {
         $response = [];
@@ -867,6 +926,7 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> $d->employee_no.' - '.$d->name.' - '.$d->type(),
+                'banks'         => $d->arrBanks(),
             ];
         }
 
@@ -1840,7 +1900,7 @@ class Select2Controller extends Controller {
                 foreach($d->inventoryTransferOutDetail as $row){
                     $details[] = [
                         'name'      => $row->item->code.' - '.$row->item->name,
-                        'origin'    => $row->itemStock->place->name.' - '.$row->itemStock->warehouse->name.' - '.($row->itemStock->area()->exists() ? $row->itemStock->area->name : ''),
+                        'origin'    => $row->itemStock->place->name.' - '.$row->itemStock->warehouse->name.' - '.($row->itemStock->area()->exists() ? $row->itemStock->area->name : '').' - Shading : '.($row->itemStock->itemShading()->exists() ? $row->itemStock->itemShading->code : '-'),
                         'qty'       => number_format($row->qty,3,',','.'),
                         'unit'      => $row->item->uomUnit->code,
                         'note'      => $row->note,
@@ -1877,6 +1937,35 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			    => $d->id,
                 'text' 			    => $d->place->code.' - '.$d->warehouse->code.' - '.($d->area()->exists() ? $d->area->name : '').' Item '.$d->item->name.' Qty. '.number_format($d->qty,3,',','.').' '.$d->item->uomUnit->code,
+                'qty'               => $d->qty,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function itemOnlyStock(Request $request)
+    {
+        $response   = [];
+        $search     = $request->search;
+        $data = ItemStock::where(function($query) use($search){
+                        $query->whereHas('item',function($query) use($search){
+                            $query->where('code', 'like', "%$search%")
+                                ->orWhere('name','like',"%$search%");
+                        });
+                    })
+                    ->whereIn('place_id',$this->dataplaces)
+                    ->whereIn('warehouse_id',$this->datawarehouses)
+                    ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->item->code.' - '.$d->item->name.' Lokasi '.$d->place->code.' - '.$d->warehouse->name.' - '.($d->area()->exists() ? $d->area->name : '').($d->itemShading()->exists() ? ' - Shading : '.$d->itemShading->code : ''),
+                'place_id'          => $d->place_id,
+                'warehouse_id'      => $d->warehouse_id,
+                'area_id'           => $d->area_id ? $d->area_id : '',
+                'item_shading_id'   => $d->item_shading_id ? $d->item_shading_id : '',
                 'qty'               => $d->qty,
             ];
         }
@@ -3026,20 +3115,23 @@ class Select2Controller extends Controller {
                             'id'            => $row->id,
                             'item_id'       => $row->item_id,
                             'item_name'     => $row->item->code.' - '.$row->item->name,
-                            'qty'           => number_format($row->qty,3,',','.'),
-                            'unit'          => $row->item->buyUnit->code,
+                            'qty'           => number_format($row->qty * $row->item->buy_convert,3,',','.'),
+                            'unit'          => $row->item->uomUnit->code,
                             'note'          => $row->note,
                             'date'          => $row->required_date,
                             'place_id'      => $row->place_id,
+                            'place_name'    => $row->place->code,
                             'warehouse_id'  => $row->warehouse_id,
+                            'warehouse_name'=> $row->warehouse->name,
                             'line_id'       => $row->line_id,
                             'machine_id'    => $row->machine_id,
                             'department_id' => $row->department_id,
                             'requester'     => $row->requester ? $row->requester : '',
-                            'qty_balance'   => number_format($row->balanceGi(),3,',','.'),
+                            'qty_balance'   => number_format($row->balanceGi() * $row->item->buy_convert,3,',','.'),
                             'type'          => $row->getTable(),
-                            'list_warehouse'=> $row->item->warehouseList(),
-                            'item_stock'    => $row->item->currentStockPurchasePlaceWarehouse($row->place_id,$row->warehouse_id),
+                            'project_id'    => $row->project()->exists() ? $row->project->id : '',
+                            'project_name'  => $row->project()->exists() ? $row->project->name : '',
+                            'stock_list'    => $row->item->currentStock($this->dataplaces,$this->datawarehouses),
                         ];
                     }
                 }

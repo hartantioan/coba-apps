@@ -23,6 +23,10 @@ class InventoryRevaluationDetail extends Model
         'warehouse_id',
         'nominal',
         'coa_id',
+        'line_id',
+        'machine_id',
+        'department_id',
+        'project_id',
     ];
 
     public function inventoryRevaluation()
@@ -53,5 +57,25 @@ class InventoryRevaluationDetail extends Model
     public function coa()
     {
         return $this->belongsTo('App\Models\Coa', 'coa_id', 'id')->withTrashed();
+    }
+
+    public function line()
+    {
+        return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();
+    }
+
+    public function machine()
+    {
+        return $this->belongsTo('App\Models\Machine', 'machine_id', 'id')->withTrashed();
+    }
+
+    public function project()
+    {
+        return $this->belongsTo('App\Models\Project', 'project_id', 'id')->withTrashed();
+    }
+
+    public function department()
+    {
+        return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
     }
 }

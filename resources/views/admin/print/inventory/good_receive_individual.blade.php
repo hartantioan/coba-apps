@@ -52,7 +52,7 @@
                 }
 
                 table > thead > tr > th {
-                    font-size:13px !important;
+                    font-size:10px !important;
                     font-weight: 800 !important;
                 }
                 td{
@@ -289,8 +289,13 @@
                                     <th class="center">Harga Total.</th>
                                     <th class="center">Coa</th>
                                     <th class="center">Plant</th>
+                                    <th class="center">Line</th>
+                                    <th class="center">Mesin</th>
                                     <th class="center">Departemen</th>
                                     <th class="center">Ke Gudang</th>
+                                    <th class="center">Area</th>
+                                    <th class="center">Shading</th>
+                                    <th class="center">Proyek</th>
                                     <th class="center">Keterangan</th>
                                 </tr>
                             </thead>
@@ -304,8 +309,13 @@
                                     <td class="right-align">{{ number_format($row->total,3,',','.') }}</td>
                                     <td class="center-align">{{ $row->coa->name }}</td>
                                     <td class="center-align">{{ $row->place->code }}</td>
+                                    <td class="center-align">{{ $row->line()->exists() ? $row->line->code : '-' }}</td>
+                                    <td class="center-align">{{ $row->machine()->exists() ? $row->machine->code : '-' }}</td>
                                     <td class="center-align">{{ $row->department_id ? $row->department->name : '-' }}</td>
                                     <td class="center-align">{{ $row->warehouse->name }}</td>
+                                    <td class="center-align">{{ $row->area()->exists() ? $row->area->name : '-' }}</td>
+                                    <td class="center-align">{{ $row->itemShading()->exists() ? $row->itemShading->code : '-' }}</td>
+                                    <td class="center-align">{{ $row->project()->exists() ? $row->project->name : '-' }}</td>
                                     <td>{{ $row->note }}</td>
                                 </tr>
                                 @endforeach

@@ -1524,22 +1524,23 @@ class LandedCostController extends Controller
             if($query->landedCostFeeDetail()->exists()){
                 
                 foreach($query->landedCostFeeDetail as $row_fee_detail){
-                    foreach($row_fee_detail->purchaseInvoiceDetail as $row_invoice_detail_atas)
-                    $invoice=[
-                        "key"=>$row_invoice_detail_atas->purchaseInvoice->code,
-                        "name"=>$row_invoice_detail_atas->purchaseInvoice->code,
-                        'properties'=> [
-                            ['name'=> "Tanggal :".$row_invoice_detail_atas->purchaseInvoice->code],
-                            ['name'=> "Nominal : Rp.:".number_format($row_invoice_detail_atas->purchaseInvoice->grandtotal,2,',','.')],
-                         ],
-                        'url'=>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($row_invoice_detail_atas->purchaseInvoice->code),
-                    ];
-                    $data_go_chart[]=$invoice;
-                    $data_link[]=[
-                        'from'=>$query->code,
-                        'to'=>$row_invoice_detail_atas->purchaseInvoice->code,
-                        'string_link'=>$query->code.$row_invoice_detail_atas->purchaseInvoice->code
-                    ];
+                    foreach($row_fee_detail->purchaseInvoiceDetail as $row_invoice_detail_atas){
+                        $invoice=[
+                            "key"=>$row_invoice_detail_atas->purchaseInvoice->code,
+                            "name"=>$row_invoice_detail_atas->purchaseInvoice->code,
+                            'properties'=> [
+                                ['name'=> "Tanggal :".$row_invoice_detail_atas->purchaseInvoice->code],
+                                ['name'=> "Nominal : Rp.:".number_format($row_invoice_detail_atas->purchaseInvoice->grandtotal,2,',','.')],
+                            ],
+                            'url'=>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($row_invoice_detail_atas->purchaseInvoice->code),
+                        ];
+                        $data_go_chart[]=$invoice;
+                        $data_link[]=[
+                            'from'=>$query->code,
+                            'to'=>$row_invoice_detail_atas->purchaseInvoice->code,
+                            'string_link'=>$query->code.$row_invoice_detail_atas->purchaseInvoice->code
+                        ];
+                    }
                 }
             }
             
@@ -2887,6 +2888,7 @@ class LandedCostController extends Controller
                 'message'   => $query->journal,
                 'user'      => $query->user->name,
                 'reference' =>  $query->lookable_id ? $query->lookable->code : '-',
+                'company' => $query->company()->exists() ? $query->company->name : '-',
             ];
             $string='';
             foreach($query->journal->journalDetail()->where(function($query){

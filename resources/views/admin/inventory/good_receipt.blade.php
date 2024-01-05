@@ -102,7 +102,7 @@
                                                         <th rowspan="2">Perusahaan</th>
                                                         <th rowspan="2">Code</th>
                                                         <th rowspan="2">Penerima</th>
-                                                        <th colspan="3" class="center-align">Tanggal</th>
+                                                        <th colspan="2" class="center-align">Tanggal</th>
                                                         <th rowspan="2">Keterangan</th>
                                                         <th rowspan="2">No.Surat Jalan</th>
                                                         <th rowspan="2">Dokumen</th>
@@ -111,7 +111,6 @@
                                                     </tr>
                                                     <tr>
                                                         <th>Pengajuan</th>
-                                                        <th>Kadaluwarsa</th>
                                                         <th>Dokumen</th>
                                                     </tr>
                                                 </thead>
@@ -174,10 +173,6 @@
                             <div class="input-field col m3 s12 step6">
                                 <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. diterima" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                 <label class="active" for="post_date">Tgl. Diterima</label>
-                            </div>
-                            <div class="input-field col m3 s12 step7">
-                                <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. tenggat">
-                                <label class="active" for="due_date">Tgl. Tenggat</label>
                             </div>
                             <div class="input-field col m3 s12 step8">
                                 <input id="document_date" name="document_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. dokumen">
@@ -422,6 +417,8 @@
             </div>
             <div class="col" id="ref_jurnal">
             </div>
+            <div class="col" id="company_jurnal">
+            </div>
         </div>
         <div class="row mt-2">
             <table class="bordered Highlight striped">
@@ -429,7 +426,6 @@
                         <tr>
                             <th class="center-align">No</th>
                             <th class="center-align">Coa</th>
-                            <th class="center-align">Perusahaan</th>
                             <th class="center-align">Partner Bisnis</th>
                             <th class="center-align">Plant</th>
                             <th class="center-align">Line</th>
@@ -502,7 +498,6 @@
             onOpenStart: function(modal,trigger) {
                 $('#post_date').attr('min','{{ $minDate }}');
                 $('#post_date').attr('max','{{ $maxDate }}');
-                $('#due_date').attr('min','{{ date("Y-m-d") }}');
                 $('#document_date').attr('min','{{ date("Y-m-d") }}');
             },
             onOpenEnd: function(modal, trigger) {
@@ -585,6 +580,7 @@
                 $('#user_jurnal').empty();
                 $('#note_jurnal').empty();
                 $('#ref_jurnal').empty();
+                $('#company_jurnal').empty();
                 $('#post_date_jurnal').empty();
             }
         });
@@ -1011,7 +1007,6 @@
                 { name: 'company_id', className: 'center-align' },
                 { name: 'receiver', className: 'center-align' },
                 { name: 'date_post', className: 'center-align' },
-                { name: 'date_due', className: 'center-align' },
                 { name: 'date_doc', className: 'center-align' },
                 { name: 'note', className: '' },
                 { name: 'delivery_no', className: 'center-align' },
@@ -1408,10 +1403,8 @@
                 $('#note').val(response.note);
                 $('#receiver_name').val(response.receiver_name);
                 $('#post_date').val(response.post_date);
-                $('#due_date').val(response.due_date);
                 $('#document_date').val(response.document_date);
                 $('#delivery_no').val(response.delivery_no);
-                $('#due_date').removeAttr('min');
                 $('#document_date').removeAttr('min');
                 
                 if(response.details.length > 0){
@@ -1821,10 +1814,11 @@
                     $('#title_data').append(``+data.title+``);
                     $('#code_data').append(data.message.code);
                     $('#body-journal-table').append(data.tbody);
-                    $('#user_jurnal').append(`Pengguna `+data.user);
-                    $('#note_jurnal').append(`Keterangan `+data.message.note);
-                    $('#ref_jurnal').append(`Referensi `+data.reference);
-                    $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
+                    $('#user_jurnal').append(`Pengguna : `+data.user);
+                    $('#note_jurnal').append(`Keterangan : `+data.message.note);
+                    $('#ref_jurnal').append(`Referensi : `+data.reference);
+                    $('#company_jurnal').append(`Perusahaan : `+data.company);
+                    $('#post_date_jurnal').append(`Tanggal : `+data.message.post_date);
                 }
             }
         });
@@ -1867,11 +1861,6 @@
                     title : 'Tgl. Diterima',
                     element : document.querySelector('.step6'),
                     intro : 'Tanggal grpo diterima,harap hati hati jangan sampai salah.' 
-                },
-                {
-                    title : 'Tgl. Tenggat',
-                    element : document.querySelector('.step7'),
-                    intro : 'Tanggal Tenggat dari grpo pada form' 
                 },
                 {
                     title : 'Tgl. Dokumen',

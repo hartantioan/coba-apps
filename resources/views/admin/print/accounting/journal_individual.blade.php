@@ -266,8 +266,10 @@
                                 <th class="center">Partner Bisnis</th>
                                 <th class="center">Plant</th>
                                 <th class="center">Line</th>
+                                <th class="center">Mesin</th>
                                 <th class="center">Departemen</th>
-                                <th class="center">Gudang</th>
+                                <th class="center">Proyek</th>
+                                <th class="center">Keterangan</th>
                                 <th class="center">Debit</th>
                                 <th class="center">Kredit</th>
                             </tr>
@@ -281,14 +283,16 @@
         })->get() as $key => $row)
                                 <tr>
                                     <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
-                                    <td class="center-align">{{ $row->place_id ? $row->place->company->name : '-' }}</td>
+                                    <td class="center-align">{{ $row->coa->company->name }}</td>
                                     <td class="center-align">{{ $row->account_id ? $row->account->name : '-' }}</td>
                                     <td class="center-align">{{ $row->place_id ? $row->place->code : '-' }}</td>
                                     <td class="center-align">{{ $row->line_id ? $row->line->name : '-' }}</td>
+                                    <td class="center-align">{{ $row->machine_id ? $row->machine->name : '-' }}</td>
                                     <td class="center-align">{{ $row->department_id ? $row->department->name : '-' }}</td>
-                                    <td class="center-align">{{ $row->warehouse_id ? $row->warehouse->name : '-' }}</td>
-                                    <td class="right-align">{{ $row->type == '1' ? number_format($row->nominal,3,',','.') : '' }}</td>
-                                    <td class="right-align">{{ $row->type == '2' ? number_format($row->nominal,3,',','.') : '' }}</td>
+                                    <td class="center-align">{{ $row->project_id ? $row->project->name : '-' }}</td>
+                                    <td class="center-align">{{ $row->note ? $row->note : '' }}</td>
+                                    <td align="right">{{ $row->type == '1' ? number_format($row->nominal,2,',','.') : '' }}</td>
+                                    <td align="right">{{ $row->type == '2' ? number_format($row->nominal,2,',','.') : '' }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

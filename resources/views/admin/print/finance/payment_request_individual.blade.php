@@ -204,7 +204,7 @@
                         </table>
                     </td>
                     <td width="33%" align="center">
-                        <h2 class="indigo-text">Permintaan Pembayaran</h2>
+                        <h2 class="indigo-text">Payment Request</h2>
                     </td>
                     <td width="33%" class="right-align">
                         <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%;right:0;">
@@ -225,6 +225,7 @@
                                         <td width="40%">
                                            Tipe Pembayaran
                                         </td>
+                                        <td width="1%">:</td>
                                         <td width="60%">
                                             {{ $data->paymentType() }}
                                         </td>
@@ -233,6 +234,7 @@
                                         <td width="40%">
                                             Partner Bisnis
                                         </td>
+                                        <td width="1%">:</td>
                                         <td width="60%">
                                             {{ $data->account->name }}
                                         </td>
@@ -241,6 +243,7 @@
                                         <td width="40%">
                                             Vendor Bank
                                         </td>
+                                        <td width="1%">:</td>
                                         <td width="60%">
                                             {{ $data->account_bank }}
                                         </td>
@@ -249,6 +252,7 @@
                                         <td width="40%">
                                             Vendor Bank Account No
                                         </td>
+                                        <td width="1%">:</td>
                                         <td width="60%">
                                             {{ $data->account_no }}
                                         </td>
@@ -257,6 +261,7 @@
                                         <td width="40%">
                                             Vendor Bank Account Name
                                         </td>
+                                        <td width="1%">:</td>
                                         <td width="60%">
                                             {{ $data->account_name }}
                                         </td>
@@ -265,6 +270,7 @@
                                         <td width="40%">
                                            Kas / Bank
                                         </td>
+                                        <td width="1%">:</td>
                                         <td width="60%">
                                             {{ $data->coa_source_id ? $data->coaSource->name : '-' }}
                                         </td>
@@ -301,6 +307,12 @@
                                     <th class="center">Tgl.Tenggat</th>
                                     <th class="center">Keterangan</th>
                                     <th class="center">Coa</th>
+                                    <th class="center">Plant</th>
+                                    <th class="center">Gudang</th>
+                                    <th class="center">Line</th>
+                                    <th class="center">Mesin</th>
+                                    <th class="center">Departemen</th>
+                                    <th class="center">Proyek</th>
                                     <th class="center">Bayar</th>
                                 </tr>
                             </thead>
@@ -315,6 +327,12 @@
                                     <td align="center">{{ $row->purchaseInvoice() ? date('d/m/y',strtotime($row->lookable->due_date)) : '-' }}</td>
                                     <td>{{ $row->note }}</td>
                                     <td>{{ $row->coa->name }}</td>
+                                    <td>{{ $row->place()->exists() ? $row->place->code : '-' }}</td>
+                                    <td>{{ $row->warehouse()->exists() ? $row->warehouse->code : '-' }}</td>
+                                    <td>{{ $row->line()->exists() ? $row->line->code : '-' }}</td>
+                                    <td>{{ $row->machine()->exists() ? $row->machine->code : '-' }}</td>
+                                    <td>{{ $row->department()->exists() ? $row->department->code : '-' }}</td>
+                                    <td>{{ $row->project()->exists() ? $row->project->name : '-' }}</td>
                                     <td align="right">{{ number_format($row->nominal,2,',','.') }}</td>
                                 </tr>
                                 @php
@@ -335,7 +353,7 @@
                                             <div class="mt-3">
                                                 Catatan : {{ $data->note }}
                                             </div>
-                                            Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal).' '.$data->currency->document_text }}
+                                            Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.$data->currency->document_text }}
                                         </td>
                                         
                                     </tr>

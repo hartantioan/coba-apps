@@ -344,7 +344,7 @@
                                         <div class="preserveLines" style="text-align:left !important;">
                                             {{ $data->note_external }}
                                         </div>
-                                        Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal).' '.$data->currency->document_text }}
+                                        Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.$data->currency->document_text }}
                                     </td>
                                     
                                 </tr>
@@ -584,7 +584,7 @@
                                         <div class="preserveLines" style="text-align:left !important;">
                                             {{ $data->note_external }}
                                         </div>
-                                        Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal).' '.$data->currency->document_text }}
+                                        Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.$data->currency->document_text }}
                                     </td>
                                     
                                 </tr>

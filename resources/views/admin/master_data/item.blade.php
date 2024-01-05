@@ -320,7 +320,7 @@
                                 <div class="input-field col s12">
                                     <select class="select2 browser-default" id="buy_unit" name="buy_unit">
                                         @foreach ($unit as $row)
-                                            <option value="{{ $row->id }}">{{ $row->name.' - '.$row->code }}</option>
+                                            <option value="{{ $row->id }}">{{ $row->code.' - '.$row->name }}</option>
                                         @endforeach
                                     </select>
                                     <label class="active" for="buy_unit">Satuan Beli</label>
@@ -328,7 +328,7 @@
                                 <div class="input-field col s12">
                                     <select class="select2 browser-default" id="sell_unit" name="sell_unit">
                                         @foreach ($unit as $row)
-                                            <option value="{{ $row->id }}">{{ $row->name.' - '.$row->code }}</option>
+                                            <option value="{{ $row->id }}">{{ $row->code.' - '.$row->name }}</option>
                                         @endforeach
                                     </select>
                                     <label class="active" for="sell_unit">Satuan Jual</label>
@@ -336,7 +336,7 @@
                                 <div class="input-field col s12">
                                     <select class="select2 browser-default" id="production_unit" name="production_unit">
                                         @foreach ($unit as $row)
-                                            <option value="{{ $row->id }}">{{ $row->name.' - '.$row->code }}</option>
+                                            <option value="{{ $row->id }}">{{ $row->code.' - '.$row->name }}</option>
                                         @endforeach
                                     </select>
                                     <label class="active" for="production_unit">Satuan Produksi</label>
@@ -344,7 +344,7 @@
                                 <div class="input-field col s12">
                                     <select class="select2 browser-default" id="pallet_unit" name="pallet_unit">
                                         @foreach ($pallet as $row)
-                                            <option value="{{ $row->id }}">{{ $row->name.' - '.$row->code }}</option>
+                                            <option value="{{ $row->id }}">{{ $row->code.' - '.$row->name }}</option>
                                         @endforeach
                                     </select>
                                     <label class="active" for="pallet_unit">Satuan Pallet</label>
@@ -372,7 +372,7 @@
                                 <div class="input-field col s12" style="top: 75px;">
                                     <select class="select2 browser-default" id="uom_unit" name="uom_unit">
                                         @foreach ($unit as $row)
-                                            <option value="{{ $row->id }}">{{ $row->name.' - '.$row->code }}</option>
+                                            <option value="{{ $row->id }}">{{ $row->code.' - '.$row->name }}</option>
                                         @endforeach
                                     </select>
                                     <label class="active" for="uom_unit">Satuan Stok (UoM)</label>

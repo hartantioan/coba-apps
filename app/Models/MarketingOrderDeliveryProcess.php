@@ -404,6 +404,7 @@ class MarketingOrderDeliveryProcess extends Model
 			
         $query = Journal::create([
             'user_id'		=> $modp->user_id,
+            'company_id'    => $modp->company_id,
             'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($modp->post_date)).'00'),
             'lookable_type'	=> 'marketing_order_delivery_processes',
             'lookable_id'	=> $modp->id,
@@ -412,7 +413,7 @@ class MarketingOrderDeliveryProcess extends Model
             'status'		=> '3'
         ]);
         
-        $coabdp = Coa::where('code','100.01.04.05.01')->where('company_id',$modp->company_id)->first()->id;
+        $coabdp = Coa::where('code','100.01.04.05.01')->where('company_id',$modp->company_id)->first();
 
         foreach($modp->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
 
@@ -420,8 +421,8 @@ class MarketingOrderDeliveryProcess extends Model
 
             JournalDetail::create([
                 'journal_id'	=> $query->id,
-                'account_id'	=> $modp->marketingOrderDelivery->marketingOrder->account_id,
-                'coa_id'		=> $coabdp,
+                'account_id'	=> $coabdp->bp_journal ? $modp->marketingOrderDelivery->marketingOrder->account_id : NULL,
+                'coa_id'		=> $coabdp->id,
                 'place_id'		=> $row->place_id,
                 'item_id'		=> $row->item_id,
                 'warehouse_id'	=> $row->warehouse_id,
@@ -432,7 +433,6 @@ class MarketingOrderDeliveryProcess extends Model
 
             JournalDetail::create([
                 'journal_id'	=> $query->id,
-                'account_id'	=> $modp->marketingOrderDelivery->marketingOrder->account_id,
                 'coa_id'		=> $row->itemStock->item->itemGroup->coa_id,
                 'place_id'		=> $row->place_id,
                 'item_id'		=> $row->item_id,
@@ -473,6 +473,7 @@ class MarketingOrderDeliveryProcess extends Model
 			
         $query = Journal::create([
             'user_id'		=> $modp->user_id,
+            'company_id'    => $modp->company_id,
             'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($modp->return_date)).'00'),
             'lookable_type'	=> 'marketing_order_delivery_processes',
             'lookable_id'	=> $modp->id,
@@ -481,8 +482,8 @@ class MarketingOrderDeliveryProcess extends Model
             'status'		=> '3'
         ]);
         
-        $coabdp = Coa::where('code','100.01.04.05.01')->where('company_id',$modp->company_id)->first()->id;
-        $coahpp = Coa::where('code','500.01.01.01.01')->where('company_id',$modp->company_id)->first()->id;
+        $coabdp = Coa::where('code','100.01.04.05.01')->where('company_id',$modp->company_id)->first();
+        $coahpp = Coa::where('code','500.01.01.01.01')->where('company_id',$modp->company_id)->first();
 
         foreach($modp->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
 
@@ -490,8 +491,8 @@ class MarketingOrderDeliveryProcess extends Model
 
             JournalDetail::create([
                 'journal_id'	=> $query->id,
-                'account_id'	=> $modp->marketingOrderDelivery->marketingOrder->account_id,
-                'coa_id'		=> $coahpp,
+                'account_id'	=> $coahpp->bp_journal ? $modp->marketingOrderDelivery->marketingOrder->account_id : NULL,
+                'coa_id'		=> $coahpp->id,
                 'place_id'		=> $row->place_id,
                 'item_id'		=> $row->item_id,
                 'warehouse_id'	=> $row->warehouse_id,
@@ -502,8 +503,8 @@ class MarketingOrderDeliveryProcess extends Model
 
             JournalDetail::create([
                 'journal_id'	=> $query->id,
-                'account_id'	=> $modp->marketingOrderDelivery->marketingOrder->account_id,
-                'coa_id'		=> $coabdp,
+                'account_id'	=> $coabdp->bp_journal ? $modp->marketingOrderDelivery->marketingOrder->account_id : NULL,
+                'coa_id'		=> $coabdp->id,
                 'place_id'		=> $row->place_id,
                 'item_id'		=> $row->item_id,
                 'warehouse_id'	=> $row->warehouse_id,

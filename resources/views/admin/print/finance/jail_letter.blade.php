@@ -233,7 +233,7 @@
                                             Terbilang
                                         </td>
                                         <td>
-                                            : {{ strtoupper(CustomHelper::terbilang($data->grandtotal).' '.$data->currency->document_text) }}
+                                            : {{ strtoupper(CustomHelper::terbilangWithKoma($data->grandtotal).' '.$data->currency->document_text) }}
                                         </td>
                                     </tr>
                                     <tr>

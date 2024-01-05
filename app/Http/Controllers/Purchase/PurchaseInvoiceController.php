@@ -222,7 +222,7 @@ class PurchaseInvoiceController extends Controller
                             'note2'         => $rowdetail->note2,
                             'top'           => $datapo->payment_term,
                             'delivery_no'   => '-',
-                            'purchase_no'   => 'NO PO - '.$datapo->code,
+                            'purchase_no'   => $datapo->code,
                             'percent_tax'   => $rowdetail->percent_tax,
                             'percent_wtax'  => $rowdetail->percent_wtax,
                             'include_tax'   => $rowdetail->is_include_tax,
@@ -273,8 +273,8 @@ class PurchaseInvoiceController extends Controller
                             'note'          => $rowdetail->note,
                             'note2'         => $rowdetail->note2,
                             'top'           => $top,
-                            'delivery_no'   => 'NO SJ - '.$datagr->delivery_no,
-                            'purchase_no'   => 'NO PO - '.$rowdetail->purchaseOrderDetail->purchaseOrder->code,
+                            'delivery_no'   => $datagr->delivery_no,
+                            'purchase_no'   => $rowdetail->purchaseOrderDetail->purchaseOrder->code,
                             'percent_tax'   => $rowdetail->purchaseOrderDetail->percent_tax,
                             'percent_wtax'  => $rowdetail->purchaseOrderDetail->percent_wtax,
                             'include_tax'   => $rowdetail->purchaseOrderDetail->is_include_tax,
@@ -319,7 +319,7 @@ class PurchaseInvoiceController extends Controller
                             'note2'         => '',
                             'top'           => 0,
                             'delivery_no'   => $datalc->getListDeliveryNo(),
-                            'purchase_no'   => $datalc->getPurchaseCode(),
+                            'purchase_no'   => $datalc->getGoodReceiptNo(),
                             'percent_tax'   => $rowdetail->percent_tax,
                             'percent_wtax'  => $rowdetail->percent_wtax,
                             'include_tax'   => $rowdetail->is_include_tax,
@@ -1259,8 +1259,8 @@ class PurchaseInvoiceController extends Controller
                 'note'          => $row->note,
                 'note2'         => $row->note2,
                 'top'           => $row->getTop(),
-                'delivery_no'   => 'NO SJ - '.$row->getDeliveryCode(),
-                'purchase_no'   => 'NO PO - '.$row->getPurchaseCode(),
+                'delivery_no'   => $row->getDeliveryCode(),
+                'purchase_no'   => $row->getPurchaseCode(),
                 'percent_tax'   => $row->percent_tax,
                 'percent_wtax'  => $row->percent_wtax,
                 'include_tax'   => $row->is_include_tax,
@@ -3330,7 +3330,6 @@ class PurchaseInvoiceController extends Controller
            
             $data_go_chart = unique_key($data_go_chart,'name');
             $data_link=unique_key($data_link,'string_link');
-            info($data_link);
             $response = [
                 'status'  => 200,
                 'message' => $data_go_chart,
@@ -3355,6 +3354,7 @@ class PurchaseInvoiceController extends Controller
                 'message'   => $query->journal,
                 'user'      => $query->user->name,
                 'reference' =>  $query->lookable_id ? $query->lookable->code : '-',
+                'company' => $query->company()->exists() ? $query->company->name : '-',
             ];
             $string='';
             foreach($query->journal->journalDetail()->where(function($query){
@@ -3366,7 +3366,6 @@ class PurchaseInvoiceController extends Controller
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
-                    <td class="center-align">'.$row->coa->company->name.'</td>
                     <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
                     <td class="center-align">'.($row->place_id ? $row->place->code : '-').'</td>
                     <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>

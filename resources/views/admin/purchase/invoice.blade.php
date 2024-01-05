@@ -261,7 +261,7 @@
                                     <label class="active" for="post_date">Tgl. Posting</label>
                                 </div>
                                 <div class="input-field col m3 s12 step7">
-                                    <input id="received_date" name="received_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Terima" value="{{ date('Y-m-d') }}" onchange="addDays();">
+                                    <input id="received_date" name="received_date" type="date" placeholder="Tgl. Terima" value="{{ date('Y-m-d') }}" onchange="addDays();">
                                     <label class="active" for="received_date">Tgl. Terima</label>
                                 </div>
                                 <div class="input-field col m3 s12 step8">
@@ -269,8 +269,8 @@
                                     <label class="active" for="top">TOP (hari) Autofill dari GRPO</label>
                                 </div>
                                 <div class="input-field col m3 s12 step9">
-                                    <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Kadaluarsa">
-                                    <label class="active" for="due_date">Tgl. Kadaluarsa</label>
+                                    <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Jatuh Tempo">
+                                    <label class="active" for="due_date">Tgl. Jatuh Tempo</label>
                                 </div>
                                 <div class="input-field col m3 s12 step10">
                                     <input id="document_date" name="document_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. dokumen">
@@ -697,6 +697,8 @@
             </div>
             <div class="col" id="ref_jurnal">
             </div>
+            <div class="col" id="company_jurnal">
+            </div>
         </div>
         <div class="row mt-2">
             <table class="bordered Highlight striped">
@@ -704,7 +706,6 @@
                         <tr>
                             <th class="center-align">No</th>
                             <th class="center-align">Coa</th>
-                            <th class="center-align">Perusahaan</th>
                             <th class="center-align">Partner Bisnis</th>
                             <th class="center-align">Plant</th>
                             <th class="center-align">Line</th>
@@ -956,6 +957,7 @@
                 $('#user_jurnal').empty();
                 $('#note_jurnal').empty();
                 $('#ref_jurnal').empty();
+                $('#company_jurnal').empty();
                 $('#post_date_jurnal').empty();
             }
         });
@@ -1664,7 +1666,7 @@
                                                     ` + val.grandtotal + `
                                                 </td>
                                                 <td>
-                                                    <input class="browser-default" type="text" name="arr_note[]" value="` + val.info + val.note + `" data-id="` + count + `">
+                                                    <input class="browser-default" type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
                                                 </td>
                                                 <td>
                                                     <input class="browser-default" type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
@@ -3253,10 +3255,11 @@
                     $('#title_data').append(``+data.title+``);
                     $('#code_data').append(data.message.code);
                     $('#body-journal-table').append(data.tbody);
-                    $('#user_jurnal').append(`Pengguna `+data.user);
-                    $('#note_jurnal').append(`Keterangan `+data.message.note);
-                    $('#ref_jurnal').append(`Referensi `+data.reference);
-                    $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
+                    $('#user_jurnal').append(`Pengguna : `+data.user);
+                    $('#note_jurnal').append(`Keterangan : `+data.message.note);
+                    $('#ref_jurnal').append(`Referensi : `+data.reference);
+                    $('#company_jurnal').append(`Perusahaan : `+data.company);
+                    $('#post_date_jurnal').append(`Tanggal : `+data.message.post_date);
                 }
             }
         });
@@ -3311,7 +3314,7 @@
                     intro : 'Tenggat waktu pembayaran dalam hari yang juga dapat terisi secara otomatis melalui GRPO .' 
                 },
                 {
-                    title : 'Tgl. Kadaluarsa',
+                    title : 'Tgl. Jatuh Tempo',
                     element : document.querySelector('.step9'),
                     intro : 'Tanggal berlaku  dari dokumen ini.' 
                 },

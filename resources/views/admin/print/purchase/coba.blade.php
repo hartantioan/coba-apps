@@ -242,7 +242,7 @@
                         </tr>
                         <tr>
                             <td width="50%">
-                                Tgl. Tenggat
+                                Tgl. Jatuh Tempo
                             </td>
                             <td width="50%">
                                 {{ date('d/m/y',strtotime($data->due_date)) }}
@@ -292,7 +292,7 @@
                             <div class="mt-3">
                                 Catatan : {{ $data->note }}
                             </div>
-                            Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal) }}
+                            Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal) }}
                         </td>
                         
                     </tr>

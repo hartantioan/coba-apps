@@ -41,13 +41,13 @@
 
             @media only screen and (max-width : 768px) {
                 .invoice-print-area {
-                    zoom:0.4;
+                    zoom:0.6;
                 }
             }
         
             @media only screen and (max-width : 992px) {
                 .invoice-print-area {
-                    zoom:0.6;
+                    zoom:0.8;
                     font-size:11px !important;
                 }
 
@@ -56,25 +56,25 @@
                     font-weight: 800 !important;
                 }
                 td{
-                    font-size:0.7em !important;
+                    font-size:0.9em !important;
                 }
                 .tb-header td{
-                    font-size:0.6em !important;
+                    font-size:0.7em !important;
                 }
                 .tbl-info td{
                     font-size:1em !important;
                 }
                 .table-data-item td{
-                    font-size:0.6em !important;
+                    font-size:0.8em !important;
                 }
                 .table-data-item th{
                     border:0.6px solid black;
                 }
                 .table-bot td{
-                    font-size:0.6em !important;
+                    font-size:0.8em !important;
                 }
                 .table-bot1 td{
-                    font-size:0.7em !important;
+                    font-size:0.9em !important;
                 }
             }
         
@@ -156,7 +156,9 @@
             @page { margin: 5em 3em 6em 3em; }
             header { position: fixed; top: -70px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
                 
-        
+            td {
+                vertical-align: top !important;
+            }
            
         </style>
     </head>
@@ -164,25 +166,12 @@
         <header>
             <table border="0" width="100%" style="font-size:1em" class="tb-header">
                 <tr>
-                    <td width="83%" class="left-align" >
-                        <tr>
-                            <td>
-                                <span class="invoice-number mr-1"># {{ $data->code }}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="margin-top: -2px;">
-                                <small style="font-size:1em"> <small>Diajukan:</small>
-                                <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span></small>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <h5 class="indigo-text">Kas / Bank Keluar</h5>
-                            </td>
-                        </tr>
-                                
-                        
+                    <td width="33%" class="left-align" >
+                        <span class="invoice-number mr-1"># {{ $data->code }}</span>
+                        <br>
+                        <small style="font-size:1em"> <small>Tgl.Outgoing:</small>
+                        <small>{{ date('d/m/y',strtotime($data->post_date)) }}</small>
+                        <h2 class="indigo-text">Kas / Bank Keluar</h2>
                     </td>
                     <td width="33%" class="right-align">
                         
@@ -192,53 +181,26 @@
                     
                     <td width="34%" class="right-align">
                         
-                            <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
+                        <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%;right:0;">
                        
                     </td>
                 </tr>
                 
             </table>
-            <hr style="border-top: 3px solid black; margin-top:-2%">
+            <hr style="border-top: 3px solid black; margin-top:-15px">
         </header>
         <main>
             <div class="card">
                 <div class="card-content invoice-print-area ">
                     <table border="0" width="100%" class="mt-3">
                         <tr>
-                            <td width="33%" class="left-align" style="vertical-align: top !important;">
-                                <table border="0" width="100%" class="tbl-info">
-                                    <tr>
-                                        <td width="40%">
-                                            Dari
-                                        </td>
-                                        <td width="60%">
-                                            {{ $data->user->name }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="40%">
-                                            Posisi
-                                        </td>
-                                        <td width="60%">
-                                            {{ $data->user->position->Level->name }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="40%">
-                                            Depart.
-                                        </td>
-                                        <td width="60%">
-                                            {{ $data->user->position->division->name }}
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                            <td width="33%" class="left-align" style="vertical-align: top !important;">
+                            <td width="33%" class="left-align">
                                 <table border="0" width="100%" class="tbl-info">
                                     <tr>
                                         <td width="40%">
                                             Partner Bisnis
                                         </td>
+                                        <td width="1%">:</td>
                                         <td width="60%">
                                             {{ $data->account->name }}
                                         </td>
@@ -247,6 +209,7 @@
                                         <td width="40%">
                                             Alamat
                                         </td>
+                                        <td width="1%">:</td>
                                         <td width="60%">
                                             {{ $data->account->address }}
                                         </td>
@@ -255,8 +218,58 @@
                                         <td width="40%">
                                             Telepon
                                         </td>
+                                        <td width="1%">:</td>
                                         <td width="60%">
                                             {{ $data->account->phone.' / '.$data->account->office_no }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="40%">
+                                            Dibayar dari
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="60%">
+                                            {{ $data->coaSource->name }}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td width="33%" class="left-align" style="vertical-align: top !important;">
+                                <table border="0" width="100%" class="tbl-info">
+                                    <tr>
+                                        <td width="40%">
+                                            Rekening Tujuan
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="60%">
+                                            {{ $data->paymentRequest->account_no }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="40%">
+                                            Bank
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="60%">
+                                            {{ $data->paymentRequest->account_bank }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="40%">
+                                            Nama
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="60%">
+                                            {{ $data->paymentRequest->account_name }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="40%">
+                                            Payment Req.
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="60%">
+                                            {{ $data->paymentRequest->code }}
                                         </td>
                                     </tr>
                                 </table>
@@ -270,7 +283,7 @@
                                     </tr>
                                     <tr>
                                         <td align="center">
-                                            <h1>{{ $data->code }}</h1>
+                                            <h2>{{ $data->code }}</h2>
                                         </td>
                                     </tr>
                                 </table>
@@ -287,13 +300,13 @@
                                     <th class="center">Total Bayar</th>
                                 </tr>
                                 <tr>
-                                    <th class="right-align" style="font-weight: !important;font-size:0.5em !important">{{ number_format($data->admin,3,',','.') }}</th>
-                                    <th class="right-align" style="font-weight:normal !important;font-size:0.8em !important">{{ number_format($data->grandtotal,3,',','.') }}</th>
+                                    <th class="right-align" style="font-weight: !important;font-size:1em !important">{{ number_format($data->admin,2,',','.') }}</th>
+                                    <th class="right-align" style="font-weight:normal !important;font-size:1em !important">{{ number_format($data->grandtotal,2,',','.') }}</th>
                                 </tr>
                             </thead>
                             <tfoot>
                                 <tr>
-                                    <th colspan="2" style="border: none !important" border="0">Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal).' '.ucwords($data->currency->document_text) }}</i></th>
+                                    <th colspan="2" style="border: none !important" border="0">Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords($data->currency->document_text) }}</i></th>
                                 </tr>
                             </tfoot>
                             

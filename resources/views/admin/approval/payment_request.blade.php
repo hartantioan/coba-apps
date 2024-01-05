@@ -138,7 +138,7 @@
         <!-- logo and title -->
         <div class="row mt-3 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">Permintaan Pembayaran</h5>
+                <h5 class="indigo-text">Payment Request</h5>
             </div>
             <div class="col m6 s12">
                 <img src="{{ url('website/logo_web_fix.png') }}" width="80%">
@@ -230,6 +230,12 @@
                         <th class="center">Tipe</th>
                         <th class="center">Keterangan</th>
                         <th class="center">Coa</th>
+                        <th class="center">Plant</th>
+                        <th class="center">Gudang</th>
+                        <th class="center">Line</th>
+                        <th class="center">Mesin</th>
+                        <th class="center">Departemen</th>
+                        <th class="center">Proyek</th>
                         <th class="center">Bayar</th>
                     </tr>
                 </thead>
@@ -243,6 +249,12 @@
                         <td class="center-align">{{ $row->type() }}</td>
                         <td>{{ $row->note }}</td>
                         <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
+                        <td>{{ $row->place()->exists() ? $row->place->code : '-' }}</td>
+                        <td>{{ $row->warehouse()->exists() ? $row->warehouse->code : '-' }}</td>
+                        <td>{{ $row->line()->exists() ? $row->line->code : '-' }}</td>
+                        <td>{{ $row->machine()->exists() ? $row->machine->code : '-' }}</td>
+                        <td>{{ $row->department()->exists() ? $row->department->code : '-' }}</td>
+                        <td>{{ $row->project()->exists() ? $row->project->name : '-' }}</td>
                         <td class="right-align">{{ number_format($row->nominal,3,',','.') }}</td>
                     </tr>
                     @php
@@ -268,7 +280,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="10">Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal).' '.ucwords($data->currency->document_text) }}</i></th>
+                        <th colspan="10">Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords($data->currency->document_text) }}</i></th>
                     </tr>
                 </tfoot>
             </table>

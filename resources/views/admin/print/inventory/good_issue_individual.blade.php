@@ -167,7 +167,7 @@
                     <td width="83%" class="left-align" >
                         <tr>
                             <td>
-                                <span class="invoice-number mr-1">Barang Masuk # {{ $data->code }}</span>
+                                <span class="invoice-number mr-1">Barang Keluar # {{ $data->code }}</span>
                             </td>
                         </tr>
                         <tr>
@@ -268,6 +268,13 @@
                                     <th class="center">Coa</th>
                                     <th class="center">Plant</th>
                                     <th class="center">Dari Gudang</th>
+                                    <th class="center">Area</th>
+                                    <th class="center">Shading</th>
+                                    <th class="center">Line</th>
+                                    <th class="center">Mesin</th>
+                                    <th class="center">Departemen</th>
+                                    <th class="center">Proyek</th>
+                                    <th class="center">Requester</th>
                                     <th class="center">Keterangan</th>
                                 </tr>
                             </thead>
@@ -280,6 +287,13 @@
                                     <td class="center-align">{{ $row->coa->name }}</td>
                                     <td class="center-align">{{ $row->itemStock->place->code }}</td>
                                     <td class="center-align">{{ $row->itemStock->warehouse->name }}</td>
+                                    <td class="center-align">{{ $row->itemStock->area()->exists() ? $row->itemStock->area->name : '-' }}</td>
+                                    <td class="center-align">{{ $row->itemShading()->exists() ? $row->itemShading->code : '-' }}</td>
+                                    <td class="center-align">{{ $row->line()->exists() ? $row->line->name : '-' }}</td>
+                                    <td class="center-align">{{ $row->machine()->exists() ? $row->machine->name : '-' }}</td>
+                                    <td class="center-align">{{ $row->department()->exists() ? $row->department->name : '-' }}</td>
+                                    <td class="center-align">{{ $row->project()->exists() ? $row->project->name : '-' }}</td>
+                                    <td class="center-align">{{ $row->requester ? $row->requester : '-' }}</td>
                                     <td>{{ $row->note }}</td>
                                 </tr>
                                 @endforeach

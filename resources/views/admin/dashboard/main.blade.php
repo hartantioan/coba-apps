@@ -100,15 +100,16 @@
                                 <div class="row">
                                     <div class="col s12 m12">
                                         <h5>HPP & STOK REALTIME</h5>
-                                        <table class="bordered" style="font-size:10px;">
+                                        <table class="bordered" style="font-size:10px;zoom:0.8;">
                                             <thead>
                                                 <tr>
                                                     <th class="center-align">No.</th>
-                                                    <th class="center-align">Item</th>
+                                                    <th class="center-align">Item (dari Stok)</th>
                                                     <th class="center-align">Shading</th>
                                                     <th class="center-align">Plant</th>
                                                     <th class="center-align">Gudang</th>
                                                     <th class="center-align">Area</th>
+                                                    <th class="center-align">Shading</th>
                                                     <th class="center-align">Qty in Stock</th>
                                                     <th class="center-align">Qty Commited</th>
                                                     <th class="center-align">Rp</th>
@@ -123,6 +124,7 @@
                                                         <td class="">{{ $row->place->code.' - '.$row->place->company->name }}</td>
                                                         <td class="center-align">{{ $row->warehouse->name }}</td>
                                                         <td class="center-align">{{ $row->area()->exists() ? $row->area->name : '-' }}</td>
+                                                        <td class="center-align">{{ $row->itemShading()->exists() ? $row->itemShading->code : '-' }}</td>
                                                         <td class="center-align">{{ number_format($row->qty,3,',','.').' '.$row->item->uomUnit->code }}</td>
                                                         <td class="center-align">{{ number_format($row->totalUndeliveredItem(),3,',','.').' '.$row->item->uomUnit->code }}</td>
                                                         <td class="right-align">{{ number_format($row->valueNow(),3,',','.') }}</td>

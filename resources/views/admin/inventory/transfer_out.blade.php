@@ -13,6 +13,14 @@
     .select2-dropdown {
         width: 200px !important;
     }
+
+    .select2 {
+        max-width: 150px !important;
+    }
+
+    select {
+        max-width: 100% !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -230,7 +238,7 @@
                                     <h4>Detail Produk</h4>
                                     Coa debit mengikuti coa pada masing-masing grup item.
                                     <div style="overflow:auto;">
-                                        <table class="bordered" id="table-detail">
+                                        <table class="bordered" style="min-width:1800px !important;" id="table-detail">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Item</th>
@@ -415,6 +423,8 @@
             </div>
             <div class="col" id="ref_jurnal">
             </div>
+            <div class="col" id="company_jurnal">
+            </div>
         </div>
         <div class="row mt-2">
             <table class="bordered Highlight striped">
@@ -422,7 +432,6 @@
                         <tr>
                             <th class="center-align">No</th>
                             <th class="center-align">Coa</th>
-                            <th class="center-align">Perusahaan</th>
                             <th class="center-align">Partner Bisnis</th>
                             <th class="center-align">Plant</th>
                             <th class="center-align">Line</th>
@@ -561,6 +570,7 @@
                 $('#user_jurnal').empty();
                 $('#note_jurnal').empty();
                 $('#ref_jurnal').empty();
+                $('#company_jurnal').empty();
                 $('#post_date_jurnal').empty();
             }
         });
@@ -663,7 +673,7 @@
     }
 
     function cekRow(val){
-        /* var qtystock = 0, balance = 0, stockinput = parseFloat($('#rowQty' + val).val().replaceAll(".", "").replaceAll(",","."));
+        var qtystock = 0, balance = 0, stockinput = parseFloat($('#rowQty' + val).val().replaceAll(".", "").replaceAll(",","."));
         if($('#arr_item_stock' + val).val()){
             qtystock = parseFloat($('#arr_item_stock' + val).find(':selected').data('qty').replaceAll(".", "").replaceAll(",","."));
         }
@@ -671,11 +681,11 @@
         balance = qtystock - stockinput;
 
         if(balance < 0){
-            M.toast({
+            /* M.toast({
                 html: 'Maaf, stock yang anda masukkan lebih dari stok yang ada pada gudang.'
-            });
+            }); */
             $('#rowQty' + val).val(formatRupiahIni(qtystock.toFixed(2).toString().replace('.',',')));
-        } */
+        }
     }
 
     function resetWarehouseTo(){
@@ -1401,10 +1411,11 @@
                     $('#title_data').append(``+data.title+``);
                     $('#code_data').append(data.message.code);
                     $('#body-journal-table').append(data.tbody);
-                    $('#user_jurnal').append(`Pengguna `+data.user);
-                    $('#note_jurnal').append(`Keterangan `+data.message.note);
-                    $('#ref_jurnal').append(`Referensi `+data.reference);
-                    $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
+                    $('#user_jurnal').append(`Pengguna : `+data.user);
+                    $('#note_jurnal').append(`Keterangan : `+data.message.note);
+                    $('#ref_jurnal').append(`Referensi : `+data.reference);
+                    $('#company_jurnal').append(`Perusahaan : `+data.company);
+                    $('#post_date_jurnal').append(`Tanggal : `+data.message.post_date);
                 }
             }
         });

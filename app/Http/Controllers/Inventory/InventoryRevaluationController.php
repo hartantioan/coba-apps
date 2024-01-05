@@ -26,6 +26,9 @@ use App\Models\User;
 use App\Models\Company;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportInventoryTransferOut;
+use App\Models\Department;
+use App\Models\Line;
+use App\Models\Machine;
 use App\Models\Menu;
 
 class InventoryRevaluationController extends Controller
@@ -53,7 +56,10 @@ class InventoryRevaluationController extends Controller
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
             'newcode'   => $menu->document_code.date('y'),
-            'menucode'  => $menu->document_code
+            'menucode'  => $menu->document_code,
+            'line'      => Line::where('status','1')->get(),
+            'machine'   => Machine::where('status','1')->get(),
+            'department'=> Department::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -337,6 +343,10 @@ class InventoryRevaluationController extends Controller
                             'warehouse_id'              => $request->arr_warehouse[$key],
                             'nominal'                   => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
                             'coa_id'                    => $request->arr_coa[$key],
+                            'line_id'                   => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
+                            'machine_id'                => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
+                            'department_id'             => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
+                            'project_id'                => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
                         ]);
                     }
 
@@ -383,6 +393,12 @@ class InventoryRevaluationController extends Controller
                                 <th class="center-align">Item</th>
                                 <th class="center-align">Plant</th>
                                 <th class="center-align">Gudang</th>
+                                <th class="center-align">Area</th>
+                                <th class="center-align">Shading</th>
+                                <th class="center-align">Line</th>
+                                <th class="center-align">Mesin</th>
+                                <th class="center-align">Departemen</th>
+                                <th class="center-align">Proyek</th>
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
                                 <th class="center-align">Coa</th>
@@ -396,6 +412,12 @@ class InventoryRevaluationController extends Controller
                 <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
                 <td class="center-align">'.$row->place->code.'</td>
                 <td class="center-align">'.$row->warehouse->name.'</td>
+                <td class="center-align">'.($row->itemStock->area()->exists() ? $row->itemStock->area->name : '-').'</td>
+                <td class="center-align">'.($row->itemStock->itemShading()->exists() ? $row->itemStock->itemShading->code : '-').'</td>
+                <td class="center-align">'.($row->line()->exists() ? $row->line->name : '-').'</td>
+                <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
+                <td class="center-align">'.($row->department()->exists() ? $row->department->name : '-').'</td>
+                <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
                 <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->item->uomUnit->code.'</td>
                 <td class="center-align">'.$row->coa->name.'</td>
@@ -493,6 +515,11 @@ class InventoryRevaluationController extends Controller
                 'coa_name'          => $row->coa->code.' - '.$row->coa->code,
                 'warehouse_id'      => $row->warehouse_id,
                 'place_id'          => $row->place_id,
+                'line_id'           => $row->line_id,
+                'machine_id'        => $row->machine_id,
+                'department_id'     => $row->department_id,
+                'project_id'        => $row->project()->exists() ? $row->project->id : '',
+                'project_name'      => $row->project()->exists() ? $row->project->name : '',
             ];
         }
 
@@ -935,6 +962,7 @@ class InventoryRevaluationController extends Controller
                 'message'   => $query->journal,
                 'user'      => $query->user->name,
                 'reference' =>  $query->lookable_id ? $query->lookable->code : '-',
+                'company' => $query->company()->exists() ? $query->company->name : '-',
             ];
             $string='';
             foreach($query->journal->journalDetail()->where(function($query){
@@ -946,7 +974,6 @@ class InventoryRevaluationController extends Controller
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
-                    <td class="center-align">'.$row->coa->company->name.'</td>
                     <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
                     <td class="center-align">'.($row->place_id ? $row->place->code : '-').'</td>
                     <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>

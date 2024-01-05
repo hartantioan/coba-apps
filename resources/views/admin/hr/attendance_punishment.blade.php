@@ -369,6 +369,7 @@
                 $('#user_jurnal').empty();
                 $('#note_jurnal').empty();
                 $('#ref_jurnal').empty();
+                $('#company_jurnal').empty();
                 $('#post_date_jurnal').empty();
             }
         });

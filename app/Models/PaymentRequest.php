@@ -40,6 +40,7 @@ class PaymentRequest extends Model
         'account_name',
         'note',
         'status',
+        'is_reimburse',
         'void_id',
         'void_note',
         'void_date',
@@ -135,6 +136,16 @@ class PaymentRequest extends Model
         };
 
         return $status;
+    }
+
+    public function isReimburse(){
+        $reimburse = match ($this->is_reimburse) {
+            '1' => 'Ya',
+            '2' => 'Tidak',
+            default => 'Invalid',
+        };
+
+        return $reimburse;
     }
 
     public function paymentType(){

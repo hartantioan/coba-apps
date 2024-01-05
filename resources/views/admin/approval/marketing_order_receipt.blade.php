@@ -161,7 +161,7 @@
                     Terbilang
                 </div>
                 <div class="col s9 m9">
-                    : {{ CustomHelper::terbilang($data->grandtotal) }}
+                    : {{ CustomHelper::terbilangWithKoma($data->grandtotal) }}
                 </div>
             </div>
             <div class="col s12 mt-2">

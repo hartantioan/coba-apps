@@ -180,7 +180,7 @@
                     </td>
                     
                     <td width="34%" class="right-align">
-                        <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
+                        <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%;right:0;">
                     </td>
                 </tr>
                 
@@ -272,7 +272,7 @@
                                 </tr>
                                 <tr>
                                     <td width="50%">
-                                        Tgl. Tenggat
+                                        Tgl. Jatuh Tempo
                                     </td>
                                     <td width="50%">
                                         {{ date('d/m/y',strtotime($data->due_date)) }}
@@ -280,7 +280,7 @@
                                 </tr>
                                 <tr>
                                     <td width="50%">
-                                        Tgl. Tenggat
+                                        Tgl. Jatuh Tempo
                                     </td>
                                     <td width="50%">
                                         {{ date('d/m/y',strtotime($data->due_date)) }}
@@ -373,7 +373,7 @@
                                     <div class="mt-3">
                                         Catatan : {{ $data->note }}
                                     </div>
-                                    Terbilang : <i>{{ CustomHelper::terbilang($data->balance) }}
+                                    Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->balance).' Rupiah' }}
                                 </td>
                                 
                             </tr>

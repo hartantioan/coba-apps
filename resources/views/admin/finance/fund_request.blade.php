@@ -117,7 +117,8 @@
                                                         <th rowspan="2">Termin</th>
                                                         <th rowspan="2">Tipe Pembayaran</th>
                                                         <th rowspan="2">Rekening Penerima</th>
-                                                        <th rowspan="2">Bank & No.Rek</th>
+                                                        <th rowspan="2">No.Rek</th>
+                                                        <th rowspan="2">Bank</th>
                                                         <th rowspan="2">Total</th>
                                                         <th rowspan="2">PPN</th>
                                                         <th rowspan="2">PPh</th>
@@ -295,7 +296,7 @@
 <!-- END: Page Main-->
 <script>
     $(function() {
-        
+        var previous = '';
 
         $('#datatable_serverside').on('click', 'button, select', function(event) {
             event.stopPropagation();
@@ -421,6 +422,7 @@
                 { name: 'payment_type', className: 'center-align' },
                 { name: 'name_account', className: 'center-align' },
                 { name: 'no_account', className: 'center-align' },
+                { name: 'bank_account', className: 'center-align' },
                 { name: 'total', className: 'right-align' },
                 { name: 'tax', className: 'right-align' },
                 { name: 'wtax', className: 'right-align' },
@@ -1024,38 +1026,58 @@
         });
     }
 
+    function updatePrevious(element){
+        previous = $(element).val();
+    }
+
     function updateDocumentStatus(code,element){
         var status = $(element).val();
-        $.ajax({
-            type : "POST",
-            url  : '{{ Request::url() }}/update_document_status',
-            data : {
-                code : code,
-                status : status,
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            cache: false,
-            beforeSend: function() {
-                loadingOpen('#datatable_serverside');
-            },
-            success: function(data){
-                loadingClose('#datatable_serverside');
-                if(data.status == '200'){
-                    M.toast({
-                        html: data.message
-                    });
-                }else{
-                    if(data.status == '422'){
-                        $(element).val(data.value);
+        swal({
+            title: "Apakah anda yakin ingin update status?",
+            text: "Status dokumen LENGKAP untuk mem-biayakan langsung pengeluaran dari kas/bank yang ada (tanpa ada BP). untuk status dokumen TIDAK LENGKAP adalah untuk menjurnalkan uang keluar ke Piutang Karyawan.",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+                cancel: 'Tidak, jangan!',
+                delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                $.ajax({
+                    type : "POST",
+                    url  : '{{ Request::url() }}/update_document_status',
+                    data : {
+                        code : code,
+                        status : status,
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    cache: false,
+                    beforeSend: function() {
+                        loadingOpen('#datatable_serverside');
+                    },
+                    success: function(data){
+                        loadingClose('#datatable_serverside');
+                        if(data.status == '200'){
+                            M.toast({
+                                html: data.message
+                            });
+                        }else{
+                            if(data.status == '422'){
+                                $(element).val(data.value);
+                            }
+                            swal({
+                                title: 'Ups!',
+                                text: data.message,
+                                icon: 'warning'
+                            });
+                            $(element).val(previous);
+                        }
                     }
-                    swal({
-                        title: 'Ups!',
-                        text: data.message,
-                        icon: 'warning'
-                    });
-                }
+                });
+            }else{
+                $(element).val(previous);
             }
         });
     }

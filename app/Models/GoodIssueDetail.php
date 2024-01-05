@@ -24,6 +24,15 @@ class GoodIssueDetail extends Model
         'coa_id',
         'lookable_type',
         'lookable_id',
+        'place_id',
+        'warehouse_id',
+        'area_id',
+        'item_shading_id',
+        'line_id',
+        'machine_id',
+        'department_id',
+        'project_id',
+        'requester',
     ];
 
     public function lookable(){
@@ -47,6 +56,45 @@ class GoodIssueDetail extends Model
     public function itemStock()
     {
         return $this->belongsTo('App\Models\ItemStock', 'item_stock_id', 'id');
+    }
+
+    public function itemShading(){
+        return $this->belongsTo('App\Models\ItemShading','item_shading_id','id')->withTrashed();
+    }
+
+    public function line()
+    {
+        return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();
+    }
+
+    public function place()
+    {
+        return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
+    }
+
+    public function warehouse()
+    {
+        return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
+    }
+
+    public function area()
+    {
+        return $this->belongsTo('App\Models\Area', 'area_id', 'id')->withTrashed();
+    }
+
+    public function machine()
+    {
+        return $this->belongsTo('App\Models\Machine', 'machine_id', 'id')->withTrashed();
+    }
+
+    public function project()
+    {
+        return $this->belongsTo('App\Models\Project', 'project_id', 'id')->withTrashed();
+    }
+
+    public function department()
+    {
+        return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
     }
 
     public function coa()

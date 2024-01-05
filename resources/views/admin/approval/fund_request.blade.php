@@ -220,6 +220,14 @@
                         </tr>
                         <tr>
                             <td width="40%">
+                                Bank Tujuan
+                            </td>
+                            <td width="60%">
+                                {{ $data->bank_account }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="40%">
                                 Tipe
                             </td>
                             <td width="60%">

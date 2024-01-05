@@ -462,6 +462,8 @@
             </div>
             <div class="col" id="ref_jurnal">
             </div>
+            <div class="col" id="company_jurnal">
+            </div>
         </div>
         <div class="row mt-2">
             <table class="bordered Highlight striped">
@@ -469,7 +471,6 @@
                         <tr>
                             <th class="center-align">No</th>
                             <th class="center-align">Coa</th>
-                            <th class="center-align">Perusahaan</th>
                             <th class="center-align">Partner Bisnis</th>
                             <th class="center-align">Plant</th>
                             <th class="center-align">Line</th>
@@ -621,6 +622,7 @@
                 $('#user_jurnal').empty();
                 $('#note_jurnal').empty();
                 $('#ref_jurnal').empty();
+                $('#company_jurnal').empty();
                 $('#post_date_jurnal').empty();
             }
         });
@@ -2115,10 +2117,11 @@
                     $('#title_data').append(``+data.title+``);
                     $('#code_data').append(data.message.code);
                     $('#body-journal-table').append(data.tbody);
-                    $('#user_jurnal').append(`Pengguna `+data.user);
-                    $('#note_jurnal').append(`Keterangan `+data.message.note);
-                    $('#ref_jurnal').append(`Referensi `+data.reference);
-                    $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
+                    $('#user_jurnal').append(`Pengguna : `+data.user);
+                    $('#note_jurnal').append(`Keterangan : `+data.message.note);
+                    $('#ref_jurnal').append(`Referensi : `+data.reference);
+                    $('#company_jurnal').append(`Perusahaan : `+data.company);
+                    $('#post_date_jurnal').append(`Tanggal : `+data.message.post_date);
                 }
             }
         });

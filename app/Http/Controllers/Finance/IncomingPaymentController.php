@@ -64,7 +64,7 @@ class IncomingPaymentController extends Controller
         $lastSegment = request()->segment(count(request()->segments()));
         $menu = Menu::where('url', $lastSegment)->first();
         $data = [
-            'title'         => 'Kas Masuk',
+            'title'         => 'Incoming Payment',
             'content'       => 'admin.finance.incoming_payment',
             'company'       => Company::where('status','1')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
@@ -201,7 +201,7 @@ class IncomingPaymentController extends Controller
                     if($op){
                         $balance = $op->balancePaymentIncoming();
                         if(!$op->used()->exists() && $balance > 0){
-                            CustomHelper::sendUsedData($op->getTable(),$op->id,'Form Kas Masuk');
+                            CustomHelper::sendUsedData($op->getTable(),$op->id,'Form Incoming Payment');
                             $coa = Coa::where('code','100.01.03.03.02')->where('company_id',$op->company_id)->first();
                             $details[] = [
                                 'id'                    => $op->id,
@@ -226,7 +226,7 @@ class IncomingPaymentController extends Controller
                     if($dp){
                         $balance = $dp->balancePaymentIncoming();
                         if(!$dp->used()->exists() && $balance > 0){
-                            CustomHelper::sendUsedData($dp->getTable(),$dp->id,'Form Kas Masuk');
+                            CustomHelper::sendUsedData($dp->getTable(),$dp->id,'Form Incoming Payment');
                             $coapiutang = Coa::where('code','100.01.03.01.01')->where('company_id',$dp->company_id)->first();
                             $details[] = [
                                 'id'                    => $dp->id,
@@ -251,7 +251,7 @@ class IncomingPaymentController extends Controller
                     if($moi){
                         $balance = $moi->balancePaymentIncoming();
                         if(!$moi->used()->exists() && $balance > 0){
-                            CustomHelper::sendUsedData($moi->getTable(),$moi->id,'Form Kas Masuk');
+                            CustomHelper::sendUsedData($moi->getTable(),$moi->id,'Form Incoming Payment');
                             $coapiutang = Coa::where('code','100.01.03.01.01')->where('company_id',$moi->company_id)->first();
                             $details[] = [
                                 'id'                    => $moi->id,
@@ -276,7 +276,7 @@ class IncomingPaymentController extends Controller
                     if($moi){
                         $balance = $moi->balance();
                         if(!$moi->used()->exists() && $balance > 0){
-                            CustomHelper::sendUsedData($moi->getTable(),$moi->id,'Form Kas Masuk');
+                            CustomHelper::sendUsedData($moi->getTable(),$moi->id,'Form Incoming Payment');
                             $details[] = [
                                 'id'                    => $moi->id,
                                 'code'                  => $moi->code,
@@ -955,6 +955,7 @@ class IncomingPaymentController extends Controller
                 'message'   => $query->journal,
                 'user'      => $query->user->name,
                 'reference' =>  $query->lookable_id ? $query->lookable->code : '-',
+                'company' => $query->company()->exists() ? $query->company->name : '-',
             ];
             $string='';
             foreach($query->journal->journalDetail()->where(function($query){
@@ -966,7 +967,6 @@ class IncomingPaymentController extends Controller
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
-                    <td class="center-align">'.$row->coa->company->name.'</td>
                     <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
                     <td class="center-align">'.($row->place_id ? $row->place->code : '-').'</td>
                     <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>

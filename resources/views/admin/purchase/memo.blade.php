@@ -251,11 +251,15 @@
                                 <p class="mt-2 mb-2">
                                     <h6>Detail Transaksi</h6>
                                     <div style="overflow:auto;">
-                                        <table class="bordered" id="table-detail" style="min-width:2000px;">
+                                        <table class="bordered" id="table-detail" style="min-width:2300px;">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Ref.Dokumen / Coa</th>
-                                                    <th class="center">FP/BP/Tgl.Potong BP/SPK/Invoice Vendor</th>
+                                                    <th class="center">No. Faktur Pajak</th>
+                                                    <th class="center">No. Bukti Potong</th>
+                                                    <th class="center">Tgl. Bukti Potong</th>
+                                                    <th class="center">No. SPK</th>
+                                                    <th class="center">No. Invoice Vendor</th>
                                                     <th class="center">Tgl.Post</th>
                                                     <th class="center">Keterangan</th>
                                                     <th class="center">Edit Nominal</th>
@@ -268,7 +272,7 @@
                                             </thead>
                                             <tbody id="body-detail">
                                                 <tr id="last-row-detail">
-                                                    <td colspan="10" class="center">
+                                                    <td colspan="14" class="center">
                                                         Silahkan pilih A/P Invoice atau A/P Down Payment
                                                     </td>
                                                 </tr>
@@ -485,6 +489,8 @@
             </div>
             <div class="col" id="ref_jurnal">
             </div>
+            <div class="col" id="company_jurnal">
+            </div>
         </div>
         <div class="row mt-2">
             <table class="bordered Highlight striped">
@@ -492,7 +498,6 @@
                         <tr>
                             <th class="center-align">No</th>
                             <th class="center-align">Coa</th>
-                            <th class="center-align">Perusahaan</th>
                             <th class="center-align">Partner Bisnis</th>
                             <th class="center-align">Plant</th>
                             <th class="center-align">Line</th>
@@ -666,6 +671,7 @@
                 $('#user_jurnal').empty();
                 $('#note_jurnal').empty();
                 $('#ref_jurnal').empty();
+                $('#company_jurnal').empty();
                 $('#post_date_jurnal').empty();
             }
         });
@@ -860,6 +866,18 @@
                                         ` + response.tax_no + `
                                     </td>
                                     <td>
+                                        ` + response.tax_cut_no + `
+                                    </td>
+                                    <td>
+                                        ` + response.cut_date + `
+                                    </td>
+                                    <td>
+                                        ` + response.spk_no + `
+                                    </td>
+                                    <td>
+                                        ` + response.invoice_no + `
+                                    </td>
+                                    <td>
                                         ` + response.post_date + `
                                     </td>
                                     <td>
@@ -904,7 +922,19 @@
                                             ` + response.rawcode + `
                                         </td>
                                         <td>
-                                            ` + val.tax_no + `
+                                            ` + response.tax_no + `
+                                        </td>
+                                        <td>
+                                            ` + response.tax_cut_no + `
+                                        </td>
+                                        <td>
+                                            ` + response.cut_date + `
+                                        </td>
+                                        <td>
+                                            ` + response.spk_no + `
+                                        </td>
+                                        <td>
+                                            ` + response.invoice_no + `
                                         </td>
                                         <td>
                                             ` + val.post_date + `
@@ -1671,6 +1701,21 @@
                                     ` + val.tax_no + `
                                 </td>
                                 <td>
+                                    ` + val.tax_no + `
+                                </td>
+                                <td>
+                                    ` + val.tax_cut_no + `
+                                </td>
+                                <td>
+                                    ` + val.cut_date + `
+                                </td>
+                                <td>
+                                    ` + val.spk_no + `
+                                </td>
+                                <td>
+                                    ` + val.invoice_no + `
+                                </td>
+                                <td>
                                     ` + val.post_date + `
                                 </td>
                                 <td>
@@ -1824,10 +1869,11 @@
                     $('#title_data').append(``+data.title+``);
                     $('#code_data').append(data.message.code);
                     $('#body-journal-table').append(data.tbody);
-                    $('#user_jurnal').append(`Pengguna `+data.user);
-                    $('#note_jurnal').append(`Keterangan `+data.message.note);
-                    $('#ref_jurnal').append(`Referensi `+data.reference);
-                    $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
+                    $('#user_jurnal').append(`Pengguna : `+data.user);
+                    $('#note_jurnal').append(`Keterangan : `+data.message.note);
+                    $('#ref_jurnal').append(`Referensi : `+data.reference);
+                    $('#company_jurnal').append(`Perusahaan : `+data.company);
+                    $('#post_date_jurnal').append(`Tanggal : `+data.message.post_date);
                 }
             }
         });

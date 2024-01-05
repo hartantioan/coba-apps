@@ -9,6 +9,9 @@
     table.bordered th {
         padding: 5px !important;
     }
+    .select2 {
+        max-width: 150px !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -167,19 +170,23 @@
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Produk</h4>
                                     <div style="overflow:auto;">
-                                        <table class="bordered" id="table-detail">
+                                        <table class="bordered" style="min-width:1800px !important;" id="table-detail">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Item</th>
                                                     <th class="center">Ambil Dari</th>
                                                     <th class="center">Nominal</th>
                                                     <th class="center">Coa</th>
+                                                    <th class="center">Line</th>
+                                                    <th class="center">Mesin</th>
+                                                    <th class="center">Departemen</th>
+                                                    <th class="center">Proyek</th>
                                                     <th class="center">Hapus</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
-                                                    <td colspan="5" class="center">
+                                                    <td colspan="9" class="center">
                                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> Tambah Item
                                                         </a>
@@ -194,7 +201,7 @@
                                                     <td class="right-align">
                                                         <h6 id="total">0,00</h6>
                                                     </td>
-                                                    <td colspan="2">
+                                                    <td colspan="6">
                                                         
                                                     </td>
                                                 </tr>
@@ -364,6 +371,8 @@
             </div>
             <div class="col" id="ref_jurnal">
             </div>
+            <div class="col" id="company_jurnal">
+            </div>
         </div>
         <div class="row mt-2">
             <table class="bordered Highlight striped">
@@ -371,7 +380,6 @@
                         <tr>
                             <th class="center-align">No</th>
                             <th class="center-align">Coa</th>
-                            <th class="center-align">Perusahaan</th>
                             <th class="center-align">Partner Bisnis</th>
                             <th class="center-align">Plant</th>
                             <th class="center-align">Line</th>
@@ -452,6 +460,7 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
+                $('#total').text('0,000');
             }
         });
 
@@ -479,6 +488,7 @@
                 $('#user_jurnal').empty();
                 $('#note_jurnal').empty();
                 $('#ref_jurnal').empty();
+                $('#company_jurnal').empty();
                 $('#post_date_jurnal').empty();
             }
         });
@@ -510,6 +520,33 @@
                 <td>
                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                 </td>
+                <td>
+                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
+                        <option value="">--Kosong--</option>
+                        @foreach ($line as $rowline)
+                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
+                        @endforeach
+                    </select>    
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                        <option value="">--Kosong--</option>
+                        @foreach ($machine as $row)
+                            <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                        @endforeach    
+                    </select>
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
+                        <option value="">--Kosong--</option>
+                        @foreach ($department as $rowdept)
+                            <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                        @endforeach
+                    </select>    
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
@@ -522,6 +559,7 @@
 
         select2ServerSide('#arr_itemkuy' + count, '{{ url("admin/select2/item") }}');
         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+        select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
         
         $('#arr_item_stock' + count).append(`
             <option value="">--Silahkan pilih item--</option>
@@ -529,6 +567,14 @@
             dropdownAutoWidth: true,
             width: '100%',
         });
+    }
+
+    function changeLine(element){
+        if($(element).val()){
+            $(element).parent().prev().find('select[name="arr_line[]"]').val($(element).find(':selected').data('line')).trigger('change');
+        }else{
+            $(element).parent().prev().find('select[name="arr_line[]"]').val($(element).parent().prev().find('select[name="arr_line[]"] option:first').val()).trigger('change');
+        }
     }
 
     function countAll(){
@@ -561,7 +607,7 @@
                 `);
                 $.each($("#arr_itemkuy" + val).select2('data')[0].stock_list, function(i, value) {
                     $('#arr_item_stock' + val).append(`
-                        <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-place="` + value.place_id + `" data-warehouse="` + value.warehouse_id + `">` + value.warehouse + ` - ` + value.qty + `</option>
+                        <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-place="` + value.place_id + `" data-warehouse="` + value.warehouse_id + `">` + value.warehouse + ` - Shading : ` + value.shading + ` - ` + value.qty + `</option>
                     `);
                 });
             }else{
@@ -761,10 +807,11 @@
                     $('#title_data').append(``+data.title+``);
                     $('#code_data').append(data.message.code);
                     $('#body-journal-table').append(data.tbody);
-                    $('#user_jurnal').append(`Pengguna `+data.user);
-                    $('#note_jurnal').append(`Keterangan `+data.message.note);
-                    $('#ref_jurnal').append(`Referensi `+data.reference);
-                    $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
+                    $('#user_jurnal').append(`Pengguna : `+data.user);
+                    $('#note_jurnal').append(`Keterangan : `+data.message.note);
+                    $('#ref_jurnal').append(`Referensi : `+data.reference);
+                    $('#company_jurnal').append(`Perusahaan : `+data.company);
+                    $('#post_date_jurnal').append(`Tanggal : `+data.message.post_date);
                 }
             }
         });
@@ -826,6 +873,10 @@
                 formData.delete('arr_place[]');
                 formData.delete('arr_warehouse[]');
                 formData.delete('arr_coa[]');
+                formData.delete('arr_line[]');
+                formData.delete('arr_machine[]');
+                formData.delete('arr_department[]');
+                formData.delete('arr_project[]');
 
                 $('select[name^="arr_itemkuy"]').each(function(){
                     if($(this).val() && $('#arr_item_stock' + $(this).data('code')).val() && $('#arr_nominal' + $(this).data('code')).val() && $('#arr_place' + $(this).data('code')).val() && $('#arr_warehouse' + $(this).data('code')).val() && $('#arr_coa' + $(this).data('code')).val() && $('#arr_qty' + $(this).data('code')).val()){
@@ -836,6 +887,10 @@
                         formData.append('arr_place[]',$('#arr_place' + $(this).data('code')).val());
                         formData.append('arr_warehouse[]',$('#arr_warehouse' + $(this).data('code')).val());
                         formData.append('arr_coa[]',$('#arr_coa' + $(this).data('code')).val());
+                        formData.append('arr_line[]',($('#arr_line' + $(this).data('code')).val() ? $('#arr_line' + $(this).data('code')).val() : ''));
+                        formData.append('arr_machine[]',($('#arr_machine' + $(this).data('code')).val() ? $('#arr_machine' + $(this).data('code')).val() : ''));
+                        formData.append('arr_department[]',($('#arr_department' + $(this).data('code')).val() ? $('#arr_department' + $(this).data('code')).val() : ''));
+                        formData.append('arr_project[]',($('#arr_project' + $(this).data('code')).val() ? $('#arr_project' + $(this).data('code')).val() : ''));
                     }else{
                         passed = false;
                     }
@@ -970,6 +1025,33 @@
                                 <td>
                                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                                 </td>
+                                <td>
+                                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
+                                        <option value="">--Kosong--</option>
+                                        @foreach ($line as $rowline)
+                                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
+                                        @endforeach
+                                    </select>    
+                                </td>
+                                <td>
+                                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                                        <option value="">--Kosong--</option>
+                                        @foreach ($machine as $row)
+                                            <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                                        @endforeach    
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
+                                        <option value="">--Kosong--</option>
+                                        @foreach ($department as $rowdept)
+                                            <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                                        @endforeach
+                                    </select>    
+                                </td>
+                                <td>
+                                    <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                                </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                         <i class="material-icons">delete</i>
@@ -977,6 +1059,15 @@
                                 </td>
                             </tr>
                         `);
+                        $('#arr_line' + count).val(val.line_id);
+                        $('#arr_machine' + count).val(val.machine_id);
+                        $('#arr_department' + count).val(val.department_id);
+                        if(val.project_id){
+                            $('#arr_project' + count).append(`
+                                <option value="` + val.project_id + `">` + val.project_name + `</option>
+                            `);
+                        }
+
                         $('#arr_itemkuy' + count).append(`
                             <option value="` + val.item_id + `">` + val.item_name + `</option>
                         `);
@@ -1001,7 +1092,7 @@
                             `);
                             $.each(val.stock_list, function(i, value) {
                                 $('#arr_item_stock' + count).append(`
-                                    <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-place="` + value.place_id + `" data-warehouse="` + value.warehouse_id + `">` + value.warehouse + ` - ` + value.qty + `</option>
+                                    <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-place="` + value.place_id + `" data-warehouse="` + value.warehouse_id + `">` + value.warehouse + ` - Shading : ` + value.shading + ` - ` + value.qty + `</option>
                                 `);
                             });
 
@@ -1009,6 +1100,8 @@
                         }
                     });
                 }
+
+                countAll();
                 
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();

@@ -9,7 +9,7 @@
             <th>Mata Uang</th>
             <th>Konversi</th>
             <th>Tgl. Post</th>
-            <th>Tgl. Tenggat</th>
+            <th>Tgl. Jatuh Tempo</th>
             <th>Keterangan</th>
             <th>Status</th>
             <th>Deleter</th>

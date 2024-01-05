@@ -178,10 +178,6 @@
                                         <label class="active" for="post_date">Tgl. Posting</label>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Kadaluarsa">
-                                        <label class="active" for="due_date">Tgl. Kadaluarsa</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
                                         <select class="form-control" id="currency_id" name="currency_id">
                                             @foreach ($currency as $row)
                                                 <option value="{{ $row->id }}">{{ $row->code.' '.$row->name }}</option>
@@ -232,7 +228,6 @@
                                                         <th class="center">Line</th>
                                                         <th class="center">Mesin</th>
                                                         <th class="center">Departemen</th>
-                                                        <th class="center">Gudang</th>
                                                         <th class="center">Proyek</th>
                                                         <th class="center">Keterangan</th>
                                                         <th class="center">Debit</th>
@@ -242,7 +237,7 @@
                                                 </thead>
                                                 <tbody id="body-coa">
                                                     <tr id="last-row-coa">
-                                                        <td colspan="12">
+                                                        <td colspan="11">
                                                             <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addCoa('1')" href="javascript:void(0);">
                                                                 <i class="material-icons left">add</i> Tambah Debit
                                                             </a>
@@ -292,7 +287,6 @@
                                                         <th class="center" style="width:75px;">Line</th>
                                                         <th class="center" style="width:75px;">Mesin</th>
                                                         <th class="center" style="width:75px;">Departemen</th>
-                                                        <th class="center" style="width:75px;">Gudang</th>
                                                         <th class="center">Debit</th>
                                                         <th class="center">Kredit</th>
                                                         <th class="center">Keterangan</th>
@@ -681,9 +675,6 @@
                             </select>
                         </td>
                         <td>
-                            <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
-                        </td>
-                        <td>
                             <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
                         </td>
                         <td>
@@ -703,12 +694,6 @@
                     </tr>
                 `);
 
-                if(val.warehouse_id){
-                    $('#arr_warehouse' + count).append(`
-                        <option value="` + val.warehouse_id + `">` + val.warehouse_name + `</option>
-                    `);
-                }
-
                 if($('#cost_distribution_id').select2('data')[0].coa_id){
                     $('#arr_coa' + count).append(`
                         <option value="` + $('#cost_distribution_id').select2('data')[0].coa_id + `">` + $('#cost_distribution_id').select2('data')[0].coa_name + `</option>
@@ -717,7 +702,6 @@
                 select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
                 select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa_journal") }}');
                 select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
-                select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
                 select2ServerSide('#arr_account' + count, '{{ url("admin/select2/business_partner") }}');
                 $('#arr_place' + count).val(val.place_id).formSelect();
                 $('#arr_department' + count).val(val.department_id).formSelect();
@@ -778,9 +762,6 @@
                     </select>
                 </td>
                 <td>
-                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
-                </td>
-                <td>
                     <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
                 </td>
                 <td>
@@ -801,7 +782,6 @@
         `);
         
         select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
-        select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
         select2ServerSide('#arr_account' + count, '{{ url("admin/select2/business_partner") }}');
         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
         $('#arr_place' + count).formSelect();
@@ -889,9 +869,6 @@
                 </td>
                 <td>
                     <input type="text" name="arr_multi_department[]" placeholder="ID Departemen">
-                </td>
-                <td>
-                    <input type="text" name="arr_multi_warehouse[]" placeholder="ID Gudang">
                 </td>
                 <td>
                     <input type="text" name="arr_multi_debit[]" placeholder="Nominal Debit" value="0" onkeyup="countAllMulti()">
@@ -1012,9 +989,6 @@
                                 </td>
                                 <td>
                                     <input type="text" name="arr_multi_department[]" placeholder="ID Departemen">
-                                </td>
-                                <td>
-                                    <input type="text" name="arr_multi_warehouse[]" placeholder="ID Gudang">
                                 </td>
                                 <td>
                                     <input type="text" name="arr_multi_debit[]" placeholder="Nominal Debit" value="0" onkeyup="countAllMulti()">
@@ -1246,7 +1220,6 @@
                     formData.delete("arr_account[]");
                     formData.delete("arr_item[]");
                     formData.delete("arr_department[]");
-                    formData.delete("arr_warehouse[]");
                     formData.delete("arr_project[]");
                     formData.delete("arr_note[]");
                     formData.delete("arr_nominal[]");
@@ -1261,7 +1234,6 @@
                         formData.append('arr_account[]',($('select[name^="arr_account"]').eq(index).val() ? $('select[name^="arr_account"]').eq(index).val() : 'NULL'));
                         formData.append('arr_item[]',($('select[name^="arr_item"]').eq(index).val() ? $('select[name^="arr_item"]').eq(index).val() : 'NULL'));
                         formData.append('arr_department[]',$('select[name^="arr_department"]').eq(index).val());
-                        formData.append('arr_warehouse[]',($('select[name^="arr_warehouse"]').eq(index).val() ? $('select[name^="arr_warehouse"]').eq(index).val() : 'NULL'));
                         formData.append('arr_project[]',($('select[name^="arr_project[]"]').eq(index).val() ? $('select[name^="arr_project[]"]').eq(index).val() : 'NULL'));
                         formData.append('arr_note[]',($('input[name^="arr_note[]"]').eq(index).val() ? $('input[name^="arr_note[]"]').eq(index).val() : ''));
                         formData.append('arr_nominal[]',($('input[name^="arr_nominal"]').eq(index).val() ? $('input[name^="arr_nominal"]').eq(index).val() : 'NULL'));
@@ -1374,7 +1346,6 @@
                 formData.delete("arr_multi_line[]");
                 formData.delete("arr_multi_machine[]");
                 formData.delete("arr_multi_department[]");
-                formData.delete("arr_multi_warehouse[]");
                 formData.delete("arr_multi_debit[]");
                 formData.delete("arr_multi_kredit[]");
                 formData.delete("arr_multi_note_detail[]");
@@ -1394,7 +1365,6 @@
                         formData.append('arr_multi_line[]',($('input[name^="arr_multi_line"]').eq(index).val() ? $('input[name^="arr_multi_line"]').eq(index).val() : ''));
                         formData.append('arr_multi_machine[]',($('input[name^="arr_multi_machine"]').eq(index).val() ? $('input[name^="arr_multi_machine"]').eq(index).val() : ''));
                         formData.append('arr_multi_department[]',($('input[name^="arr_multi_department"]').eq(index).val() ? $('input[name^="arr_multi_department"]').eq(index).val() : ''));
-                        formData.append('arr_multi_warehouse[]',($('input[name^="arr_multi_warehouse"]').eq(index).val() ? $('input[name^="arr_multi_warehouse"]').eq(index).val() : ''));
                         formData.append('arr_multi_debit[]',($('input[name^="arr_multi_debit"]').eq(index).val() ? $('input[name^="arr_multi_debit"]').eq(index).val() : '0'));
                         formData.append('arr_multi_kredit[]',($('input[name^="arr_multi_kredit"]').eq(index).val() ? $('input[name^="arr_multi_kredit"]').eq(index).val() : '0'));
                         formData.append('arr_multi_note_detail[]',($('input[name^="arr_multi_note_detail"]').eq(index).val() ? $('input[name^="arr_multi_note_detail"]').eq(index).val() : '-'));
@@ -1512,7 +1482,6 @@
                 $('#company_id').val(response.company_id).formSelect();
                 $('#note').val(response.note);
                 $('#post_date').val(response.post_date);
-                $('#due_date').val(response.due_date);
                 $('#currency_id').val(response.currency_id).formSelect();
                 $('#currency_rate').val(response.currency_rate);
                 $('#journal_id').empty();
@@ -1570,9 +1539,6 @@
                                 </select>
                             </td>
                             <td>
-                                <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
-                            </td>
-                            <td>
                                 <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
                             </td>
                             <td>
@@ -1616,7 +1582,6 @@
                             }
                         }
                     });
-                    select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
                     select2ServerSide('#arr_account' + count, '{{ url("admin/select2/business_partner") }}');
                     $('#arr_place' + count).val(val.place_id);
                     $('#arr_department' + count).val(val.department_id);
@@ -1634,11 +1599,6 @@
                     if(val.account_id){
                         $('#arr_account' + count).append(`
                             <option value="` + val.account_id + `">` + val.account_name + `</option>
-                        `);
-                    }
-                    if(val.warehouse_id){
-                        $('#arr_warehouse' + count).append(`
-                            <option value="` + val.warehouse_id + `">` + val.warehouse_name + `</option>
                         `);
                     }
                 });

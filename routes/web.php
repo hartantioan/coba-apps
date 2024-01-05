@@ -297,6 +297,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('item_for_hardware_item', [Select2Controller::class, 'itemForHardware']);
                 Route::get('inventory_transfer_out', [Select2Controller::class, 'inventoryTransferOut']);
                 Route::get('item_stock', [Select2Controller::class, 'itemStock']);
+                Route::get('item_only_stock', [Select2Controller::class, 'itemOnlyStock']);
                 Route::get('item_stock_material_request', [Select2Controller::class, 'itemStockMaterialRequest']);
                 Route::get('department', [Select2Controller::class, 'department']);
                 Route::get('item_revaluation', [Select2Controller::class, 'itemRevaluation']);
@@ -335,6 +336,8 @@ Route::prefix('admin')->group(function () {
                 Route::get('delivery_cost', [Select2Controller::class, 'deliveryCost']);
                 Route::get('production_order', [Select2Controller::class, 'productionOrder']);
                 Route::get('journal', [Select2Controller::class, 'journal']);
+                Route::get('user_bank_by_account', [Select2Controller::class, 'userBankByAccount']);
+                Route::get('all_user_bank', [Select2Controller::class, 'allUserBank']);
             });
 
             Route::prefix('menu')->group(function () {

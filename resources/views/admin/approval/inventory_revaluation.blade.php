@@ -190,21 +190,39 @@
         <table class="bordered" style="margin-top:25px;">
             <thead>
                 <tr>
-                    <th class="center">Item</th>
-                    <th class="center">Posisi Barang</th>
-                    <th class="center">Stok</th>
-                    <th class="center">Coa</th>
-                    <th class="center">Nominal</th>
+                    <th class="center-align">No</th>
+                    <th class="center-align">Item</th>
+                    <th class="center-align">Plant</th>
+                    <th class="center-align">Gudang</th>
+                    <th class="center-align">Area</th>
+                    <th class="center-align">Shading</th>
+                    <th class="center-align">Line</th>
+                    <th class="center-align">Mesin</th>
+                    <th class="center-align">Departemen</th>
+                    <th class="center-align">Proyek</th>
+                    <th class="center-align">Qty</th>
+                    <th class="center-align">Sat.</th>
+                    <th class="center-align">Coa</th>
+                    <th class="center-align">Nominal</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($data->inventoryRevaluationDetail as $row)
+                @foreach($data->inventoryRevaluationDetail as $keydetail => $rowdetail)
                 <tr>
-                    <td>{{ $row->item->code.' - '.$row->item->name }}</td>
-                    <td>{{ $row->place->code.' - '.$row->warehouse->code }}</td>
-                    <td class="center-align">{{ number_format($row->qty,3,',','.').' '.$row->item->uomUnit->code }}</td>
-                    <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
-                    <td class="right-align">{{ number_format($row->nominal,2,',','.') }}</td>
+                    <td align="center">{{ ($keydetail + 1) }}</td>
+                    <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name }}</td>
+                    <td align="center">{{ $rowdetail->place->code }}</td>
+                    <td align="center">{{ $rowdetail->warehouse->name }}</td>
+                    <td align="center">{{ $rowdetail->itemStock->area()->exists() ? $rowdetail->itemStock->area->name : '-' }}</td>
+                    <td align="center">{{ $rowdetail->itemStock->itemShading()->exists() ? $rowdetail->itemStock->itemShading->code : '-' }}</td>
+                    <td align="center">{{ $rowdetail->line()->exists() ? $rowdetail->line->name : '-' }}</td>
+                    <td align="center">{{ $rowdetail->machine()->exists() ? $rowdetail->machine->name : '-' }}</td>
+                    <td align="center">{{ $rowdetail->department()->exists() ? $rowdetail->department->name : '-' }}</td>
+                    <td align="center">{{ $rowdetail->project()->exists() ? $rowdetail->project->name : '-' }}</td>
+                    <td align="center">{{ number_format($rowdetail->qty,3,',','.') }}</td>
+                    <td align="center">{{ $rowdetail->item->buyUnit->code }}</td>
+                    <td>{{ $rowdetail->coa->name }}</td>
+                    <td align="center">{{ number_format($rowdetail->nominal,2,',','.') }}</td>
                 </tr>
                 @endforeach
             </tbody>

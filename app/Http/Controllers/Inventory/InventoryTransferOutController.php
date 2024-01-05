@@ -492,6 +492,7 @@ class InventoryTransferOutController extends Controller
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Item</th>
+                                <th class="center-align">Shading</th>
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
                                 <th class="center-align">Keterangan</th>
@@ -503,6 +504,7 @@ class InventoryTransferOutController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
+                <td class="center-align">'.($row->itemStock->itemShading()->exists() ? $row->itemStock->itemShading->code : '-').'</td>
                 <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->item->uomUnit->code.'</td>
                 <td class="center-align">'.$row->note.'</td>
@@ -1039,6 +1041,7 @@ class InventoryTransferOutController extends Controller
                 'message'   => $query->journal,
                 'user'      => $query->user->name,
                 'reference' =>  $query->lookable_id ? $query->lookable->code : '-',
+                'company' => $query->company()->exists() ? $query->company->name : '-',
             ];
             $string='';
             foreach($query->journal->journalDetail()->where(function($query){
@@ -1050,7 +1053,6 @@ class InventoryTransferOutController extends Controller
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
-                    <td class="center-align">'.$row->coa->company->name.'</td>
                     <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
                     <td class="center-align">'.($row->place_id ? $row->place->code : '-').'</td>
                     <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>

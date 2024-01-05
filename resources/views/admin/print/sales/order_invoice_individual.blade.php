@@ -258,7 +258,7 @@
                                         <div class="mt-3">
                                             Catatan : {{ $data->note }}
                                         </div>
-                                        Terbilang : <i>{{ CustomHelper::terbilang($data->balance) }}
+                                        Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->balance) }}
                                     </td>
                                     
                                 </tr>

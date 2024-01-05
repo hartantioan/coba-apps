@@ -215,7 +215,7 @@
                                         </td>
                                         <td>:</td>
                                         <td>
-                                            {{ CustomHelper::terbilang($data->grandtotal) }}
+                                            {{ CustomHelper::terbilangWithKoma($data->grandtotal) }}
                                         </td>
                                     </tr>
                                 </table>
@@ -330,7 +330,7 @@
                                         </td>
                                         <td>:</td>
                                         <td>
-                                            {{ CustomHelper::terbilang($data->grandtotal) }}
+                                            {{ CustomHelper::terbilangWithKoma($data->grandtotal) }}
                                         </td>
                                     </tr>
                                 </table>

@@ -117,7 +117,11 @@ class PurchaseMemoController extends Controller
                         $details[] = [
                             'id'            => $row->id,
                             'rawcode'       => $row->getCode(),
-                            'tax_no'        => $data->tax_no.' - '.$data->tax_cut_no.' - '.date('d/m/y',strtotime($data->cut_date)).' - '.$data->spk_no.' - '.$data->invoice_no,
+                            'tax_no'        => $data->tax_no,
+                            'tax_cut_no'    => $data->tax_cut_no,
+                            'cut_date'      => date('d/m/y',strtotime($data->cut_date)),
+                            'spk_no'        => $data->spk_no,
+                            'invoice_no'    => $data->invoice_no,
                             'code'          => CustomHelper::encrypt($data->code),
                             'type'          => $row->getTable(),
                             'post_date'     => date('d/m/y',strtotime($data->post_date)),
@@ -145,6 +149,10 @@ class PurchaseMemoController extends Controller
                 }elseif($request->type == 'podp'){
                     $data['rawcode'] = $data->code;
                     $data['tax_no'] = '-';
+                    $data['tax_cut_no'] = '-';
+                    $data['cut_date'] = '-';
+                    $data['spk_no'] = '-';
+                    $data['invoice_no'] = '-';
                     $data['code'] = CustomHelper::encrypt($data->code);
                     $data['type'] = $data->getTable();
                     $data['post_date'] = date('d/m/y',strtotime($data->post_date));
@@ -667,7 +675,11 @@ class PurchaseMemoController extends Controller
                 $details[] = [
                     'id'            => $row->lookable_id,
                     'rawcode'       => $row->lookable->getCode(),
-                    'tax_no'        => $row->lookable->purchaseInvoice->tax_no.' - '.$row->lookable->purchaseInvoice->tax_cut_no.' - '.date('d/m/y',strtotime($row->lookable->purchaseInvoice->cut_date)).' - '.$row->lookable->purchaseInvoice->spk_no.' - '.$row->lookable->purchaseInvoice->invoice_no,
+                    'tax_no'        => $row->lookable->purchaseInvoice->tax_no,
+                    'tax_cut_no'    => $row->lookable->purchaseInvoice->tax_cut_no,
+                    'cut_date'      => date('d/m/y',strtotime($row->lookable->purchaseInvoice->cut_date)),
+                    'spk_no'        => $row->lookable->purchaseInvoice->spk_no,
+                    'invoice_no'    => $row->lookable->purchaseInvoice->invoice_no,
                     'code'          => CustomHelper::encrypt($row->lookable->getCode()),
                     'type'          => $row->lookable_type,
                     'post_date'     => date('d/m/y',strtotime($row->lookable->purchaseInvoice->post_date)),
@@ -690,6 +702,10 @@ class PurchaseMemoController extends Controller
                     'id'            => $row->lookable_id,
                     'rawcode'       => $row->lookable->code,
                     'tax_no'        => '-',
+                    'tax_cut_no'    => '-',
+                    'cut_date'      => '-',
+                    'spk_no'        => '-',
+                    'invoice_no'    => '-',
                     'code'          => $row->lookable->code,
                     'type'          => $row->lookable_type,
                     'post_date'     => date('d/m/y',strtotime($row->lookable->post_date)),
@@ -2265,6 +2281,7 @@ class PurchaseMemoController extends Controller
                 'message'   => $query->journal,
                 'user'      => $query->user->name,
                 'reference' =>  $query->lookable_id ? $query->lookable->code : '-',
+                'company' => $query->company()->exists() ? $query->company->name : '-',
             ];
             $string='';
             foreach($query->journal->journalDetail()->where(function($query){
@@ -2276,7 +2293,6 @@ class PurchaseMemoController extends Controller
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
-                    <td class="center-align">'.$row->coa->company->name.'</td>
                     <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
                     <td class="center-align">'.($row->place_id ? $row->place->code : '-').'</td>
                     <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>

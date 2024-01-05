@@ -212,7 +212,6 @@ class JournalController extends Controller
                                 <th class="center-align">Line</th>
                                 <th class="center-align">Mesin</th>
                                 <th class="center-align">Departemen</th>
-                                <th class="center-align">Gudang</th>
                                 <th class="center-align">Proyek</th>
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Debit</th>
@@ -236,7 +235,6 @@ class JournalController extends Controller
                 <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
                 <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
                 <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
-                <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
                 <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
                 <td class="">'.$row->note.'</td>
                 <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
@@ -306,7 +304,6 @@ class JournalController extends Controller
                 'company_id'                => 'required',
                 'note'                      => 'required',
                 'post_date'                 => 'required',
-                'due_date'                  => 'required',
                 'currency_id'               => 'required',
                 'currency_rate'             => 'required',
                 'arr_type'                  => 'required|array',
@@ -319,7 +316,6 @@ class JournalController extends Controller
                 'company_id.required'               => 'Perusahaan tidak boleh kosong',
                 'note.required'                     => 'Catatan tidak boleh kosong',
                 'post_date.required'                => 'Tgl post tidak boleh kosong.',
-                'due_date.required'                 => 'Tgl tenggat tidak boleh kosong.',
                 'currency_rate.required'            => 'Konversi tidak boleh kosong.',
                 'currency_id.required'              => 'Mata uang tidak boleh kosong.',
                 'arr_type.required'                 => 'Tipe tidak boleh kosong.',
@@ -393,7 +389,6 @@ class JournalController extends Controller
                         $query->currency_id = $request->currency_id;
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                         $query->post_date = $request->post_date;
-                        $query->due_date = $request->due_date;
                         $query->note = $request->note;
                         $query->status = '1';
 
@@ -419,7 +414,6 @@ class JournalController extends Controller
                         'company_id'                => $request->company_id,
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
                         'post_date'                 => $request->post_date,
-                        'due_date'                  => $request->due_date,
                         'note'                      => $request->note,
                         'status'                    => '1'
                     ]);
@@ -438,7 +432,6 @@ class JournalController extends Controller
                                 'machine_id'                    => $request->arr_machine[$key] == 'NULL' ? NULL : $request->arr_machine[$key],
                                 'account_id'                    => $request->arr_account[$key] == 'NULL' ? NULL : $request->arr_account[$key],
                                 'department_id'                 => $request->arr_department[$key],
-                                'warehouse_id'                  => $request->arr_warehouse[$key] == 'NULL' ? NULL : $request->arr_warehouse[$key],
                                 'project_id'                    => $request->arr_project[$key] == 'NULL' ? NULL : $request->arr_project[$key],
                                 'note'                          => $request->arr_note[$key] == '' ? NULL : $request->arr_note[$key],
                                 'type'                          => $row,
@@ -579,7 +572,6 @@ class JournalController extends Controller
                                 'line_id'           => $request->arr_multi_line[$key] ? $request->arr_multi_line[$key] : NULL,
                                 'machine_id'        => $request->arr_multi_machine[$key] ? $request->arr_multi_machine[$key] : NULL,
                                 'department_id'     => $request->arr_multi_department[$key] ? $request->arr_multi_department[$key] : NULL,
-                                'warehouse_id'      => $request->arr_multi_warehouse[$key] ? $request->arr_multi_warehouse[$key] : NULL,
                                 'type'              => '1',
                                 'nominal'           => floatval($request->arr_multi_debit[$key]),
                                 'note'              => $request->arr_multi_note_detail[$key],
@@ -595,7 +587,6 @@ class JournalController extends Controller
                                 'line_id'           => $request->arr_multi_line[$key] ? $request->arr_multi_line[$key] : NULL,
                                 'machine_id'        => $request->arr_multi_machine[$key] ? $request->arr_multi_machine[$key] : NULL,
                                 'department_id'     => $request->arr_multi_department[$key] ? $request->arr_multi_department[$key] : NULL,
-                                'warehouse_id'      => $request->arr_multi_warehouse[$key] ? $request->arr_multi_warehouse[$key] : NULL,
                                 'type'              => '2',
                                 'nominal'           => floatval($request->arr_multi_kredit[$key]),
                                 'note'              => $request->arr_multi_note_detail[$key],
@@ -648,8 +639,6 @@ class JournalController extends Controller
                 'machine_id'                    => $row->machine()->exists() ? $row->machine_id : '',
                 'machine_name'                  => $row->machine()->exists() ? $row->machine->name : '',
                 'department_id'                 => $row->department_id ? $row->department_id : '',
-                'warehouse_id'                  => $row->warehouse_id ? $row->warehouse_id : '',
-                'warehouse_name'                => $row->warehouse_id ? $row->warehouse->name : '',
                 'project_id'                    => $row->project()->exists() ? $row->project_id : '',
                 'project_name'                  => $row->project()->exists() ? $row->project->name : '',
                 'nominal'                       => number_format($row->nominal,2,',','.'),

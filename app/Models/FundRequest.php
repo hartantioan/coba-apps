@@ -31,6 +31,7 @@ class FundRequest extends Model
         'payment_type',
         'name_account',
         'no_account',
+        'bank_account',
         'document',
         'total',
         'tax',

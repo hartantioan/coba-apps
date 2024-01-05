@@ -270,6 +270,12 @@
                                     <th class="center">Item</th>
                                     <th class="center">Plant</th>
                                     <th class="center">Gudang</th>
+                                    <th class="center">Area</th>
+                                    <th class="center">Shading</th>
+                                    <th class="center">Line</th>
+                                    <th class="center">Mesin</th>
+                                    <th class="center">Departemen</th>
+                                    <th class="center">Proyek</th>
                                     <th class="center">Qty</th>
                                     <th class="center">Sat.</th>
                                     <th class="center">Coa</th>
@@ -283,7 +289,13 @@
                                     <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name }}</td>
                                     <td align="center">{{ $rowdetail->place->code }}</td>
                                     <td align="center">{{ $rowdetail->warehouse->name }}</td>
-                                    <td align="center">{{ $rowdetail->qty }}</td>
+                                    <td align="center">{{ $rowdetail->itemStock->area()->exists() ? $rowdetail->itemStock->area->name : '-' }}</td>
+                                    <td align="center">{{ $rowdetail->itemStock->itemShading()->exists() ? $rowdetail->itemStock->itemShading->code : '-' }}</td>
+                                    <td align="center">{{ $rowdetail->line()->exists() ? $rowdetail->line->name : '-' }}</td>
+                                    <td align="center">{{ $rowdetail->machine()->exists() ? $rowdetail->machine->name : '-' }}</td>
+                                    <td align="center">{{ $rowdetail->department()->exists() ? $rowdetail->department->name : '-' }}</td>
+                                    <td align="center">{{ $rowdetail->project()->exists() ? $rowdetail->project->name : '-' }}</td>
+                                    <td align="center">{{ number_format($rowdetail->qty,3,',','.') }}</td>
                                     <td align="center">{{ $rowdetail->item->buyUnit->code }}</td>
                                     <td>{{ $rowdetail->coa->name }}</td>
                                     <td align="center">{{ number_format($rowdetail->nominal,2,',','.') }}</td>

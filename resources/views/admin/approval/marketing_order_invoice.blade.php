@@ -268,7 +268,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="9">Terbilang : <i>{{ CustomHelper::terbilang($data->balance) }}</i></th>
+                        <th colspan="9">Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->balance) }}</i></th>
                     </tr>
                 </tfoot>
             </table>

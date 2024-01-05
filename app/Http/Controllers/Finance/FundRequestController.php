@@ -94,6 +94,7 @@ class FundRequestController extends Controller
             'payment_type',
             'name_account',
             'no_account',
+            'bank_account',
             'total',
             'tax',
             'wtax',
@@ -193,6 +194,7 @@ class FundRequestController extends Controller
                     $val->paymentType(),
                     $val->name_account,
                     $val->no_account,
+                    $val->bank_account,
                     number_format($val->total,2,',','.'),
                     number_format($val->tax,2,',','.'),
                     number_format($val->wtax,2,',','.'),
@@ -202,7 +204,7 @@ class FundRequestController extends Controller
                     number_format($totalReceivableBalance,2,',','.'),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     '
-                        <select class="browser-default" onchange="updateDocumentStatus(`'.CustomHelper::encrypt($val->code).'`,this)" style="width:150px;">
+                        <select class="browser-default" onfocus="updatePrevious(this);" onchange="updateDocumentStatus(`'.CustomHelper::encrypt($val->code).'`,this)" style="width:150px;">
                             <option value="1" '.($val->document_status == '1' ? 'selected' : '').'>MENUNGGU</option>
                             <option value="2" '.($val->document_status == '2' ? 'selected' : '').'>LENGKAP</option>
                             <option value="3" '.($val->document_status == '3' ? 'selected' : '').'>TIDAK LENGKAP</option>
@@ -745,6 +747,7 @@ class FundRequestController extends Controller
             'payment_type',
             'name_account',
             'no_account',
+            'bank_account',
             'total',
             'tax',
             'wtax',
@@ -819,6 +822,7 @@ class FundRequestController extends Controller
                     $val->paymentType(),
                     $val->name_account,
                     $val->no_account,
+                    $val->bank_account,
                     number_format($val->grandtotal,2,',','.'),
                     number_format($val->tax,2,',','.'),
                     number_format($val->wtax,2,',','.'),
@@ -984,6 +988,7 @@ class FundRequestController extends Controller
                         $query->payment_type = $request->payment_type;
                         $query->name_account = $request->name_account;
                         $query->no_account = $request->no_account;
+                        $query->bank_account = $request->bank_account;
                         $query->document = $document;
                         $query->total = str_replace(',','.',str_replace('.','',$request->total));
                         $query->tax = str_replace(',','.',str_replace('.','',$request->tax));
@@ -1027,6 +1032,7 @@ class FundRequestController extends Controller
                         'payment_type'  => $request->payment_type,
                         'name_account'  => $request->name_account,
                         'no_account'    => $request->no_account,
+                        'bank_account'  => $request->bank_account,
                         'document'      => $request->file('file') ? $request->file('file')->store('public/fund_requests') : NULL,
                         'total'         => str_replace(',','.',str_replace('.','',$request->total)),
                         'tax'           => str_replace(',','.',str_replace('.','',$request->tax)),

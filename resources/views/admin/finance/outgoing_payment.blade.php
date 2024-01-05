@@ -230,7 +230,7 @@
                             </div>
                             <div class="input-field col m3 s12 step9">
                                 <select class="browser-default" id="payment_request_id" name="payment_request_id" onchange="getPaymentRequest();"></select>
-                                <label class="active" for="user_bank_id">Permintaan Pembayaran (Jika Ada)</label>
+                                <label class="active" for="user_bank_id">Payment Request (Jika Ada)</label>
                             </div>
                             <div class="input-field col m3 s12 step10">
                                 <input id="admin" name="admin" type="text" value="0,000" onkeyup="formatRupiah(this)">
@@ -312,6 +312,8 @@
             </div>
             <div class="col" id="ref_jurnal">
             </div>
+            <div class="col" id="company_jurnal">
+            </div>
         </div>
         <div class="row mt-2">
             <table class="bordered Highlight striped">
@@ -319,7 +321,6 @@
                         <tr>
                             <th class="center-align">No</th>
                             <th class="center-align">Coa</th>
-                            <th class="center-align">Perusahaan</th>
                             <th class="center-align">Partner Bisnis</th>
                             <th class="center-align">Plant</th>
                             <th class="center-align">Line</th>
@@ -572,6 +573,7 @@
                 $('#user_jurnal').empty();
                 $('#note_jurnal').empty();
                 $('#ref_jurnal').empty();
+                $('#company_jurnal').empty();
                 $('#post_date_jurnal').empty();
             }
         });
@@ -1413,10 +1415,11 @@
                     $('#title_data').append(``+data.title+``);
                     $('#code_data').append(data.message.code);
                     $('#body-journal-table').append(data.tbody);
-                    $('#user_jurnal').append(`Pengguna `+data.user);
-                    $('#note_jurnal').append(`Keterangan `+data.message.note);
-                    $('#ref_jurnal').append(`Referensi `+data.reference);
-                    $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
+                    $('#user_jurnal').append(`Pengguna : `+data.user);
+                    $('#note_jurnal').append(`Keterangan : `+data.message.note);
+                    $('#ref_jurnal').append(`Referensi : `+data.reference);
+                    $('#company_jurnal').append(`Perusahaan : `+data.company);
+                    $('#post_date_jurnal').append(`Tanggal : `+data.message.post_date);
                 }
             }
         });
@@ -1473,7 +1476,7 @@
                 {
                     title : 'Permintaan Pembayaraan',
                     element : document.querySelector('.step9'),
-                    intro : 'Pilih permintaan pembayaran yang terkait form ini' 
+                    intro : 'Pilih Payment Request yang terkait form ini' 
                 },
                 {
                     title : 'Biaya Admin',

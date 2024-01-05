@@ -285,6 +285,14 @@
                                     </tr>
                                     <tr>
                                         <td width="40%">
+                                            Bank Tujuan
+                                        </td>
+                                        <td width="60%">
+                                            : {{ $data->bank_account }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="40%">
                                             Tipe
                                         </td>
                                         <td width="60%">
@@ -345,20 +353,38 @@
                     <!-- invoice subtotal -->
                     <div class="invoice-subtotal break-row">
                         <div class="row">
-                        <div class="column1">
-                            <table style="width:100%">
-                                <tr class="break-row">
-                                    <td>
-                                        <div class="mt-3">
-                                            Catatan : {{ $data->note }}
-                                        </div>
-                                    </td>
-                                    
-                                </tr>
-                            </table>
-                        </div>
-                        <div class="column2">
-                        </div>
+                            <div class="column1">
+                                <table style="width:100%">
+                                    <tr class="break-row">
+                                        <td>
+                                            <div class="mt-3">
+                                                Catatan : {{ $data->note }}
+                                            </div>
+                                        </td>
+                                        
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="column2" align="right">
+                                <table style="border-collapse:collapse;right:0;" width="95%" class="table-bot" style="font-size:1.1rem !important;">
+                                    <tr class="break-row">
+                                        <td class="right-align" width="50%">Total</td>
+                                        <td class="right-align" width="50%" style="border:0.6px solid black;">{{ number_format($data->total,2,',','.') }}</td>
+                                    </tr>
+                                    <tr class="break-row">
+                                        <td class="right-align">PPN</td>
+                                        <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->tax,2,',','.') }}</td>
+                                    </tr class="break-row">
+                                    <tr class="break-row">
+                                        <td class="right-align">PPh</td>
+                                        <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->wtax,2,',','.') }}</td>
+                                    </tr class="break-row">
+                                    <tr>
+                                        <td class="right-align">Grandtotal</td>
+                                        <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->grandtotal,2,',','.') }}</td>
+                                    </tr class="break-row">                          
+                                </table>
+                            </div>
                         </div>
                         <table class="table-bot1" width="100%" border="0">
                             <tr>

@@ -92,7 +92,6 @@ class GoodReceiptPOController extends Controller
             'company_id',
             'receiver_name',
             'post_date',
-            'due_date',
             'document_date',
             'note',
             'delivery_no',
@@ -111,7 +110,6 @@ class GoodReceiptPOController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
-                            ->orWhere('due_date', 'like', "%$search%")
                             ->orWhere('document_date', 'like', "%$search%")
                             ->orWhere('receiver_name', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
@@ -151,7 +149,6 @@ class GoodReceiptPOController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
-                            ->orWhere('due_date', 'like', "%$search%")
                             ->orWhere('document_date', 'like', "%$search%")
                             ->orWhere('receiver_name', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
@@ -200,7 +197,6 @@ class GoodReceiptPOController extends Controller
                     $val->company->name,
                     $val->receiver_name,
                     date('d/m/y',strtotime($val->post_date)),
-                    date('d/m/y',strtotime($val->due_date)),
                     date('d/m/y',strtotime($val->document_date)),
                     $val->note,
                     $val->delivery_no,
@@ -322,7 +318,6 @@ class GoodReceiptPOController extends Controller
             'company_id'                => 'required',
 			'receiver_name'			    => 'required',
 			'post_date'		            => 'required',
-			'due_date'		            => 'required',
             'document_date'		        => 'required',
             'delivery_no'		        => 'required',
             'arr_item'                  => 'required|array',
@@ -336,7 +331,6 @@ class GoodReceiptPOController extends Controller
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'receiver_name.required'            => 'Nama penerima tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
-			'due_date.required' 				=> 'Tanggal kadaluwarsa tidak boleh kosong.',
             'document_date.required' 			=> 'Tanggal dokumen tidak boleh kosong.',
             'delivery_no.required' 			    => 'No surat jalan tidak boleh kosong.',
             'arr_item.required'                 => 'Item tidak boleh kosong',
@@ -469,7 +463,6 @@ class GoodReceiptPOController extends Controller
                         $query->company_id = $request->company_id;
                         $query->receiver_name = $request->receiver_name;
                         $query->post_date = $request->post_date;
-                        $query->due_date = $request->due_date;
                         $query->document_date = $request->document_date;
                         $query->delivery_no = $request->delivery_no;
                         $query->document = $document;
@@ -506,7 +499,6 @@ class GoodReceiptPOController extends Controller
                         'company_id'            => $request->company_id,
                         'receiver_name'         => $request->receiver_name,
                         'post_date'             => $request->post_date,
-                        'due_date'              => $request->due_date,
                         'document_date'         => $request->document_date,
                         'delivery_no'           => $request->delivery_no,
                         'document'              => $request->file('document') ? $request->file('document')->store('public/good_receipts') : NULL,
@@ -2606,6 +2598,7 @@ class GoodReceiptPOController extends Controller
                 'message'   => $query->journal,
                 'user'      => $query->user->name,
                 'reference' =>  $query->lookable_id ? $query->lookable->code : '-',
+                'company' => $query->company()->exists() ? $query->company->name : '-',
             ];
             $string='';
             foreach($query->journal->journalDetail()->where(function($query){
@@ -2617,7 +2610,6 @@ class GoodReceiptPOController extends Controller
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
-                    <td class="center-align">'.$row->coa->company->name.'</td>
                     <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
                     <td class="center-align">'.($row->place_id ? $row->place->code : '-').'</td>
                     <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>

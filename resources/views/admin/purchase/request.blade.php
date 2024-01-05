@@ -2349,7 +2349,7 @@
                     intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
                 },
                 {
-                    title : 'Tgl. Kadaluarsa',
+                    title : 'Tgl. Jatuh Tempo',
                     element : document.querySelector('.step4'),
                     intro : 'Tanggal kadaluarsa digunakan untuk menentukan masa berlaku dokumen hingga tanggal ini ditentukan.' 
                 },

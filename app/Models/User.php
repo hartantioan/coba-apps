@@ -275,6 +275,21 @@ class User extends Authenticatable
         return $bank;
     }
 
+    public function arrBanks(){
+        $banks = [];
+
+        foreach($this->userBank()->orderByDesc('is_default')->get() as $row){
+            $banks[] = [
+                'bank_id'   => $row->bank_id,
+                'name'      => $row->name,
+                'bank_name' => $row->bank->name,
+                'no'        => $row->no,
+            ];
+        }
+
+        return $banks;
+    }
+
     public function fundRequest(){
         return $this->hasMany('App\Models\FundRequest','account_id','id')->whereIn('status',['2','3']);
     }

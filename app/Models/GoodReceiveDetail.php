@@ -27,8 +27,9 @@ class GoodReceiveDetail extends Model
         'machine_id',
         'department_id',
         'warehouse_id',
-        'project_id',
         'area_id',
+        'item_shading_id',
+        'project_id',
     ];
 
     public function goodReceive()
@@ -59,6 +60,10 @@ class GoodReceiveDetail extends Model
     public function area()
     {
         return $this->belongsTo('App\Models\Area', 'area_id', 'id')->withTrashed();
+    }
+
+    public function itemShading(){
+        return $this->belongsTo('App\Models\ItemShading','item_shading_id','id')->withTrashed();
     }
 
     public function project()

@@ -636,7 +636,6 @@
 
     function updatePrevious(element){
         previous = $(element).val();
-        console.log(previous);
     }
 
     function updateSendStatus(code,element){

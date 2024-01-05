@@ -191,7 +191,7 @@ class PurchaseInvoiceDetail extends Model
     public function getPurchaseCode(){
         $code = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->purchaseOrderDetail->purchaseOrder->code,
-            'landed_cost_fee_details'   => $this->lookable->landedCost->getPurchaseCode(),
+            'landed_cost_fee_details'   => $this->lookable->landedCost->getGoodReceiptNo(),
             'purchase_order_details'    => $this->lookable->purchaseOrder->code.' - '.$this->lookable->purchaseOrder->code,
             'coas'                      => $this->lookable->code.' - '.$this->lookable->name,
             default                     => '-',

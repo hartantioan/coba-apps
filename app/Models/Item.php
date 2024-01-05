@@ -223,12 +223,17 @@ class Item extends Model
         $data = ItemStock::where('item_id',$this->id)->whereIn('place_id',$dataplaces)->whereIn('warehouse_id',$datawarehouses)->get();
         foreach($data as $detail){
             $arrData[] = [
-                'id'            => $detail->id,
-                'warehouse'     => $detail->place->code.' - '.$detail->warehouse->name.' - '.($detail->area()->exists() ? $detail->area->name : ''),
-                'warehouse_id'  => $detail->warehouse_id,
-                'place_id'      => $detail->place_id,
-                'qty'           => number_format($detail->qty,3,',','.').' '.$this->uomUnit->code,
-                'qty_raw'       => number_format($detail->qty,3,',','.'),
+                'id'                => $detail->id,
+                'warehouse'         => $detail->place->code.' - '.$detail->warehouse->name.' - '.($detail->area()->exists() ? $detail->area->name : ''),
+                'name'              => $detail->place->code.' Gudang: '.$detail->warehouse->name.($detail->area()->exists() ? ' Area: '.$detail->area->name : ''),
+                'warehouse_id'      => $detail->warehouse_id,
+                'place_id'          => $detail->place_id,
+                'area_id'           => $detail->area()->exists() ? $detail->area_id : '',
+                'area'              => $detail->area()->exists() ? $detail->area->name : '',
+                'item_shading_id'   => $detail->itemShading()->exists() ? $detail->item_shading_id : '',
+                'shading'           => $detail->itemShading()->exists() ? $detail->itemShading->code : '',
+                'qty'               => number_format($detail->qty,3,',','.').' '.$this->uomUnit->code,
+                'qty_raw'           => number_format($detail->qty,3,',','.'),
             ];
         }
         
@@ -301,7 +306,7 @@ class Item extends Model
         foreach($data as $detail){
             $arrData[] = [
                 'id'            => $detail->id,
-                'warehouse'     => $detail->place->code.' - '.$detail->warehouse->name.' - '.($detail->area()->exists() ? $detail->area->name : ''),
+                'warehouse'     => 'Plant : '.$detail->place->code.' - Gudang : '.$detail->warehouse->name.' - Area : '.($detail->area()->exists() ? $detail->area->name : '').' - Shading : '.($detail->itemShading()->exists() ? $detail->itemShading->code : '-'),
                 'warehouse_id'  => $detail->warehouse_id,
                 'area'          => $detail->area()->exists() ? $detail->area->name : '',
                 'area_id'       => $detail->area_id ? $detail->area_id : '',

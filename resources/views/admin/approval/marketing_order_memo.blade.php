@@ -252,7 +252,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="5">Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal) }}</i></th>
+                        <th colspan="5">Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal) }}</i></th>
                     </tr>
                 </tfoot>
             </table>

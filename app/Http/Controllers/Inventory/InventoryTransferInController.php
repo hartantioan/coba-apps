@@ -91,11 +91,11 @@ class InventoryTransferInController extends Controller
     public function getTotalTransferOut(Request $request){
         $total_data_out = InventoryTransferOut::where(function($query){
             $query->where(function($query){
-                $query->whereIn('place_from',$this->dataplaces)
-                    ->whereIn('warehouse_from',$this->datawarehouses);
+                /* $query->whereIn('place_from',$this->dataplaces)
+                    ->whereIn('warehouse_from',$this->datawarehouses); */
             })->orWhere(function($query){
-                $query->whereIn('place_to',$this->dataplaces)
-                    ->whereIn('warehouse_to',$this->datawarehouses);
+                /* $query->whereIn('place_to',$this->dataplaces)
+                    ->whereIn('warehouse_to',$this->datawarehouses); */
             });
         })
         ->whereDoesntHave('inventoryTransferIn')
@@ -124,8 +124,8 @@ class InventoryTransferInController extends Controller
 
         $total_data = InventoryTransferIn::whereHas('inventoryTransferOut',function($query){
             $query->where(function($query){
-                $query->whereIn('place_to',$this->dataplaces)
-                    ->whereIn('warehouse_to',$this->datawarehouses);
+                /* $query->whereIn('place_to',$this->dataplaces)
+                    ->whereIn('warehouse_to',$this->datawarehouses); */
             });
         })->count();
         
@@ -154,10 +154,10 @@ class InventoryTransferInController extends Controller
                 }
             })
             ->whereHas('inventoryTransferOut',function($query){
-                $query->where(function($query){
+                /* $query->where(function($query){
                     $query->whereIn('place_to',$this->dataplaces)
                         ->whereIn('warehouse_to',$this->datawarehouses);
-                });
+                }); */
             })
             ->offset($start)
             ->limit($length)
@@ -195,10 +195,10 @@ class InventoryTransferInController extends Controller
                 }
             })
             ->whereHas('inventoryTransferOut',function($query){
-                $query->where(function($query){
+                /* $query->where(function($query){
                     $query->whereIn('place_to',$this->dataplaces)
                         ->whereIn('warehouse_to',$this->datawarehouses);
-                });
+                }); */
             })
             ->count();
 
@@ -497,6 +497,7 @@ class InventoryTransferInController extends Controller
                 'message'   => $query->journal,
                 'user'      => $query->user->name,
                 'reference' =>  $query->lookable_id ? $query->lookable->code : '-',
+                'company' => $query->company()->exists() ? $query->company->name : '-',
             ];
             $string='';
             foreach($query->journal->journalDetail()->where(function($query){
@@ -508,7 +509,6 @@ class InventoryTransferInController extends Controller
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
-                    <td class="center-align">'.$row->coa->company->name.'</td>
                     <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
                     <td class="center-align">'.($row->place_id ? $row->place->code : '-').'</td>
                     <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>

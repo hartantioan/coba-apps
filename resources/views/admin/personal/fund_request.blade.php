@@ -95,7 +95,8 @@
                                                         <th rowspan="2">Termin</th>
                                                         <th rowspan="2">Tipe Pembayaran</th>
                                                         <th rowspan="2">Rekening Penerima</th>
-                                                        <th rowspan="2">Bank & No.Rek</th>
+                                                        <th rowspan="2">No.Rek</th>
+                                                        <th rowspan="2">Bank</th>
                                                         <th rowspan="2">Total</th>
                                                         <th rowspan="2">PPN</th>
                                                         <th rowspan="2">PPh</th>
@@ -173,7 +174,7 @@
                                     <label class="active" for="post_date">Tgl. Posting</label>
                                 </div>
                                 <div class="input-field col m3 s12">
-                                    <input id="required_date" name="required_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting">
+                                    <input id="required_date" name="required_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d', strtotime('12/31')) }}" type="date" placeholder="Tgl. posting">
                                     <label class="active" for="required_date">Tgl. Request Pembayaran</label>
                                 </div>
                                 <div class="file-field input-field col m3 s12">
@@ -211,8 +212,8 @@
                                 </div>
                                 <div class="input-field col m3 s12">
                                     <select class="form-control" id="payment_type" name="payment_type">
-                                        <option value="1">Tunai</option>
                                         <option value="2">Transfer</option>
+                                        <option value="1">Tunai</option>
                                         <option value="3">Cek</option>
                                         <option value="4">BG</option>
                                     </select>
@@ -242,7 +243,11 @@
                                     </div>
                                     <div class="input-field col m3 s12">
                                         <input id="no_account" name="no_account" type="text" placeholder="Rekening atas nama">
-                                        <label class="active" for="no_account">Bank & No. Rek. Penerima</label>
+                                        <label class="active" for="no_account">No. Rek. Penerima</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="bank_account" name="bank_account" type="text" placeholder="Bank Tujuan">
+                                        <label class="active" for="bank_account">Bank Tujuan</label>
                                     </div>
                                 </div>
                                 <div class="col m12">
@@ -448,12 +453,13 @@
 
     function getRekening(){
         if($('#user_bank_id').val()){
-            $('#name_account,#no_account').prop('readonly',true);
+            $('#name_account,#no_account,#bank_account').prop('readonly',true);
             $('#name_account').val($('#user_bank_id').find(':selected').data('name'));
-            $('#no_account').val($('#user_bank_id').find(':selected').data('bankno'));
+            $('#no_account').val($('#user_bank_id').find(':selected').data('no'));
+            $('#bank_account').val($('#user_bank_id').find(':selected').data('bank'));
         }else{
-            $('#name_account,#no_account').prop('readonly',false);
-            $('#name_account,#no_account').val('');
+            $('#name_account,#no_account,#bank_account').prop('readonly',false);
+            $('#name_account,#no_account,#bank_account').val('');
         }
     }
 
@@ -662,6 +668,7 @@
                 { name: 'payment_type', className: 'center-align' },
                 { name: 'name_account', className: 'center-align' },
                 { name: 'no_account', className: 'center-align' },
+                { name: 'bank_account', className: 'center-align' },
                 { name: 'total', className: 'right-align' },
                 { name: 'tax', className: 'right-align' },
                 { name: 'wtax', className: 'right-align' },
@@ -712,7 +719,7 @@
                             `);
                             $.each(response.banks, function(i, val) {
                                 $('#user_bank_id').append(`
-                                    <option value="` + val.bank_id + `" data-name="` + val.name + `" data-bankno="` + val.bank_name + ` - ` + val.no + `">` + val.bank_name + ` - ` + val.no + ` - ` + val.name + `</option>
+                                    <option value="` + val.bank_id + `" data-name="` + val.name + `" data-bank="` + val.bank_name + `" data-no="` + val.no + `">` + val.bank_name + ` - ` + val.no + ` - ` + val.name + `</option>
                                 `);
                             });                        
                         }else{
@@ -970,6 +977,7 @@
                 $('#payment_type').val(response.payment_type).formSelect();
                 $('#name_account').val(response.name_account);
                 $('#no_account').val(response.no_account);
+                $('#bank_account').val(response.bank_account);
                 $('#currency_id').val(response.currency_id).formSelect();
                 $('#currency_rate').val(response.currency_rate);
                 $('#total').val(response.total);

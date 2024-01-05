@@ -9,6 +9,10 @@
     table.bordered th {
         padding: 5px !important;
     }
+
+    .select2 {
+        max-width: 100px !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -199,27 +203,34 @@
                                 </div>
                             </div>
                         </fieldset>
-                        <fieldset>
+                        <fieldset style="min-width: 100%;overflow:auto;">
                             <legend>3. Detail Produk</legend>
                             <div class="row">
                                 <div class="col m12 s12 step6">
                                     <p class="mt-2 mb-2">
                                         <h5>Detail Produk</h5>
                                         Coa debit mengikuti coa pada masing-masing grup item.
-                                        <div style="overflow:auto;">
-                                            <table class="bordered" style="width:100%;" id="table-detail">
+                                        <div>
+                                            <table class="bordered" style="min-width:2000px;" id="table-detail">
                                                 <thead>
                                                     <tr>
-                                                        <th class="center">Stok Item (Stok saat ini)</th>
+                                                        <th class="center">Item</th>
+                                                        <th class="center">Stok</th>
                                                         <th class="center">Qty</th>
+                                                        <th class="center">Satuan</th>
                                                         <th class="center">Keterangan</th>
-                                                        <th class="center">Coa Debit</th>
+                                                        <th class="center">Coa</th>
+                                                        <th class="center">Line</th>
+                                                        <th class="center">Mesin</th>
+                                                        <th class="center">Departemen</th>
+                                                        <th class="center">Proyek</th>
+                                                        <th class="center">Requester</th>
                                                         <th class="center">Hapus</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td colspan="5" class="center">
+                                                        <td colspan="12" class="center">
                                                             <button class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                                 <i class="material-icons left">add</i> Tambah Item
                                                             </button>
@@ -393,6 +404,8 @@
             </div>
             <div class="col" id="ref_jurnal">
             </div>
+            <div class="col" id="company_jurnal">
+            </div>
         </div>
         <div class="row mt-2">
             <table class="bordered Highlight striped">
@@ -400,7 +413,6 @@
                         <tr>
                             <th class="center-align">No</th>
                             <th class="center-align">Coa</th>
-                            <th class="center-align">Perusahaan</th>
                             <th class="center-align">Partner Bisnis</th>
                             <th class="center-align">Plant</th>
                             <th class="center-align">Line</th>
@@ -544,6 +556,7 @@
                 $('#user_jurnal').empty();
                 $('#note_jurnal').empty();
                 $('#ref_jurnal').empty();
+                $('#company_jurnal').empty();
                 $('#post_date_jurnal').empty();
             }
         });
@@ -762,20 +775,55 @@
                             var count = makeid(10);
                             $('#last-row-item').before(`
                                 <tr class="row_item" data-id="` + $('#material_request_id').val() + `">
-                                    <input type="hidden" id="tempQty` + count + `" value="0">
                                     <input type="hidden" name="arr_lookable_type[]" value="` + val.type + `">
                                     <input type="hidden" name="arr_lookable_id[]" value="` + val.id + `">
                                     <td>
-                                        <select class="browser-default item-array" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="setStock('` + count + `')"></select>
+                                        <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" data-id="` + count + `"></select>
+                                    </td>
+                                    <td class="center" id="stock` + count + `">
+                                        -
                                     </td>
                                     <td>
-                                        <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_balance + `" onkeyup="formatRupiah(this);setStock('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`">
+                                        <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_balance + `" onkeyup="formatRupiah(this);setStock('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
+                                    </td>
+                                    <td class="center" id="unit` + count + `">
+                                        ` + val.unit + `
                                     </td>
                                     <td>
-                                        <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="`+ val.note +`">
+                                        <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="Untuk ` + val.place_name + ` ` + val.warehouse_name + `">
                                     </td>
                                     <td class="center">
                                         <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                                    </td>
+                                    <td>
+                                        <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
+                                            <option value="">--Kosong--</option>
+                                            @foreach ($line as $rowline)
+                                                <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
+                                            @endforeach
+                                        </select>    
+                                    </td>
+                                    <td>
+                                        <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                                            <option value="">--Kosong--</option>
+                                            @foreach ($machine as $row)
+                                                <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                                            @endforeach    
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
+                                            <option value="">--Kosong--</option>
+                                            @foreach ($department as $rowdept)
+                                                <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                                            @endforeach
+                                        </select>    
+                                    </td>
+                                    <td>
+                                        <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                                    </td>
+                                    <td>
+                                        <input name="arr_requester[]" id="arr_requester` + count + `" class="materialize-textarea" type="text" placeholder="Requester...">
                                     </td>
                                     <td class="center">
                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -784,32 +832,34 @@
                                     </td>
                                 </tr>
                             `);
-                            $('#arr_item_stock' + count).select2({
-                                placeholder: '-- Pilih stok item --',
-                                minimumInputLength: 1,
-                                allowClear: true,
-                                cache: true,
-                                width: 'resolve',
-                                dropdownParent: $('body').parent(),
-                                ajax: {
-                                    url: '{{ url("admin/select2/item_stock_material_request") }}',
-                                    type: 'GET',
-                                    dataType: 'JSON',
-                                    data: function(params) {
-                                        return {
-                                            search: params.term,
-                                            place_id: val.place_id,
-                                            warehouse_id: val.warehouse_id,
-                                            item_id: val.item_id,
-                                        };
-                                    },
-                                    processResults: function(data) {
-                                        return {
-                                            results: data.items
-                                        }
-                                    }
-                                }
-                            });
+                            $('#stock' + count).empty();
+                            let optionStock = '<select class="browser-default" id="arr_item_stock' + count + '" name="arr_item_stock[]" required onchange="resetQty(`'+ count +'`)">';
+                            if(val.stock_list.length > 0){
+                                $.each(val.stock_list, function(i, value) {
+                                    optionStock += '<option value="' + value.id + '" data-qty="' + value.qty_raw + '">' + value.name + ' ' + value.shading + ' ' + value.qty + '</option>';
+                                });
+                            }else{
+                                optionStock += '<option value="" data-qty="0,000">--Stock tidak ditemukan--</option>';
+                            }
+                            optionStock += '</select>';
+
+                            $('#stock' + count).append(optionStock);
+                            $('#arr_line' + count).val(val.line_id);
+                            $('#arr_machine' + count).val(val.machine_id);
+                            $('#arr_department' + count).val(val.department_id);
+                            $('#arr_requester' + count).val(val.requester);
+                            if(val.item_id){
+                                $('#arr_item' + count).append(`
+                                    <option value="` + val.item_id +`">` + val.item_name + `</option>
+                                `);
+                            }
+                            select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
+                            if(val.project_id){
+                                $('#arr_project' + count).append(`
+                                    <option value="` + val.project_id +`">` + val.project_name + `</option>
+                                `);
+                            }
+                            select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
                             select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
                         });
 
@@ -861,20 +911,55 @@
         var count = makeid(10);
         $('#last-row-item').before(`
             <tr class="row_item" data-id="">
-                <input type="hidden" id="tempQty` + count + `" value="0">
                 <input type="hidden" name="arr_lookable_type[]" value="">
                 <input type="hidden" name="arr_lookable_id[]" value="">
                 <td>
-                    <select class="browser-default item-array" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="setStock('` + count + `')"></select>
+                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" data-id="` + count + `"></select>
+                </td>
+                <td class="center" id="stock` + count + `">
+                    -
                 </td>
                 <td>
-                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);setStock('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`">
+                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0,000" onkeyup="formatRupiah(this);setStock('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
+                </td>
+                <td class="center" id="unit` + count + `">
+                    -
                 </td>
                 <td>
                     <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ...">
                 </td>
                 <td class="center">
                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
+                        <option value="">--Kosong--</option>
+                        @foreach ($line as $rowline)
+                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
+                        @endforeach
+                    </select>    
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                        <option value="">--Kosong--</option>
+                        @foreach ($machine as $row)
+                            <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                        @endforeach    
+                    </select>
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
+                        <option value="">--Kosong--</option>
+                        @foreach ($department as $rowdept)
+                            <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                        @endforeach
+                    </select>    
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                </td>
+                <td>
+                    <input name="arr_requester[]" id="arr_requester` + count + `" class="materialize-textarea" type="text" placeholder="Requester...">
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -883,49 +968,53 @@
                 </td>
             </tr>
         `);
-        select2ServerSide('#arr_item_stock' + count, '{{ url("admin/select2/item_stock") }}');
+        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+        select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
+    }
+
+    function changeLine(element){
+        if($(element).val()){
+            $(element).parent().prev().find('select[name="arr_line[]"]').val($(element).find(':selected').data('line')).trigger('change');
+        }else{
+            $(element).parent().prev().find('select[name="arr_line[]"]').val($(element).parent().prev().find('select[name="arr_line[]"] option:first').val()).trigger('change');
+        }
+    }
+
+    function getRowUnit(val){
+        $('#stock' + val).empty();
+        $('#unit' + val).empty();
+        if($("#arr_item" + val).val()){
+            $('#unit' + val).text($("#arr_item" + val).select2('data')[0].uom);
+            let optionStock = '<select class="browser-default" id="arr_item_stock' + val + '" name="arr_item_stock[]" required onchange="resetQty(`'+ val +'`)">';
+            if($("#arr_item" + val).select2('data')[0].stock_list.length > 0){
+                $.each($("#arr_item" + val).select2('data')[0].stock_list, function(i, value) {
+                    optionStock += '<option value="' + value.id + '" data-qty="' + value.qty_raw + '">' + value.name + ' ' + value.shading + ' ' + value.qty + '</option>';
+                });
+            }else{
+                optionStock += '<option value="" data-qty="0,000">--Stock tidak ditemukan--</option>';
+            }
+            optionStock += '</select>';
+            $('#stock' + val).append(optionStock);
+        }else{
+            $('#stock' + val).append(` - `);
+            $('#unit' + val).append(` - `);
+        }
+    }
+
+    function resetQty(val){
+        $('#rowQty' + val).val('0,000');
     }
 
     function setStock(val){
-        if($('#arr_item_stock' + val).val()){
-            let passed = true;
-
-            $('select[name^="arr_item_stock"]').each(function(){
-                if($(this).attr("id") !== 'arr_item_stock' + val){
-                    if($(this).val()){
-                        if($(this).val() == $('#arr_item_stock' + val).val()){
-                            passed = false;
-                        }
-                    }
-                }
-            });
-
-            if(passed){
-                if($('#rowQty' + val).val()){
-                    $('#tempQty' + val).val(
-                        $('#arr_item_stock' + val).select2('data')[0].qty ? $('#arr_item_stock' + val).select2('data')[0].qty : $('#tempQty' + val).val()
-                    );
-                    let max = parseFloat($('#tempQty' + val).val());
-                    let qty = parseFloat($('#rowQty' + val).val().replaceAll(".", "").replaceAll(",","."));
-
-                    if(qty > max){
-                        $('#rowQty' + val).val(
-                            formatRupiahIni(max.toString().replace('.',','))
-                        );
-                    }
-                }
-            }else{
-                $('#tempQty' + val).val('0');
-                $('#arr_item_stock' + val).empty();
-                swal({
-                    title: 'Ups!',
-                    text: 'Mohon maaf, anda tidak bisa menambahkan lebih dari 1 baris stock item yang sama.',
-                    icon: 'warning'
-                });
+        if($("#arr_item" + val).val()){
+            let qtyMax = parseFloat($('#arr_item_stock' + val).find(':selected').data('qty').toString().replaceAll(".", "").replaceAll(",","."));
+            let qtyInput = parseFloat($('#rowQty' + val).val().replaceAll(".", "").replaceAll(",","."));
+            if(qtyInput > qtyMax){
+                $('#rowQty' + val).val(formatRupiahIni(qtyMax.toFixed(3).toString().replace('.',',')));
             }
         }else{
-            $('#tempQty' + val).val('0');
+            $('#rowQty' + val).val('0,000');
         }
     }
 
@@ -947,6 +1036,10 @@
                 formData.delete('arr_qty[]');
                 formData.delete('arr_note[]');
                 formData.delete('arr_coa[]');
+                formData.delete('arr_line[]');
+                formData.delete('arr_machine[]');
+                formData.delete('arr_department[]');
+                formData.delete('arr_project[]');
                 
                 $('select[name^="arr_item_stock"]').each(function(index){
                     if(!$(this).val()){
@@ -969,8 +1062,12 @@
                         passed = false;
                     }else{
                         formData.append('arr_coa[]',$(this).val());
-                        formData.append('arr_note[]',($('select[name^="arr_note"]').eq(index).val() ? $('select[name^="arr_note"]').eq(index).val() : ''));
+                        formData.append('arr_note[]',($('input[name^="arr_note"]').eq(index).val() ? $('input[name^="arr_note"]').eq(index).val() : ''));
                     }
+                    formData.append('arr_line[]',($('select[name^="arr_line[]"]').eq(index).val() ? $('select[name^="arr_line[]"]').eq(index).val() : ''));
+                    formData.append('arr_machine[]',($('select[name^="arr_machine[]"]').eq(index).val() ? $('select[name^="arr_machine[]"]').eq(index).val() : ''));
+                    formData.append('arr_department[]',($('select[name^="arr_department[]"]').eq(index).val() ? $('select[name^="arr_department[]"]').eq(index).val() : ''));
+                    formData.append('arr_project[]',($('select[name^="arr_project[]"]').eq(index).val() ? $('select[name^="arr_project[]"]').eq(index).val() : ''));
                 });
 
                 if(passed){
@@ -1089,20 +1186,55 @@
                         var count = makeid(10);
                         $('#last-row-item').before(`
                             <tr class="row_item" data-id="` + val.reference_id + `">
-                                <input type="hidden" id="tempQty` + count + `" value="` + val.qtyraw + `">
                                 <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
                                 <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
                                 <td>
-                                    <select class="browser-default item-array" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="setStock('` + count + `')"></select>
+                                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" data-id="` + count + `"></select>
+                                </td>
+                                <td class="center" id="stock` + count + `">
+                                    -
                                 </td>
                                 <td>
                                     <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);setStock('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
+                                </td>
+                                <td class="center" id="unit` + count + `">
+                                    ` + val.uom + `
                                 </td>
                                 <td>
                                     <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
                                 </td>
                                 <td class="center">
                                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                                </td>
+                                <td>
+                                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
+                                        <option value="">--Kosong--</option>
+                                        @foreach ($line as $rowline)
+                                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
+                                        @endforeach
+                                    </select>    
+                                </td>
+                                <td>
+                                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                                        <option value="">--Kosong--</option>
+                                        @foreach ($machine as $row)
+                                            <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                                        @endforeach    
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
+                                        <option value="">--Kosong--</option>
+                                        @foreach ($department as $rowdept)
+                                            <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                                        @endforeach
+                                    </select>    
+                                </td>
+                                <td>
+                                    <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                                </td>
+                                <td>
+                                    <input name="arr_requester[]" id="arr_requester` + count + `" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.requester + `">
                                 </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -1111,14 +1243,37 @@
                                 </td>
                             </tr>
                         `);
-                        $('#arr_item_stock' + count).append(`
-                            <option value="` + val.item_stock_id + `">` + val.item_stock_name + `</option>
+
+                        $('#stock' + count).empty();
+                        let optionStock = '<select class="browser-default" id="arr_item_stock' + count + '" name="arr_item_stock[]" required onchange="resetQty(`'+ count +'`)">';
+                        if(val.stock_list.length > 0){
+                            $.each(val.stock_list, function(i, value) {
+                                optionStock += '<option value="' + value.id + '" data-qty="' + (value.id == val.item_stock_id ? val.qtyraw : value.qty_raw ) + '" ' + (value.id == val.item_stock_id ? 'selected' : '') + '>' + value.name + ' ' + value.shading + ' ' + value.qty + '</option>';
+                            });
+                        }else{
+                            optionStock += '<option value="" data-qty="0,000">--Stock tidak ditemukan--</option>';
+                        }
+                        optionStock += '</select>';
+
+                        $('#stock' + count).append(optionStock);
+
+                        $('#arr_item' + count).append(`
+                            <option value="` + val.item_id + `">` + val.item_name + `</option>
                         `);
                         $('#arr_coa' + count).append(`
                             <option value="` + val.coa_id + `">` + val.coa_name + `</option>
                         `);
-                        select2ServerSide('#arr_item_stock' + count, '{{ url("admin/select2/item_stock") }}');
+                        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
                         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+                        $('#arr_line' + count).val(val.line_id);
+                        $('#arr_machine' + count).val(val.machine_id);
+                        $('#arr_department' + count).val(val.department_id);
+                        if(val.project_id){
+                            $('#arr_project' + count).append(`
+                                <option value="` + val.project_id +`">` + val.project_name + `</option>
+                            `);
+                        }
+                        select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
                     });
                 }
                 
@@ -1437,10 +1592,11 @@
                     $('#title_data').append(``+data.title+``);
                     $('#code_data').append(data.message.code);
                     $('#body-journal-table').append(data.tbody);
-                    $('#user_jurnal').append(`Pengguna `+data.user);
-                    $('#note_jurnal').append(`Keterangan `+data.message.note);
-                    $('#ref_jurnal').append(`Referensi `+data.reference);
-                    $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
+                    $('#user_jurnal').append(`Pengguna : `+data.user);
+                    $('#note_jurnal').append(`Keterangan : `+data.message.note);
+                    $('#ref_jurnal').append(`Referensi : `+data.reference);
+                    $('#company_jurnal').append(`Perusahaan : `+data.company);
+                    $('#post_date_jurnal').append(`Tanggal : `+data.message.post_date);
                 }
             }
         });

@@ -212,7 +212,7 @@
                         <tr>
                             <td>Terbilang</td>
                             <td>:</td>
-                            <td><i>{{ CustomHelper::terbilang($data->grandtotal).' '.$data->currency->document_text }}</i></td>
+                            <td><i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.$data->currency->document_text }}</i></td>
                         </tr>
                         @if($data->type !== '1')
                         <tr>

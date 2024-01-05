@@ -51,25 +51,27 @@ use App\Models\Department;
 use App\Models\Menu;
 use App\Models\MarketingOrderMemo;
 use App\Models\OutgoingPayment;
+use App\Models\Warehouse;
 use Illuminate\Database\Eloquent\Builder;
 
 class PaymentRequestController extends Controller
 {
 
-    protected $dataplaces, $dataplacecode;
+    protected $dataplaces, $dataplacecode, $datawarehouse;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
         $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
+        $this->datawarehouse = $user ? $user->userWarehouseArray() : [];
     }
     public function index(Request $request)
     {
         $lastSegment = request()->segment(count(request()->segments()));
         $menu = Menu::where('url', $lastSegment)->first();
         $data = [
-            'title'         => 'Permintaan Pembayaran',
+            'title'         => 'Payment Request',
             'content'       => 'admin.finance.payment_request',
             'currency'      => Currency::where('status','1')->get(),
             'company'       => Company::where('status','1')->get(),
@@ -80,6 +82,10 @@ class PaymentRequestController extends Controller
             'newcode'       => $menu->document_code.date('y'),
             'menucode'      => $menu->document_code,
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+            'warehouse'     => Warehouse::where('status','1')->whereIn('id',$this->datawarehouse)->get(),
+            'line'          => Line::where('status','1')->get(),
+            'machine'       => Machine::where('status','1')->get(),
+            'department'    => Department::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -118,6 +124,7 @@ class PaymentRequestController extends Controller
             'account_no',
             'account_name',
             'note',
+            'is_reimburse',
         ];
 
         $start  = $request->start;
@@ -274,6 +281,7 @@ class PaymentRequestController extends Controller
                     $val->account_no,
                     $val->account_name,
                     $val->note,
+                    $val->isReimburse(),
                     $val->status(),
                     $val->balance == 0 ? 'Terbayar' : ($val->status == '2' && !$val->outgoingPayment()->exists() ?
                     '<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small" data-popup="tooltip" title="Bayar" onclick="cashBankOut(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">screen_share</i></button>' : ($val->outgoingPayment()->exists() ? $val->outgoingPayment->code : $val->statusRaw() )),
@@ -551,6 +559,11 @@ class PaymentRequestController extends Controller
                                 'currency_id'   => $data->currency_id,
                                 'currency_rate' => number_format($data->currency_rate,2,',','.'),
                                 'note'          => $data->note,
+                                'name_account'  => $data->name_account,
+                                'no_account'    => $data->no_account,
+                                'bank_account'  => $data->bank_account,
+                                'place_id'      => $data->place_id,
+                                'department_id' => $data->department_id,
                             ];
                         }
                     }
@@ -580,6 +593,11 @@ class PaymentRequestController extends Controller
                                 'currency_id'   => $data->currency_id,
                                 'currency_rate' => number_format($data->currency_rate,2,',','.'),
                                 'note'          => $data->note,
+                                'name_account'  => '',
+                                'no_account'    => '',
+                                'bank_account'  => '',
+                                'place_id'      => '',
+                                'department_id' => '',
                             ];
                         }
                     }
@@ -609,6 +627,11 @@ class PaymentRequestController extends Controller
                                 'currency_id'   => $data->currency()->id,
                                 'currency_rate' => number_format($data->currencyRate(),2,',','.'),
                                 'note'          => $data->invoice_no,
+                                'name_account'  => '',
+                                'no_account'    => '',
+                                'bank_account'  => '',
+                                'place_id'      => '',
+                                'department_id' => '',
                             ];
                         }
                     }
@@ -638,6 +661,11 @@ class PaymentRequestController extends Controller
                                 'currency_id'   => 1,
                                 'currency_rate' => number_format(1,2,',','.'),
                                 'note'          => $data->note,
+                                'name_account'  => '',
+                                'no_account'    => '',
+                                'bank_account'  => '',
+                                'place_id'      => '',
+                                'department_id' => '',
                             ];
                         }
                     }
@@ -754,7 +782,7 @@ class PaymentRequestController extends Controller
                     if($approved && !$revised){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Permintaan Pembayaran telah diapprove, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Payment Request telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
 
@@ -795,6 +823,7 @@ class PaymentRequestController extends Controller
                         $query->account_name = $request->account_name;
                         $query->note = $request->note;
                         $query->status = '1';
+                        $query->is_reimburse = $request->is_reimburse;
 
                         $query->save();
 
@@ -805,7 +834,7 @@ class PaymentRequestController extends Controller
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status permintaan pembayaraan sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+					        'message' => 'Status Payment Request sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                 }catch(\Exception $e){
@@ -839,6 +868,7 @@ class PaymentRequestController extends Controller
                         'account_name'              => $request->account_name,
                         'note'                      => $request->note,
                         'status'                    => '1',
+                        'is_reimburse'              => $request->is_reimburse,
                     ]);
 
                     DB::commit();
@@ -860,7 +890,13 @@ class PaymentRequestController extends Controller
                                 'cost_distribution_id'          => intval($request->arr_cost_distribution_cost[$key]),
                                 'coa_id'                        => intval($row),
                                 'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
-                                'note'                          => $request->arr_note_cost[$key]
+                                'note'                          => $request->arr_note_cost[$key],
+                                'place_id'                      => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
+                                'warehouse_id'                  => $request->arr_warehouse[$key] ? $request->arr_warehouse[$key] : NULL,
+                                'line_id'                       => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
+                                'machine_id'                    => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
+                                'department_id'                 => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
+                                'project_id'                    => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
                             ]);
                         }
                     }
@@ -886,7 +922,13 @@ class PaymentRequestController extends Controller
                                 'cost_distribution_id'          => $request->arr_cost_distribution[$key] ? $request->arr_cost_distribution[$key] : NULL,
                                 'coa_id'                        => $request->arr_coa[$key],
                                 'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_pay[$key])),
-                                'note'                          => $request->arr_note[$key]
+                                'note'                          => $request->arr_note[$key],
+                                'place_id'                      => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
+                                'warehouse_id'                  => $request->arr_warehouse[$key] ? $request->arr_warehouse[$key] : NULL,
+                                'line_id'                       => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
+                                'machine_id'                    => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
+                                'department_id'                 => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
+                                'project_id'                    => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
                             ]);
 
                             if($row == 'fund_requests'){
@@ -916,7 +958,7 @@ class PaymentRequestController extends Controller
                 }
 
                 CustomHelper::sendApproval('payment_requests',$query->id,$query->note);
-                CustomHelper::sendNotification('payment_requests',$query->id,'Permintaan Pembayaran No. '.$query->code,$query->note,session('bo_id'));
+                CustomHelper::sendNotification('payment_requests',$query->id,'Payment Request No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()
                     ->performedOn(new PaymentRequest())
@@ -953,7 +995,7 @@ class PaymentRequestController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="7">Daftar Pembayaran</th>
+                                <th class="center-align" colspan="13">Daftar Pembayaran</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -962,6 +1004,12 @@ class PaymentRequestController extends Controller
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Dist.Biaya</th>
                                 <th class="center-align">Coa</th>
+                                <th class="center-align">Plant</th>
+                                <th class="center-align">Gudang</th>
+                                <th class="center-align">Line</th>
+                                <th class="center-align">Mesin</th>
+                                <th class="center-align">Departemen</th>
+                                <th class="center-align">Proyek</th>
                                 <th class="center-align">Bayar</th>
                             </tr>
                         </thead><tbody>';
@@ -975,6 +1023,12 @@ class PaymentRequestController extends Controller
                 <td class="center-align">'.$row->note.'</td>
                 <td class="center-align">'.($row->cost_distribution_id ? $row->costDistribution->code.' - '.$row->costDistribution->name : '-').'</td>
                 <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
+                <td class="center-align">'.($row->place()->exists() ? $row->place->code : '-').'</td>
+                <td class="center-align">'.($row->warehouse()->exists() ? $row->warehouse->code : '-').'</td>
+                <td class="center-align">'.($row->line()->exists() ? $row->line->code : '-').'</td>
+                <td class="center-align">'.($row->machine()->exists() ? $row->machine->code : '-').'</td>
+                <td class="center-align">'.($row->department()->exists() ? $row->department->code : '-').'</td>
+                <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
                 <td class="right-align">'.number_format($row->nominal,3,',','.').'</td>
             </tr>';
         }
@@ -1103,6 +1157,8 @@ class PaymentRequestController extends Controller
             $arr[] = [
                 'id'            => $row->lookable_id,
                 'type'          => $row->lookable_type,
+                'type_document' => $row->lookable_type == 'fund_requests' ? $row->lookable->document_status : '',
+                'type_fr'       => $row->lookable_type == 'fund_requests' ? $row->lookable->type : '',
                 'code'          => $code,
                 'rawcode'       => $row->lookable->code,
                 'post_date'     => $row->lookable->post_date,
@@ -1118,6 +1174,16 @@ class PaymentRequestController extends Controller
                 'coa_id'        => $row->coa_id,
                 'coa_name'      => $row->coa->code.' - '.$row->coa->name,
                 'memo'          => number_format($row->getMemo(),2,',','.'),
+                'name_account'  => $row->fundRequest() ? ($row->lookable->name_account ? $row->lookable->name_account : '') : '',
+                'no_account'    => $row->fundRequest() ? ($row->lookable->no_account ? $row->lookable->no_account : '') : '',
+                'bank_account'  => $row->fundRequest() ? ($row->lookable->bank_account ? $row->lookable->bank_account : '') : '',
+                'place_id'      => $row->place()->exists() ? $row->place->id : '',
+                'warehouse_id'  => $row->warehouse()->exists() ? $row->warehouse->id : '',
+                'line_id'       => $row->line()->exists() ? $row->line->id : '',
+                'machine_id'    => $row->machine()->exists() ? $row->machine->id : '',
+                'department_id' => $row->department()->exists() ? $row->department->id : '',
+                'project_id'    => $row->project()->exists() ? $row->project->id : '',
+                'project_name'  => $row->project()->exists() ? $row->project->name : '',
             ];
         }
 
@@ -1195,7 +1261,7 @@ class PaymentRequestController extends Controller
                     ->withProperties($query)
                     ->log('Void the payment requests data');
     
-                CustomHelper::sendNotification('payment_requests',$query->id,'Permintaan Pembayaran No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::sendNotification('payment_requests',$query->id,'Payment Request No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval('payment_requests',$query->id);
 
                 $response = [
@@ -1628,7 +1694,7 @@ class PaymentRequestController extends Controller
                 
         if($pr){
             $data = [
-                'title'     => 'Print Permintaan Pembayaran',
+                'title'     => 'Print Payment Request',
                 'data'      => $pr
             ];
 
@@ -1643,7 +1709,7 @@ class PaymentRequestController extends Controller
 
         if($data){
             if(!$data->used()->exists() && !$data->outgoingPayment()->exists()){
-                CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Permintaan Pembayaran (Payment Request)');
+                CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Payment Request (Payment Request)');
 
                 $html = '<div class="row pt-1 pb-1"><div class="col s12"><table>
                         <thead>
@@ -1772,12 +1838,12 @@ class PaymentRequestController extends Controller
             }elseif($data->outgoingPayment()->exists()){
                 return response()->json([
                     'status'    => 500,
-                    'message'   => 'Permintaan Pembayaran '.$data->outgoingPayment->code.' telah memiliki kas bank out.'
+                    'message'   => 'Payment Request '.$data->outgoingPayment->code.' telah memiliki kas bank out.'
                 ]);
             }else{
                 return response()->json([
                     'status'    => 500,
-                    'message'   => 'Permintaan Pembayaran '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.'
+                    'message'   => 'Payment Request '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.'
                 ]);
             }
         }else{
@@ -3362,6 +3428,7 @@ class PaymentRequestController extends Controller
                 'message'   => $query->journal,
                 'user'      => $query->user->name,
                 'reference' =>  $query->lookable_id ? $query->lookable->code : '-',
+                'company' => $query->company()->exists() ? $query->company->name : '-',
             ];
             $string='';
             foreach($query->journal->journalDetail()->where(function($query){
@@ -3373,13 +3440,14 @@ class PaymentRequestController extends Controller
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
-                    <td class="center-align">'.$row->coa->company->name.'</td>
                     <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
-                    <td class="center-align">'.($row->place()->exists() ? $row->place->code : '-').'</td>
+                    <td class="center-align">'.($row->place_id ? $row->place->code : '-').'</td>
                     <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
                     <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
                     <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
                     <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
+                    <td class="center-align">'.($row->project_id ? $row->project->name : '-').'</td>
+                    <td class="center-align">'.($row->note ? $row->note : '').'</td>
                     <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
                     <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
                 </tr>';

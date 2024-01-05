@@ -29,17 +29,20 @@ use App\Models\Company;
 use App\Models\Department;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportGoodIssue;
+use App\Models\Line;
+use App\Models\Machine;
 use App\Models\Menu;
 
 class GoodIssueController extends Controller
 {
-    protected $dataplaces, $dataplacecode;
+    protected $dataplaces, $dataplacecode, $datawarehouses;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
         $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
+        $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
     }
 
     public function index(Request $request)
@@ -55,7 +58,9 @@ class GoodIssueController extends Controller
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
             'newcode'   => $menu->document_code.date('y'),
-            'menucode'  => $menu->document_code
+            'menucode'  => $menu->document_code,
+            'line'      => Line::where('status','1')->get(),
+            'machine'   => Machine::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -385,6 +390,15 @@ class GoodIssueController extends Controller
                             'coa_id'                => $request->arr_coa[$key],
                             'lookable_type'         => $request->arr_lookable_type[$key] ? $request->arr_lookable_type[$key] : NULL,
                             'lookable_id'           => $request->arr_lookable_id[$key] ? $request->arr_lookable_id[$key] : NULL,
+                            'place_id'              => $item_stock->place_id,
+                            'warehouse_id'          => $item_stock->warehouse_id,
+                            'area_id'               => $item_stock->area_id ? $item_stock->area_id : NULL,
+                            'item_shading_id'       => $item_stock->item_shading_id ? $item_stock->item_shading_id : NULL,
+                            'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
+                            'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
+                            'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
+                            'project_id'            => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
+                            'requester'             => $request->arr_requester[$key] ? $request->arr_requester[$key] : NULL,
                         ]);
                     }
 
@@ -436,6 +450,12 @@ class GoodIssueController extends Controller
                                 <th class="center-align">Plant</th>
                                 <th class="center-align">Gudang</th>
                                 <th class="center-align">Area</th>
+                                <th class="center-align">Shading</th>
+                                <th class="center-align">Line</th>
+                                <th class="center-align">Mesin</th>
+                                <th class="center-align">Departemen</th>
+                                <th class="center-align">Proyek</th>
+                                <th class="center-align">Requester</th>
                             </tr>
                         </thead><tbody>';
         
@@ -450,6 +470,12 @@ class GoodIssueController extends Controller
                 <td class="center-align">'.$row->itemStock->place->name.'</td>
                 <td class="center-align">'.$row->itemStock->warehouse->name.'</td>
                 <td class="center-align">'.($row->itemStock->area()->exists() ? $row->itemStock->area->name : '-').'</td>
+                <td class="center-align">'.($row->itemShading()->exists() ? $row->itemShading->code : '-').'</td>
+                <td class="center-align">'.($row->line()->exists() ? $row->line->name : '-').'</td>
+                <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
+                <td class="center-align">'.($row->department()->exists() ? $row->department->name : '-').'</td>
+                <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
+                <td class="center-align">'.($row->requester ? $row->requester : '-').'</td>
             </tr>';
         }
         
@@ -515,10 +541,12 @@ class GoodIssueController extends Controller
         
         foreach($gr->goodIssueDetail as $row){
             $arr[] = [
+                'item_id'           => $row->itemStock->item_id,
+                'item_name'         => $row->itemStock->item->code.' - '.$row->itemStock->item->name,
+                'uom'               => $row->itemStock->item->uomUnit->code,
                 'item_stock_id'     => $row->item_stock_id,
-                'item_stock_name'   => $row->itemStock->place->code.' - '.$row->itemStock->warehouse->code.' Qty. '.number_format($row->itemStock->qty + $row->qty,3,',','.').' '.$row->itemStock->item->uomUnit->code,
                 'qty'               => number_format($row->qty,3,',','.'),
-                'qtyraw'            => $row->qty + $row->itemStock->qty,
+                'qtyraw'            => in_array($gr->status,['2','3']) ? number_format($row->qty + $row->itemStock->qty,3,',','.') : number_format($row->itemStock->qty,3,',','.'),
                 'price'             => number_format($row->price,3,',','.'),
                 'total'             => number_format($row->total,3,',','.'),
                 'coa_id'            => $row->coa_id,
@@ -527,6 +555,13 @@ class GoodIssueController extends Controller
                 'lookable_type'     => $row->lookable_type ? $row->lookable_type : '',
                 'lookable_id'       => $row->lookable_id ? $row->lookable_id : '',
                 'reference_id'      => $row->lookable_type ? $row->lookable->materialRequest->id : '',
+                'stock_list'        => $row->itemStock->item->currentStock($this->dataplaces,$this->datawarehouses),
+                'line_id'           => $row->line_id,
+                'machine_id'        => $row->machine_id,
+                'department_id'     => $row->department_id,
+                'project_id'        => $row->project()->exists() ? $row->project->id : '',
+                'project_name'      => $row->project()->exists() ? $row->project->name : '',
+                'requester'         => $row->requester,
             ];
         }
 
@@ -985,6 +1020,7 @@ class GoodIssueController extends Controller
                 'message'   => $query->journal,
                 'user'      => $query->user->name,
                 'reference' =>  $query->lookable_id ? $query->lookable->code : '-',
+                'company' => $query->company()->exists() ? $query->company->name : '-',
             ];
             $string='';
             foreach($query->journal->journalDetail()->where(function($query){
@@ -996,7 +1032,6 @@ class GoodIssueController extends Controller
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
-                    <td class="center-align">'.$row->coa->company->name.'</td>
                     <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
                     <td class="center-align">'.($row->place_id ? $row->place->code : '-').'</td>
                     <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>

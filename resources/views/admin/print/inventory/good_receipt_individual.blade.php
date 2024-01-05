@@ -41,13 +41,13 @@
 
             @media only screen and (max-width : 768px) {
                 .invoice-print-area {
-                    zoom:0.4;
+                    zoom:0.6;
                 }
             }
         
             @media only screen and (max-width : 992px) {
                 .invoice-print-area {
-                    zoom:0.6;
+                    zoom:0.8;
                     font-size:11px !important;
                 }
 
@@ -56,25 +56,25 @@
                     font-weight: 800 !important;
                 }
                 td{
-                    font-size:0.7em !important;
+                    font-size:0.9em !important;
                 }
                 .tb-header td{
-                    font-size:0.6em !important;
+                    font-size:0.8em !important;
                 }
                 .tbl-info td{
                     font-size:1em !important;
                 }
                 .table-data-item td{
-                    font-size:0.8em !important;
+                    font-size:1em !important;
                 }
                 .table-data-item th{
                     border:0.6px solid black;
                 }
                 .table-bot td{
-                    font-size:0.6em !important;
+                    font-size:0.8em !important;
                 }
                 .table-bot1 td{
-                    font-size:0.7em !important;
+                    font-size:0.9em !important;
                 }
             }
         
@@ -156,7 +156,9 @@
             @page { margin: 6em 3em 6em 3em; }
             header { position: fixed; top: -85px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
                 
-        
+            td {
+                vertical-align: top !important;
+            }
            
         </style>
     </head>
@@ -164,87 +166,27 @@
         <header>
             <table border="0" width="100%" style="font-size:1em" class="tb-header">
                 <tr>
-                    <td width="83%" class="left-align" >
-                        <tr>
-                            <td>
-                                <span class="invoice-number mr-1"># {{ $data->code }}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="margin-top: -2px;">
-                                <small>Diajukan:</small>
-                                <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span>
-                                <br>
-                                <small>Hingga:</small>
-                                <span>{{ date('d/m/y',strtotime($data->due_date)) }}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <h5 class="indigo-text">Penerimaan Barang</h5>
-                            </td>
-                        </tr>
-                                
-                        
+                    <td width="33%" class="left-align" >
+                        <span class="invoice-number mr-1"># {{ $data->code }}</span>
+                        <small>Diajukan:{{ date('d/m/y',strtotime($data->post_date)) }}</small>
+                        <h2 class="indigo-text">Penerimaan Barang</h2>
                     </td>
                     <td width="33%" class="right-align">
-                        
-                        
-                   
                     </td>
-                    
                     <td width="34%" class="right-align">
-                        
-                            <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
-                       
+                        <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%;right:0;">
                     </td>
                 </tr>
                 
             </table>
-            <hr style="border-top: 3px solid black; margin-top:-2%">
+            <hr style="border-top: 3px solid black; margin-top:-10px">
         </header>
         <main>
             <div class="card">
                 <div class="card-content invoice-print-area ">
                     <table border="0" width="100%">
                         <tr>
-                            <td width="33%" class="left-align">
-                                <table border="0" width="50%" class="tbl-info">
-                                    <tr>
-                                        <td width="25%">
-                                            Dari
-                                        </td>
-                                        <td width="50%">
-                                            {{ $data->user->name }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="50%">
-                                            Posisi
-                                        </td>
-                                        <td width="50%">
-                                            {{ $data->user->position->Level->name }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="50%">
-                                            Depart.
-                                        </td>
-                                        <td width="50%">
-                                            {{ $data->user->position->division->name }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="50%">
-                                            HP
-                                        </td>
-                                        <td width="50%">
-                                            {{ $data->user->phone }}
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                            <td width="33%" class="left-align">
+                            <td width="50%" class="left-align">
                                 <table border="0" width="100%" class="tbl-info">
                                     <tr>
                                         <td width="40%">
@@ -252,14 +194,6 @@
                                         </td>
                                         <td width="60%">
                                             {{ $data->receiver_name }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="40%">
-                                            Lampiran
-                                        </td>
-                                        <td width="60%">
-                                            <a href="{{ $data->attachment() }}" target="_blank"><i class="material-icons">attachment</i></a>
                                         </td>
                                     </tr>
                                     <tr>
@@ -272,7 +206,7 @@
                                     </tr>
                                 </table>
                             </td>
-                            <td width="33%" class="left-align">
+                            <td width="50%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
                                         <td align="center">
@@ -281,7 +215,7 @@
                                     </tr>
                                     <tr>
                                         <td align="center">
-                                            <h1>{{ $data->code }}</h1>
+                                            <h2>{{ $data->code }}</h2>
                                         </td>
                                     </tr>
                                 </table>
@@ -311,7 +245,7 @@
                                 <tr>
                                     <td class="center">{{ ($keydetail + 1) }}</td>
                                     <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name }}</td>
-                                    <td class="center">{{ $rowdetail->qty }}</td>
+                                    <td class="center">{{ number_format($rowdetail->qty,3,',','.') }}</td>
                                     <td class="center">{{ $rowdetail->item->buyUnit->code }}</td>
                                     <td>{{ $rowdetail->note }}</td>
                                     <td>{{ $rowdetail->note2 }}</td>
@@ -346,11 +280,6 @@
                         <table class="table-bot1" width="100%" border="0">
                             <tr>
                                 <td class="center-align" style="height:2em">
-                                    Diterima oleh,
-                                    <img src="" width="100px" height="100px">
-                                    <div class="mt-6">{{ $data->receiver_name }}</div>
-                                </td>
-                                <td class="center-align" style="height:2em">
                                     {!! ucwords(strtolower($data->user->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
                                     <br>
                                     Dibuat oleh,
@@ -374,6 +303,11 @@
                                         @endforeach
                                     @endforeach
                                 @endif
+                                <td class="center-align" style="height:2em">
+                                    Diterima oleh,
+                                    <br><br><br><br><br>
+                                    <div class="mt-6">{{ $data->receiver_name }}</div>
+                                </td>
                             </tr>
                         </table>  
                     </div>

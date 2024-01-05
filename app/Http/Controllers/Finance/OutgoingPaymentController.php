@@ -51,7 +51,7 @@ class OutgoingPaymentController extends Controller
         $lastSegment = request()->segment(count(request()->segments()));
         $menu = Menu::where('url', $lastSegment)->first();
         $data = [
-            'title'         => 'Kas / Bank Keluar',
+            'title'         => 'Outgoing Payment',
             'content'       => 'admin.finance.outgoing_payment',
             'currency'      => Currency::where('status','1')->get(),
             'company'       => Company::where('status','1')->get(),
@@ -364,7 +364,7 @@ class OutgoingPaymentController extends Controller
     public function sendUsedData(Request $request){
         $op = OutgoingPayment::find($request->id);
         if(!$op->used()->exists()){
-            CustomHelper::sendUsedData('outgoing_payments',$request->id,'Form Kas / Bank Keluar');
+            CustomHelper::sendUsedData('outgoing_payments',$request->id,'Form Outgoing Payment');
             return response()->json([
                 'status'    => 200,
                 'code'      => $op->code,
@@ -373,7 +373,7 @@ class OutgoingPaymentController extends Controller
         }else{
             return response()->json([
                 'status'    => 500,
-                'message'   => 'Kas / Bank Keluar '.$op->used->lookable->code.' telah dipakai di '.$op->used->ref.', oleh '.$op->used->user->name.'.'
+                'message'   => 'Outgoing Payment '.$op->used->lookable->code.' telah dipakai di '.$op->used->ref.', oleh '.$op->used->user->name.'.'
             ]);
         }
     }
@@ -407,9 +407,9 @@ class OutgoingPaymentController extends Controller
 
         if($pr->used()->exists()){
             $pr['status'] = 500;
-            $pr['message'] = 'Kas / Bank Keluar '.$pr->used->lookable->code.' telah dipakai di '.$pr->used->ref.', oleh '.$pr->used->user->name.'.';
+            $pr['message'] = 'Outgoing Payment '.$pr->used->lookable->code.' telah dipakai di '.$pr->used->ref.', oleh '.$pr->used->user->name.'.';
         }else{
-            CustomHelper::sendUsedData('outgoing_payments',$pr->id,'Form Kas / Bank Keluar');
+            CustomHelper::sendUsedData('outgoing_payments',$pr->id,'Form Outgoing Payment');
             $pr['status'] = 200;
             $pr['account_name'] = $pr->account->name;
             $pr['coa_source_name'] = $pr->coaSource->code.' - '.$pr->coaSource->name.' - '.$pr->coaSource->company->name;
@@ -551,7 +551,7 @@ class OutgoingPaymentController extends Controller
 			if($query) {
 
                 CustomHelper::sendApproval('outgoing_payments',$query->id,$query->note);
-                CustomHelper::sendNotification('outgoing_payments',$query->id,'Kas / Bank Keluar No. '.$query->code,$query->note,session('bo_id'));
+                CustomHelper::sendNotification('outgoing_payments',$query->id,'Outgoing Payment No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()
                     ->performedOn(new OutgoingPayment())
@@ -605,7 +605,7 @@ class OutgoingPaymentController extends Controller
                     ->withProperties($query)
                     ->log('Void the outgoing payment data');
     
-                CustomHelper::sendNotification('outgoing_payments',$query->id,'Kas / Bank Keluar No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::sendNotification('outgoing_payments',$query->id,'Outgoing Payment No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval('outgoing_payments',$query->id);
                 CustomHelper::removeJournal('outgoing_payments',$query->id);
 
@@ -632,7 +632,7 @@ class OutgoingPaymentController extends Controller
                 if($row->status == '2'){
                     return response()->json([
                         'status'  => 500,
-                        'message' => 'Kas / Bank Keluar telah diapprove / sudah dalam progres, anda tidak bisa melakukan perubahan.'
+                        'message' => 'Outgoing Payment telah diapprove / sudah dalam progres, anda tidak bisa melakukan perubahan.'
                     ]);
                 }
             }
@@ -2440,6 +2440,7 @@ class OutgoingPaymentController extends Controller
                 'message'   => $query->journal,
                 'user'      => $query->user->name,
                 'reference' =>  $query->lookable_id ? $query->lookable->code : '-',
+                'company' => $query->company()->exists() ? $query->company->name : '-',
             ];
             $string='';
             foreach($query->journal->journalDetail()->where(function($query){
@@ -2451,7 +2452,6 @@ class OutgoingPaymentController extends Controller
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
-                    <td class="center-align">'.$row->coa->company->name.'</td>
                     <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
                     <td class="center-align">'.($row->place_id ? $row->place->code : '-').'</td>
                     <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>

@@ -203,8 +203,13 @@
                     <th class="center">Harga Total.</th>
                     <th class="center">Coa</th>
                     <th class="center">Plant</th>
+                    <th class="center">Line</th>
+                    <th class="center">Mesin</th>
                     <th class="center">Departemen</th>
                     <th class="center">Ke Gudang</th>
+                    <th class="center">Area</th>
+                    <th class="center">Shading</th>
+                    <th class="center">Proyek</th>
                     <th class="center">Keterangan</th>
                 </tr>
             </thead>
@@ -217,9 +222,14 @@
                     <td class="right-align">{{ number_format($row->price,3,',','.') }}</td>
                     <td class="right-align">{{ number_format($row->total,3,',','.') }}</td>
                     <td class="center-align">{{ $row->coa->code.' - '.$row->coa->name }}</td>
-                    <td class="center-align">{{ $row->place->code.' - '.$row->place->company->name }}</td>
+                    <td class="center-align">{{ $row->place->code }}</td>
+                    <td class="center-align">{{ $row->line()->exists() ? $row->line->code : '-' }}</td>
+                    <td class="center-align">{{ $row->machine()->exists() ? $row->machine->code : '-' }}</td>
                     <td class="center-align">{{ $row->department_id ? $row->department->name : '-' }}</td>
                     <td class="center-align">{{ $row->warehouse->name }}</td>
+                    <td class="center-align">{{ $row->area()->exists() ? $row->area->name : '-' }}</td>
+                    <td class="center-align">{{ $row->itemShading()->exists() ? $row->itemShading->name : '-' }}</td>
+                    <td class="center-align">{{ $row->project()->exists() ? $row->project->code : '-' }}</td>
                     <td>{{ $row->note }}</td>
                 </tr>
                 @endforeach

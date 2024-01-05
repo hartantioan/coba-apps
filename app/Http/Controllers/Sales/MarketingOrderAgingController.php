@@ -246,7 +246,7 @@ class MarketingOrderAgingController extends Controller
                 <th rowspan="2" class="center-align">No.</th>
                 <th rowspan="2" class="center-align" style="min-width:250px !important;">Supplier</th>
                 <th rowspan="2" class="center-align" style="min-width:175px !important;">Total Piutang</th>
-                <th colspan="'.$countPeriod.'">Nominal Jatuh Tempo (Dari Tgl. Posting dan Tgl. Tenggat)</th>
+                <th colspan="'.$countPeriod.'">Nominal Jatuh Tempo (Dari Tgl. Posting dan Tgl. Jatuh Tempo)</th>
             </tr>
             <tr>';
                 
@@ -497,7 +497,7 @@ class MarketingOrderAgingController extends Controller
                 <th rowspan="2" class="center-align" style="min-width:250px !important;">Supplier</th>
                 <th rowspan="2" class="center-align" style="min-width:250px !important;">Invoice</th>
                 <th rowspan="2" class="center-align" style="min-width:175px !important;">Nominal</th>
-                <th colspan="'.$countPeriod.'">Nominal Jatuh Tempo (Dari Tgl. Posting dan Tgl. Tenggat)</th>
+                <th colspan="'.$countPeriod.'">Nominal Jatuh Tempo (Dari Tgl. Posting dan Tgl. Jatuh Tempo)</th>
                 
             </tr>
             <tr>';

@@ -196,7 +196,7 @@
                                     <h4>Detail Produk</h4>
                                     Coa debit mengikuti coa pada masing-masing grup item.
                                     <div style="overflow:auto;">
-                                        <table class="bordered" style="min-width:2500px !important;" id="table-detail">
+                                        <table class="bordered" style="min-width:2800px !important;" id="table-detail">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Item</th>
@@ -213,13 +213,14 @@
                                                     <th class="center">Departemen</th>
                                                     <th class="center">Gudang</th>
                                                     <th class="center">Area</th>
+                                                    <th class="center">Shading</th>
                                                     <th class="center">Proyek</th>
                                                     <th class="center">Hapus</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
-                                                    <td colspan="16" class="center">
+                                                    <td colspan="17">
                                                         <button class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> Tambah Item
                                                         </button>
@@ -390,6 +391,8 @@
             </div>
             <div class="col" id="ref_jurnal">
             </div>
+            <div class="col" id="company_jurnal">
+            </div>
         </div>
         <div class="row mt-2">
             <table class="bordered Highlight striped">
@@ -397,7 +400,6 @@
                         <tr>
                             <th class="center-align">No</th>
                             <th class="center-align">Coa</th>
-                            <th class="center-align">Perusahaan</th>
                             <th class="center-align">Partner Bisnis</th>
                             <th class="center-align">Plant</th>
                             <th class="center-align">Line</th>
@@ -539,6 +541,7 @@
                 $('#user_jurnal').empty();
                 $('#note_jurnal').empty();
                 $('#ref_jurnal').empty();
+                $('#company_jurnal').empty();
                 $('#post_date_jurnal').empty();
             }
         });
@@ -607,6 +610,7 @@
         $('#tempPrice' + val).empty();
         $("#arr_warehouse" + val).empty();
         $('#area' + val).empty();
+        $('#shading' + val).empty();
         if($("#arr_item" + val).val()){
             $('#arr_unit' + val).text($("#arr_item" + val).select2('data')[0].uom);
             if($("#arr_item" + val).select2('data')[0].price_list.length){
@@ -640,8 +644,19 @@
                     <select class="browser-default" id="arr_area` + val + `" name="arr_area[]"></select>
                 `);
                 select2ServerSide('#arr_area' + val, '{{ url("admin/select2/area") }}');
+                let optionShading = '<select class="browser-default" id="arr_shading' + val + '" name="arr_shading[]" required>';
+                if($("#arr_item" + val).select2('data')[0].list_shading.length > 0){
+                    $.each($("#arr_item" + val).select2('data')[0].list_shading, function(i, value) {
+                        optionShading += '<option value="' + value.id + '">' + value.code + '</option>';
+                    });
+                }else{
+                    optionShading += '<option value="">--Shading tidak ditemukan--</option>';
+                }
+                optionShading += '</select>';
+                $('#shading' + val).append(optionShading);
             }else{
                 $('#area' + val).append(` - `);
+                $('#shading' + val).append(` - `);
             }
         }else{
             $('#tempPrice' + val).empty();
@@ -650,6 +665,7 @@
                 <option value="">--Silahkan pilih item--</option>
             `);
             $('#area' + val).append(` - `);
+            $('#shading' + val).append(` - `);
         }
     }
 
@@ -835,6 +851,9 @@
                 <td class="center" id="area` + count + `">
                     -
                 </td>
+                <td class="center" id="shading` + count + `">
+                    -
+                </td>
                 <td>
                     <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
                 </td>
@@ -894,12 +913,14 @@
                 var formData = new FormData($('#form_data')[0]);
 
                 formData.delete("arr_area[]");
+                formData.delete("arr_shading[]");
                 formData.delete("arr_line[]");
                 formData.delete("arr_machine[]");
                 formData.delete("arr_project[]");
 
                 $('select[name^="arr_item[]"]').each(function(index){
                     formData.append('arr_area[]',($('#arr_area' + $(this).data('id')).length > 0 ? ($('#arr_area' + $(this).data('id')).val() ? $('#arr_area' + $(this).data('id')).val() : '' )  : ''));
+                    formData.append('arr_shading[]',($('#arr_shading' + $(this).data('id')).length > 0 ? ($('#arr_shading' + $(this).data('id')).val() ? $('#arr_shading' + $(this).data('id')).val() : '' )  : ''));
                     formData.append('arr_line[]',($('#arr_line' + $(this).data('id')).val() ? $('#arr_line' + $(this).data('id')).val() : '' ));
                     formData.append('arr_machine[]',($('#arr_machine' + $(this).data('id')).val() ? $('#arr_machine' + $(this).data('id')).val() : '' ));
                     formData.append('arr_project[]',($('#arr_project' + $(this).data('id')).val() ? $('#arr_project' + $(this).data('id')).val() : '' ));
@@ -1078,6 +1099,9 @@
                                 <td class="center" id="area` + count + `">
                                     ` + ( val.area_id ? '<select class="browser-default" id="arr_area' + count + '" name="arr_area[]"></select>' : '-' ) + `
                                 </td>
+                                <td class="center" id="shading` + count + `">
+                                    -
+                                </td>
                                 <td>
                                     <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
                                 </td>
@@ -1101,6 +1125,8 @@
                         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
                         $('#arr_place' + count).val(val.place_id).formSelect();
                         $('#arr_department' + count).val(val.department_id).formSelect();
+                        $('#arr_line' + count).val(val.line_id);
+                        $('#arr_machine' + count).val(val.machine_id);
                         if(val.area_id){
                             $('#arr_area' + count).append(`
                                 <option value="` + val.area_id + `">` + val.area_name + `</option>
@@ -1112,7 +1138,21 @@
                                 <option value="` + val.project_id + `">` + val.project_name + `</option>
                             `);
                         }
+
                         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
+
+                        if(val.is_sales_item){
+                            let optionShading = '<select class="browser-default" id="arr_shading' + val + '" name="arr_shading[]" required>';
+                            if(val.list_shading.length > 0){
+                                $.each(val.list_shading, function(i, value) {
+                                    optionShading += '<option value="' + value.id + '" ' + (value.id == val.item_shading_id ? 'selected' : '') + '>' + value.code + '</option>';
+                                });
+                            }else{
+                                optionShading += '<option value="">--Shading tidak ditemukan--</option>';
+                            }
+                            optionShading += '</select>';
+                            $('#shading' + val).append(optionShading);
+                        }
                     });
                 }
                 
@@ -1432,10 +1472,11 @@
                     $('#title_data').append(``+data.title+``);
                     $('#code_data').append(data.message.code);
                     $('#body-journal-table').append(data.tbody);
-                    $('#user_jurnal').append(`Pengguna `+data.user);
-                    $('#note_jurnal').append(`Keterangan `+data.message.note);
-                    $('#ref_jurnal').append(`Referensi `+data.reference);
-                    $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
+                    $('#user_jurnal').append(`Pengguna : `+data.user);
+                    $('#note_jurnal').append(`Keterangan : `+data.message.note);
+                    $('#ref_jurnal').append(`Referensi : `+data.reference);
+                    $('#company_jurnal').append(`Perusahaan : `+data.company);
+                    $('#post_date_jurnal').append(`Tanggal : `+data.message.post_date);
                 }
             }
         });

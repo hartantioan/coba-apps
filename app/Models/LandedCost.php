@@ -108,6 +108,25 @@ class LandedCost extends Model
         }
     }
 
+    public function getGoodReceiptNo(){
+        $arr = [];
+        
+        foreach($this->landedCostDetail as $row){
+            if($row->goodReceiptDetail()){
+                $index = CustomHelper::checkArrayRaw($arr,$row->lookable->goodReceipt->code);
+                if($index < 0){
+                    $arr[] = $row->lookable->goodReceipt->code;
+                }
+            }
+        }
+
+        if(count($arr) > 0){
+            return implode(', ',$arr);
+        }else{
+            return '-';
+        }
+    }
+
     public function getListDeliveryNo(){
         $arr = [];
 

@@ -393,6 +393,7 @@ class GoodReceiveController extends Controller
                             'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
                             'department_id'         => isset($request->arr_department[$key]) ? $request->arr_department[$key] : NULL,
                             'area_id'               => $request->arr_area[$key] ? $request->arr_area[$key] : NULL,
+                            'item_shading_id'       => $request->arr_shading[$key] ? $request->arr_shading[$key] : NULL,
                             'project_id'            => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
                         ]);
 
@@ -451,6 +452,7 @@ class GoodReceiveController extends Controller
                                 <th class="center-align">Departemen</th>
                                 <th class="center-align">Gudang</th>
                                 <th class="center-align">Area</th>
+                                <th class="center-align">Shading</th>
                                 <th class="center-align">Proyek</th>
                             </tr>
                         </thead><tbody>';
@@ -458,11 +460,11 @@ class GoodReceiveController extends Controller
         foreach($data->goodReceiveDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
+                <td>'.$row->item->code.' - '.$row->item->name.'</td>
                 <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->item->uomUnit->code.'</td>
-                <td class="center-align">'.number_format($row->price,3,',','.').'</td>
-                <td class="center-align">'.number_format($row->total,3,',','.').'</td>
+                <td class="center-align">'.number_format($row->price,2,',','.').'</td>
+                <td class="center-align">'.number_format($row->total,2,',','.').'</td>
                 <td class="center-align">'.$row->note.'</td>
                 <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
                 <td class="center-align">'.$row->place->code.'</td>
@@ -470,7 +472,8 @@ class GoodReceiveController extends Controller
                 <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
                 <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
                 <td class="center-align">'.$row->warehouse->name.'</td>
-                <td class="center-align">'.($row->area()->exists() ? $row->area->name : '').'</td>
+                <td class="center-align">'.($row->area()->exists() ? $row->area->name : '-').'</td>
+                <td class="center-align">'.($row->itemShading()->exists() ? $row->itemShading->code : '-').'</td>
                 <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
             </tr>';
         }
@@ -532,7 +535,7 @@ class GoodReceiveController extends Controller
     public function show(Request $request){
         $gr = GoodReceive::where('code',CustomHelper::decrypt($request->id))->first();
         $gr['code_place_id'] = substr($gr->code,7,2);
-        $gr['currency_rate'] = number_format($gr->currency_rate,3,',','.');
+        $gr['currency_rate'] = number_format($gr->currency_rate,2,',','.');
 
         $arr = [];
         
@@ -542,8 +545,8 @@ class GoodReceiveController extends Controller
                 'item_name'         => $row->item->code.' - '.$row->item->name,
                 'qty'               => number_format($row->qty,3,',','.'),
                 'unit'              => $row->item->uomUnit->code,
-                'price'             => number_format($row->price,3,',','.'),
-                'total'             => number_format($row->total,3,',','.'),
+                'price'             => number_format($row->price,2,',','.'),
+                'total'             => number_format($row->total,2,',','.'),
                 'coa_id'            => $row->coa_id,
                 'coa_name'          => $row->coa->code.' - '.$row->coa->name,
                 'place_id'          => $row->place_id,
@@ -557,6 +560,9 @@ class GoodReceiveController extends Controller
                 'project_id'        => $row->project()->exists() ? $row->project->id : '',
                 'project_name'      => $row->project()->exists() ? $row->project->name : '',
                 'note'              => $row->note,
+                'item_shading_id'   => $row->item_shading_id,
+                'list_shading'      => $row->item->arrShading(),
+                'is_sales_item'     => $row->item->is_sales_item ? $row->item->is_sales_item : '',
             ];
         }
 
@@ -1013,6 +1019,7 @@ class GoodReceiveController extends Controller
                 'message'   => $query->journal,
                 'user'      => $query->user->name,
                 'reference' =>  $query->lookable_id ? $query->lookable->code : '-',
+                'company' => $query->company()->exists() ? $query->company->name : '-',
             ];
             $string='';
             foreach($query->journal->journalDetail()->where(function($query){
@@ -1024,7 +1031,6 @@ class GoodReceiveController extends Controller
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
-                    <td class="center-align">'.$row->coa->company->name.'</td>
                     <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
                     <td class="center-align">'.($row->place_id ? $row->place->code : '-').'</td>
                     <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>

@@ -73,6 +73,7 @@ class PurchaseRequestController extends Controller
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
             'newcode'   =>  $menu->document_code.date('y'),
+            'menucode'  => $menu->document_code,
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

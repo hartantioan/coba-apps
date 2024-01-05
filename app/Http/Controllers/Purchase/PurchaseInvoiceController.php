@@ -56,13 +56,14 @@ use Illuminate\Database\Eloquent\Builder;
 class PurchaseInvoiceController extends Controller
 {
 
-    protected $dataplaces, $dataplacecode;
+    protected $dataplaces, $dataplacecode, $datawarehouses;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
         $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
+        $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
     }
     public function index(Request $request)
     {

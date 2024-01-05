@@ -1243,10 +1243,10 @@
                                             <span>` + val.unit + `</span>
                                         </td>
                                         <td>
-                                            <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + val.note + `" style="width:100%;">
+                                            <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + val.note + `" style="width:100%;" readonly>
                                         </td>
                                         <td>
-                                            <input name="arr_note2[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + val.note2 + `" style="width:100%;">
+                                            <input name="arr_note2[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + val.note2 + `" style="width:100%;" readonly>
                                         </td>
                                         <td>
                                             <input name="arr_remark[]" class="browser-default" type="text" placeholder="Keterangan..." value="-" style="width:100%;">
@@ -1429,10 +1429,10 @@
                                     <span>` + val.unit + `</span>
                                 </td>
                                 <td>
-                                    <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + val.note + `" style="width:100%;">
+                                    <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + val.note + `" style="width:100%;" readonly>
                                 </td>
                                 <td>
-                                    <input name="arr_note2[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + val.note2 + `" style="width:100%;">
+                                    <input name="arr_note2[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + val.note2 + `" style="width:100%;" readonly>
                                 </td>
                                 <td>
                                     <input name="arr_remark[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + val.remark + `"  style="width:100%;">

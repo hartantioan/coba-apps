@@ -130,9 +130,8 @@
                                                         <th>Total</th>
                                                         <th>PPN</th>
                                                         <th>PPh</th>
-                                                        <th>Grandtotal</th>
                                                         <th>Pembulatan</th>
-                                                        <th>Final</th>
+                                                        <th>Grandtotal</th>
                                                         <th>Dokumen</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
@@ -304,18 +303,14 @@
                                             <td class="right-align"><span id="wtax">0,00</span></td>
                                         </tr>
                                         <tr>
-                                            <td>Grandtotal</td>
-                                            <td class="right-align"><span id="grandtotal">0,00</span></td>
-                                        </tr>
-                                        <tr>
                                             <td>Pembulatan</td>
                                             <td class="right-align">
                                                 <input class="browser-default" id="rounding" name="rounding" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td><h6>Final</h6></td>
-                                            <td class="right-align"><h6><span id="final">0,00</span></h6></td>
+                                            <td>Grandtotal</td>
+                                            <td class="right-align"><span id="grandtotal">0,00</span></td>
                                         </tr>
                                     </thead>
                                 </table>
@@ -990,7 +985,7 @@
     }
 
     function countAll(){
-        var total = 0, tax = 0, grandtotal = 0, balance = 0, wtax = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",",".")), final = 0;
+        var total = 0, tax = 0, grandtotal = 0, balance = 0, wtax = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",","."));
         
         if($('input[name^="arr_code"]').length > 0){
             $('input[name^="arr_code"]').each(function(){
@@ -1028,6 +1023,8 @@
             });
         }
 
+        grandtotal += rounding;
+
         $('#total').text(
             (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
         );
@@ -1039,12 +1036,6 @@
         );
         $('#grandtotal').text(
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
-        );
-
-        final = grandtotal + rounding;
-
-        $('#final').text(
-            (final >= 0 ? '' : '-') + formatRupiahIni(final.toFixed(2).toString().replace('.',','))
         );
     }
 
@@ -1417,9 +1408,8 @@
                 { name: 'total', className: 'right-align' },
                 { name: 'tax', className: 'right-align' },
                 { name: 'wtax', className: 'right-align' },
-                { name: 'grandtotal', className: 'right-align' },
                 { name: 'rounding', className: 'right-align' },
-                { name: 'final', className: 'right-align' },
+                { name: 'grandtotal', className: 'right-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },

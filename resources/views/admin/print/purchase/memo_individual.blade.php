@@ -324,6 +324,10 @@
                                 </tr>
                                 @endif
                                 <tr class="break-row">
+                                    <td class="right-align" style="padding-right:15px">Pembulatan</td>
+                                    <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->rounding,2,',','.') }}</td>
+                                </tr>
+                                <tr class="break-row">
                                     <td class="right-align" style="padding-right:15px">Grandtotal</td>
                                     <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->grandtotal,2,',','.') }}</td>
                                 </tr>

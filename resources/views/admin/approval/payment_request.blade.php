@@ -231,7 +231,6 @@
                         <th class="center">Keterangan</th>
                         <th class="center">Coa</th>
                         <th class="center">Plant</th>
-                        <th class="center">Gudang</th>
                         <th class="center">Line</th>
                         <th class="center">Mesin</th>
                         <th class="center">Departemen</th>
@@ -250,7 +249,6 @@
                         <td>{{ $row->note }}</td>
                         <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
                         <td>{{ $row->place()->exists() ? $row->place->code : '-' }}</td>
-                        <td>{{ $row->warehouse()->exists() ? $row->warehouse->code : '-' }}</td>
                         <td>{{ $row->line()->exists() ? $row->line->code : '-' }}</td>
                         <td>{{ $row->machine()->exists() ? $row->machine->code : '-' }}</td>
                         <td>{{ $row->department()->exists() ? $row->department->code : '-' }}</td>
@@ -262,19 +260,19 @@
                     @endphp
                     @endforeach
                     <tr>
-                        <td colspan="4" class="right-align">Total</td>
+                        <td colspan="9" class="right-align">Total</td>
                         <td class="right-align">{{ number_format($data->total,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td colspan="4" class="right-align">Pembulatan</td>
+                        <td colspan="9" class="right-align">Pembulatan</td>
                         <td class="right-align">{{ number_format($data->rounding,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td colspan="4" class="right-align">Admin</td>
+                        <td colspan="9" class="right-align">Admin</td>
                         <td class="right-align">{{ number_format($data->admin,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td colspan="4" class="right-align">Grandtotal</td>
+                        <td colspan="9" class="right-align">Grandtotal</td>
                         <td class="right-align">{{ number_format($data->grandtotal,2,',','.') }}</td>
                     </tr>
                 </tbody>

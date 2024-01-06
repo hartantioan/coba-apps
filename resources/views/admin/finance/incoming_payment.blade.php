@@ -257,7 +257,7 @@
                             <div class="row">
                                 <div class="col m12 s12 step12">
                                     <p class="mt-2 mb-2">
-                                        <h6>Detail AR Invoice / AR Down Payment / AR Credit Memo / BS.Karyawan / Coa</h6>
+                                        <h6>Detail AR Invoice / AR Down Payment / AR Memo / BS.Karyawan / Coa</h6>
                                         <div style="overflow:auto;">
                                             <table class="bordered" style="max-width:1650px !important;" id="table-detail">
                                                 <thead>
@@ -407,7 +407,7 @@
                             </li>
                             <li class="active" id="other-tab">
                                 <div class="collapsible-header purple lightrn-1 white-text">
-                                    <i class="material-icons">layers</i> AR Invoice / AR Down Payment / AR Credit Memo
+                                    <i class="material-icons">layers</i> AR Invoice / AR Down Payment / AR Memo
                                 </div>
                                 <div class="collapsible-body">
                                     <div id="datatable_buttons_multi_other"></div>
@@ -1084,7 +1084,7 @@
                 if(passedEmployee == true && passedOther == true){
                     swal({
                         title: 'Ups!',
-                        text: 'Anda tidak bisa mencampur BS Karyawan dengan AR Invoice / AR Down Payment / AR Credit Memo.',
+                        text: 'Anda tidak bisa mencampur BS Karyawan dengan AR Invoice / AR Down Payment / AR Memo.',
                         icon: 'warning'
                     });
                 }else if(passedEmployee == true || passedOther == true){

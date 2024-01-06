@@ -192,9 +192,8 @@ class PurchaseMemoController extends Controller
             'total',
             'tax',
             'wtax',
-            'grandtotal',
             'rounding',
-            'final',
+            'grandtotal',
         ];
 
         $start  = $request->start;
@@ -315,9 +314,8 @@ class PurchaseMemoController extends Controller
                     number_format($val->total,2,',','.'),
                     number_format($val->tax,2,',','.'),
                     number_format($val->wtax,2,',','.'),
-                    number_format($val->grandtotal,2,',','.'),
                     number_format($val->rounding,2,',','.'),
-                    number_format($val->final,2,',','.'),
+                    number_format($val->grandtotal,2,',','.'),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
                     '
@@ -396,7 +394,6 @@ class PurchaseMemoController extends Controller
             $tax = 0;
             $wtax = 0;
             $grandtotal = 0;
-            $final = 0;
             $rounding = str_replace(',','.',str_replace('.','',$request->rounding));
 
             $passed = true;
@@ -408,7 +405,7 @@ class PurchaseMemoController extends Controller
                 $grandtotal += str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key]));
             }
 
-            $final = $grandtotal + $rounding;
+            $grandtotal += $rounding;
 
 			if($request->temp){
                 DB::beginTransaction();
@@ -462,9 +459,8 @@ class PurchaseMemoController extends Controller
                         $query->total = round($total,2);
                         $query->tax = round($tax,2);
                         $query->wtax = round($wtax,2);
-                        $query->grandtotal = round($grandtotal,2);
                         $query->rounding = round($rounding,2);
-                        $query->final = round($final,2);
+                        $query->grandtotal = round($grandtotal,2);
                         $query->document = $document;
                         $query->note = $request->note;
                         $query->status = '1';
@@ -499,9 +495,8 @@ class PurchaseMemoController extends Controller
                         'total'                     => round($total,2),
                         'tax'                       => round($tax,2),
                         'wtax'                      => round($wtax,2),
-                        'grandtotal'                => round($grandtotal,2),
                         'rounding'                  => round($rounding,2),
-                        'final'                     => round($final,2),
+                        'grandtotal'                => round($grandtotal,2),
                         'note'                      => $request->note,
                         'document'                  => $request->file('document') ? $request->file('document')->store('public/purchase_memos') : NULL,
                         'status'                    => '1',

@@ -48,7 +48,7 @@ class IncomingPaymentDetail extends Model
             'coas'                          => 'Coa',
             'outgoing_payments'             => 'Kas Keluar / Outgoing Payment',
             'marketing_order_invoices'      => 'AR Invoice',
-            'marketing_order_memos'         => 'AR Credit Memo',
+            'marketing_order_memos'         => 'AR Memo',
             'marketing_order_down_payments' => 'AR Down Payment',
             default                         => $this->lookable->code,
         };

@@ -12,8 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('purchase_memos', function (Blueprint $table) {
-            $table->double('rounding')->nullable()->after('wtax');
-            $table->double('final')->nullable()->after('grandtotal');
+            $table->dropColumn('final');
         });
     }
 
@@ -23,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('purchase_memos', function (Blueprint $table) {
-            $table->dropColumn('rounding','final');
+            //
         });
     }
 };

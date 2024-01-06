@@ -171,7 +171,7 @@
                         <br>
                         <small style="font-size:1em"> <small>Tgl.Outgoing:</small>
                         <small>{{ date('d/m/y',strtotime($data->post_date)) }}</small>
-                        <h2 class="indigo-text">Kas / Bank Keluar</h2>
+                        <h2 class="indigo-text">Outgoing Payment</h2>
                     </td>
                     <td width="33%" class="right-align">
                         
@@ -296,17 +296,19 @@
                         <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
                             <thead>
                                 <tr>
+                                    <th class="center">Nominal PR</th>
                                     <th class="center">Biaya Admin</th>
                                     <th class="center">Total Bayar</th>
                                 </tr>
                                 <tr>
+                                    <th class="right-align" style="font-weight: !important;font-size:1em !important">{{ number_format($data->total,2,',','.') }}</th>
                                     <th class="right-align" style="font-weight: !important;font-size:1em !important">{{ number_format($data->admin,2,',','.') }}</th>
                                     <th class="right-align" style="font-weight:normal !important;font-size:1em !important">{{ number_format($data->grandtotal,2,',','.') }}</th>
                                 </tr>
                             </thead>
                             <tfoot>
                                 <tr>
-                                    <th colspan="2" style="border: none !important" border="0">Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords($data->currency->document_text) }}</i></th>
+                                    <th colspan="3" style="border: none !important" border="0">Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords($data->currency->document_text) }}</i></th>
                                 </tr>
                             </tfoot>
                             
@@ -319,7 +321,6 @@
                             <table style="width:100%">
                                 <tr class="break-row">
                                     <td>
-                                        {!! ucwords(strtolower($data->user->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
                                         <div class="mt-3">
                                             Catatan : {{ $data->note }}
                                         </div>

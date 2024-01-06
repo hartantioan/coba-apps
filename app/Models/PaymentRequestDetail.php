@@ -135,7 +135,7 @@ class PaymentRequestDetail extends Model
             'purchase_invoices'         => 'A/P Invoice',
             'purchase_down_payments'    => 'AP Down Payment',
             'coas'                      => 'Coa Biaya',
-            'marketing_order_memos'     => 'AR Credit Memo',
+            'marketing_order_memos'     => 'AR Memo',
             default                     => 'Belum ditentukan',
           };
   

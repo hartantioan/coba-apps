@@ -316,7 +316,7 @@
                                 <div class="col m12 s12">
                                     <ul class="collapsible">
                                         <li class="active step18" id="main-tab" onclick="changeMode();">
-                                            <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">library_books</i>Pembayaran BS / AP DP / AP Invoice / AR Credit Memo</div>
+                                            <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">library_books</i>Pembayaran BS / AP DP / AP Invoice / AR Memo</div>
                                             <div class="collapsible-body" style="display:block;">
                                                 <div class="mt-2 mb-2" style="overflow:scroll;width:100% !important;">
                                                     <table class="bordered" style="min-width:3250px !important;" id="table-detail">
@@ -341,7 +341,6 @@
                                                                 <th class="center">Dist.Biaya</th>
                                                                 <th class="center">Coa</th>
                                                                 <th class="center">Plant</th>
-                                                                <th class="center">Gudang</th>
                                                                 <th class="center">Line</th>
                                                                 <th class="center">Mesin</th>
                                                                 <th class="center">Departemen</th>
@@ -351,7 +350,7 @@
                                                         </thead>
                                                         <tbody id="body-detail">
                                                             <tr id="empty-detail">
-                                                                <td colspan="20" class="center">
+                                                                <td colspan="19" class="center">
                                                                     Pilih partner bisnis untuk memulai...
                                                                 </td>
                                                             </tr>
@@ -374,7 +373,6 @@
                                                                     <th class="center">Keterangan</th>
                                                                     <th class="center">Nominal</th>
                                                                     <th class="center">Plant</th>
-                                                                    <th class="center">Gudang</th>
                                                                     <th class="center">Line</th>
                                                                     <th class="center">Mesin</th>
                                                                     <th class="center">Departemen</th>
@@ -384,7 +382,7 @@
                                                             </thead>
                                                             <tbody id="body-detail-coa">
                                                                 <tr id="last-row-coa">
-                                                                    <td colspan="11" class="center">
+                                                                    <td colspan="10" class="center">
                                                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addCoa()" href="javascript:void(0);">
                                                                             <i class="material-icons left">add</i> Tambah Coa
                                                                         </a>
@@ -621,7 +619,7 @@
                         <ul class="collapsible-modal6">
                             <li class="active">
                                 <div class="collapsible-header purple lightrn-1 white-text">
-                                    <i class="material-icons">layers</i> Fund Requests / AP Down Payment / AP Invoice / AR Credit Memo
+                                    <i class="material-icons">layers</i> Fund Requests / AP Down Payment / AP Invoice / AR Memo
                                 </div>
                                 <div class="collapsible-body">
                                     <div id="datatable_buttons_multi"></div>
@@ -938,7 +936,7 @@
                 M.updateTextFields();
                 $('#body-detail').empty().append(`
                     <tr id="empty-detail">
-                        <td colspan="20" class="center">
+                        <td colspan="19" class="center">
                             Pilih partner bisnis untuk memulai...
                         </td>
                     </tr>
@@ -1331,14 +1329,6 @@
                     </select>    
                 </td>
                 <td>
-                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]" style="width:200px !important;">
-                        <option value="">--Kosong--</option>
-                        @foreach ($warehouse as $row)
-                            <option value="{{ $row->id }}">{{ $row->name }}</option>
-                        @endforeach
-                    </select>
-                </td>
-                <td>
                     <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" style="width:200px !important;" onchange="changePlace(this);">
                         <option value="">--Kosong--</option>
                         @foreach ($line as $rowline)
@@ -1701,17 +1691,6 @@
                                             <td class="center">
                                                 ` + ( val.coa_id ? `-` 
                                                 : 
-                                                `<select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]" style="width:200px !important;">
-                                                    <option value="">--Kosong--</option>
-                                                    @foreach ($warehouse as $row)
-                                                        <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                                    @endforeach
-                                                </select>` 
-                                                ) + `
-                                            </td>
-                                            <td class="center">
-                                                ` + ( val.coa_id ? `-` 
-                                                : 
                                                 `<select class="browser-default" id="arr_line` + count + `" name="arr_line[]" style="width:200px !important;" onchange="changePlace(this);">
                                                     <option value="">--Kosong--</option>
                                                     @foreach ($line as $rowline)
@@ -1773,7 +1752,7 @@
                             }else{
                                 $('#body-detail').empty().append(`
                                     <tr id="empty-detail">
-                                        <td colspan="20" class="center">
+                                        <td colspan="19" class="center">
                                             Pilih partner bisnis untuk memulai...
                                         </td>
                                     </tr>
@@ -2216,7 +2195,6 @@
                 formData.delete("arr_note_cost[]");
                 formData.delete("arr_line[]");
                 formData.delete("arr_place[]");
-                formData.delete("arr_warehouse[]");
                 formData.delete("arr_machine[]");
                 formData.delete("arr_department[]");
                 formData.delete("arr_project[]");
@@ -2250,11 +2228,6 @@
                                 formData.append('arr_place[]',
                                     ($('#arr_place' + $(this).data('id')).length > 0 ? 
                                         ($('#arr_place' + $(this).data('id')).val() ? $('#arr_place' + $(this).data('id')).val() : '') 
-                                    : '')
-                                );
-                                formData.append('arr_warehouse[]',
-                                    ($('#arr_warehouse' + $(this).data('id')).length > 0 ? 
-                                        ($('#arr_warehouse' + $(this).data('id')).val() ? $('#arr_warehouse' + $(this).data('id')).val() : '') 
                                     : '')
                                 );
                                 formData.append('arr_department[]',
@@ -2495,14 +2468,6 @@
                                     </select>    
                                 </td>
                                 <td>
-                                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]" style="width:200px !important;">
-                                        <option value="">--Kosong--</option>
-                                        @foreach ($warehouse as $row)
-                                            <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </td>
-                                <td>
                                     <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" style="width:200px !important;" onchange="changePlace(this);">
                                         <option value="">--Kosong--</option>
                                         @foreach ($line as $rowline)
@@ -2537,7 +2502,6 @@
                             </tr>
                         `);
                         $('#arr_place' + count).val(val.place_id);
-                        $('#arr_warehouse' + count).val(val.warehouse_id);
                         $('#arr_line' + count).val(val.line_id);
                         $('#arr_machine' + count).val(val.machine_id);
                         $('#arr_department' + count).val(val.department_id);
@@ -2629,14 +2593,6 @@
                                     </select>` : `-` ) + `
                                     </td>
                                     <td class="center">
-                                        ` + ( (val.type_fr == '1' && val.type_document == '2') || val.type_fr == '2' ? `<select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]" style="width:200px !important;">
-                                        <option value="">--Kosong--</option>
-                                        @foreach ($warehouse as $row)
-                                            <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                        @endforeach
-                                    </select>` : `-` ) + `
-                                    </td>
-                                    <td class="center">
                                         ` + ( (val.type_fr == '1' && val.type_document == '2') || val.type_fr == '2' ? `<select class="browser-default" id="arr_line` + count + `" name="arr_line[]" style="width:200px !important;" onchange="changePlace(this);">
                                         <option value="">--Kosong--</option>
                                         @foreach ($line as $rowline)
@@ -2671,7 +2627,6 @@
                             
                             if((val.type_fr == '1' && val.type_document == '2') || val.type_fr == '2'){
                                 $('#arr_place' + count).val(val.place_id);
-                                $('#arr_warehouse' + count).val(val.warehouse_id);
                                 $('#arr_line' + count).val(val.line_id);
                                 $('#arr_machine' + count).val(val.machine_id);
                                 $('#arr_department' + count).val(val.department_id);
@@ -3348,7 +3303,7 @@
             steps: [
                 {
                     title : 'Payment Request',
-                    intro : 'Form ini digunakan untuk mengelola data permintaan bayar BS Karyawan, Pinjaman Karyawan, AP DP, AP Invoice, AR Credit Memo, dan Rekonsiliasi Piutang Karyawan.'
+                    intro : 'Form ini digunakan untuk mengelola data permintaan bayar BS Karyawan, Pinjaman Karyawan, AP DP, AP Invoice, AR Memo, dan Rekonsiliasi Piutang Karyawan.'
                 },
                 {
                     title : 'Nomor Dokumen',

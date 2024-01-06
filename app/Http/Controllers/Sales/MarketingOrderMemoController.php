@@ -54,7 +54,7 @@ class MarketingOrderMemoController extends Controller
        
         $menu = Menu::where('url', $lastSegment)->first();
         $data = [
-            'title'         => 'AR Credit Memo',
+            'title'         => 'AR Memo',
             'content'       => 'admin.sales.order_memo',
             'company'       => Company::where('status','1')->get(),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
@@ -255,7 +255,7 @@ class MarketingOrderMemoController extends Controller
         }
        
         if(!$modp->used()->exists()){
-            CustomHelper::sendUsedData($modp->getTable(),$request->id,'Form AR Credit Memo');
+            CustomHelper::sendUsedData($modp->getTable(),$request->id,'Form AR Memo');
             return response()->json([
                 'status'    => 200,
             ]);
@@ -340,7 +340,7 @@ class MarketingOrderMemoController extends Controller
             if($grandtotal > $bp->count_limit_credit){
                 return response()->json([
                     'status'  => 500,
-                    'message' => 'AR Credit Memo tidak bisa diproses karena Saldo Piutang adalah '.number_format($bp->count_limit_credit,2,',','.').', sedangkan nominal yang anda inputkan adalah '.number_format($grandtotal,2,',','.').'.'
+                    'message' => 'AR Memo tidak bisa diproses karena Saldo Piutang adalah '.number_format($bp->count_limit_credit,2,',','.').', sedangkan nominal yang anda inputkan adalah '.number_format($grandtotal,2,',','.').'.'
                 ]);
             }
             
@@ -369,7 +369,7 @@ class MarketingOrderMemoController extends Controller
                     if($approved && !$revised){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'AR Credit Memo telah diapprove, anda tidak bisa melakukan perubahan.'
+                            'message' => 'AR Memo telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
 
@@ -413,7 +413,7 @@ class MarketingOrderMemoController extends Controller
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status AR Credit Memo detail sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+					        'message' => 'Status AR Memo detail sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                 }catch(\Exception $e){
@@ -468,13 +468,13 @@ class MarketingOrderMemoController extends Controller
                 }
 
                 CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
-                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan AR Credit Memo No. '.$query->code,$query->note,session('bo_id'));
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan AR Memo No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()
                     ->performedOn(new MarketingOrderMemo())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit AR Credit Memo.');
+                    ->log('Add / edit AR Memo.');
 
 				$response = [
 					'status'    => 200,
@@ -587,7 +587,7 @@ class MarketingOrderMemoController extends Controller
                 
         if($moi){
             $data = [
-                'title'     => 'Print AR Credit Memo',
+                'title'     => 'Print AR Memo',
                 'data'      => $moi
             ];
 
@@ -603,7 +603,7 @@ class MarketingOrderMemoController extends Controller
                 
         if($pr){
             $data = [
-                'title'     => 'AR Credit Memo',
+                'title'     => 'AR Memo',
                 'data'      => $pr
             ];
 
@@ -666,7 +666,7 @@ class MarketingOrderMemoController extends Controller
                 
                 if($pr){
                     $data = [
-                        'title'     => 'AR Credit Memo',
+                        'title'     => 'AR Memo',
                         'data'      => $pr,
                     ];
                     $img_path = 'website/logo_web_fix.png';
@@ -762,7 +762,7 @@ class MarketingOrderMemoController extends Controller
                         $query = MarketingOrderMemo::where('code', 'LIKE', '%'.$x)->first();
                         if($query){
                             $data = [
-                                'title'     => 'AR Credit Memo',
+                                'title'     => 'AR Memo',
                                 'data'      => $query
                             ];
                             $img_path = 'website/logo_web_fix.png';
@@ -974,7 +974,7 @@ class MarketingOrderMemoController extends Controller
         }
 
         foreach($arrUsed as $row){
-            CustomHelper::sendUsedData($row['type'],$row['id'],'Form AR Credit Memo');
+            CustomHelper::sendUsedData($row['type'],$row['id'],'Form AR Memo');
         }
 
         $po['details'] = $arr;
@@ -1046,7 +1046,7 @@ class MarketingOrderMemoController extends Controller
                     ->withProperties($query)
                     ->log('Void the data');
     
-                CustomHelper::sendNotification($query->getTable(),$query->id,'AR Credit Memo No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'AR Memo No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval($query->getTable(),$query->id);
                 CustomHelper::removeJournal($query->getTable(),$query->id);
 

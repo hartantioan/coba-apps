@@ -47,6 +47,7 @@ use App\Models\PurchaseInvoiceDetail;
 
 use App\Helpers\CustomHelper;
 use App\Exports\ExportPurchaseInvoice;
+use App\Exports\ExportTemplatePurchaseInvoice;
 use App\Models\LandedCostFeeDetail;
 use App\Models\Project;
 use App\Models\User;
@@ -95,6 +96,171 @@ class PurchaseInvoiceController extends Controller
         $code = PurchaseInvoice::generateCode($request->val);
         				
 		return response()->json($code);
+    }
+
+    public function getScanBarcode(Request $request){
+        $code = $request->code;
+        $precode = explode('-',$code)[0];
+        
+        $details = [];
+
+        $menu = Menu::where('document_code','like',"$precode%")->first();
+
+        if($menu){
+            if($menu->table_name == 'good_receipts'){
+                $datagr = GoodReceipt::where('code',$code)->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->first();
+                if($datagr){
+                    $top = 0;
+                    $info = '';
+                    foreach($datagr->goodReceiptDetail as $rowdetail){
+                        if($top < $rowdetail->purchaseOrderDetail->purchaseOrder->payment_term){
+                            $top = $rowdetail->purchaseOrderDetail->purchaseOrder->payment_term;
+                        }
+                        $info .= 'Diterima '.$rowdetail->qty.' '.$rowdetail->item->buyUnit->code.' dari '.$rowdetail->purchaseOrderDetail->qty.' '.$rowdetail->item->buyUnit->code;
+                    }
+                    foreach($datagr->goodReceiptDetail as $rowdetail){
+                        if($rowdetail->balanceInvoice() > 0){
+                            $details[] = [
+                                'type'          => 'good_receipt_details',
+                                'id'            => $rowdetail->id,
+                                'name'          => $rowdetail->item->code.' - '.$rowdetail->item->name,
+                                'qty_received'  => number_format($rowdetail->qty,3,',','.'),
+                                'qty_returned'  => number_format($rowdetail->qtyReturn(),3,',','.'),
+                                'qty_balance'   => number_format(($rowdetail->qty - $rowdetail->qtyReturn()),3,',','.'),
+                                'price'         => number_format($rowdetail->purchaseOrderDetail->price,2,',','.'),
+                                'buy_unit'      => $rowdetail->item->buyUnit->code,
+                                'rawcode'       => $datagr->code,
+                                'post_date'     => date('d/m/y',strtotime($datagr->post_date)),
+                                'due_date'      => date('d/m/y',strtotime($datagr->due_date)),
+                                'total'         => number_format($rowdetail->total,2,',','.'),
+                                'tax'           => number_format($rowdetail->tax,2,',','.'),
+                                'wtax'          => number_format($rowdetail->wtax,2,',','.'),
+                                'grandtotal'    => number_format($rowdetail->grandtotal,2,',','.'),
+                                'info'          => $info,
+                                'note'          => $rowdetail->note,
+                                'note2'         => $rowdetail->note2,
+                                'top'           => $top,
+                                'delivery_no'   => $datagr->delivery_no,
+                                'purchase_no'   => $rowdetail->purchaseOrderDetail->purchaseOrder->code,
+                                'percent_tax'   => $rowdetail->purchaseOrderDetail->percent_tax,
+                                'percent_wtax'  => $rowdetail->purchaseOrderDetail->percent_wtax,
+                                'include_tax'   => $rowdetail->purchaseOrderDetail->is_include_tax,
+                                'place_id'      => $rowdetail->place_id ? $rowdetail->place_id : '',
+                                'line_id'       => $rowdetail->line_id ? $rowdetail->line_id : '',
+                                'machine_id'    => $rowdetail->machine_id ? $rowdetail->machine_id : '',
+                                'department_id' => $rowdetail->department_id ? $rowdetail->department_id : '',
+                                'warehouse_id'  => $rowdetail->warehouse_id ? $rowdetail->warehouse_id : '',
+                                'project_id'    => $rowdetail->purchaseOrderDetail->project_id ? $rowdetail->purchaseOrderDetail->project_id : '',
+                                'place_name'    => $rowdetail->place_id ? $rowdetail->place->code : '-',
+                                'line_name'     => $rowdetail->line_id ? $rowdetail->line->name : '-',
+                                'machine_name'  => $rowdetail->machine_id ? $rowdetail->machine->name : '-',
+                                'department_name' => $rowdetail->department_id ? $rowdetail->department->name : '-',
+                                'warehouse_name'=> $rowdetail->warehouse_id ? $rowdetail->warehouse->name : '-',
+                                'project_name'  => $rowdetail->purchaseOrderDetail->project_id ? $rowdetail->purchaseOrderDetail->project->name : '-',
+                            ];
+                        }
+                    }
+                }
+            }elseif($menu->table_name == 'landed_costs'){
+                $datalc = LandedCost::where('code',$code)->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->first();
+                if($datalc){
+                    if($datalc->balanceInvoice() > 0){
+                        foreach($datalc->landedCostFeeDetail as $rowdetail){
+                            $details[] = [
+                                'type'          => $rowdetail->getTable(),
+                                'id'            => $rowdetail->id,
+                                'name'          => $rowdetail->landedCostFee->name,
+                                'qty_received'  => 1,
+                                'qty_returned'  => 0,
+                                'qty_balance'   => 1,
+                                'price'         => number_format($rowdetail->total,2,',','.'),
+                                'buy_unit'      => '-',
+                                'rawcode'       => $datalc->code,
+                                'post_date'     => date('d/m/y',strtotime($datalc->post_date)),
+                                'due_date'      => date('d/m/y',strtotime($datalc->post_date)),
+                                'total'         => number_format($rowdetail->total,2,',','.'),
+                                'tax'           => number_format($rowdetail->tax,2,',','.'),
+                                'wtax'          => number_format($rowdetail->wtax,2,',','.'),
+                                'grandtotal'    => number_format($rowdetail->grandtotal,2,',','.'),
+                                'info'          => $datalc->code,
+                                'note'          => $datalc->note,
+                                'note2'         => '',
+                                'top'           => 0,
+                                'delivery_no'   => $datalc->getListDeliveryNo(),
+                                'purchase_no'   => $datalc->getGoodReceiptNo(),
+                                'percent_tax'   => $rowdetail->percent_tax,
+                                'percent_wtax'  => $rowdetail->percent_wtax,
+                                'include_tax'   => $rowdetail->is_include_tax,
+                                'place_id'      => '',
+                                'line_id'       => '',
+                                'machine_id'    => '',
+                                'department_id' => '',
+                                'warehouse_id'  => '',
+                                'project_id'    => '',
+                                'place_name'    => '-',
+                                'line_name'     => '-',
+                                'machine_name'  => '-',
+                                'department_name' => '-',
+                                'warehouse_name'=> '-',
+                                'project_name'  => '-',
+                            ];
+                        }
+                    }
+                }
+            }elseif($menu->table_name == 'purchase_orders'){
+                $datapo = PurchaseOrder::where('code',$code)->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->first();
+                if($datapo){
+                    foreach($datapo->purchaseOrderDetail as $rowdetail){
+                        if($rowdetail->balanceInvoice() > 0){
+                            $arrTotal = $rowdetail->getArrayTotal();
+                            $details[] = [
+                                'type'          => 'purchase_order_details',
+                                'id'            => $rowdetail->id,
+                                'name'          => $rowdetail->item_id ? $rowdetail->item->code.' - '.$rowdetail->item->name : $rowdetail->coa->code.' - '.$rowdetail->coa->name,
+                                'qty_received'  => number_format($rowdetail->qty,3,',','.'),
+                                'qty_returned'  => 0,
+                                'qty_balance'   => number_format($rowdetail->qty,3,',','.'),
+                                'price'         => number_format($arrTotal['total'] / $rowdetail->qty,2,',','.'),
+                                'buy_unit'      => $rowdetail->item_id ? $rowdetail->item->buyUnit->code : '-',
+                                'rawcode'       => $datapo->code,
+                                'post_date'     => date('d/m/y',strtotime($datapo->post_date)),
+                                'due_date'      => date('d/m/y',strtotime($datapo->post_date)),
+                                'total'         => number_format($arrTotal['total'],2,',','.'),
+                                'tax'           => number_format($arrTotal['tax'],2,',','.'),
+                                'wtax'          => number_format($arrTotal['wtax'],2,',','.'),
+                                'grandtotal'    => number_format($arrTotal['grandtotal'],2,',','.'),
+                                'info'          => $rowdetail->note,
+                                'note'          => $rowdetail->note,
+                                'note2'         => $rowdetail->note2,
+                                'top'           => $datapo->payment_term,
+                                'delivery_no'   => '-',
+                                'purchase_no'   => $datapo->code,
+                                'percent_tax'   => $rowdetail->percent_tax,
+                                'percent_wtax'  => $rowdetail->percent_wtax,
+                                'include_tax'   => $rowdetail->is_include_tax,
+                                'place_id'      => $rowdetail->place_id ? $rowdetail->place_id : '',
+                                'line_id'       => $rowdetail->line_id ? $rowdetail->line_id : '',
+                                'machine_id'    => $rowdetail->machine_id ? $rowdetail->machine_id : '',
+                                'department_id' => $rowdetail->department_id ? $rowdetail->department_id : '',
+                                'warehouse_id'  => $rowdetail->warehouse_id ? $rowdetail->warehouse_id : '',
+                                'project_id'    => $rowdetail->project_id ? $rowdetail->project_id : '',
+                                'place_name'    => $rowdetail->place_id ? $rowdetail->place->code : '-',
+                                'line_name'     => $rowdetail->line_id ? $rowdetail->line->name : '-',
+                                'machine_name'  => $rowdetail->machine_id ? $rowdetail->machine->name : '-',
+                                'department_name' => $rowdetail->department_id ? $rowdetail->department->name : '-',
+                                'warehouse_name'=> $rowdetail->warehouse_id ? $rowdetail->warehouse->name : '-',
+                                'project_name'  => $rowdetail->project_id ? $rowdetail->project->name : '-',
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+
+        $result['details'] = $details;
+        $result['status'] = count($details) > 0 ? 200 : 500;
+        				
+		return response()->json($result);
     }
 
     public function getAccountData(Request $request){
@@ -372,6 +538,8 @@ class PurchaseInvoiceController extends Controller
             'nominal_discount',
             'total',
             'tax',
+            'wtax',
+            'rounding',
             'grandtotal',
             'downpayment',
             'balance'
@@ -537,6 +705,7 @@ class PurchaseInvoiceController extends Controller
                     number_format($val->total,2,',','.'),
                     number_format($val->tax,2,',','.'),
                     number_format($val->wtax,2,',','.'),
+                    number_format($val->rounding,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
                     number_format($val->downpayment,2,',','.'),
                     number_format($val->balance,2,',','.'),
@@ -664,7 +833,9 @@ class PurchaseInvoiceController extends Controller
                 $grandtotal = $total + $tax - $wtax;
             }
 
-            $balance = $grandtotal - $downpayment + $rounding;
+            $grandtotal += $rounding;
+
+            $balance = $grandtotal - $downpayment;
 
             if($request->temp){
                 DB::beginTransaction();
@@ -720,9 +891,9 @@ class PurchaseInvoiceController extends Controller
                         $query->total = round($total,2);
                         $query->tax = round($tax,2);
                         $query->wtax = round($wtax,2);
+                        $query->rounding = round($rounding,2);
                         $query->grandtotal = round($grandtotal,2);
                         $query->downpayment = round($downpayment,2);
-                        $query->rounding = round($rounding,2);
                         $query->balance = round($balance,2);
                         $query->document = $document;
                         $query->note = $request->note;
@@ -769,9 +940,9 @@ class PurchaseInvoiceController extends Controller
                         'total'                     => round($total,2),
                         'tax'                       => round($tax,2),
                         'wtax'                      => round($wtax,2),
+                        'rounding'                  => round($rounding,2),
                         'grandtotal'                => round($grandtotal,2),
                         'downpayment'               => round($downpayment,2),
-                        'rounding'                  => round($rounding,2),
                         'balance'                   => round($balance,2),
                         'note'                      => $request->note,
                         'document'                  => $request->file('document') ? $request->file('document')->store('public/purchase_invoices') : NULL,
@@ -827,7 +998,7 @@ class PurchaseInvoiceController extends Controller
                         foreach($request->arr_multi_coa as $key => $row){
                             $coa = Coa::where('code',explode('-',$row)[0])->where('company_id',$request->company_id)->first();
                             $tax = $request->arr_multi_tax_id[$key] ? Tax::where('code',explode('-',$request->arr_multi_tax_id[$key])[0])->first() : '';
-                            $wtax = $request->arr_multi_wtax_id[$key] ? Tax::where('code',explode('-',$request->arr_multi_wtax_id[$key])[0])->first() : '';
+                            $wtax = $request->arr_multi_wtax_id[$key] ? Tax::where('code',explode('|',$request->arr_multi_wtax_id[$key])[0])->first() : '';
                             $place = $request->arr_multi_place[$key] ? Place::where('code',explode('-',$request->arr_multi_place[$key])[0])->first() : '';
                             $line = $request->arr_multi_line[$key] ? Line::where('code',$request->arr_multi_line[$key])->first() : '';
                             $machine = $request->arr_multi_machine[$key] ? Machine::where('code',explode('|',$request->arr_multi_machine[$key])[1])->first() : '';
@@ -3389,4 +3560,7 @@ class PurchaseInvoiceController extends Controller
         return response()->json($response);
     }
     
+    public function getImportExcel(){
+        return Excel::download(new ExportTemplatePurchaseInvoice(), 'format_copas_multi_ap_invoice'.uniqid().'.xlsx');
+    }
 }

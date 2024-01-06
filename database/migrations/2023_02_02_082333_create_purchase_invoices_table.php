@@ -30,9 +30,9 @@ return new class extends Migration
             $table->double('total')->nullable();
             $table->double('tax')->nullable();
             $table->double('wtax')->nullable();
+            $table->double('rounding')->nullable();
             $table->double('grandtotal')->nullable();
             $table->double('downpayment')->nullable();
-            $table->double('rounding')->nullable();
             $table->double('balance')->nullable();
             $table->string('document')->nullable();
             $table->text('note')->nullable();

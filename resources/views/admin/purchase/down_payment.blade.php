@@ -1159,21 +1159,23 @@
         }
     }
 
-    function countAll(){
-
-        let subtotal = 0, discount = 0, total = 0, grandtotal = 0, tax = 0, wtax = 0, ada = false, percent_tax = $('#tax_id').val(), percent_wtax = $('#wtax_id').val();
-
+    function checkAll(){
         if($('input[name^="arr_code"]').length > 0){
+            let dp = 0;
             $('input[name^="arr_code"]').each(function(){
                 let element = $(this);
                 if($(element).is(':checked')){
-                    ada = true;
-                    subtotal += parseFloat($('#rowNominal' + element.data('id')).val().replaceAll(".", "").replaceAll(",","."));
+                    dp += parseFloat($('#rowNominal' + element.data('id')).val().replaceAll(".", "").replaceAll(",","."));
                 }
             });
+            $('#subtotal').val(formatRupiahIni(dp.toFixed(2).toString().replace('.',',')));
+            countAll();
         }
+    }
 
-        $('#subtotal').val(formatRupiahIni(subtotal.toFixed(2).toString().replace('.',',')));
+    function countAll(){
+
+        let subtotal = parseFloat($('#subtotal').val().replaceAll(".", "").replaceAll(",",".")), discount = 0, total = 0, grandtotal = 0, tax = 0, wtax = 0, percent_tax = $('#tax_id').val(), percent_wtax = $('#wtax_id').val();
 
         total = subtotal - parseFloat($('#discount').val().replaceAll(".", "").replaceAll(",","."));
 
@@ -1225,7 +1227,7 @@
                 }
             });
         }
-        countAll();
+        checkAll();
     }
 
     function loadDataTable() {

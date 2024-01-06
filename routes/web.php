@@ -1371,10 +1371,12 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[PurchaseInvoiceController::class, 'rowDetail']);
                     Route::post('show', [PurchaseInvoiceController::class, 'show']);
                     Route::post('get_code', [PurchaseInvoiceController::class, 'getCode']);
+                    Route::post('get_scan_barcode', [PurchaseInvoiceController::class, 'getScanBarcode']);
                     Route::post('print',[PurchaseInvoiceController::class, 'print']);
                     Route::post('print_by_range',[PurchaseInvoiceController::class, 'printByRange']);
                     Route::get('print_individual/{id}',[PurchaseInvoiceController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('export',[PurchaseInvoiceController::class, 'export']);
+                    Route::get('get_import_excel',[PurchaseInvoiceController::class, 'getImportExcel']);
                     Route::get('view_journal/{id}',[PurchaseInvoiceController::class, 'viewJournal'])->middleware('operation.access:purchase_invoice,journal');
                     Route::get('viewstructuretree',[PurchaseInvoiceController::class, 'viewStructureTree']);
                     Route::post('create',[PurchaseInvoiceController::class, 'create'])->middleware('operation.access:purchase_invoice,update');

@@ -2634,6 +2634,25 @@ class CustomHelper {
 				}
 			}
 
+			#start journal rounding
+			if($pi->rounding > 0 || $pi->rounding < 0){
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coarounding->id,
+					'account_id'	=> $coarounding->bp_journal ? $account_id : NULL,
+					'type'			=> $pi->rounding > 0 ? '1' : '2',
+					'nominal'		=> abs($pi->rounding * $currency_rate),
+				]);
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coahutangusaha->id,
+					'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
+					'type'			=> $pi->rounding > 0 ? '2' : '1',
+					'nominal'		=> abs($pi->rounding * $currency_rate),
+				]);
+			}
+
 			#start journal down payment
 
 			if($pi->downpayment > 0){
@@ -2655,25 +2674,6 @@ class CustomHelper {
 					'account_id'	=> $coauangmukapembelian->bp_journal ? $account_id : NULL,
 					'type'			=> '2',
 					'nominal'		=> $downpayment,
-				]);
-			}
-
-			#start journal rounding
-			if($pi->rounding > 0 || $pi->rounding < 0){
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $coarounding->id,
-					'account_id'	=> $coarounding->bp_journal ? $account_id : NULL,
-					'type'			=> $pi->rounding > 0 ? '1' : '2',
-					'nominal'		=> abs($pi->rounding * $currency_rate),
-				]);
-
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $coahutangusaha->id,
-					'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
-					'type'			=> $pi->rounding > 0 ? '2' : '1',
-					'nominal'		=> abs($pi->rounding * $currency_rate),
 				]);
 			}
 

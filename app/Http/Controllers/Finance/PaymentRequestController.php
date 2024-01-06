@@ -82,7 +82,6 @@ class PaymentRequestController extends Controller
             'newcode'       => $menu->document_code.date('y'),
             'menucode'      => $menu->document_code,
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
-            'warehouse'     => Warehouse::where('status','1')->whereIn('id',$this->datawarehouse)->get(),
             'line'          => Line::where('status','1')->get(),
             'machine'       => Machine::where('status','1')->get(),
             'department'    => Department::where('status','1')->get(),
@@ -892,7 +891,6 @@ class PaymentRequestController extends Controller
                                 'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
                                 'note'                          => $request->arr_note_cost[$key],
                                 'place_id'                      => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
-                                'warehouse_id'                  => $request->arr_warehouse[$key] ? $request->arr_warehouse[$key] : NULL,
                                 'line_id'                       => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
                                 'machine_id'                    => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
                                 'department_id'                 => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
@@ -924,7 +922,6 @@ class PaymentRequestController extends Controller
                                 'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_pay[$key])),
                                 'note'                          => $request->arr_note[$key],
                                 'place_id'                      => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
-                                'warehouse_id'                  => $request->arr_warehouse[$key] ? $request->arr_warehouse[$key] : NULL,
                                 'line_id'                       => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
                                 'machine_id'                    => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
                                 'department_id'                 => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
@@ -1005,7 +1002,6 @@ class PaymentRequestController extends Controller
                                 <th class="center-align">Dist.Biaya</th>
                                 <th class="center-align">Coa</th>
                                 <th class="center-align">Plant</th>
-                                <th class="center-align">Gudang</th>
                                 <th class="center-align">Line</th>
                                 <th class="center-align">Mesin</th>
                                 <th class="center-align">Departemen</th>
@@ -1024,7 +1020,6 @@ class PaymentRequestController extends Controller
                 <td class="center-align">'.($row->cost_distribution_id ? $row->costDistribution->code.' - '.$row->costDistribution->name : '-').'</td>
                 <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
                 <td class="center-align">'.($row->place()->exists() ? $row->place->code : '-').'</td>
-                <td class="center-align">'.($row->warehouse()->exists() ? $row->warehouse->code : '-').'</td>
                 <td class="center-align">'.($row->line()->exists() ? $row->line->code : '-').'</td>
                 <td class="center-align">'.($row->machine()->exists() ? $row->machine->code : '-').'</td>
                 <td class="center-align">'.($row->department()->exists() ? $row->department->code : '-').'</td>
@@ -1178,7 +1173,6 @@ class PaymentRequestController extends Controller
                 'no_account'    => $row->fundRequest() ? ($row->lookable->no_account ? $row->lookable->no_account : '') : '',
                 'bank_account'  => $row->fundRequest() ? ($row->lookable->bank_account ? $row->lookable->bank_account : '') : '',
                 'place_id'      => $row->place()->exists() ? $row->place->id : '',
-                'warehouse_id'  => $row->warehouse()->exists() ? $row->warehouse->id : '',
                 'line_id'       => $row->line()->exists() ? $row->line->id : '',
                 'machine_id'    => $row->machine()->exists() ? $row->machine->id : '',
                 'department_id' => $row->department()->exists() ? $row->department->id : '',
@@ -1726,6 +1720,11 @@ class PaymentRequestController extends Controller
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Dist.Biaya</th>
                                 <th class="center-align">Coa</th>
+                                <th class="center-align">Plant</th>
+                                <th class="center-align">Line</th>
+                                <th class="center-align">Mesin</th>
+                                <th class="center-align">Departemen</th>
+                                <th class="center-align">Proyek</th>
                                 <th class="center-align">Bayar</th>
                             </tr>
                         </thead><tbody>';
@@ -1739,47 +1738,44 @@ class PaymentRequestController extends Controller
                         <td class="center-align">'.$row->note.'</td>
                         <td class="center-align">'.($row->cost_distribution_id ? $row->costDistribution->code.' - '.$row->costDistribution->name : '-').'</td>
                         <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
+                        <td class="center-align">'.($row->place()->exists() ? $row->place->code : '').'</td>
+                        <td class="center-align">'.($row->line()->exists() ? $row->line->name : '').'</td>
+                        <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '').'</td>
+                        <td class="center-align">'.($row->department()->exists() ? $row->department->name : '').'</td>
+                        <td class="center-align">'.($row->project()->exists() ? $row->project->name : '').'</td>
                         <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
                     </tr>';
                 }
 
-                $html .= '<tr>
-                    <td class="right-align" colspan="5">TOTAL</td>
-                    <td class=""></td>
-                    <td class="right-align">'.number_format($data->total,2,',','.').'</td>
-                </tr>';
-
-                $html .= '<tr>
-                    <td class="right-align" colspan="5">PEMBULATAN</td>
-                    <td class=""></td>
-                    <td class="right-align">'.number_format($data->rounding,2,',','.').'</td>
-                </tr>';
-
-                $html .= '<tr>
-                    <td class="right-align" colspan="5">BIAYA ADMIN</td>
-                    <td class="">DIST.BIAYA : '.($data->cost_distribution_id ? $data->costDistribution->code.' - '.$data->costDistribution->name : '-').'</td>
-                    <td class="right-align">'.number_format($data->admin,2,',','.').'</td>
-                </tr>';
-
-                $html .= '<tr>
-                    <td class="right-align" colspan="5">GRANDTOTAL</td>
-                    <td class=""></td>
-                    <td class="right-align">'.number_format($data->grandtotal,2,',','.').'</td>
-                </tr>';
-
-                $html .= '<tr>
-                    <td class="right-align" colspan="5">BAYAR (PIUTANG)</td>
-                    <td class=""></td>
-                    <td class="right-align">'.number_format($data->payment,2,',','.').'</td>
-                </tr>';
-
-                $html .= '<tr>
-                    <td class="right-align" colspan="5">SISA HARUS BAYAR</td>
-                    <td class=""></td>
-                    <td class="right-align">'.number_format($data->balance,2,',','.').'</td>
-                </tr>';
-
                 $html .= '</tbody></table></div>';
+
+                $html .= '<div class="col s4 right mt-1"><table class="bordered" style="right:0px;" style="min-width:50%;">
+                            <thead>
+                                <tr>
+                                    <th>TOTAL</th>
+                                    <th class="right-align">'.number_format($data->total,2,',','.').'</th>
+                                </tr>
+                                <tr>
+                                    <th>PEMBULATAN</th>
+                                    <th class="right-align">'.number_format($data->rounding,2,',','.').'</th>
+                                </tr>
+                                <tr>
+                                    <th>BIAYA ADMIN</th>
+                                    <th class="right-align">DIST.BIAYA : '.($data->cost_distribution_id ? $data->costDistribution->code.' - '.$data->costDistribution->name : '0,00').'</th>
+                                </tr>
+                                <tr>
+                                    <th>GRANDTOTAL</th>
+                                    <th class="right-align">'.number_format($data->grandtotal,2,',','.').'</th>
+                                </tr>
+                                <tr>
+                                    <th>BAYAR (PIUTANG)</th>
+                                    <th class="right-align">'.number_format($data->payment,2,',','.').'</th>
+                                </tr>
+                                <tr>
+                                    <th>SISA HARUS BAYAR</th>
+                                    <th class="right-align">'.number_format($data->balance,2,',','.').'</th>
+                                </tr>
+                            </thead></table></div>';
 
                 $html .= '<div class="col s12 mt-1"><table style="max-width:500px;">
                                 <thead>

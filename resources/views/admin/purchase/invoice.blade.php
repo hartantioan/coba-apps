@@ -170,6 +170,7 @@
                                                         <th rowspan="2">Total</th>
                                                         <th rowspan="2">PPN</th>
                                                         <th rowspan="2">PPh</th>
+                                                        <th rowspan="2">Pembulatan</th>
                                                         <th rowspan="2">Grandtotal</th>
                                                         <th rowspan="2">Downpayment</th>
                                                         <th rowspan="2">Balance</th>
@@ -305,6 +306,10 @@
                                         <input class="file-path validate" type="text">
                                     </div>
                                 </div>
+                                <div class="input-field col m3 s12">
+                                    <input id="scan_barcode" name="scan_barcode" type="text" placeholder="Ketik nomor dokumen dan tekan Enter...">
+                                    <label class="active" for="invoice_no">Tambah Dokumen dari Scan Barcode</label>
+                                </div>
                                 <div class="col m12 s12 step17">
                                     <div id="detailOne" class="col s12">
                                         <p class="mt-2 mb-2">
@@ -356,7 +361,7 @@
                                     </div>
                                     <div id="detailMulti" class="col s12" style="display:none;">
                                         <div class="col s12" style="overflow:auto;width:100% !important;">
-                                            <h6>Anda bisa menggunakan fitur copy paste dari format excel yang telah disediakan. Silahkan klik <a href="{{ asset(Storage::url('format_imports/format_copas_ap_invoice_2.xlsx')) }}" target="_blank">disini</a> untuk mengunduh. Jangan menyalin kolom paling atas (bagian header), dan tempel pada isian paling kiri di tabel di bawah ini.</h6>
+                                            <h6>Anda bisa menggunakan fitur copy paste dari format excel yang telah disediakan. Silahkan klik <a href="{{-- {{ asset(Storage::url('format_imports/format_copas_ap_invoice_2.xlsx')) }} --}}{{ Request::url() }}/get_import_excel" target="_blank">disini</a> untuk mengunduh. Jangan menyalin kolom paling atas (bagian header), dan tempel pada isian paling kiri di tabel di bawah ini.</h6>
                                             <h6>Fitur ini hanya untuk transaksi yang langsung menjadi biaya pada hutang usaha.</h6>
                                             <p class="mt-2 mb-2">
                                                 <table class="bordered" style="min-width:2700px;zoom:0.7;">
@@ -378,12 +383,13 @@
                                                             <th class="center">Mesin</th>
                                                             <th class="center">Departemen</th>
                                                             <th class="center">Gudang</th>
+                                                            <th class="center">Proyek</th>
                                                             <th class="center">Hapus</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="body-multi">
                                                         <tr id="last-row-multi">
-                                                            <td colspan="17">
+                                                            <td colspan="18">
                                                                 <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 step_2_1 " onclick="addLine()" href="javascript:void(0);">
                                                                     <i class="material-icons left">add</i> Tambah 1 Baris
                                                                 </a>
@@ -448,15 +454,15 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td>Uang Muka</td>
-                                                <td class="right-align">
-                                                    <input class="browser-default" id="downpayment" name="downpayment" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" readonly>
-                                                </td>
-                                            </tr>
-                                            <tr>
                                                 <td>Pembulatan</td>
                                                 <td class="right-align">
                                                     <input class="browser-default" id="rounding" name="rounding" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countGrandtotal();" style="text-align:right;width:100%;">
+                                                </td> 
+                                            </tr>
+                                            <tr>
+                                                <td>Uang Muka</td>
+                                                <td class="right-align">
+                                                    <input class="browser-default" id="downpayment" name="downpayment" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" readonly>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -972,6 +978,184 @@
         $("#table-detail th").resizable({
             minWidth: 100,
         });
+
+        $("#scan_barcode").on( "keypress", function(e) {
+            var key = e.which;
+            if(key == 13){
+                if($(this).val()){
+                    let code = $(this).val();
+                    $.ajax({
+                        url: '{{ Request::url() }}/get_scan_barcode',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: {
+                            code: code,
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            loadingOpen('.modal-content');
+                        },
+                        success: function(response) {
+                            loadingClose('.modal-content');
+                            if(response.status == 200){
+                                if(response.details.length > 0){
+                                    $.each(response.details, function(i, val) {
+                                        var count = makeid(10);
+                                        $('#last-row-detail').before(`
+                                            <tr class="row_detail">
+                                                <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
+                                                <input type="hidden" name="arr_price[]" value="` + val.price + `" data-id="` + count + `">
+                                                <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
+                                                <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `">
+                                                <input type="hidden" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `">
+                                                <input type="hidden" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `">
+                                                <input type="hidden" id="arr_place` + count + `" name="arr_place[]" value="` + val.place_id + `" data-id="` + count + `">
+                                                <input type="hidden" id="arr_line` + count + `" name="arr_line[]" value="` + val.line_id + `" data-id="` + count + `">
+                                                <input type="hidden" id="arr_machine` + count + `" name="arr_machine[]" value="` + val.machine_id + `" data-id="` + count + `">
+                                                <input type="hidden" id="arr_department` + count + `" name="arr_department[]" value="` + val.department_id + `" data-id="` + count + `">
+                                                <input type="hidden" id="arr_warehouse` + count + `" name="arr_warehouse[]" value="` + val.warehouse_id + `" data-id="` + count + `">
+                                                <input type="hidden" id="arr_project` + count + `" name="arr_project[]" value="` + val.project_id + `" data-id="` + count + `">
+                                                <input type="hidden" name="arr_code[]" value="` + val.id + `" data-id="` + count + `">
+                                                <input type="hidden" name="arr_temp_qty[]" value="` + val.qty_balance + `" data-id="` + count + `">
+                                                <td class="center">
+                                                    ` + val.rawcode + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.purchase_no + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.delivery_no + `
+                                                </td>
+                                                <td class="">
+                                                    ` + val.name + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.buy_unit + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.qty_received + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.qty_returned + `
+                                                </td>
+                                                <td class="center">
+                                                    <input class="browser-default" type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                                                </td>
+                                                <td class="right-align">
+                                                    ` + val.price + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.post_date + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.due_date + `
+                                                </td>
+                                                <td class="right-align row_total" id="row_total` + count + `">
+                                                    ` + val.total + `
+                                                </td>
+                                                <td class="center">
+                                                    <select class="browser-default" id="arr_percent_tax` + count + `" name="arr_percent_tax[]" data-id="` + count + `" onchange="countAll();">
+                                                        <option value="0" data-id="">-- Non-PPN --</option>
+                                                        @foreach ($tax as $row1)
+                                                            <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </td>
+                                                <td class="center">
+                                                    <select class="browser-default" id="arr_include_tax` + count + `" name="arr_include_tax[]" data-id="` + count + `" onchange="countAll();">
+                                                        <option value="0">Tidak</option>
+                                                        <option value="1">Ya</option>
+                                                    </select>
+                                                </td>
+                                                <td class="right-align" id="row_tax` + count + `">
+                                                    ` + val.tax + `
+                                                </td>
+                                                <td class="center">
+                                                    <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
+                                                        <option value="0" data-id="">-- Non-PPh --</option>
+                                                        @foreach ($wtax as $row2)
+                                                            <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </td>
+                                                <td class="right-align" id="row_wtax` + count + `">
+                                                    ` + val.wtax + `    
+                                                </td>
+                                                <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
+                                                    ` + val.grandtotal + `
+                                                </td>
+                                                <td>
+                                                    <input class="browser-default" type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
+                                                </td>
+                                                <td>
+                                                    <input class="browser-default" type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.place_name + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.line_name + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.machine_name + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.department_name + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.warehouse_name + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.project_name + `
+                                                </td>
+                                            </tr>
+                                        `);
+
+                                        $('#arr_percent_tax' + count).val(val.percent_tax);
+                                        $('#arr_percent_wtax' + count).val(val.percent_wtax);
+                                        $('#arr_include_tax' + count).val(val.include_tax);
+
+                                        $('#top').val(val.top);
+
+                                    });                        
+                                }else{
+                                    $('.row_detail').remove();
+                                    $('#total,#tax,#balance').text('0,00');
+                                }
+
+                                addDays();
+                                
+                                $('.modal-content').scrollTop(400);
+                                M.updateTextFields();
+
+                                countAll();
+
+                            }else{
+                                swal({
+                                    title: 'Ups!',
+                                    text: 'Mohon maaf data tidak ditemukan.',
+                                    icon: 'error'
+                                });
+                            }
+
+                            $('#scan_barcode').val('');
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('.modal-content');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                }
+                e.preventDefault();
+            }
+        });
     });
 
     String.prototype.replaceAt = function(index, replacement) {
@@ -1104,37 +1288,26 @@
         `);
         $('#body-multi :input').off('paste');
         $('#body-multi :input').on('paste', function (e) {
-            var $start = $(this);
-            var source;
-
-            if (window.clipboardData !== undefined) {
-                source = window.clipboardData;
-            } else {
-                source = e.originalEvent.clipboardData;
-            }
-            var data = source.getData("Text");
-            if (data.length > 0) {
-                if (data.indexOf("\t") > -1) {
-                    var columns = data.split("\n");
-                    $.each(columns, function () {
-                        var values = this.split("\t");
-                        $.each(values, function () {
-                            $start.val(this);
-                            if($start.closest('td').next('td').find('input')[0] != undefined) {
-                                $start = $start.closest('td').next('td').find('input');
-                            }else{
-                                return false;  
-                            }
+            var $this = $(this);
+            $.each(e.originalEvent.clipboardData.items, function(i, v){
+                if (v.type === 'text/plain'){
+                    v.getAsString(function(text){
+                        var x = $this.closest('td').index(),
+                            y = $this.closest('tr').index()+1,
+                            obj = {};
+                        text = text.trim('\r\n');
+                        $.each(text.split('\r\n'), function(i2, v2){
+                            $.each(v2.split('\t'), function(i3, v3){
+                                var row = y+i2, col = x+i3;
+                                obj['cell-'+row+'-'+col] = v3;
+                                $this.closest('table').find('tr:eq('+row+') td:eq('+col+') input').val(v3);
+                            });
                         });
-                        $start = $start.closest('td').parent().next('tr').children('td:first').find('input');
+
                     });
-                    e.preventDefault();
                 }
-                countAllMulti();
-                M.toast({
-                    html: 'Sukses ditempel.'
-                });
-            }
+            });
+            return false;
         });
     }
 
@@ -2090,11 +2263,13 @@
                 );
             });
 
+            grandtotal += rounding;
+
             $('input[name^="arr_dp_code"]').each(function(index){
                 downpayment += parseFloat($('input[name^="arr_nominal"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
             });
 
-            balance = grandtotal - downpayment + rounding;
+            balance = grandtotal - downpayment;
 
             $('#downpayment').val(
                 (downpayment >= 0 ? '' : '-') + formatRupiahIni(downpayment.toFixed(2).replace('.',','))
@@ -2120,13 +2295,13 @@
         if($('#type_detail').val() == '1'){
             let total = parseFloat($('#total').text().replaceAll(".", "").replaceAll(",",".")), tax = parseFloat($('#tax').text().replaceAll(".", "").replaceAll(",",".")), wtax = parseFloat($('#wtax').val().replaceAll(".", "").replaceAll(",",".")), downpayment = 0, balance = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",","."));
             
-            let grandtotal = total + tax - wtax;
+            let grandtotal = total + tax - wtax + rounding;
 
             $('input[name^="arr_dp_code"]').each(function(index){
                 downpayment += parseFloat($('input[name^="arr_nominal"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
             });
 
-            balance = grandtotal - downpayment + rounding;
+            balance = grandtotal - downpayment;
 
             $('#balance').text(
                 (balance >= 0 ? '' : '-') + formatRupiahIni(balance.toFixed(2).toString().replace('.',','))
@@ -2296,6 +2471,7 @@
                 { name: 'total', className: 'right-align' },
                 { name: 'tax', className: 'right-align' },
                 { name: 'wtax', className: 'right-align' },
+                { name: 'rounding', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
                 { name: 'downpayment', className: 'right-align' },
                 { name: 'balance', className: 'right-align' },

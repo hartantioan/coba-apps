@@ -301,7 +301,7 @@
                                 @foreach($data->purchaseOrderDetail as $key => $row)
                                 <tr>
                                     <td align="center" rowspan="3">{{ ($key + 1) }}</td>
-                                    <td align="center">{{ $row->item_id ? $row->item->code.' - '.$row->item->name : $row->coa->name }}</td>
+                                    <td align="left">{{ $row->item_id ? $row->item->code.' - '.$row->item->name : $row->coa->name }}</td>
                                     <td align="center">{{ number_format($row->qty,3,',','.') }}</td>
                                     <td align="center">{{ $row->item_id ? $row->item->buyUnit->code : '-' }}</td>
                                     <td align="right">{{ number_format($row->price,2,',','.') }}</td>

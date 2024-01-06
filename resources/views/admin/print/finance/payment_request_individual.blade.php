@@ -308,7 +308,6 @@
                                     <th class="center">Keterangan</th>
                                     <th class="center">Coa</th>
                                     <th class="center">Plant</th>
-                                    <th class="center">Gudang</th>
                                     <th class="center">Line</th>
                                     <th class="center">Mesin</th>
                                     <th class="center">Departemen</th>
@@ -328,7 +327,6 @@
                                     <td>{{ $row->note }}</td>
                                     <td>{{ $row->coa->name }}</td>
                                     <td>{{ $row->place()->exists() ? $row->place->code : '-' }}</td>
-                                    <td>{{ $row->warehouse()->exists() ? $row->warehouse->code : '-' }}</td>
                                     <td>{{ $row->line()->exists() ? $row->line->code : '-' }}</td>
                                     <td>{{ $row->machine()->exists() ? $row->machine->code : '-' }}</td>
                                     <td>{{ $row->department()->exists() ? $row->department->code : '-' }}</td>

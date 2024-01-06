@@ -1835,7 +1835,7 @@
             exitOnOverlayClick : false,
             steps: [
                 {
-                    title : 'AR Credit Memo',
+                    title : 'AR Memo',
                     intro : 'Form ini digunakan untuk mengelola data credit memo untuk dokumen AR Invoice dan Piutang Usaha dari sebuah Partner Bisnis.'
                 },
                 {

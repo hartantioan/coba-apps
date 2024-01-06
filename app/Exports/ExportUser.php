@@ -15,6 +15,8 @@ class ExportUser implements FromCollection, WithTitle, WithHeadings, WithCustomS
     * @return \Illuminate\Support\Collection
     */
 
+    protected $search, $status, $type;
+
     public function __construct(string $search, string $status, string $type)
     {
         $this->search = $search ? $search : '';

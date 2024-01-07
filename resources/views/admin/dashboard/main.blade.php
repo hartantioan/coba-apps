@@ -121,7 +121,7 @@
                                                         <td class="center-align">{{ ($key + 1) }}</td>
                                                         <td class="">{{ $row->item->code.' - '.$row->item->name }}</td>
                                                         <td class="">{{ $row->itemShading()->exists() ? $row->itemShading->code : '-' }}</td>
-                                                        <td class="">{{ $row->place->code.' - '.$row->place->company->name }}</td>
+                                                        <td class="">{{ $row->place->code }}</td>
                                                         <td class="center-align">{{ $row->warehouse->name }}</td>
                                                         <td class="center-align">{{ $row->area()->exists() ? $row->area->name : '-' }}</td>
                                                         <td class="center-align">{{ $row->itemShading()->exists() ? $row->itemShading->code : '-' }}</td>

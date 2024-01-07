@@ -84,6 +84,19 @@ class GoodReceiptDetail extends Model
         });
     }
 
+    public function goodReceiptDetailSerial(){
+        return $this->hasMany('App\Models\GoodReceiptDetailSerial','good_receipt_detail_id','id');
+    }
+
+    public function listSerial(){
+        $arr = [];
+        foreach($this->goodReceiptDetailSerial as $row){
+            $arr[] = $row->serial_number;
+        }
+
+        return implode(', ',$arr);
+    }
+
     public function getRowTotal(){
         $total = 0;
         $rowprice = 0;

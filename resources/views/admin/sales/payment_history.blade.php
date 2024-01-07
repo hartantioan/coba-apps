@@ -20,7 +20,7 @@
 		.determinate {
 			width: 0;
 			transition: width 1s ease-in-out;
-			padding: 8px;
+			padding: 1px;
 			position: relative;
 			color: #fff;
 			text-align: right;

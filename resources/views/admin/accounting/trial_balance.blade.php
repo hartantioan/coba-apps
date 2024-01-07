@@ -77,7 +77,7 @@
                                             </div>
                                             <div class="col m2 s6 ">
                                                 <label for="month_start" style="font-size:1rem;">Bulan Mulai :</label>
-                                                <input type="month" id="month_start" name="month_start" value="{{ date('Y-m') }}">
+                                                <input type="month" id="month_start" name="month_start" value="{{ date('Y-m'.'-01') }}">
                                             </div>
                                             <div class="col m2 s6 ">
                                                 <label for="month_end" style="font-size:1rem;">Bulan Akhir :</label>

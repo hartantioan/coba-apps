@@ -197,8 +197,15 @@
                 <thead>
                     <tr>
                         <th class="center">No.</th>
-                        <th class="center">Nama Aset</th>
                         <th class="center">Kode Aset</th>
+                        <th class="center">Nama Aset</th>
+                        <th class="center-align">Plant</th>
+                        <th class="center-align">Gudang</th>
+                        <th class="center-align">Line</th>
+                        <th class="center-align">Mesin</th>
+                        <th class="center-align">Departemen</th>
+                        <th class="center-align">Proyek</th>
+                        <th class="center-align">Dist.Biaya</th>
                         <th class="center">Harga</th>
                         <th class="center">Qty</th>
                         <th class="center">Satuan</th>
@@ -212,6 +219,13 @@
                             <td class="center-align">{{ $key + 1 }}</td>
                             <td>{{ $row->asset->code }}</td>
                             <td>{{ $row->asset->name }}</td>
+                            <td>{{ ($row->place()->exists() ? $row->place->code : '-') }}</td>
+                            <td>{{ ($row->warehouse()->exists() ? $row->warehouse->name : '-') }}</td>
+                            <td>{{ ($row->line()->exists() ? $row->line->code : '-') }}</td>
+                            <td>{{ ($row->machine()->exists() ? $row->machine->code : '-') }}</td>
+                            <td>{{ ($row->department()->exists() ? $row->department->name : '-') }}</td>
+                            <td>{{ ($row->project()->exists() ? $row->project->name : '-') }}</td>
+                            <td>{{ ($row->costDistribution()->exists() ? $row->costDistribution->name : '-') }}</td>
                             <td class="right-align">{{ number_format($row->price,3,',','.') }}</td>
                             <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
                             <td class="center-align">{{ $row->unit->code }}</td>

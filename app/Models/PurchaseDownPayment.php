@@ -210,7 +210,7 @@ class PurchaseDownPayment extends Model
         foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query) use($date){
             $query->where('payment_type','5')->whereIn('status',['1','2','3'])->whereDoesntHave('outgoingPayment')->whereNull('coa_source_id')->whereDate('post_date','<=',$date);
         })->get() as $rowpayment){
-            $total += $rowpayment->nominal;
+            $total -= $rowpayment->nominal;
         }
         return $total;
     }

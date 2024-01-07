@@ -25,16 +25,20 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportCapitalization;
 use Illuminate\Database\Eloquent\Builder;
 use App\Helpers\CustomHelper;
+use App\Models\Line;
+use App\Models\Machine;
+use App\Models\Warehouse;
 
 class CapitalizationController extends Controller
 {
-    protected $dataplaces, $dataplacecode;
+    protected $dataplaces, $dataplacecode, $datawarehouses;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
         $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
+        $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
     }
 
     public function index(Request $request)
@@ -48,11 +52,13 @@ class CapitalizationController extends Controller
             'currency'      => Currency::where('status','1')->get(),
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-            
             'newcode'       => $menu->document_code.date('y'),
             'menucode'      => $menu->document_code,
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
-
+            'department'    => Department::where('status','1')->get(),
+            'line'          => Line::where('status','1')->get(),
+            'machine'       => Machine::where('status','1')->get(),
+            'warehouse'     => Warehouse::where('status','1')->whereIn('id',$this->datawarehouses)->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -155,7 +161,7 @@ class CapitalizationController extends Controller
                     $val->user->name,
                     $val->company->name,
                     $val->currency->code.' - '.$val->currency->name,
-                    number_format($val->currency_rate,3,',','.'),
+                    number_format($val->currency_rate,2,',','.'),
                     date('d/m/y',strtotime($val->post_date)),
                     $val->note,
                     $val->status(),
@@ -303,6 +309,13 @@ class CapitalizationController extends Controller
                     CapitalizationDetail::create([
                         'capitalization_id'     => $query->id,
                         'asset_id'              => $row,
+                        'place_id'              => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
+                        'warehouse_id'          => $request->arr_warehouse[$key] ? $request->arr_warehouse[$key] : NULL,
+                        'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
+                        'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
+                        'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
+                        'project_id'            => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
+                        'cost_distribution_id'  => $request->arr_cost_distribution_cost[$key] ? $request->arr_cost_distribution_cost[$key] : NULL,
                         'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                         'unit_id'               => $request->arr_unit[$key],
                         'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
@@ -348,6 +361,13 @@ class CapitalizationController extends Controller
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Aset</th>
+                                <th class="center-align">Plant</th>
+                                <th class="center-align">Gudang</th>
+                                <th class="center-align">Line</th>
+                                <th class="center-align">Mesin</th>
+                                <th class="center-align">Departemen</th>
+                                <th class="center-align">Proyek</th>
+                                <th class="center-align">Dist.Biaya</th>
                                 <th class="center-align">Harga</th>
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Unit</th>
@@ -360,6 +380,13 @@ class CapitalizationController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td>'.$row->asset->code.' - '.$row->asset->name.'</td>
+                <td>'.($row->place()->exists() ? $row->place->code : '-').'</td>
+                <td>'.($row->warehouse()->exists() ? $row->warehouse->name : '-').'</td>
+                <td>'.($row->line()->exists() ? $row->line->code : '-').'</td>
+                <td>'.($row->machine()->exists() ? $row->machine->code : '-').'</td>
+                <td>'.($row->department()->exists() ? $row->department->name : '-').'</td>
+                <td>'.($row->project()->exists() ? $row->project->name : '-').'</td>
+                <td>'.($row->costDistribution()->exists() ? $row->costDistribution->name : '-').'</td>
                 <td class="right-align">'.number_format($row->price,2,',','.').'</td>
                 <td class="center-align">'.$row->qty.'</td>
                 <td class="center-align">'.$row->unit->code.'</td>
@@ -431,16 +458,26 @@ class CapitalizationController extends Controller
         
         foreach($cap->capitalizationDetail as $row){
             $arr[] = [
-                'asset_id'          => $row->asset_id,
-                'asset_code'        => $row->asset->code,
-                'asset_name'        => $row->asset->name,
-                'place_name'        => $row->asset->place->name,
-                'qty'               => $row->qty,
-                'unit_id'           => $row->unit_id,
-                'unit_name'         => $row->unit->name,
-                'price'             => number_format($row->price,3,',','.'),
-                'total'             => number_format($row->total,3,',','.'),
-                'note'              => $row->note
+                'asset_id'              => $row->asset_id,
+                'asset_code'            => $row->asset->code,
+                'asset_name'            => $row->asset->name,
+                'place_name'            => $row->asset->place->name,
+                'place_code'            => $row->asset->place->code,
+                'place_id'              => $row->place_id ? $row->place_id : '',
+                'warehouse_id'          => $row->warehouse_id ? $row->warehouse_id : '',
+                'line_id'               => $row->line_id ? $row->line_id : '',
+                'machine_id'            => $row->machine_id ? $row->machine_id : '',
+                'department_id'         => $row->department_id ? $row->department_id : '',
+                'project_id'            => $row->project()->exists() ? $row->project_id : '',
+                'project_name'          => $row->project()->exists() ? $row->project->name : '',
+                'cost_distribution_id'  => $row->costDistribution()->exists() ? $row->cost_distribution_id : '',
+                'cost_distribution_name'=> $row->costDistribution()->exists() ? $row->costDistribution->code.' - '.$row->costDistribution->name : '',
+                'qty'                   => $row->qty,
+                'unit_id'               => $row->unit_id,
+                'unit_name'             => $row->unit->name,
+                'price'                 => number_format($row->price,3,',','.'),
+                'total'                 => number_format($row->total,3,',','.'),
+                'note'                  => $row->note
             ];
         }
 

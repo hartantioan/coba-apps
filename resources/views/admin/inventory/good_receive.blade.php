@@ -206,7 +206,7 @@
                                                     <th class="center">Harga</th>
                                                     <th class="center">Total</th>
                                                     <th class="center">Keterangan</th>
-                                                    <th class="center">Coa Kredit</th>
+                                                    <th class="center">Coa</th>
                                                     <th class="center">Plant</th>
                                                     <th class="center">Line</th>
                                                     <th class="center">Mesin</th>

@@ -552,6 +552,7 @@ class Select2Controller extends Controller {
                 'price'                 => $capital ? number_format($capital->price,3,',','.') : '0,000',
                 'place_id'              => $d->place_id,
                 'place_name'            => $d->place->name,
+                'place_code'            => $d->place->code,
                 'book_balance'          => $d->book_balance,
                 'qty_balance'           => $d->qtyBalance(),
             ];
@@ -585,6 +586,7 @@ class Select2Controller extends Controller {
                 'price'                 => $capital ? number_format($capital->price,3,',','.') : '0,000',
                 'place_id'              => $d->place_id,
                 'place_name'            => $d->place->name,
+                'place_code'            => $d->place->code,
                 'book_balance'          => $d->book_balance,
                 'qty_balance'           => $d->qtyBalance(),
             ];

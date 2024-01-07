@@ -44,6 +44,7 @@ use App\Models\Department;
 use App\Models\GoodReceiptDetail;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportGoodReceipt;
+use App\Models\GoodReceiptDetailSerial;
 use App\Models\Menu;
 
 class GoodReceiptPOController extends Controller
@@ -241,13 +242,16 @@ class GoodReceiptPOController extends Controller
             if($data->hasBalance()){
                 CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Goods Receipt');
                 $details = [];
+                $serials = [];
+                $maxcolumn = 0;
                 foreach($data->purchaseOrderDetail as $row){
-                    if($row->getBalanceReceipt() > 0){
+                    $qtyBalance = $row->getBalanceReceipt();
+                    if($qtyBalance > 0){
                         $details[] = [
                             'purchase_order_detail_id'  => $row->id,
                             'item_id'                   => $row->item_id,
                             'item_name'                 => $row->item->code.' - '.$row->item->name,
-                            'qty'                       => number_format($row->getBalanceReceipt(),3,',','.'),
+                            'qty'                       => number_format($qtyBalance,3,',','.'),
                             'unit'                      => $row->item->buyUnit->code,
                             'place_id'                  => $row->place_id,
                             'place_name'                => $row->place->code,
@@ -262,10 +266,23 @@ class GoodReceiptPOController extends Controller
                             'note'                      => $row->note,
                             'note2'                     => $row->note2,
                         ];
+                        if($row->item()->exists()){
+                            if($row->item->itemGroup->is_activa){
+                                $serials[] = [
+                                    'purchase_order_detail_id'  => $row->id,
+                                    'item_id'                   => $row->item_id,
+                                    'item_name'                 => $row->item->code.' - '.$row->item->name,
+                                    'qty_serial'                => $qtyBalance,
+                                ];
+                                $maxcolumn = $qtyBalance > $maxcolumn ? $qtyBalance : $maxcolumn;
+                            }
+                        }
                     }
                 }
 
                 $data['details'] = $details;
+                $data['serials'] = $serials;
+                $data['maxcolumn'] = $maxcolumn;
             }else{
                 $data['status'] = '500';
                 $data['message'] = 'Seluruh item pada purchase order '.$data->code.' telah diterima di gudang.';
@@ -476,6 +493,7 @@ class GoodReceiptPOController extends Controller
                         $query->save();
 
                         foreach($query->goodReceiptDetail as $row){
+                            $row->goodReceiptDetailSerial()->delete();
                             $row->delete();
                         }
 
@@ -520,7 +538,7 @@ class GoodReceiptPOController extends Controller
                 DB::beginTransaction();
                 try {
                     foreach($request->arr_purchase as $key => $row){
-                        GoodReceiptDetail::create([
+                        $grd = GoodReceiptDetail::create([
                             'good_receipt_id'           => $query->id,
                             'purchase_order_detail_id'  => $row,
                             'good_scale_detail_id'      => $request->arr_scale[$key] ? $request->arr_scale[$key] : NULL,
@@ -539,6 +557,16 @@ class GoodReceiptPOController extends Controller
                             'department_id'             => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
                             'warehouse_id'              => $request->arr_warehouse[$key]
                         ]);
+                        foreach($request->arr_serial_po as $keyserial => $rowserial){
+                            if($rowserial == $row){
+                                GoodReceiptDetailSerial::create([
+                                    'good_receipt_id'           => $query->id,
+                                    'good_receipt_detail_id'    => $grd->id,
+                                    'item_id'                   => $request->arr_serial_item[$keyserial],
+                                    'serial_number'             => $request->arr_serial[$keyserial],
+                                ]);
+                            }
+                        }
                     }
 
                     CustomHelper::sendApproval('good_receipts',$query->id,$query->note);
@@ -614,6 +642,9 @@ class GoodReceiptPOController extends Controller
                 <td class="center-align">'.($rowdetail->department_id ? $rowdetail->department->name : '-').'</td>
                 <td class="center-align">'.$rowdetail->warehouse->name.'</td>
                 <td class="center-align">'.($rowdetail->good_scale_detail_id ? $rowdetail->goodScaleDetail->goodScale->code : '-').'</td>
+            </tr>
+            <tr>
+                <td colspan="13">Serial No : '.$rowdetail->listSerial().'</td>
             </tr>';
         }
         

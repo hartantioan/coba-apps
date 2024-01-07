@@ -67,7 +67,7 @@
                                             </div>
                                             <div class="col m2 s6 ">
                                                 <label for="date_start" style="font-size:1rem;">Tanggal Mulai :</label>
-                                                <input type="date" id="date_start" name="date_start" value="{{ date('Y-m-d') }}">
+                                                <input type="date" id="date_start" name="date_start" value="{{ date('Y-m'.'-01') }}">
                                             </div>
                                             <div class="col m2 s6 ">
                                                 <label for="date_end" style="font-size:1rem;">Tanggal Akhir :</label>

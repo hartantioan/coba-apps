@@ -35,7 +35,7 @@
                                         <div class="input-field col m3 s12">
                                             <select class="form-control" id="plant" name="plant">
                                                 @foreach ($place as $row)
-                                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                                    <option value="{{ $row->id }}">{{ $row->code }}</option>
                                                 @endforeach
                                             </select>
                                             <label class="" for="plant">Plant</label>

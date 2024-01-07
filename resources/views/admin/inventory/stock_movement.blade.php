@@ -38,7 +38,7 @@
                                 <div class="col s12">
                                     <div class="row">
                                         <div class="input-field col m3 s12">
-                                            <input id="start_date" name="start_date" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                                            <input id="start_date" name="start_date" type="date" placeholder="Tgl. posting" value="{{ date('Y-m').'-01' }}">
                                             <label class="active" for="start_date">Tanggal Awal</label>
                                         </div>
                                         <div class="input-field col m3 s12">

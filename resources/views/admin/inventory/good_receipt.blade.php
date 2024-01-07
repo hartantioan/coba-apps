@@ -244,6 +244,22 @@
                                     </div>
                                 </p>
                             </div>
+                            <div class="col m12 s12">
+                                <p class="mt-2 mb-2">
+                                    <h5>Detail Nomor Serial (Item Aktiva)</h5>
+                                    <div style="overflow:auto;">
+                                        <table class="bordered" style="min-width:100%;" id="table-serial">
+                                            <tbody id="body-item-serial">
+                                                <tr id="empty-item-serial">
+                                                    <td class="center">
+                                                        Pilih purchase order untuk memulai...
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </p>
+                            </div>
                             <div class="input-field col m4 s12 step13">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
@@ -1086,12 +1102,13 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                var formData = new FormData($('#form_data')[0]);
+                var formData = new FormData($('#form_data')[0]), passedSerial = true;
 
                 formData.delete("arr_department[]");
                 formData.delete("arr_line[]");
                 formData.delete("arr_machine[]");
                 formData.delete("arr_scale[]");
+                formData.delete("arr_serial[]");
 
                 $('input[name^="arr_department"]').each(function(index){
                     formData.append('arr_department[]',($(this).val() ? $(this).val() : ''));
@@ -1108,70 +1125,90 @@
                 $('select[name^="arr_scale"]').each(function(index){
                     formData.append('arr_scale[]',($(this).val() ? $(this).val() : ''));
                 });
-        
-                $.ajax({
-                    url: '{{ Request::url() }}/create',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    cache: true,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        $('#validation_alert').hide();
-                        $('#validation_alert').html('');
-                        loadingOpen('.modal-content');
-                    },
-                    success: function(response) {
-                        loadingClose('.modal-content');
-                        if(response.status == 200) {
-                            success();
-                            M.toast({
-                                html: response.message
-                            });
-                        } else if(response.status == 422) {
-                            $('#validation_alert').show();
-                            $('.modal-content').scrollTop(0);
-                            
-                            swal({
-                                title: 'Ups! Validation',
-                                text: 'Check your form.',
-                                icon: 'warning'
-                            });
 
-                            $.each(response.error, function(i, val) {
-                                $.each(val, function(i, val) {
-                                    $('#validation_alert').append(`
-                                        <div class="card-alert card red">
-                                            <div class="card-content white-text">
-                                                <p>` + val + `</p>
-                                            </div>
-                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                <span aria-hidden="true">×</span>
-                                            </button>
-                                        </div>
-                                    `);
+                if($('input[name^="arr_serial[]"]').length > 0){
+                    $('input[name^="arr_serial[]"]').each(function(index){
+                        if(!$(this).val()){
+                            passedSerial = false;
+                        }else{
+                            formData.append('arr_serial[]',$(this).val());
+                            formData.append('arr_serial_item[]',$(this).data('item'));
+                            formData.append('arr_serial_po[]',$(this).data('po'));
+                        }
+                    });
+                }
+                
+                if(passedSerial){
+                    $.ajax({
+                        url: '{{ Request::url() }}/create',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        cache: true,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            $('#validation_alert').hide();
+                            $('#validation_alert').html('');
+                            loadingOpen('.modal-content');
+                        },
+                        success: function(response) {
+                            loadingClose('.modal-content');
+                            if(response.status == 200) {
+                                success();
+                                M.toast({
+                                    html: response.message
                                 });
-                            });
-                        } else {
-                            M.toast({
-                                html: response.message
+                            } else if(response.status == 422) {
+                                $('#validation_alert').show();
+                                $('.modal-content').scrollTop(0);
+                                
+                                swal({
+                                    title: 'Ups! Validation',
+                                    text: 'Check your form.',
+                                    icon: 'warning'
+                                });
+
+                                $.each(response.error, function(i, val) {
+                                    $.each(val, function(i, val) {
+                                        $('#validation_alert').append(`
+                                            <div class="card-alert card red">
+                                                <div class="card-content white-text">
+                                                    <p>` + val + `</p>
+                                                </div>
+                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                        `);
+                                    });
+                                });
+                            } else {
+                                M.toast({
+                                    html: response.message
+                                });
+                            }
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('.modal-content');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
                             });
                         }
-                    },
-                    error: function() {
-                        $('.modal-content').scrollTop(0);
-                        loadingClose('.modal-content');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
-                        });
-                    }
-                });
+                    });
+                }else{
+                    swal({
+                        title: 'Ups!',
+                        text: 'Nomor serial item tidak boleh kosong.',
+                        icon: 'error'
+                    });
+                }
             }
         });
     }
@@ -1179,6 +1216,19 @@
     function success(){
         loadDataTable();
         $('#modal1').modal('close');
+    }
+
+    function adjustSerial(element,podid,itemid){
+        let countSerialPo = $('input[name^="arr_serial[]"][data-po="' + podid + '"]').length;
+        let qty = parseFloat($(element).val().replaceAll(".", "").replaceAll(",","."));
+        if(qty !== countSerialPo){
+            $('input[name^="arr_serial[]"][data-po="' + podid + '"]').remove();
+        }
+        for(let i = 1;i<=qty;i++){
+            $('td[data-pod="' + podid + '"]').append(`
+                <input name="arr_serial[]" class="browser-default" type="text" placeholder="Nomor serial item..." value="" style="width:150px;" required data-item="` + itemid + `" data-po="`+ podid +`">
+            `);
+        }
     }
 
     function getPurchaseOrder(){
@@ -1237,7 +1287,7 @@
                                             ` + val.item_name + `
                                         </td>
                                         <td>
-                                            <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                            <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);adjustSerial(this,` + val.purchase_order_detail_id + `,` + val.item_id + `)" style="text-align:right;width:100px;">
                                         </td>
                                         <td class="center">
                                             <span>` + val.unit + `</span>
@@ -1305,6 +1355,24 @@
                                 });
                             });
                         }
+                        if(response.serials.length > 0){
+                            $('#empty-item-serial').remove();
+                            $.each(response.serials, function(i, val) {
+                                var count = makeid(10);
+                                let columns = '';
+                                for(let i = 1;i<=response.maxcolumn;i++){
+                                    columns += (i > val.qty_serial ? `` : `<input name="arr_serial[]" class="browser-default" type="text" placeholder="Nomor serial item..." value="" style="width:150px;" required data-item="` + val.item_id + `" data-po="`+ val.purchase_order_detail_id +`">`);
+                                }
+                                $('#body-item-serial').append(`
+                                    <tr class="row_item_serial" data-po="` + response.id + `">
+                                        <td style="min-width:200px !important;">
+                                            ` + val.item_name + `
+                                        </td>
+                                        <td data-pod="` + val.purchase_order_detail_id + `">` + columns + `</td>
+                                    </tr>
+                                `);
+                            });
+                        }
                         $('#purchase_order_id').empty();
                         $('.modal-content').scrollTop(0);
                         M.updateTextFields();
@@ -1353,10 +1421,21 @@
             },
             success: function(response) {
                 $('.row_item[data-po="' + id + '"]').remove();
+                $('.row_item_serial[data-po="' + id + '"]').remove();
                 if($('.row_item').length == 0 && $('#empty-item').length == 0){
                     $('#body-item').append(`
                         <tr id="empty-item">
                             <td colspan="13" class="center">
+                                Pilih purchase order untuk memulai...
+                            </td>
+                        </tr>
+                    `);
+                }
+
+                if($('.row_item_serial').length == 0 && $('#empty-item-serial').length == 0){
+                    $('#body-item-serial').append(`
+                        <tr id="empty-item-serial">
+                            <td class="center">
                                 Pilih purchase order untuk memulai...
                             </td>
                         </tr>

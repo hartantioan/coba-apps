@@ -74,6 +74,7 @@
                                                         <th>Coa</th>
                                                         <th>Gudang</th>
                                                         <th>Tipe Produksi</th>
+                                                        <th>Item Aktiva</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -147,6 +148,27 @@
                             <label class="active" for="warehouse_id">Gudang</label>
                         </div>
                         <div class="input-field col s6">
+                            <select class="browser-default" id="production_type" name="production_type">
+                                <option value="">Bukan Item Produksi</option>
+                                <option value="1">SFG-1</option>
+                                <option value="2">SFG-2</option>
+                                <option value="3">SFG-3</option>
+                                <option value="4">FG</option>
+                            </select>
+                            <label class="active" for="production_type">Tipe Produksi</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <div class="switch mb-1">
+                                <label for="is_activa">Item Aktiva</label>
+                                <label>
+                                    Tidak
+                                    <input type="checkbox" id="is_activa" name="is_activa" value="1">
+                                    <span class="lever"></span>
+                                    Ya
+                                </label>
+                            </div>
+                        </div>
+                        <div class="input-field col s6">
                             <div class="switch mb-1">
                                 <label for="order">Status</label>
                                 <label>
@@ -156,16 +178,6 @@
                                     Active
                                 </label>
                             </div>
-                        </div>
-                        <div class="input-field col s6">
-                            <select class="browser-default" id="production_type" name="production_type">
-                                <option value="">Bukan Item Produksi</option>
-                                <option value="1">SFG-1</option>
-                                <option value="2">SFG-2</option>
-                                <option value="3">SFG-3</option>
-                                <option value="4">FG</option>
-                            </select>
-                            <label class="active" for="production_type">Tipe Produksi</label>
                         </div>
                         <div class="col s12 mt-3">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
@@ -268,6 +280,7 @@
                 { name: 'coa', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'warehouse_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'production_type', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'is_activa', orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -416,6 +429,12 @@
                     $('#status').prop( "checked", true);
                 }else{
                     $('#status').prop( "checked", false);
+                }
+
+                if(response.is_activa == '1'){
+                    $('#is_activa').prop( "checked", true);
+                }else{
+                    $('#is_activa').prop( "checked", false);
                 }
 
                 $('.modal-content').scrollTop(0);

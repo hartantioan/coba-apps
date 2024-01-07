@@ -62,24 +62,38 @@ class AgingAPController extends Controller
                         AND pm.post_date <= :date2
                         AND pm.status IN ('2','3')
                 ),0) AS total_memo,
+                IFNULL((
+                    SELECT
+                        SUM(prd.nominal)
+                        FROM payment_request_details prd
+                        JOIN payment_requests pr
+                            ON pr.id = prd.payment_request_id
+                        WHERE prd.lookable_type = 'purchase_invoices'
+                        AND prd.lookable_id = pi.id
+                        AND pr.post_date <= :date3
+                        AND pr.status IN ('2','3')
+                        AND pr.payment_type = '5'
+                ),0) AS total_reconcile,
                 u.name AS account_name,
                 u.employee_no AS account_code
                 FROM purchase_invoices pi
                 LEFT JOIN users u
                     ON u.id = pi.account_id
                 WHERE 
-                    pi.post_date <= :date3
+                    pi.post_date <= :date4
                     AND pi.balance > 0
                     AND pi.status IN ('2','3')
         ", array(
             'date1' => $date,
             'date2' => $date,
             'date3' => $date,
+            'date4' => $date,
         ));
 
         $results2 = DB::select("
             SELECT 
                 *,
+                pi.top AS topdp,
                 IFNULL((SELECT 
                     SUM(nominal) 
                     FROM payment_request_details prd 
@@ -102,19 +116,32 @@ class AgingAPController extends Controller
                         AND pm.post_date <= :date2
                         AND pm.status IN ('2','3')
                 ),0) AS total_memo,
+                IFNULL((
+                    SELECT
+                        SUM(prd.nominal)
+                        FROM payment_request_details prd
+                        JOIN payment_requests pr
+                            ON pr.id = prd.payment_request_id
+                        WHERE prd.lookable_type = 'purchase_down_payments'
+                        AND prd.lookable_id = pi.id
+                        AND pr.post_date <= :date3
+                        AND pr.status IN ('2','3')
+                        AND pr.payment_type = '5'
+                ),0) AS total_reconcile,
                 u.name AS account_name,
                 u.employee_no AS account_code
                 FROM purchase_down_payments pi
                 LEFT JOIN users u
                     ON u.id = pi.account_id
                 WHERE 
-                    pi.post_date <= :date3
+                    pi.post_date <= :date4
                     AND pi.grandtotal > 0
                     AND pi.status IN ('2','3')
         ", array(
             'date1' => $date,
             'date2' => $date,
             'date3' => $date,
+            'date4' => $date,
         ));
 
         $countPeriod = 1;
@@ -149,7 +176,7 @@ class AgingAPController extends Controller
         $newData = []; 
 
         foreach($results as $row){
-            $balance = $row->balance - $row->total_payment - $row->total_memo;
+            $balance = $row->balance - $row->total_payment - $row->total_memo - $row->total_reconcile;
             if($balance > 0){
                 $daysDiff = $this->dateDiffInDays($row->due_date,$date);
                 $index = $this->findDuplicate($row->account_code,$newData);
@@ -185,8 +212,8 @@ class AgingAPController extends Controller
                         }
                     }
                     $newData[] = [
-                        'customer_code'         => $row->account_code,
-                        'customer_name'         => $row->account_name,
+                        'supplier_code'         => $row->account_code,
+                        'supplier_name'         => $row->account_name,
                         'data'                  => $arrDetail,
                         'total'                 => $balance,
                     ];
@@ -195,9 +222,10 @@ class AgingAPController extends Controller
         }
 
         foreach($results2 as $row){
-            $balance = $row->grandtotal - $row->total_payment - $row->total_memo;
+            $balance = $row->grandtotal - $row->total_payment - $row->total_memo - $row->total_reconcile;
+            $due_date = $row->due_date ? $row->due_date : date('Y-m-d', strtotime($row->post_date. ' + '.$row->topdp.' day'));
             if($balance > 0){
-                $daysDiff = $this->dateDiffInDays($row->due_date,$date);
+                $daysDiff = $this->dateDiffInDays($due_date,$date);
                 $index = $this->findDuplicate($row->account_code,$newData);
                 if($index >= 0){
                     foreach($newData[$index]['data'] as $key => $rowdata){
@@ -231,8 +259,8 @@ class AgingAPController extends Controller
                         }
                     }
                     $newData[] = [
-                        'customer_code'         => $row->account_code,
-                        'customer_name'         => $row->account_name,
+                        'supplier_code'         => $row->account_code,
+                        'supplier_name'         => $row->account_name,
                         'data'                  => $arrDetail,
                         'total'                 => $balance,
                     ];
@@ -245,7 +273,7 @@ class AgingAPController extends Controller
             <tr>
                 <th rowspan="2" class="center-align">No.</th>
                 <th rowspan="2" class="center-align" style="min-width:250px !important;">Supplier</th>
-                <th rowspan="2" class="center-align" style="min-width:175px !important;">Total Piutang</th>
+                <th rowspan="2" class="center-align" style="min-width:175px !important;">Total Hutang</th>
                 <th colspan="'.$countPeriod.'">Nominal Jatuh Tempo (Dari Tgl. Posting dan Tgl. Jatuh Tempo)</th>
             </tr>
             <tr>';
@@ -259,7 +287,7 @@ class AgingAPController extends Controller
         <tbody>';
 
         foreach($newData as $key => $row){
-            $html .= '<tr class="row_detail"><td class="center-align">'.($key + 1).'</td><td>'.$row['customer_name'].'</td>';
+            $html .= '<tr class="row_detail"><td class="center-align">'.($key + 1).'</td><td>'.$row['supplier_name'].'</td>';
 
             $html .= '<td class="right-align">'.number_format($row['total'],2,',','.').'</td>';
 
@@ -338,24 +366,38 @@ class AgingAPController extends Controller
                         AND pm.post_date <= :date2
                         AND pm.status IN ('2','3')
                 ),0) AS total_memo,
+                IFNULL((
+                    SELECT
+                        SUM(prd.nominal)
+                        FROM payment_request_details prd
+                        JOIN payment_requests pr
+                            ON pr.id = prd.payment_request_id
+                        WHERE prd.lookable_type = 'purchase_invoices'
+                        AND prd.lookable_id = pi.id
+                        AND pr.post_date <= :date3
+                        AND pr.status IN ('2','3')
+                        AND pr.payment_type = '5'
+                ),0) AS total_reconcile,
                 u.name AS account_name,
                 u.employee_no AS account_code
                 FROM purchase_invoices pi
                 LEFT JOIN users u
                     ON u.id = pi.account_id
                 WHERE 
-                    pi.post_date <= :date3
+                    pi.post_date <= :date4
                     AND pi.balance > 0
                     AND pi.status IN ('2','3')
         ", array(
             'date1' => $date,
             'date2' => $date,
             'date3' => $date,
+            'date4' => $date,
         ));
 
         $results2 = DB::select("
             SELECT 
                 *,
+                pi.top AS topdp,
                 IFNULL((SELECT 
                     SUM(nominal) 
                     FROM payment_request_details prd 
@@ -378,19 +420,32 @@ class AgingAPController extends Controller
                         AND pm.post_date <= :date2
                         AND pm.status IN ('2','3')
                 ),0) AS total_memo,
+                IFNULL((
+                    SELECT
+                        SUM(prd.nominal)
+                        FROM payment_request_details prd
+                        JOIN payment_requests pr
+                            ON pr.id = prd.payment_request_id
+                        WHERE prd.lookable_type = 'purchase_down_payments'
+                        AND prd.lookable_id = pi.id
+                        AND pr.post_date <= :date3
+                        AND pr.status IN ('2','3')
+                        AND pr.payment_type = '5'
+                ),0) AS total_reconcile,
                 u.name AS account_name,
                 u.employee_no AS account_code
                 FROM purchase_down_payments pi
                 LEFT JOIN users u
                     ON u.id = pi.account_id
                 WHERE 
-                    pi.post_date <= :date3
+                    pi.post_date <= :date4
                     AND pi.grandtotal > 0
                     AND pi.status IN ('2','3')
         ", array(
             'date1' => $date,
             'date2' => $date,
             'date3' => $date,
+            'date4' => $date,
         ));
 
         $countPeriod = 1;
@@ -425,7 +480,7 @@ class AgingAPController extends Controller
         $newData = []; 
 
         foreach($results as $row){
-            $balance = $row->balance - $row->total_payment - $row->total_memo;
+            $balance = $row->balance - $row->total_payment - $row->total_memo - $row->total_reconcile;
             if($balance > 0){
                 $daysDiff = $this->dateDiffInDays($row->due_date,$date);
                 $arrDetail = [];
@@ -448,8 +503,8 @@ class AgingAPController extends Controller
                     }
                 }
                 $newData[] = [
-                    'customer_code'         => $row->account_code,
-                    'customer_name'         => $row->account_name,
+                    'supplier_code'         => $row->account_code,
+                    'supplier_name'         => $row->account_name,
                     'invoice'               => $row->code,
                     'data'                  => $arrDetail,
                     'total'                 => $balance,
@@ -458,9 +513,10 @@ class AgingAPController extends Controller
         }
 
         foreach($results2 as $row){
-            $balance = $row->grandtotal - $row->total_payment - $row->total_memo;
+            $balance = $row->grandtotal - $row->total_payment - $row->total_memo - $row->total_reconcile;
+            $due_date = $row->due_date ? $row->due_date : date('Y-m-d', strtotime($row->post_date. ' + '.$row->topdp.' day'));
             if($balance > 0){
-                $daysDiff = $this->dateDiffInDays($row->due_date,$date);
+                $daysDiff = $this->dateDiffInDays($due_date,$date);
                 $arrDetail = [];
                 foreach($arrColumn as $key => $rowcolumn){
                     if($daysDiff <= $rowcolumn['end'] && $daysDiff >= $rowcolumn['start']){
@@ -481,8 +537,8 @@ class AgingAPController extends Controller
                     }
                 }
                 $newData[] = [
-                    'customer_code'         => $row->account_code,
-                    'customer_name'         => $row->account_name,
+                    'supplier_code'         => $row->account_code,
+                    'supplier_name'         => $row->account_name,
                     'invoice'               => $row->code,
                     'data'                  => $arrDetail,
                     'total'                 => $balance,
@@ -511,7 +567,7 @@ class AgingAPController extends Controller
         <tbody>';
 
         foreach($newData as $key => $row){
-            $html .= '<tr class="row_detail"><td class="center-align">'.($key + 1).'</td><td>'.$row['customer_name'].'</td><td>'.$row['invoice'].'</td>';
+            $html .= '<tr class="row_detail"><td class="center-align">'.($key + 1).'</td><td>'.$row['supplier_name'].'</td><td>'.$row['invoice'].'</td>';
 
             $html .= '<td class="right-align">'.number_format($row['total'],2,',','.').'</td>';
 
@@ -565,19 +621,20 @@ class AgingAPController extends Controller
 
         foreach($arrInvoice as $row){
             $prefix = substr($row,0,4);
-            if($prefix == 'PODP'){
+            if($prefix == 'APDP'){
                 $dp = PurchaseDownPayment::where('code',$row)->first();
                 if($dp){
                     $memo = $dp->totalMemoByDate($date);
                     $paid = $dp->totalPaidByDate($date);
                     $balance = $dp->grandtotal - $memo - $paid;
+                    $due_date = $dp->due_date ? $dp->due_date : date('Y-m-d', strtotime($dp->post_date. ' + '.$dp->top.' day'));
                     $results[] = [
                         'code'          => $dp->code,
                         'vendor'        => $dp->supplier->name,
                         'post_date'     => date('d/m/y',strtotime($dp->post_date)),
                         'rec_date'      => '-',
-                        'due_date'      => date('d/m/y',strtotime($dp->due_date)),
-                        'due_days'      => $this->dateDiffInDays($dp->due_date,$date),
+                        'due_date'      => $due_date,
+                        'due_days'      => $this->dateDiffInDays($due_date,$date),
                         'grandtotal'    => number_format($dp->grandtotal,2,',','.'),
                         'memo'          => number_format($memo,2,',','.'),
                         'paid'          => number_format($paid,2,',','.'),

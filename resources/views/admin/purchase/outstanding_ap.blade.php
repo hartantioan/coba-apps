@@ -158,15 +158,14 @@
                 if(response.status == 200) {
                     $('#detail_invoice').empty();
                     if(response.message.length > 0){
-                        var gtall=0;
                         $.each(response.message, function(i, val) {
-                            gtall+=val.grandtotal;
+                            console.log(val.details.length);
                             $('#detail_invoice').append(`
                                 <tr>
                                     <td class="center-align" rowspan="`+val.details.length+`">`+(i+1)+`</td>
-                                    <td  rowspan="`+val.details.length+`">`+val.code+`</td>
-                                    <td  rowspan="`+val.details.length+`">`+val.vendor+`</td>
-                                    <td >`+val.details[0].po+`</td>
+                                    <td rowspan="`+val.details.length+`">`+val.code+`</td>
+                                    <td rowspan="`+val.details.length+`">`+val.vendor+`</td>
+                                    <td>`+val.details[0].po+`</td>
                                     <td class="center-align" rowspan="`+val.details.length+`">`+val.post_date+`</td>
                                     <td class="center-align" rowspan="`+val.details.length+`">`+val.rec_date+`</td>
                                     <td class="center-align">`+val.details[0].top+`</td>
@@ -188,18 +187,19 @@
                             $.each(val.details,function(j, details) {
                                 if(j>0){
                                     $('#detail_invoice').append(`
-                                        <td >`+val.details[j].po+`</td>
-                                        <td class="center-align">`+val.details[j].top+`</td>
-                                        <td >`+val.details[j].item_name+`</td>
-                                        <td >`+val.details[j].note1+`</td>
-                                        <td >`+val.details[j].note2+`</td>
-                                        <td class="center-align">`+val.details[j].qty+`</td>
-                                        <td class="center-align">`+val.details[j].unit+`</td>
-                                        <td class="right-align">`+val.details[j].price_o+`</td>
-                                        <td class="right-align">`+val.details[j].total+`</td>
-                                        <td class="right-align">`+val.details[j].ppn+`</td>
-                                        <td class="right-align">`+val.details[j].pph+`</td>
-                                        
+                                        <tr>
+                                            <td >`+val.details[j].po+`</td>
+                                            <td class="center-align">`+val.details[j].top+`</td>
+                                            <td >`+val.details[j].item_name+`</td>
+                                            <td >`+val.details[j].note1+`</td>
+                                            <td >`+val.details[j].note2+`</td>
+                                            <td class="center-align">`+val.details[j].qty+`</td>
+                                            <td class="center-align">`+val.details[j].unit+`</td>
+                                            <td class="right-align">`+val.details[j].price_o+`</td>
+                                            <td class="right-align">`+val.details[j].total+`</td>
+                                            <td class="right-align">`+val.details[j].ppn+`</td>
+                                            <td class="right-align">`+val.details[j].pph+`</td>
+                                        </tr>
                                     `);
                                 }
                             });

@@ -362,7 +362,7 @@ class MarketingOrderDownPayment extends Model
 
     public function getPercentPayment(){
         $total = $this->grandtotal - $this->totalMemo();
-        $percent = round(($this->totalPay() / $total) * 100);
+        $percent = $total > 0 ? round(($this->totalPay() / $total) * 100) : 0;
         return $percent;
     }
 }

@@ -21,6 +21,7 @@ class ItemGroup extends Model
         'parent_id',
         'coa_id',
         'production_type',
+        'is_activa',
         'status'
     ];
 
@@ -57,6 +58,15 @@ class ItemGroup extends Model
         };
 
         return $status;
+    }
+
+    public function isActiva(){
+        $activa = match ($this->is_activa) {
+          '1' => 'Ya',
+          default => 'Tidak',
+        };
+
+        return $activa;
     }
 
     public function productionType(){

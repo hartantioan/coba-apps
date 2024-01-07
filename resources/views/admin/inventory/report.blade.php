@@ -31,13 +31,13 @@
                                         </div>
                                         <div class="input-field col m3 s12">
                                             <select class="form-control" id="mode" name="mode">
-                                                <option value="1">Tanpa Data Terhapus</option>
-                                                <option value="2">Dengan Data Terhapus</option>
+                                                <option value="1">Exclude Deleted Data</option>
+                                                <option value="2">All Data</option>
                                             </select>
                                             <label class="" for="mode">Mode Data</label>
                                         </div>
                                         <div class="input-field col m3 s12">
-                                            <input id="start_date" name="start_date" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                                            <input id="start_date" name="start_date" type="date" placeholder="Tgl. posting" value="{{ date('Y-m').'-01' }}">
                                             <label class="active" for="start_date">Tanggal Awal</label>
                                         </div>
                                         <div class="input-field col m3 s12">

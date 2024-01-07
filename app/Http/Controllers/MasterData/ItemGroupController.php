@@ -98,6 +98,7 @@ class ItemGroupController extends Controller
                     $val->coa->name,
                     $val->listWarehouse(),
                     $val->productionType(),
+                    $val->isActiva(),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -150,6 +151,7 @@ class ItemGroupController extends Controller
                     $query->parent_id       = $request->parent_id ? $request->parent_id : NULL;
                     $query->coa_id          = $request->coa_id;
                     $query->production_type = $request->production_type ? $request->production_type : NULL;
+                    $query->is_activa       = $request->is_activa ? $request->is_activa : NULL;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
 
@@ -168,6 +170,7 @@ class ItemGroupController extends Controller
                         'parent_id'         => $request->parent_id ? $request->parent_id : NULL,
                         'coa_id'            => $request->coa_id,
                         'production_type'   => $request->production_type ? $request->production_type : NULL,
+                        'is_activa'         => $request->is_activa ? $request->is_activa : NULL,
                         'status'            => $request->status ? $request->status : '2',
                     ]);
                     DB::commit();

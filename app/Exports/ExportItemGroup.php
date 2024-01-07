@@ -14,6 +14,8 @@ class ExportItemGroup implements FromCollection, WithTitle, WithHeadings, WithCu
     * @return \Illuminate\Support\Collection
     */
 
+    protected $search, $status;
+
     public function __construct(string $search, string $status)
     {
         $this->search = $search ? $search : '';

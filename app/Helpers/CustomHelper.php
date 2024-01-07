@@ -501,7 +501,7 @@ class CustomHelper {
 					'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
 					'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
 					'warehouse_id'	=> $rowdetail->warehouse_id,
-					'project_id'	=> $rowdetail->productionOrderDetail->project_id ? $rowdetail->productionOrderDetail->project_id : NULL,
+					'project_id'	=> $rowdetail->purchaseOrderDetail->project_id ? $rowdetail->purchaseOrderDetail->project_id : NULL,
 					'type'			=> '1',
 					'nominal'		=> $rowtotal
 				]);
@@ -516,7 +516,7 @@ class CustomHelper {
 						'account_id'	=> $coa_credit->bp_journal ? $gr->account_id : NULL,
 						'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
 						'warehouse_id'	=> $rowdetail->warehouse_id,
-						'project_id'	=> $rowdetail->productionOrderDetail->project_id ? $rowdetail->productionOrderDetail->project_id : NULL,
+						'project_id'	=> $rowdetail->purchaseOrderDetail->project_id ? $rowdetail->purchaseOrderDetail->project_id : NULL,
 						'type'			=> '2',
 						'nominal'		=> $rowtotal
 					]);
@@ -867,6 +867,7 @@ class CustomHelper {
 								'account_id'                    => $row->coa->bp_journal ? $pr->account_id : NULL,
 								'department_id'                 => $rowcost->department_id ? $rowcost->department_id : NULL,
 								'warehouse_id'                  => $rowcost->warehouse_id ? $rowcost->warehouse_id : NULL,
+								'project_id'					=> $row->project_id ? $row->project_id : NULL,
 								'type'                          => '1',
 								'nominal'                       => $nominal * $pr->currency_rate
 							]);
@@ -1003,6 +1004,7 @@ class CustomHelper {
 							'account_id'                    => $row->coa->bp_journal ? $op->account_id : NULL,
 							'department_id'                 => $rowcost->department_id ? $rowcost->department_id : NULL,
 							'warehouse_id'                  => $rowcost->warehouse_id ? $rowcost->warehouse_id : NULL,
+							'project_id'					=> $row->project_id ? $row->project_id : NULL,
 							'type'                          => '1',
 							'nominal'                       => $nominal * $op->currency_rate
 						]);
@@ -1290,7 +1292,7 @@ class CustomHelper {
 					'item_id'		=> $row->item_id,
 					'department_id'	=> $row->goodReceiptDetail->department_id ? $row->goodReceiptDetail->department_id : NULL,
 					'warehouse_id'	=> $row->goodReceiptDetail->warehouse_id,
-					'project_id'	=> $row->goodReceiptDetail->productionOrderDetail->project_id ? $row->goodReceiptDetail->productionOrderDetail->project_id : NULL,
+					'project_id'	=> $row->goodReceiptDetail->purchaseOrderDetail->project_id ? $row->goodReceiptDetail->purchaseOrderDetail->project_id : NULL,
 					'type'			=> '1',
 					'nominal'		=> -1 * $rowtotal,
 				]);
@@ -1304,7 +1306,7 @@ class CustomHelper {
 						'account_id'	=> $coa_credit->bp_journal ? $row->goodReturnPO->account_id : NULL,
 						'department_id'	=> $row->goodReceiptDetail->department_id ? $row->goodReceiptDetail->department_id : NULL,
 						'warehouse_id'	=> $row->goodReceiptDetail->warehouse_id,
-						'project_id'	=> $row->goodReceiptDetail->productionOrderDetail->project_id ? $row->goodReceiptDetail->productionOrderDetail->project_id : NULL,
+						'project_id'	=> $row->goodReceiptDetail->purchaseOrderDetail->project_id ? $row->goodReceiptDetail->purchaseOrderDetail->project_id : NULL,
 						'type'			=> '2',
 						'nominal'		=> -1 * $rowtotal,
 					]);
@@ -1614,18 +1616,57 @@ class CustomHelper {
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $row->asset->assetGroup->coa_id,
-						'place_id'		=> $row->asset->place_id,
+						'place_id'		=> $row->place_id ? $row->place_id : NULL,
+						'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
+						'line_id'		=> $row->line_id ? $row->line_id : NULL,
+						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+						'department_id'	=> $row->department_id ? $row->department_id : NULL,
+						'project_id'	=> $row->project_id ? $row->project_id : NULL,
 						'type'			=> '1',
-						'nominal'		=> $row->total
+						'nominal'		=> $row->total * $cp->currency_rate
 					]);
 
-					JournalDetail::create([
-						'journal_id'	=> $query->id,
-						'coa_id'		=> Coa::where('code','100.01.01.99.04')->where('company_id',$row->asset->place->company_id)->first()->id,
-						'place_id'		=> $row->asset->place_id,
-						'type'			=> '2',
-						'nominal'		=> $row->total
-					]);
+					$coaAyatSilangPembelianAset = Coa::where('code','100.01.01.99.04')->where('company_id',$row->asset->place->company_id)->first();
+
+					if($row->cost_distribution_id){
+						$total = $row->total;
+						$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
+						$accumulation = 0;
+						foreach($row->costDistribution->costDistributionDetail as $key => $rowcost){
+							if($key == $lastIndex){
+								$nominal = $total - $accumulation;
+							}else{
+								$nominal = round(($rowcost->percentage / 100) * $total);
+								$accumulation += $nominal;
+							}
+							JournalDetail::create([
+								'journal_id'                    => $query->id,
+								'cost_distribution_detail_id'   => $rowcost->id,
+								'coa_id'                        => $coaAyatSilangPembelianAset->id,
+								'place_id'                      => $rowcost->place_id ? $rowcost->place_id : NULL,
+								'line_id'                       => $rowcost->line_id ? $rowcost->line_id : NULL,
+								'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : NULL,
+								'department_id'                 => $rowcost->department_id ? $rowcost->department_id : NULL,
+								'warehouse_id'                  => $rowcost->warehouse_id ? $rowcost->warehouse_id : NULL,
+								'project_id'					=> $row->project_id ? $row->project_id : NULL,
+								'type'                          => '1',
+								'nominal'                       => $nominal * $cp->currency_rate
+							]);
+						}
+					}else{
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $coaAyatSilangPembelianAset->id,
+							'place_id'		=> $row->place_id ? $row->place_id : NULL,
+							'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
+							'line_id'		=> $row->line_id ? $row->line_id : NULL,
+							'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+							'department_id'	=> $row->department_id ? $row->department_id : NULL,
+							'project_id'	=> $row->project_id ? $row->project_id : NULL,
+							'type'			=> '2',
+							'nominal'		=> $row->total * $cp->currency_rate
+						]);
+					}
 				}
 			}
 		}elseif($table_name == 'inventory_transfer_outs'){

@@ -11,7 +11,7 @@
     }
 
     .select2 {
-        max-width: 100px !important;
+        max-width: 350px !important;
     }
 </style>
 <!-- BEGIN: Page Main-->
@@ -211,7 +211,7 @@
                                         <h5>Detail Produk</h5>
                                         Coa debit mengikuti coa pada masing-masing grup item.
                                         <div>
-                                            <table class="bordered" style="min-width:2000px;" id="table-detail">
+                                            <table class="bordered" style="min-width:2300px;" id="table-detail">
                                                 <thead>
                                                     <tr>
                                                         <th class="center">Item</th>
@@ -1006,7 +1006,7 @@
             $('#stock' + val).append(optionStock);
 
             $('#serial' + val).append(`
-                <select class="browser-default" id="arr_serial` + val + `" name="arr_serial[]"></select>
+                <select class="browser-default" id="arr_serial` + val + `" name="arr_serial[]" multiple="multiple" style="width:350px !important;max-width:350px !important;"></select>
             `);
             $('#arr_serial' + val).select2({
                 placeholder: '-- Kosong --',

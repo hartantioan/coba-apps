@@ -557,14 +557,16 @@ class GoodReceiptPOController extends Controller
                             'department_id'             => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
                             'warehouse_id'              => $request->arr_warehouse[$key]
                         ]);
-                        foreach($request->arr_serial_po as $keyserial => $rowserial){
-                            if($rowserial == $row){
-                                GoodReceiptDetailSerial::create([
-                                    'good_receipt_id'           => $query->id,
-                                    'good_receipt_detail_id'    => $grd->id,
-                                    'item_id'                   => $request->arr_serial_item[$keyserial],
-                                    'serial_number'             => $request->arr_serial[$keyserial],
-                                ]);
+                        if($request->arr_serial_po){
+                            foreach($request->arr_serial_po as $keyserial => $rowserial){
+                                if($rowserial == $row){
+                                    GoodReceiptDetailSerial::create([
+                                        'good_receipt_id'           => $query->id,
+                                        'good_receipt_detail_id'    => $grd->id,
+                                        'item_id'                   => $request->arr_serial_item[$keyserial],
+                                        'serial_number'             => $request->arr_serial[$keyserial],
+                                    ]);
+                                }
                             }
                         }
                     }

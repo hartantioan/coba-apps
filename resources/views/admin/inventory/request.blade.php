@@ -1351,6 +1351,36 @@
                                                 <option value="">--Silahkan pilih item--</option>    
                                             </select>    
                                         </td>
+                                        <td>
+                                            <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
+                                                <option value="">--Kosong--</option>
+                                                @foreach ($line as $rowline)
+                                                    <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
+                                                @endforeach
+                                            </select>    
+                                        </td>
+                                        <td>
+                                            <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                                                <option value="">--Kosong--</option>
+                                                @foreach ($machine as $row)
+                                                    <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                                                @endforeach    
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
+                                                <option value="">--Kosong--</option>
+                                                @foreach ($department as $rowdept)
+                                                    <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                                                @endforeach
+                                            </select>    
+                                        </td>
+                                        <td>
+                                            <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                                        </td>
+                                        <td>
+                                            <input name="arr_requester[]" type="text" placeholder="Yang meminta barang / requester" value="` + val.requester + `" required>
+                                        </td>
                                         <td class="center">
                                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                                 <i class="material-icons">delete</i>
@@ -1363,6 +1393,26 @@
                                 `);
                                 select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
                                 $('#arr_place' + count).val(val.place_id);
+
+                                if(val.line_id){
+                                    $('#arr_line' + count).val(val.line_id);
+                                }
+
+                                if(val.machine_id){
+                                    $('#arr_machine' + count).val(val.machine_id);
+                                }
+
+                                if(val.department_id){
+                                    $('#arr_department' + count).val(val.department_id);
+                                }
+
+                                if(val.project_id){
+                                    $('#arr_project' + count).append(`
+                                        <option value="` + val.project_id + `">` + val.project_name + `</option>
+                                    `);
+                                }
+
+                                select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
 
                                 $('#arr_warehouse' + count).empty();
                                 if(val.list_warehouse.length > 0){

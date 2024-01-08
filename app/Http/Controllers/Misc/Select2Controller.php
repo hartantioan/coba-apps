@@ -63,6 +63,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Color;
 use App\Models\DeliveryCost;
+use App\Models\GoodReceiptDetailSerial;
 use App\Models\Journal;
 use App\Models\Pattern;
 use App\Models\ProductionOrder;
@@ -3371,6 +3372,22 @@ class Select2Controller extends Controller {
 
     public function goodReceiptSerialNumber(Request $request)
     {
-        
+        $response = [];
+        $search   = $request->search;
+        $data = GoodReceiptDetailSerial::where(function($query) use($search){
+                    $query->where('serial_number', 'like', "%$search%");
+                })
+                ->whereNull('good_issue_detail_id')
+                ->where('item_id',$request->item_id)
+                ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->serial_number,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
     }
 }

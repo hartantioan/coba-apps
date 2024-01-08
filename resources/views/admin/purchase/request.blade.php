@@ -1986,6 +1986,8 @@
                 var count = makeid(10);
                 $('#last-row-item').before(`
                     <tr class="row_item">
+                        <input type="hidden" name="arr_lookable_type[]" value="">
+                        <input type="hidden" name="arr_lookable_id[]" value="">
                         <td>
                             <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                         </td>

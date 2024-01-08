@@ -243,8 +243,8 @@ class EmployeeTransferController extends Controller
                 DB::beginTransaction();
                 try {
                     
-                    $query = EmployeeTransfer::find($request->temp);
-
+                    $query = EmployeeTransfer::find(CustomHelper::decrypt($request->temp));
+                    info($request->temp);
                     $approved = false;
                     $revised = false;
 

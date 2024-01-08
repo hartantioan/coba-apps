@@ -90,8 +90,8 @@ class PurchaseInvoice extends Model
                 $currency = Currency::where('code','IDR')->where('status','1')->first();
             }elseif($row->lookable_type == 'purchase_order_details'){
                 $currency = $row->lookable->purchaseOrder->currency;
-            }elseif($row->lookable_type == 'landed_costs'){
-                $currency = $row->lookable->currency;
+            }elseif($row->lookable_type == 'landed_cost_fee_details'){
+                $currency = $row->lookable->landedCost->currency;
             }else{
                 $currency = $row->lookable->purchaseOrderDetail->purchaseOrder->currency;
             }

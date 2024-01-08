@@ -11,7 +11,12 @@
     }
 
     .select2 {
-        max-width: 350px !important;
+        max-width: 100px !important;
+    }
+
+    .select2-selection--multiple{
+        overflow: hidden !important;
+        height: auto !important;
     }
 </style>
 <!-- BEGIN: Page Main-->
@@ -1006,7 +1011,7 @@
             $('#stock' + val).append(optionStock);
 
             $('#serial' + val).append(`
-                <select class="browser-default" id="arr_serial` + val + `" name="arr_serial[]" multiple="multiple" style="width:350px !important;max-width:350px !important;"></select>
+                <select class="browser-default" id="arr_serial` + val + `" name="arr_serial[]" multiple="multiple"></select>
             `);
             $('#arr_serial' + val).select2({
                 placeholder: '-- Kosong --',

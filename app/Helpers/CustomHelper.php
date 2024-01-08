@@ -1335,6 +1335,8 @@ class CustomHelper {
 					NULL,
 					NULL,
 				);
+
+				$row->goodReceiptDetail->goodReceipt->updateRootDocumentStatusProcess();
 			}
 
 			$journal = Journal::find($query->id);

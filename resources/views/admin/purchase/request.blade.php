@@ -108,7 +108,7 @@
                                                     </tr>
                                                     <tr>
                                                         <th>Pengajuan</th>
-                                                        <th>Kadaluwarsa</th>
+                                                        <th>Jatuh Tempo</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -157,7 +157,7 @@
                                 </div>
                                 <div class="input-field col m4 s12 step4">
                                     <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting">
-                                    <label class="active" for="due_date">Tgl. Kadaluwarsa</label>
+                                    <label class="active" for="due_date">Tgl. Jatuh Tempo</label>
                                 </div>
                                 <div class="file-field input-field col m4 s12 step6">
                                     <div class="btn">
@@ -2353,7 +2353,7 @@
                 {
                     title : 'Tgl. Jatuh Tempo',
                     element : document.querySelector('.step4'),
-                    intro : 'Tanggal kadaluarsa digunakan untuk menentukan masa berlaku dokumen hingga tanggal ini ditentukan.' 
+                    intro : 'Tanggal jatuh tempo digunakan untuk menentukan masa berlaku dokumen hingga tanggal ini ditentukan.' 
                 },
                 {
                     title : 'File Lampiran',

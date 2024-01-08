@@ -73,7 +73,7 @@
                                                         <th>Parent</th>
                                                         <th>Coa</th>
                                                         <th>Gudang</th>
-                                                        <th>Tipe Produksi</th>
+                                                        <th>Item Hasil Produksi</th>
                                                         <th>Item Aktiva</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
@@ -149,13 +149,13 @@
                         </div>
                         <div class="input-field col s6">
                             <select class="browser-default" id="production_type" name="production_type">
-                                <option value="">Bukan Item Produksi</option>
+                                <option value="">Bukan Hasil Produksi</option>
                                 <option value="1">SFG-1</option>
                                 <option value="2">SFG-2</option>
                                 <option value="3">SFG-3</option>
                                 <option value="4">FG</option>
                             </select>
-                            <label class="active" for="production_type">Tipe Produksi</label>
+                            <label class="active" for="production_type">Item Hasil Produksi</label>
                         </div>
                         <div class="input-field col s6">
                             <div class="switch mb-1">

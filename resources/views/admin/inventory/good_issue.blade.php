@@ -216,6 +216,7 @@
                                                     <tr>
                                                         <th class="center">Item</th>
                                                         <th class="center">Stok</th>
+                                                        <th class="center">No.Serial</th>
                                                         <th class="center">Qty</th>
                                                         <th class="center">Satuan</th>
                                                         <th class="center">Keterangan</th>
@@ -230,7 +231,7 @@
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td colspan="12" class="center">
+                                                        <td colspan="13" class="center">
                                                             <button class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                                 <i class="material-icons left">add</i> Tambah Item
                                                             </button>
@@ -783,6 +784,9 @@
                                     <td class="center" id="stock` + count + `">
                                         -
                                     </td>
+                                    <td class="center" id="serial` + count + `">
+                                        -
+                                    </td>
                                     <td>
                                         <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_balance + `" onkeyup="formatRupiah(this);setStock('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
                                     </td>
@@ -919,6 +923,9 @@
                 <td class="center" id="stock` + count + `">
                     -
                 </td>
+                <td class="center" id="serial` + count + `">
+                    -
+                </td>
                 <td>
                     <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0,000" onkeyup="formatRupiah(this);setStock('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
                 </td>
@@ -984,6 +991,7 @@
     function getRowUnit(val){
         $('#stock' + val).empty();
         $('#unit' + val).empty();
+        $('#serial' + val).empty();
         if($("#arr_item" + val).val()){
             $('#unit' + val).text($("#arr_item" + val).select2('data')[0].uom);
             let optionStock = '<select class="browser-default" id="arr_item_stock' + val + '" name="arr_item_stock[]" required onchange="resetQty(`'+ val +'`)">';
@@ -996,9 +1004,38 @@
             }
             optionStock += '</select>';
             $('#stock' + val).append(optionStock);
+
+            $('#serial' + val).append(`
+                <select class="browser-default" id="arr_serial` + val + `" name="arr_serial[]"></select>
+            `);
+            $('#arr_serial' + val).select2({
+                placeholder: '-- Kosong --',
+                minimumInputLength: 1,
+                allowClear: true,
+                cache: true,
+                width: 'resolve',
+                dropdownParent: $('body').parent(),
+                ajax: {
+                    url: '{{ url("admin/select2/good_receipt_serial_number") }}',
+                    type: 'GET',
+                    dataType: 'JSON',
+                    data: function(params) {
+                        return {
+                            search: params.term,
+                            item_id: $("#arr_item" + val).val(),
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data.items
+                        }
+                    }
+                }
+            });
         }else{
             $('#stock' + val).append(` - `);
             $('#unit' + val).append(` - `);
+            $('#serial' + val).append(` - `);
         }
     }
 
@@ -1192,6 +1229,9 @@
                                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" data-id="` + count + `"></select>
                                 </td>
                                 <td class="center" id="stock` + count + `">
+                                    -
+                                </td>
+                                <td class="center" id="serial` + count + `">
                                     -
                                 </td>
                                 <td>

@@ -416,7 +416,7 @@
                     <div class="invoice-subtotal break-row">
                         Remark :
                         <ol>
-                            <li>Harap cantumkan Nomor PO di dokumen DO.</li>
+                            <li>Harap cantumkan Nomor PO di dokumen DO atau Surat Jalan.</li>
                             <li>Penjual harus menandatangani PO ini paling lambat 3 (tiga) hari kerja dari tanggal PO.</li>
                             <li>Pihak supplier tidak diperbolehkan memberikan uang dan/atau hadiah dalam bentuk apapun kepada karyawan/staff {{ $data->company->name }}. Jika melanggar akan diproses secara hukum dan seluruh sisa tagihan dianggap lunas.</li>
                         </ol>

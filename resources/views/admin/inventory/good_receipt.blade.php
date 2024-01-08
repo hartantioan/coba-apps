@@ -244,9 +244,14 @@
                                     </div>
                                 </p>
                             </div>
-                            <div class="col m12 s12">
+                            <div class="col m12 s12 step13">
                                 <p class="mt-2 mb-2">
                                     <h5>Detail Nomor Serial (Item Aktiva)</h5>
+                                    <div class="card-alert card red">
+                                        <div class="card-content white-text">
+                                            <p>Hati-hati! Jumlah nomor serial akan berubah ketika anda mengubah qty barang. Jika ada data pada input nomor serial, maka data akan hilang ditimpa dengan inputan baru. Pastikan anda tidak mengisi nomor serial jika qty belum diatur.</p>
+                                        </div>
+                                    </div>
                                     <div style="overflow:auto;">
                                         <table class="bordered" style="min-width:100%;" id="table-serial">
                                             <tbody id="body-item-serial">
@@ -260,12 +265,12 @@
                                     </div>
                                 </p>
                             </div>
-                            <div class="input-field col m4 s12 step13">
+                            <div class="input-field col m4 s12 step14">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step14" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step15" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -533,10 +538,22 @@
                 $('.row_item').each(function(){
                     $(this).remove();
                 });
+                $('.row_item_serial').each(function(){
+                    $(this).remove();
+                });
                 if($('#empty-item').length == 0){
                     $('#body-item').append(`
                         <tr id="empty-item">
                             <td colspan="13" class="center">
+                                Pilih purchase order untuk memulai...
+                            </td>
+                        </tr>
+                    `);
+                }
+                if($('#empty-item-serial').length == 0){
+                    $('#body-item-serial').append(`
+                        <tr id="empty-item-serial">
+                            <td class="center">
                                 Pilih purchase order untuk memulai...
                             </td>
                         </tr>
@@ -1287,7 +1304,7 @@
                                             ` + val.item_name + `
                                         </td>
                                         <td>
-                                            <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);adjustSerial(this,` + val.purchase_order_detail_id + `,` + val.item_id + `)" style="text-align:right;width:100px;">
+                                            <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);adjustSerial(this,` + val.purchase_order_detail_id + `,` + val.item_id + `);" style="text-align:right;width:100px;">
                                         </td>
                                         <td class="center">
                                             <span>` + val.unit + `</span>
@@ -1502,7 +1519,7 @@
                                     ` + val.item_name + `
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);adjustSerial(this,` + val.purchase_order_detail_id + `,` + val.item_id + `);" style="text-align:right;width:100px;">
                                 </td>
                                 <td class="center">
                                     <span>` + val.unit + `</span>
@@ -1572,6 +1589,25 @@
                                 }
                             }
                         });
+                    });
+                }
+
+                if(response.serials.length > 0){
+                    $('#empty-item-serial').remove();
+                    $.each(response.serials, function(i, val) {
+                        var count = makeid(10);
+                        let columns = '';
+                        $.each(val.list_serial_number, function(i, value) {
+                            columns += `<input name="arr_serial[]" class="browser-default" type="text" placeholder="Nomor serial item..." value="` + value + `" style="width:150px;" required data-item="` + val.item_id + `" data-po="`+ val.purchase_order_detail_id +`">`;
+                        });
+                        $('#body-item-serial').append(`
+                            <tr class="row_item_serial" data-po="` + val.purchase_order_id + `">
+                                <td style="min-width:200px !important;">
+                                    ` + val.item_name + `
+                                </td>
+                                <td data-pod="` + val.purchase_order_detail_id + `">` + columns + `</td>
+                            </tr>
+                        `);
                     });
                 }
 
@@ -1964,16 +2000,21 @@
                 {
                     title : 'Detail Produk',
                     element : document.querySelector('.step12'),
-                    intro : 'List produk yang terkait dengan po ataupun grpo .' 
+                    intro : 'List produk yang terkait dengan po ataupun grpo.' 
+                },
+                {
+                    title : 'Detail Nomor Serial',
+                    element : document.querySelector('.step13'),
+                    intro : 'Tabel ini untuk mengelola data nomor serial jika item yang ditarik dari PO adalah item dari Grup Aktiva.' 
                 },
                 {
                     title : 'Keterangan',
-                    element : document.querySelector('.step13'),
+                    element : document.querySelector('.step14'),
                     intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step14'),
+                    element : document.querySelector('.step15'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

@@ -726,6 +726,7 @@ class GoodReceiptPOController extends Controller
         $grm['code_place_id'] = substr($grm->code,7,2);
 
         $arr = [];
+        $serials = [];
         
         foreach($grm->goodReceiptDetail as $row){
             $arr[] = [
@@ -752,7 +753,26 @@ class GoodReceiptPOController extends Controller
             ];
         }
 
+        foreach($grm->goodReceiptDetail as $row){
+            if($row->goodReceiptDetailSerial()->exists()){
+                $rowserials = [];
+
+                foreach($row->goodReceiptDetailSerial as $rowserial){
+                    $rowserials[] = $rowserial->serial_number;
+                }
+
+                $serials[] = [
+                    'purchase_order_id'         => $row->purchaseOrderDetail->purchaseOrder->id,
+                    'purchase_order_detail_id'  => $rowserial->goodReceiptDetail->purchase_order_detail_id,
+                    'item_id'                   => $row->item_id,
+                    'item_name'                 => $row->item->code.' - '.$row->item->name,
+                    'list_serial_number'        => $rowserials,
+                ];
+            }
+        }
+
         $grm['details'] = $arr;
+        $grm['serials'] = $serials;
         				
 		return response()->json($grm);
     }
@@ -1905,15 +1925,13 @@ class GoodReceiptPOController extends Controller
                                 ];
                        
                                 $data_go_chart[]=$data_pyrc_tempura;
-                                info($row_pyr_cross->lookable->code);
-                                info($row_pyr_detail->paymentRequest->code);
                                 $data_link[]=[
-                                    'from'=>$row_pyr_detail->paymentRequest->code,
-                                    'to'=>$row_pyr_cross->lookable->code,
-                                    'string_link'=>$row_pyr_detail->paymentRequest->code.$row_pyr_cross->lookable->code,
+                                    'from'=>$row_pyr_cross->lookable->code,
+                                    'to'=>$row_pyr_detail->paymentRequest->code,
+                                    'string_link'=>$row_pyr_cross->lookable->code.$row_pyr_detail->paymentRequest->code,
                                 ];
-                                if(!in_array($row_pyr_cross->id, $data_id_pyrcs)){
-                                    $data_id_pyrcs[] = $row_pyr_cross->id;
+                                if(!in_array($row_pyr_cross->lookable->id, $data_id_pyrcs)){
+                                    $data_id_pyrcs[] = $row_pyr_cross->lookable->id;
                                 }
                             }
 
@@ -1922,9 +1940,8 @@ class GoodReceiptPOController extends Controller
                     }
                     
                 }
-                
+
                 foreach($data_id_pyrcs as $payment_request_cross_id){
-                    info($payment_request_cross_id);
                     $query_pyrc = PaymentRequestCross::find($payment_request_cross_id);
                     if($query_pyrc->paymentRequest->exists()){
                         $data_pyr_tempura = [
@@ -1938,13 +1955,13 @@ class GoodReceiptPOController extends Controller
                         ];
                         $data_go_chart[]=$data_pyr_tempura;
                         $data_link[]=[
-                            'from'=>$query_pyrc->paymentRequest->code,
-                            'to'=>$query_pyrc->lookable->code,
-                            'string_link'=>$query_pyrc->paymentRequest->code.$query_pyrc->lookable->code,
+                            'from'=>$query_pyrc->lookable->code,
+                            'to'=>$query_pyrc->paymentRequest->code,
+                            'string_link'=>$query_pyrc->code.$query_pyrc->paymentRequest->code,
                         ];
                         
-                        if(!in_array($query_pyrc->paymentRequest->id, $data_id_pyrs)){
-                            $data_id_pyrs[] = $query_pyrc->paymentRequest->id;
+                        if(!in_array($query_pyrc->id, $data_id_pyrs)){
+                            $data_id_pyrs[] = $query_pyrc->id;
                             $added=true;
                         }
                     }
@@ -1961,13 +1978,11 @@ class GoodReceiptPOController extends Controller
     
                         $data_go_chart[]=$outgoing_tempura;
                         $data_link[]=[
-                            'from'=>$query_pyrc->paymentRequest->code,
-                            'to'=>$query_pyrc->lookable->code,
-                            'string_link'=>$query_pyrc->paymentRequest->code.$query_pyrc->lookable->code,
+                            'from'=>$query_pyrc->lookable->code,
+                            'to'=>$query_pyrc->paymentRequest->code,
+                            'string_link'=>$query_pyrc->lookable->code.$query_pyrc->paymentRequest->code,
                         ];
-                        
                     }
-                
                 }
                 
                 foreach($data_id_dp as $downpayment_id){
@@ -2103,31 +2118,6 @@ class GoodReceiptPOController extends Controller
                         ];
                         
 
-                    }
-
-                    if($query_dp->hasPaymentRequestDetail()->exists()){
-                        foreach($query_dp->hasPaymentRequestDetail as $row_pyr_detail){
-                            $data_pyr_tempura=[
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
-                                    ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
-                                ],
-                                "key" => $row_pyr_detail->paymentRequest->code,
-                                "name" => $row_pyr_detail->paymentRequest->code,
-                                'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
-                            ];
-                            $data_go_chart[]=$data_pyr_tempura;
-                            $data_link[]=[
-                                'from'=>$query_dp->code,
-                                'to'=>$row_pyr_detail->paymentRequest->code,
-                                'string_link'=>$query_dp->code.$row_pyr_detail->paymentRequest->code,
-                            ]; 
-                           
-                            if(!in_array($row_pyr_detail->paymentRequest->id, $data_id_pyrs)){
-                                $data_id_pyrs[]= $row_pyr_detail->paymentRequest->id;
-                                $added=true;
-                            }  
-                        }
                     }
 
                 }

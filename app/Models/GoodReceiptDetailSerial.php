@@ -19,6 +19,7 @@ class GoodReceiptDetailSerial extends Model
         'good_receipt_detail_id',
         'item_id',
         'serial_number',
+        'good_issue_detail_id',
     ];
 
     public function goodReceipt()
@@ -29,6 +30,11 @@ class GoodReceiptDetailSerial extends Model
     public function goodReceiptDetail()
     {
         return $this->belongsTo('App\Models\GoodReceiptDetail', 'good_receipt_detail_id', 'id')->withTrashed();
+    }
+
+    public function goodIssueDetail()
+    {
+        return $this->belongsTo('App\Models\GoodIssueDetail', 'good_issue_detail_id', 'id')->withTrashed();
     }
 
     public function item()

@@ -3368,4 +3368,9 @@ class Select2Controller extends Controller {
 
         return response()->json(['items' => $response]);
     }
+
+    public function goodReceiptSerialNumber(Request $request)
+    {
+        
+    }
 }

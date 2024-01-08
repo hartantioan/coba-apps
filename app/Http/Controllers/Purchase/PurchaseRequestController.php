@@ -88,7 +88,6 @@ class PurchaseRequestController extends Controller
             'company_id',
             'post_date',
             'due_date',
-            'required_date',
             'note',
         ];
 
@@ -106,7 +105,6 @@ class PurchaseRequestController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('due_date', 'like', "%$search%")
-                            ->orWhere('required_date', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('purchaseRequestDetail',function($query) use($search, $request){
                                 $query->whereHas('item',function($query) use($search, $request){
@@ -146,7 +144,6 @@ class PurchaseRequestController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('due_date', 'like', "%$search%")
-                            ->orWhere('required_date', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('purchaseRequestDetail',function($query) use($search, $request){
                                 $query->whereHas('item',function($query) use($search, $request){
@@ -386,7 +383,6 @@ class PurchaseRequestController extends Controller
                         $query->where('code', 'like', "%$request->search%")
                             ->orWhere('post_date', 'like', "%$request->search%")
                             ->orWhere('due_date', 'like', "%$request->search%")
-                            ->orWhere('required_date', 'like', "%$request->search%")
                             ->orWhere('note', 'like', "%$request->search%")
                             ->orWhereHas('purchaseRequestDetail',function($query) use($request){
                                 $query->whereHas('item',function($query) use($request){

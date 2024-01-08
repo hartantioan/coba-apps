@@ -116,6 +116,11 @@ class GoodIssueDetail extends Model
         });
     }
 
+    public function goodReceiptDetailSerial()
+    {
+        return $this->hasMany('App\Models\GoodReceiptDetailSerial', 'good_issue_detail_id', 'id');
+    }
+
     public function qtyBalance(){
         $qty = $this->qtyConvertToBuy();
 

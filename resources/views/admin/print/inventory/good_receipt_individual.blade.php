@@ -254,6 +254,9 @@
                                     <td class="center">{{ $rowdetail->department()->exists() ?$rowdetail->department->name : '-' }}</td>
                                     <td class="center">{{ $rowdetail->warehouse->name }}</td>
                                 </tr>
+                                <tr>
+                                    <td colspan="10">No. Serial : {{ $rowdetail->listSerial() }}</td>
+                                </tr>
                                 @endforeach
                             </tbody>
                         </table>

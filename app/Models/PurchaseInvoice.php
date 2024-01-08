@@ -107,8 +107,8 @@ class PurchaseInvoice extends Model
                 $rate = 1;
             }elseif($row->lookable_type == 'purchase_order_details'){
                 $rate = $row->lookable->purchaseOrder->currency_rate;
-            }elseif($row->lookable_type == 'landed_costs'){
-                $rate = $row->lookable->currency_rate;
+            }elseif($row->lookable_type == 'landed_cost_fee_details'){
+                $rate = $row->lookable->landedCost->currency_rate;
             }else{
                 $rate = $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
             }

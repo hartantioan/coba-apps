@@ -11,13 +11,13 @@
     }
 
     .select2 {
-        max-width: 100px !important;
+        max-width: 350px !important;
     }
 
-    .select2-selection--multiple{
+    /* .select2-selection--multiple{
         overflow: hidden !important;
         height: auto !important;
-    }
+    } */
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">

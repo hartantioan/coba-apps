@@ -702,10 +702,10 @@ class MaterialRequestController extends Controller
         return response()->json($response);
     }
     public function viewStructureTree(Request $request){
-        $query = PurchaseRequest::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = MaterialRequest::where('code',CustomHelper::decrypt($request->id))->first();
         $data_go_chart = [];
         $data_link = [];
-        $pr = [
+        $mr = [
                 'key'   => $query->code,
                 "name"  => $query->code,
                 "color" => "lightblue",
@@ -715,8 +715,8 @@ class MaterialRequestController extends Controller
                 'url'   =>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($query->code),
                 "title" =>$query->code,
             ];
-        $data_go_chart[]=$pr;
-
+        $data_go_chart[]=$mr;
+        
         $data_id_good_scale = [];
         $data_id_good_issue = [];
         $data_id_mr = [];
@@ -746,63 +746,9 @@ class MaterialRequestController extends Controller
         
         if($query) {
 
+            $data_id_mr[]=$query->id;
             //Pengambilan Main Branch beserta id terkait
-            foreach($query->purchaseRequestDetail as $purchase_request_detail){
-                if($purchase_request_detail->purchaseOrderDetail()->exists()){
-                   foreach($purchase_request_detail->purchaseOrderDetail as $purchase_order_detail){
-                        $po=[
-                            'properties'=> [
-                                ['name'=> "Tanggal : ".$purchase_order_detail->purchaseOrder->post_date],
-                                ['name'=> "Vendor  : ".$purchase_order_detail->purchaseOrder->supplier->name],
-                             ],
-                            'key'=>$purchase_order_detail->purchaseOrder->code,
-                            'name'=>$purchase_order_detail->purchaseOrder->code,
-                            'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($purchase_order_detail->purchaseOrder->code),
-                        ];
-                        
-                        $data_go_chart[]=$po;
-                        $data_link[]=[
-                            'from'=>$query->code,
-                            'to'=>$po["key"],
-                            'string_link'=>$query->code.$po["key"],
-                        ];
-                        $data_id_po[]= $purchase_order_detail->purchaseOrder->id;  
-                            
-                        
-                        
-                        if($purchase_order_detail->goodReceiptDetail()->exists()){
-                            foreach($purchase_order_detail->goodReceiptDetail as $good_receipt_detail){
-                                $data_good_receipt = [
-                                    'properties'=> [
-                                        ['name'=> "Tanggal :".$good_receipt_detail->goodReceipt->post_date],
-                                        ['name'=> "url", 'type'=> request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($good_receipt_detail->goodReceipt->code)],
-                                     ],
-                                    "key" => $good_receipt_detail->goodReceipt->code,
-                                    "name" => $good_receipt_detail->goodReceipt->code,
-                                    
-                                    'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($good_receipt_detail->goodReceipt->code),
-                                    
-                                ];
-                             
-                                $data_link[]=[
-                                    'from'=>$purchase_order_detail->purchaseOrder->code,
-                                    'to'=>$data_good_receipt["key"],
-                                    'string_link'=>$purchase_order_detail->purchaseOrder->code.$data_good_receipt["key"],
-                                ];
-                                $data_id_gr[]= $good_receipt_detail->goodReceipt->id;
-                                $data_go_chart[]=$data_good_receipt;  
-                                
-                            }
-                        }
-                
-                        
-                        
-                    }//selesaiforeachdetailpo
-                }//selesai if
-                else{
-                    
-                }
-            }
+            
 
             $added = true;
             while($added){

@@ -106,7 +106,7 @@ class PurchaseRequestController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('due_date', 'like', "%$search%")
-                            ->orWhere('required_date', 'like', "%$search%")
+                            
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('purchaseRequestDetail',function($query) use($search, $request){
                                 $query->whereHas('item',function($query) use($search, $request){
@@ -146,7 +146,6 @@ class PurchaseRequestController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('due_date', 'like', "%$search%")
-                            ->orWhere('required_date', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('purchaseRequestDetail',function($query) use($search, $request){
                                 $query->whereHas('item',function($query) use($search, $request){

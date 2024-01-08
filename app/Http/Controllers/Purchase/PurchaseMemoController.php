@@ -936,7 +936,7 @@ class PurchaseMemoController extends Controller
           
 
             $added = true;
-            wwhile($added){
+            while($added){
                
                 $added=false;
                 // Pengambilan foreign branch gr

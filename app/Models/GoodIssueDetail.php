@@ -33,6 +33,7 @@ class GoodIssueDetail extends Model
         'department_id',
         'project_id',
         'requester',
+        'qty_return',
     ];
 
     public function lookable(){

@@ -424,6 +424,7 @@ class GoodIssueController extends Controller
                             'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
                             'project_id'            => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
                             'requester'             => $request->arr_requester[$key] ? $request->arr_requester[$key] : NULL,
+                            'qty_return'            => str_replace(',','.',str_replace('.','',$request->arr_qty_return[$key])),
                         ]);
 
                         if($request->arr_serial[$key]){
@@ -472,7 +473,7 @@ class GoodIssueController extends Controller
                     <table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="15">Daftar Item</th>
+                                <th class="center-align" colspan="16">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -490,6 +491,7 @@ class GoodIssueController extends Controller
                                 <th class="center-align">Departemen</th>
                                 <th class="center-align">Proyek</th>
                                 <th class="center-align">Requester</th>
+                                <th class="center-align">Qty Kembali</th>
                             </tr>
                         </thead><tbody>';
         
@@ -497,7 +499,7 @@ class GoodIssueController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->itemStock->item->name.'</td>
-                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
+                <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->itemStock->item->uomUnit->code.'</td>
                 <td class="center-align">'.$row->note.'</td>
                 <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
@@ -510,9 +512,10 @@ class GoodIssueController extends Controller
                 <td class="center-align">'.($row->department()->exists() ? $row->department->name : '-').'</td>
                 <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
                 <td class="center-align">'.($row->requester ? $row->requester : '-').'</td>
+                <td class="right-align">'.number_format($row->qty_return,3,',','.').'</td>
             </tr>
             <tr>
-                <td colspan="15">Serial : '.$row->listSerial().'</td>
+                <td colspan="16">Serial : '.$row->listSerial().'</td>
             </tr>';
         }
         
@@ -584,8 +587,8 @@ class GoodIssueController extends Controller
                 'item_stock_id'     => $row->item_stock_id,
                 'qty'               => number_format($row->qty,3,',','.'),
                 'qtyraw'            => in_array($gr->status,['2','3']) ? number_format($row->qty + $row->itemStock->qty,3,',','.') : number_format($row->itemStock->qty,3,',','.'),
-                'price'             => number_format($row->price,3,',','.'),
-                'total'             => number_format($row->total,3,',','.'),
+                'price'             => number_format($row->price,2,',','.'),
+                'total'             => number_format($row->total,2,',','.'),
                 'coa_id'            => $row->coa_id,
                 'coa_name'          => $row->coa->code.' - '.$row->coa->name,
                 'note'              => $row->note,
@@ -599,8 +602,9 @@ class GoodIssueController extends Controller
                 'project_id'        => $row->project()->exists() ? $row->project->id : '',
                 'project_name'      => $row->project()->exists() ? $row->project->name : '',
                 'requester'         => $row->requester,
+                'qty_return'        => number_format($row->qty_return,3,',','.'),
                 'is_activa'         => $row->itemStock->item->itemGroup->is_activa ? $row->itemStock->item->itemGroup->is_activa : '',
-                'list_serial'       => $row->arrSerial(), #lanjutkan
+                'list_serial'       => $row->arrSerial(),
             ];
         }
 

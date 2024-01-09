@@ -315,8 +315,19 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col s12">
-                            <div class="col s4">
+                        <div class="col s6 row">
+                            <div class="col s12">
+                                <div class="input-field col s12">
+                                    <select class="select2 browser-default" id="uom_unit" name="uom_unit" onchange="getUnitStock();">
+                                        <option value="">--Silahkan pilih--</option>
+                                        @foreach ($unit as $row)
+                                            <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' - '.$row->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="active" for="uom_unit">Satuan Stok</label>
+                                </div>
+                            </div>
+                            <div class="col s6 row">
                                 <div class="input-field col s12">
                                     <select class="select2 browser-default" id="buy_unit" name="buy_unit">
                                         @foreach ($unit as $row)
@@ -350,36 +361,30 @@
                                     <label class="active" for="pallet_unit">Satuan Pallet</label>
                                 </div>
                             </div>
-                            <div class="col s4 row">
+                            <div class="col s6 row">
                                 <div class="input-field col s12">
-                                    <input id="buy_convert" name="buy_convert" type="text" placeholder="Ex: 1 SAK Beli = *50* KG Stok" onkeyup="formatRupiah(this);">
+                                    <input id="buy_convert" name="buy_convert" type="text" placeholder="Ex: 1 SAK Beli = ? KG Stok" onkeyup="formatRupiah(this);">
                                     <label class="active" for="buy_convert">Konversi Satuan Beli ke Stok</label>
+                                    <div class="form-control-feedback stock-unit">-</div>
                                 </div>
                                 <div class="input-field col s12">
-                                    <input id="sell_convert" name="sell_convert" type="text" placeholder="Ex: 1 Truk Jual = *100* KG Stok" onkeyup="formatRupiah(this);">
+                                    <input id="sell_convert" name="sell_convert" type="text" placeholder="Ex: 1 Truk Jual = ? KG Stok" onkeyup="formatRupiah(this);">
                                     <label class="active" for="sell_convert">Konversi Satuan Jual ke Stok</label>
+                                    <div class="form-control-feedback stock-unit">-</div>
                                 </div>
                                 <div class="input-field col s12">
-                                    <input id="production_convert" name="production_convert" type="text" placeholder="Ex: 1 PCS = *0.5* M2 Stok" onkeyup="formatRupiah(this);">
+                                    <input id="production_convert" name="production_convert" type="text" placeholder="Ex: 1 PCS = ? M2 Stok" onkeyup="formatRupiah(this);">
                                     <label class="active" for="production_convert">Konversi Satuan Produksi ke Stok</label>
+                                    <div class="form-control-feedback stock-unit">-</div>
                                 </div>
                                 <div class="input-field col s12">
-                                    <input id="pallet_convert" name="pallet_convert" type="text" placeholder="Ex: 1 Pallet Kayu = *50* Box Keramik" onkeyup="formatRupiah(this);">
-                                    <label class="active" for="pallet_convert">Konversi Pallet ke Satuan Jual</label>
-                                </div>
-                            </div>
-                            <div class="col s4">
-                                <div class="input-field col s12" style="top: 75px;">
-                                    <select class="select2 browser-default" id="uom_unit" name="uom_unit">
-                                        @foreach ($unit as $row)
-                                            <option value="{{ $row->id }}">{{ $row->code.' - '.$row->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    <label class="active" for="uom_unit">Satuan Stok (UoM)</label>
+                                    <input id="pallet_convert" name="pallet_convert" type="text" placeholder="Ex: 1 Pallet Kayu = ? M2 Stok" onkeyup="formatRupiah(this);">
+                                    <label class="active" for="pallet_convert">Konversi Pallet ke Satuan Stok</label>
+                                    <div class="form-control-feedback stock-unit">-</div>
                                 </div>
                             </div>
                         </div>
-                        <div class="input-field col s4">
+                        <div class="input-field col s6">
                             <div class="switch mb-1">
                                 <label for="is_inventory_item">Item untuk Inventori</label>
                                 <label class="right">
@@ -663,8 +668,9 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
-                $("#form_data > select").prop("selectedIndex", 0).trigger('change');
+                $('#uom_unit').val('').trigger('change');
                 M.updateTextFields();
+                $('.stock-unit').text('-');
                 $('#type_id,#size_id,#variety_id,#pattern_id,#color_id,#grade_id,#brand_id').empty();
                 /* $('#item-sale-show').hide(); */
                 arrCode = [];
@@ -710,6 +716,14 @@
         select2ServerSide('#brand_id', '{{ url("admin/select2/brand") }}');
 
     });
+
+    function getUnitStock(){
+        if($('#uom_unit').val()){
+            $('.stock-unit').text($("#uom_unit").select2().find(":selected").data("code"));
+        }else{
+            $('.stock-unit').text('-');
+        }
+    }
 
     function shading(id,name){
         $('#text-shading').text(name);
@@ -1120,7 +1134,7 @@
                 $('#name').val(response.name);
                 $('#note').val(response.note);
                 $('#item_group_id').val(response.item_group_id).trigger('change');
-                $('#uom_unit').val(response.uom_unit).trigger('change');
+                $('#uom_unit').val(response.uom_unit_id).trigger('change');
                 $('#buy_unit').val(response.buy_unit).trigger('change');
                 $('#buy_convert').val(response.buy_convert);
                 $('#sell_unit').val(response.sell_unit).trigger('change');
@@ -1133,6 +1147,7 @@
                 $('#tolerance_gr').val(response.tolerance_gr);
                 $('#min_stock').val(response.min_stock);
                 $('#max_stock').val(response.max_stock);
+                $('.stock-unit').text(response.uom_code);
 
                 if(response.is_inventory_item == '1'){
                     $('#is_inventory_item').prop( "checked", true);

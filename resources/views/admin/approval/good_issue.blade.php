@@ -209,7 +209,7 @@
                     <th class="center">Departemen</th>
                     <th class="center">Proyek</th>
                     <th class="center">Requester</th>
-                    <th class="center">Keterangan</th>
+                    <th class="center">Jum.Kembali</th>
                 </tr>
             </thead>
             <tbody>
@@ -228,7 +228,10 @@
                     <td class="center-align">{{ $row->department()->exists() ? $row->department->name : '-' }}</td>
                     <td class="center-align">{{ $row->project()->exists() ? $row->project->name : '-' }}</td>
                     <td class="center-align">{{ $row->requester ? $row->requester : '-' }}</td>
-                    <td>{{ $row->note }}</td>
+                    <td class="center-align">{{ number_format($row->qty_return,3,',','.') }}</td>
+                </tr>
+                <tr>
+                    <td colspan="14">Keterangan : {{ $row->note }}</td>
                 </tr>
                 <tr>
                     <td colspan="14">Serial : {{ $row->listSerial() }}</td>

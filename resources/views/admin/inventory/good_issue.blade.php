@@ -240,12 +240,13 @@
                                                         <th class="center">Departemen</th>
                                                         <th class="center">Proyek</th>
                                                         <th class="center">Requester</th>
+                                                        <th class="center">Qty Kembali</th>
                                                         <th class="center">Hapus</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td colspan="13" class="center">
+                                                        <td colspan="14" class="center">
                                                             <button class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                                 <i class="material-icons left">add</i> Tambah Item
                                                             </button>
@@ -841,7 +842,10 @@
                                         <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
                                     </td>
                                     <td>
-                                        <input name="arr_requester[]" id="arr_requester` + count + `" class="materialize-textarea" type="text" placeholder="Requester...">
+                                        <input name="arr_requester[]" id="arr_requester` + count + `" class="materialize-textarea" type="text" placeholder="Requester..." value="` + val.requester + `">
+                                    </td>
+                                    <td>
+                                        <input name="arr_qty_return[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0,000" onkeyup="formatRupiah(this);setQtyReturn(this);" style="text-align:right;width:100%;" data-id="` + count + `">
                                     </td>
                                     <td class="center">
                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -1013,6 +1017,9 @@
                 <td>
                     <input name="arr_requester[]" id="arr_requester` + count + `" class="materialize-textarea" type="text" placeholder="Requester...">
                 </td>
+                <td>
+                    <input name="arr_qty_return[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0,000" onkeyup="formatRupiah(this);setQtyReturn(this);" style="text-align:right;width:100%;" data-id="` + count + `">
+                </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
@@ -1023,6 +1030,14 @@
         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
+    }
+
+    function setQtyReturn(element){
+        let qty = parseFloat($(element).val().replaceAll(".", "").replaceAll(",","."));
+        let max = parseFloat($('#rowQty' + $(element).data('id')).val().replaceAll(".", "").replaceAll(",","."));
+        if(qty > max){
+            $(element).val($('#rowQty' + $(element).data('id')).val());
+        }
     }
 
     function changeLine(element){
@@ -1171,7 +1186,7 @@
                     formData.append('arr_project[]',($('select[name^="arr_project[]"]').eq(index).val() ? $('select[name^="arr_project[]"]').eq(index).val() : ''));
                 });
 
-                /* if(passedSerial){
+                if(passedSerial){
                     if(passed){
                         $.ajax({
                             url: '{{ Request::url() }}/create',
@@ -1249,7 +1264,7 @@
                         text: 'Mohon maaf, salah satu item / lebih harus ditentukan nomor serialnya karena merupakan item aktiva.',
                         icon: 'warning'
                     });
-                } */
+                }
             }
         });
     }
@@ -1346,6 +1361,9 @@
                                 </td>
                                 <td>
                                     <input name="arr_requester[]" id="arr_requester` + count + `" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.requester + `">
+                                </td>
+                                <td>
+                                    <input name="arr_qty_return[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_return + `" onkeyup="formatRupiah(this);setQtyReturn(this);" style="text-align:right;width:100%;" data-id="` + count + `">
                                 </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">

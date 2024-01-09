@@ -466,6 +466,8 @@ class ItemController extends Controller
 
     public function show(Request $request){
         $item = Item::find($request->id);
+        $item['uom_unit_id'] = $item->uomUnit->id;
+        $item['uom_code'] = $item->uomUnit->code;
         $item['buy_convert'] = number_format($item->buy_convert,3,',','.');
         $item['sell_convert'] = number_format($item->sell_convert,3,',','.');
         $item['pallet_convert'] = number_format($item->pallet_convert,3,',','.');

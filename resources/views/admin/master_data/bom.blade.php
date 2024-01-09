@@ -382,9 +382,16 @@
     }
 
     function getCodeAndName(){
-        $('#code').val($("#item_id").select2('data')[0].code);
-        $('#name').val($("#item_id").select2('data')[0].name);
-        $('.production-unit').text($("#item_id").select2('data')[0].production);
+        if($("#item_id").val()){
+            $('#code').val($("#item_id").select2('data')[0].code);
+            $('#name').val($("#item_id").select2('data')[0].name);
+            $('.production-unit').text($("#item_id").select2('data')[0].production);
+        }else{
+            $('#code').val('');
+            $('#name').val('');
+            $('.production-unit').text('-');
+        }
+        
     }
 
     function rowDetail(data) {

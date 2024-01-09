@@ -109,6 +109,11 @@
                                     </h4>
                                     <div class="row">
                                         <div class="col s12">
+                                            <div class="card-alert card red">
+                                                <div class="card-content white-text">
+                                                    <p>Info : AP Memo ketika menarik AP Invoice yang berisi data Good Receipt PO maka qty dari gudang akan dikurangi sesuai qty yang diinputkan pada memo.</p>
+                                                </div>
+                                            </div>
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
@@ -261,6 +266,7 @@
                                                     <th class="center">No. Invoice Vendor</th>
                                                     <th class="center">Tgl.Post</th>
                                                     <th class="center">Keterangan</th>
+                                                    <th class="center">Edit Qty PO</th>
                                                     <th class="center">Edit Nominal</th>
                                                     <th class="center">Total</th>
                                                     <th class="center">PPN</th>
@@ -271,7 +277,7 @@
                                             </thead>
                                             <tbody id="body-detail">
                                                 <tr id="last-row-detail">
-                                                    <td colspan="14" class="center">
+                                                    <td colspan="15" class="center">
                                                         Silahkan pilih A/P Invoice atau A/P Down Payment
                                                     </td>
                                                 </tr>
@@ -585,7 +591,7 @@
                 if($('#last-row-detail').length == 0){
                     $('#body-detail').append(`
                         <tr id="last-row-detail">
-                            <td colspan="10" class="center">
+                            <td colspan="15" class="center">
                                 Silahkan pilih A/P Invoice atau A/P Down Payment
                             </td>
                         </tr>
@@ -728,7 +734,7 @@
             if($('.row_detail').length == 0){
                 $('#body-detail').append(`
                     <tr id="last-row-detail">
-                        <td colspan="10" class="center">
+                        <td colspan="15" class="center">
                             Silahkan pilih A/P Invoice atau A/P Down Payment
                         </td>
                     </tr>
@@ -879,7 +885,10 @@
                                         <input name="arr_description[]" type="text" placeholder="Keterangan" value="` + response.note + ` - ` + response.account_name + `">
                                     </td>
                                     <td>
-                                        <input type="text" name="arr_nominal[]" onfocus="emptyThis(this);" value="` + response.balanceformat + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                        <input type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="1" data-id="` + count + `" onkeyup="formatRupiah(this);countQty(this);" style="text-align:right;" data-max="1" readonly>
+                                    </td>
+                                    <td>
+                                        <input type="text" name="arr_nominal[]" onfocus="emptyThis(this);" value="` + response.balanceformat + `" data-id="` + count + `" onkeyup="formatRupiah(this);countNominal(this);" style="text-align:right;" data-max="` + response.balanceformat + `">
                                     </td>
                                     <td>
                                         <input type="text" name="arr_total[]" onfocus="emptyThis(this);" value="` + response.balanceformat + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
@@ -938,7 +947,10 @@
                                             <input name="arr_description[]" type="text" placeholder="Keterangan" value="` + val.note + ` - ` + val.account_name + `">
                                         </td>
                                         <td>
-                                            <input type="text" name="arr_nominal[]" onfocus="emptyThis(this);" value="` + val.balanceformat + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                            <input type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty + `" data-id="` + count + `" onkeyup="formatRupiah(this);countQty(this);" style="text-align:right;" data-max="` + val.qty + `">
+                                        </td>
+                                        <td>
+                                            <input type="text" name="arr_nominal[]" onfocus="emptyThis(this);" value="` + val.balanceformat + `" data-id="` + count + `" onkeyup="formatRupiah(this);countNominal(this);" style="text-align:right;" data-max="` + val   .balanceformat + `">
                                         </td>
                                         <td>
                                             <input type="text" name="arr_total[]" onfocus="emptyThis(this);" value="` + val.balanceformat + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
@@ -982,6 +994,38 @@
         }else{
             
         }
+    }
+
+    function countQty(element){
+        let qty = parseFloat($(element).val().replaceAll(".", "").replaceAll(",","."));
+        let max = parseFloat($(element).data('max').replaceAll(".", "").replaceAll(",","."));
+        let id = $(element).data('id');
+        if(qty > max){
+            qty = max;
+            $(element).val($(element).data('max'));
+        }
+        let bobot = qty / max;
+        let newTotal = bobot * parseFloat($('input[name^="arr_nominal[]"][data-id="' + $(element).data('id') + '"]').data('max').replaceAll(".", "").replaceAll(",","."));
+        $('input[name^="arr_nominal[]"][data-id="' + $(element).data('id') + '"]').val(
+            (newTotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(newTotal).toString().replace('.',','))
+        );
+        countAll();
+    }
+
+    function countNominal(element){
+        let qty = parseFloat($(element).val().replaceAll(".", "").replaceAll(",","."));
+        let max = parseFloat($(element).data('max').replaceAll(".", "").replaceAll(",","."));
+        let id = $(element).data('id');
+        if(qty > max){
+            qty = max;
+            $(element).val($(element).data('max'));
+        }
+        let bobot = qty / max;
+        let newTotal = bobot * parseFloat($('input[name^="arr_qty[]"][data-id="' + $(element).data('id') + '"]').data('max').replaceAll(".", "").replaceAll(",","."));
+        $('input[name^="arr_qty[]"][data-id="' + $(element).data('id') + '"]').val(
+            (newTotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(newTotal).toString().replace('.',','))
+        );
+        countAll();
     }
 
     function countAll(){
@@ -1060,7 +1104,7 @@
                 if($('.row_detail').length == 0 || $('#last-row-detail').length == 0){
                     $('#body-detail').append(`
                         <tr id="last-row-detail">
-                            <td colspan="10" class="center">
+                            <td colspan="15" class="center">
                                 Silahkan pilih A/P Invoice atau A/P Down Payment
                             </td>
                         </tr>
@@ -1514,7 +1558,7 @@
                 var passed = true;
 
                 $('input[name^="arr_code"]').each(function(i){
-                    if($('input[name^="arr_description"]').eq(i).val() == '' || $('input[name^="arr_total"]').eq(i).val() == '' || $('input[name^="arr_tax"]').eq(i).val() == '' || $('input[name^="arr_wtax"]').eq(i).val() == '' || $('input[name^="arr_grandtotal"]').eq(i).val() == ''){
+                    if($('input[name^="arr_description"]').eq(i).val() == '' || $('input[name^="arr_total"]').eq(i).val() == '' || $('input[name^="arr_tax"]').eq(i).val() == '' || $('input[name^="arr_wtax"]').eq(i).val() == '' || $('input[name^="arr_grandtotal"]').eq(i).val() == '' || $('input[name^="arr_qty"]').eq(i).val() == ''){
                         passed = false;
                     }                    
                 });
@@ -1691,9 +1735,6 @@
                                     ` + val.tax_no + `
                                 </td>
                                 <td>
-                                    ` + val.tax_no + `
-                                </td>
-                                <td>
                                     ` + val.tax_cut_no + `
                                 </td>
                                 <td>
@@ -1712,7 +1753,10 @@
                                     <input name="arr_description[]" type="text" placeholder="Keterangan" value="` + val.note + ` - ` + val.account_name + `">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_nominal[]" onfocus="emptyThis(this);" value="` + val.total + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                    <input type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty + `" data-id="` + count + `" onkeyup="formatRupiah(this);countQty(this);" style="text-align:right;" data-max="` + val.qty_max + `" readonly>
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_nominal[]" onfocus="emptyThis(this);" value="` + val.total + `" data-id="` + count + `" onkeyup="formatRupiah(this);countNominal(this);" style="text-align:right;" data-max="` + val.balanceformat + `">
                                 </td>
                                 <td>
                                     <input type="text" name="arr_total[]" onfocus="emptyThis(this);" value="` + val.total + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>

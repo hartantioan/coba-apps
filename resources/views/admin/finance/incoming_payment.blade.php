@@ -1431,7 +1431,7 @@
                         formData.append('arr_subtotal[]',$('input[name^="arr_subtotal[]"]').eq(index).val());
                         formData.append('arr_type[]',$('input[name^="arr_type[]"]').eq(index).val());
                         formData.append('arr_note[]',(
-                            $('input[name^="arr_note"]').eq(index).val() ? $('input[name^="arr_note[]"]').eq(index).val() : ''
+                            $('input[name^="arr_note[]"]').eq(index).val() ? $('input[name^="arr_note[]"]').eq(index).val() : ''
                         ));
                         if(!$(this).val() || !$('input[name^="arr_total[]"]').eq(index).val() || !$('input[name^="arr_rounding[]"]').eq(index).val() || !$('input[name^="arr_subtotal[]"]').eq(index).val()){
                             passed = false;

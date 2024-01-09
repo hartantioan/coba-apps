@@ -2032,8 +2032,6 @@
                 formData.delete("arr_is_include_tax[]");
                 formData.delete("arr_wtax[]");
                 formData.delete("arr_wtax[]");
-                formData.delete("arr_note[]");
-                formData.delete("arr_note2[]");
                 formData.delete("arr_warehouse[]");
                 formData.delete("arr_line[]");
                 formData.delete("arr_project[]");
@@ -2044,8 +2042,6 @@
                     formData.append('arr_wtax_id[]',$('select[name^="arr_wtax"]').eq(index).find(':selected').data('id'));
                     formData.append('arr_is_include_tax[]',($('input[name^="arr_is_include_tax"]').eq(index).is(':checked') ? '1' : '0'));
                     formData.append('arr_wtax[]',$('select[name^="arr_wtax"]').eq(index).val());
-                    formData.append('arr_note[]',($('input[name^="arr_note"]').eq(index).val() ? $('input[name^="arr_note"]').eq(index).val() : ''));
-                    formData.append('arr_note2[]',($('input[name^="arr_note2"]').eq(index).val() ? $('input[name^="arr_note2"]').eq(index).val() : ''));
                     formData.append('arr_line[]',($('select[name^="arr_line"]').eq(index).val() ? $('select[name^="arr_line"]').eq(index).val() : ''));
                     formData.append('arr_warehouse[]',($('select[name^="arr_warehouse"]').eq(index).val() ? $('select[name^="arr_warehouse"]').eq(index).val() : ''));
                     formData.append('arr_project[]',($('select[name^="arr_project[]"]').eq(index).val() ? $('select[name^="arr_project[]"]').eq(index).val() : ''));

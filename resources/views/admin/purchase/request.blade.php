@@ -156,7 +156,7 @@
                                     <label class="active" for="post_date">Tgl. Posting</label>
                                 </div>
                                 <div class="input-field col m4 s12 step4">
-                                    <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting">
+                                    <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" max="{{ date('Y').'-12-31' }}" type="date" placeholder="Tgl. posting">
                                     <label class="active" for="due_date">Tgl. Jatuh Tempo</label>
                                 </div>
                                 <div class="file-field input-field col m4 s12 step6">

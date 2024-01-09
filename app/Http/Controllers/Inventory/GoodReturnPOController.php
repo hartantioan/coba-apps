@@ -229,6 +229,7 @@ class GoodReturnPOController extends Controller
                             'item_id'                   => $row->item_id,
                             'item_name'                 => $row->item->code.' - '.$row->item->name,
                             'qty'                       => number_format($row->qty,3,',','.'),
+                            'qty_balance'               => number_format($row->getBalanceReturn(),3,',','.'),
                             'unit'                      => $row->item->buyUnit->code,
                             'place_id'                  => $row->place_id,
                             'place_name'                => $row->place->code,
@@ -312,26 +313,22 @@ class GoodReturnPOController extends Controller
 
                 if($grd){
 
-                    $discount = $grd->purchaseOrderDetail->purchaseOrder->discount;
-                    $subtotal = $grd->purchaseOrderdetail->purchaseOrder->subtotal;
-
                     $rowprice = 0;
 
-                    $bobot = $grd->purchaseOrderDetail->subtotal / $subtotal;
-                    $rowprice = round($grd->purchaseOrderDetail->subtotal / $grd->purchaseOrderDetail->qty,3);
+                    $rowprice = round($grd->total / $grd->qty,2);
 
-                    $total = ($rowprice * floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key])))) - ($bobot * $discount);
+                    $total = round($rowprice * floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key]))),2);
 
                     if($grd->purchaseOrderDetail->is_tax == '1' && $grd->purchaseOrderDetail->is_include_tax == '1'){
-                        $total = $total / (1 + ($grd->purchaseOrderDetail->percent_tax / 100));
+                        $total = round($total / (1 + ($grd->purchaseOrderDetail->percent_tax / 100)),2);
                     }
 
                     if($grd->purchaseOrderDetail->is_tax == '1'){
-                        $tax = round($total * ($grd->purchaseOrderDetail->percent_tax / 100),3);
+                        $tax = round($total * ($grd->purchaseOrderDetail->percent_tax / 100),2);
                     }
 
                     if($grd->purchaseOrderDetail->is_wtax == '1'){
-                        $wtax = round($total * ($grd->purchaseOrderDetail->percent_wtax / 100),3);
+                        $wtax = round($total * ($grd->purchaseOrderDetail->percent_wtax / 100),2);
                     }
 
                     $grandtotal = $total + $tax - $wtax;
@@ -343,7 +340,7 @@ class GoodReturnPOController extends Controller
                 }
             }
 
-			if($request->temp){
+			/* if($request->temp){
                 DB::beginTransaction();
                 try {
                     $query = GoodReturnPO::where('code',CustomHelper::decrypt($request->temp))->first();
@@ -475,7 +472,7 @@ class GoodReturnPOController extends Controller
 					'status'  => 500,
 					'message' => 'Data failed to save.'
 				];
-			}
+			} */
 		}
 		
 		return response()->json($response);
@@ -613,6 +610,7 @@ class GoodReturnPOController extends Controller
                 'item_name'                 => $row->item->code.' - '.$row->item->name,
                 'qty_returned'              => number_format($row->qty,3,',','.'),
                 'qty_received'              => number_format($row->goodReceiptDetail->qty,3,',','.'),
+                'qty_balance'               => number_format($row->goodReceiptDetail->getBalanceReturn(),3,',','.'),
                 'unit'                      => $row->item->buyUnit->code,
                 'note'                      => $row->note,
                 'note2'                     => $row->note2,

@@ -919,7 +919,7 @@
                             formData.append('arr_item[]',$(this).val());
                             formData.append('arr_item_stock[]',$('select[name^="arr_item_stock"]').eq(index).val());
                             formData.append('arr_qty[]',$('input[name^="arr_qty"]').eq(index).val());
-                            formData.append('arr_note[]',$('input[name^="arr_note"]').eq(index).val());
+                            formData.append('arr_note[]',$('input[name^="arr_note[]"]').eq(index).val());
                             formData.append('arr_area[]',($('#arr_area' + code).length > 0 ? ($('#arr_area' + code).val() ? $('#arr_area' + code).val() : '' ) : ''));
                         }
                     });

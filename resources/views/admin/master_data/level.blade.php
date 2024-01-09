@@ -75,7 +75,7 @@
                                                         <th>#</th>
                                                         <th>Code</th>
                                                         <th>Nama</th>
-                                                        <th>Order</th>
+                                                        <th>Urutan</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>

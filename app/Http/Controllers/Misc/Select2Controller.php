@@ -300,6 +300,7 @@ class Select2Controller extends Controller {
                 'list_warehouse'    => $d->warehouseList(),
                 'is_sales_item'     => $d->is_sales_item ? $d->is_sales_item : '',
                 'list_shading'      => $d->arrShading(),
+                'is_activa'         => $d->itemGroup->is_activa ? $d->itemGroup->is_activa : '',
             ];
         }
 
@@ -3135,6 +3136,7 @@ class Select2Controller extends Controller {
                             'project_id'    => $row->project()->exists() ? $row->project->id : '',
                             'project_name'  => $row->project()->exists() ? $row->project->name : '',
                             'stock_list'    => $row->item->currentStock($this->dataplaces,$this->datawarehouses),
+                            'is_activa'     => $row->item->itemGroup->is_activa,
                         ];
                     }
                 }

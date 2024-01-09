@@ -296,6 +296,9 @@
                                     <td class="center-align">{{ $row->requester ? $row->requester : '-' }}</td>
                                     <td>{{ $row->note }}</td>
                                 </tr>
+                                <tr>
+                                    <td colspan="14">Serial : {{ $row->listSerial() }}</td>
+                                </tr>
                                 @endforeach
                             </tbody>
                             

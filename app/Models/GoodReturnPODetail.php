@@ -40,26 +40,11 @@ class GoodReturnPODetail extends Model
 
     public function getRowTotal(){
         $total = 0;
-        $rowprice = 0;
-        $po = $this->goodReceiptDetail->purchaseOrderDetail->purchaseOrder;
-        $discount = $po->discount;
-        $subtotal = $po->subtotal;
-        $bobot = 0;
+        $rowprice = round($this->goodReceiptDetail->total / $this->goodReceiptDetail->qty,2);
 
-        $datarow = $this->goodReceiptDetail->purchaseOrderDetail;
+        $total = $rowprice * $this->qty;
 
-        if($datarow){
-            $bobot = $datarow->subtotal / $subtotal;
-            $rowprice = $datarow->subtotal / $datarow->qty;
-        }
-
-        $total = ($rowprice * $this->qty) - ($bobot * $discount);
-
-        if($datarow->is_tax == '1' && $datarow->is_include_tax == '1'){
-            $total = $total / (1 + ($datarow->percent_tax / 100));
-        }
-
-        return round($total,3);
+        return round($total,2);
     }
 
     public function qtyConvert(){

@@ -1287,7 +1287,7 @@
                         formData.append('arr_area[]',$('input[name^="arr_area[]"]').eq(index).val());
                         formData.append('arr_item_stock[]',$('select[name^="arr_item_stock"]').eq(index).val());
                         formData.append('arr_qty[]',$('input[name^="arr_qty"]').eq(index).val());
-                        formData.append('arr_note[]',$('input[name^="arr_note"]').eq(index).val());
+                        formData.append('arr_note[]',$('input[name^="arr_note[]"]').eq(index).val());
                         if(!$('input[name^="arr_modi"]').eq(index).val()){
                             passed = false;
                         }

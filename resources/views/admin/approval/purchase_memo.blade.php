@@ -200,6 +200,7 @@
                     <tr>
                         <th class="center-align">No.</th>
                         <th class="center-align">Referensi</th>
+                        <th class="center-align">Qty</th>
                         <th class="center-align">Keterangan</th>
                         <th class="center-align">Total</th>
                         <th class="center-align">PPN</th>
@@ -212,17 +213,18 @@
                     <tr>
                         <td class="center-align" rowspan="3">{{ ($key + 1) }}</td>
                         <td class="center-align">{{ $row->getCode() }}</td>
+                        <td class="right-align">{{ number_format($row->qty,3,',','.') }}</td>
                         <td class="right-align">{{ number_format($row->total,2,',','.') }}</td>
                         <td class="right-align">{{ number_format($row->tax,2,',','.') }}</td>
                         <td class="right-align">{{ number_format($row->wtax,2,',','.') }}</td>
                         <td class="right-align">{{ number_format($row->grandtotal,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td colspan="6">Keterangan : {{ $row->description }}</td>
+                        <td colspan="7">Keterangan : {{ $row->description }}</td>
                     </tr>
                     @endforeach
                     <tr>
-                        <td colspan="6" rowspan="7">
+                        <td colspan="7" rowspan="7">
                             Rekening :
                             {{ $data->supplier->defaultBank() ? $data->supplier->defaultBank() : ' - ' }}
                             <div class="mt-3">
@@ -231,29 +233,29 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="5">Total</td>
+                        <td class="right-align" colspan="6">Total</td>
                         <td class="right-align">{{ number_format($data->total,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="5">PPN</td>
+                        <td class="right-align" colspan="6">PPN</td>
                         <td class="right-align">{{ number_format($data->tax,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="5">PPh</td>
+                        <td class="right-align" colspan="6">PPh</td>
                         <td class="right-align">{{ number_format($data->wtax,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="5"><h6>Pembulatan</h6></td>
+                        <td class="right-align" colspan="6"><h6>Pembulatan</h6></td>
                         <td class="right-align"><h6>{{ number_format($data->rounding,2,',','.') }}</h6></td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="5"><h6>Grandtotal</h6></td>
+                        <td class="right-align" colspan="6"><h6>Grandtotal</h6></td>
                         <td class="right-align"><h6>{{ number_format($data->grandtotal,2,',','.') }}</h6></td>
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="9">Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.$data->currency->document_text }}</i></th>
+                        <th colspan="10">Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.$data->currency->document_text }}</i></th>
                     </tr>
                 </tfoot>
             </table>

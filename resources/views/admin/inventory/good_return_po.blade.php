@@ -1010,6 +1010,14 @@
         $('#modal1').modal('close');
     }
 
+    function checkRow(element){
+        let qty = parseFloat($(element).val().replaceAll(".", "").replaceAll(",","."));
+        let max = parseFloat($(element).data('max').replaceAll(".", "").replaceAll(",","."));
+        if(qty > max){
+            $(element).val($(element).data('max'));
+        }
+    }
+
     function getGoodReceipt(){
         let val = $('#good_receipt_id').val();
 
@@ -1064,7 +1072,7 @@
                                             <span>` + val.qty + `</span>
                                         </td>
                                         <td>
-                                            <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                            <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_balance + `" onkeyup="formatRupiah(this);checkRow(this);" style="text-align:right;width:100px;" data-max="` + val.qty_balance + `">
                                         </td>
                                         <td class="center">
                                             <span>` + val.unit + `</span>
@@ -1199,7 +1207,7 @@
                                     <span>` + val.qty_received + `</span>
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_returned + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_returned + `" onkeyup="formatRupiah(this);checkRow(this);" style="text-align:right;width:100px;" data-max="` + val.qty_balance + `">
                                 </td>
                                 <td class="center">
                                     <span>` + val.unit + `</span>

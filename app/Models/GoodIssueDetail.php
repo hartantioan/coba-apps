@@ -121,6 +121,28 @@ class GoodIssueDetail extends Model
         return $this->hasMany('App\Models\GoodReceiptDetailSerial', 'good_issue_detail_id', 'id');
     }
 
+    public function listSerial(){
+        $arr = [];
+        foreach($this->goodReceiptDetailSerial as $row){
+            $arr[] = $row->serial_number;
+        }
+
+        return implode(', ',$arr);
+    }
+
+    public function arrSerial(){
+        $arr = [];
+        
+        foreach($this->goodReceiptDetailSerial as $row){
+            $arr[] = [
+                'serial_id'     => $row->id,
+                'serial_number' => $row->serial_number,
+            ];
+        }
+
+        return $arr;
+    }
+
     public function qtyBalance(){
         $qty = $this->qtyConvertToBuy();
 

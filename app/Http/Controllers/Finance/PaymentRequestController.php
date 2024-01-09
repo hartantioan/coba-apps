@@ -1237,16 +1237,18 @@ class PaymentRequestController extends Controller
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
 
-                foreach($query->paymentRequestDetail as $row){
-                    if($row->lookable_type == 'fund_requests'){
-                        if($row->lookable->document_status == '3'){
-                            $row->lookable->removeLimitCreditEmployee($row->nominal);
+                if(in_array($query->status,['2','3'])){
+                    foreach($query->paymentRequestDetail as $row){
+                        if($row->lookable_type == 'fund_requests'){
+                            if($row->lookable->type == '1' && $row->lookable->document_status == '3'){
+                                $row->lookable->removeLimitCreditEmployee($row->nominal);
+                            }
                         }
                     }
-                }
-
-                foreach($query->paymentRequestCross as $row){
-                    $row->addLimitCreditEmployee();
+    
+                    foreach($query->paymentRequestCross as $row){
+                        $row->addLimitCreditEmployee();
+                    }
                 }
     
                 activity()

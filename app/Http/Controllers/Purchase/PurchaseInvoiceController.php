@@ -420,6 +420,7 @@ class PurchaseInvoiceController extends Controller
                 }
                 foreach($datagr->goodReceiptDetail as $rowdetail){
                     if($rowdetail->balanceInvoice() > 0){
+                        $price = round($rowdetail->total / $rowdetail->qty,2);
                         $details[] = [
                             'type'          => 'good_receipt_details',
                             'id'            => $rowdetail->id,
@@ -427,11 +428,11 @@ class PurchaseInvoiceController extends Controller
                             'qty_received'  => number_format($rowdetail->qty,3,',','.'),
                             'qty_returned'  => number_format($rowdetail->qtyReturn(),3,',','.'),
                             'qty_balance'   => number_format(($rowdetail->qty - $rowdetail->qtyReturn()),3,',','.'),
-                            'price'         => number_format($rowdetail->purchaseOrderDetail->price,2,',','.'),
+                            'price'         => number_format($price,2,',','.'),
                             'buy_unit'      => $rowdetail->item->buyUnit->code,
                             'rawcode'       => $datagr->code,
                             'post_date'     => date('d/m/y',strtotime($datagr->post_date)),
-                            'due_date'      => date('d/m/y',strtotime($datagr->due_date)),
+                            'due_date'      => '-',
                             'total'         => number_format($rowdetail->total,2,',','.'),
                             'tax'           => number_format($rowdetail->tax,2,',','.'),
                             'wtax'          => number_format($rowdetail->wtax,2,',','.'),

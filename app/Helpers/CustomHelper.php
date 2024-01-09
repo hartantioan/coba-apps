@@ -196,6 +196,29 @@ class CustomHelper {
 						'date'				=> $date,
 						'type'				=> $type
 					]);
+				}elseif($lookable_type == 'purchase_memos'){
+					$priceeach = $total / $qty;
+					$totalout = $total;
+					$qtybalance = $old_data->qty_final - $qty;
+					$totalfinal = $old_data->total_final - $total;
+					ItemCogs::create([
+						'lookable_type'		=> $lookable_type,
+						'lookable_id'		=> $lookable_id,
+						'company_id'		=> $company_id,
+						'place_id'			=> $place_id,
+						'warehouse_id'		=> $warehouse_id,
+						'area_id'			=> $area_id,
+						'item_id'			=> $item_id,
+						'item_shading_id'	=> $shading ? $shading : NULL,
+						'qty_out'			=> $qty,
+						'price_out'			=> round($priceeach,2),
+						'total_out'			=> $totalout,
+						'qty_final'			=> $qtybalance,
+						'price_final'		=> round($priceeach,2),
+						'total_final'		=> $totalfinal,
+						'date'				=> $date,
+						'type'				=> $type
+					]);
 				}else{
 					$priceeach = $old_data->price_final;
 					$totalout = round($priceeach * $qty,2);
@@ -1122,6 +1145,10 @@ class CustomHelper {
 			$journal->note = $journal->note.' - '.implode(', ',$arrNote);
 			$journal->save();
 
+			$op->paymentRequest->update([
+				'status'	=> '3',
+			]);
+
 		}elseif($table_name == 'good_receives'){
 
 			$gr = GoodReceive::find($table_id);
@@ -1884,70 +1911,16 @@ class CustomHelper {
 				$coacode = '';
 
 				if($row->lookable_type == 'purchase_invoice_details'){
-					$coacode = '700.01.01.01.99';
-					$coamodel = Coa::where('code',$coacode)->where('company_id',$pm->company_id)->first();
-					if($row->total > 0){
-						$total = 0;
-						if($row->lookable->lookable_type == 'coas'){
-							$total = -1 * $row->total;
-						}elseif($row->lookable->lookable_type == 'purchase_order_details'){
-							$total = -1 * $row->total * $row->lookable->purchaseOrder->currency_rate;
-						}elseif($row->lookable->lookable_type == 'landed_cost_fee_details'){
-							$total = -1 * $row->total * $row->lookable->lookable->landedCost->currency_rate;
-						}else{
-							$total = -1 * $row->total * $row->lookable->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
-						}
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $coamodel->id,
-							'place_id'		=> $row->lookable->place_id ? $row->lookable->place_id : NULL,
-							'line_id'		=> $row->lookable->line_id ? $row->lookable->line_id : NULL,
-							'machine_id'	=> $row->lookable->line_id ? $row->lookable->line_id : NULL,
-							'account_id'	=> $coamodel->bp_journal ? $row->lookable->purchaseInvoice->account_id : NULL,
-							'department_id'	=> $row->lookable->department_id ? $row->lookable->department_id : NULL,
-							'warehouse_id'	=> $row->lookable->warehouse_id ? $row->lookable->warehouse_id : NULL,
-							'project_id'	=> $row->lookable->project_id ? $row->lookable->project_id : NULL,
-							'type'			=> '1',
-							'nominal'		=> $total,
-						]);
-					}
-
-					if($row->tax > 0){
-						$tax = 0;
-						if($row->lookable->lookable_type == 'coas'){
-							$tax = -1 * $row->tax;
-						}elseif($row->lookable->lookable_type == 'purchase_order_details'){
-							$tax = -1 * $row->tax * $row->lookable->purchaseOrder->currency_rate;
-						}elseif($row->lookable->lookable_type == 'landed_cost_fee_details'){
-							$tax = -1 * $row->tax * $row->lookable->lookable->landedCost->currency_rate;
-						}else{
-							$tax = -1 * $row->tax * $row->lookable->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
-						}
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $row->taxMaster->coa_purchase_id,
-							'place_id'		=> $row->lookable->place_id ? $row->lookable->place_id : NULL,
-							'line_id'		=> $row->lookable->line_id ? $row->lookable->line_id : NULL,
-							'machine_id'	=> $row->lookable->line_id ? $row->lookable->line_id : NULL,
-							'account_id'	=> $row->taxMaster->coaPurchase->bp_journal ? $row->lookable->purchaseInvoice->account_id : NULL,
-							'department_id'	=> $row->lookable->department_id ? $row->lookable->department_id : NULL,
-							'warehouse_id'	=> $row->lookable->warehouse_id ? $row->lookable->warehouse_id : NULL,
-							'project_id'	=> $row->lookable->project_id ? $row->lookable->project_id : NULL,
-							'type'			=> '1',
-							'nominal'		=> $tax,
-						]);
-					}
-	
 					if($row->wtax > 0){
 						$wtax = 0;
 						if($row->lookable->lookable_type == 'coas'){
-							$wtax = -1 * $row->wtax;
+							$wtax = $row->wtax;
 						}elseif($row->lookable->lookable_type == 'purchase_order_details'){
-							$wtax = -1 * $row->wtax * $row->lookable->purchaseOrder->currency_rate;
+							$wtax = $row->wtax * $row->lookable->purchaseOrder->currency_rate;
 						}elseif($row->lookable->lookable_type == 'landed_cost_fee_details'){
-							$wtax = -1 * $row->wtax * $row->lookable->lookable->landedCost->currency_rate;
+							$wtax = $row->wtax * $row->lookable->lookable->landedCost->currency_rate;
 						}else{
-							$wtax = -1 * $row->wtax * $row->lookable->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
+							$wtax = $row->wtax * $row->lookable->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
 						}
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -1959,7 +1932,7 @@ class CustomHelper {
 							'department_id'	=> $row->lookable->department_id ? $row->lookable->department_id : NULL,
 							'warehouse_id'	=> $row->lookable->warehouse_id ? $row->lookable->warehouse_id : NULL,
 							'project_id'	=> $row->lookable->project_id ? $row->lookable->project_id : NULL,
-							'type'			=> '2',
+							'type'			=> '1',
 							'nominal'		=> $wtax,
 						]);
 					}
@@ -1967,20 +1940,130 @@ class CustomHelper {
 					if($row->grandtotal > 0){
 						$grandtotal = 0;
 						if($row->lookable->lookable_type == 'coas'){
-							$grandtotal = -1 * $row->grandtotal;
+							$grandtotal = $row->grandtotal;
 						}elseif($row->lookable->lookable_type == 'purchase_order_details'){
-							$grandtotal = -1 * $row->grandtotal * $row->lookable->purchaseOrder->currency_rate;
+							$grandtotal = $row->grandtotal * $row->lookable->purchaseOrder->currency_rate;
 						}elseif($row->lookable->lookable_type == 'landed_cost_fee_details'){
-							$grandtotal = -1 * $row->grandtotal * $row->lookable->lookable->landedCost->currency_rate;
+							$grandtotal = $row->grandtotal * $row->lookable->lookable->landedCost->currency_rate;
 						}else{
-							$grandtotal = -1 * $row->grandtotal * $row->lookable->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
+							$grandtotal = $row->grandtotal * $row->lookable->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
 						}
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $coahutangusaha->id,
 							'account_id'	=> $coahutangusaha->bp_journal ? $row->lookable->purchaseInvoice->account_id : NULL,
-							'type'			=> '2',
+							'type'			=> '1',
 							'nominal'		=> $grandtotal,
+						]);
+					}
+
+					$coacode = '200.01.03.01.02';
+					$coamodel = Coa::where('code',$coacode)->where('company_id',$pm->company_id)->first();
+					$coahutangbelumditagih = Coa::where('code','200.01.03.01.02')->where('company_id',$pm->company_id)->first();
+					if($row->total > 0){
+						$total = 0;
+						if($row->lookable->lookable_type == 'coas'){
+							$total = $row->total;
+						}elseif($row->lookable->lookable_type == 'purchase_order_details'){
+							$total = $row->total * $row->lookable->purchaseOrder->currency_rate;
+						}elseif($row->lookable->lookable_type == 'landed_cost_fee_details'){
+							$total = $row->total * $row->lookable->lookable->landedCost->currency_rate;
+						}elseif($row->lookable->lookable_type == 'good_receipt_details'){
+							$total = $row->total * $row->lookable->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
+							
+							if($coahutangbelumditagih){
+								JournalDetail::create([
+									'journal_id'	=> $query->id,
+									'coa_id'		=> $coahutangbelumditagih->id,
+									'place_id'		=> $row->lookable->lookable->place_id,
+									'line_id'		=> $row->lookable->lookable->line_id ? $row->lookable->lookable->line_id : NULL,
+									'machine_id'	=> $row->lookable->lookable->machine_id ? $row->lookable->lookable->machine_id : NULL,
+									'account_id'	=> $coahutangbelumditagih->bp_journal ? $pm->account_id : NULL,
+									'department_id'	=> $row->lookable->lookable->department_id ? $row->lookable->lookable->department_id : NULL,
+									'warehouse_id'	=> $row->lookable->lookable->warehouse_id,
+									'project_id'	=> $row->lookable->lookable->purchaseOrderDetail->project_id ? $row->lookable->lookable->purchaseOrderDetail->project_id : NULL,
+									'type'			=> '1',
+									'nominal'		=> $total
+								]);
+							}
+
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $row->lookable->lookable->item->itemGroup->coa_id,
+								'account_id'	=> $pm->account_id,
+								'place_id'		=> $row->lookable->lookable->place_id,
+								'line_id'		=> $row->lookable->lookable->line_id ? $row->lookable->lookable->line_id : NULL,
+								'machine_id'	=> $row->lookable->lookable->machine_id ? $row->lookable->lookable->machine_id : NULL,
+								'department_id'	=> $row->lookable->lookable->department_id ? $row->lookable->lookable->department_id : NULL,
+								'warehouse_id'	=> $row->lookable->lookable->warehouse_id,
+								'project_id'	=> $row->lookable->lookable->purchaseOrderDetail->project_id ? $row->lookable->lookable->purchaseOrderDetail->project_id : NULL,
+								'type'			=> '2',
+								'nominal'		=> $total,
+							]);
+
+							self::sendCogs('purchase_memos',
+								$pm->id,
+								$pm->company_id,
+								$row->lookable->lookable->place_id,
+								$row->lookable->lookable->warehouse_id,
+								$row->lookable->lookable->item_id,
+								round($row->qty * $row->lookable->lookable->item->buy_convert,3),
+								$total,
+								'OUT',
+								$pm->post_date,
+								NULL,
+								NULL,
+							);
+
+							self::sendStock(
+								$row->lookable->lookable->place_id,
+								$row->lookable->lookable->warehouse_id,
+								$row->lookable->lookable->item_id,
+								round($row->qty * $row->lookable->lookable->item->buy_convert,3),
+								'OUT',
+								NULL,
+								NULL,
+							);
+						}
+
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $coamodel->id,
+							'place_id'		=> $row->lookable->place_id ? $row->lookable->place_id : NULL,
+							'line_id'		=> $row->lookable->line_id ? $row->lookable->line_id : NULL,
+							'machine_id'	=> $row->lookable->line_id ? $row->lookable->line_id : NULL,
+							'account_id'	=> $coamodel->bp_journal ? $row->lookable->purchaseInvoice->account_id : NULL,
+							'department_id'	=> $row->lookable->department_id ? $row->lookable->department_id : NULL,
+							'warehouse_id'	=> $row->lookable->warehouse_id ? $row->lookable->warehouse_id : NULL,
+							'project_id'	=> $row->lookable->project_id ? $row->lookable->project_id : NULL,
+							'type'			=> '2',
+							'nominal'		=> $total,
+						]);
+					}
+
+					if($row->tax > 0){
+						$tax = 0;
+						if($row->lookable->lookable_type == 'coas'){
+							$tax = $row->tax;
+						}elseif($row->lookable->lookable_type == 'purchase_order_details'){
+							$tax = $row->tax * $row->lookable->purchaseOrder->currency_rate;
+						}elseif($row->lookable->lookable_type == 'landed_cost_fee_details'){
+							$tax = $row->tax * $row->lookable->lookable->landedCost->currency_rate;
+						}else{
+							$tax = $row->tax * $row->lookable->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
+						}
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->taxMaster->coa_purchase_id,
+							'place_id'		=> $row->lookable->place_id ? $row->lookable->place_id : NULL,
+							'line_id'		=> $row->lookable->line_id ? $row->lookable->line_id : NULL,
+							'machine_id'	=> $row->lookable->line_id ? $row->lookable->line_id : NULL,
+							'account_id'	=> $row->taxMaster->coaPurchase->bp_journal ? $row->lookable->purchaseInvoice->account_id : NULL,
+							'department_id'	=> $row->lookable->department_id ? $row->lookable->department_id : NULL,
+							'warehouse_id'	=> $row->lookable->warehouse_id ? $row->lookable->warehouse_id : NULL,
+							'project_id'	=> $row->lookable->project_id ? $row->lookable->project_id : NULL,
+							'type'			=> '2',
+							'nominal'		=> $tax,
 						]);
 					}
 				}
@@ -1988,33 +2071,14 @@ class CustomHelper {
 				if($row->lookable_type == 'purchase_down_payments'){
 					$coacode = '100.01.07.01.01';
 					$coamodel = Coa::where('code',$coacode)->where('company_id',$pm->company_id)->first();
-					if($row->total > 0){
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $coamodel->id,
-							'account_id'	=> $coamodel->bp_journal ? $row->lookable->account_id : NULL,
-							'type'			=> '1',
-							'nominal'		=> -1 * $row->total * $row->lookable->currency_rate,
-						]);
-					}
 
-					if($row->tax > 0){
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $row->taxMaster->coa_purchase_id,
-							'account_id'	=> $row->taxMaster->coaPurchase->bp_journal ? $row->lookable->account_id : NULL,
-							'type'			=> '1',
-							'nominal'		=> -1 * $row->tax * $row->lookable->currency_rate,
-						]);
-					}
-	
 					if($row->wtax > 0){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $row->wTaxMaster->coa_purchase_id,
 							'account_id'	=> $row->wTaxMaster->coaPurchase->bp_journal ? $row->lookable->account_id : NULL,
-							'type'			=> '2',
-							'nominal'		=> -1 * $row->wtax * $row->lookable->currency_rate,
+							'type'			=> '1',
+							'nominal'		=> $row->wtax * $row->lookable->currency_rate,
 						]);
 					}
 					
@@ -2023,8 +2087,28 @@ class CustomHelper {
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $coahutangusaha->id,
 							'account_id'	=> $coahutangusaha->bp_journal ? $row->lookable->account_id : NULL,
+							'type'			=> '1',
+							'nominal'		=> $row->grandtotal * $row->lookable->currency_rate,
+						]);
+					}
+
+					if($row->total > 0){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $coamodel->id,
+							'account_id'	=> $coamodel->bp_journal ? $row->lookable->account_id : NULL,
 							'type'			=> '2',
-							'nominal'		=> -1 * $row->grandtotal * $row->lookable->currency_rate,
+							'nominal'		=> $row->total * $row->lookable->currency_rate,
+						]);
+					}
+
+					if($row->tax > 0){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->taxMaster->coa_purchase_id,
+							'account_id'	=> $row->taxMaster->coaPurchase->bp_journal ? $row->lookable->account_id : NULL,
+							'type'			=> '2',
+							'nominal'		=> $row->tax * $row->lookable->currency_rate,
 						]);
 					}
 				}
@@ -2033,18 +2117,18 @@ class CustomHelper {
 			if($pm->rounding > 0 || $pm->rounding < 0){
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
-					'coa_id'		=> $coarounding->id,
-					'account_id'	=> $coarounding->bp_journal ? $account_id : NULL,
+					'coa_id'		=> $coahutangusaha->id,
+					'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
 					'type'			=> '1',
-					'nominal'		=> $pm->rounding > 0 ? -1 * $pm->rounding : $pm->rounding,
+					'nominal'		=> $pm->rounding > 0 ? $pm->rounding : $pm->rounding,
 				]);
 
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
-					'coa_id'		=> $coahutangusaha->id,
-					'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
+					'coa_id'		=> $coarounding->id,
+					'account_id'	=> $coarounding->bp_journal ? $account_id : NULL,
 					'type'			=> '2',
-					'nominal'		=> $pm->rounding > 0 ? -1 * $pm->rounding : $pm->rounding,
+					'nominal'		=> $pm->rounding > 0 ? $pm->rounding : $pm->rounding,
 				]);
 			}
 

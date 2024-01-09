@@ -153,7 +153,7 @@
                 $('input[name^="arr_receipt[]"]').each(function(index){
                     arr_status.push(($(this).is(':checked') ? '2' : '1'));
                     arr_receipt.push($(this).data('id'));
-                    arr_note.push($('input[name^="arr_note"]').eq(index).val());
+                    arr_note.push($('input[name^="arr_note[]"]').eq(index).val());
                 });
                 $.ajax({
                     url: '{{ Request::url() }}/courier_update',

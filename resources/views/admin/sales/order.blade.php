@@ -1816,7 +1816,7 @@
                         formData.append('arr_other_fee[]',$('input[name^="arr_other_fee"]').eq(index).val());
                         formData.append('arr_final_price[]',$('input[name^="arr_final_price"]').eq(index).val());
                         formData.append('arr_total[]',$('input[name^="arr_total"]').eq(index).val());
-                        formData.append('arr_note[]',$('input[name^="arr_note"]').eq(index).val());
+                        formData.append('arr_note[]',$('input[name^="arr_note[]"]').eq(index).val());
                         if(!$('select[name^="arr_item"]').eq(index).val()){
                             passed = false;
                         }

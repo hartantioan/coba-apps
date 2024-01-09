@@ -11,13 +11,22 @@
     }
 
     .select2 {
-        max-width: 350px !important;
+        max-width: 100% !important;
+        height:auto !important;
     }
 
-    /* .select2-selection--multiple{
+    .select2-selection--multiple{
         overflow: hidden !important;
         height: auto !important;
-    } */
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__clear {
+        cursor: pointer;
+        float: right;
+        font-weight: bold;
+        margin-top: 5px;
+        margin-right: 0px;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -221,7 +230,7 @@
                                                     <tr>
                                                         <th class="center">Item</th>
                                                         <th class="center">Stok</th>
-                                                        <th class="center">No.Serial</th>
+                                                        <th class="center" width="300px">No.Serial</th>
                                                         <th class="center">Qty</th>
                                                         <th class="center">Satuan</th>
                                                         <th class="center">Keterangan</th>
@@ -870,6 +879,37 @@
                             }
                             select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
                             select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+
+                            if(val.is_activa){
+                                $('#serial' + count).append(`
+                                    <select class="browser-default" id="arr_serial` + count + `" name="arr_serial[]" multiple="multiple"></select>
+                                `);
+
+                                $('#arr_serial' + count).select2({
+                                    placeholder: '-- Kosong --',
+                                    minimumInputLength: 1,
+                                    allowClear: true,
+                                    cache: true,
+                                    width: 'resolve',
+                                    dropdownParent: $('body').parent(),
+                                    ajax: {
+                                        url: '{{ url("admin/select2/good_receipt_serial_number") }}',
+                                        type: 'GET',
+                                        dataType: 'JSON',
+                                        data: function(params) {
+                                            return {
+                                                search: params.term,
+                                                item_id: $("#arr_item" + count).val(),
+                                            };
+                                        },
+                                        processResults: function(data) {
+                                            return {
+                                                results: data.items
+                                            }
+                                        }
+                                    }
+                                });
+                            }
                         });
 
                         $('#material_request_id').empty();
@@ -1010,33 +1050,38 @@
             optionStock += '</select>';
             $('#stock' + val).append(optionStock);
 
-            $('#serial' + val).append(`
-                <select class="browser-default" id="arr_serial` + val + `" name="arr_serial[]" multiple="multiple"></select>
-            `);
-            $('#arr_serial' + val).select2({
-                placeholder: '-- Kosong --',
-                minimumInputLength: 1,
-                allowClear: true,
-                cache: true,
-                width: 'resolve',
-                dropdownParent: $('body').parent(),
-                ajax: {
-                    url: '{{ url("admin/select2/good_receipt_serial_number") }}',
-                    type: 'GET',
-                    dataType: 'JSON',
-                    data: function(params) {
-                        return {
-                            search: params.term,
-                            item_id: $("#arr_item" + val).val(),
-                        };
-                    },
-                    processResults: function(data) {
-                        return {
-                            results: data.items
+            if($("#arr_item" + val).select2('data')[0].is_activa){
+                $('#serial' + val).append(`
+                    <select class="browser-default" id="arr_serial` + val + `" name="arr_serial[]" multiple="multiple"></select>
+                `);
+
+                $('#arr_serial' + val).select2({
+                    placeholder: '-- Kosong --',
+                    minimumInputLength: 1,
+                    allowClear: true,
+                    cache: true,
+                    width: 'resolve',
+                    dropdownParent: $('body').parent(),
+                    ajax: {
+                        url: '{{ url("admin/select2/good_receipt_serial_number") }}',
+                        type: 'GET',
+                        dataType: 'JSON',
+                        data: function(params) {
+                            return {
+                                search: params.term,
+                                item_id: $("#arr_item" + val).val(),
+                            };
+                        },
+                        processResults: function(data) {
+                            return {
+                                results: data.items
+                            }
                         }
                     }
-                }
-            });
+                });
+            }else{
+                $('#serial' + val).append(` - `);
+            }
         }else{
             $('#stock' + val).append(` - `);
             $('#unit' + val).append(` - `);
@@ -1072,7 +1117,7 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                var formData = new FormData($('#form_data')[0]), passed = true;
+                var formData = new FormData($('#form_data')[0]), passed = true, passedSerial = true;
 
                 formData.delete('arr_item_stock[]');
                 formData.delete('arr_qty[]');
@@ -1082,12 +1127,26 @@
                 formData.delete('arr_machine[]');
                 formData.delete('arr_department[]');
                 formData.delete('arr_project[]');
+                formData.delete('arr_serial[]');
                 
                 $('select[name^="arr_item_stock"]').each(function(index){
                     if(!$(this).val()){
                         passed = false;
                     }else{
                         formData.append('arr_item_stock[]',$(this).val());
+                    }
+                });
+
+                $('select[name^="arr_item[]"]').each(function(index){
+                    if($('#arr_serial' + $(this).data('id')).length > 0){
+                        let arr = $('#arr_serial' + $(this).data('id')).val();
+                        if(arr.length > 0){
+                            formData.append('arr_serial[]',$('#arr_serial' + $(this).data('id')).val());
+                        }else{
+                            passedSerial = false;
+                        }
+                    }else{
+                        formData.append('arr_serial[]','');
                     }
                 });
 
@@ -1104,7 +1163,7 @@
                         passed = false;
                     }else{
                         formData.append('arr_coa[]',$(this).val());
-                        formData.append('arr_note[]',($('input[name^="arr_note"]').eq(index).val() ? $('input[name^="arr_note"]').eq(index).val() : ''));
+                        formData.append('arr_note[]',($('input[name^="arr_note[]"]').eq(index).val() ? $('input[name^="arr_note[]"]').eq(index).val() : ''));
                     }
                     formData.append('arr_line[]',($('select[name^="arr_line[]"]').eq(index).val() ? $('select[name^="arr_line[]"]').eq(index).val() : ''));
                     formData.append('arr_machine[]',($('select[name^="arr_machine[]"]').eq(index).val() ? $('select[name^="arr_machine[]"]').eq(index).val() : ''));
@@ -1112,78 +1171,85 @@
                     formData.append('arr_project[]',($('select[name^="arr_project[]"]').eq(index).val() ? $('select[name^="arr_project[]"]').eq(index).val() : ''));
                 });
 
-                if(passed){
-
-                    $.ajax({
-                        url: '{{ Request::url() }}/create',
-                        type: 'POST',
-                        dataType: 'JSON',
-                        data: formData,
-                        contentType: false,
-                        processData: false,
-                        cache: true,
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        beforeSend: function() {
-                            $('#validation_alert').hide();
-                            $('#validation_alert').html('');
-                            loadingOpen('.modal-content');
-                        },
-                        success: function(response) {
-                            loadingClose('.modal-content');
-                            if(response.status == 200) {
-                                success();
-                                M.toast({
-                                    html: response.message
-                                });
-                            } else if(response.status == 422) {
-                                $('#validation_alert').show();
-                                $('.modal-content').scrollTop(0);
-                                
-                                swal({
-                                    title: 'Ups! Validation',
-                                    text: 'Check your form.',
-                                    icon: 'warning'
-                                });
-
-                                $.each(response.error, function(i, val) {
-                                    $.each(val, function(i, val) {
-                                        $('#validation_alert').append(`
-                                            <div class="card-alert card red">
-                                                <div class="card-content white-text">
-                                                    <p>` + val + `</p>
-                                                </div>
-                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                    <span aria-hidden="true">×</span>
-                                                </button>
-                                            </div>
-                                        `);
+                /* if(passedSerial){
+                    if(passed){
+                        $.ajax({
+                            url: '{{ Request::url() }}/create',
+                            type: 'POST',
+                            dataType: 'JSON',
+                            data: formData,
+                            contentType: false,
+                            processData: false,
+                            cache: true,
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            beforeSend: function() {
+                                $('#validation_alert').hide();
+                                $('#validation_alert').html('');
+                                loadingOpen('.modal-content');
+                            },
+                            success: function(response) {
+                                loadingClose('.modal-content');
+                                if(response.status == 200) {
+                                    success();
+                                    M.toast({
+                                        html: response.message
                                     });
-                                });
-                            } else {
-                                M.toast({
-                                    html: response.message
+                                } else if(response.status == 422) {
+                                    $('#validation_alert').show();
+                                    $('.modal-content').scrollTop(0);
+                                    
+                                    swal({
+                                        title: 'Ups! Validation',
+                                        text: 'Check your form.',
+                                        icon: 'warning'
+                                    });
+
+                                    $.each(response.error, function(i, val) {
+                                        $.each(val, function(i, val) {
+                                            $('#validation_alert').append(`
+                                                <div class="card-alert card red">
+                                                    <div class="card-content white-text">
+                                                        <p>` + val + `</p>
+                                                    </div>
+                                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                        <span aria-hidden="true">×</span>
+                                                    </button>
+                                                </div>
+                                            `);
+                                        });
+                                    });
+                                } else {
+                                    M.toast({
+                                        html: response.message
+                                    });
+                                }
+                            },
+                            error: function() {
+                                $('.modal-content').scrollTop(0);
+                                loadingClose('.modal-content');
+                                swal({
+                                    title: 'Ups!',
+                                    text: 'Check your internet connection.',
+                                    icon: 'error'
                                 });
                             }
-                        },
-                        error: function() {
-                            $('.modal-content').scrollTop(0);
-                            loadingClose('.modal-content');
-                            swal({
-                                title: 'Ups!',
-                                text: 'Check your internet connection.',
-                                icon: 'error'
-                            });
-                        }
-                    });
+                        });
+                    }else{
+                        swal({
+                            title: 'Ups!',
+                            text: 'Mohon maaf, stok item / qty / coa tidak boleh kosong atau diisi 0.',
+                            icon: 'warning'
+                        });
+                    }
                 }else{
                     swal({
                         title: 'Ups!',
-                        text: 'Mohon maaf, stok item / qty / coa tidak boleh kosong atau diisi 0.',
+                        text: 'Mohon maaf, salah satu item / lebih harus ditentukan nomor serialnya karena merupakan item aktiva.',
                         icon: 'warning'
                     });
-                }
+                } */
             }
         });
     }
@@ -1319,6 +1385,44 @@
                             `);
                         }
                         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
+
+                        if(val.is_activa){
+                            $('#serial' + count).empty();
+                            $('#serial' + count).append(`
+                                <select class="select2 browser-default" id="arr_serial` + count + `" name="arr_serial[]" multiple="multiple"></select>
+                            `);
+
+                            $.each(val.list_serial, function(i, value) {
+                                $('#arr_serial' + count).append(`
+                                    <option value="` + value.serial_id + `" selected>` + value.serial_number + `</value>
+                                `);
+                            });
+
+                            $('#arr_serial' + count).select2({
+                                placeholder: '-- Kosong --',
+                                minimumInputLength: 1,
+                                allowClear: true,
+                                cache: true,
+                                width: 'resolve',
+                                dropdownParent: $('body').parent(),
+                                ajax: {
+                                    url: '{{ url("admin/select2/good_receipt_serial_number") }}',
+                                    type: 'GET',
+                                    dataType: 'JSON',
+                                    data: function(params) {
+                                        return {
+                                            search: params.term,
+                                            item_id: $("#arr_item" + count).val(),
+                                        };
+                                    },
+                                    processResults: function(data) {
+                                        return {
+                                            results: data.items
+                                        }
+                                    }
+                                }
+                            });
+                        }
                     });
                 }
                 

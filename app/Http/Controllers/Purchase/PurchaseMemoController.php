@@ -138,6 +138,7 @@ class PurchaseMemoController extends Controller
                             'wtax_id'       => $row->wtax_id ? $row->wtax_id : '',
                             'balance'       => $row->balanceMemo(),
                             'balanceformat' => number_format($row->balanceMemo(),2,',','.'),
+                            'qty'           => $row->goodReceiptDetail() ? number_format($row->lookable->getBalanceReturn(),2,',','.') : 1,
                         ];
                     }
                     $data['rawcode'] = $data->code;
@@ -169,6 +170,7 @@ class PurchaseMemoController extends Controller
                     $data['wtax_id'] = '';
                     $data['balance'] = $data->balanceMemo();
                     $data['balanceformat'] = number_format($data->balanceMemo(),2,',','.');
+                    $data['qty'] = 1;
                 }
 
             }else{
@@ -355,6 +357,7 @@ class PurchaseMemoController extends Controller
             'arr_type'                  => 'required|array',
             'arr_code'                  => 'required|array',
             'arr_description'           => 'required|array',
+            'arr_qty'                   => 'required|array',
             'arr_total'                 => 'required|array',
             'arr_tax'                   => 'required|array',
             'arr_wtax'                  => 'required|array',
@@ -369,6 +372,8 @@ class PurchaseMemoController extends Controller
             'post_date.required'                => 'Tanggal posting tidak boleh kosong.',
             'arr_type.required'                 => 'Tipe dokumen tidak boleh kosong.',
             'arr_type.array'                    => 'Tipe dokumen harus dalam bentuk array.',
+            'arr_qty.required'                  => 'Qty barang /jasa tidak boleh kosong.',
+            'arr_qty.array'                     => 'Qty barang / jasa harus dalam bentuk array.',
             'arr_code.required'                 => 'Kode dokumen tidak boleh kosong.',
             'arr_code.array'                    => 'Kode dokumen harus dalam bentuk array.',
             'arr_description.required'          => 'Keterangan tidak boleh kosong.',
@@ -518,6 +523,7 @@ class PurchaseMemoController extends Controller
                                 'purchase_memo_id'      => $query->id,
                                 'lookable_type'         => $row,
                                 'lookable_id'           => $request->arr_code[$key],
+                                'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                                 'description'           => $request->arr_description[$key],
                                 'is_include_tax'        => $request->arr_is_include_tax[$key],
                                 'tax_id'                => $request->arr_id_tax[$key] ? $request->arr_id_tax[$key] : NULL,
@@ -566,11 +572,12 @@ class PurchaseMemoController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="7">Daftar Order Pembelian</th>
+                                <th class="center-align" colspan="8">Daftar Order Pembelian</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
-                                <th class="center-align">PO Inv./PO DP</th>
+                                <th class="center-align">AP Inv./AP DP</th>
+                                <th class="center-align">Qty</th>
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Total</th>
                                 <th class="center-align">PPN</th>
@@ -584,6 +591,7 @@ class PurchaseMemoController extends Controller
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td class="center-align">'.$row->getCode().'</td>
+                    <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                     <td class="center-align">'.$row->description.'</td>
                     <td class="right-align">'.number_format($row->total,2,',','.').'</td>
                     <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
@@ -593,7 +601,7 @@ class PurchaseMemoController extends Controller
             }
         }else{
             $string .= '<tr>
-                <td class="center-align" colspan="7">Data detail tidak ditemukan.</td>
+                <td class="center-align" colspan="8">Data detail tidak ditemukan.</td>
             </tr>';
         }
         
@@ -691,6 +699,8 @@ class PurchaseMemoController extends Controller
                     'wtax_id'       => $row->wtax_id ? $row->wtax_id : '',
                     'balance'       => $row->total + $row->lookable->balanceMemo(),
                     'balanceformat' => number_format($row->total + $row->lookable->balanceMemo(),2,',','.'),
+                    'qty_max'       => $row->lookable->goodReceiptDetail() ? number_format($row->lookable->lookable->getBalanceReturn(),2,',','.') : 1,
+                    'qty'           => number_format($row->qty,2,',','.'),
                 ];
             }elseif($row->lookable_type == 'purchase_down_payments'){
                 $details[] = [
@@ -717,6 +727,8 @@ class PurchaseMemoController extends Controller
                     'wtax_id'       => $row->wtax_id ? $row->wtax_id : '',
                     'balance'       => $row->total + $row->lookable->balanceMemo(),
                     'balanceformat' => number_format($row->total + $row->lookable->balanceMemo(),2,',','.'),
+                    'qty_max'       => 1,
+                    'qty'           => number_format($row->qty,2,',','.'),
                 ];
             }
         }
@@ -751,6 +763,10 @@ class PurchaseMemoController extends Controller
 
                 CustomHelper::removeApproval('purchase_memos',$query->id);
                 CustomHelper::removeJournal('purchase_memos',$query->id);
+
+                if(in_array($query->status,['2','3'])){
+                    CustomHelper::removeCogs($query->getTable(),$query->id);
+                }
 
                 $query->update([
                     'status'    => '5',

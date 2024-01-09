@@ -159,7 +159,11 @@ class PurchaseMemo extends Model
         return $ada;
     }
 
-    
+    public function hasChildDocument(){
+        $hasRelation = false;
+
+        return $hasRelation;
+    }
 
     public function journal(){
         return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);

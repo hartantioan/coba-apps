@@ -2570,8 +2570,8 @@
                             formData.append('arr_tax[]',$('input[name^="arr_tax"][data-id="' + $(this).data('id') + '"]').val());
                             formData.append('arr_wtax[]',$('input[name^="arr_wtax"][data-id="' + $(this).data('id') + '"]').val());
                             formData.append('arr_grandtotal[]',$('input[name^="arr_grandtotal"][data-id="' + $(this).data('id') + '"]').val());
-                            formData.append('arr_note[]',$('input[name^="arr_note"][data-id="' + $(this).data('id') + '"]').val());
-                            formData.append('arr_note2[]',$('input[name^="arr_note2"][data-id="' + $(this).data('id') + '"]').val());
+                            formData.append('arr_note[]',$('input[name^="arr_note[]"][data-id="' + $(this).data('id') + '"]').val());
+                            formData.append('arr_note2[]',$('input[name^="arr_note2[]"][data-id="' + $(this).data('id') + '"]').val());
                             formData.append('arr_place[]',$('#arr_place' + $(this).data('id')).val());
                             formData.append('arr_line[]',($('#arr_line' + $(this).data('id')).val() ? $('#arr_line' + $(this).data('id')).val() : ''));
                             formData.append('arr_machine[]',($('#arr_machine' + $(this).data('id')).val() ? $('#arr_machine' + $(this).data('id')).val() : ''));

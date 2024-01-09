@@ -210,6 +210,14 @@ class GoodReceipt extends Model
             $hasRelation = true;
         }
 
+        foreach($this->goodReceiptDetail as $row){
+            foreach($row->goodReceiptDetailSerial as $row){
+                if($row->goodIssueDetail()->exists()){
+                    $hasRelation = true;
+                }
+            }
+        }
+
         return $hasRelation;
     }
 

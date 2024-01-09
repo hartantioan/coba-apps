@@ -29,6 +29,7 @@ use App\Models\Company;
 use App\Models\Department;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportGoodIssue;
+use App\Models\GoodReceiptDetailSerial;
 use App\Models\Line;
 use App\Models\Machine;
 use App\Models\Menu;
@@ -288,6 +289,25 @@ class GoodIssueController extends Controller
                     }
                 }
 
+                if($request->arr_serial){
+                    $passedQtyAndSerial = true;
+                    foreach($request->arr_serial as $key => $row){
+                        if($row){
+                            $rowArr = explode(',',$row);
+                            if(count($rowArr) != floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key])))){
+                                $passedQtyAndSerial = false;
+                            }
+                        }
+                    }
+
+                    if($passedQtyAndSerial == false){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Maaf, salah satu item aktiva jumlah qty dengan jumlah nomor serial tidak sama.',
+                        ]);
+                    }
+                }
+
                 if($passedQtyMinus == false){
                     return response()->json([
                         'status'  => 500,
@@ -353,6 +373,11 @@ class GoodIssueController extends Controller
                         $query->save();
 
                         foreach($query->goodIssueDetail as $row){
+                            foreach($row->goodReceiptDetailSerial as $rowdetail){
+                                $rowdetail->update([
+                                    'good_issue_detail_id'  => NULL,
+                                ]);
+                            }
                             $row->delete();
                         }
                     }else{
@@ -380,7 +405,7 @@ class GoodIssueController extends Controller
                         $rowprice = NULL;
                         $item_stock = ItemStock::find(intval($row));
                         $rowprice = $item_stock->priceNow();
-                        GoodIssueDetail::create([
+                        $gid = GoodIssueDetail::create([
                             'good_issue_id'         => $query->id,
                             'item_stock_id'         => $row,
                             'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
@@ -400,6 +425,15 @@ class GoodIssueController extends Controller
                             'project_id'            => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
                             'requester'             => $request->arr_requester[$key] ? $request->arr_requester[$key] : NULL,
                         ]);
+
+                        if($request->arr_serial[$key]){
+                            $rowArr = explode(',',$request->arr_serial[$key]);
+                            foreach($rowArr as $rowdetail){
+                                GoodReceiptDetailSerial::find(intval($rowdetail))->update([
+                                    'good_issue_detail_id' => $gid->id
+                                ]);
+                            }
+                        }
                     }
 
                     CustomHelper::sendApproval('good_issues',$query->id,$query->note);
@@ -438,7 +472,7 @@ class GoodIssueController extends Controller
                     <table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="9">Daftar Item</th>
+                                <th class="center-align" colspan="15">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -476,6 +510,9 @@ class GoodIssueController extends Controller
                 <td class="center-align">'.($row->department()->exists() ? $row->department->name : '-').'</td>
                 <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
                 <td class="center-align">'.($row->requester ? $row->requester : '-').'</td>
+            </tr>
+            <tr>
+                <td colspan="15">Serial : '.$row->listSerial().'</td>
             </tr>';
         }
         
@@ -562,6 +599,8 @@ class GoodIssueController extends Controller
                 'project_id'        => $row->project()->exists() ? $row->project->id : '',
                 'project_name'      => $row->project()->exists() ? $row->project->name : '',
                 'requester'         => $row->requester,
+                'is_activa'         => $row->itemStock->item->itemGroup->is_activa ? $row->itemStock->item->itemGroup->is_activa : '',
+                'list_serial'       => $row->arrSerial(), #lanjutkan
             ];
         }
 

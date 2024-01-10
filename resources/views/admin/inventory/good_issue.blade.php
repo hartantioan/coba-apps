@@ -234,7 +234,7 @@
                                                         <th class="center">Qty</th>
                                                         <th class="center">Satuan</th>
                                                         <th class="center">Keterangan</th>
-                                                        <th class="center">Coa</th>
+                                                        <th class="center">Tipe Biaya</th>
                                                         <th class="center">Line</th>
                                                         <th class="center">Mesin</th>
                                                         <th class="center">Departemen</th>
@@ -812,7 +812,7 @@
                                         <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="Untuk ` + val.place_name + ` ` + val.warehouse_name + `">
                                     </td>
                                     <td class="center">
-                                        <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                                        <select class="browser-default" id="arr_inventory_coa` + count + `" name="arr_inventory_coa[]"></select>
                                     </td>
                                     <td>
                                         <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
@@ -882,7 +882,7 @@
                                 `);
                             }
                             select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
-                            select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+                            select2ServerSide('#arr_inventory_coa' + count, '{{ url("admin/select2/inventory_coa") }}');
 
                             if(val.is_activa){
                                 $('#serial' + count).append(`
@@ -985,7 +985,7 @@
                     <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ...">
                 </td>
                 <td class="center">
-                    <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                    <select class="browser-default" id="arr_inventory_coa` + count + `" name="arr_inventory_coa[]"></select>
                 </td>
                 <td>
                     <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
@@ -1028,7 +1028,7 @@
             </tr>
         `);
         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
-        select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+        select2ServerSide('#arr_inventory_coa' + count, '{{ url("admin/select2/inventory_coa") }}');
         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
     }
 
@@ -1137,7 +1137,7 @@
                 formData.delete('arr_item_stock[]');
                 formData.delete('arr_qty[]');
                 formData.delete('arr_note[]');
-                formData.delete('arr_coa[]');
+                formData.delete('arr_inventory_coa[]');
                 formData.delete('arr_line[]');
                 formData.delete('arr_machine[]');
                 formData.delete('arr_department[]');
@@ -1165,7 +1165,7 @@
                     }
                 });
 
-                $('input[name^="arr_qty"]').each(function(index){
+                $('input[name^="arr_qty[]"]').each(function(index){
                     if(!$(this).val() || $(this).val() == '0'){
                         passed = false;
                     }else{
@@ -1173,11 +1173,11 @@
                     }
                 });
 
-                $('select[name^="arr_coa"]').each(function(index){
+                $('select[name^="arr_inventory_coa"]').each(function(index){
                     if(!$(this).val()){
                         passed = false;
                     }else{
-                        formData.append('arr_coa[]',$(this).val());
+                        formData.append('arr_inventory_coa[]',$(this).val());
                         formData.append('arr_note[]',($('input[name^="arr_note[]"]').eq(index).val() ? $('input[name^="arr_note[]"]').eq(index).val() : ''));
                     }
                     formData.append('arr_line[]',($('select[name^="arr_line[]"]').eq(index).val() ? $('select[name^="arr_line[]"]').eq(index).val() : ''));
@@ -1330,7 +1330,7 @@
                                     <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
                                 </td>
                                 <td class="center">
-                                    <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                                    <select class="browser-default" id="arr_inventory_coa` + count + `" name="arr_inventory_coa[]"></select>
                                 </td>
                                 <td>
                                     <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
@@ -1389,11 +1389,11 @@
                         $('#arr_item' + count).append(`
                             <option value="` + val.item_id + `">` + val.item_name + `</option>
                         `);
-                        $('#arr_coa' + count).append(`
-                            <option value="` + val.coa_id + `">` + val.coa_name + `</option>
+                        $('#arr_inventory_coa' + count).append(`
+                            <option value="` + val.inventory_coa_id + `">` + val.inventory_coa_name + `</option>
                         `);
                         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
-                        select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+                        select2ServerSide('#arr_inventory_coa' + count, '{{ url("admin/select2/coa") }}');
                         $('#arr_line' + count).val(val.line_id);
                         $('#arr_machine' + count).val(val.machine_id);
                         $('#arr_department' + count).val(val.department_id);

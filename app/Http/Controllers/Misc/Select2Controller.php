@@ -64,6 +64,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Color;
 use App\Models\DeliveryCost;
 use App\Models\GoodReceiptDetailSerial;
+use App\Models\InventoryCoa;
 use App\Models\Journal;
 use App\Models\Pattern;
 use App\Models\ProductionOrder;
@@ -330,6 +331,27 @@ class Select2Controller extends Controller {
                 'uom'           => '-',
                 'code'          => CustomHelper::encrypt($d->code),
                 'type'          => $d->getTable(),
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function inventoryCoa(Request $request)
+    {   
+        $response = [];
+        $search   = $request->search;
+        $data = InventoryCoa::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%");
+                 })
+                ->where('status','1')
+                ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->name,
             ];
         }
 

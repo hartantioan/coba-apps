@@ -1101,7 +1101,7 @@
                                 <tr class="row_purchase">
                                     <td class="center-align">
                                         <label>
-                                            <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.po_code + `" onclick="countAll()" data-id="` + count + `">
+                                            <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.po_code + `" onclick="checkAll()" data-id="` + count + `">
                                             <span>Pilih</span>
                                         </label>
                                     </td>
@@ -1568,7 +1568,7 @@
                             <tr class="row_purchase">
                                 <td class="center-align">
                                     <label>
-                                        <input type="checkbox" checked id="check` + count + `" name="arr_code[]" value="` + val.purchase_order_encrypt + `" onclick="countAll()" data-id="` + count + `">
+                                        <input type="checkbox" checked id="check` + count + `" name="arr_code[]" value="` + val.purchase_order_encrypt + `" onclick="checkAll()" data-id="` + count + `">
                                         <span>Pilih</span>
                                     </label>
                                 </td>

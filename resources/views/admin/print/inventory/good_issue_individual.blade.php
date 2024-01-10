@@ -265,7 +265,7 @@
                                     <th class="center">Item</th>
                                     <th class="center">Jum.</th>
                                     <th class="center">Sat.</th>
-                                    <th class="center">Coa</th>
+                                    <th class="center">Tipe Biaya</th>
                                     <th class="center">Plant</th>
                                     <th class="center">Dari Gudang</th>
                                     <th class="center">Area</th>
@@ -284,7 +284,7 @@
                                     <td>{{ $row->itemStock->item->code.' - '.$row->itemStock->item->name }}</td>
                                     <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
                                     <td class="center-align">{{ $row->itemStock->item->uomUnit->code }}</td>
-                                    <td class="center-align">{{ $row->coa->name }}</td>
+                                    <td class="center-align">{{ $row->inventoryCoa->name }}</td>
                                     <td class="center-align">{{ $row->itemStock->place->code }}</td>
                                     <td class="center-align">{{ $row->itemStock->warehouse->name }}</td>
                                     <td class="center-align">{{ $row->itemStock->area()->exists() ? $row->itemStock->area->name : '-' }}</td>

@@ -30,6 +30,7 @@ use App\Models\Department;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportGoodIssue;
 use App\Models\GoodReceiptDetailSerial;
+use App\Models\InventoryCoa;
 use App\Models\Line;
 use App\Models\Machine;
 use App\Models\Menu;
@@ -62,6 +63,7 @@ class GoodIssueController extends Controller
             'menucode'  => $menu->document_code,
             'line'      => Line::where('status','1')->get(),
             'machine'   => Machine::where('status','1')->get(),
+            'coa_cost'  => InventoryCoa::where('status','1')->where('type','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -215,7 +217,7 @@ class GoodIssueController extends Controller
 			'post_date'		            => 'required',
             'arr_item_stock'            => 'required|array',
             'arr_qty'                   => 'required|array',
-            'arr_coa'                   => 'required|array',
+            'arr_inventory_coa'         => 'required|array',
             'arr_lookable_type'         => 'required|array',
             'arr_lookable_id'           => 'required|array',
 		], [
@@ -230,8 +232,8 @@ class GoodIssueController extends Controller
             'arr_item_stock.array'              => 'Item stok harus dalam bentuk array',
             'arr_qty.required'                  => 'Qty item tidak boleh kosong',
             'arr_qty.array'                     => 'Qty item harus dalam bentuk array',
-            'arr_coa.required'                  => 'Coa tidak boleh kosong',
-            'arr_coa.array'                     => 'Coa harus dalam bentuk array',
+            'arr_inventory_coa.required'        => 'Tipe Biaya tidak boleh kosong',
+            'arr_inventory_coa.array'           => 'Tipe Biaya harus dalam bentuk array',
             'arr_lookable_type.required'        => 'Tipe referensi tidak boleh kosong',
             'arr_lookable_type.array'           => 'Tipe referensi harus dalam bentuk array',
             'arr_lookable_id.required'          => 'Id referensi tidak boleh kosong',
@@ -405,6 +407,7 @@ class GoodIssueController extends Controller
                         $rowprice = NULL;
                         $item_stock = ItemStock::find(intval($row));
                         $rowprice = $item_stock->priceNow();
+                        $inventory_coa = InventoryCoa::find(intval($request->arr_inventory_coa[$key]));
                         $gid = GoodIssueDetail::create([
                             'good_issue_id'         => $query->id,
                             'item_stock_id'         => $row,
@@ -412,7 +415,8 @@ class GoodIssueController extends Controller
                             'price'                 => $rowprice,
                             'total'                 => $rowprice * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'note'                  => $request->arr_note[$key],
-                            'coa_id'                => $request->arr_coa[$key],
+                            'inventory_coa_id'      => $request->arr_inventory_coa[$key],
+                            'coa_id'                => $inventory_coa->coa_id,
                             'lookable_type'         => $request->arr_lookable_type[$key] ? $request->arr_lookable_type[$key] : NULL,
                             'lookable_id'           => $request->arr_lookable_id[$key] ? $request->arr_lookable_id[$key] : NULL,
                             'place_id'              => $item_stock->place_id,
@@ -424,7 +428,7 @@ class GoodIssueController extends Controller
                             'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
                             'project_id'            => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
                             'requester'             => $request->arr_requester[$key] ? $request->arr_requester[$key] : NULL,
-                            'qty_return'            => str_replace(',','.',str_replace('.','',$request->arr_qty_return[$key])),
+                            'qty_return'            => $request->arr_qty_return[$key] ? str_replace(',','.',str_replace('.','',$request->arr_qty_return[$key])) : 0,
                         ]);
 
                         if($request->arr_serial[$key]){
@@ -481,7 +485,7 @@ class GoodIssueController extends Controller
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
                                 <th class="center-align">Keterangan</th>
-                                <th class="center-align">Coa</th>
+                                <th class="center-align">Tipe Biaya</th>
                                 <th class="center-align">Plant</th>
                                 <th class="center-align">Gudang</th>
                                 <th class="center-align">Area</th>
@@ -498,11 +502,11 @@ class GoodIssueController extends Controller
         foreach($data->goodIssueDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$row->itemStock->item->name.'</td>
+                <td class="">'.$row->itemStock->item->name.'</td>
                 <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->itemStock->item->uomUnit->code.'</td>
-                <td class="center-align">'.$row->note.'</td>
-                <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
+                <td class="">'.$row->note.'</td>
+                <td class="">'.$row->inventoryCoa->name.'</td>
                 <td class="center-align">'.$row->itemStock->place->name.'</td>
                 <td class="center-align">'.$row->itemStock->warehouse->name.'</td>
                 <td class="center-align">'.($row->itemStock->area()->exists() ? $row->itemStock->area->name : '-').'</td>
@@ -589,8 +593,8 @@ class GoodIssueController extends Controller
                 'qtyraw'            => in_array($gr->status,['2','3']) ? number_format($row->qty + $row->itemStock->qty,3,',','.') : number_format($row->itemStock->qty,3,',','.'),
                 'price'             => number_format($row->price,2,',','.'),
                 'total'             => number_format($row->total,2,',','.'),
-                'coa_id'            => $row->coa_id,
-                'coa_name'          => $row->coa->code.' - '.$row->coa->name,
+                'inventory_coa_id'  => $row->inventory_coa_id,
+                'inventory_coa_name'=> $row->inventoryCoa->name,
                 'note'              => $row->note,
                 'lookable_type'     => $row->lookable_type ? $row->lookable_type : '',
                 'lookable_id'       => $row->lookable_id ? $row->lookable_id : '',

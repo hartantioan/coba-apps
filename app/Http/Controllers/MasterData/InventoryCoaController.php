@@ -1,27 +1,20 @@
 <?php
 
 namespace App\Http\Controllers\MasterData;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Foundation\Validation\ValidatesRequests;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use App\Models\Tax;
+use App\Models\InventoryCoa;
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\ExportWarehouse;
 
-class TaxController extends Controller
+class InventoryCoaController extends Controller
 {
     public function index()
     {
         $data = [
-            'title'     => 'Pajak',
-            'content'   => 'admin.master_data.tax',
+            'title'     => 'Coa Persediaan',
+            'content'   => 'admin.master_data.inventory_coa',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -32,12 +25,9 @@ class TaxController extends Controller
             'id',
             'code',
             'name',
-            'coa_purchase_id',
-            'coa_sale_id',
+            'coa_id',
             'type',
-            'percentage',
-            'is_default_ppn',
-            'is_default_pph',
+            'status',
         ];
 
         $start  = $request->start;
@@ -46,9 +36,9 @@ class TaxController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = Tax::count();
+        $total_data = InventoryCoa::count();
         
-        $query_data = Tax::where(function($query) use ($search, $request) {
+        $query_data = InventoryCoa::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -65,7 +55,7 @@ class TaxController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = Tax::where(function($query) use ($search, $request) {
+        $total_filtered = InventoryCoa::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -88,12 +78,8 @@ class TaxController extends Controller
                     $nomor,
                     $val->code,
                     $val->name,
-                    $val->coa_purchase_id ? $val->coaPurchase->code.' - '.$val->coaPurchase->name : ' - ',
-                    $val->coa_sale_id ? $val->coaSale->code.' - '.$val->coaSale->name : ' - ',
+                    $val->coa()->exists() ? $val->coa->code.' - '.$val->coa->name : ' - ',
                     $val->type(),
-                    number_format($val->percentage,2,',','.'),
-                    $val->isDefaultPpn(),
-                    $val->isDefaultPph(),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -120,21 +106,17 @@ class TaxController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code' 				=> $request->temp ? ['required', Rule::unique('taxes', 'code')->ignore($request->temp),'alpha_num:ascii'] : 'required|unique:taxes,code|alpha_num:ascii',
+            'code' 				=> $request->temp ? ['required', Rule::unique('inventory_coas', 'code')->ignore($request->temp)] : 'required|unique:inventory_coas,code',
             'name'              => 'required',
-            'coa_purchase_id'   => $request->type == '-' || $request->type == '+' ? 'required' : '',
-            'coa_sale_id'       => $request->type == '+' ? 'required' : '',
+            'coa_id'            => 'required',
             'type'              => 'required',
-            'percentage'        => 'required',
         ], [
             'code.required' 	        => 'Kode tidak boleh kosong.',
             'code.unique'               => 'Kode telah terpakai.',
             'code.alpha_num'            => 'Format kode salah. Contoh format kode adalah 123XXX.',
             'name.required'             => 'Nama tidak boleh kosong.',
-            'coa_purchase_id.required'  => 'Coa beli tidak boleh kosong.',
-            'coa_sale_id.required'      => 'Coa jual tidak boleh kosong.',
-            'type.required'             => 'Tipe pajak tidak boleh kosong.',
-            'percentage.required'       => 'Prosentase tidak boleh kosong.'
+            'coa_id.required'           => 'Coa tidak boleh kosong.',
+            'type.required'             => 'Tipe posisi tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {
@@ -146,27 +128,21 @@ class TaxController extends Controller
             DB::beginTransaction();
             try {
                 if($request->temp){
-                    $query = Tax::find($request->temp);
+                    $query = InventoryCoa::find($request->temp);
+                    $query->user_id         = session('bo_id');
                     $query->code            = $request->code;
                     $query->name	        = $request->name;
-                    $query->coa_purchase_id = $request->coa_purchase_id ? $request->coa_purchase_id : NULL;
-                    $query->coa_sale_id     = $request->coa_sale_id ? $request->coa_sale_id : NULL;
+                    $query->coa_id          = $request->coa_id;
                     $query->type            = $request->type;
-                    $query->percentage      = str_replace(',','.',str_replace('.','',$request->percentage));
-                    $query->is_default_ppn  = $request->is_default_ppn ? $request->is_default_ppn : '0';
-                    $query->is_default_pph  = $request->is_default_pph ? '1' : '0';
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                 }else{
-                    $query = Tax::create([
+                    $query = InventoryCoa::create([
+                        'user_id'           => session('bo_id'),
                         'code'              => $request->code,
                         'name'			    => $request->name,
-                        'coa_purchase_id'   => $request->coa_purchase_id ? $request->coa_purchase_id : NULL,
-                        'coa_sale_id'       => $request->coa_sale_id ? $request->coa_sale_id : NULL,
+                        'coa_id'            => $request->coa_id,
                         'type'              => $request->type,
-                        'percentage'        => str_replace(',','.',str_replace('.','',$request->percentage)),
-                        'is_default_ppn'    => $request->is_default_ppn ? $request->is_default_ppn : '0',
-                        'is_default_pph'    => $request->is_default_pph ? '1' : '0',
                         'status'            => $request->status ? $request->status : '2'
                     ]);
                 }
@@ -179,10 +155,10 @@ class TaxController extends Controller
 			if($query) {
 
                 activity()
-                    ->performedOn(new Tax())
+                    ->performedOn(new InventoryCoa())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit tax master data.');
+                    ->log('Add / edit inventory coa data.');
 
 				$response = [
 					'status'  => 200,
@@ -200,23 +176,21 @@ class TaxController extends Controller
     }
 
     public function show(Request $request){
-        $tax = Tax::find($request->id);
-        $tax['percentage'] = number_format($tax->percentage,2,',','.');
-        $tax['coa_purchase_name'] = $tax->coa_purchase_id ? $tax->coaPurchase->code.' - '.$tax->coaPurchase->name : '';
-        $tax['coa_sale_name'] = $tax->coa_sale_id ? $tax->coaSale->code.' - '.$tax->coaSale->name : '';
+        $ic = InventoryCoa::find($request->id);
+        $ic['coa_name'] = $ic->coa_id ? $ic->coa->code.' - '.$ic->coa->name : '';
         				
-		return response()->json($tax);
+		return response()->json($ic);
     }
 
     public function destroy(Request $request){
-        $query = Tax::find($request->id);
+        $query = InventoryCoa::find($request->id);
 		
         if($query->delete()) {
             activity()
-                ->performedOn(new Tax())
+                ->performedOn(new InventoryCoa())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the tax data');
+                ->log('Delete the inventory coa data');
 
             $response = [
                 'status'  => 200,

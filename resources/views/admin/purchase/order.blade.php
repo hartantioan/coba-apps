@@ -110,8 +110,6 @@
                                                         <option value="">Semua</option>
                                                         <option value="1">Cash</option>
                                                         <option value="2">Credit</option>
-                                                        <option value="3">CBD</option>
-                                                        <option value="4">DP</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -275,7 +273,7 @@
                                 <label class="active" for="document_no">No. Dokumen</label>
                             </div>
                             <div class="input-field col m3 s12 step9">
-                                <select class="form-control" id="payment_type" name="payment_type" onchange="resetTerm()">
+                                <select class="form-control" id="payment_type" name="payment_type" onchange="applyTerm()">
                                     <option value="1">Cash</option>
                                     <option value="2">Credit</option>
                                 </select>
@@ -1155,10 +1153,17 @@
     function resetTerm(){
         if(tempTerm > 0){
             $('#payment_type').val('2').formSelect();
-            $('#payment_term').val(tempTerm);
         }else{
             $('#payment_type').val('1').formSelect();
+        }
+        applyTerm();
+    }
+
+    function applyTerm(){
+        if($('#payment_type').val() == '1'){
             $('#payment_term').val('0');
+        }else if($('#payment_type').val() == '2'){
+            $('#payment_term').val(tempTerm);
         }
     }
 
@@ -2179,6 +2184,8 @@
                 $('#savewtax').val(response.wtax);
                 $('#grandtotal').text(response.grandtotal);
                 $('#savegrandtotal').val(response.grandtotal);
+
+                tempTerm = response.top_master;
                 
                 if(response.details.length > 0){
                     $('.row_item').each(function(){

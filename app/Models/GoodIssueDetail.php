@@ -21,6 +21,7 @@ class GoodIssueDetail extends Model
         'price',
         'total',
         'note',
+        'inventory_coa_id',
         'coa_id',
         'lookable_type',
         'lookable_id',
@@ -47,6 +48,11 @@ class GoodIssueDetail extends Model
         }else{
             return false;
         }
+    }
+
+    public function inventoryCoa()
+    {
+        return $this->belongsTo('App\Models\InventoryCoa', 'inventory_coa_id', 'id')->withTrashed();
     }
 
     public function goodIssue()

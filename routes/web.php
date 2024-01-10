@@ -174,6 +174,7 @@ use App\Http\Controllers\Misc\NotificationController;
 
 use App\Http\Controllers\Maintenance\WorkOrderController;
 use App\Http\Controllers\Maintenance\RequestSparepartController;
+use App\Http\Controllers\MasterData\InventoryCoaController;
 use App\Http\Controllers\MasterData\SalaryComponentController;
 
 /*
@@ -246,6 +247,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('purchase_item', [Select2Controller::class, 'purchaseItem']);
                 Route::get('sales_item', [Select2Controller::class, 'salesItem']);
                 Route::get('coa', [Select2Controller::class, 'coa']);
+                Route::get('inventory_coa', [Select2Controller::class, 'inventoryCoa']);
                 Route::get('coa_journal', [Select2Controller::class, 'coaJournal']);
                 Route::get('raw_coa', [Select2Controller::class, 'rawCoa']);
                 Route::get('employee', [Select2Controller::class, 'employee']);
@@ -658,6 +660,14 @@ Route::prefix('admin')->group(function () {
                         Route::post('import',[OutletPriceController::class, 'import'])->middleware('operation.access:outlet_price,update');
                         Route::post('create',[OutletPriceController::class, 'create'])->middleware('operation.access:outlet_price,update');
                         Route::post('destroy', [OutletPriceController::class, 'destroy'])->middleware('operation.access:outlet_price,delete');
+                    });
+
+                    Route::prefix('inventory_coa')->middleware('operation.access:inventory_coa,view')->group(function () {
+                        Route::get('/',[InventoryCoaController::class, 'index']);
+                        Route::get('datatable',[InventoryCoaController::class, 'datatable']);
+                        Route::post('show', [InventoryCoaController::class, 'show']);
+                        Route::post('create',[InventoryCoaController::class, 'create'])->middleware('operation.access:inventory_coa,update');
+                        Route::post('destroy', [InventoryCoaController::class, 'destroy'])->middleware('operation.access:inventory_coa,delete');
                     });
                 });
 
@@ -1697,6 +1707,25 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[GoodIssueController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [GoodIssueController::class, 'voidStatus'])->middleware('operation.access:good_issue,void');
                     Route::post('destroy', [GoodIssueController::class, 'destroy'])->middleware('operation.access:good_issue,delete');
+                });
+
+                Route::prefix('good_return_issue')->middleware(['operation.access:good_return_issue,view','lockacc'])->group(function () {
+                    Route::get('/',[GoodIssueController::class, 'index']);
+                    Route::get('datatable',[GoodIssueController::class, 'datatable']);
+                    Route::get('row_detail',[GoodIssueController::class, 'rowDetail']);
+                    Route::post('show', [GoodIssueController::class, 'show']);
+                    Route::post('get_code', [GoodIssueController::class, 'getCode']);
+                    Route::post('print',[GoodIssueController::class, 'print']);
+                    Route::post('print_by_range',[GoodIssueController::class, 'printByRange']);
+                    Route::post('send_used_data',[GoodIssueController::class, 'sendUsedData']);
+                    Route::post('remove_used_data', [GoodIssueController::class, 'removeUsedData']);
+                    Route::get('print_individual/{id}',[GoodIssueController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::get('export',[GoodIssueController::class, 'export']);
+                    Route::get('view_journal/{id}',[GoodIssueController::class, 'viewJournal'])->middleware('operation.access:good_return_issue,journal');
+                    Route::post('create',[GoodIssueController::class, 'create'])->middleware('operation.access:good_return_issue,update');
+                    Route::get('approval/{id}',[GoodIssueController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [GoodIssueController::class, 'voidStatus'])->middleware('operation.access:good_return_issue,void');
+                    Route::post('destroy', [GoodIssueController::class, 'destroy'])->middleware('operation.access:good_return_issue,delete');
                 });
 
                 Route::prefix('revaluation')->middleware(['operation.access:revaluation,view','lockacc'])->group(function () {

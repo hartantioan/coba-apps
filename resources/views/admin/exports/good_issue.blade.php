@@ -19,7 +19,7 @@
             <th>Qty</th>
             <th>Satuan</th>
             <th>Keterangan</th>
-            <th>Coa</th>
+            <th>Tipe Biaya</th>
             <th>Plant</th>
             <th>Gudang</th>
         </tr>
@@ -49,7 +49,7 @@
                 <td>{{ number_format($rowdetail->qty,3,',','.') }}</td>
                 <td>{{ $rowdetail->itemStock->item->uomUnit->code }}</td>
                 <td>{{ $rowdetail->note }}</td>
-                <td>{{ $rowdetail->coa->code.' - '.$rowdetail->coa->name }}</td>
+                <td>{{ $rowdetail->inventoryCoa->name }}</td>
                 <td>{{ $rowdetail->itemStock->place->name }}</td>
                 <td>{{ $rowdetail->itemStock->warehouse->name }}</td>
             </tr>

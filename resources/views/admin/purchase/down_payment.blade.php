@@ -1095,6 +1095,7 @@
                     
                     if(response.length > 0){
                         $('#empty-purchase').remove();
+                        $('.row_purchase').remove();
                         $.each(response, function(i, val) {
                             var count = makeid(10);
                             $('#body-purchase').append(`

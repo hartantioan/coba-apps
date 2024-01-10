@@ -1733,7 +1733,7 @@
                                         <input name="arr_note[]" type="text" placeholder="Keterangan barang 1..." value="` + val.note + `">
                                     </td>
                                     <td>
-                                        <input name="arr_note2[]" type="text" placeholder="Keterangan barang 2...">
+                                        <input name="arr_note2[]" type="text" placeholder="Keterangan barang 2..." value="` + val.note2 + `">
                                     </td>
                                     <td>
                                         <input name="arr_required_date[]" type="date" value="` + val.date + `">

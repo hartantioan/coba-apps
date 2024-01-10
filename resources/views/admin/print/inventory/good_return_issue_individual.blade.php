@@ -5,9 +5,12 @@
 <html lang="en">
     <head>
         <style>
+            html
+            {
+                font-family: Tahoma, "Trebuchet MS", sans-serif;
+            }
 
             .break-row {
-                margin-top: 2%;
                 page-break-inside: avoid;
             }
 
@@ -22,63 +25,69 @@
             padding: 5px;
             }
             .column2 {
-                margin-left: 10%;
+                margin-right: 60%;
                 float: left;
                 width: 50%;
                 padding: 5px;
             }
 
-            /* Clearfix (clear floats) */
             .row::after {
             content: "";
             clear: both;
             display: table;
             }
 
+            
 
-
-            @media only screen and (max-width : 992px) {
+            @media only screen and (max-width : 768px) {
                 .invoice-print-area {
                     zoom:0.6;
+                }
+            }
+        
+            @media only screen and (max-width : 992px) {
+                .invoice-print-area {
+                    zoom:0.8;
                     font-size:11px !important;
                 }
 
                 table > thead > tr > th {
-                    
                     font-size:13px !important;
                     font-weight: 800 !important;
                 }
                 td{
-                    font-size:0.7em !important;
-            
+                    font-size:0.9em !important;
                 }
                 .tb-header td{
-                    font-size:0.6em !important;
+                    font-size:0.8em !important;
                 }
                 .tbl-info td{
                     font-size:1em !important;
                 }
                 .table-data-item td{
-                    font-size:1em !important;
+                    font-size:0.8em !important;
                 }
                 .table-data-item th{
-                    border:1px solid black;
+                    border:0.6px solid black;
                 }
                 .table-bot td{
-                    font-size:1em !important;
+                    font-size:0.8em !important;
+                }
+                .table-bot1 td{
+                    font-size:0.9em !important;
                 }
             }
-
+        
             @media print {
                 .invoice-print-area {
                     font-size:13px !important;
                 }
-
+        
                 table > thead > tr > th {
                     font-size:15px !important;
                     font-weight: 800 !important;
                 }
-
+        
                 td {
                     border:none !important;
                     border-bottom: none;
@@ -86,7 +95,7 @@
                     padding: 1px !important;
                     vertical-align:top !important;
                 }
-
+        
                 body {
                     background-color:white !important;
                     zoom:0.8;
@@ -95,24 +104,24 @@
                 .modal {
                     background-color:white !important;
                 }
-
+        
                 .card {
                     background-color:white !important;
                     padding:25px !important;
                 }
-
+        
                 .invoice-print-area {
                     color: #000000 !important;
                 }
-
+        
                 .invoice-subtotal {
                     color: #000000 !important;
                 }
-
+        
                 .invoice-info {
                     font-size:12px !important;
                 }
-
+        
                 .modal {
                     position: absolute;
                     left: 0;
@@ -129,11 +138,11 @@
                     overflow: visible !important;
                     padding: 0px !important;
                 }
-
+        
                 .modal-footer {
                     display:none !important;
                 }
-
+        
                 .row .col {
                     padding:0px !important;
                 }
@@ -145,79 +154,72 @@
             }
 
             @page { margin: 5em 3em 6em 3em; }
-            header { position: fixed; top: -64px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
+            header { position: fixed; top: -70px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
                 
-
         
+           
         </style>
     </head>
     <body>
         <header>
             <table border="0" width="100%" style="font-size:1em" class="tb-header">
                 <tr>
-                    <td width="83%" class="left-align" >
-                        <tr>
-                            <td>
-                                <span class="invoice-number mr-1" style="font-size:1em"># {{ $data->code }}</span>
-                            </td>
-                        </tr>
-                        {{-- <tr>
-                            <td style="margin-top: -2px;">
-                                <small style="font-size:1em">Diajukan: {{ date('d/m/y',strtotime($data->post_date)) }}</small>
-                            </td>
-                        </tr> --}}
-                        <tr>
-                            <td>
-                                <h2 style="margin-top: -2px">{{ $title }}</h2>
-                            </td>
-                        </tr>
-                                
+                    <td width="33%" class="left-align" >
+                        <span class="invoice-number mr-1"># {{ $data->code }}</span>
+                        <br><small style="font-size:1em">Diajukan: {{ date('d/m/y',strtotime($data->post_date)) }}</small>
                         
                     </td>
-                    <td width="33%" class="right-align">
-                        
-                        
-                   
+                    <td width="33%" align="center">
+                        <h3 class="indigo-text">{{ $title }}</h3>
                     </td>
-                    
                     <td width="34%" class="right-align">
-                        
-                            <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
-                       
+                        <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%;right:0px;">
                     </td>
                 </tr>
                 
             </table>
-            <hr style="border-top: 3px solid black; margin-top:-2%">
+            <hr style="border-top: 3px solid black; margin-top:0px">
         </header>
         <main>
             <div class="card">
-                <div class="card-content invoice-print-area">
-                    <table border="0" width="100%" class="tbl-info">
+                <div class="card-content invoice-print-area ">
+                    <table border="0" width="100%">
                         <tr>
-                            <td width="33%" class="left-align">
-                                <table border="0" width="100%">
+                            <td width="66%" class="left-align">
+                                <table border="0" width="50%" class="tbl-info">
                                     <tr>
-                                        <td>
-                                            Name: {{ $data->user->name }}
+                                        <td width="50%">
+                                            Name
+                                        </td>
+                                        <td width="50%">
+                                            {{ $data->user->name }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>
-                                            Posisi: {{ $data->user->position->Level->name}}
+                                        <td width="50%">
+                                            Posisi
                                         </td>
-                                        
+                                        <td width="50%">
+                                            {{ $data->user->position->Level->name }}
+                                        </td>
                                     </tr>
                                     <tr>
-                                        <td >
-                                            Depart. {{ $data->user->position->division->name}}
+                                        <td width="50%">
+                                            Depart.
                                         </td>
-                                        
+                                        <td width="50%">
+                                            {{ $data->user->position->division->name }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="50%">
+                                            HP
+                                        </td>
+                                        <td width="50%">
+                                            {{ $data->user->phone }}
+                                        </td>
                                     </tr>
                                 </table>
-                            </td>
-                            <td width="33%" class="left-align">
- 
                             </td>
                             <td width="33%" class="left-align">
                                 <table border="0" width="100%">
@@ -235,78 +237,74 @@
                             </td>
                         </tr>
                     </table>
-                
                     <!-- product details table-->
-                    <div class="invoice-product-details">
-                    <table class="bordered" border="1" width="100%" class="table-data-item" style="border-collapse:collapse">
-                        <thead>
-                            <tr>
-                                <th align="center">No</th>
-                                <th align="center">Item</th>
-                                <th align="center">Jum.</th>
-                                <th align="center">Stok</th>
-                                <th align="center">Sat.</th>
-                                <th align="center">Tgl.Dipakai</th>
-                                <th align="center">Plant</th>
-                                <th align="center">Gudang</th>
-                                <th align="center">Line</th>
-                                <th align="center">Machine</th>
-                                <th align="center">Departemen</th>
-                                <th align="center">Proyek</th>
-                                <th align="center-">Requester</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($data->materialRequestDetail as $key => $row)
-                            <tr>
-                                <td>{{ $key + 1 }}</td>
-                                <td>{{ $row->item->code.' - '.$row->item->name }}</td>
-                                <td align="right">{{ number_format($row->qty,3,',','.') }}</td>
-                                <td align="right">{{ number_format($row->stock,3,',','.') }}</td>
-                                <td align="center">{{ $row->item->buyUnit->code }}</td>
-                                <td align="center">{{ date('d/m/y',strtotime($row->required_date)) }}</td>
-                                <td align="center">{{ $row->place->code }}</td>
-                                <td align="center">{{ $row->warehouse->name }}</td>
-                                <td align="center">{{ $row->line()->exists() ? $row->line->code : '-' }}</td>
-                                <td align="center">{{ $row->machine()->exists() ? $row->machine->name : '-' }}</td>
-                                <td align="center">{{ $row->department()->exists() ? $row->department->name : '-' }}</td>
-                                <td align="center">{{ $row->project()->exists() ? $row->project->name : '-' }}</td>
-                                <td align="">{{ $row->requester }}</td>
-                            </tr>
-                            <tr>
-                                <td colspan="13">Keterangan 1 : {{ $row->note }}</td>
-                            </tr>
-                            <tr>
-                                <td colspan="13">Keterangan 2 : {{ $row->note2 }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-                <!-- invoice subtotal -->
-                <div class="divider mt-3 mb-3"></div>
+                    
+                    <div class="invoice-product-details mt-2">
+                        <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
+                            <thead>
+                                <tr>
+                                    <th align="center" rowspan="2">Item</th>
+                                    <th align="center" colspan="4">Asal</th>
+                                    <th align="center" rowspan="2">Jum.Keluar</th>
+                                    <th align="center" rowspan="2">Jum.Kembali</th>
+                                    <th align="center" rowspan="2">Satuan</th>
+                                </tr>
+                                <tr>
+                                    <th align="center">Plant</th>
+                                    <th align="center">Gudang</th>
+                                    <th align="center">Area</th>
+                                    <th align="center">Shading</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($data->goodReturnIssueDetail as $row)
+                                <tr>
+                                    <td>{{ $row->item->code.' - '.$row->item->name }}</td>
+                                    <td align="center">{{ $row->goodIssueDetail->itemStock->place->code }}</td>
+                                    <td align="center">{{ $row->goodIssueDetail->itemStock->warehouse->name }}</td>
+                                    <td align="center">{{ $row->goodIssueDetail->itemStock->area()->exists() ? $row->goodIssueDetail->itemStock->area->name : '-' }}</td>
+                                    <td align="center">{{ $row->goodIssueDetail->itemShading()->exists() ? $row->goodIssueDetail->itemShading->code : '-' }}</td>
+                                    <td align="right">{{ number_format($row->goodIssueDetail->qtyBalanceReturn(),3,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->qty,3,',','.') }}</td>
+                                    <td align="center">{{ $row->item->uomUnit->code }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="8">Keterangan : {{ $row->note }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                            
+                        </table>
+                    </div>
+                    <!-- invoice subtotal -->
                     <div class="invoice-subtotal break-row">
-                        <table class="table-bot" width="100%" border="0">
+                        <div class="row">
+                        <div class="column1">
+                            <table style="width:100%">
+                                <tr class="break-row">
+                                    <td>
+                                        <div class="mt-3">
+                                            Catatan : {{ $data->note }}
+                                        </div>
+                                    </td>
+                                    
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="column2">
+                        </div>
+                        </div>
+                        <table class="table-bot1" width="100%" border="0">
                             <tr>
                                 <td class="center-align">
                                     {!! ucwords(strtolower($data->user->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="center-align">
-                                    Catatan : {{ $data->note }}
-                                </td>
-                            </tr>
-                        </table>
-                        <table class="table-bot" width="100%" border="0">
-                            <tr>
-                                <td class="center-align">
+                                    <br>
                                     Dibuat oleh,
                                     @if($data->user->signature)
                                         <div>{!! $data->user->signature() !!}</div>
                                     @endif
                                     <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $data->user->name }}</div>
-                                    <div class="mt-1">{{ $data->user->position->Level->code.' - '.$data->user->position->division->name }}</div>
+                                    <div class="mt-1">{{ $data->user->position->Level->name.' - '.$data->user->position->division->name }}</div>
                                 </td>
                                 @if($data->approval())
                                     @foreach ($data->approval() as $detail)
@@ -325,6 +323,7 @@
                             </tr>
                         </table>  
                     </div>
+                    
                 </div>
             </div>
         </main>

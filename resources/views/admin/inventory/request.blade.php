@@ -171,7 +171,8 @@
                                                     <th class="center">Stok (Satuan UoM)</th>
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan PO</th>
-                                                    <th class="center">Keterangan</th>
+                                                    <th class="center">Keterangan 1</th>
+                                                    <th class="center">Keterangan 2</th>
                                                     <th class="center">Tgl.Dipakai</th>
                                                     <th class="center">Plant</th>
                                                     <th class="center">Gudang</th>
@@ -198,7 +199,10 @@
                                                         <span id="arr_satuan0">-</span>
                                                     </td>
                                                     <td>
-                                                        <input name="arr_note[]" type="text" placeholder="Keterangan barang...">
+                                                        <input name="arr_note[]" type="text" placeholder="Keterangan barang 1...">
+                                                    </td>
+                                                    <td>
+                                                        <input name="arr_note2[]" type="text" placeholder="Keterangan barang 2...">
                                                     </td>
                                                     <td>
                                                         <input name="arr_required_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}">
@@ -1158,6 +1162,9 @@
                                     <input name="arr_note[]" type="text" placeholder="Keterangan barang 1..." value="` + val.note + `">
                                 </td>
                                 <td>
+                                    <input name="arr_note2[]" type="text" placeholder="Keterangan barang 2..." value="` + val.note2 + `">
+                                </td>
+                                <td>
                                     <input name="arr_required_date[]" type="date" value="` + val.date + `" min="` + $('#post_date').val() + `">
                                 </td>
                                 <td>
@@ -1338,6 +1345,9 @@
                                         </td>
                                         <td>
                                             <input name="arr_note[]" type="text" placeholder="Keterangan barang 1..." value="` + val.note + `">
+                                        </td>
+                                        <td>
+                                            <input name="arr_note2[]" type="text" placeholder="Keterangan barang 2..." value="` + val.note2 + `">
                                         </td>
                                         <td>
                                             <input name="arr_required_date[]" type="date" value="` + val.date + `" min="` + $('#post_date').val() + `">
@@ -1608,7 +1618,10 @@
                     <span id="arr_satuan` + count + `">-</span>
                 </td>
                 <td>
-                    <input name="arr_note[]" type="text" placeholder="Keterangan barang...">
+                    <input name="arr_note[]" type="text" placeholder="Keterangan barang 1...">
+                </td>
+                <td>
+                    <input name="arr_note2[]" type="text" placeholder="Keterangan barang 2...">
                 </td>
                 <td>
                     <input name="arr_required_date[]" type="date" value="{{ date('Y-m-d') }}" min="` + $('#post_date').val() + `">

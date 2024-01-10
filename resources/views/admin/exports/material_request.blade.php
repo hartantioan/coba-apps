@@ -18,7 +18,8 @@
             <th>Qty</th>
             <th>Stok</th>
             <th>Satuan</th>
-            <th>Keterangan</th>
+            <th>Keterangan 1</th>
+            <th>Keterangan 2</th>
             <th>Tgl.Dipakai</th>
             <th>Plant</th>
             <th>Gudang</th>
@@ -55,6 +56,7 @@
                     <td>{{ number_format($rowdetail->stock,3,',','.') }}</td>
                     <td>{{ $rowdetail->item->buyUnit->code }}</td>
                     <td>{{ $rowdetail->note }}</td>
+                    <td>{{ $rowdetail->note2 }}</td>
                     <td>{{ date('d/m/y',strtotime($rowdetail->required_date)) }}</td>
                     <td>{{ $rowdetail->place->code }}</td>
                     <td>{{ $rowdetail->warehouse->name }}</td>

@@ -216,7 +216,7 @@ class MaterialRequestController extends Controller
         $string = '<div class="row pt-1 pb-1"><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="15">Daftar Item (Stok yang tampil adalah stok realtime pada saat dokumen dibuat)</th>
+                                <th class="center-align" colspan="16">Daftar Item (Stok yang tampil adalah stok realtime pada saat dokumen dibuat)</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -224,7 +224,8 @@ class MaterialRequestController extends Controller
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Stok</th>
                                 <th class="center-align">Satuan</th>
-                                <th class="center-align">Keterangan</th>
+                                <th class="center-align">Keterangan 1</th>
+                                <th class="center-align">Keterangan 2</th>
                                 <th class="center-align">Tgl.Dipakai</th>
                                 <th class="center-align">Plant</th>
                                 <th class="center-align">Gudang</th>
@@ -245,6 +246,7 @@ class MaterialRequestController extends Controller
                 <td class="right-align">'.number_format($row->stock,3,',','.').'</td>
                 <td class="center-align">'.$row->item->buyUnit->code.'</td>
                 <td class="">'.$row->note.'</td>
+                <td class="">'.$row->note2.'</td>
                 <td class="center-align">'.date('d/m/y',strtotime($row->required_date)).'</td>
                 <td class="center-align">'.$row->place->code.'</td>
                 <td class="center-align">'.$row->warehouse->name.'</td>
@@ -552,6 +554,7 @@ class MaterialRequestController extends Controller
                             'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'stock'                 => $purchaseQty,
                             'note'                  => $request->arr_note[$key],
+                            'note2'                 => $request->arr_note2[$key],
                             'required_date'         => $request->arr_required_date[$key],
                             'place_id'              => $request->arr_place[$key],
                             'warehouse_id'          => $request->arr_warehouse[$key],
@@ -606,7 +609,8 @@ class MaterialRequestController extends Controller
                 'item_name'         => $row->item->code.' - '.$row->item->name,
                 'qty'               => number_format($row->qty,3,',','.'),
                 'unit'              => $row->item->buyUnit->code,
-                'note'              => $row->note,
+                'note'              => $row->note ? $row->note : '',
+                'note2'             => $row->note2 ? $row->note2 : '',
                 'date'              => $row->required_date,
                 'place_id'          => $row->place_id,
                 'warehouse_id'      => $row->warehouse_id,

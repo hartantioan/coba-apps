@@ -20,6 +20,7 @@ class MaterialRequestDetail extends Model
         'qty',
         'stock',
         'note',
+        'note2',
         'required_date',
         'place_id',
         'line_id',

@@ -21,7 +21,7 @@ use App\Models\User;
 use App\Models\Company;
 use App\Models\Department;
 use App\Helpers\CustomHelper;
-use App\Exports\ExportGoodIssue;
+use App\Exports\ExportGoodReturnIssue;
 use App\Models\GoodIssue;
 use App\Models\GoodIssueDetail;
 use App\Models\GoodReceiptDetail;
@@ -368,39 +368,39 @@ class GoodReturnIssueController extends Controller
                     <table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="16">Daftar Item</th>
+                                <th class="center-align" colspan="11">Daftar Item</th>
                             </tr>
                             <tr>
-                                <th class="center-align">No.</th>
-                                <th class="center-align">Item</th>
-                                <th class="center-align">Qty Keluar</th>
-                                <th class="center-align">Qty Kembali</th>
-                                <th class="center-align">Satuan</th>
-                                <th class="center-align">Keterangan</th>
+                                <th class="center-align" rowspan="2">No.</th>
+                                <th class="center-align" rowspan="2">Item</th>
+                                <th class="center-align" colspan="5">Informasi Asal</th>
+                                <th class="center-align" rowspan="2">Qty Keluar</th>
+                                <th class="center-align" rowspan="2">Qty Kembali</th>
+                                <th class="center-align" rowspan="2">Satuan</th>
+                                <th class="center-align" rowspan="2">Keterangan</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">Plant</th>
+                                <th class="center-align">Gudang</th>
+                                <th class="center-align">Area</th>
+                                <th class="center-align">Shading</th>
+                                <th class="center-align">Requester</th>
                             </tr>
                         </thead><tbody>';
         
-        foreach($data->goodIssueDetail as $key => $row){
+        foreach($data->goodReturnIssueDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="">'.$row->itemStock->item->name.'</td>
+                <td class="">'.$row->item->code.' - '.$row->item->name.'</td>
+                <td class="">'.$row->goodIssueDetail->itemStock->place->code.'</td>
+                <td class="">'.$row->goodIssueDetail->itemStock->warehouse->name.'</td>
+                <td class="">'.($row->goodIssueDetail->itemStock->area()->exists() ? $row->goodIssueDetail->itemStock->area->code : '-').'</td>
+                <td class="">'.($row->goodIssueDetail->itemStock->itemShading()->exists() ? $row->goodIssueDetail->itemStock->itemShading->code : '-').'</td>
+                <td class="">'.$row->goodIssueDetail->requester.'</td>
+                <td class="right-align">'.number_format($row->goodIssueDetail->qtyBalanceReturn(),3,',','.').'</td>
                 <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
-                <td class="center-align">'.$row->itemStock->item->uomUnit->code.'</td>
+                <td class="center-align">'.$row->item->uomUnit->code.'</td>
                 <td class="">'.$row->note.'</td>
-                <td class="">'.$row->inventoryCoa->name.'</td>
-                <td class="center-align">'.$row->itemStock->place->name.'</td>
-                <td class="center-align">'.$row->itemStock->warehouse->name.'</td>
-                <td class="center-align">'.($row->itemStock->area()->exists() ? $row->itemStock->area->name : '-').'</td>
-                <td class="center-align">'.($row->itemShading()->exists() ? $row->itemShading->code : '-').'</td>
-                <td class="center-align">'.($row->line()->exists() ? $row->line->name : '-').'</td>
-                <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
-                <td class="center-align">'.($row->department()->exists() ? $row->department->name : '-').'</td>
-                <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
-                <td class="center-align">'.($row->requester ? $row->requester : '-').'</td>
-                <td class="right-align">'.number_format($row->qty_return,3,',','.').'</td>
-            </tr>
-            <tr>
-                <td colspan="16">Serial : '.$row->listSerial().'</td>
             </tr>';
         }
         
@@ -459,37 +459,25 @@ class GoodReturnIssueController extends Controller
     }
 
     public function show(Request $request){
-        $gr = GoodIssue::where('code',CustomHelper::decrypt($request->id))->first();
+        $gr = GoodReturnIssue::where('code',CustomHelper::decrypt($request->id))->first();
         $gr['code_place_id'] = substr($gr->code,7,2);
 
         $arr = [];
         
-        foreach($gr->goodIssueDetail as $row){
+        foreach($gr->goodReturnIssueDetail as $row){
             $arr[] = [
-                'item_id'           => $row->itemStock->item_id,
-                'item_name'         => $row->itemStock->item->code.' - '.$row->itemStock->item->name,
-                'uom'               => $row->itemStock->item->uomUnit->code,
-                'item_stock_id'     => $row->item_stock_id,
-                'qty'               => number_format($row->qty,3,',','.'),
-                'qtyraw'            => in_array($gr->status,['2','3']) ? number_format($row->qty + $row->itemStock->qty,3,',','.') : number_format($row->itemStock->qty,3,',','.'),
-                'price'             => number_format($row->price,2,',','.'),
-                'total'             => number_format($row->total,2,',','.'),
-                'inventory_coa_id'  => $row->inventory_coa_id,
-                'inventory_coa_name'=> $row->inventoryCoa->name,
-                'note'              => $row->note,
-                'lookable_type'     => $row->lookable_type ? $row->lookable_type : '',
-                'lookable_id'       => $row->lookable_id ? $row->lookable_id : '',
-                'reference_id'      => $row->lookable_type ? $row->lookable->materialRequest->id : '',
-                'stock_list'        => $row->itemStock->item->currentStock($this->dataplaces,$this->datawarehouses),
-                'line_id'           => $row->line_id,
-                'machine_id'        => $row->machine_id,
-                'department_id'     => $row->department_id,
-                'project_id'        => $row->project()->exists() ? $row->project->id : '',
-                'project_name'      => $row->project()->exists() ? $row->project->name : '',
-                'requester'         => $row->requester,
-                'qty_return'        => number_format($row->qty_return,3,',','.'),
-                'is_activa'         => $row->itemStock->item->itemGroup->is_activa ? $row->itemStock->item->itemGroup->is_activa : '',
-                'list_serial'       => $row->arrSerial(),
+                'good_issue_id'         => $row->goodIssueDetail->goodIssue->id,
+                'good_issue_detail_id'  => $row->good_issue_detail_id,
+                'item_id'               => $row->item_id,
+                'item_name'             => $row->item->code.' - '.$row->item->name,
+                'place_name'            => $row->goodIssueDetail->itemStock->place->code,
+                'warehouse_name'        => $row->goodIssueDetail->itemStock->warehouse->name,
+                'area_name'             => $row->goodIssueDetail->itemStock->area()->exists() ? $row->goodIssueDetail->itemStock->area->code : '-',
+                'shading_name'          => $row->goodIssueDetail->itemStock->itemShading()->exists() ? $row->goodIssueDetail->itemStock->itemShading->code : '-',
+                'qty_balance'           => number_format($row->goodIssueDetail->qtyBalanceReturn(),3,',','.'),
+                'qty'                   => number_format($row->qty,3,',','.'),
+                'note'                  => $row->note,
+                'unit'                  => $row->item->uomUnit->code,
             ];
         }
 
@@ -551,7 +539,7 @@ class GoodReturnIssueController extends Controller
     }
 
     public function destroy(Request $request){
-        $query = GoodIssue::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = GoodReturnIssue::where('code',CustomHelper::decrypt($request->id))->first();
 
         $approved = false;
         $revised = false;
@@ -591,18 +579,18 @@ class GoodReturnIssueController extends Controller
                 'delete_note'   => $request->msg,
             ]);
 
-            CustomHelper::removeJournal('good_issues',$query->id);
-            CustomHelper::removeCogs('good_issues',$query->id);
+            CustomHelper::removeJournal($query->getTable(),$query->id);
+            CustomHelper::removeCogs($query->getTable(),$query->id);
 
-            $query->goodIssueDetail()->delete();
+            $query->goodReturnIssueDetail()->delete();
 
-            CustomHelper::removeApproval('good_issues',$query->id);
+            CustomHelper::removeApproval($query->getTable(),$query->id);
 
             activity()
-                ->performedOn(new GoodIssue())
+                ->performedOn(new GoodReturnIssue())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the good receive data');
+                ->log('Delete the good return issue data');
 
             $response = [
                 'status'  => 200,
@@ -620,15 +608,15 @@ class GoodReturnIssueController extends Controller
 
     public function approval(Request $request,$id){
         
-        $gr = GoodIssue::where('code',CustomHelper::decrypt($id))->first();
+        $gr = GoodReturnIssue::where('code',CustomHelper::decrypt($id))->first();
                 
         if($gr){
             $data = [
-                'title'     => 'Print Goods Receive (Barang Keluar)',
+                'title'     => 'Barang Kembali',
                 'data'      => $gr
             ];
 
-            return view('admin.approval.good_issue', $data);
+            return view('admin.approval.good_return_issue', $data);
         }else{
             abort(404);
         }
@@ -652,11 +640,11 @@ class GoodReturnIssueController extends Controller
             $currentDateTime = Date::now();
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             foreach($request->arr_id as $key =>$row){
-                $pr = GoodIssue::where('code',$row)->first();
+                $pr = GoodReturnIssue::where('code',$row)->first();
                 
                 if($pr){
                     $data = [
-                        'title'     => 'Good Issue',
+                        'title'     => 'Barang Kembali',
                         'data'      => $pr
                     ];
                     $img_path = 'website/logo_web_fix.png';
@@ -665,7 +653,7 @@ class GoodReturnIssueController extends Controller
                     $img_base_64 = base64_encode($image_temp);
                     $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                     $data["image"]=$path_img;
-                    $pdf = Pdf::loadView('admin.print.inventory.good_issue_individual', $data)->setPaper('a5', 'landscape');
+                    $pdf = Pdf::loadView('admin.print.inventory.good_return_issue_individual', $data)->setPaper('a5', 'landscape');
                     $pdf->render();
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                     $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -751,10 +739,10 @@ class GoodReturnIssueController extends Controller
                         // Pad $nomor with leading zeros to ensure it has at least 8 digits
                         $nomorPadded = str_repeat('0', $paddingLength) . $nomor;
                         $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
-                        $query = GoodIssue::where('Code', 'LIKE', '%'.$x)->first();
+                        $query = GoodReturnIssue::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
                             $data = [
-                                'title'     => 'Good Issue',
+                                'title'     => 'Barang Kembali',
                                 'data'      => $query
                             ];
                             $img_path = 'website/logo_web_fix.png';
@@ -763,7 +751,7 @@ class GoodReturnIssueController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.inventory.good_issue_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.inventory.good_return_issue_individual', $data)->setPaper('a5', 'landscape');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -827,10 +815,10 @@ class GoodReturnIssueController extends Controller
                 }else{
                     foreach($merged as $code){
                         $etNumbersArray = explode(',', $request->tabledata);
-                        $query = GoodIssue::where('code', 'LIKE', '%'.$etNumbersArray[$code-1])->first();
+                        $query = GoodReturnIssue::where('code', 'LIKE', '%'.$etNumbersArray[$code-1])->first();
                         if($query){
                             $data = [
-                                'title'     => 'Good Issue',
+                                'title'     => 'Barang Kembali',
                                 'data'      => $query
                             ];
                             $img_path = 'website/logo_web_fix.png';
@@ -839,7 +827,7 @@ class GoodReturnIssueController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.inventory.good_issue_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.inventory.good_return_issue_individual', $data)->setPaper('a5', 'landscape');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -883,12 +871,12 @@ class GoodReturnIssueController extends Controller
 
     public function printIndividual(Request $request,$id){
         
-        $pr = GoodIssue::where('code',CustomHelper::decrypt($id))->first();
+        $pr = GoodReturnIssue::where('code',CustomHelper::decrypt($id))->first();
         $currentDateTime = Date::now();
         $formattedDate = $currentDateTime->format('d/m/Y H:i:s');        
         if($pr){
             $data = [
-                'title'     => 'Good Issue',
+                'title'     => 'Barang Kembali',
                 'data'      => $pr
             ];
 
@@ -905,7 +893,7 @@ class GoodReturnIssueController extends Controller
             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
             $data["image"]=$path_img;
              
-            $pdf = Pdf::loadView('admin.print.inventory.good_issue_individual', $data)->setPaper('a5', 'landscape');
+            $pdf = Pdf::loadView('admin.print.inventory.good_return_issue_individual', $data)->setPaper('a5', 'landscape');
             $pdf->render();
     
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
@@ -936,7 +924,7 @@ class GoodReturnIssueController extends Controller
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $mode = $request->mode ? $request->mode : '';
-		return Excel::download(new ExportGoodIssue($post_date,$end_date,$mode), 'good_issue_'.uniqid().'.xlsx');
+		return Excel::download(new ExportGoodReturnIssue($post_date,$end_date,$mode), 'good_return_issue_'.uniqid().'.xlsx');
     }
 
     public function viewJournal(Request $request,$id){

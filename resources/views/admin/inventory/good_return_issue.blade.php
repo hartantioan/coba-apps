@@ -520,6 +520,15 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
+                if($('#last-row-item').length == 0){
+                    $('#body-item').append(`
+                        <tr id="last-row-item">
+                            <td colspan="10" class="center">
+                                Silahkan tambahkan Good Issue / Barang Keluar.
+                            </td>
+                        </tr>
+                    `);
+                }
             }
         });
 

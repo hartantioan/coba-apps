@@ -120,7 +120,7 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">Permohonan Pembelian # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">Barang Masuk # {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
@@ -134,7 +134,7 @@
         <!-- logo and title -->
         <div class="row mt-3 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">{{ $title }}</h5>
+                <h5 class="indigo-text">Barang Masuk</h5>
             </div>
             <div class="col m6 s12">
                 <img src="{{ url('website/logo_web_fix.png') }}" width="80%">
@@ -176,6 +176,12 @@
                 <h6 class="invoice-from">Lain-lain</h6>
                 <div class="row">
                     <div class="col s3">
+                        Lampiran
+                    </div>
+                    <div class="col s9">
+                        <a href="{{ $data->attachment() }}" target="_blank"><i class="material-icons">attachment</i></a>
+                    </div>
+                    <div class="col s3">
                         Status
                     </div>
                     <div class="col s9">
@@ -186,57 +192,42 @@
         </div>
         <div class="divider mb-3 mt-3"></div>
         <!-- product details table-->
-        <div class="invoice-product-details" style="min-width: 100%;overflow:auto;">
-            <table class="bordered" style="width:1800px;">
-                <thead>
-                    <tr>
-                        <th class="center-align">Proses</th>
-                        <th class="center-align">Item</th>
-                        <th class="center-align">Req.</th>
-                        <th class="center-align">Stok</th>
-                        <th class="center-align">Sat.</th>
-                        <th class="center-align">Tgl.Dipakai</th>
-                        <th class="center-align">Plant</th>
-                        <th class="center-align">Gudang</th>
-                        <th class="center-align">Line</th>
-                        <th class="center-align">Machine</th>
-                        <th class="center-align">Departemen</th>
-                        <th class="center-align">Proyek</th>
-                        <th class="center-align">Requester</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($data->materialRequestDetail as $key => $row)
-                    <tr>
-                        <td class="center-align">
-                            <label>
-                                <input type="checkbox" id="arr_status_material_request{{ $key }}" name="arr_status_material_request[]" value="{{ $row->id }}" {{ $row->status ? 'checked' : '' }}>
-                                <span>Pilih</span>
-                            </label>
-                        </td>
-                        <td>{{ $row->item->code.' - '.$row->item->name }}</td>
-                        <td class="right-align">{{ number_format($row->qty,3,',','.') }}</td>
-                        <td class="right-align">{{ number_format($row->stock,3,',','.') }}</td>
-                        <td class="center-align">{{ $row->item->buyUnit->code }}</td>
-                        <td class="indigo-text center-align">{{ date('d/m/y',strtotime($row->required_date)) }}</td>
-                        <td class="center-align">{{ $row->place->code }}</td>
-                        <td class="center-align">{{ $row->warehouse->name }}</td>
-                        <td class="center-align">{{ $row->line()->exists() ? $row->line->code : '-' }}</td>
-                        <td class="center-align">{{ $row->machine()->exists() ? $row->machine->name : '-' }}</td>
-                        <td class="center-align">{{ $row->department()->exists() ? $row->department->name : '-' }}</td>
-                        <td class="center-align">{{ $row->project()->exists() ? $row->project->name : '-' }}</td>
-                        <td class="">{{ $row->requester }}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="13">Keterangan 1 : {{ $row->note }}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="13">Keterangan 2 : {{ $row->note2 }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+        <div class="invoice-product-details">
+        <table class="bordered">
+            <thead>
+                <tr>
+                    <th align="center" rowspan="2">Item</th>
+                    <th align="center" colspan="4">Asal</th>
+                    <th align="center" rowspan="2">Jum.Keluar</th>
+                    <th align="center" rowspan="2">Jum.Kembali</th>
+                    <th align="center" rowspan="2">Satuan</th>
+                </tr>
+                <tr>
+                    <th align="center">Plant</th>
+                    <th align="center">Gudang</th>
+                    <th align="center">Area</th>
+                    <th align="center">Shading</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($data->goodReturnIssueDetail as $row)
+                <tr>
+                    <td>{{ $row->item->code.' - '.$row->item->name }}</td>
+                    <td align="center">{{ $row->goodIssueDetail->itemStock->place->code }}</td>
+                    <td align="center">{{ $row->goodIssueDetail->itemStock->warehouse->name }}</td>
+                    <td align="center">{{ $row->goodIssueDetail->itemStock->area()->exists() ? $row->goodIssueDetail->itemStock->area->name : '-' }}</td>
+                    <td align="center">{{ $row->goodIssueDetail->itemShading()->exists() ? $row->goodIssueDetail->itemShading->code : '-' }}</td>
+                    <td align="right">{{ number_format($row->goodIssueDetail->qtyBalanceReturn(),3,',','.') }}</td>
+                    <td align="right">{{ number_format($row->qty,3,',','.') }}</td>
+                    <td align="center">{{ $row->item->uomUnit->code }}</td>
+                </tr>
+                <tr>
+                    <td colspan="8">Keterangan : {{ $row->note }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
     <!-- invoice subtotal -->
     <div class="divider mt-3 mb-3"></div>
         <div class="invoice-subtotal">

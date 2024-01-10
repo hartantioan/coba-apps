@@ -24,6 +24,7 @@ use App\Models\GoodReceipt;
 use App\Models\GoodReceiptDetail;
 use App\Models\GoodReceiptMain;
 use App\Models\GoodReceive;
+use App\Models\GoodReturnIssue;
 use App\Models\GoodReturnPO;
 use App\Models\IncomingPayment;
 use App\Models\InventoryRevaluation;
@@ -1442,7 +1443,77 @@ class CustomHelper {
 					$row->itemStock->item_shading_id ? $row->itemStock->item_shading_id : NULL,
 				);
 			}
+
+		}elseif($table_name == 'good_return_issues'){
 			
+			$gr = GoodReturnIssue::find($table_id);
+			
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'company_id'	=> $gr->company_id,
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
+				'lookable_type'	=> $gr->getTable(),
+				'lookable_id'	=> $gr->id,
+				'post_date'		=> $gr->post_date,
+				'note'			=> $gr->code,
+				'status'		=> '3'
+			]);
+
+			foreach($gr->goodReturnIssueDetail as $row){
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $row->goodIssueDetail->itemStock->item->itemGroup->coa_id,
+					'place_id'		=> $row->goodIssueDetail->itemStock->place_id,
+					'item_id'		=> $row->goodIssueDetail->itemStock->item_id,
+					'warehouse_id'	=> $row->goodIssueDetail->itemStock->warehouse_id,
+					'line_id'		=> $row->goodIssueDetail->line_id ? $row->goodIssueDetail->line_id : NULL,
+					'machine_id'	=> $row->goodIssueDetail->machine_id ? $row->goodIssueDetail->machine_id : NULL,
+					'department_id'	=> $row->goodIssueDetail->department_id ? $row->goodIssueDetail->department_id : NULL,
+					'project_id'	=> $row->goodIssueDetail->project_id ? $row->goodIssueDetail->project_id : NULL,
+					'type'			=> '1',
+					'nominal'		=> $row->total,
+				]);
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $row->goodIssueDetail->coa_id,
+					'place_id'		=> $row->goodIssueDetail->itemStock->place_id,
+					'item_id'		=> $row->goodIssueDetail->itemStock->item_id,
+					'warehouse_id'	=> $row->goodIssueDetail->itemStock->warehouse_id,
+					'line_id'		=> $row->goodIssueDetail->line_id ? $row->goodIssueDetail->line_id : NULL,
+					'machine_id'	=> $row->goodIssueDetail->machine_id ? $row->goodIssueDetail->machine_id : NULL,
+					'department_id'	=> $row->goodIssueDetail->department_id ? $row->goodIssueDetail->department_id : NULL,
+					'project_id'	=> $row->goodIssueDetail->project_id ? $row->goodIssueDetail->project_id : NULL,
+					'type'			=> '2',
+					'nominal'		=> $row->total,
+				]);
+
+				self::sendCogs($gr->getTable(),
+					$gr->id,
+					$row->goodIssueDetail->itemStock->place->company_id,
+					$row->goodIssueDetail->itemStock->place_id,
+					$row->goodIssueDetail->itemStock->warehouse_id,
+					$row->item_id,
+					$row->qty,
+					$row->total,
+					'IN',
+					$gr->post_date,
+					$row->goodIssueDetail->itemStock->area_id ? $row->goodIssueDetail->itemStock->area_id : NULL,
+					$row->goodIssueDetail->itemStock->item_shading_id ? $row->goodIssueDetail->itemStock->item_shading_id : NULL,
+				);
+
+				self::sendStock(
+					$row->goodIssueDetail->itemStock->place_id,
+					$row->goodIssueDetail->itemStock->warehouse_id,
+					$row->item_id,
+					$row->qty,
+					'OUT',
+					$row->goodIssueDetail->itemStock->area_id ? $row->goodIssueDetail->itemStock->area_id : NULL,
+					$row->goodIssueDetail->itemStock->item_shading_id ? $row->goodIssueDetail->itemStock->item_shading_id : NULL,
+				);
+			}
+
 		}elseif($table_name == 'landed_costs'){
 
 			$lc = LandedCost::find($data->id);

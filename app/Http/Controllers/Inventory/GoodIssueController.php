@@ -413,7 +413,7 @@ class GoodIssueController extends Controller
                             'item_stock_id'         => $row,
                             'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'price'                 => $rowprice,
-                            'total'                 => $rowprice * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                            'total'                 => round($rowprice * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),2),
                             'note'                  => $request->arr_note[$key],
                             'inventory_coa_id'      => $request->arr_inventory_coa[$key],
                             'coa_id'                => $inventory_coa->coa_id,
@@ -634,6 +634,11 @@ class GoodIssueController extends Controller
                     'status'  => 500,
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
                 ];
+            }elseif($query->hasChildDocument()){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah digunakan pada form Good Return Issue / Barang Kembali.'
+                ];
             }else{
                 $query->update([
                     'status'    => '5',
@@ -642,8 +647,8 @@ class GoodIssueController extends Controller
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
 
-                CustomHelper::removeJournal('good_issues',$query->id);
-                CustomHelper::removeCogs('good_issues',$query->id);
+                CustomHelper::removeJournal($query->getTable(),$query->id);
+                CustomHelper::removeCogs($query->getTable(),$query->id);
     
                 activity()
                     ->performedOn(new GoodIssue())

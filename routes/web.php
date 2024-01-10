@@ -161,7 +161,7 @@ use App\Http\Controllers\Accounting\ProfitLossController;
 use App\Http\Controllers\Accounting\ClosingJournalController;
 use App\Http\Controllers\Accounting\LockPeriodController;
 use App\Http\Controllers\Accounting\SubsidiaryLedgerController;
-
+use App\Http\Controllers\Inventory\GoodReturnIssueController;
 use App\Http\Controllers\Setting\MenuController;
 use App\Http\Controllers\Setting\MenuCoaController;
 use App\Http\Controllers\Setting\ApprovalController;
@@ -258,6 +258,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('asset_item', [Select2Controller::class, 'assetItem']);
                 Route::get('purchase_request', [Select2Controller::class, 'purchaseRequest']);
                 Route::get('good_issue', [Select2Controller::class, 'goodIssue']);
+                Route::get('good_issue_return', [Select2Controller::class, 'goodIssueReturn']);
                 Route::get('purchase_order', [Select2Controller::class, 'purchaseOrder']);
                 Route::get('vendor', [Select2Controller::class, 'vendor']);
                 Route::get('good_receipt', [Select2Controller::class, 'goodReceipt']);
@@ -1710,22 +1711,22 @@ Route::prefix('admin')->group(function () {
                 });
 
                 Route::prefix('good_return_issue')->middleware(['operation.access:good_return_issue,view','lockacc'])->group(function () {
-                    Route::get('/',[GoodIssueController::class, 'index']);
-                    Route::get('datatable',[GoodIssueController::class, 'datatable']);
-                    Route::get('row_detail',[GoodIssueController::class, 'rowDetail']);
-                    Route::post('show', [GoodIssueController::class, 'show']);
-                    Route::post('get_code', [GoodIssueController::class, 'getCode']);
-                    Route::post('print',[GoodIssueController::class, 'print']);
-                    Route::post('print_by_range',[GoodIssueController::class, 'printByRange']);
-                    Route::post('send_used_data',[GoodIssueController::class, 'sendUsedData']);
-                    Route::post('remove_used_data', [GoodIssueController::class, 'removeUsedData']);
-                    Route::get('print_individual/{id}',[GoodIssueController::class, 'printIndividual'])->withoutMiddleware('direct.access');
-                    Route::get('export',[GoodIssueController::class, 'export']);
-                    Route::get('view_journal/{id}',[GoodIssueController::class, 'viewJournal'])->middleware('operation.access:good_return_issue,journal');
-                    Route::post('create',[GoodIssueController::class, 'create'])->middleware('operation.access:good_return_issue,update');
-                    Route::get('approval/{id}',[GoodIssueController::class, 'approval'])->withoutMiddleware('direct.access');
-                    Route::post('void_status', [GoodIssueController::class, 'voidStatus'])->middleware('operation.access:good_return_issue,void');
-                    Route::post('destroy', [GoodIssueController::class, 'destroy'])->middleware('operation.access:good_return_issue,delete');
+                    Route::get('/',[GoodReturnIssueController::class, 'index']);
+                    Route::get('datatable',[GoodReturnIssueController::class, 'datatable']);
+                    Route::get('row_detail',[GoodReturnIssueController::class, 'rowDetail']);
+                    Route::post('show', [GoodReturnIssueController::class, 'show']);
+                    Route::post('get_code', [GoodReturnIssueController::class, 'getCode']);
+                    Route::post('print',[GoodReturnIssueController::class, 'print']);
+                    Route::post('print_by_range',[GoodReturnIssueController::class, 'printByRange']);
+                    Route::post('send_used_data',[GoodReturnIssueController::class, 'sendUsedData']);
+                    Route::post('remove_used_data', [GoodReturnIssueController::class, 'removeUsedData']);
+                    Route::get('print_individual/{id}',[GoodReturnIssueController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::get('export',[GoodReturnIssueController::class, 'export']);
+                    Route::get('view_journal/{id}',[GoodReturnIssueController::class, 'viewJournal'])->middleware('operation.access:good_return_issue,journal');
+                    Route::post('create',[GoodReturnIssueController::class, 'create'])->middleware('operation.access:good_return_issue,update');
+                    Route::get('approval/{id}',[GoodReturnIssueController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [GoodReturnIssueController::class, 'voidStatus'])->middleware('operation.access:good_return_issue,void');
+                    Route::post('destroy', [GoodReturnIssueController::class, 'destroy'])->middleware('operation.access:good_return_issue,delete');
                 });
 
                 Route::prefix('revaluation')->middleware(['operation.access:revaluation,view','lockacc'])->group(function () {

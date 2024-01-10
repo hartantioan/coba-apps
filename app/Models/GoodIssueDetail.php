@@ -128,6 +128,13 @@ class GoodIssueDetail extends Model
         return $this->hasMany('App\Models\GoodReceiptDetailSerial', 'good_issue_detail_id', 'id');
     }
 
+    public function goodReturnIssueDetail()
+    {
+        return $this->hasMany('App\Models\GoodReturnIssueDetail', 'good_issue_detail_id', 'id')->whereHas('goodReturnIssue',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
     public function listSerial(){
         $arr = [];
         foreach($this->goodReceiptDetailSerial as $row){
@@ -154,6 +161,16 @@ class GoodIssueDetail extends Model
         $qty = $this->qtyConvertToBuy();
 
         foreach($this->purchaseOrderDetail as $row){
+            $qty -= $row->qty;
+        }
+
+        return $qty;
+    }
+
+    public function qtyBalanceReturn(){
+        $qty = $this->qty;
+
+        foreach($this->goodReturnIssueDetail as $row){
             $qty -= $row->qty;
         }
 

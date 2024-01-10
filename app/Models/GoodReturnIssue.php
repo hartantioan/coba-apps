@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
-class GoodIssue extends Model
+class GoodReturnIssue extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'good_issues';
+    protected $table = 'good_return_issues';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
@@ -20,8 +20,6 @@ class GoodIssue extends Model
         'user_id',
         'company_id',
         'post_date',
-        'currency_id',
-        'currency_rate',
         'note',
         'document',
         'grandtotal',
@@ -50,19 +48,14 @@ class GoodIssue extends Model
         return $this->belongsTo('App\Models\User','void_id','id')->withTrashed();
     }
 
-    public function currency()
-    {
-        return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
-    }
-
     public function company()
     {
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
-    public function goodIssueDetail()
+    public function goodReturnIssueDetail()
     {
-        return $this->hasMany('App\Models\GoodIssueDetail');
+        return $this->hasMany('App\Models\GoodReturnIssueDetail');
     }
 
     public function status(){
@@ -113,7 +106,7 @@ class GoodIssue extends Model
     public static function generateCode($prefix)
     {
         $cek = substr($prefix,0,7);
-        $query = GoodIssue::selectRaw('RIGHT(code, 8) as code')
+        $query = GoodReturnIssue::selectRaw('RIGHT(code, 8) as code')
             ->whereRaw("code LIKE '$cek%'")
             ->withTrashed()
             ->orderByDesc('id')
@@ -153,67 +146,7 @@ class GoodIssue extends Model
         return $ada;
     }
 
-    
-
-    public function hasBalance(){
-        $qty = 0;
-
-        foreach($this->goodIssueDetail as $row){
-            $qty += $row->qtyBalance();
-        }
-
-        if($qty > 0){
-            return true;
-        }else{
-            return false;
-        }
-    }
-
-    public function hasBalanceReturn(){
-        $qty = 0;
-
-        foreach($this->goodIssueDetail()->whereHas('itemStock',function($query){
-            $query->whereHas('item',function($query){
-                $query->whereHas('itemGroup',function($query){
-                    $query->whereNull('is_activa');
-                });
-            });
-        })->get() as $row){
-            $qty += $row->qtyBalanceReturn();
-        }
-
-        if($qty > 0){
-            return true;
-        }else{
-            return false;
-        }
-    }
-
-    public function updateGrandtotal(){
-        $total = 0;
-
-        foreach($this->goodIssueDetail as $row){
-            $total += $row->total;
-        }
-
-        $gi = GoodIssue::find($this->id)->update([
-            'grandtotal'    => $total
-        ]);
-    }
-
     public function journal(){
         return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
-    }
-
-    public function hasChildDocument(){
-        $hasRelation = false;
-
-        foreach($this->goodIssueDetail as $row){
-            if($row->goodReturnIssueDetail()->exists()){
-                $hasRelation = true;
-            }
-        }
-
-        return $hasRelation;
     }
 }

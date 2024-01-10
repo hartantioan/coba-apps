@@ -789,6 +789,66 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function goodIssueReturn(Request $request)
+    {
+
+        $response = [];
+        $search   = $request->search;
+        $data = GoodIssue::where(function($query) use($search){
+                    $query->where(function($query) use ($search) {
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('post_date', 'like', "%$search%")
+                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhereHas('goodIssueDetail',function($query) use($search){
+                                $query->whereHas('itemStock',function($query) use($search){
+                                    $query->whereHas('item',function($query) use($search){
+                                        $query->where('code', 'like', "%$search%")
+                                            ->orWhere('name','like',"%$search%");
+                                    });
+                                });
+                            })
+                            ->orWhereHas('user',function($query) use($search){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            });
+                    });
+                })
+                ->whereDoesntHave('used')
+                ->whereIn('status',['2','3'])->get();
+
+        foreach($data as $d) {
+            if($d->hasBalanceReturn()){
+                $details = [];
+
+                foreach($d->goodIssueDetail as $row){
+                    if($row->qtyBalanceReturn() > 0){
+                        $details[] = [
+                            'id'            => $row->id,
+                            'item_id'       => $row->itemStock->item_id,
+                            'item_name'     => $row->itemStock->item->code.' - '.$row->itemStock->item->name,
+                            'place_name'    => $row->itemStock->place->code,
+                            'warehouse_name'=> $row->itemStock->warehouse->name,
+                            'area_name'     => $row->itemStock->area()->exists() ? $row->itemStock->area->code : '-',
+                            'shading_name'  => $row->itemStock->itemShading()->exists() ? $row->itemStock->itemShading->code : '-',
+                            'qty_balance'   => $row->qtyBalanceReturn(),
+                            'unit'          => $row->itemStock->item->uomUnit->code,
+                        ];
+                    }
+                }
+
+                $response[] = [
+                    'id'   			=> $d->id,
+                    'text' 			=> $d->code.' - '.$d->note,
+                    'table'         => $d->getTable(),
+                    'details'       => $details,
+                    'code'          => $d->code,
+                ];
+            }
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function purchaseOrder(Request $request)
     {
 

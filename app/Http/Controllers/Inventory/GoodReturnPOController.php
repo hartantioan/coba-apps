@@ -340,7 +340,7 @@ class GoodReturnPOController extends Controller
                 }
             }
 
-			/* if($request->temp){
+			if($request->temp){
                 DB::beginTransaction();
                 try {
                     $query = GoodReturnPO::where('code',CustomHelper::decrypt($request->temp))->first();
@@ -472,7 +472,7 @@ class GoodReturnPOController extends Controller
 					'status'  => 500,
 					'message' => 'Data failed to save.'
 				];
-			} */
+			}
 		}
 		
 		return response()->json($response);

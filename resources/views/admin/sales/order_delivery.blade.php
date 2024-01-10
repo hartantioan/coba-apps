@@ -950,7 +950,10 @@
         myDiagram.layout = $(go.TreeLayout);
 
         myDiagram.addDiagramListener("InitialLayoutCompleted", e => {
-            e.diagram.findTreeRoots().each(r => r.expandTree(3));
+           e.diagram.findTreeRoots().each(r => r.expandTree(3));
+            e.diagram.nodes.each(node => {
+                node.findTreeChildrenNodes().each(child => child.expandTree(10));
+            });
         });
 
         myDiagram.model = $(go.GraphLinksModel,
@@ -1116,7 +1119,7 @@
                 left: 3,
                 right: 1
             },
-            "order": [[0, 'asc']],
+            "order": [[0, 'desc']],
             dom: 'Blfrtip',
             buttons: [
                 'columnsToggle',

@@ -783,7 +783,7 @@
                 left: 2,
                 right: 1
             },
-            "order": [[0, 'asc']],
+            "order": [[0, 'desc']],
             ajax: {
                 url: '{{ Request::url() }}/datatable',
                 type: 'GET',

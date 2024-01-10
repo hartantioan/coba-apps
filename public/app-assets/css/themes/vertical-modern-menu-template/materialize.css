@@ -8224,6 +8224,7 @@ textarea.materialize-textarea + label:after,
 
 .input-field.col label
 {
+    font-weight: 900;
     left: .75rem;
 }
 
@@ -8259,6 +8260,7 @@ textarea.materialize-textarea + label:after,
 
 .input-field > label:not(.label-icon).active
 {
+    font-weight: 900;
     -webkit-transform: translateY(-14px) scale(.8);
         -ms-transform: translateY(-14px) scale(.8);
             transform: translateY(-14px) scale(.8);

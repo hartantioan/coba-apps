@@ -1328,8 +1328,11 @@ class GoodReceiptPOController extends Controller
                             'to'=>$query_gr->code,
                             'string_link'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->code.$query_gr->code
                         ];
-                        $data_id_po[]= $good_receipt_detail->purchaseOrderDetail->purchaseOrder->id; 
-
+                        //$data_id_po[]= $good_receipt_detail->purchaseOrderDetail->purchaseOrder->id; 
+                        if(!in_array($good_receipt_detail->purchaseOrderDetail->purchaseOrder->id, $data_id_po)){
+                            $data_id_po[]= $good_receipt_detail->purchaseOrderDetail->purchaseOrder->id; 
+                            $added = true; 
+                        }
                         if($good_receipt_detail->goodReturnPODetail()->exists()){
                             foreach($good_receipt_detail->goodReturnPODetail as $goodReturnPODetail){
                                 $good_return_tempura =[
@@ -1374,7 +1377,12 @@ class GoodReceiptPOController extends Controller
                                     'to'=>$landed_cost_detail->landedCost->code,
                                     'string_link'=>$query_gr->code.$landed_cost_detail->landedCost->code,
                                 ];
-                                $data_id_lc[] = $landed_cost_detail->landedCost->id;
+                               
+                                if(!in_array($landed_cost_detail->landedCost->id, $data_id_lc)){
+                                    $data_id_lc[] = $landed_cost_detail->landedCost->id;
+                                    $added = true; 
+                                }
+                               
                                 
                                 
                             }
@@ -1453,7 +1461,11 @@ class GoodReceiptPOController extends Controller
                                 'to'=>$query_gs->code,
                                 'string_link'=>$data_gs->goodReceiptDetail->goodReceipt->code.$query_gs->code
                             ];
-                            $data_id_gr[]= $data_gs->goodReceiptDetail->goodReceipt->id; 
+                            if(!in_array($data_gs->goodReceiptDetail->goodReceipt->id, $data_id_gr)){
+                                $data_id_gr[]= $data_gs->goodReceiptDetail->goodReceipt->id; 
+                                $added = true; 
+                            }
+                            // $data_id_gr[]= $data_gs->goodReceiptDetail->goodReceipt->id; 
     
                         }
                     }
@@ -2536,7 +2548,11 @@ class GoodReceiptPOController extends Controller
                                 'to'=>$query_pr->code,
                                 'string_link'=>$purchase_request_detail->lookable->materialRequest->code.$query_pr->code,
                             ];
-                            $data_id_mr[]= $purchase_request_detail->lookable->materialRequest->id;  
+                            if(!in_array($purchase_request_detail->lookable->materialRequest->id,$data_id_mr)){
+                                $data_id_mr[]= $purchase_request_detail->lookable->materialRequest->id;  
+                                $added = true;
+                            }
+                           
                              
                         }
                     }
@@ -2600,7 +2616,7 @@ class GoodReceiptPOController extends Controller
                         }
                     }
                 }
-            }     
+            }      
             function unique_key($array,$keyname){
 
                 $new_array = array();

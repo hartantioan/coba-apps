@@ -69,6 +69,7 @@ class User extends Authenticatable
         'is_ar_invoice',
         'registration_id',
         'reset_code',
+        'type_payment',
     ];
 
     protected $hidden = [

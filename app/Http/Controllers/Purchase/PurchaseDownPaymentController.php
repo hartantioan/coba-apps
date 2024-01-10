@@ -1444,8 +1444,11 @@ class PurchaseDownPaymentController extends Controller
                             'to'=>$query_gr->code,
                             'string_link'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->code.$query_gr->code
                         ];
-                        $data_id_po[]= $good_receipt_detail->purchaseOrderDetail->purchaseOrder->id; 
-
+                        //$data_id_po[]= $good_receipt_detail->purchaseOrderDetail->purchaseOrder->id; 
+                        if(!in_array($good_receipt_detail->purchaseOrderDetail->purchaseOrder->id, $data_id_po)){
+                            $data_id_po[]= $good_receipt_detail->purchaseOrderDetail->purchaseOrder->id; 
+                            $added = true; 
+                        }
                         if($good_receipt_detail->goodReturnPODetail()->exists()){
                             foreach($good_receipt_detail->goodReturnPODetail as $goodReturnPODetail){
                                 $good_return_tempura =[
@@ -1490,7 +1493,12 @@ class PurchaseDownPaymentController extends Controller
                                     'to'=>$landed_cost_detail->landedCost->code,
                                     'string_link'=>$query_gr->code.$landed_cost_detail->landedCost->code,
                                 ];
-                                $data_id_lc[] = $landed_cost_detail->landedCost->id;
+                               
+                                if(!in_array($landed_cost_detail->landedCost->id, $data_id_lc)){
+                                    $data_id_lc[] = $landed_cost_detail->landedCost->id;
+                                    $added = true; 
+                                }
+                               
                                 
                                 
                             }
@@ -1569,7 +1577,11 @@ class PurchaseDownPaymentController extends Controller
                                 'to'=>$query_gs->code,
                                 'string_link'=>$data_gs->goodReceiptDetail->goodReceipt->code.$query_gs->code
                             ];
-                            $data_id_gr[]= $data_gs->goodReceiptDetail->goodReceipt->id; 
+                            if(!in_array($data_gs->goodReceiptDetail->goodReceipt->id, $data_id_gr)){
+                                $data_id_gr[]= $data_gs->goodReceiptDetail->goodReceipt->id; 
+                                $added = true; 
+                            }
+                            // $data_id_gr[]= $data_gs->goodReceiptDetail->goodReceipt->id; 
     
                         }
                     }
@@ -2043,15 +2055,13 @@ class PurchaseDownPaymentController extends Controller
                                 ];
                        
                                 $data_go_chart[]=$data_pyrc_tempura;
-                                info($row_pyr_cross->lookable->code);
-                                info($row_pyr_detail->paymentRequest->code);
                                 $data_link[]=[
-                                    'from'=>$row_pyr_detail->paymentRequest->code,
-                                    'to'=>$row_pyr_cross->lookable->code,
-                                    'string_link'=>$row_pyr_detail->paymentRequest->code.$row_pyr_cross->lookable->code,
+                                    'from'=>$row_pyr_cross->lookable->code,
+                                    'to'=>$row_pyr_detail->paymentRequest->code,
+                                    'string_link'=>$row_pyr_cross->lookable->code.$row_pyr_detail->paymentRequest->code,
                                 ];
-                                if(!in_array($row_pyr_cross->id, $data_id_pyrcs)){
-                                    $data_id_pyrcs[] = $row_pyr_cross->id;
+                                if(!in_array($row_pyr_cross->lookable->id, $data_id_pyrcs)){
+                                    $data_id_pyrcs[] = $row_pyr_cross->lookable->id;
                                 }
                             }
 
@@ -2060,9 +2070,8 @@ class PurchaseDownPaymentController extends Controller
                     }
                     
                 }
-                
+
                 foreach($data_id_pyrcs as $payment_request_cross_id){
-                    info($payment_request_cross_id);
                     $query_pyrc = PaymentRequestCross::find($payment_request_cross_id);
                     if($query_pyrc->paymentRequest->exists()){
                         $data_pyr_tempura = [
@@ -2076,13 +2085,13 @@ class PurchaseDownPaymentController extends Controller
                         ];
                         $data_go_chart[]=$data_pyr_tempura;
                         $data_link[]=[
-                            'from'=>$query_pyrc->paymentRequest->code,
-                            'to'=>$query_pyrc->lookable->code,
-                            'string_link'=>$query_pyrc->paymentRequest->code.$query_pyrc->lookable->code,
+                            'from'=>$query_pyrc->lookable->code,
+                            'to'=>$query_pyrc->paymentRequest->code,
+                            'string_link'=>$query_pyrc->code.$query_pyrc->paymentRequest->code,
                         ];
                         
-                        if(!in_array($query_pyrc->paymentRequest->id, $data_id_pyrs)){
-                            $data_id_pyrs[] = $query_pyrc->paymentRequest->id;
+                        if(!in_array($query_pyrc->id, $data_id_pyrs)){
+                            $data_id_pyrs[] = $query_pyrc->id;
                             $added=true;
                         }
                     }
@@ -2099,13 +2108,11 @@ class PurchaseDownPaymentController extends Controller
     
                         $data_go_chart[]=$outgoing_tempura;
                         $data_link[]=[
-                            'from'=>$query_pyrc->paymentRequest->code,
-                            'to'=>$query_pyrc->lookable->code,
-                            'string_link'=>$query_pyrc->paymentRequest->code.$query_pyrc->lookable->code,
+                            'from'=>$query_pyrc->lookable->code,
+                            'to'=>$query_pyrc->paymentRequest->code,
+                            'string_link'=>$query_pyrc->lookable->code.$query_pyrc->paymentRequest->code,
                         ];
-                        
                     }
-                
                 }
                 
                 foreach($data_id_dp as $downpayment_id){
@@ -2241,31 +2248,6 @@ class PurchaseDownPaymentController extends Controller
                         ];
                         
 
-                    }
-
-                    if($query_dp->hasPaymentRequestDetail()->exists()){
-                        foreach($query_dp->hasPaymentRequestDetail as $row_pyr_detail){
-                            $data_pyr_tempura=[
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
-                                    ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
-                                ],
-                                "key" => $row_pyr_detail->paymentRequest->code,
-                                "name" => $row_pyr_detail->paymentRequest->code,
-                                'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
-                            ];
-                            $data_go_chart[]=$data_pyr_tempura;
-                            $data_link[]=[
-                                'from'=>$query_dp->code,
-                                'to'=>$row_pyr_detail->paymentRequest->code,
-                                'string_link'=>$query_dp->code.$row_pyr_detail->paymentRequest->code,
-                            ]; 
-                           
-                            if(!in_array($row_pyr_detail->paymentRequest->id, $data_id_pyrs)){
-                                $data_id_pyrs[]= $row_pyr_detail->paymentRequest->id;
-                                $added=true;
-                            }  
-                        }
                     }
 
                 }
@@ -2682,7 +2664,11 @@ class PurchaseDownPaymentController extends Controller
                                 'to'=>$query_pr->code,
                                 'string_link'=>$purchase_request_detail->lookable->materialRequest->code.$query_pr->code,
                             ];
-                            $data_id_mr[]= $purchase_request_detail->lookable->materialRequest->id;  
+                            if(!in_array($purchase_request_detail->lookable->materialRequest->id,$data_id_mr)){
+                                $data_id_mr[]= $purchase_request_detail->lookable->materialRequest->id;  
+                                $added = true;
+                            }
+                           
                              
                         }
                     }

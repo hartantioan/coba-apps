@@ -313,10 +313,21 @@
 <div id="modal5" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;min-width:100%;max-width:100%;">
     <div class="modal-content">
         <div class="row">
-            <div class="col s12 m12" style="overflow: auto">
-                <div class="result" style="width:2500px;" id="salary_canvas">
-                  
-                </div>         
+            <div class="col s12">
+                <ul class="tabs">
+                    <li class="tab col m3"><a class="active" href="#monthly">Monthly Payment </a></li>
+                    <li class="tab col m3"><a  href="#daily">Daily Payment</a></li>
+                </ul>
+            </div>
+            <div class="col s12 m12" >
+                <div id="monthly" class="col s12"  style="overflow: auto">
+                    <div class="result" style="width:2500px;" id="salary_canvas"  ></div>  
+                </div>
+                <div id="daily" class="col s12" style="overflow: auto">
+                    <div class="result" style="width:2500px;" id="salary_canvas2"  ></div>  
+                </div>
+                
+                       
             </div>
         </div>
     </div>
@@ -438,7 +449,7 @@
             "deferRender": true,
             "destroy": true,
             "iDisplayInLength": 10,
-            "order": [[0, 'asc']],
+            "order": [[0, 'desc']],
             ajax: {
                 url: '{{ Request::url() }}/datatable',
                 type: 'GET',
@@ -741,8 +752,8 @@
                 loadingClose('#main');
                 if(response.status == 200) {
                     $('#modal5').modal('open');
-                    console.log(response.message);
-                    var string = '';
+                    console.log(response);                    var string = '';
+                    var string2='';
                     $.each(response.title, function(i, val) {
                         string += '<h4> Report Salary for '+val
                             +'</h4> <table> '
@@ -751,9 +762,17 @@
                        
                         string+='</table>';
                     });
-
+                    $.each(response.title, function(i, val) {
+                        string2 += '<h4> Report Salary for '+val
+                            +'</h4> <table> '
+                 
+                        string2+=response.perday[i];
+                       
+                        string2+='</table>';
+                    });
+                    console.log(string2);
                     $('#salary_canvas').append(string);
-                    
+                    $('#salary_canvas2').append(string2);
                 }
             },
             error: function() {

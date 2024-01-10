@@ -341,7 +341,7 @@
             "deferRender": true,
             "destroy": true,
             "iDisplayInLength": 10,
-            "order": [[0, 'asc']],
+            "order": [[0, 'desc']],
             ajax: {
                 url: '{{ URL::to('/') }}/admin/master_data/master_hr/employee/datatable_education',
                 type: 'GET',

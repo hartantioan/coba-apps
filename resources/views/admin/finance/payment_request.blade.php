@@ -2016,7 +2016,7 @@
                 left: 2,
                 right: 1
             },
-            "order": [[0, 'asc']],
+            "order": [[0, 'desc']],
             ajax: {
                 url: '{{ Request::url() }}/datatable',
                 type: 'GET',
@@ -3252,7 +3252,10 @@
         myDiagram.layout = $(go.TreeLayout);
 
         myDiagram.addDiagramListener("InitialLayoutCompleted", e => {
-            e.diagram.findTreeRoots().each(r => r.expandTree(3));
+           e.diagram.findTreeRoots().each(r => r.expandTree(3));
+            e.diagram.nodes.each(node => {
+                node.findTreeChildrenNodes().each(child => child.expandTree(10));
+            });
         });
 
         myDiagram.model = $(go.GraphLinksModel,

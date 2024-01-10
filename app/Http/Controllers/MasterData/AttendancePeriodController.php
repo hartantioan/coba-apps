@@ -541,23 +541,46 @@ class AttendancePeriodController extends Controller
                                         } 
                                     }
                                     if($row_schedule_filter->status == 5 && $query_lembur && $lembur_awal_shift == 1){////perhitungan untuk time in dimana lembur tidak masuk tapi ada jadwal lembur yang bergabung dengan jam
-                                        $lembur = 1;
-                                       
-                                      
-                                        if($diffHoursTimePartMinIn<=$row_schedule_filter->shift->tolerant && $exact_in[$key] != 1){
-                                            $exact_in[$key]= 2 ;
-                                            
-                                            $login[$key]= $timePart;
-                                            if (count($query_data) == 3 && $key > 0 ) {
-                                                $exact_in[$key]= 1 ;
+                                        info('masukkkkksd'.$date);
+                                        $time_in_temp = $row_schedule_filter->shift->time_in;
+                                        $time_out_temp = $row_schedule_filter->shift->time_out;
+                                        $real_time_in_temp =$date->format('Y-m-d') . ' ' . $time_in_temp;
+                                        $real_time_out_temp =$date->format('Y-m-d') . ' ' . $time_out_temp;
+                                        if($dateAttd > $real_time_in_temp && $dateAttd < $real_time_out_temp){
+                                            $lembur = 0;
+                                            $diffHoursTimePartMinInTemp = Carbon::parse($timePart)->diffInHours($time_in_temp);
+                                            if($diffHoursTimePartMinInTemp<=$row_schedule_filter->shift->tolerant && $exact_in[$key] != 1){
+                                                $exact_in[$key]= 2 ;
+                                                
                                                 $login[$key]= $timePart;
+                                                if (count($query_data) == 3 && $key > 0 ) {
+                                                    $exact_in[$key]= 1 ;
+                                                    $login[$key]= $timePart;
+                                                }
+                                                $array_masuk[$key]=$timePart;
                                             }
+                                        }else{
                                             $array_masuk[$key]=$timePart;
-                                        } 
+                                            if(!$login[$key]){
+                                                $lembur = 1;
+                                                $exact_in[$key]= 1 ;
+                                               
+                                                $login[$key]= $timePart;
+                                                if (count($query_data) == 3 && $key > 0 ) {
+                                                    $exact_in[$key]= 1 ;
+                                                    $login[$key]= $timePart;
+                                                }
+                                                $array_masuk[$key]=$timePart;
+                                            }
+                                           
+                                        }
+                                        
+                                       
                                     }
                                     //mengetahui apabila jam yang ada melebihi toleransi pada shift.
                                     if($diffHoursTimePartMinIn<=$row_schedule_filter->shift->tolerant && $exact_in[$key] != 1 &&$row_schedule_filter->status != 5){
                                         $exact_in[$key]= 2 ;
+                                        
                                         
                                         $login[$key]= $timePart;
                                         if (count($query_data) == 3 && $key > 0 ) {
@@ -593,7 +616,7 @@ class AttendancePeriodController extends Controller
                                     }  
                                 }
                             }
-
+                            
                             $latestRecord = $query_attendance->last();
                             if($query_lembur){
                                 $query_libur = Holiday::where('date',$query_lembur->date)->first();
@@ -1683,7 +1706,7 @@ class AttendancePeriodController extends Controller
                     $date_overtime_no_schedule->addDay();
                 }
                 
-                info($attendance_detail);
+                
                 
                 //mencari apakah dia datang tidak checkclock atau pulang tidak checkclock salah tol
                 
@@ -1715,7 +1738,7 @@ class AttendancePeriodController extends Controller
 
                 
                 DB::beginTransaction();
-                $query = AttendanceMonthlyReport::create([
+                $query_monthly_report = AttendanceMonthlyReport::create([
                     'user_id'                   => $row_user->id,
                     'period_id'			        => $attendance_period->id,
                     'late'                      => $counter_late,
@@ -1759,7 +1782,7 @@ class AttendancePeriodController extends Controller
                     $temp_for_punishment_forget[]=[
                         'salary_report_user_id' => null,
                         'lookable_type'         =>'punishments',
-                        'lookable_id'           =>$query_tidak_check_masuk->id,
+                        'lookable_id'           =>$query_tidak_check_pulang->id,
                         'type'                  =>2,
                         'nominal'               =>0,
                     ];
@@ -1798,7 +1821,7 @@ class AttendancePeriodController extends Controller
                         $temp_for_punishment_forget[1]['nominal'] = $counter_out_forget*$query_tidak_check_pulang->price;
                     }
                 }
-
+                //pembuatan tidak cek masuk // keluar untuk ditaruh ke report
 
             }
            
@@ -1862,7 +1885,7 @@ class AttendancePeriodController extends Controller
                             'late_status'              => $status,
                             'status'                   => '1',
                         ]);
-                        info($row_attd_detail);
+                       
                         $query_daily_report= AttendanceDailyReports::create([
                             'user_id'                  => $row_attd_detail['user_no'],
                             'masuk'                    => $row_attd_detail['jam_masuk'][$key_masuk],
@@ -1895,7 +1918,44 @@ class AttendancePeriodController extends Controller
                             'total_received'                             => 0,
                         ]);
                         //component hhitung dari master data
-                        $query_employee_salary_component = EmployeeSalaryComponent::where('user_id',$row_counter['uid'])->get();
+                        if($query_report_peruser->user->type_payment == 2){
+                            $query_employee_salary_day = EmployeeSalaryComponent::where('user_id', $row_counter['uid'])
+                                ->where('salary_component_id',2)
+                                ->first();
+                            $kali = $query_monthly_report->effective_day * $query_employee_salary_day->nominal;
+                            info($kali. ' hasil kali');
+                            info($query_monthly_report->effective_day . ' total jadwal');
+                            info($query_employee_salary_day->nominal . ' total nominal ');
+                            $query_report_peruser->total_plus = $query_report_peruser->total_plus+$kali;
+                            $query_salary_reports_detail = SalaryReportDetail::create([
+                                'salary_report_user_id' =>$query_report_peruser->id,
+                                'lookable_type'         =>'salary_components',
+                                'lookable_id'           =>$query_employee_salary_day->salary_component_id,
+                                'type'                  =>1,
+                                'nominal'               =>$query_employee_salary_day->nominal,
+                            ]);
+                        }
+                        if($query_report_peruser->user->type_payment == 1){
+                            $query_employee_salary_month = EmployeeSalaryComponent::where('user_id', $row_counter['uid'])
+                                ->where('salary_component_id',1)
+                                ->first();
+                            $query_salary_reports_detail = SalaryReportDetail::create([
+                                'salary_report_user_id' =>$query_report_peruser->id,
+                                'lookable_type'         =>'salary_components',
+                                'lookable_id'           =>$query_employee_salary_month->salary_component_id,
+                                'type'                  =>1,
+                                'nominal'               =>$query_employee_salary_month->nominal,
+                            ]);
+                            $query_report_peruser->total_plus = $query_report_peruser->total_plus+$query_employee_salary_month->nominal;
+                        }
+                       
+
+                        //pakai 1 dan 2 tidak sama dengan karena ingin mengambil komponen yang bukan gaji harian atau gaji bulanan.
+                        $query_employee_salary_component = EmployeeSalaryComponent::where('user_id', $row_counter['uid'])
+                        ->whereNotIn('salary_component_id', [1, 2])
+                        ->get();
+                        
+
                         foreach($query_employee_salary_component as $row_salary_component){
                             $type = ($row_salary_component->nominal > 0) ? 1 : 2;
                             $query_salary_reports_detail = SalaryReportDetail::create([
@@ -1906,6 +1966,7 @@ class AttendancePeriodController extends Controller
                                 'nominal'               =>$row_salary_component->nominal,
                             ]);
                             if($type==1){
+                                
                                 $query_report_peruser->total_plus = $query_report_peruser->total_plus+$row_salary_component->nominal;
                             }else{
                                
@@ -1913,6 +1974,7 @@ class AttendancePeriodController extends Controller
                             }
                             
                         }
+                        info($query_report_peruser->total_plus . 'atas');
                         //lembur itung
                         $lembur_get = OvertimeRequest::whereBetween('date', [$start_date, $end_date])
                         ->where('status', 2)
@@ -1934,25 +1996,26 @@ class AttendancePeriodController extends Controller
                                 $nominal_biasa += $row_lembur->grandtotal;
                             }
                         }
-                        if($total_biasa>0){
-                            $query_salary_reports_detail = SalaryReportDetail::create([
-                                'salary_report_user_id' =>$query_report_peruser->id,
-                                'lookable_type'         =>'overtime_requests',
-                                'lookable_id'           => -1,
-                                'type'                  =>$type,
-                                'nominal'               =>$nominal_biasa,
-                            ]);
-                        }
-                        if($total_kusus>0){
-                            $query_salary_reports_detail = SalaryReportDetail::create([
-                                'salary_report_user_id' =>$query_report_peruser->id,
-                                'lookable_type'         =>'overtime_requests',
-                                'lookable_id'           => -2,
-                                'type'                  =>$type,
-                                'nominal'               => $nominal_kusus,
-                            ]);
-                        }
                         
+                        $query_salary_reports_detail = SalaryReportDetail::create([
+                            'salary_report_user_id' =>$query_report_peruser->id,
+                            'lookable_type'         =>'overtime_requests',
+                            'lookable_id'           => -1,
+                            'type'                  =>1,
+                            'nominal'               =>$nominal_biasa,
+                        ]);
+                    
+                    
+                        $query_salary_reports_detail = SalaryReportDetail::create([
+                            'salary_report_user_id' =>$query_report_peruser->id,
+                            'lookable_type'         =>'overtime_requests',
+                            'lookable_id'           => -2,
+                            'type'                  =>1,
+                            'nominal'               => $nominal_kusus,
+                        ]);
+                        $query_report_peruser->total_plus = $query_report_peruser->total_plus+$nominal_kusus+$nominal_biasa;
+                        info($nominal_kusus+$nominal_biasa.'totalsd');
+                        info($query_report_peruser->total_plus.'bawah');
                         
                     }
                     
@@ -1980,7 +2043,7 @@ class AttendancePeriodController extends Controller
                         ]);
                         $minus += $row_counter['counter']*$row_counter['price']; 
                         $query_report_peruser->total_minus = $query_report_peruser->total_minus+$query_salary_reports_detail->nominal;
-                       
+                        info($minus);
                         $query_report_peruser->save();
                     }else{
                         $query_salary_reports_detail = SalaryReportDetail::create([
@@ -1994,7 +2057,7 @@ class AttendancePeriodController extends Controller
                    
                   
                     if($counter == count($row_counter)-1){
-                      
+                        $minus_forget = 0;
                         foreach($temp_for_punishment_forget as $row_forget){
                             
                             $query_salary_reports_detail = SalaryReportDetail::create([
@@ -2004,9 +2067,12 @@ class AttendancePeriodController extends Controller
                                 'type'                  =>2,
                                 'nominal'               =>$row_forget['nominal'],
                             ]);
+                            $minus_forget+=$row_forget['nominal'];
                         }
-                        
-                        $query_report_peruser->total_received = $query_report_peruser->total_plus-$minus; 
+                        info($query_report_peruser->id);
+                        $query_report_peruser->total_minus = $query_report_peruser->total_minus+$minus_forget; 
+                        $query_report_peruser->total_received = $query_report_peruser->total_plus-$minus-$minus_forget; 
+
                         $query_report_peruser->save();
                     }
                     $counter++;
@@ -2062,7 +2128,9 @@ class AttendancePeriodController extends Controller
                                 
                                
                                 if( $query_salary_report_user){
+                                    info($query_salary_report_user->total_plus.'bawah lagie atas');
                                     $query_salary_report_user->total_plus = $query_salary_report_user->total_plus+$query_mbeng1->nominal;
+                                    info($query_salary_report_user->total_plus.'bawah lagie');
                                     $query_salary_report_user->total_received = $query_salary_report_user->total_received+$query_mbeng1->nominal;
                                     $query_salary_report_user->save();
                                 }
@@ -2358,10 +2426,21 @@ class AttendancePeriodController extends Controller
 
         $salary_report_template = SalaryReportTemplate::where('salary_report_id',$salary_report->id)->get();
         
-        $salary_report_user= SalaryReportUser::where('salary_report_id',$salary_report->id)->get();
+        $salary_report_user = SalaryReportUser::where('salary_report_id', $salary_report->id)
+        ->whereHas('user', function ($query) {
+            $query->where('type_payment', 1);
+        })
+        ->get();
+
+        $salary_report_user_harian = SalaryReportUser::where('salary_report_id', $salary_report->id)
+        ->whereHas('user', function ($query) {
+            $query->where('type_payment', 2);
+        })
+        ->get();
 
         $plant = Place::where('status',1)->get();
         $plant_for_user = [];
+        $salary_for_perday_user = [];
         $title = [];
         foreach($plant as $row){
             if (!isset($title[$row->id])) {
@@ -2373,26 +2452,50 @@ class AttendancePeriodController extends Controller
         foreach($plant as $row_plant){
             if (!isset($plant_for_user[$row_plant->id])) {
                 $plant_for_user[$row_plant->id] = '';
+                $salary_for_perday_user[$row_plant->id] ='';
             }
 
             $plant_for_user[$row_plant->id] .='<tr>
             <th>Nama</th>
             <th>NIK</th>
             ';
+
+            $salary_for_perday_user[$row_plant->id] .='<tr>
+            <th>Nama</th>
+            <th>NIK</th>
+            ';
         }
         foreach($salary_report_template as $row_template){
-            if($row_template->lookable_type == 'salary_components'){
+            if($row_template->lookable_type == 'salary_components' && $row_template->lookable_id != 2 ){
                 foreach($plant_for_user as $key=>$rowws){
                     $plant_for_user[$key].='<th>'.$row_template->salaryComponent->name.'</th>';
                 }
             }
+            if($row_template->lookable_type == 'salary_components' && $row_template->lookable_id != 1 ){
+                foreach($salary_for_perday_user as $key=>$rowws){
+                    $salary_for_perday_user[$key].='<th>'.$row_template->salaryComponent->name.'</th>';
+                }
+            }
             if($row_template->lookable_type == 'punishments'){
                 $plant_for_user[$row_template->punishment->place_id].='<th>'.$row_template->punishment->name.'</th>';
+                $salary_for_perday_user[$row_template->punishment->place_id].='<th>'.$row_template->punishment->name.'</th>';
             }
             
         }
+
         foreach($plant_for_user as $key=>$rowws){
             $plant_for_user[$key].='
+            <th>Total Lembur</th>
+            <th>Total Lembur Kusus</th>
+            <th>Total Hukuman</th>
+            <th>Total Denda</th>
+            <th>Total Tunjangan Kinerja</th>
+            <th>Total Gaji</th>
+            </tr>';
+
+            $salary_for_perday_user[$key].='
+            <th>Total Lembur</th>
+            <th>Total Lembur Kusus</th>
             <th>Total Hukuman</th>
             <th>Total Denda</th>
             <th>Total Tunjangan Kinerja</th>
@@ -2401,14 +2504,17 @@ class AttendancePeriodController extends Controller
         }
 
         foreach($salary_report_user as $row_user_report){
-            $query_detail = SalaryReportDetail::where('salary_report_user_id',$row_user_report->id)->get();
-            
+            $query_detail = SalaryReportDetail::where('salary_report_user_id',$row_user_report->id)
+            ->where('lookable_type','!=','overtime_requests')->get();
+            $query_detail_overtime = SalaryReportDetail::where('salary_report_user_id',$row_user_report->id)
+            ->where('lookable_type','overtime_requests')->get();
             $plant_for_user[$row_user_report->user->place_id].='
                     <tr>
                     <td>'.$row_user_report->user->name.'</td>
                     <td>'.$row_user_report->user->employee_no.'</td>';
             $nominal_plus = 0 ;
             $nominal_minus = 0 ;
+            info($query_detail);
             foreach($salary_report_template as $row_template){
                 
                 foreach($query_detail as $row_detail){
@@ -2417,7 +2523,7 @@ class AttendancePeriodController extends Controller
                         if($row_detail->lookable_type == 'punishments'){
                             $nominal_minus+=$row_detail->nominal;
                         }
-                        
+                       
                         $plant_for_user[$row_user_report->user->place_id].='
                             <td>'.$row_detail->nominal.'</td>
                         ';
@@ -2425,12 +2531,20 @@ class AttendancePeriodController extends Controller
                     
                 }
             }
-            $query_payment = EmployeeRewardPunishmentPayment::where('period_id',CustomHelper::decrypt($request->id))->get();
+            $query_payment = EmployeeRewardPunishmentPayment::where('period_id',CustomHelper::decrypt($request->id))->
+            where('user_id',$row_user_report->user->id)->get();
             foreach($query_payment as $row_payment){
                
                 if($row_payment->employeeRewardPunishmentDetail->employeeRewardPunishment->type == 1){
                     $nominal_plus+=$row_payment->nominal; 
                 }
+            }
+            foreach($query_detail_overtime as $row_overtime_detail){
+                $nominal_plus += $row_overtime_detail->nominal ;
+                $plant_for_user[$row_user_report->user->place_id].='
+                    <td>'.$row_overtime_detail->nominal.'</td>
+                ';
+                
             }  
            
             $plant_for_user[$row_user_report->user->place_id].='
@@ -2442,12 +2556,66 @@ class AttendancePeriodController extends Controller
             ';
             
         }
-        
-        
+
+        foreach($salary_report_user_harian as $row_user_report){
+            $query_detail = SalaryReportDetail::where('salary_report_user_id',$row_user_report->id)
+            ->where('lookable_type','!=','overtime_requests')->get();
+            $query_detail_overtime = SalaryReportDetail::where('salary_report_user_id',$row_user_report->id)
+            ->where('lookable_type','overtime_requests')->get();
+            $salary_for_perday_user[$row_user_report->user->place_id].='
+                    <tr>
+                    <td>'.$row_user_report->user->name.'</td>
+                    <td>'.$row_user_report->user->employee_no.'</td>';
+            $nominal_plus = 0 ;
+            $nominal_minus = 0 ;
+            info($query_detail);
+            foreach($salary_report_template as $row_template){
+                
+                foreach($query_detail as $row_detail){
+                    
+                    if($row_detail->lookable_type == $row_template->lookable_type && $row_detail->lookable_id == $row_template->lookable_id){
+                        if($row_detail->lookable_type == 'punishments'){
+                            $nominal_minus+=$row_detail->nominal;
+                        }
+                        $salary_for_perday_user[$row_user_report->user->place_id].='
+                            <td>'.$row_detail->nominal.'</td>
+                        ';
+                       
+                    }
+                    
+                }
+            }
+            $query_payment = EmployeeRewardPunishmentPayment::where('period_id',CustomHelper::decrypt($request->id))->
+            where('user_id',$row_user_report->user->id)->get();
+            foreach($query_payment as $row_payment){
+               
+                if($row_payment->employeeRewardPunishmentDetail->employeeRewardPunishment->type == 1){
+                    $nominal_plus+=$row_payment->nominal; 
+                }
+            }
+            foreach($query_detail_overtime as $row_overtime_detail){
+                $nominal_plus += $row_overtime_detail->nominal ;
+               
+                $salary_for_perday_user[$row_user_report->user->place_id].='
+                    <td>'.$row_overtime_detail->nominal.'</td>
+                ';
+            }  
+            $salary_for_perday_user[$row_user_report->user->place_id].='
+                <td>'.$nominal_minus.'</td>
+                <td>'.$row_user_report->total_minus.'</td>
+                <td>'.$nominal_plus.'</td>
+                <td>'.$row_user_report->total_received.'</td>
+                </tr>
+            ';
+           
+            
+        }
+
        
         $response = [
             'status'    => 200,
             'message'   => $plant_for_user,
+            'perday'    => $salary_for_perday_user,
             'title'     => $title,
         ];
         return response()->json($response);

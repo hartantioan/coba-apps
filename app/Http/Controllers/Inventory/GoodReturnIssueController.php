@@ -362,7 +362,7 @@ class GoodReturnIssueController extends Controller
     }
 
     public function rowDetail(Request $request){
-        $data   = GoodIssue::where('code',CustomHelper::decrypt($request->id))->first();
+        $data   = GoodReturnIssue::where('code',CustomHelper::decrypt($request->id))->first();
         
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">
                     <table style="min-width:100%;max-width:100%;">
@@ -373,20 +373,10 @@ class GoodReturnIssueController extends Controller
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Item</th>
-                                <th class="center-align">Qty</th>
+                                <th class="center-align">Qty Keluar</th>
+                                <th class="center-align">Qty Kembali</th>
                                 <th class="center-align">Satuan</th>
                                 <th class="center-align">Keterangan</th>
-                                <th class="center-align">Tipe Biaya</th>
-                                <th class="center-align">Plant</th>
-                                <th class="center-align">Gudang</th>
-                                <th class="center-align">Area</th>
-                                <th class="center-align">Shading</th>
-                                <th class="center-align">Line</th>
-                                <th class="center-align">Mesin</th>
-                                <th class="center-align">Departemen</th>
-                                <th class="center-align">Proyek</th>
-                                <th class="center-align">Requester</th>
-                                <th class="center-align">Qty Kembali</th>
                             </tr>
                         </thead><tbody>';
         

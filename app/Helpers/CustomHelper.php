@@ -1508,7 +1508,7 @@ class CustomHelper {
 					$row->goodIssueDetail->itemStock->warehouse_id,
 					$row->item_id,
 					$row->qty,
-					'OUT',
+					'IN',
 					$row->goodIssueDetail->itemStock->area_id ? $row->goodIssueDetail->itemStock->area_id : NULL,
 					$row->goodIssueDetail->itemStock->item_shading_id ? $row->goodIssueDetail->itemStock->item_shading_id : NULL,
 				);

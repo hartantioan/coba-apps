@@ -316,6 +316,7 @@
                 $('#form_data')[0].reset();
                 $('#temp').val('');
                 M.updateTextFields();
+                $('#manager_id,#employee_id,#position_id').empty();
             }
         });
         

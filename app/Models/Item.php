@@ -347,6 +347,11 @@ class Item extends Model
         return $this->hasMany('App\Models\ItemShading','item_id','id');
     }
 
+    public function itemUnit()
+    {
+        return $this->hasMany('App\Models\ItemUnit','item_id','id');
+    }
+
     public function listShading(){
         $arr = [];
         foreach($this->itemShading as $row){

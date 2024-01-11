@@ -326,8 +326,14 @@
                                     </select>
                                     <label class="active" for="uom_unit">Satuan Stok</label>
                                 </div>
+                                <div class="input-field col s12">
+                                    Tambah Satuan Konversi <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 right" onclick="addUnit()" href="javascript:void(0);">
+                                        <i class="material-icons left">add</i>
+                                    </a>
+                                </div>
                             </div>
                             <div class="col s6 row">
+                                
                                 <div class="input-field col s12">
                                     <select class="select2 browser-default" id="buy_unit" name="buy_unit">
                                         @foreach ($unit as $row)
@@ -493,7 +499,7 @@
 
 <!-- END: Page Main-->
 <script>
-    var selected = [], arrCode = [], arrName = [];
+    var selected = [], arrCode = [], arrName = [], mainUnit = '';
     
     $(function() {
         
@@ -719,10 +725,11 @@
 
     function getUnitStock(){
         if($('#uom_unit').val()){
-            $('.stock-unit').text($("#uom_unit").select2().find(":selected").data("code"));
+            mainUnit = $("#uom_unit").select2().find(":selected").data("code") ? $("#uom_unit").select2().find(":selected").data("code") : '-';
         }else{
-            $('.stock-unit').text('-');
+            mainUnit = '-';
         }
+        $('.stock-unit').text(mainUnit);
     }
 
     function shading(id,name){

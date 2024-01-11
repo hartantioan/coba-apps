@@ -7,6 +7,14 @@
                 <div class="section">
                     
                     <div class="row">
+                        <div class="col s12 m6 l12">
+                            <h5>Daftar Menu yang bisa anda akses</h5>
+                            <div class="card padding-4 animate fadeLeft">
+                                @foreach ($user->menuUser()->where('type','view')->get() as $row)
+                                    <a class="waves-effect waves-light btn-small mr-1 mt-1" href="{{ $row->menu->fullUrl() }}"><i class="material-icons left">{{ $row->icon }}</i>{{ $row->menu->name }}</a>
+                                @endforeach
+                            </div>
+                        </div>
                         <div class="col s12 m6 l4">
                             <div class="card padding-4 animate fadeLeft">
                                 <div class="row">

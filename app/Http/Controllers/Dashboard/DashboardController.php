@@ -13,9 +13,17 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 
 class DashboardController extends Controller
 {
+    protected $user;
+
+    public function __construct(){
+        $user = User::find(session('bo_id'));
+
+        $this->user = $user;
+    }
     public function index()
     {
         $data = [
@@ -23,6 +31,7 @@ class DashboardController extends Controller
             'content'       => 'admin.dashboard.main',
             'itemcogs'      => ItemCogs::orderByDesc('date')->orderByDesc('id')->get(),
             'itemstocks'    => ItemStock::all(),
+            'user'          => $this->user,
             /* 'pr'        => PurchaseRequest::all(),
             'pr1'       => PurchaseRequest::find(5),
             'po'        => PurchaseOrder::find(1), */

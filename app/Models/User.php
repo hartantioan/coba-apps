@@ -482,6 +482,10 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\User','manager_id','id')->where('status',$this->table);
     }
 
+    public function menuUser(){
+        return $this->hasMany('App\Models\MenuUser','user_id','id');
+    }
+
     public function position(){
         return $this->belongsTo('App\Models\Position','position_id','id')->withTrashed();
     }

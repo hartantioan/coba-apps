@@ -1022,9 +1022,10 @@ class UserController extends Controller
                                 $cek2 = UserWarehouse::where('user_id',$rowuser)->where('warehouse_id',$row)->count();
                                 if($cek2 == 0){
                                     UserWarehouse::create([
-                                        'user_id'   => $rowuser,
-                                        'place_id'  => $row
+                                        'user_id'       => $rowuser,
+                                        'warehouse_id'  => $row
                                     ]);
+                                    info('kambing');
                                 }
                             }
                         }

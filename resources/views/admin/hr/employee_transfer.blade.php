@@ -756,8 +756,11 @@
                         <option value="` + response.manager_id + `">` + response.manager.name + `</option>
                     `);
                 }
+                console.log(response);
+                $('#position_id').empty().append(`
+                    <option value="` + response.position_id + `">` + response.position.code +" - "+response.position.name+ `</option>
+                `);
                 
-                $('#position_id').val(response.position_id).formSelect();
                 $('#plant_id').val(response.plant_id).formSelect();
           
                 

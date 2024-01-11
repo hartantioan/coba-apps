@@ -346,7 +346,8 @@ class EmployeeTransferController extends Controller
     public function show(Request $request){
         $line = EmployeeTransfer::find(CustomHelper::decrypt($request->id));
         $line['employee']=$line->account;
-        $line['manager']=$line->manager;				
+        $line['manager']=$line->manager;
+        $line['position'] = $line->position;				
 		return response()->json($line);
     }
 

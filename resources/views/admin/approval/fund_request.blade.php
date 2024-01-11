@@ -299,7 +299,9 @@
                             <div>{!! $data->user->signature() !!}</div>
                         @endif
                         <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $data->user->name }}</div>
-                        <div class="mt-1">{{ $data->user->position->Level->name.' '.$data->user->position->division->name }}</div>
+                        @if ($data->user->position()->exists())
+                            <div class="mt-1">{{ $data->user->position->Level->name.' '.$data->user->position->division->name }}</div>  
+                        @endif
                     </td>
                     @if($data->approval())
                         @foreach ($data->approval() as $detail)
@@ -310,7 +312,9 @@
                                         <div>{!! $row->user->signature() !!}</div>
                                     @endif
                                     <div class="{{ $row->user->signature ? '' : 'mt-5' }}">{{ $row->user->name }}</div>
-                                    <div class="mt-1">{{ $row->user->position->Level->name.' - '.$row->user->position->division->name }}</div>
+                                    @if ($row->user->position()->exists())
+                                        <div class="mt-1">{{ $row->user->position->Level->name.' - '.$row->user->position->division->name }}</div>
+                                    @endif
                                 </td>
                             @endforeach
                         @endforeach

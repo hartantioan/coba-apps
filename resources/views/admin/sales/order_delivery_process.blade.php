@@ -91,13 +91,13 @@
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="start_date" style="font-size:1rem;">Start Date (Tanggal Mulai) :</label>
+                                                <label for="start_date" style="font-size:1rem;">Tanggal Mulai :</label>
                                                 <div class="input-field col s12">
                                                 <input type="date" id="start_date" name="start_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="finish_date" style="font-size:1rem;">End Date (Tanggal Berhenti) :</label>
+                                                <label for="finish_date" style="font-size:1rem;">Tanggal Akhir :</label>
                                                 <div class="input-field col s12">
                                                     <input type="date" id="finish_date" name="finish_date"  onchange="loadDataTable()">
                                                 </div>

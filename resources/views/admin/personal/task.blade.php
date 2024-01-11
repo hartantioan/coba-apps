@@ -54,13 +54,13 @@
                                             <div class="collapsible-body">
                                                 <div class="row">
                                                     <div class="col m4 s6 ">
-                                                        <label for="start-date" style="font-size:1rem;">Start Date (Tanggal Mulai) :</label>
+                                                        <label for="start-date" style="font-size:1rem;">Tanggal Mulai :</label>
                                                         <div class="input-field col s12">
                                                         <input type="date" id="start-date" name="start-date"  onchange="loadDataTable()">
                                                         </div>
                                                     </div>
                                                     <div class="col m4 s6 ">
-                                                        <label for="finish-date" style="font-size:1rem;">End Date (Tanggal Berhenti) :</label>
+                                                        <label for="finish-date" style="font-size:1rem;">Tanggal Akhir :</label>
                                                         <div class="input-field col s12">
                                                             <input type="date" id="finish-date" name="finish-date"  onchange="loadDataTable()">
                                                         </div>

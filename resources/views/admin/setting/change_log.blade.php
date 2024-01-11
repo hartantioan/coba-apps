@@ -123,7 +123,7 @@
                            
                             <div class="input-field col m4 s12">
                                 <input type="date" id="release_date" name="release_date"  onchange="loadDataTable()">
-                                <label class="active" for="release_date" style="font-size:1rem;">Start Date (Tanggal Mulai) :</label>
+                                <label class="active" for="release_date" style="font-size:1rem;">Tanggal Mulai :</label>
                             </div>
                             <div class="input-field col m4 s12">
                                 <input id="title" name="title" type="text" placeholder="Judul">

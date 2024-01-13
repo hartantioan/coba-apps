@@ -59,11 +59,11 @@
                             <span class="hide-on-small-onl">Excel</span>
                             <i class="material-icons right">view_list</i>
                         </a>
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3 modal-trigger" href="#modal2">
+                        {{-- <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3 modal-trigger" href="#modal2">
                             <i class="material-icons hide-on-med-and-up">file_download</i>
                             <span class="hide-on-small-onl">Import</span>
                             <i class="material-icons right">file_download</i>
-                        </a>
+                        </a> --}}
                     </div>
                 </div>
             </div>
@@ -112,7 +112,12 @@
                                         <div class="col s12">
                                             <div class="card-alert card green">
                                                 <div class="card-content white-text">
-                                                    <p>Info : Silahkan tekan tombol <a href="javascript:void(0);" class="btn-floating mb-1 btn-flat waves-effect waves-light amber darken-3 accent-2 white-text btn-small" data-popup="tooltip" title="Shading Item"><i class="material-icons dp48">devices_other</i></a> untuk melihat jumlah kode shading item (khusus untuk Item Penjualan).</p>
+                                                    <p>Info 1 : Silahkan tekan tombol <a href="javascript:void(0);" class="btn-floating mb-1 btn-flat waves-effect waves-light amber darken-3 accent-2 white-text btn-small" data-popup="tooltip" title="Shading Item"><i class="material-icons dp48">devices_other</i></a> untuk melihat jumlah kode shading item (khusus untuk Item Penjualan).</p>
+                                                </div>
+                                            </div>
+                                            <div class="card-alert card red">
+                                                <div class="card-content white-text">
+                                                    <p>Info 2 : Item yang terpakai pada transaksi, Satuan tidak akan bisa dirubah.</p>
                                                 </div>
                                             </div>
                                             {{-- <div class="card-alert card blue">
@@ -317,77 +322,48 @@
                         </div>
                         <div class="col s6 row">
                             <div class="col s12">
-                                <div class="input-field col s12">
+                                <div class="input-field col s12 unit-inputs">
                                     <select class="select2 browser-default" id="uom_unit" name="uom_unit" onchange="getUnitStock();">
                                         <option value="">--Silahkan pilih--</option>
                                         @foreach ($unit as $row)
                                             <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' - '.$row->name }}</option>
                                         @endforeach
                                     </select>
-                                    <label class="active" for="uom_unit">Satuan Stok</label>
+                                    <label class="active" for="uom_unit">Satuan Stock</label>
                                 </div>
                                 <div class="input-field col s12">
-                                    Tambah Satuan Konversi <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 right" onclick="addUnit()" href="javascript:void(0);">
-                                        <i class="material-icons left">add</i>
-                                    </a>
+                                    
                                 </div>
                             </div>
-                            <div class="col s6 row">
-                                
-                                <div class="input-field col s12">
-                                    <select class="select2 browser-default" id="buy_unit" name="buy_unit">
-                                        @foreach ($unit as $row)
-                                            <option value="{{ $row->id }}">{{ $row->code.' - '.$row->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    <label class="active" for="buy_unit">Satuan Beli</label>
+                            <div class="col s12">
+                                <div class="center">
+                                    <h6>Satuan Konversi</h6>
                                 </div>
-                                <div class="input-field col s12">
-                                    <select class="select2 browser-default" id="sell_unit" name="sell_unit">
-                                        @foreach ($unit as $row)
-                                            <option value="{{ $row->id }}">{{ $row->code.' - '.$row->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    <label class="active" for="sell_unit">Satuan Jual</label>
-                                </div>
-                                <div class="input-field col s12">
-                                    <select class="select2 browser-default" id="production_unit" name="production_unit">
-                                        @foreach ($unit as $row)
-                                            <option value="{{ $row->id }}">{{ $row->code.' - '.$row->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    <label class="active" for="production_unit">Satuan Produksi</label>
-                                </div>
-                                <div class="input-field col s12">
-                                    <select class="select2 browser-default" id="pallet_unit" name="pallet_unit">
-                                        @foreach ($pallet as $row)
-                                            <option value="{{ $row->id }}">{{ $row->code.' - '.$row->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    <label class="active" for="pallet_unit">Satuan Pallet</label>
-                                </div>
-                            </div>
-                            <div class="col s6 row">
-                                <div class="input-field col s12">
-                                    <input id="buy_convert" name="buy_convert" type="text" placeholder="Ex: 1 SAK Beli = ? KG Stok" onkeyup="formatRupiah(this);">
-                                    <label class="active" for="buy_convert">Konversi Satuan Beli ke Stok</label>
-                                    <div class="form-control-feedback stock-unit">-</div>
-                                </div>
-                                <div class="input-field col s12">
-                                    <input id="sell_convert" name="sell_convert" type="text" placeholder="Ex: 1 Truk Jual = ? KG Stok" onkeyup="formatRupiah(this);">
-                                    <label class="active" for="sell_convert">Konversi Satuan Jual ke Stok</label>
-                                    <div class="form-control-feedback stock-unit">-</div>
-                                </div>
-                                <div class="input-field col s12">
-                                    <input id="production_convert" name="production_convert" type="text" placeholder="Ex: 1 PCS = ? M2 Stok" onkeyup="formatRupiah(this);">
-                                    <label class="active" for="production_convert">Konversi Satuan Produksi ke Stok</label>
-                                    <div class="form-control-feedback stock-unit">-</div>
-                                </div>
-                                <div class="input-field col s12">
-                                    <input id="pallet_convert" name="pallet_convert" type="text" placeholder="Ex: 1 Pallet Kayu = ? M2 Stok" onkeyup="formatRupiah(this);">
-                                    <label class="active" for="pallet_convert">Konversi Pallet ke Satuan Stok</label>
-                                    <div class="form-control-feedback stock-unit">-</div>
-                                </div>
+                                <table class="bordered">
+                                    <thead>
+                                        <tr>
+                                            <th class="center">Satuan</th>
+                                            <th class="center">Konversi</th>
+                                            <th class="center">Jual</th>
+                                            <th class="center">Beli</th>
+                                            <th class="center">Hapus</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="body-unit">
+                                        <tr id="empty-unit">
+                                            <td colspan="5" class="center">Silahkan tambahkan satuan konversi</td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th colspan="5" class="center">
+                                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addUnit();" href="javascript:void(0);">
+                                                    <i class="material-icons left">add</i> Tambah
+                                                </a>
+                                            </th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
                             </div>
                         </div>
                         <div class="input-field col s6">
@@ -466,7 +442,7 @@
                             </div>
                         </div>
                         <div class="col s12 mt-3">
-                            <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                            
                         </div>
                     </div>
                 </form>
@@ -474,6 +450,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button class="btn waves-effect waves-light mr-1" onclick="save();">Simpan <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -502,6 +479,15 @@
     var selected = [], arrCode = [], arrName = [], mainUnit = '';
     
     $(function() {
+
+        M.Modal.prototype._handleFocus = function (e) {
+            if (!this.el.contains(e.target) && this._nthModalOpened === M.Modal._modalsOpen) {
+                var s2 = 'select2-search__field';
+                if (e.target.className.indexOf(s2)<0) {
+                    this.el.focus();
+                }
+            }
+        };
         
         $(".select2").select2({
             dropdownAutoWidth: true,
@@ -681,6 +667,12 @@
                 /* $('#item-sale-show').hide(); */
                 arrCode = [];
                 arrName = [];
+                $('#body-unit').empty().append(`
+                    <tr id="empty-unit">
+                        <td colspan="5" class="center">Silahkan tambahkan satuan konversi</td>
+                    </tr>
+                `);
+                $('.unit-inputs').css('pointer-events','auto');
             }
         });
 
@@ -721,15 +713,83 @@
         select2ServerSide('#grade_id', '{{ url("admin/select2/grade") }}');
         select2ServerSide('#brand_id', '{{ url("admin/select2/brand") }}');
 
+        $('.select2').each(function () {
+            $(this).select2({
+                dropdownParent: $(this).parent(),
+            });
+        });
+        
+        $(document).on('select2:close', '.select2', function (e) {
+            var evt = "scroll.select2";
+            $(e.target).parents().off(evt);
+            $(window).off(evt);
+        });
+
+        $('#body-unit').on('click', '.delete-data-unit', function() {
+            $(this).closest('tr').remove();
+            if($('.row_unit').length == 0){
+                $('#body-unit').append(`
+                    <tr id="empty-unit">
+                        <td colspan="5" class="center">Silahkan tambahkan satuan konversi</td>
+                    </tr>
+                `);
+            }
+        });
     });
+
+    function addUnit(){
+        if($('#empty-unit').length > 0){
+            $('#empty-unit').remove();
+        }
+        let unit = $("#uom_unit").select2().find(":selected").data("code") ? $("#uom_unit").select2().find(":selected").data("code") : '-';
+        let count = makeid(10);
+        $('#body-unit').append(`
+            <tr class="row_unit">
+                <td class="unit-inputs">
+                    <select class="select2 browser-default" id="arr_unit` + count + `" name="arr_unit[]">
+                        @foreach ($unit as $row)
+                            <option value="{{ $row->id }}">{{ $row->code.' - '.$row->name }}</option>
+                        @endforeach
+                    </select>
+                </td>
+                <td>
+                    <div class="input-field">
+                        <input name="arr_conversion[]" onfocus="emptyThis(this);" type="text" value="0" onkeyup="formatRupiahNoMinus(this)">
+                        <div class="form-control-feedback stock-unit">` + unit + `</div>
+                    </div>
+                </td>
+                <td class="center-align">
+                    <label>
+                        <input type="checkbox" id="arr_sell_unit` + count + `" name="arr_sell_unit[]" value="1">
+                        <span>Pilih</span>
+                    </label>
+                </td>
+                <td class="center-align">
+                    <label>
+                        <input type="checkbox" id="arr_buy_unit` + count + `" name="arr_buy_unit[]" value="1">
+                        <span>Pilih</span>
+                    </label>
+                </td>
+                <td class="center-align">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-unit" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
+            </tr>
+        `);
+        $(".select2").select2({
+            dropdownParent: $('#modal1'),
+            dropdownAutoWidth: true,
+            width: '100%',
+        });
+    }
 
     function getUnitStock(){
         if($('#uom_unit').val()){
-            mainUnit = $("#uom_unit").select2().find(":selected").data("code") ? $("#uom_unit").select2().find(":selected").data("code") : '-';
+            $('.stock-unit').text($("#uom_unit").select2().find(":selected").data("code"));
         }else{
-            mainUnit = '-';
+            $('.stock-unit').text('-');
         }
-        $('.stock-unit').text(mainUnit);
     }
 
     function shading(id,name){
@@ -960,79 +1020,131 @@
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
 
+    function isDuplicate(arr,val){
+        let ada = false;
+        for(let i=0;i<arr.length;i++){
+            if(arr[i] == val){
+                ada = true;
+            }
+        }
+        return ada;
+    }
+
     function save(){
 			
-        var formData = new FormData($('#form_data')[0]);
-        
-        $.ajax({
-            url: '{{ Request::url() }}/create',
-            type: 'POST',
-            dataType: 'JSON',
-            data: formData,
-            contentType: false,
-            processData: false,
-            cache: true,
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                $('#validation_alert').hide();
-                $('#validation_alert').html('');
-                loadingOpen('.modal-content');
-            },
-            success: function(response) {
-                loadingClose('.modal-content');
-                if(response.status == 200) {
-                    $('#parent_id').empty();
+        var formData = new FormData($('#form_data')[0]), passed = true, passedSameUnit = true;
 
-                    $.each(response.data, function(i, val) {
-                        $('#parent_id').append(val);
-                    });
+        formData.delete("arr_sell_unit[]");
+        formData.delete("arr_buy_unit[]");
 
-                    success();
-                    M.toast({
-                        html: response.message
-                    });
-                } else if(response.status == 422) {
-                    $('#validation_alert').show();
-                    $('.modal-content').scrollTop(0);
-                    
-                    swal({
-                        title: 'Ups! Validation',
-                        text: 'Check your form.',
-                        icon: 'warning'
-                    });
-
-                    $.each(response.error, function(i, val) {
-                        $.each(val, function(i, val) {
-                            $('#validation_alert').append(`
-                                <div class="card-alert card red">
-                                    <div class="card-content white-text">
-                                        <p>` + val + `</p>
-                                    </div>
-                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">×</span>
-                                    </button>
-                                </div>
-                            `);
-                        });
-                    });
-                } else {
-                    M.toast({
-                        html: response.message
-                    });
+        let arrUnit = [];
+        $('select[name^="arr_unit[]"]').each(function(index){
+            if(!$(this).val()){
+                passed = false;
+            }else{
+                if(isDuplicate(arrUnit,$(this).val())){
+                    passedSameUnit = false;
                 }
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('.modal-content');
+                arrUnit.push($(this).val());
+            }
+        });
+        $('input[name^="arr_conversion[]"]').each(function(index){
+            if($(this).val() == '' || parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")) == 0){
+                passed = false;
+            }
+        });
+        $('input[name^="arr_sell_unit[]"]').each(function(index){
+            formData.append('arr_sell_unit[]',($(this).is(':checked') ? $(this).val() : ''));
+        });
+        $('input[name^="arr_buy_unit[]"]').each(function(index){
+            formData.append('arr_buy_unit[]',($(this).is(':checked') ? $(this).val() : ''));
+        });
+        
+        if(passedSameUnit){
+            if(passed){
+                $.ajax({
+                    url: '{{ Request::url() }}/create',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    cache: true,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#validation_alert').hide();
+                        $('#validation_alert').html('');
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+                        if(response.status == 200) {
+                            $('#parent_id').empty();
+
+                            $.each(response.data, function(i, val) {
+                                $('#parent_id').append(val);
+                            });
+
+                            success();
+                            M.toast({
+                                html: response.message
+                            });
+                        } else if(response.status == 422) {
+                            $('#validation_alert').show();
+                            $('.modal-content').scrollTop(0);
+                            
+                            swal({
+                                title: 'Ups! Validation',
+                                text: 'Check your form.',
+                                icon: 'warning'
+                            });
+
+                            $.each(response.error, function(i, val) {
+                                $.each(val, function(i, val) {
+                                    $('#validation_alert').append(`
+                                        <div class="card-alert card red">
+                                            <div class="card-content white-text">
+                                                <p>` + val + `</p>
+                                            </div>
+                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    `);
+                                });
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('.modal-content');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }else{
                 swal({
                     title: 'Ups!',
-                    text: 'Check your internet connection.',
+                    text: 'Mohon maaf, satuan konversi tidak boleh kosong.',
                     icon: 'error'
                 });
             }
-        });
+        }else{
+            swal({
+                title: 'Ups!',
+                text: 'Mohon maaf, satuan konversi tidak boleh ada yang sama.',
+                icon: 'error'
+            });
+        }
     }
 
     function saveShading(){
@@ -1142,14 +1254,6 @@
                 $('#note').val(response.note);
                 $('#item_group_id').val(response.item_group_id).trigger('change');
                 $('#uom_unit').val(response.uom_unit_id).trigger('change');
-                $('#buy_unit').val(response.buy_unit).trigger('change');
-                $('#buy_convert').val(response.buy_convert);
-                $('#sell_unit').val(response.sell_unit).trigger('change');
-                $('#sell_convert').val(response.sell_convert);
-                $('#pallet_unit').val(response.pallet_unit).trigger('change');
-                $('#pallet_convert').val(response.pallet_convert);
-                $('#production_unit').val(response.production_unit).trigger('change');
-                $('#production_convert').val(response.production_convert);
                 $('#warehouse_id').val(response.warehouses).trigger('change');
                 $('#tolerance_gr').val(response.tolerance_gr);
                 $('#min_stock').val(response.min_stock);
@@ -1219,6 +1323,58 @@
                     $('#status').prop( "checked", true);
                 }else{
                     $('#status').prop( "checked", false);
+                }
+
+                if(response.units.length > 0){
+                    $('#body-unit').empty();
+
+                    $.each(response.units, function(i, val) {
+                        let unit = response.uom_code;
+                        let count = makeid(10);
+                        $('#body-unit').append(`
+                            <tr class="row_unit">
+                                <td class="unit-inputs">
+                                    <select class="select2 browser-default" id="arr_unit` + count + `" name="arr_unit[]">
+                                        @foreach ($unit as $row)
+                                            <option value="{{ $row->id }}">{{ $row->code.' - '.$row->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td>
+                                    <div class="input-field">
+                                        <input name="arr_conversion[]" onfocus="emptyThis(this);" type="text" value="` + val.conversion + `" onkeyup="formatRupiahNoMinus(this)">
+                                        <div class="form-control-feedback stock-unit">` + unit + `</div>
+                                    </div>
+                                </td>
+                                <td class="center-align">
+                                    <label>
+                                        <input type="checkbox" id="arr_sell_unit` + count + `" name="arr_sell_unit[]" value="1" ` + (val.is_sell_unit ? 'checked' : '' ) + `>
+                                        <span>Pilih</span>
+                                    </label>
+                                </td>
+                                <td class="center-align">
+                                    <label>
+                                        <input type="checkbox" id="arr_buy_unit` + count + `" name="arr_buy_unit[]" value="1" ` + (val.is_buy_unit ? 'checked' : '' ) + `>
+                                        <span>Pilih</span>
+                                    </label>
+                                </td>
+                                <td class="center-align">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-unit" href="javascript:void(0);">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        `);
+                        $(".select2").select2({
+                            dropdownAutoWidth: true,
+                            width: '100%',
+                        });
+                        $('#arr_unit' + count).val(val.unit_id).trigger('change');
+                    });
+                }
+
+                if(response.used){
+                    $('.unit-inputs').css('pointer-events','none');
                 }
 
                 $('.modal-content').scrollTop(0);

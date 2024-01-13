@@ -178,9 +178,9 @@
                                         <label class="active" for="post_date">Tgl. Posting</label>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        <select class="form-control" id="currency_id" name="currency_id">
+                                        <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
                                             @foreach ($currency as $row)
-                                                <option value="{{ $row->id }}">{{ $row->code.' '.$row->name }}</option>
+                                                <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
                                             @endforeach
                                         </select>
                                         <label class="" for="currency_id">Mata Uang</label>
@@ -189,10 +189,10 @@
                                         <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                                         <label class="active" for="currency_rate">Konversi</label>
                                     </div>
-                                    <div class="input-field col m3 s12">
+                                    {{-- <div class="input-field col m3 s12">
                                         <select class="browser-default" id="journal_id" name="journal_id"></select>
                                         <label class="active" for="journal_id">Journal Referensi (Opsional : Pinjaman Karyawan)</label>
-                                    </div>
+                                    </div> --}}
                                     <div class="col s12">
                                         <h5>Tambah dari Distribusi (Opsional)</h5>
                                         <div class="input-field col s3">
@@ -495,6 +495,9 @@
                 window.onbeforeunload = function() {
                     return 'You will lose all changes made since your last save';
                 };
+                if(!$('#temp').val()){
+                    loadCurrency();
+                }
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();

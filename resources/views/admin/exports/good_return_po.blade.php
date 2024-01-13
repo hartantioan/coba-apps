@@ -49,7 +49,7 @@
                 <td>{{ $rowdetail->item->name.' - '.$rowdetail->item->name }}</td>
                 <td align="center">{{ $rowdetail->goodReceiptDetail->qty }}</td>
                 <td align="center">{{ $rowdetail->qty }}</td>
-                <td align="center">{{ $rowdetail->item->buyUnit->code }}</td>
+                <td align="center">{{ $rowdetail->itemUnit->unit->code }}</td>
                 <td>{{ $rowdetail->note }}</td>
                 <td align="center">{{ $rowdetail->goodReceiptDetail->place->name.' - '.$rowdetail->goodReceiptDetail->place->company->name }}</td>
                 <td align="center">{{ $rowdetail->goodReceiptDetail->department->name ?? ''  }}</td>

@@ -476,7 +476,7 @@ class GoodReturnIssueController extends Controller
                 'shading_name'          => $row->goodIssueDetail->itemStock->itemShading()->exists() ? $row->goodIssueDetail->itemStock->itemShading->code : '-',
                 'qty_balance'           => number_format($row->goodIssueDetail->qtyBalanceReturn(),3,',','.'),
                 'qty'                   => number_format($row->qty,3,',','.'),
-                'note'                  => $row->note,
+                'note'                  => $row->note ? $row->note : '',
                 'unit'                  => $row->item->uomUnit->code,
             ];
         }

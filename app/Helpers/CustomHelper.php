@@ -1313,18 +1313,6 @@ class CustomHelper {
 
 				$rowtotal = $row->getRowTotal() * $row->goodReceiptDetail->purchaseOrderDetail->purchaseOrder->currency_rate;
 
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $row->item->itemGroup->coa_id,
-					'place_id'		=> $row->goodReceiptDetail->place_id,
-					'item_id'		=> $row->item_id,
-					'department_id'	=> $row->goodReceiptDetail->department_id ? $row->goodReceiptDetail->department_id : NULL,
-					'warehouse_id'	=> $row->goodReceiptDetail->warehouse_id,
-					'project_id'	=> $row->goodReceiptDetail->purchaseOrderDetail->project_id ? $row->goodReceiptDetail->purchaseOrderDetail->project_id : NULL,
-					'type'			=> '1',
-					'nominal'		=> -1 * $rowtotal,
-				]);
-
 				if($coa_credit){
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
@@ -1335,10 +1323,22 @@ class CustomHelper {
 						'department_id'	=> $row->goodReceiptDetail->department_id ? $row->goodReceiptDetail->department_id : NULL,
 						'warehouse_id'	=> $row->goodReceiptDetail->warehouse_id,
 						'project_id'	=> $row->goodReceiptDetail->purchaseOrderDetail->project_id ? $row->goodReceiptDetail->purchaseOrderDetail->project_id : NULL,
-						'type'			=> '2',
-						'nominal'		=> -1 * $rowtotal,
+						'type'			=> '1',
+						'nominal'		=> $rowtotal,
 					]);
 				}
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $row->item->itemGroup->coa_id,
+					'place_id'		=> $row->goodReceiptDetail->place_id,
+					'item_id'		=> $row->item_id,
+					'department_id'	=> $row->goodReceiptDetail->department_id ? $row->goodReceiptDetail->department_id : NULL,
+					'warehouse_id'	=> $row->goodReceiptDetail->warehouse_id,
+					'project_id'	=> $row->goodReceiptDetail->purchaseOrderDetail->project_id ? $row->goodReceiptDetail->purchaseOrderDetail->project_id : NULL,
+					'type'			=> '2',
+					'nominal'		=> $rowtotal,
+				]);
 
 				self::sendCogs('good_returns',
 					$gr->id,
@@ -2078,7 +2078,7 @@ class CustomHelper {
 								$row->lookable->lookable->place_id,
 								$row->lookable->lookable->warehouse_id,
 								$row->lookable->lookable->item_id,
-								round($row->qty * $row->lookable->lookable->item->buy_convert,3),
+								round($row->qty * $row->lookable->lookable->qty_conversion,3),
 								$total,
 								'OUT',
 								$pm->post_date,
@@ -2090,7 +2090,7 @@ class CustomHelper {
 								$row->lookable->lookable->place_id,
 								$row->lookable->lookable->warehouse_id,
 								$row->lookable->lookable->item_id,
-								round($row->qty * $row->lookable->lookable->item->buy_convert,3),
+								round($row->qty * $row->lookable->lookable->qty_conversion,3),
 								'OUT',
 								NULL,
 								NULL,

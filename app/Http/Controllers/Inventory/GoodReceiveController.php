@@ -559,7 +559,7 @@ class GoodReceiveController extends Controller
                 'area_name'         => $row->area()->exists() ? $row->area->name : '',
                 'project_id'        => $row->project()->exists() ? $row->project->id : '',
                 'project_name'      => $row->project()->exists() ? $row->project->name : '',
-                'note'              => $row->note,
+                'note'              => $row->note ? $row->note : '',
                 'item_shading_id'   => $row->item_shading_id,
                 'list_shading'      => $row->item->arrShading(),
                 'is_sales_item'     => $row->item->is_sales_item ? $row->item->is_sales_item : '',

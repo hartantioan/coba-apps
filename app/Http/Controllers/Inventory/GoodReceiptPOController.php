@@ -252,7 +252,7 @@ class GoodReceiptPOController extends Controller
                             'item_id'                   => $row->item_id,
                             'item_name'                 => $row->item->code.' - '.$row->item->name,
                             'qty'                       => number_format($qtyBalance,3,',','.'),
-                            'unit'                      => $row->item->buyUnit->code,
+                            'unit'                      => $row->itemUnit->unit->code,
                             'place_id'                  => $row->place_id,
                             'place_name'                => $row->place->code,
                             'line_id'                   => $row->line_id ? $row->line_id : '',
@@ -263,8 +263,8 @@ class GoodReceiptPOController extends Controller
                             'department_name'           => $row->department_id ? $row->department->name : '-',
                             'warehouse_id'              => $row->warehouse_id,
                             'warehouse_name'            => $row->warehouse->name,
-                            'note'                      => $row->note,
-                            'note2'                     => $row->note2,
+                            'note'                      => $row->note ? $row->note2 : '',
+                            'note2'                     => $row->note2 ? $row->note2 : '',
                         ];
                         if($row->item()->exists()){
                             if($row->item->itemGroup->is_activa){
@@ -309,7 +309,7 @@ class GoodReceiptPOController extends Controller
                             'item_id'                   => $row->item_id,
                             'item_name'                 => $row->item->code.' - '.$row->item->name,
                             'qty'                       => number_format($row->getBalanceReceipt(),3,',','.'),
-                            'unit'                      => $row->item->buyUnit->code,
+                            'item_unit_id'              => $row->item_unit_id,
                             'place_id'                  => $row->place_id,
                             'place_name'                => $row->place->code.' - '.$row->place->company->name,
                             'department_id'             => $row->department_id,
@@ -538,12 +538,15 @@ class GoodReceiptPOController extends Controller
                 DB::beginTransaction();
                 try {
                     foreach($request->arr_purchase as $key => $row){
+                        $pod = PurchaseOrderDetail::find(intval($row));
                         $grd = GoodReceiptDetail::create([
                             'good_receipt_id'           => $query->id,
                             'purchase_order_detail_id'  => $row,
                             'good_scale_detail_id'      => $request->arr_scale[$key] ? $request->arr_scale[$key] : NULL,
                             'item_id'                   => $request->arr_item[$key],
                             'qty'                       => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                            'item_unit_id'              => $pod->item_unit_id,
+                            'qty_conversion'            => $pod->qty_conversion,
                             'total'                     => $arrDetail[$key]['total'],
                             'tax'                       => $arrDetail[$key]['tax'],
                             'wtax'                      => $arrDetail[$key]['wtax'],
@@ -634,7 +637,7 @@ class GoodReceiptPOController extends Controller
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$rowdetail->item->code.' - '.$rowdetail->item->name.'</td>
                 <td class="center-align">'.number_format($rowdetail->qty,3,',','.').'</td>
-                <td class="center-align">'.$rowdetail->item->buyUnit->code.'</td>
+                <td class="center-align">'.$rowdetail->itemUnit->unit->code.'</td>
                 <td class="center-align">'.$rowdetail->note.'</td>
                 <td class="center-align">'.$rowdetail->note2.'</td>
                 <td class="center-align">'.$rowdetail->remark.'</td>
@@ -738,9 +741,9 @@ class GoodReceiptPOController extends Controller
                 'item_id'                   => $row->item_id,
                 'item_name'                 => $row->item->name,
                 'qty'                       => number_format($row->qty,3,',','.'),
-                'unit'                      => $row->item->buyUnit->code,
-                'note'                      => $row->note,
-                'note2'                     => $row->note2,
+                'unit'                      => $row->itemUnit->unit->code,
+                'note'                      => $row->note ? $row->note : '',
+                'note2'                     => $row->note2 ? $row->note2 : '',
                 'remark'                    => $row->remark,
                 'place_id'                  => $row->place_id,
                 'place_name'                => $row->place->code,

@@ -19,9 +19,16 @@ class GoodReturnPODetail extends Model
         'good_receipt_detail_id',
         'item_id',
         'qty',
+        'item_unit_id',
+        'qty_conversion',
         'note',
         'note2',
     ];
+
+    public function itemUnit()
+    {
+        return $this->belongsTo('App\Models\ItemUnit', 'item_unit_id', 'id')->withTrashed();
+    }
 
     public function goodReturnPO()
     {
@@ -48,7 +55,7 @@ class GoodReturnPODetail extends Model
     }
 
     public function qtyConvert(){
-        $qty = round($this->qty * $this->item->buy_convert,3);
+        $qty = round($this->qty * $this->qty_conversion,3);
 
         return $qty;
     }

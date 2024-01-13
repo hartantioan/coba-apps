@@ -46,6 +46,7 @@ use App\Exports\ExportPurchaseOrder;
 use App\Models\User;
 use App\Models\Tax;
 use App\Models\Coa;
+use App\Models\ItemUnit;
 use Milon\Barcode\DNS2D;
 use Milon\Barcode\Facades\DNS2DFacade;
 
@@ -288,6 +289,7 @@ class PurchaseOrderController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
+                $btn_close = $val->inventory_type == '1' ? '<button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>' : '';
 				
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
@@ -316,11 +318,10 @@ class PurchaseOrderController extends Controller
                     number_format($val->wtax,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
                     $val->status(),
-                    '
+                    $btn_close.'
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) .'`,`'.$val->code.'`)"><i class="material-icons dp48">local_printshop</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
@@ -384,10 +385,10 @@ class PurchaseOrderController extends Controller
                                 'item_id'                       => $row->item_id,
                                 'item_name'                     => $row->item->code.' - '.$row->item->name,
                                 'old_prices'                    => $row->item->oldPrices($this->dataplaces),
-                                'unit'                          => $row->item->buyUnit->code,
+                                'item_unit_id'                  => $row->item_unit_id,
                                 'qty'                           => number_format($row->qtyBalance(),3,',','.'),
-                                'note'                          => $row->note,
-                                'note2'                         => $row->note2,
+                                'note'                          => $row->note ? $row->note : '',
+                                'note2'                         => $row->note2 ? $row->note2 : '',
                                 'warehouse_name'                => $row->warehouse->code.' - '.$row->warehouse->name,
                                 'warehouse_id'                  => $row->warehouse_id,
                                 'place_id'                      => $row->place_id,
@@ -397,6 +398,7 @@ class PurchaseOrderController extends Controller
                                 'requester'                     => $row->requester ? $row->requester : '',
                                 'project_id'                    => $row->project()->exists() ? $row->project->id : '',
                                 'project_name'                  => $row->project()->exists() ? $row->project->name : '-',
+                                'buy_units'                     => $row->item->arrBuyUnits(),
                             ];
                         }
                     }
@@ -407,19 +409,20 @@ class PurchaseOrderController extends Controller
                             'item_id'                       => $row->itemStock->item_id,
                             'item_name'                     => $row->itemStock->item->code.' - '.$row->itemStock->item->name,
                             'old_prices'                    => $row->itemStock->item->oldPrices($this->dataplaces),
-                            'unit'                          => $row->itemStock->item->buyUnit->code,
-                            'qty'                           => number_format($row->qtyConvertToBuy(),3,',','.'),
-                            'note'                          => $row->note,
+                            'item_unit_id'                  => '',
+                            'qty'                           => number_format($row->qty,3,',','.'),
+                            'note'                          => $row->note ? $row->note : '',
                             'note2'                         => '',
                             'warehouse_name'                => $row->itemStock->warehouse->code.' - '.$row->itemStock->warehouse->name,
                             'warehouse_id'                  => $row->itemStock->warehouse_id,
                             'place_id'                      => $row->itemStock->place_id,
-                            'line_id'                       => '',
-                            'machine_id'                    => '',
-                            'department_id'                 => '',
-                            'requester'                     => '',
-                            'project_id'                    => '',
-                            'project_name'                  => '-',
+                            'line_id'                       => $row->line_id ? $row->line_id : '',
+                            'machine_id'                    => $row->machine_id ? $row->machine_id : '',
+                            'department_id'                 => $row->department_id ? $row->department_id : '',
+                            'requester'                     => $row->requester ? $row->requester : '',
+                            'project_id'                    => $row->project()->exists() ? $row->project->id : '',
+                            'project_name'                  => $row->project()->exists() ? $row->project->name : '-',
+                            'buy_units'                     => $row->itemStock->item->arrBuyUnits(),
                         ];
                     }
                 }elseif($request->type == 'sj'){
@@ -729,13 +732,16 @@ class PurchaseOrderController extends Controller
 
                                 $tax = round(($request->arr_tax[$key] / 100) * $rowsubtotal,2);
                                 $wtax = round($bobot * str_replace(',','.',str_replace('.','',$request->wtax)),2);
-        
+                                
+                                $itemUnit = ItemUnit::find(intval($request->arr_unit[$key]));
                                 $querydetail = PurchaseOrderDetail::create([
                                     'purchase_order_id'             => $query->id,
                                     'purchase_request_detail_id'    => $request->arr_data ? ($request->arr_type[$key] == 'po' ? $request->arr_data[$key] : NULL) : NULL,
                                     'good_issue_detail_id'          => $request->arr_data ? ($request->arr_type[$key] == 'gi' ? $request->arr_data[$key] : NULL) : NULL,
                                     'item_id'                       => $request->arr_type[$key] == 'gi' ? CustomHelper::addNewItemService(intval($row)) : $row,
                                     'qty'                           => $qty,
+                                    'item_unit_id'                  => $itemUnit->id,
+                                    'qty_conversion'                => $itemUnit->conversion,
                                     'price'                         => $price,
                                     'percent_discount_1'            => $disc1,
                                     'percent_discount_2'            => $disc2,
@@ -891,7 +897,7 @@ class PurchaseOrderController extends Controller
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.($row->item_id ? $row->item->code.' - '.$row->item->name : $row->coa->name).'</td>
                 <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
-                <td class="center-align">'.($row->item_id ? $row->item->buyUnit->code : '-').'</td>
+                <td class="center-align">'.($row->item_id ? $row->itemUnit->unit->code : '-').'</td>
                 <td class="right-align">'.number_format($row->price,2,',','.').'</td>
                 <td class="center-align">'.number_format($row->percent_discount_1,2,',','.').'</td>
                 <td class="center-align">'.number_format($row->percent_discount_2,2,',','.').'</td>
@@ -987,9 +993,9 @@ class PurchaseOrderController extends Controller
                 'item_name'                         => $row->item_id ? $row->item->code.' - '.$row->item->name : '',
                 'coa_name'                          => $row->coa_id ? $row->coa->name : '',
                 'qty'                               => number_format($row->qty,3,',','.'),
-                'unit'                              => $row->item_id ? $row->item->buyUnit->code : '-',
-                'note'                              => $row->note,
-                'note2'                             => $row->note2,
+                'item_unit_id'                      => $row->item_id ? $row->item_unit_id : '-',
+                'note'                              => $row->note ? $row->note : '',
+                'note2'                             => $row->note2 ? $row->note2 : '',
                 'price'                             => number_format($row->price,2,',','.'),
                 'disc1'                             => number_format($row->percent_discount_1,2,',','.'),
                 'disc2'                             => number_format($row->percent_discount_2,2,',','.'),
@@ -1012,6 +1018,7 @@ class PurchaseOrderController extends Controller
                 'requester'                         => $row->requester ? $row->requester : '',
                 'project_id'                        => $row->purchaseRequestDetail()->exists() ? ($row->purchaseRequestDetail->project()->exists() ? $row->purchaseRequestDetail->project->id : '') : '',
                 'project_name'                      => $row->purchaseRequestDetail()->exists() ? ($row->purchaseRequestDetail->project()->exists() ? $row->purchaseRequestDetail->project->name : '-') : '-',
+                'buy_units'                         => $row->item_id ? $row->item->arrBuyUnits() : [],
             ];
         }
 
@@ -3021,7 +3028,7 @@ class PurchaseOrderController extends Controller
                 'item_id'           => $row->item_id,
                 'item_name'         => $row->item->code.' - '.$row->item->name,
                 'qty'               => number_format($row->qty,3,',','.'),
-                'unit'              => $row->item->buyUnit->code,
+                'unit'              => $row->item_id ? $row->itemUnit->unit->code : '-',
                 'qty_balance'       => number_format($row->getBalanceReceipt(),3,',','.'),
                 'qty_gr'            => number_format($row->qtyGR(),3,',','.'),
                 'closed'            => $row->status ? $row->status : '',
@@ -3133,7 +3140,7 @@ class PurchaseOrderController extends Controller
                     <td class="">'.$row->purchaseOrder->note.'</td>
                     <td class="center-align">'.$row->purchaseOrder->status().'</td>
                     <td class="">'.$row->item->code.' - '.$row->item->name.'</td>
-                    <td class="center-align">'.$row->item->buyUnit->code.'</td>
+                    <td class="center-align">'.$row->itemUnit->unit->code.'</td>
                     <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
                     <td class="right-align">'.number_format($row->qtyGR(),3,',','.').'</td>
                     <td class="right-align">'.number_format($row->getBalanceReceipt(),3,',','.').'</td>

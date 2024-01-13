@@ -100,7 +100,7 @@ class PurchaseDownPaymentController extends Controller
             foreach($row->purchaseOrderDetail as $key => $rowdetail){
                 $item_code = $rowdetail->item()->exists() ? $rowdetail->item->code : ($rowdetail->coa()->exists() ? $rowdetail->coa->code : '');
                 $item_name = $rowdetail->item()->exists() ? $rowdetail->item->name : ($rowdetail->coa()->exists() ? $rowdetail->coa->name : '');
-                $item_unit = $rowdetail->item()->exists() ? $rowdetail->item->buyUnit->code : '';
+                $item_unit = $rowdetail->item()->exists() ? $rowdetail->itemUnit->unit->code : '-';
                 $list_items .= '<li>'.$item_code.' - '.$item_name.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit.'</li>';
             }
 
@@ -113,7 +113,7 @@ class PurchaseDownPaymentController extends Controller
                 'delivery_date' => date('d/m/y',strtotime($row->delivery_date)),
                 'grandtotal'    => number_format($row->grandtotal,2,',','.'),
                 'list_items'    => $list_items,
-                'note'          => $row->note,
+                'note'          => $row->note ? $row->note : '',
             ];
         }
 
@@ -729,7 +729,7 @@ class PurchaseDownPaymentController extends Controller
         foreach($pdp->checklistDocumentList as $row){
             $arrChecklist[] = [
                 'id'    => $row->checklist_document_id,
-                'note'  => $row->note,
+                'note'  => $row->note ? $row->note : '',
             ];
         }
 
@@ -740,7 +740,7 @@ class PurchaseDownPaymentController extends Controller
             foreach($row->purchaseOrder->purchaseOrderDetail as $key => $rowdetail){
                 $item_code = $rowdetail->item()->exists() ? $rowdetail->item->code : ($rowdetail->coa()->exists() ? $rowdetail->coa->code : '');
                 $item_name = $rowdetail->item()->exists() ? $rowdetail->item->name : ($rowdetail->coa()->exists() ? $rowdetail->coa->name : '');
-                $item_unit = $rowdetail->item()->exists() ? $rowdetail->item->buyUnit->code : '';
+                $item_unit = $rowdetail->item()->exists() ? $rowdetail->itemUnit->unit->code : '-';
                 $list_items .= '<li>'.$item_code.' - '.$item_name.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit.'</li>';
             }
 
@@ -752,7 +752,7 @@ class PurchaseDownPaymentController extends Controller
                 'purchase_order_encrypt'    => CustomHelper::encrypt($row->purchaseOrder->code),
                 'post_date'                 => date('d/m/y',strtotime($row->purchaseOrder->post_date)),
                 'delivery_date'             => date('d/m/y',strtotime($row->purchaseOrder->delivery_date)),
-                'note'                      => $row->note,
+                'note'                      => $row->note ? $row->note : '',
                 'total'                     => number_format($row->purchaseOrder->grandtotal,2,',','.'),
                 'total_dp'                  => number_format($row->nominal,2,',','.'),
                 'list_items'                => $list_items,

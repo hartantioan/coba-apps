@@ -17,8 +17,9 @@ class ItemUnit extends Model
     protected $fillable = [
         'item_id',
         'unit_id',
+        'conversion',
         'is_sell_unit',
-        'is_purchase_unit',
+        'is_buy_unit',
     ];
 
     public function item(){

@@ -82,7 +82,7 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Sh
                     'item_code'         => $row->item->code,
                     'item'              => $row->item->name,
                     'qty'               => $row->qty,
-                    'unit'              => $row->item->buyUnit->code,
+                    'unit'              => $row->item_id ? $row->itemUnit->unit->code : '-',
                     'remarks'           => $row->note,
                     'free_text'         => $row->note2,
                     'type'              => $row->purchaseOrder->inventoryType(),

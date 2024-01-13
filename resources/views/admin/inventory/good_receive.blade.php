@@ -202,7 +202,7 @@
                                                     <th class="center">Item</th>
                                                     <th class="center">Stok Skrg</th>
                                                     <th class="center">Qty</th>
-                                                    <th class="center">Satuan UOM</th>
+                                                    <th class="center">Satuan Stock</th>
                                                     <th class="center">Harga</th>
                                                     <th class="center">Total</th>
                                                     <th class="center">Keterangan</th>
@@ -659,6 +659,7 @@
                 $('#shading' + val).append(` - `);
             }
         }else{
+            $("#arr_item" + val).empty();
             $('#tempPrice' + val).empty();
             $('#arr_stock' + val).text('-');
             $("#arr_warehouse" + val).append(`
@@ -864,7 +865,7 @@
                 </td>
             </tr>
         `);
-        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
+        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item_receive") }}');
         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
         $('#arr_place' + count).formSelect();
@@ -1121,7 +1122,7 @@
                         $('#arr_warehouse' + count).append(`
                             <option value="` + val.warehouse_id + `">` + val.warehouse_name + `</option>
                         `);
-                        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
+                        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item_receive") }}');
                         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
                         $('#arr_place' + count).val(val.place_id).formSelect();
                         $('#arr_department' + count).val(val.department_id).formSelect();

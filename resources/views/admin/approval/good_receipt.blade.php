@@ -222,7 +222,7 @@
                         <td class="center">{{ ($keydetail + 1) }}</td>
                         <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name }}</td>
                         <td class="center">{{ $rowdetail->qty }}</td>
-                        <td class="center">{{ $rowdetail->item->buyUnit->code }}</td>
+                        <td class="center">{{ $rowdetail->itemUnit->unit->code }}</td>
                         <td>{{ $rowdetail->note }}</td>
                         <td>{{ $rowdetail->note2 }}</td>
                         <td>{{ $rowdetail->remark }}</td>

@@ -18,6 +18,8 @@ class PurchaseRequestDetail extends Model
         'purchase_request_id',
         'item_id',
         'qty',
+        'item_unit_id',
+        'qty_conversion',
         'note',
         'note2',
         'required_date',
@@ -40,6 +42,11 @@ class PurchaseRequestDetail extends Model
     public function project()
     {
         return $this->belongsTo('App\Models\Project', 'project_id', 'id')->withTrashed();
+    }
+
+    public function itemUnit()
+    {
+        return $this->belongsTo('App\Models\ItemUnit', 'item_unit_id', 'id')->withTrashed();
     }
 
     public function purchaseRequest()

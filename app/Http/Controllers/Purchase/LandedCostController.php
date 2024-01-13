@@ -117,7 +117,7 @@ class LandedCostController extends Controller
                         'tax'           => number_format($row->tax,2,',','.'),
                         'wtax'          => number_format($row->wtax,2,',','.'),
                         'grandtotal'    => number_format($row->grandtotal,2,',','.'),
-                        'note'          => $row->note,
+                        'note'          => $row->note ? $row->note : '',
                         'landed_cost'   => $row->getLandedCostList()
                     ];
                 }
@@ -135,7 +135,7 @@ class LandedCostController extends Controller
                         'tax'           => number_format($row->tax,2,',','.'),
                         'wtax'          => number_format($row->wtax,2,',','.'),
                         'grandtotal'    => number_format($row->grandtotal,2,',','.'),
-                        'note'          => $row->note,
+                        'note'          => $row->note ? $row->note : '',
                         'landed_cost'   => $row->getLandedCostList()
                     ];
                 }
@@ -162,7 +162,7 @@ class LandedCostController extends Controller
                         'code_iti'          => $row->code,
                         'code_ito'          => $row->inventoryTransferOut->code,
                         'post_date'         => date('d/m/y',strtotime($row->post_date)),
-                        'note'              => $row->note,
+                        'note'              => $row->note ? $row->note : '',
                     ];
                 }
             }

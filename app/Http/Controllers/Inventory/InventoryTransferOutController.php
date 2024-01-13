@@ -579,7 +579,7 @@ class InventoryTransferOutController extends Controller
                 'item_name'     => $row->item->code.' - '.$row->item->name,
                 'qty'           => number_format($row->qty,3,',','.'),
                 'unit'          => $row->item->uomUnit->code,
-                'note'          => $row->note,
+                'note'          => $row->note ? $row->note : '',
                 'stock_list'    => $row->item->currentStock($this->dataplaces,$this->datawarehouses),
                 'area_id'       => $row->area_id ? $row->area_id : '',
                 'area_name'     => $row->area()->exists() ? $row->area->name : '',

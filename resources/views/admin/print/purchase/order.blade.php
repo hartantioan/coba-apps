@@ -190,7 +190,7 @@
 												<tr>
 													<td>{{ $rowdetail->item_id ? $rowdetail->item->code.' - '.$rowdetail->item->name : $rowdetail->coa->code.' - '.$rowdetail->coa->name }}</td>
 													<td>{{ number_format($rowdetail->qty,3,',','.') }}</td>
-													<td>{{ $rowdetail->item_id ? $rowdetail->item->buyUnit->code : '-' }}</td>
+													<td>{{ $rowdetail->item_id ? $rowdetail->itemUnit->unit->code : '-' }}</td>
 													<td>{{ $rowdetail->note }}</td>
 													<td align="right">{{ number_format($rowdetail->price,2,',','.') }}</td>
 													<td align="right">{{ number_format($rowdetail->percent_discount_1,2,',','.') }}</td>

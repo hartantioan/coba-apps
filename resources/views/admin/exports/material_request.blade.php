@@ -54,7 +54,7 @@
                     <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name }}</td>
                     <td>{{ number_format($rowdetail->qty,3,',','.') }}</td>
                     <td>{{ number_format($rowdetail->stock,3,',','.') }}</td>
-                    <td>{{ $rowdetail->item->buyUnit->code }}</td>
+                    <td>{{ $rowdetail->itemUnit->unit->code }}</td>
                     <td>{{ $rowdetail->note }}</td>
                     <td>{{ $rowdetail->note2 }}</td>
                     <td>{{ date('d/m/y',strtotime($rowdetail->required_date)) }}</td>

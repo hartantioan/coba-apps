@@ -217,7 +217,7 @@
                         <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                         <td class="right-align">{{ number_format($row->qty,3,',','.') }}</td>
                         <td class="right-align">{{ number_format($row->stock,3,',','.') }}</td>
-                        <td class="center-align">{{ $row->item->buyUnit->code }}</td>
+                        <td class="center-align">{{ $row->itemUnit->unit->code }}</td>
                         <td class="indigo-text center-align">{{ date('d/m/y',strtotime($row->required_date)) }}</td>
                         <td class="center-align">{{ $row->place->code }}</td>
                         <td class="center-align">{{ $row->warehouse->name }}</td>

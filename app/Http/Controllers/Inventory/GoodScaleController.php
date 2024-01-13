@@ -18,6 +18,7 @@ use App\Models\User;
 use App\Models\Place;
 use App\Models\Department;
 use App\Helpers\CustomHelper;
+use App\Models\ItemUnit;
 use App\Models\Menu;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -269,7 +270,7 @@ class GoodScaleController extends Controller
                             'item_id'                   => $row->item_id,
                             'item_name'                 => $row->item->code.' - '.$row->item->name,
                             'qty'                       => number_format($row->getBalanceReceipt(),3,',','.'),
-                            'unit'                      => $row->item->buyUnit->code,
+                            'unit'                      => $row->itemUnit->unit->code,
                             'place_id'                  => $row->place_id,
                             'place_name'                => $row->place->code,
                             'warehouse_id'              => $row->warehouse_id,
@@ -440,6 +441,7 @@ class GoodScaleController extends Controller
                 if($query) {
 
                     foreach($request->arr_purchase as $key => $row){
+                        $itemUnit = ItemUnit::find(intval($request->arr_satuan[$key]));
                         $balance = str_replace(',','.',str_replace('.','',$request->arr_qty_in[$key])) - str_replace(',','.',str_replace('.','',$request->arr_qty_out[$key]));
                         GoodScaleDetail::create([
                             'good_scale_id'             => $query->id,
@@ -448,6 +450,8 @@ class GoodScaleController extends Controller
                             'qty_in'                    => str_replace(',','.',str_replace('.','',$request->arr_qty_in[$key])),
                             'qty_out'                   => str_replace(',','.',str_replace('.','',$request->arr_qty_out[$key])),
                             'qty_balance'               => $balance,
+                            'item_unit_id'              => $request->arr_satuan[$key],
+                            'qty_conversion'            => $itemUnit->conversion,
                             'note'                      => $request->arr_note[$key],
                             'note2'                     => $request->arr_note2[$key],
                             'place_id'                  => $request->arr_place[$key],
@@ -518,7 +522,7 @@ class GoodScaleController extends Controller
                 <td class="center-align">'.number_format($rowdetail->qty_in,3,',','.').'</td>
                 <td class="center-align">'.number_format($rowdetail->qty_out,3,',','.').'</td>
                 <td class="center-align">'.number_format($rowdetail->qty_balance,3,',','.').'</td>
-                <td class="center-align">'.$rowdetail->item->buyUnit->code.'</td>
+                <td class="center-align">'.$rowdetail->itemUnit->unit->code.'</td>
                 <td class="center-align">'.$rowdetail->note.'</td>
                 <td class="center-align">'.$rowdetail->note2.'</td>
                 <td class="center-align">'.$rowdetail->place->code.'</td>
@@ -610,7 +614,7 @@ class GoodScaleController extends Controller
                 'qty_po'                    => $row->purchase_order_detail_id ? number_format($row->purchaseOrderDetail->getBalanceReceipt(),3,',','.') : '-',
                 'qty_in'                    => number_format($row->qty_in,3,',','.'),
                 'qty_out'                   => number_format($row->qty_out,3,',','.'),
-                'unit'                      => $row->item->buyUnit->code,
+                'unit'                      => $row->itemUnit->unit->code,
                 'place_id'                  => $row->place_id,
                 'place_name'                => $row->place->code.' - '.$row->place->code,
                 'warehouse_id'              => $row->warehouse_id,
@@ -721,7 +725,7 @@ class GoodScaleController extends Controller
                 'qty_in'                    => number_format($row->qty_in,3,',','.'),
                 'qty_out'                   => number_format($row->qty_out,3,',','.'),
                 'qty_balance'               => number_format($row->qty_balance,3,',','.'),
-                'unit'                      => $row->item->buyUnit->code,
+                'item_unit_id'              => $row->item_unit_id,
                 'place_id'                  => $row->place_id,
                 'place_name'                => $row->place->code,
                 'warehouse_id'              => $row->warehouse_id,
@@ -729,6 +733,7 @@ class GoodScaleController extends Controller
                 'list_warehouse'            => $row->item->warehouseList(),
                 'note'                      => $row->note,
                 'note2'                     => $row->note2,
+                'buy_units'                 => $row->item->arrBuyUnits(),
             ];
         }
 

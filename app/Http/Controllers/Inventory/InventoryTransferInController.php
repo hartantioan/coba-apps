@@ -479,7 +479,7 @@ class InventoryTransferInController extends Controller
                 'origin'    => $row->itemStock->place->name.' - '.$row->itemStock->warehouse->name,
                 'qty'       => number_format($row->qty,3,',','.'),
                 'unit'      => $row->item->uomUnit->code,
-                'note'      => $row->note,
+                'note'      => $row->note ? $row->note : '',
             ];
         }
 

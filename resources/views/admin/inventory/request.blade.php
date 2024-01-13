@@ -168,7 +168,7 @@
                                             <thead>
                                                 <tr>
                                                     <th class="center">Item</th>
-                                                    <th class="center">Stok (Satuan UoM)</th>
+                                                    <th class="center">Stok (Satuan Stock)</th>
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan PO</th>
                                                     <th class="center">Keterangan 1</th>
@@ -196,7 +196,9 @@
                                                         <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="0" onkeyup="formatRupiahNoMinus(this)">
                                                     </td>
                                                     <td class="center">
-                                                        <span id="arr_satuan0">-</span>
+                                                        <select class="browser-default" id="arr_satuan0" name="arr_satuan[]" required>
+                                                            <option value="">--Silahkan pilih item--</option>    
+                                                        </select>
                                                     </td>
                                                     <td>
                                                         <input name="arr_note[]" type="text" placeholder="Keterangan barang 1...">
@@ -996,7 +998,7 @@
         }).then(function (willDelete) {
             if (willDelete) {
                 
-                var formData = new FormData($('#form_data')[0]), passedPlaceWarehouse = true;
+                var formData = new FormData($('#form_data')[0]), passedPlaceWarehouse = true, passedUnit = true;
 
                 formData.delete("arr_line[]");
                 formData.delete("arr_machine[]");
@@ -1032,75 +1034,89 @@
                     }
                 });
 
-                if(passedPlaceWarehouse){
+                $('select[name^="arr_satuan[]"]').each(function(index){
+                    if(!$(this).val()){
+                        passedUnit = false;
+                    }
+                });
 
-                    $.ajax({
-                        url: '{{ Request::url() }}/create',
-                        type: 'POST',
-                        dataType: 'JSON',
-                        data: formData,
-                        contentType: false,
-                        processData: false,
-                        cache: true,
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        beforeSend: function() {
-                            $('#validation_alert').hide();
-                            $('#validation_alert').html('');
-                            loadingOpen('.modal-content');
-                        },
-                        success: function(response) {
-                            loadingClose('.modal-content');
-                            if(response.status == 200) {
-                                success();
-                                M.toast({
-                                    html: response.message
-                                });
-                            } else if(response.status == 422) {
-                                $('#validation_alert').show();
-                                $('.modal-content').scrollTop(0);
-                                
-                                swal({
-                                    title: 'Ups! Validation',
-                                    text: 'Check your form.',
-                                    icon: 'warning'
-                                });
+                if(passedUnit){
+                    if(passedPlaceWarehouse){
 
-                                $.each(response.error, function(i, val) {
-                                    $.each(val, function(i, val) {
-                                        $('#validation_alert').append(`
-                                            <div class="card-alert card red">
-                                                <div class="card-content white-text">
-                                                    <p>` + val + `</p>
-                                                </div>
-                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                    <span aria-hidden="true">×</span>
-                                                </button>
-                                            </div>
-                                        `);
+                        $.ajax({
+                            url: '{{ Request::url() }}/create',
+                            type: 'POST',
+                            dataType: 'JSON',
+                            data: formData,
+                            contentType: false,
+                            processData: false,
+                            cache: true,
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            beforeSend: function() {
+                                $('#validation_alert').hide();
+                                $('#validation_alert').html('');
+                                loadingOpen('.modal-content');
+                            },
+                            success: function(response) {
+                                loadingClose('.modal-content');
+                                if(response.status == 200) {
+                                    success();
+                                    M.toast({
+                                        html: response.message
                                     });
-                                });
-                            } else {
-                                M.toast({
-                                    html: response.message
+                                } else if(response.status == 422) {
+                                    $('#validation_alert').show();
+                                    $('.modal-content').scrollTop(0);
+                                    
+                                    swal({
+                                        title: 'Ups! Validation',
+                                        text: 'Check your form.',
+                                        icon: 'warning'
+                                    });
+
+                                    $.each(response.error, function(i, val) {
+                                        $.each(val, function(i, val) {
+                                            $('#validation_alert').append(`
+                                                <div class="card-alert card red">
+                                                    <div class="card-content white-text">
+                                                        <p>` + val + `</p>
+                                                    </div>
+                                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                        <span aria-hidden="true">×</span>
+                                                    </button>
+                                                </div>
+                                            `);
+                                        });
+                                    });
+                                } else {
+                                    M.toast({
+                                        html: response.message
+                                    });
+                                }
+                            },
+                            error: function() {
+                                $('.modal-content').scrollTop(0);
+                                loadingClose('.modal-content');
+                                swal({
+                                    title: 'Ups!',
+                                    text: 'Check your internet connection.',
+                                    icon: 'error'
                                 });
                             }
-                        },
-                        error: function() {
-                            $('.modal-content').scrollTop(0);
-                            loadingClose('.modal-content');
-                            swal({
-                                title: 'Ups!',
-                                text: 'Check your internet connection.',
-                                icon: 'error'
-                            });
-                        }
-                    });
+                        });
+                    }else{
+                        swal({
+                            title: 'Ups!',
+                            text: 'Salah satu item tidak / belum memiliki gudang atau plant.',
+                            icon: 'error'
+                        });
+                    }
                 }else{
                     swal({
                         title: 'Ups!',
-                        text: 'Salah satu item tidak / belum memiliki gudang atau plant.',
+                        text: 'Salah satu item belum diatur satuannya.',
                         icon: 'error'
                     });
                 }
@@ -1156,7 +1172,9 @@
                                     <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinusNoMinus(this)">
                                 </td>
                                 <td class="center">
-                                    <span id="arr_satuan` + count + `">` + val.unit + `</span>
+                                    <select class="browser-default" id="arr_satuan` + count + `" name="arr_satuan[]" required>
+                                        <option value="">--Silahkan pilih item--</option>    
+                                    </select>
                                 </td>
                                 <td>
                                     <input name="arr_note[]" type="text" placeholder="Keterangan barang 1..." value="` + val.note + `">
@@ -1258,10 +1276,11 @@
                         $('#arr_warehouse' + count).val(val.warehouse_id);
 
                         $('#arr_stock' + count).empty();
+                        alert(val.stock_list.length);
                         if(val.stock_list.length > 0){
                             let html = `<div>`;
                             $.each(val.stock_list, function(i, value) {
-                                html += value.warehouse + ` Qty : ` + value.qty;
+                                html += value.warehouse + ` Qty Stock : ` + value.qty;
                             });
                             html += `</div>`;
                             $('#arr_stock' + count).append(html);
@@ -1269,6 +1288,15 @@
                             $('#arr_stock' + count).append(`
                                 -
                             `);
+                        }
+                        
+                        if(val.buy_units.length > 0){
+                            $('#arr_satuan' + count).empty();
+                            $.each(val.buy_units, function(i, value) {
+                                $('#arr_satuan' + count).append(`
+                                    <option value="` + value.id + `" ` + (value.id == val.item_unit_id ? 'selected' : '') + `>` + value.code + ` Konv. : ` + value.conversion + `</option>
+                                `);
+                            });
                         }
                     });
                 }
@@ -1341,7 +1369,9 @@
                                             <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinusNoMinus(this)">
                                         </td>
                                         <td class="center">
-                                            <span id="arr_satuan` + count + `">` + val.unit + `</span>
+                                            <select class="browser-default" id="arr_satuan` + count + `" name="arr_satuan[]" required>
+                                                <option value="">--Silahkan pilih item--</option>    
+                                            </select>
                                         </td>
                                         <td>
                                             <input name="arr_note[]" type="text" placeholder="Keterangan barang 1..." value="` + val.note + `">
@@ -1446,7 +1476,7 @@
                                 if(val.stock_list.length > 0){
                                     let html = `<div>`;
                                     $.each(val.stock_list, function(i, value) {
-                                        html += value.warehouse + ` Qty : ` + value.qty;
+                                        html += value.warehouse + ` Qty Stock : ` + value.qty;
                                     });
                                     html += `</div>`;
                                     $('#arr_stock' + count).append(html);
@@ -1454,6 +1484,15 @@
                                     $('#arr_stock' + count).append(`
                                         -
                                     `);
+                                }
+
+                                if(val.buy_units.length > 0){
+                                    $('#arr_satuan' + count).empty();
+                                    $.each(val.buy_units, function(i, value) {
+                                        $('#arr_satuan' + count).append(`
+                                            <option value="` + value.id + `" ` + (value.id == val.item_unit_id ? 'selected' : '') + `>` + value.code  + ` Konv. : ` + value.conversion + `</option>
+                                        `);
+                                    });
                                 }
                             });
                         }
@@ -1481,8 +1520,6 @@
     function getRowUnit(val){
         $("#arr_warehouse" + val).empty();
         if($("#arr_item" + val).val()){
-            $('#arr_satuan' + val).text($("#arr_item" + val).select2('data')[0].buy_unit);
-
             if($("#arr_item" + val).select2('data')[0].list_warehouse.length > 0){
                 $.each($("#arr_item" + val).select2('data')[0].list_warehouse, function(i, value) {
                     $('#arr_warehouse' + val).append(`
@@ -1499,7 +1536,7 @@
             if($("#arr_item" + val).select2('data')[0].stock_list.length > 0){
                 let html = `<div>`;
                 $.each($("#arr_item" + val).select2('data')[0].stock_list, function(i, value) {
-                    html += value.warehouse + ` Qty : ` + value.qty;
+                    html += value.warehouse + ` Qty Stock: ` + value.qty;
                 });
                 html += `</div>`;
                 $('#arr_stock' + val).append(html);
@@ -1508,8 +1545,24 @@
                     -
                 `);
             }
+
+            $('#arr_satuan' + val).empty();
+            if($("#arr_item" + val).select2('data')[0].buy_units.length > 0){
+                $.each($("#arr_item" + val).select2('data')[0].buy_units, function(i, value) {
+                    $('#arr_satuan' + val).append(`
+                        <option value="` + value.id + `">` + value.code + ` Konv. : ` + value.conversion + `</option>
+                    `);
+                });
+            }else{
+                $("#arr_satuan" + val).append(`
+                    <option value="">--Satuan tidak diatur di master data Item--</option>
+                `);
+            }
         }else{
-            $('#arr_satuan' + val).text('-');
+            $("#arr_item" + val).empty();
+            $("#arr_satuan" + val).empty().append(`
+                <option value="">--Silahkan pilih item--</option>
+            `);
             $("#arr_warehouse" + val).append(`
                 <option value="">--Silahkan pilih item--</option>
             `);
@@ -1615,7 +1668,9 @@
                     <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="0" onkeyup="formatRupiahNoMinus(this)">
                 </td>
                 <td class="center">
-                    <span id="arr_satuan` + count + `">-</span>
+                    <select class="browser-default" id="arr_satuan` + count + `" name="arr_satuan[]" required>
+                        <option value="">--Silahkan pilih item--</option>    
+                    </select>
                 </td>
                 <td>
                     <input name="arr_note[]" type="text" placeholder="Keterangan barang 1...">

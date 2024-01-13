@@ -181,7 +181,7 @@ class FundRequestController extends Controller
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->user->name,
-                    $val->place->name.' - '.$val->place->company->name,
+                    $val->place->code,
                     $val->department->name,
                     $val->account->name,
                     $val->type(),

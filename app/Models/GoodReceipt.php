@@ -191,7 +191,7 @@ class GoodReceipt extends Model
         $html = '<ol>';
 
         foreach($this->goodReceiptDetail as $row){
-            $html .= '<li>'.$row->item->code.' - '.$row->item->name.' Qty. '.$row->qty.' '.$row->item->buyUnit->code.'</li>';
+            $html .= '<li>'.$row->item->code.' - '.$row->item->name.' Qty. '.$row->qty.' '.$row->itemUnit->unit->code.'</li>';
         }
 
         $html .= '</ol>';

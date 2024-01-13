@@ -400,7 +400,7 @@ class PaymentRequestController extends Controller
                         'balance'       => number_format($row->grandtotal,2,',','.'),
                         'memo'          => number_format($memo,2,',','.'),
                         'final'         => $row->currency->symbol.' '.number_format($final,2,',','.'),
-                        'note'          => $row->note,
+                        'note'          => $row->note ? $row->note : '',
                     ];
                 }
             }
@@ -426,7 +426,7 @@ class PaymentRequestController extends Controller
                         'balance'       => number_format($row->grandtotal,2,',','.'),
                         'memo'          => number_format($memo,2,',','.'),
                         'final'         => $row->currency->symbol.' '.number_format($final,2,',','.'),
-                        'note'          => $row->note,
+                        'note'          => $row->note ? $row->note : '',
                     ];
                 }
             }
@@ -452,7 +452,7 @@ class PaymentRequestController extends Controller
                         'balance'       => number_format($row->balance,2,',','.'),
                         'memo'          => number_format($memo,2,',','.'),
                         'final'         => $row->currency()->symbol.' '.number_format($final,2,',','.'),
-                        'note'          => $row->note,
+                        'note'          => $row->note ? $row->note : '',
                     ];
                 }
             }
@@ -478,7 +478,7 @@ class PaymentRequestController extends Controller
                         'balance'       => number_format($row->grandtotal,2,',','.'),
                         'memo'          => number_format($memo,2,',','.'),
                         'final'         => 'IDR '.number_format($final,2,',','.'),
-                        'note'          => $row->note,
+                        'note'          => $row->note ? $row->note : '',
                     ];
                 }
             }
@@ -557,7 +557,7 @@ class PaymentRequestController extends Controller
                                 'memo'          => number_format(0,2,',','.'),
                                 'currency_id'   => $data->currency_id,
                                 'currency_rate' => number_format($data->currency_rate,2,',','.'),
-                                'note'          => $data->note,
+                                'note'          => $data->note ? $data->note : '',
                                 'name_account'  => $data->name_account,
                                 'no_account'    => $data->no_account,
                                 'bank_account'  => $data->bank_account,
@@ -591,7 +591,7 @@ class PaymentRequestController extends Controller
                                 'memo'          => number_format($data->totalMemo(),2,',','.'),
                                 'currency_id'   => $data->currency_id,
                                 'currency_rate' => number_format($data->currency_rate,2,',','.'),
-                                'note'          => $data->note,
+                                'note'          => $data->note ? $data->note : '',
                                 'name_account'  => '',
                                 'no_account'    => '',
                                 'bank_account'  => '',
@@ -659,7 +659,7 @@ class PaymentRequestController extends Controller
                                 'memo'          => number_format($data->totalUsed(),2,',','.'),
                                 'currency_id'   => 1,
                                 'currency_rate' => number_format(1,2,',','.'),
-                                'note'          => $data->note,
+                                'note'          => $data->note ? $data->note : '',
                                 'name_account'  => '',
                                 'no_account'    => '',
                                 'bank_account'  => '',
@@ -1163,7 +1163,7 @@ class PaymentRequestController extends Controller
                 'wtax'          => number_format($row->lookable->wtax,3,',','.'),
                 'grandtotal'    => number_format($row->lookable->grandtotal,3,',','.'),
                 'nominal'       => number_format($row->nominal,3,',','.'),
-                'note'          => $row->note,
+                'note'          => $row->note ? $row->note : '',
                 'cost_distribution_id'        => $row->cost_distribution_id ? $row->cost_distribution_id : '',
                 'cost_distribution_name'      => $row->cost_distribution_id ? $row->costDistribution->code.' - '.$row->costDistribution->name : '',
                 'coa_id'        => $row->coa_id,
@@ -1895,7 +1895,7 @@ class PaymentRequestController extends Controller
                         'payment'                   => $cek->payment,
                         'balance'                   => $cek->balance,
                         'document'                  => $request->file('documentPay') ? $request->file('documentPay')->store('public/outgoing_payments') : NULL,
-                        'note'                      => $request->notePay,
+                        'note'                      => $request->notePay ? $request->notePay : '',
                         'status'                    => '3',
                     ]);
 

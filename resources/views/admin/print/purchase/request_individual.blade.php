@@ -260,7 +260,7 @@
                                 <td align="center" rowspan="2">{{ $key+1 }}.</td>
                                 <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                                 <td align="right">{{ $row->qty }}</td>
-                                <td align="center">{{ $row->item->buyUnit->code }}</td>
+                                <td align="center">{{ $row->itemUnit->unit->code }}</td>
                                 <td>{{ $row->note }}</td>
                                 <td>{{ $row->note2 }}</td>
                                 <td align="center">{{ date('d/m/y',strtotime($row->required_date)) }}</td>

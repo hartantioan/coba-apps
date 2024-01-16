@@ -116,7 +116,7 @@ class PurchaseInvoiceController extends Controller
                         if($top < $rowdetail->purchaseOrderDetail->purchaseOrder->payment_term){
                             $top = $rowdetail->purchaseOrderDetail->purchaseOrder->payment_term;
                         }
-                        $info .= 'Diterima '.$rowdetail->qty.' '.$rowdetail->item->buyUnit->code.' dari '.$rowdetail->purchaseOrderDetail->qty.' '.$rowdetail->item->buyUnit->code;
+                        $info .= 'Diterima '.$rowdetail->qty.' '.$rowdetail->itemUnit->unit->code.' dari '.$rowdetail->purchaseOrderDetail->qty.' '.$rowdetail->itemUnit->unit->code;
                     }
                     foreach($datagr->goodReceiptDetail as $rowdetail){
                         if($rowdetail->balanceInvoice() > 0){
@@ -128,7 +128,7 @@ class PurchaseInvoiceController extends Controller
                                 'qty_returned'  => number_format($rowdetail->qtyReturn(),3,',','.'),
                                 'qty_balance'   => number_format(($rowdetail->qty - $rowdetail->qtyReturn()),3,',','.'),
                                 'price'         => number_format($rowdetail->purchaseOrderDetail->price,2,',','.'),
-                                'buy_unit'      => $rowdetail->item->buyUnit->code,
+                                'buy_unit'      => $rowdetail->itemUnit->unit->code,
                                 'rawcode'       => $datagr->code,
                                 'post_date'     => date('d/m/y',strtotime($datagr->post_date)),
                                 'due_date'      => date('d/m/y',strtotime($datagr->due_date)),
@@ -137,8 +137,8 @@ class PurchaseInvoiceController extends Controller
                                 'wtax'          => number_format($rowdetail->wtax,2,',','.'),
                                 'grandtotal'    => number_format($rowdetail->grandtotal,2,',','.'),
                                 'info'          => $info,
-                                'note'          => $rowdetail->note,
-                                'note2'         => $rowdetail->note2,
+                                'note'          => $rowdetail->note ? $rowdetail->note : '',
+                                'note2'         => $rowdetail->note2 ? $rowdetail->note2 : '',
                                 'top'           => $top,
                                 'delivery_no'   => $datagr->delivery_no,
                                 'purchase_no'   => $rowdetail->purchaseOrderDetail->purchaseOrder->code,
@@ -183,7 +183,7 @@ class PurchaseInvoiceController extends Controller
                                 'wtax'          => number_format($rowdetail->wtax,2,',','.'),
                                 'grandtotal'    => number_format($rowdetail->grandtotal,2,',','.'),
                                 'info'          => $datalc->code,
-                                'note'          => $datalc->note,
+                                'note'          => $datalc->note ? $datalc->note : '',
                                 'note2'         => '',
                                 'top'           => 0,
                                 'delivery_no'   => $datalc->getListDeliveryNo(),
@@ -221,7 +221,7 @@ class PurchaseInvoiceController extends Controller
                                 'qty_returned'  => 0,
                                 'qty_balance'   => number_format($rowdetail->qty,3,',','.'),
                                 'price'         => number_format($arrTotal['total'] / $rowdetail->qty,2,',','.'),
-                                'buy_unit'      => $rowdetail->item_id ? $rowdetail->item->buyUnit->code : '-',
+                                'buy_unit'      => $rowdetail->item_id ? $rowdetail->itemUnit->unit->code : '-',
                                 'rawcode'       => $datapo->code,
                                 'post_date'     => date('d/m/y',strtotime($datapo->post_date)),
                                 'due_date'      => date('d/m/y',strtotime($datapo->post_date)),
@@ -229,9 +229,9 @@ class PurchaseInvoiceController extends Controller
                                 'tax'           => number_format($arrTotal['tax'],2,',','.'),
                                 'wtax'          => number_format($arrTotal['wtax'],2,',','.'),
                                 'grandtotal'    => number_format($arrTotal['grandtotal'],2,',','.'),
-                                'info'          => $rowdetail->note,
-                                'note'          => $rowdetail->note,
-                                'note2'         => $rowdetail->note2,
+                                'info'          => $rowdetail->note ? $rowdetail->note : '',
+                                'note'          => $rowdetail->note ? $rowdetail->note : '',
+                                'note2'         => $rowdetail->note2 ? $rowdetail->note2 : '',
                                 'top'           => $datapo->payment_term,
                                 'delivery_no'   => '-',
                                 'purchase_no'   => $datapo->code,
@@ -376,7 +376,7 @@ class PurchaseInvoiceController extends Controller
                             'qty_returned'  => 0,
                             'qty_balance'   => number_format($rowdetail->qty,3,',','.'),
                             'price'         => number_format($arrTotal['total'] / $rowdetail->qty,2,',','.'),
-                            'buy_unit'      => $rowdetail->item_id ? $rowdetail->item->buyUnit->code : '-',
+                            'buy_unit'      => $rowdetail->item_id ? $rowdetail->itemUnit->unit->code : '-',
                             'rawcode'       => $datapo->code,
                             'post_date'     => date('d/m/y',strtotime($datapo->post_date)),
                             'due_date'      => date('d/m/y',strtotime($datapo->post_date)),
@@ -384,9 +384,9 @@ class PurchaseInvoiceController extends Controller
                             'tax'           => number_format($arrTotal['tax'],2,',','.'),
                             'wtax'          => number_format($arrTotal['wtax'],2,',','.'),
                             'grandtotal'    => number_format($arrTotal['grandtotal'],2,',','.'),
-                            'info'          => $rowdetail->note,
-                            'note'          => $rowdetail->note,
-                            'note2'         => $rowdetail->note2,
+                            'info'          => $rowdetail->note ? $rowdetail->note : '',
+                            'note'          => $rowdetail->note ? $rowdetail->note : '',
+                            'note2'         => $rowdetail->note2 ? $rowdetail->note2 : '',
                             'top'           => $datapo->payment_term,
                             'delivery_no'   => '-',
                             'purchase_no'   => $datapo->code,
@@ -416,7 +416,7 @@ class PurchaseInvoiceController extends Controller
                     if($top < $rowdetail->purchaseOrderDetail->purchaseOrder->payment_term){
                         $top = $rowdetail->purchaseOrderDetail->purchaseOrder->payment_term;
                     }
-                    $info .= 'Diterima '.$rowdetail->qty.' '.$rowdetail->item->buyUnit->code.' dari '.$rowdetail->purchaseOrderDetail->qty.' '.$rowdetail->item->buyUnit->code;
+                    $info .= 'Diterima '.$rowdetail->qty.' '.$rowdetail->itemUnit->unit->code.' dari '.$rowdetail->purchaseOrderDetail->qty.' '.$rowdetail->itemUnit->unit->code;
                 }
                 foreach($datagr->goodReceiptDetail as $rowdetail){
                     if($rowdetail->balanceInvoice() > 0){
@@ -429,7 +429,7 @@ class PurchaseInvoiceController extends Controller
                             'qty_returned'  => number_format($rowdetail->qtyReturn(),3,',','.'),
                             'qty_balance'   => number_format(($rowdetail->qty - $rowdetail->qtyReturn()),3,',','.'),
                             'price'         => number_format($price,2,',','.'),
-                            'buy_unit'      => $rowdetail->item->buyUnit->code,
+                            'buy_unit'      => $rowdetail->itemUnit->unit->code,
                             'rawcode'       => $datagr->code,
                             'post_date'     => date('d/m/y',strtotime($datagr->post_date)),
                             'due_date'      => '-',
@@ -438,8 +438,8 @@ class PurchaseInvoiceController extends Controller
                             'wtax'          => number_format($rowdetail->wtax,2,',','.'),
                             'grandtotal'    => number_format($rowdetail->grandtotal,2,',','.'),
                             'info'          => $info,
-                            'note'          => $rowdetail->note,
-                            'note2'         => $rowdetail->note2,
+                            'note'          => $rowdetail->note ? $rowdetail->note : '',
+                            'note2'         => $rowdetail->note2 ? $rowdetail->note2 : '',
                             'top'           => $top,
                             'delivery_no'   => $datagr->delivery_no,
                             'purchase_no'   => $rowdetail->purchaseOrderDetail->purchaseOrder->code,
@@ -483,7 +483,7 @@ class PurchaseInvoiceController extends Controller
                             'wtax'          => number_format($rowdetail->wtax,2,',','.'),
                             'grandtotal'    => number_format($rowdetail->grandtotal,2,',','.'),
                             'info'          => $datalc->code,
-                            'note'          => $datalc->note,
+                            'note'          => $datalc->note ? $datalc->note : '',
                             'note2'         => '',
                             'top'           => 0,
                             'delivery_no'   => $datalc->getListDeliveryNo(),
@@ -1428,9 +1428,9 @@ class PurchaseInvoiceController extends Controller
                 'tax'           => number_format($row->tax,2,',','.'),
                 'wtax'          => number_format($row->wtax,2,',','.'),
                 'grandtotal'    => number_format($row->grandtotal,2,',','.'),
-                'info'          => $row->note,
-                'note'          => $row->note,
-                'note2'         => $row->note2,
+                'info'          => $row->note ? $row->note : '',
+                'note'          => $row->note ? $row->note : '',
+                'note2'         => $row->note2 ? $row->note2 : '',
                 'top'           => $row->getTop(),
                 'delivery_no'   => $row->getDeliveryCode(),
                 'purchase_no'   => $row->getPurchaseCode(),

@@ -1013,7 +1013,7 @@ class ClosingJournalController extends Controller
                     $arrError[] = [
                         'date'      => date('d/m/y',strtotime($detail->journal->post_date)),
                         'code'      => $detail->journal->code,
-                        'note'      => $detail->journal->note.' - '.$detail->note,
+                        'note'      => ($detail->journal->note ? $detail->journal->note : '').' - '.($detail->note ? $detail->note : ''),
                         'balance'   => number_format($balance,2,',','.'),
                     ];
                 }
@@ -1067,7 +1067,7 @@ class ClosingJournalController extends Controller
                     $arrError[] = [
                         'date'      => date('d/m/y',strtotime($detail->journal->post_date)),
                         'code'      => $detail->journal->code,
-                        'note'      => $detail->journal->note.' - '.$detail->note,
+                        'note'      => ($detail->journal->note ? $detail->journal->note : '').' - '.($detail->note ? $detail->note : ''),
                         'balance'   => number_format($balance,2,',','.'),
                     ];
                 }
@@ -1118,7 +1118,7 @@ class ClosingJournalController extends Controller
                     'warehouse_code'    => $row->warehouse->code,
                     'date'              => date('d/m/y',strtotime($row->date)),
                     'code'              => $row->lookable->code,
-                    'note'              => $row->lookable->note,
+                    'note'              => $row->lookable->note ? $row->lookable->note : '',
                     'balance'           => number_format($row->qty_final,2,',','.'),
                 ];
             }

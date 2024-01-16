@@ -244,6 +244,9 @@ Route::prefix('admin')->group(function () {
                 Route::get('province', [Select2Controller::class, 'province']);
                 Route::get('country', [Select2Controller::class, 'country']);
                 Route::get('item', [Select2Controller::class, 'item']);
+                Route::get('item_receive', [Select2Controller::class, 'itemReceive']);
+                Route::get('item_issue', [Select2Controller::class, 'itemIssue']);
+                Route::get('item_revaluation', [Select2Controller::class, 'itemRevaluation']);
                 Route::get('purchase_item', [Select2Controller::class, 'purchaseItem']);
                 Route::get('sales_item', [Select2Controller::class, 'salesItem']);
                 Route::get('coa', [Select2Controller::class, 'coa']);
@@ -255,7 +258,6 @@ Route::prefix('admin')->group(function () {
                 Route::get('customer', [Select2Controller::class, 'customer']);
                 Route::get('employee_customer', [Select2Controller::class, 'employeeCustomer']);
                 Route::get('warehouse', [Select2Controller::class, 'warehouse']);
-                Route::get('asset_item', [Select2Controller::class, 'assetItem']);
                 Route::get('purchase_request', [Select2Controller::class, 'purchaseRequest']);
                 Route::get('good_issue', [Select2Controller::class, 'goodIssue']);
                 Route::get('good_issue_return', [Select2Controller::class, 'goodIssueReturn']);

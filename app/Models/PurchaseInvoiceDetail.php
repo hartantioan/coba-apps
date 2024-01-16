@@ -159,8 +159,8 @@ class PurchaseInvoiceDetail extends Model
 
     public function getUnitCode(){
         $code = match ($this->lookable_type) {
-            'good_receipt_details'      => $this->lookable->item->buyUnit->code,
-            'purchase_order_details'    => $this->lookable->item_id ? $this->lookable->item->buyUnit->code : '-',
+            'good_receipt_details'      => $this->lookable->itemUnit->unit->code,
+            'purchase_order_details'    => $this->lookable->item_id ? $this->lookable->itemUnit->unit->code : '-',
             default                     => '-',
         };
 

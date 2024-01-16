@@ -78,7 +78,7 @@ class ExportPurchaseRequest implements FromCollection, WithTitle, WithHeadings, 
                 'item_code'         => $row->item->code,
                 'item'              => $row->item->name,
                 'qty'               => $row->qty,
-                'unit'              => $row->item->buyUnit->code,
+                'unit'              => $row->itemUnit->unit->code,
                 'remarks'           => $row->note,
                 'free_text'         => $row->note2,
             ];

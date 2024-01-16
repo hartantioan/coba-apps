@@ -266,7 +266,7 @@
                                                     <th class="center">No. Invoice Vendor</th>
                                                     <th class="center">Tgl.Post</th>
                                                     <th class="center">Keterangan</th>
-                                                    <th class="center">Edit Qty PO</th>
+                                                    <th class="center">Edit Qty</th>
                                                     <th class="center">Edit Nominal</th>
                                                     <th class="center">Total</th>
                                                     <th class="center">PPN</th>

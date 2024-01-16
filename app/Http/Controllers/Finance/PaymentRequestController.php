@@ -400,7 +400,7 @@ class PaymentRequestController extends Controller
                         'balance'       => number_format($row->grandtotal,2,',','.'),
                         'memo'          => number_format($memo,2,',','.'),
                         'final'         => $row->currency->symbol.' '.number_format($final,2,',','.'),
-                        'note'          => $row->note,
+                        'note'          => $row->note ? $row->note : '',
                     ];
                 }
             }
@@ -426,7 +426,7 @@ class PaymentRequestController extends Controller
                         'balance'       => number_format($row->grandtotal,2,',','.'),
                         'memo'          => number_format($memo,2,',','.'),
                         'final'         => $row->currency->symbol.' '.number_format($final,2,',','.'),
-                        'note'          => $row->note,
+                        'note'          => $row->note ? $row->note : '',
                     ];
                 }
             }
@@ -452,7 +452,7 @@ class PaymentRequestController extends Controller
                         'balance'       => number_format($row->balance,2,',','.'),
                         'memo'          => number_format($memo,2,',','.'),
                         'final'         => $row->currency()->symbol.' '.number_format($final,2,',','.'),
-                        'note'          => $row->note,
+                        'note'          => $row->note ? $row->note : '',
                     ];
                 }
             }
@@ -478,7 +478,7 @@ class PaymentRequestController extends Controller
                         'balance'       => number_format($row->grandtotal,2,',','.'),
                         'memo'          => number_format($memo,2,',','.'),
                         'final'         => 'IDR '.number_format($final,2,',','.'),
-                        'note'          => $row->note,
+                        'note'          => $row->note ? $row->note : '',
                     ];
                 }
             }
@@ -557,7 +557,7 @@ class PaymentRequestController extends Controller
                                 'memo'          => number_format(0,2,',','.'),
                                 'currency_id'   => $data->currency_id,
                                 'currency_rate' => number_format($data->currency_rate,2,',','.'),
-                                'note'          => $data->note,
+                                'note'          => $data->note ? $data->note : '',
                                 'name_account'  => $data->name_account,
                                 'no_account'    => $data->no_account,
                                 'bank_account'  => $data->bank_account,
@@ -591,7 +591,7 @@ class PaymentRequestController extends Controller
                                 'memo'          => number_format($data->totalMemo(),2,',','.'),
                                 'currency_id'   => $data->currency_id,
                                 'currency_rate' => number_format($data->currency_rate,2,',','.'),
-                                'note'          => $data->note,
+                                'note'          => $data->note ? $data->note : '',
                                 'name_account'  => '',
                                 'no_account'    => '',
                                 'bank_account'  => '',
@@ -659,7 +659,7 @@ class PaymentRequestController extends Controller
                                 'memo'          => number_format($data->totalUsed(),2,',','.'),
                                 'currency_id'   => 1,
                                 'currency_rate' => number_format(1,2,',','.'),
-                                'note'          => $data->note,
+                                'note'          => $data->note ? $data->note : '',
                                 'name_account'  => '',
                                 'no_account'    => '',
                                 'bank_account'  => '',
@@ -682,10 +682,10 @@ class PaymentRequestController extends Controller
             'code'			        => $request->temp ? ['required', Rule::unique('payment_requests', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:payment_requests,code',
 			'account_id' 			=> 'required',
             'company_id'            => 'required',
-            'coa_source_id'         => $request->payment_type == '5' ? '' : 'required',
+            'coa_source_id'         => $request->payment_type == '5' || ($request->payment_type == '6' && str_replace(',','.',str_replace('.','',$request->balance))) == 0 ? '' : 'required',
             'payment_type'          => 'required',
             'post_date'             => 'required',
-            'pay_date'              => $request->payment_type == '5' ? '' : 'required',
+            'pay_date'              => $request->payment_type == '5' || ($request->payment_type == '6' && str_replace(',','.',str_replace('.','',$request->balance))) == 0 ? '' : 'required',
             'currency_id'           => 'required',
             'currency_rate'         => 'required',
             'cost_distribution_id'  => str_replace(',','.',str_replace('.','',$request->admin)) > 0 ? 'required' : '',
@@ -696,7 +696,6 @@ class PaymentRequestController extends Controller
             'arr_pay'               => $request->arr_type ? 'required|array' : '',
             'arr_coa'               => $request->arr_type ? 'required|array' : '',
             'arr_coa_cost'          => $request->arr_coa_cost ? 'required|array' : '',
-            'arr_cost_distribution_cost' => $request->arr_coa_cost ? 'required|array' : '',
             'arr_note_cost'         => $request->arr_coa_cost ? 'required|array' : '',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
@@ -724,8 +723,6 @@ class PaymentRequestController extends Controller
             'arr_coa.array'                     => 'Baris coa harus dalam bentuk array.',
             'arr_coa_cost.required'             => 'Coa rekonsiliasi tidak boleh kosong.',
             'arr_coa_cost.array'                => 'Coa rekonsiliasi harus dalam bentuk array.',
-            'arr_cost_distribution_cost.required' => 'Distribusi biaya rekonsiliasi tidak boleh kosong.',
-            'arr_cost_distribution_cost.array'  => 'Distribusi biaya rekonsiliasi harus dalam bentuk array.',
             'arr_note_cost.required'            => 'Keterangan rekonsiliasi tidak boleh kosong.',
             'arr_note_cost.array'               => 'Keterangan rekonsiliasi harus dalam bentuk array.',
 		]);
@@ -737,7 +734,7 @@ class PaymentRequestController extends Controller
             ];
         } else {
 
-            if($request->arr_coa_cost){
+            /* if($request->arr_coa_cost){
                 $passedProfitLoss = true;
                 foreach($request->arr_coa_cost as $key => $row){
                     $coa = Coa::find(intval($row));
@@ -754,7 +751,7 @@ class PaymentRequestController extends Controller
                         'message' => 'Untuk Coa Biaya harus memiliki Distribusi Biaya.'
                     ]);
                 }
-            }
+            } */
             
 			if($request->temp){
                 DB::beginTransaction();
@@ -886,7 +883,7 @@ class PaymentRequestController extends Controller
                                 'payment_request_id'            => $query->id,
                                 'lookable_type'                 => 'coas',
                                 'lookable_id'                   => intval($row),
-                                'cost_distribution_id'          => intval($request->arr_cost_distribution_cost[$key]),
+                                'cost_distribution_id'          => $request->arr_cost_distribution_cost[$key] ? intval($request->arr_cost_distribution_cost[$key]) : NULL,
                                 'coa_id'                        => intval($row),
                                 'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
                                 'note'                          => $request->arr_note_cost[$key],
@@ -1163,7 +1160,7 @@ class PaymentRequestController extends Controller
                 'wtax'          => number_format($row->lookable->wtax,3,',','.'),
                 'grandtotal'    => number_format($row->lookable->grandtotal,3,',','.'),
                 'nominal'       => number_format($row->nominal,3,',','.'),
-                'note'          => $row->note,
+                'note'          => $row->note ? $row->note : '',
                 'cost_distribution_id'        => $row->cost_distribution_id ? $row->cost_distribution_id : '',
                 'cost_distribution_name'      => $row->cost_distribution_id ? $row->costDistribution->code.' - '.$row->costDistribution->name : '',
                 'coa_id'        => $row->coa_id,
@@ -1895,7 +1892,7 @@ class PaymentRequestController extends Controller
                         'payment'                   => $cek->payment,
                         'balance'                   => $cek->balance,
                         'document'                  => $request->file('documentPay') ? $request->file('documentPay')->store('public/outgoing_payments') : NULL,
-                        'note'                      => $request->notePay,
+                        'note'                      => $request->notePay ? $request->notePay : '',
                         'status'                    => '3',
                     ]);
 
@@ -2738,8 +2735,9 @@ class PaymentRequestController extends Controller
                 }
 
                 foreach($data_id_pyrcs as $payment_request_cross_id){
+                    info($payment_request_cross_id);
                     $query_pyrc = PaymentRequestCross::find($payment_request_cross_id);
-                    if($query_pyrc->paymentRequest->exists()){
+                    if($query_pyrc->paymentRequest()->exists()){
                         $data_pyr_tempura = [
                             'key'   => $query_pyrc->paymentRequest->code,
                             "name"  => $query_pyrc->paymentRequest->code,

@@ -241,7 +241,7 @@ class LandedCost extends Model
 
         foreach($this->landedCostDetail as $row){
             if($row->goodReceiptDetail()){
-                $html .= '<li>'.$row->lookable->item->code.' - '.$row->lookable->item->name.' Qty. '.$row->lookable->qty.' '.$row->lookable->item->buyUnit->code.'</li>';
+                $html .= '<li>'.$row->lookable->item->code.' - '.$row->lookable->item->name.' Qty. '.$row->lookable->qty.' '.$row->lookable->itemUnit->unit->code.'</li>';
             }
         }
 

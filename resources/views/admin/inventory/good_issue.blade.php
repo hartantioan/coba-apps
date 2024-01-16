@@ -875,7 +875,7 @@
                                     <option value="` + val.item_id +`">` + val.item_name + `</option>
                                 `);
                             }
-                            select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
+                            select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item_issue") }}');
                             if(val.project_id){
                                 $('#arr_project' + count).append(`
                                     <option value="` + val.project_id +`">` + val.project_name + `</option>
@@ -1027,7 +1027,7 @@
                 </td>
             </tr>
         `);
-        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
+        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item_issue") }}');
         select2ServerSide('#arr_inventory_coa' + count, '{{ url("admin/select2/inventory_coa") }}');
         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
     }
@@ -1098,6 +1098,7 @@
                 $('#serial' + val).append(` - `);
             }
         }else{
+            $("#arr_item" + val).empty();
             $('#stock' + val).append(` - `);
             $('#unit' + val).append(` - `);
             $('#serial' + val).append(` - `);
@@ -1392,7 +1393,7 @@
                         $('#arr_inventory_coa' + count).append(`
                             <option value="` + val.inventory_coa_id + `">` + val.inventory_coa_name + `</option>
                         `);
-                        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
+                        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item_issue") }}');
                         select2ServerSide('#arr_inventory_coa' + count, '{{ url("admin/select2/coa") }}');
                         $('#arr_line' + count).val(val.line_id);
                         $('#arr_machine' + count).val(val.machine_id);

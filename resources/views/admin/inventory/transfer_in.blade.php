@@ -214,7 +214,7 @@
                                                     <th class="center">Item</th>
                                                     <th class="center">Ambil Dari</th>
                                                     <th class="center">Qty</th>
-                                                    <th class="center">Satuan UOM</th>
+                                                    <th class="center">Satuan Stock</th>
                                                     <th class="center">Keterangan</th>
                                                     <th class="center">Area</th>
                                                 </tr>

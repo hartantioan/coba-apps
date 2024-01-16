@@ -221,7 +221,8 @@
                                         <option value="1">Tunai</option>
                                         <option value="3">Cek</option>
                                         <option value="4">BG</option>
-                                        <option value="5">Rekonsiliasi</option>
+                                        <option value="5">Rekonsiliasi Tanpa Dokumen</option>
+                                        <option value="6">Rekonsiliasi Dengan Dokumen</option>
                                     </select>
                                     <label class="" for="payment_type">Tipe Pembayaran</label>
                                 </div>
@@ -243,7 +244,7 @@
                                     <label class="active" for="payment_no">No. CEK/BG</label>
                                 </div>
                                 <div class="input-field col m3 s12 step7_1">
-                                    <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
+                                    <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);loadCurrency();">
                                     <label class="active" for="post_date">Tgl. Posting</label>
                                 </div>
                                 <div class="input-field col m3 s12 op-element step8">
@@ -346,11 +347,12 @@
                                                                 <th class="center">Departemen</th>
                                                                 <th class="center">Proyek</th>
                                                                 <th class="center">Rekening</th>
+                                                                <th class="center">Salin Baris</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody id="body-detail">
                                                             <tr id="empty-detail">
-                                                                <td colspan="19" class="center">
+                                                                <td colspan="20" class="center">
                                                                     Pilih partner bisnis untuk memulai...
                                                                 </td>
                                                             </tr>
@@ -365,13 +367,13 @@
                                                 <p class="mt-2 mb-2">
                                                     <h6>Gunakan fitur ini untuk rekonsiliasi biaya dengan piutang karyawan, pastikan anda menentukan daftar piutang mana yang ingin anda gunakan.</h6>
                                                     <div style="overflow:scroll;width:100% !important;">
-                                                        <table class="bordered" style="min-width:1650px !important;" id="table-detail1">
+                                                        <table class="bordered" style="min-width:2200px !important;" id="table-detail1">
                                                             <thead>
                                                                 <tr>
                                                                     <th class="center">Coa</th>
                                                                     <th class="center">Dist.Biaya</th>
                                                                     <th class="center">Keterangan</th>
-                                                                    <th class="center">Nominal</th>
+                                                                    <th class="center" width="15%">Nominal</th>
                                                                     <th class="center">Plant</th>
                                                                     <th class="center">Line</th>
                                                                     <th class="center">Mesin</th>
@@ -936,7 +938,7 @@
                 M.updateTextFields();
                 $('#body-detail').empty().append(`
                     <tr id="empty-detail">
-                        <td colspan="19" class="center">
+                        <td colspan="20" class="center">
                             Pilih partner bisnis untuk memulai...
                         </td>
                     </tr>
@@ -1730,6 +1732,9 @@
                                             <td>
                                                 ` + val.bank_account + ` ` + val.no_account + ` ` + val.name_account + `    
                                             </td>
+                                            <td class="center">
+                                                ` + (val.type == 'fund_requests' ? `<button type="button" class="btn-floating mb-1 btn-flat orange accent-2 white-text btn-small" data-popup="tooltip" title="Salin" onclick="duplicate('` + count + `','`+ val.code + `')"><i class="material-icons dp48">content_copy</i></button>` : '') + `    
+                                            </td>
                                         </tr>
                                     `);
                                     
@@ -1752,7 +1757,7 @@
                             }else{
                                 $('#body-detail').empty().append(`
                                     <tr id="empty-detail">
-                                        <td colspan="19" class="center">
+                                        <td colspan="20" class="center">
                                             Pilih partner bisnis untuk memulai...
                                         </td>
                                     </tr>
@@ -2254,12 +2259,37 @@
                     if($('select[name^="arr_coa_cost"]').length > 0){
                         $('select[name^="arr_coa_cost"]').each(function(index){
                             formData.append('arr_coa_cost[]',$('#arr_coa_cost' + $(this).data('id')).val());
-                            formData.append('arr_cost_distribution_cost[]',$('#arr_cost_distribution_cost' + $(this).data('id')).val());
+                            formData.append('arr_cost_distribution_cost[]',($('#arr_cost_distribution_cost' + $(this).data('id')).val() ? $('#arr_cost_distribution_cost' + $(this).data('id')).val() : ''));
                             formData.append('arr_note_cost[]',$('#arr_note_cost' + $(this).data('id')).val());
                             formData.append('arr_nominal[]',$('#arr_nominal' + $(this).data('id')).val());
-                            if(!$(this).val() || !$('select[name^="arr_cost_distribution_cost"]').eq(index).val() || !$('input[name^="arr_note_cost"]').eq(index).val()){
+                            if(!$(this).val() || !$('input[name^="arr_note_cost"]').eq(index).val()){
                                 passedReconcile = false;
                             }
+                            formData.append('arr_line[]',
+                                ($('#arr_line' + $(this).data('id')).length > 0 ? 
+                                    ($('#arr_line' + $(this).data('id')).val() ? $('#arr_line' + $(this).data('id')).val() : '') 
+                                : '')
+                            );
+                            formData.append('arr_machine[]',
+                                ($('#arr_machine' + $(this).data('id')).length > 0 ? 
+                                    ($('#arr_machine' + $(this).data('id')).val() ? $('#arr_machine' + $(this).data('id')).val() : '') 
+                                : '')
+                            );
+                            formData.append('arr_place[]',
+                                ($('#arr_place' + $(this).data('id')).length > 0 ? 
+                                    ($('#arr_place' + $(this).data('id')).val() ? $('#arr_place' + $(this).data('id')).val() : '') 
+                                : '')
+                            );
+                            formData.append('arr_department[]',
+                                ($('#arr_department' + $(this).data('id')).length > 0 ? 
+                                    ($('#arr_department' + $(this).data('id')).val() ? $('#arr_department' + $(this).data('id')).val() : '') 
+                                : '')
+                            );
+                            formData.append('arr_project[]',
+                                ($('#arr_project' + $(this).data('id')).length > 0 ? 
+                                    ($('#arr_project' + $(this).data('id')).val() ? $('#arr_project' + $(this).data('id')).val() : '') 
+                                : '')
+                            );
                         });
                     }else{
                         passedReconcile = false;

@@ -20,6 +20,8 @@ class GoodReceiptDetail extends Model
         'good_scale_detail_id',
         'item_id',
         'qty',
+        'item_unit_id',
+        'qty_conversion',
         'total',
         'tax',
         'wtax',
@@ -42,6 +44,11 @@ class GoodReceiptDetail extends Model
     public function item()
     {
         return $this->belongsTo('App\Models\Item', 'item_id', 'id')->withTrashed();
+    }
+
+    public function itemUnit()
+    {
+        return $this->belongsTo('App\Models\ItemUnit', 'item_unit_id', 'id')->withTrashed();
     }
 
     public function place()
@@ -122,7 +129,7 @@ class GoodReceiptDetail extends Model
     }
 
     public function qtyConvert(){
-        $qty = round($this->qty * $this->item->buy_convert,3);
+        $qty = round($this->qty * $this->qty_conversion,3);
 
         return $qty;
     }

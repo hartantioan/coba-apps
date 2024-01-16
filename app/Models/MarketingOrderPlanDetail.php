@@ -18,10 +18,17 @@ class MarketingOrderPlanDetail extends Model
         'marketing_order_plan_id',
         'item_id',
         'qty',
+        'item_unit_id',
+        'qty_conversion',
         'request_date',
         'note',
         'is_urgent',
     ];
+
+    public function itemUnit()
+    {
+        return $this->belongsTo('App\Models\ItemUnit', 'item_unit_id', 'id')->withTrashed();
+    }
 
     public function marketingOrderPlan()
     {

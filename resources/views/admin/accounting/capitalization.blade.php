@@ -185,7 +185,7 @@
                             <label class="active" for="currency_rate">Konversi</label>
                         </div>
                         <div class="input-field col s3 step6">
-                            <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
+                            <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);loadCurrency();">
                             <label class="active" for="post_date">Tgl. Posting</label>
                         </div>
                         <div class="input-field col m3 step7">

@@ -164,9 +164,9 @@
                         </div>
                         <div class="input-field col s3 step4">
                             <input type="hidden" id="temp" name="temp">
-                            <select class="form-control" id="currency_id" name="currency_id">
+                            <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
                                 @foreach ($currency as $row)
-                                    <option value="{{ $row->id }}">{{ $row->code.' '.$row->name }}</option>
+                                    <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
                                 @endforeach
                             </select>
                             <label class="" for="currency_id">Mata Uang</label>
@@ -176,7 +176,7 @@
                             <label class="active" for="currency_rate">Konversi</label>
                         </div>
                         <div class="input-field col s3 step6">
-                            <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
+                            <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);loadCurrency();">
                             <label class="active" for="post_date">Tgl. Posting</label>
                         </div>
                         <div class="input-field col s3 step7">
@@ -465,6 +465,9 @@
                 window.onbeforeunload = function() {
                     return 'You will lose all changes made since your last save';
                 };
+                if(!$('#temp').val()){
+                    loadCurrency();
+                }
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();

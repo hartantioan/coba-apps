@@ -557,7 +557,7 @@
 
         M.updateTextFields();
 
-        select2ServerSide('#arr_itemkuy' + count, '{{ url("admin/select2/item") }}');
+        select2ServerSide('#arr_itemkuy' + count, '{{ url("admin/select2/item_revaluation") }}');
         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
         
@@ -616,6 +616,7 @@
                 `);
             }
         }else{
+            $("#arr_itemkuy" + val).empty();
             $('#arr_item_stock' + val).empty().append(`
                 <option value="">--Silahkan pilih item--</option>
             `);
@@ -1076,7 +1077,7 @@
                             <option value="` + val.coa_id + `">` + val.coa_name + `</option>
                         `);
 
-                        select2ServerSide('#arr_itemkuy' + count, '{{ url("admin/select2/item") }}');
+                        select2ServerSide('#arr_itemkuy' + count, '{{ url("admin/select2/item_revaluation") }}');
                         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
                         
                         $('#arr_item_stock' + count).append(`

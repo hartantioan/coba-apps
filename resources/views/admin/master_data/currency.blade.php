@@ -63,6 +63,7 @@
                                                         <th>Nama</th>
                                                         <th>Teks Dokumen</th>
                                                         <th>Simbol</th>
+                                                        <th>Tipe Mata Uang</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -108,6 +109,13 @@
                         <div class="input-field col s6">
                             <input id="symbol" name="symbol" type="text" placeholder="Simbol / lambang">
                             <label class="active" for="symbol">Simbol / lambang</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <select id="type" name="type" class="browser-default">
+                                <option value="1">Lokal</option>
+                                <option value="2">Asing</option>
+                            </select>
+                            <label for="type" class="active">Tipe Mata Uang</label>
                         </div>
                         <div class="input-field col s6">
                             <div class="switch mb-1">
@@ -202,6 +210,7 @@
                 { name: 'name', className: 'center-align' },
                 { name: 'document_text', className: 'center-align' },
                 { name: 'symbol', className: 'center-align' },
+                { name: 'type', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -316,6 +325,7 @@
                 }else{
                     $('#status').prop( "checked", false);
                 }
+                $('#type').val(response.type);
                 $('.modal-content').scrollTop(0);
                 $('#code').focus();
                 M.updateTextFields();

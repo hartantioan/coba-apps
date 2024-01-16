@@ -477,7 +477,7 @@ class CapitalizationController extends Controller
                 'unit_name'             => $row->unit->name,
                 'price'                 => number_format($row->price,3,',','.'),
                 'total'                 => number_format($row->total,3,',','.'),
-                'note'                  => $row->note
+                'note'                  => $row->note ? $row->note : '',
             ];
         }
 

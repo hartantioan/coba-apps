@@ -308,6 +308,62 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function itemReceive(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Item::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%");
+                })->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
+                'code'              => $d->code,
+                'name'              => $d->name,
+                'uom'               => $d->uomUnit->code,
+                'price_list'        => $d->currentCogs($this->dataplaces),
+                'stock_list'        => $d->currentStock($this->dataplaces,$this->datawarehouses),
+                'list_warehouse'    => $d->warehouseList(),
+                'is_sales_item'     => $d->is_sales_item ? $d->is_sales_item : '',
+                'list_shading'      => $d->arrShading(),
+                'is_activa'         => $d->itemGroup->is_activa ? $d->itemGroup->is_activa : '',
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function itemIssue(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Item::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%");
+                })->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
+                'code'              => $d->code,
+                'name'              => $d->name,
+                'uom'               => $d->uomUnit->code,
+                'price_list'        => $d->currentCogs($this->dataplaces),
+                'stock_list'        => $d->currentStock($this->dataplaces,$this->datawarehouses),
+                'list_warehouse'    => $d->warehouseList(),
+                'is_sales_item'     => $d->is_sales_item ? $d->is_sales_item : '',
+                'list_shading'      => $d->arrShading(),
+                'is_activa'         => $d->itemGroup->is_activa ? $d->itemGroup->is_activa : '',
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function coa(Request $request)
     {   
         $arrCompany = Place::whereIn('id',$this->dataplaces)->get()->pluck('company_id');
@@ -483,10 +539,10 @@ class Select2Controller extends Controller {
                 'code'              => $d->code,
                 'name'              => $d->name,
                 'uom'               => $d->uomUnit->code,
-                'buy_unit'          => $d->buyUnit->code,
                 'old_prices'        => $d->oldPrices($this->dataplaces),
                 'list_warehouse'    => $d->warehouseList(),
                 'stock_list'        => $d->currentStock($this->dataplaces,$this->datawarehouses),
+                'buy_units'         => $d->arrBuyUnits(),
             ];
         }
 
@@ -519,33 +575,6 @@ class Select2Controller extends Controller {
                 'list_warehouse'    => $d->warehouseList(),
                 'list_outletprice'  => $d->listOutletPrice(),
                 'list_area'         => Area::where('status','1')->get(),
-            ];
-        }
-
-        return response()->json(['items' => $response]);
-    }
-
-    public function assetItem(Request $request)
-    {
-        $response = [];
-        $search   = $request->search;
-        $data = Item::where(function($query) use($search){
-                    $query->where('code', 'like', "%$search%")
-                        ->orWhere('name', 'like', "%$search%");
-                })
-                ->where('status','1')
-                ->where(function($query) use($search){
-                    $query->whereNotNull('is_asset');
-                })->get();
-
-        foreach($data as $d) {
-            $response[] = [
-                'id'   			=> $d->id,
-                'text' 			=> $d->code.' - '.$d->name,
-                'code'          => $d->code,
-                'name'          => $d->name,
-                'uom'           => $d->uomUnit->code,
-                'buy_unit'      => $d->buyUnit->code,
             ];
         }
 
@@ -1948,6 +1977,34 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function itemRevaluation(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Item::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%");
+                })->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
+                'code'              => $d->code,
+                'name'              => $d->name,
+                'uom'               => $d->uomUnit->code,
+                'price_list'        => $d->currentCogs($this->dataplaces),
+                'stock_list'        => $d->currentStock($this->dataplaces,$this->datawarehouses),
+                'list_warehouse'    => $d->warehouseList(),
+                'is_sales_item'     => $d->is_sales_item ? $d->is_sales_item : '',
+                'list_shading'      => $d->arrShading(),
+                'is_activa'         => $d->itemGroup->is_activa ? $d->itemGroup->is_activa : '',
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function inventoryTransferOut(Request $request)
     {
         $response   = [];
@@ -1989,7 +2046,7 @@ class Select2Controller extends Controller {
                         'origin'    => $row->itemStock->place->name.' - '.$row->itemStock->warehouse->name.' - '.($row->itemStock->area()->exists() ? $row->itemStock->area->name : '').' - Shading : '.($row->itemStock->itemShading()->exists() ? $row->itemStock->itemShading->code : '-'),
                         'qty'       => number_format($row->qty,3,',','.'),
                         'unit'      => $row->item->uomUnit->code,
-                        'note'      => $row->note,
+                        'note'      => $row->note ? $row->note : '',
                         'area'      => $row->area()->exists() ? $row->area->name : '-',
                     ];
                 }
@@ -2249,7 +2306,7 @@ class Select2Controller extends Controller {
                     'subdistrict'   => $d->subdistrict->name,
                     'type'          => $d->getTable(),
                     'post_date'     => date('d/m/y',strtotime($d->post_date)),
-                    'note'          => $d->note_internal.' - '.$d->note_external,
+                    'note'          => ($d->note_internal ? $d->note_internal : '').' - '.($d->note_external ? $d->note_external : ''),
                     'code'          => $d->code,
                     'grandtotal'    => number_format($d->grandtotal,2,',','.'),
                 ];
@@ -2297,7 +2354,7 @@ class Select2Controller extends Controller {
                 'subdistrict'   => $d->subdistrict->name,
                 'type'          => $d->getTable(),
                 'post_date'     => date('d/m/y',strtotime($d->post_date)),
-                'note'          => $d->note_internal.' - '.$d->note_external,
+                'note'          => ($d->note_internal ? $d->note_internal : '').' - '.($d->note_external ? $d->note_external : ''),
                 'code'          => $d->code,
                 'grandtotal'    => number_format($d->grandtotal,2,',','.'),
             ];
@@ -2412,7 +2469,7 @@ class Select2Controller extends Controller {
                         'qty_do'            => number_format($row->qty,3,',','.'),
                         'qty_return'        => number_format($row->qtyReturn(),3,',','.'),
                         'price'             => number_format($price,2,',','.'),
-                        'note'              => $row->note,
+                        'note'              => $row->note ? $row->note : '',
                     ];
                     $totalAll += $total;
                     $taxAll += $tax;
@@ -2486,7 +2543,7 @@ class Select2Controller extends Controller {
                     'grandtotal'        => number_format($d->grandtotal,2,',','.'),
                     'balance'           => number_format($d->balanceInvoice(),2,',','.'),
                     'balance_array'     => $arrNominal,
-                    'note'              => $d->note,
+                    'note'              => $d->note ? $d->note : '',
                     'tax_no'            => $d->tax_no ? $d->tax_no : '-',
                 ];
             }
@@ -2537,7 +2594,7 @@ class Select2Controller extends Controller {
                     'tax'               => number_format($d->tax,2,',','.'),
                     'grandtotal'        => number_format($d->grandtotal,2,',','.'),
                     'balance'           => number_format($d->balanceInvoicePaid(),2,',','.'),
-                    'note'              => $d->note,
+                    'note'              => $d->note ? $d->note : '',
                     'tax_no'            => $d->tax_no ? $d->tax_no : '-',
                 ];
             }
@@ -2611,7 +2668,7 @@ class Select2Controller extends Controller {
                     'grandtotal'        => number_format($d->grandtotal,2,',','.'),
                     'downpayment'       => number_format($d->downpayment,2,',','.'),
                     'balance'           => number_format($arrNominalMain['balance'],2,',','.'),
-                    'note'              => $d->note,
+                    'note'              => $d->note ? $d->note : '',
                     'details'           => $arrDetail,
                     'tax_no'            => $d->tax_no ? $d->tax_no : '-',
                 ];
@@ -2770,7 +2827,7 @@ class Select2Controller extends Controller {
                         'production_convert'=> $row->item->production_convert,
                         'pallet_convert'    => $row->item->pallet_convert,
                         'request_date'      => date('d/m/y',strtotime($row->request_date)),
-                        'note'              => $row->note,
+                        'note'              => $row->note ? $row->note : '',
                         'bom_link'          => $cekBom->exists() ? $cekBom->orderByDesc('id')->first()->code : '',
                         'is_urgent'         => $row->isUrgent(),
                         'group'             => $row->item->itemGroup->production_type,
@@ -2975,7 +3032,7 @@ class Select2Controller extends Controller {
                             'unit'          => $rowdetail->item()->exists() ? $rowdetail->item->productionUnit->code : '-',
                             'nominal'       => $rowdetail->coa()->exists() ? number_format($bobot * $rowdetail->nominal,2,',','.') : '0,00',
                             'total'         => $rowdetail->coa()->exists() ? number_format($bobot * $rowdetail->total,2,',','.') : '0,00',
-                            'note'          => $rowdetail->description,
+                            'note'          => $rowdetail->description ? $rowdetail->description : '',
                         ];
                     }
                 }
@@ -3137,7 +3194,7 @@ class Select2Controller extends Controller {
                             'item_id'       => $row->item_id,
                             'item_name'     => $row->item->code.' - '.$row->item->name,
                             'qty'           => number_format($row->qty,3,',','.'),
-                            'unit'          => $row->item->buyUnit->code,
+                            'item_unit_id'  => $row->item_unit_id,
                             'note'          => $row->note ? $row->note : '',
                             'note2'         => $row->note2 ? $row->note2 : '',
                             'date'          => $row->required_date,
@@ -3152,6 +3209,7 @@ class Select2Controller extends Controller {
                             'qty_balance'   => number_format($row->balancePr(),3,',','.'),
                             'type'          => $row->getTable(),
                             'list_warehouse'=> $row->item->warehouseList(),
+                            'buy_units'     => $row->item->arrBuyUnits(),
                         ];
                     }
                 }
@@ -3202,9 +3260,9 @@ class Select2Controller extends Controller {
                             'id'            => $row->id,
                             'item_id'       => $row->item_id,
                             'item_name'     => $row->item->code.' - '.$row->item->name,
-                            'qty'           => number_format($row->qty * $row->item->buy_convert,3,',','.'),
+                            'qty'           => number_format($row->qty * $row->qty_conversion,3,',','.'),
                             'unit'          => $row->item->uomUnit->code,
-                            'note'          => $row->note,
+                            'note'          => $row->note ? $row->note : '',
                             'date'          => $row->required_date,
                             'place_id'      => $row->place_id,
                             'place_name'    => $row->place->code,
@@ -3214,7 +3272,7 @@ class Select2Controller extends Controller {
                             'machine_id'    => $row->machine_id,
                             'department_id' => $row->department_id,
                             'requester'     => $row->requester ? $row->requester : '',
-                            'qty_balance'   => number_format($row->balanceGi() * $row->item->buy_convert,3,',','.'),
+                            'qty_balance'   => number_format($row->balanceGi() * $row->qty_conversion,3,',','.'),
                             'type'          => $row->getTable(),
                             'project_id'    => $row->project()->exists() ? $row->project->id : '',
                             'project_name'  => $row->project()->exists() ? $row->project->name : '',
@@ -3309,7 +3367,7 @@ class Select2Controller extends Controller {
                         'qty_do'            => number_format($row->qty,3,',','.'),
                         'qty_return'        => number_format($row->qtyReturn(),3,',','.'),
                         'price'             => number_format($price,2,',','.'),
-                        'note'              => $row->note,
+                        'note'              => $row->note ? $row->note : '',
                     ];
                     $totalAll += $total;
                     $taxAll += $tax;

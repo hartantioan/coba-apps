@@ -28,6 +28,7 @@ class JournalDetail extends Model
         'item_id',
         'type',
         'nominal',
+        'nominal_fc',
         'note',
     ];
 

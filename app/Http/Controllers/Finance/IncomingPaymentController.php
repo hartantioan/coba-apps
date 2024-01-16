@@ -789,7 +789,7 @@ class IncomingPaymentController extends Controller
                 'total'                 => number_format($row->total,'2',',','.'),
                 'rounding'              => number_format($row->rounding,'2',',','.'),
                 'subtotal'              => number_format($row->subtotal,'2',',','.'),
-                'note'                  => $row->note,
+                'note'                  => $row->note ? $row->note : '',
             ];
         }
 

@@ -30,7 +30,8 @@ class CurrencyController extends Controller
             'code',
             'name',
             'document_text',
-            'symbol'
+            'symbol',
+            'type',
         ];
 
         $start  = $request->start;
@@ -83,6 +84,7 @@ class CurrencyController extends Controller
                     $val->name,
                     $val->document_text,
                     $val->symbol,
+                    $val->type(),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -133,6 +135,7 @@ class CurrencyController extends Controller
                     $query->name	        = $request->name;
                     $query->document_text   = $request->document_text;
                     $query->symbol          = $request->symbol;
+                    $query->type            = $request->type;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
@@ -147,6 +150,7 @@ class CurrencyController extends Controller
                         'name'			=> $request->name,
                         'document_text' => $request->document_text,
                         'symbol'        => $request->symbol,
+                        'type'          => $request->type,
                         'status'        => $request->status ? $request->status : '2'
                     ]);
                     DB::commit();

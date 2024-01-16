@@ -19,6 +19,8 @@ class MaterialRequestDetail extends Model
         'item_id',
         'qty',
         'stock',
+        'item_unit_id',
+        'qty_conversion',
         'note',
         'note2',
         'required_date',
@@ -55,6 +57,11 @@ class MaterialRequestDetail extends Model
     public function department()
     {
         return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
+    }
+
+    public function itemUnit()
+    {
+        return $this->belongsTo('App\Models\ItemUnit', 'item_unit_id', 'id')->withTrashed();
     }
 
     public function item()
@@ -102,7 +109,7 @@ class MaterialRequestDetail extends Model
             $totalGi = $this->qty;
         }
         foreach($this->goodIssueDetail as $row){
-            $totalGi -= round(($row->qty / $row->itemStock->item->buy_convert),3);
+            $totalGi -= round(($row->qty / $row->qty_conversion),3);
         }
         return $totalGi;
     }

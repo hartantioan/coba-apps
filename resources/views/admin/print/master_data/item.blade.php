@@ -206,10 +206,6 @@
 								<th>Nama</th>
 								<th>Grup</th>
 								<th>Satuan Stok</th>
-								<th>Satuan Beli</th>
-								<th>Konversi Beli</th>
-								<th>Satuan Jual</th>
-								<th>Konversi Jual</th>
 								<th>Item Stok</th>
 								<th>Item Penjualan</th>
 								<th>Item Pembelian</th>
@@ -226,10 +222,6 @@
 									<td>{{ $row->name }}</td>
 									<td>{{ $row->itemGroup->name }}</td>
 									<td>{{ $row->uomUnit->code }}</td>
-									<td>{{ $row->buyUnit->code }}</td>
-									<td>{{ number_format($row->buy_convert,5,',','.') }}</td>
-									<td>{{ $row->sellUnit->code }}</td>
-									<td>{{ number_format($row->sell_convert,5,',','.') }}</td>
 									<td>{{$row->is_inventory_item ? 'v' : 'x' }}</td>
 									<td>{{$row->is_sales_item ? 'v' : 'x' }}</td>
 									<td>{{$row->is_purchase_item ? 'v' : 'x'}}</td>

@@ -424,7 +424,7 @@ class RetirementController extends Controller
                 'unit_name'         => $row->unit->name,
                 'asset_nominal'     => number_format($row->asset->nominal,3,',','.'),
                 'retirement_nominal'=> number_format($row->retirement_nominal,3,',','.'),
-                'note'              => $row->note,
+                'note'              => $row->note ? $row->note : '',
                 'coa_id'            => $row->coa_id,
                 'coa_name'          => $row->coa->code.' - '.$row->coa->name
             ];

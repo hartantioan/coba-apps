@@ -109,13 +109,6 @@ class GoodIssueDetail extends Model
         return $this->belongsTo('App\Models\Coa', 'coa_id', 'id')->withTrashed();
     }
 
-    public function qtyConvertToBuy()
-    {
-        $qty = round($this->qty / $this->itemStock->item->buy_convert,3);
-
-        return $qty;
-    }
-
     public function purchaseOrderDetail()
     {
         return $this->hasMany('App\Models\PurchaseOrderDetail', 'good_issue_detail_id', 'id')->whereHas('purchaseOrder',function($query){
@@ -158,10 +151,10 @@ class GoodIssueDetail extends Model
     }
 
     public function qtyBalance(){
-        $qty = $this->qtyConvertToBuy();
+        $qty = $this->qty;
 
         foreach($this->purchaseOrderDetail as $row){
-            $qty -= $row->qty;
+            $qty -= $row->qty * $row->qty_conversion;
         }
 
         return $qty;

@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('item_id')->nullable()->index();
             $table->bigInteger('unit_id')->nullable()->index();
+            $table->double('conversion')->nullable();
             $table->char('is_sell_unit',1)->nullable();
-            $table->char('is_purchase_unit',1)->nullable();
+            $table->char('is_buy_unit',1)->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
         });

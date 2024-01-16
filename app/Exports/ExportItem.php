@@ -14,6 +14,8 @@ class ExportItem implements FromCollection, WithTitle, WithHeadings, WithCustomS
     * @return \Illuminate\Support\Collection
     */
 
+    protected $search, $status, $type;
+
     public function __construct(string $search, string $status, string $type)
     {
         $this->search = $search ? $search : '';
@@ -27,14 +29,6 @@ class ExportItem implements FromCollection, WithTitle, WithHeadings, WithCustomS
         'NAMA',
         'GRUP',
         'SATUAN STOK',
-        'SATUAN BELI',
-        'KONVERSI SATUAN BELI KE STOK',
-        'SATUAN JUAL',
-        'KONVERSI SATUAN JUAL KE STOK',
-        'SATUAN PALLET',
-        'KONVERSI SATUAN PALET KE SATUAN JUAL',
-        'SATUAN PRODUKSI',
-        'KONVERSI SATUAN PRODUKSI KE SATUAN STOK',
         'ITEM STOK',
         'ITEM PENJUALAN',
         'ITEM PEMBELIAN',
@@ -94,14 +88,6 @@ class ExportItem implements FromCollection, WithTitle, WithHeadings, WithCustomS
                 'name'              => $row->name,
                 'grup'              => $row->itemGroup->name,
                 'uom_unit'          => $row->uomUnit->code,
-                'buy_unit'          => $row->buyUnit->code,
-                'buy_convert'       => number_format($row->buy_convert,3,',','.'),
-                'sell_unit'         => $row->sellUnit->code,
-                'sell_convert'      => number_format($row->sell_convert,3,',','.'),
-                'pallet_unit'       => $row->palletUnit->code,
-                'pallet_convert'    => number_format($row->pallet_convert,3,',','.'),
-                'production_unit'   => $row->productionUnit->code,
-                'production_convert'=> number_format($row->production_convert,3,',','.'),
                 'is_stock'          => $row->is_inventory_item ? 'Ya' : 'Tidak',
                 'is_sales'          => $row->is_sales_item ? 'Ya' : 'Tidak',
                 'is_purchase'       => $row->is_purchase_item ? 'Ya' : 'Tidak',

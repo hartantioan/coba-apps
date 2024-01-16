@@ -296,7 +296,7 @@
                                     <td align="center">{{ $rowdetail->department()->exists() ? $rowdetail->department->name : '-' }}</td>
                                     <td align="center">{{ $rowdetail->project()->exists() ? $rowdetail->project->name : '-' }}</td>
                                     <td align="center">{{ number_format($rowdetail->qty,3,',','.') }}</td>
-                                    <td align="center">{{ $rowdetail->item->buyUnit->code }}</td>
+                                    <td align="center">{{ $rowdetail->itemUnit->unit->code }}</td>
                                     <td>{{ $rowdetail->coa->name }}</td>
                                     <td align="center">{{ number_format($rowdetail->nominal,2,',','.') }}</td>
                                 </tr>

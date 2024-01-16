@@ -263,7 +263,7 @@
                                 <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                                 <td align="right">{{ number_format($row->qty,3,',','.') }}</td>
                                 <td align="right">{{ number_format($row->stock,3,',','.') }}</td>
-                                <td align="center">{{ $row->item->buyUnit->code }}</td>
+                                <td align="center">{{ $row->itemUnit->unit->code }}</td>
                                 <td align="center">{{ date('d/m/y',strtotime($row->required_date)) }}</td>
                                 <td align="center">{{ $row->place->code }}</td>
                                 <td align="center">{{ $row->warehouse->name }}</td>

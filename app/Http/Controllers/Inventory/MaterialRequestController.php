@@ -42,6 +42,7 @@ use App\Models\User;
 use App\Models\Place;
 use App\Helpers\CustomHelper;
 use App\Models\Department;
+use App\Models\ItemUnit;
 use App\Models\Menu;
 
 class MaterialRequestController extends Controller
@@ -244,7 +245,7 @@ class MaterialRequestController extends Controller
                 <td>'.$row->item->code.' - '.$row->item->name.'</td>
                 <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="right-align">'.number_format($row->stock,3,',','.').'</td>
-                <td class="center-align">'.$row->item->buyUnit->code.'</td>
+                <td class="center-align">'.$row->itemUnit->unit->code.'</td>
                 <td class="">'.$row->note.'</td>
                 <td class="">'.$row->note2.'</td>
                 <td class="center-align">'.date('d/m/y',strtotime($row->required_date)).'</td>
@@ -441,6 +442,7 @@ class MaterialRequestController extends Controller
             'company_id'                => 'required',
 			'post_date' 				=> 'required',
             'note'		                => 'required',
+            'arr_satuan'                => 'required|array',
             'arr_item'                  => 'required|array',
             'arr_place'                 => 'required|array',
             'arr_warehouse'             => 'required|array',
@@ -452,7 +454,8 @@ class MaterialRequestController extends Controller
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
 			'note.required'				        => 'Keterangan tidak boleh kosong',
-            'arr_item.required'                 => 'Item tidak boleh kosong',
+            'arr_satuan.array'                  => 'Satuan harus dalam bentuk array.',
+            'arr_satuan.required'               => 'Satuan tidak boleh kosong',
             'arr_item.array'                    => 'Item harus dalam bentuk array.',
             'arr_place.required'                => 'Penempatan tujuan tidak boleh kosong.',
             'arr_place.array'                   => 'Penempatan tujuan harus dalam bentuk array.',
@@ -544,15 +547,18 @@ class MaterialRequestController extends Controller
                     $grandtotal = 0;
                     foreach($request->arr_item as $key => $row){
                         $item = Item::find(intval($row));
+                        $itemUnit = ItemUnit::find(intval($request->arr_satuan[$key]));
                         $price = $item->priceNow($request->arr_place[$key],date('Y-m-d'));
-                        $grandtotal += $price * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) * $item->buy_convert;
+                        $grandtotal += $price * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) * $itemUnit->conversion;
                         $total = ItemStock::where('item_id',$row)->where('place_id',$request->arr_place[$key])->where('warehouse_id',$request->arr_warehouse[$key])->sum('qty');
-                        $purchaseQty = $total > 0 ? $total / $item->buy_convert : 0;
+                        $purchaseQty = $total > 0 ? $total / $itemUnit->conversion : 0;
                         MaterialRequestDetail::create([
                             'material_request_id'   => $query->id,
                             'item_id'               => $row,
                             'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'stock'                 => $purchaseQty,
+                            'item_unit_id'          => $request->arr_satuan[$key],
+                            'qty_conversion'        => $itemUnit->conversion,
                             'note'                  => $request->arr_note[$key],
                             'note2'                 => $request->arr_note2[$key],
                             'required_date'         => $request->arr_required_date[$key],
@@ -608,7 +614,7 @@ class MaterialRequestController extends Controller
                 'item_id'           => $row->item_id,
                 'item_name'         => $row->item->code.' - '.$row->item->name,
                 'qty'               => number_format($row->qty,3,',','.'),
-                'unit'              => $row->item->buyUnit->code,
+                'item_unit_id'      => $row->item_unit_id,
                 'note'              => $row->note ? $row->note : '',
                 'note2'             => $row->note2 ? $row->note2 : '',
                 'date'              => $row->required_date,
@@ -618,10 +624,11 @@ class MaterialRequestController extends Controller
                 'machine_id'        => $row->machine_id,
                 'department_id'     => $row->department_id,
                 'requester'         => $row->requester,
-                'stock_list'        => $row->item->currentStockPurchase($this->dataplacecode,$this->datawarehouses),
+                'stock_list'        => $row->item->currentStockPurchase($this->dataplaces,$this->datawarehouses),
                 'list_warehouse'    => $row->item->warehouseList(),
                 'project_id'        => $row->project()->exists() ? $row->project->id : '',
                 'project_name'      => $row->project()->exists() ? $row->project->name : '',
+                'buy_units'         => $row->item->arrBuyUnits(),
             ];
         }
 

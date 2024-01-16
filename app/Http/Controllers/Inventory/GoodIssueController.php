@@ -595,7 +595,7 @@ class GoodIssueController extends Controller
                 'total'             => number_format($row->total,2,',','.'),
                 'inventory_coa_id'  => $row->inventory_coa_id,
                 'inventory_coa_name'=> $row->inventoryCoa->name,
-                'note'              => $row->note,
+                'note'              => $row->note ? $row->note : '',
                 'lookable_type'     => $row->lookable_type ? $row->lookable_type : '',
                 'lookable_id'       => $row->lookable_id ? $row->lookable_id : '',
                 'reference_id'      => $row->lookable_type ? $row->lookable->materialRequest->id : '',

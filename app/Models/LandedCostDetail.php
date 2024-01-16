@@ -112,12 +112,6 @@ class LandedCostDetail extends Model
         });
     }
 
-    public function qtyBuy(){
-        $qty = round($this->qty / $this->item->buy_convert,3);
-
-        return $qty;
-    }
-
     public function getTax(){
         $total = $this->landedCost->total;
         $tax = ($this->nominal / $total) * $this->landedCost->tax;

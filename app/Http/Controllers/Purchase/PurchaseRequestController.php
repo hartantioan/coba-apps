@@ -44,6 +44,7 @@ use App\Models\Place;
 use App\Models\Department;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportPurchaseRequest;
+use App\Models\ItemUnit;
 
 class PurchaseRequestController extends Controller
 {
@@ -249,7 +250,7 @@ class PurchaseRequestController extends Controller
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
                 <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
-                <td class="center-align">'.$row->item->buyUnit->code.'</td>
+                <td class="center-align">'.$row->itemUnit->unit->code.'</td>
                 <td class="">'.$row->note.'</td>
                 <td class="">'.$row->note2.'</td>
                 <td class="center-align">'.date('d/m/y',strtotime($row->required_date)).'</td>
@@ -619,10 +620,13 @@ class PurchaseRequestController extends Controller
                 DB::beginTransaction();
                 try {
                     foreach($request->arr_item as $key => $row){
+                        $itemUnit = ItemUnit::find(intval($request->arr_satuan[$key]));
                         PurchaseRequestDetail::create([
                             'purchase_request_id'   => $query->id,
                             'item_id'               => $row,
                             'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                            'item_unit_id'          => $itemUnit->id,
+                            'qty_conversion'        => $itemUnit->conversion,
                             'note'                  => $request->arr_note[$key],
                             'note2'                 => $request->arr_note2[$key],
                             'required_date'         => $request->arr_required_date[$key],
@@ -677,9 +681,9 @@ class PurchaseRequestController extends Controller
                 'item_id'           => $row->item_id,
                 'item_name'         => $row->item->code.' - '.$row->item->name,
                 'qty'               => number_format($row->qty,3,',','.'),
-                'unit'              => $row->item->buyUnit->code,
-                'note'              => $row->note,
-                'note2'             => $row->note2,
+                'item_unit_id'      => $row->item_unit_id,
+                'note'              => $row->note ? $row->note : '',
+                'note2'             => $row->note2 ? $row->note2 : '',
                 'date'              => $row->required_date,
                 'warehouse_name'    => $row->warehouse->name,
                 'warehouse_id'      => $row->warehouse_id,
@@ -693,6 +697,7 @@ class PurchaseRequestController extends Controller
                 'requester'         => $row->requester ? $row->requester : '',
                 'project_id'        => $row->project_id ? $row->project_id : '',
                 'project_name'      => $row->project_id ? $row->project->name : '',
+                'buy_units'         => $row->item->arrBuyUnits(),
             ];
         }
 
@@ -2496,7 +2501,7 @@ class PurchaseRequestController extends Controller
                 'item_id'           => $row->item_id,
                 'item_name'         => $row->item->code.' - '.$row->item->name,
                 'qty'               => number_format($row->qty,3,',','.'),
-                'unit'              => $row->item->buyUnit->code,
+                'unit'              => $row->itemUnit->unit->code,
                 'qty_balance'       => number_format($row->qtyBalance(),3,',','.'),
                 'qty_po'            => number_format($row->qtyPO(),3,',','.'),
                 'closed'            => $row->status ? $row->status : '',
@@ -2608,7 +2613,7 @@ class PurchaseRequestController extends Controller
                     <td class="">'.$row->purchaseRequest->note.'</td>
                     <td class="center-align">'.$row->purchaseRequest->status().'</td>
                     <td class="">'.$row->item->code.' - '.$row->item->name.'</td>
-                    <td class="center-align">'.$row->item->buyUnit->code.'</td>
+                    <td class="center-align">'.$row->itemUnit->unit->code.'</td>
                     <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
                     <td class="right-align">'.number_format($row->qtyPO(),3,',','.').'</td>
                     <td class="right-align">'.number_format($row->qtyBalance(),3,',','.').'</td>
@@ -2640,29 +2645,29 @@ class PurchaseRequestController extends Controller
             $arr = [];
 
             foreach($data as $key => $row){
-                $min_stock = $row->min_stock / $row->buy_convert;
-                $max_stock = $row->max_stock / $row->buy_convert;
-                $qtyStock = $row->itemStock()->whereIn('place_id',[$this->dataplaces])->sum('qty') / $row->buy_convert;
+                $min_stock = $row->min_stock;
+                $max_stock = $row->max_stock;
+                $qtyStock = $row->itemStock()->whereIn('place_id',[$this->dataplaces])->sum('qty');
                 $prd = PurchaseRequestDetail::whereIn('place_id',[$this->dataplaces])->where('item_id',$row)->whereHas('purchaseRequest',function($query){
                     $query->whereIn('status',['2','3']);
                 })->whereNull('status')->get();
                 $stockPrd = 0;
                 foreach($prd as $rowprd){
-                    $stockPrd += $rowprd->qtyBalance();
+                    $stockPrd += $rowprd->qtyBalance() * $rowprd->qty_conversion;
                 }
                 $pod = PurchaseOrderDetail::whereIn('place_id',[$this->dataplaces])->where('item_id',$row)->whereHas('purchaseOrder',function($query){
                     $query->whereIn('status',['2','3']);
                 })->whereNull('status')->get();
                 $stockPo = 0;
                 foreach($pod as $rowpod){
-                    $stockPo += $rowpod->getBalanceReceipt();
+                    $stockPo += $rowpod->getBalanceReceipt() * $rowpod->qty_conversion;
                 }
                 $balance = $max_stock - $qtyStock - $stockPrd - $stockPo;
                 if($balance > $min_stock){
                     $arr[] = [
                         'item_id'       => $row->id,
                         'item_name'     => $row->code.' - '.$row->name,
-                        'unit'          => $row->buyUnit->code,
+                        'unit'          => $row->uomUnit->code,
                         'in_stock'      => number_format($qtyStock,3,',','.'),
                         'in_pr'         => number_format($stockPrd,3,',','.'),
                         'in_po'         => number_format($stockPo,3,',','.'),
@@ -2670,6 +2675,7 @@ class PurchaseRequestController extends Controller
                         'max_stock'     => number_format($max_stock,3,',','.'),
                         'qty_request'   => number_format($balance,3,',','.'),
                         'list_warehouse'=> $row->warehouseList(),
+                        'buy_units'     => $row->arrBuyUnits(),
                     ];
                 }
             }

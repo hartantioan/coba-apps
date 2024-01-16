@@ -250,27 +250,8 @@ class Item extends Model
                 'warehouse'     => $detail->place->code.' - '.$detail->warehouse->name,
                 'warehouse_id'  => $detail->warehouse_id,
                 'place_id'      => $detail->place_id,
-                'qty'           => number_format($detail->qty / $detail->item->buy_convert,3,',','.').' '.$this->sellUnit->code,
-                'qty_raw'       => number_format($detail->qty / $detail->item->buy_convert,3,',','.'),
-            ];
-        }
-        
-        return $arrData;
-    }
-
-    public function currentStockPurchasePlaceWarehouse($place,$warehouse){
-        $arrData = [];
-
-        $data = ItemStock::where('item_id',$this->id)->where('place_id',$place)->where('warehouse_id',$warehouse)->get();
-        foreach($data as $detail){
-            $arrData[] = [
-                'id'            => $detail->id,
-                'warehouse'     => $detail->place->code.' - '.$detail->warehouse->name,
-                'warehouse_id'  => $detail->warehouse_id,
-                'place_id'      => $detail->place_id,
-                'qty'           => number_format($detail->qty / $detail->item->buy_convert,3,',','.').' '.$this->sellUnit->code,
-                'qty_raw'       => number_format($detail->qty / $detail->item->buy_convert,3,',','.'),
-                'qty_rawfull'   => $detail->qty / $detail->item->buy_convert,
+                'qty'           => number_format($detail->qty,3,',','.').' '.$this->uomUnit->code,
+                'qty_raw'       => number_format($detail->qty,3,',','.'),
             ];
         }
         
@@ -366,6 +347,30 @@ class Item extends Model
             $arr[] = [
                 'id'    => $row->id,
                 'code'  => $row->code,
+            ];
+        }
+        return $arr;
+    }
+
+    public function arrBuyUnits(){
+        $arr = [];
+        foreach($this->itemUnit()->whereNotNull('is_buy_unit')->get() as $row){
+            $arr[] = [
+                'id'            => $row->id,
+                'code'          => $row->unit->code,
+                'conversion'    => $row->conversion,
+            ];
+        }
+        return $arr;
+    }
+
+    public function arrSellUnits(){
+        $arr = [];
+        foreach($this->itemUnit()->whereNotNull('is_sell_unit')->get() as $row){
+            $arr[] = [
+                'id'            => $row->id,
+                'code'          => $row->unit->code,
+                'conversion'    => $row->conversion,
             ];
         }
         return $arr;
@@ -471,5 +476,51 @@ class Item extends Model
         }
 
         return implode(', ',$arr);
+    }
+
+    public function materialRequestDetail(){
+        return $this->hasMany('App\Models\MaterialRequestDetail','item_id','id')->withTrashed();
+    }
+
+    public function purchaseRequestDetail(){
+        return $this->hasMany('App\Models\PurchaseRequestDetail','item_id','id')->withTrashed();
+    }
+
+    public function purchaseOrderDetail(){
+        return $this->hasMany('App\Models\PurchaseOrderDetail','item_id','id')->withTrashed();
+    }
+
+    public function goodReceiptDetail(){
+        return $this->hasMany('App\Models\GoodReceiptDetail','item_id','id')->withTrashed();
+    }
+
+    public function landedCostDetail(){
+        return $this->hasMany('App\Models\LandedCostDetail','item_id','id')->withTrashed();
+    }
+
+    public function hasChildDocument(){
+        $hasRelation = false;
+
+        if($this->materialRequestDetail()->exists()){
+            $hasRelation = true;
+        }
+
+        if($this->purchaseRequestDetail()->exists()){
+            $hasRelation = true;
+        }
+
+        if($this->purchaseOrderDetail()->exists()){
+            $hasRelation = true;
+        }
+
+        if($this->goodReceiptDetail()->exists()){
+            $hasRelation = true;
+        }
+
+        if($this->landedCostDetail()->exists()){
+            $hasRelation = true;
+        }
+
+        return $hasRelation;
     }
 }

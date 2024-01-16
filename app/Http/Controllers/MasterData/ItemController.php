@@ -27,6 +27,7 @@ use App\Imports\ImportItem;
 use Maatwebsite\Excel\Facades\Excel;
 
 use App\Exports\ExportItem;
+use App\Models\ItemUnit;
 
 class ItemController extends Controller
 {
@@ -173,14 +174,8 @@ class ItemController extends Controller
             'name'              => 'required',
             'item_group_id'     => 'required',
             'uom_unit'          => 'required',
-            'buy_unit'          => 'required',
-            'buy_convert'       => 'required',
-            'sell_unit'         => 'required',
-            'sell_convert'      => 'required',
-            'pallet_unit'       => 'required',
-            'pallet_convert'    => 'required',
-            'production_unit'   => 'required',
-            'production_convert'=> 'required',
+            'arr_unit'          => 'required',
+            'arr_conversion'    => 'required',  
             'tolerance_gr'      => 'required',
             'min_stock'         => 'required',
             'max_stock'         => 'required',
@@ -190,14 +185,8 @@ class ItemController extends Controller
             'name.required'             => 'Nama tidak boleh kosong.',
             'item_group_id.required'    => 'Grup item tidak boleh kosong.',
             'uom_unit.required'         => 'Satuan stok & produksi tidak boleh kosong.',
-            'buy_unit.required'         => 'Satuan beli tidak boleh kosong.',
-            'buy_convert.required'      => 'Satuan konversi beli ke stok tidak boleh kosong.',
-            'sell_unit.required'        => 'Satuan jual tidak boleh kosong.',
-            'sell_convert.required'     => 'Satuan konversi jual ke stok tidak boleh kosong.',
-            'pallet_unit.required'      => 'Satuan pallet tidak boleh kosong.',
-            'pallet_convert.required'   => 'Satuan konversi pallet ke satuan jual tidak boleh kosong.',
-            'production_unit.required'  => 'Satuan produksi tidak boleh kosong.',
-            'production_convert.required'=> 'Satuan konversi produksi ke satuan stok tidak boleh kosong.',
+            'arr_unit.required'         => 'Satuan konversi tidak boleh kosong.',
+            'arr_conversion.required'   => 'Nilai konversi tidak boleh kosong.',
             'tolerance_gr.required'     => 'Toleransi penerimaan barang tidak boleh kosong.',
             'min_stock.required'        => 'Nilai minimal stock tidak boleh kosong.',
             'max_stock.required'        => 'Nilai maksimal stock tidak boleh kosong.',
@@ -217,14 +206,6 @@ class ItemController extends Controller
                     $query->name                = $request->name;
                     $query->item_group_id       = $request->item_group_id;
                     $query->uom_unit            = $request->uom_unit;
-                    $query->buy_unit            = $request->buy_unit;
-                    $query->buy_convert         = str_replace(',','.',str_replace('.','',$request->buy_convert));
-                    $query->sell_unit           = $request->sell_unit;
-                    $query->sell_convert        = str_replace(',','.',str_replace('.','',$request->sell_convert));
-                    $query->pallet_unit         = $request->pallet_unit;
-                    $query->pallet_convert      = str_replace(',','.',str_replace('.','',$request->pallet_convert));
-                    $query->production_unit     = $request->production_unit;
-                    $query->production_convert  = str_replace(',','.',str_replace('.','',$request->production_convert));
                     $query->tolerance_gr        = str_replace(',','.',str_replace('.','',$request->tolerance_gr));
                     $query->is_inventory_item   = $request->is_inventory_item ? $request->is_inventory_item : NULL;
                     $query->is_sales_item       = $request->is_sales_item ? $request->is_sales_item : NULL;
@@ -243,6 +224,10 @@ class ItemController extends Controller
                     $query->brand_id            = $request->brand_id ? $request->brand_id : NULL;
                     $query->save();
 
+                    if($request->arr_unit){
+                        $query->itemUnit()->whereNotIn('unit_id',$request->arr_unit)->delete();
+                    }
+
                     DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
@@ -255,14 +240,6 @@ class ItemController extends Controller
                         'name'			    => $request->name,
                         'item_group_id'     => $request->item_group_id,
                         'uom_unit'          => $request->uom_unit,
-                        'buy_unit'          => $request->buy_unit,
-                        'buy_convert'       => str_replace(',','.',str_replace('.','',$request->buy_convert)),
-                        'sell_unit'         => $request->sell_unit,
-                        'sell_convert'      => str_replace(',','.',str_replace('.','',$request->sell_convert)),
-                        'pallet_unit'       => $request->pallet_unit,
-                        'pallet_convert'    => str_replace(',','.',str_replace('.','',$request->pallet_convert)),
-                        'production_unit'   => $request->production_unit,
-                        'production_convert'=> str_replace(',','.',str_replace('.','',$request->production_convert)),
                         'tolerance_gr'      => str_replace(',','.',str_replace('.','',$request->tolerance_gr)),
                         'is_inventory_item' => $request->is_inventory_item ? $request->is_inventory_item : NULL,
                         'is_sales_item'     => $request->is_sales_item ? $request->is_sales_item : NULL,
@@ -287,6 +264,30 @@ class ItemController extends Controller
 			}
 			
 			if($query) {
+
+                if($request->arr_unit){
+                    foreach($request->arr_unit as $key => $row){
+                        $cek = ItemUnit::where('item_id',$query->id)->where('unit_id',intval($row))->count();
+                        if($cek == 0){
+                            ItemUnit::create([
+                                'item_id'       => $query->id,
+                                'unit_id'       => $row,
+                                'conversion'    => str_replace(',','.',str_replace('.','',$request->arr_conversion[$key])),
+                                'is_sell_unit'  => $request->arr_sell_unit[$key] ? $request->arr_sell_unit[$key] : NULL,
+                                'is_buy_unit'   => $request->arr_buy_unit[$key] ? $request->arr_buy_unit[$key] : NULL,
+                            ]);
+                        }else{
+                            $itemUnit = ItemUnit::where('item_id',$query->id)->where('unit_id',intval($row))->first();
+                            if($itemUnit){
+                                $itemUnit->update([
+                                    'conversion'    => str_replace(',','.',str_replace('.','',$request->arr_conversion[$key])),
+                                    'is_sell_unit'  => $request->arr_sell_unit[$key] ? $request->arr_sell_unit[$key] : NULL,
+                                    'is_buy_unit'   => $request->arr_buy_unit[$key] ? $request->arr_buy_unit[$key] : NULL,
+                                ]);
+                            }
+                        }
+                    }
+                }
 
                 activity()
                     ->performedOn(new Item())
@@ -368,31 +369,38 @@ class ItemController extends Controller
     {
         $data   = Item::where('code',CustomHelper::decrypt($request->id))->first();
 
+        $units = '';
+
+        foreach($data->itemUnit as $key => $row){
+            $units .= '<tr>';
+            $units .= '<td>'.($key + 1).'</td>';
+            $units .= '<td>'.$row->unit->name.'</td>';
+            $units .= '<td class="right-align">'.number_format($row->conversion,3,',','.').'</td>';
+            $units .= '<td class="center-align">'.$data->uomUnit->name.'</td>';
+            $units .= '<td>'.($row->is_sell_unit ? 'Ya' : 'Tidak').'</td>';
+            $units .= '<td>'.($row->is_buy_unit ? 'Ya' : 'Tidak').'</td>';
+            $units .= '</tr>';
+        }
+
         $string = '<table style="min-width:50%;max-width:50%;">
                         <thead>
                             <tr>
-                                <th>Satuan Beli</th>
-                                <th>'.$data->buyUnit->code.'</th>
-                            </tr>
-                            <tr>
-                                <th>Konversi Satuan Beli ke Stok</th>
-                                <th>1 '.$data->buyUnit->code.' = '.number_format($data->buy_convert,3,',','.').' '.$data->uomUnit->code.'</th>
-                            </tr>
-                            <tr>
-                                <th>Satuan Jual</th>
-                                <th>'.$data->sellUnit->code.'</th>
-                            </tr>
-                            <tr>
-                                <th>Konversi Satuan Jual ke Stok</th>
-                                <th>1 '.$data->sellUnit->code.' = '.number_format($data->sell_convert,3,',','.').' '.$data->uomUnit->code.'</th>
-                            </tr>
-                            <tr>
-                                <th>Konversi Produksi ke Satuan Stok</th>
-                                <th>1 '.$data->productionUnit->code.' = '.number_format($data->production_convert,3,',','.').' '.$data->uomUnit->code.'</th>
-                            </tr>
-                            <tr>
-                                <th>Konversi Pallet ke Satuan Jual</th>
-                                <th>1 '.$data->palletUnit->code.' = '.number_format($data->pallet_convert,3,',','.').' '.$data->sellUnit->code.'</th>
+                                <th>
+                                    List Satuan Konversi
+                                </th>
+                                <th>
+                                    <table class="bordered" style="min-width:100%;max-width:100%;">
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Satuan</th>
+                                            <th>Konversi</th>
+                                            <th>Stock</th>
+                                            <th>Jual</th>
+                                            <th>Beli</th>
+                                        </tr>
+                                        '.$units.'
+                                    </table>
+                                </th>
                             </tr>
                             <tr>
                                 <th>Item Stok</th>
@@ -429,6 +437,10 @@ class ItemController extends Controller
                             <tr>
                                 <th>Maksimal Stock</th>
                                 <th>'.number_format($data->max_stock,2,',','.').' '.$data->uomUnit->code.'</th>
+                            </tr>
+                            <tr>
+                                <th>Shading</th>
+                                <th>'.($data->listShading()).'</th>
                             </tr>
                             <tr>
                                 <th>Tipe</th>
@@ -468,10 +480,6 @@ class ItemController extends Controller
         $item = Item::find($request->id);
         $item['uom_unit_id'] = $item->uomUnit->id;
         $item['uom_code'] = $item->uomUnit->code;
-        $item['buy_convert'] = number_format($item->buy_convert,3,',','.');
-        $item['sell_convert'] = number_format($item->sell_convert,3,',','.');
-        $item['pallet_convert'] = number_format($item->pallet_convert,3,',','.');
-        $item['production_convert'] = number_format($item->production_convert,3,',','.');
         $item['tolerance_gr'] = number_format($item->tolerance_gr,2,',','.');
         $item['min_stock'] = number_format($item->min_stock,3,',','.');
         $item['max_stock'] = number_format($item->max_stock,3,',','.');
@@ -496,7 +504,19 @@ class ItemController extends Controller
         $item['brand_name'] = $item->brand()->exists() ? $item->brand->code.' - '.$item->brand->name : '';
         $item['brand_code'] = $item->brand()->exists() ? $item->brand->code : '';
         $item['brand_name_real'] = $item->brand()->exists() ? $item->brand->name : '';
-        				
+        $item['used'] = $item->hasChildDocument() ? '1' : '';
+        
+        $units = [];
+        foreach($item->itemUnit as $row){
+            $units[] = [
+                'unit_id'       => $row->unit_id,
+                'conversion'    => number_format($row->conversion,2,',','.'),
+                'is_sell_unit'  => $row->is_sell_unit ? $row->is_sell_unit : '',
+                'is_buy_unit'   => $row->is_buy_unit ? $row->is_buy_unit : '',
+            ];
+        }
+        $item['units'] = $units;
+
 		return response()->json($item);
     }
 

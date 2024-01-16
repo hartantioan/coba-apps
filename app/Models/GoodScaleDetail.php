@@ -21,11 +21,18 @@ class GoodScaleDetail extends Model
         'qty_in',
         'qty_out',
         'qty_balance',
+        'item_unit_id',
+        'qty_conversion',
         'note',
         'note2',
         'place_id',
         'warehouse_id',
     ];
+
+    public function itemUnit()
+    {
+        return $this->belongsTo('App\Models\ItemUnit', 'item_unit_id', 'id')->withTrashed();
+    }
 
     public function goodScale()
     {

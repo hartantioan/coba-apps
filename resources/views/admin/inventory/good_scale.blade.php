@@ -1012,7 +1012,9 @@
                     <span id="qtyBalance` + count + `">0,000</span>
                 </td>
                 <td class="center">
-                    <span id="arr_satuan` + count + `">-</span>
+                    <select class="browser-default" id="arr_satuan` + count + `" name="arr_satuan[]" required>
+                        <option value="">--Silahkan pilih item--</option>    
+                    </select>
                 </td>
                 <td>
                     <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan 1..." style="width:100%;">
@@ -1107,8 +1109,23 @@
                     <option value="">--Gudang tidak diatur di master data Grup Item--</option>
                 `);
             }
+            $('#arr_satuan' + val).empty();
+            if($("#arr_item" + val).select2('data')[0].buy_units.length > 0){
+                $.each($("#arr_item" + val).select2('data')[0].buy_units, function(i, value) {
+                    $('#arr_satuan' + val).append(`
+                        <option value="` + value.id + `">` + value.code + `</option>
+                    `);
+                });
+            }else{
+                $("#arr_satuan" + val).append(`
+                    <option value="">--Satuan tidak diatur di master data Item--</option>
+                `);
+            }
         }else{
-            $('#arr_satuan' + val).text('-');
+            $("#arr_item" + val).empty();
+            $("#arr_satuan" + val).empty().append(`
+                <option value="">--Silahkan pilih item--</option>
+            `);
             $("#arr_warehouse" + val).append(`
                 <option value="">--Silahkan pilih item--</option>
             `);
@@ -1422,97 +1439,111 @@
         }).then(function (willDelete) {
             if (willDelete) {
                 
-                var formData = new FormData($('#form_data')[0]);
+                var formData = new FormData($('#form_data')[0]), passedUnit = true;
 
                 var s = $('#previewImage').attr('src') ? $('#previewImage').attr('src') : '';
 
-                if(s){
-                    formData.delete("arr_item[]");
-                    formData.delete("arr_purchase[]");
-                    formData.delete("arr_qty_in[]");
-                    formData.delete("arr_qty_out[]");
-                    formData.delete("arr_note[]");
-                    formData.delete("arr_note2[]");
+                $('select[name^="arr_satuan[]"]').each(function(index){
+                    if(!$(this).val()){
+                        passedUnit = false;
+                    }
+                });
 
-                    formData.append('image_in', s);
+                if(passedUnit){
+                    if(s){
+                        formData.delete("arr_item[]");
+                        formData.delete("arr_purchase[]");
+                        formData.delete("arr_qty_in[]");
+                        formData.delete("arr_qty_out[]");
+                        formData.delete("arr_note[]");
+                        formData.delete("arr_note2[]");
 
-                    $('[name^="arr_item"]').each(function(index){
-                        formData.append('arr_item[]',($(this).val() ? $(this).val() : ''));
-                        formData.append('arr_purchase[]',($('[name^="arr_purchase"]').eq(index).val() ? $('[name^="arr_purchase"]').eq(index).val() : ''));
-                        formData.append('arr_qty_in[]',($('[name^="arr_qty_in"]').eq(index).val() ? $('[name^="arr_qty_in"]').eq(index).val() : ''));
-                        formData.append('arr_qty_out[]',($('[name^="arr_qty_out"]').eq(index).val() ? $('[name^="arr_qty_out"]').eq(index).val() : ''));
-                        formData.append('arr_note[]',($('[name^="arr_note"]').eq(index).val() ? $('[name^="arr_note"]').eq(index).val() : ''));
-                        formData.append('arr_note2[]',($('[name^="arr_note2"]').eq(index).val() ? $('[name^="arr_note2"]').eq(index).val() : ''));
-                    });
+                        formData.append('image_in', s);
 
-                    $.ajax({
-                        url: '{{ Request::url() }}/create',
-                        type: 'POST',
-                        dataType: 'JSON',
-                        data: formData,
-                        contentType: false,
-                        processData: false,
-                        cache: false,
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        beforeSend: function() {
-                            $('#validation_alert').hide();
-                            $('#validation_alert').html('');
-                            loadingOpen('.modal-content');
-                        },
-                        success: function(response) {
-                            loadingClose('.modal-content');
-                            if(response.status == 200) {
-                                success();
-                                M.toast({
-                                    html: response.message
-                                });
-                            } else if(response.status == 422) {
-                                $('#validation_alert').show();
-                                $('.modal-content').scrollTop(0);
-                                
-                                swal({
-                                    title: 'Ups! Validation',
-                                    text: 'Check your form.',
-                                    icon: 'warning'
-                                });
+                        $('[name^="arr_item"]').each(function(index){
+                            formData.append('arr_item[]',($(this).val() ? $(this).val() : ''));
+                            formData.append('arr_purchase[]',($('[name^="arr_purchase"]').eq(index).val() ? $('[name^="arr_purchase"]').eq(index).val() : ''));
+                            formData.append('arr_qty_in[]',($('[name^="arr_qty_in"]').eq(index).val() ? $('[name^="arr_qty_in"]').eq(index).val() : ''));
+                            formData.append('arr_qty_out[]',($('[name^="arr_qty_out"]').eq(index).val() ? $('[name^="arr_qty_out"]').eq(index).val() : ''));
+                            formData.append('arr_note[]',($('[name^="arr_note"]').eq(index).val() ? $('[name^="arr_note"]').eq(index).val() : ''));
+                            formData.append('arr_note2[]',($('[name^="arr_note2"]').eq(index).val() ? $('[name^="arr_note2"]').eq(index).val() : ''));
+                        });
 
-                                $.each(response.error, function(i, val) {
-                                    $.each(val, function(i, val) {
-                                        $('#validation_alert').append(`
-                                            <div class="card-alert card red">
-                                                <div class="card-content white-text">
-                                                    <p>` + val + `</p>
-                                                </div>
-                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                    <span aria-hidden="true">×</span>
-                                                </button>
-                                            </div>
-                                        `);
+                        $.ajax({
+                            url: '{{ Request::url() }}/create',
+                            type: 'POST',
+                            dataType: 'JSON',
+                            data: formData,
+                            contentType: false,
+                            processData: false,
+                            cache: false,
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            beforeSend: function() {
+                                $('#validation_alert').hide();
+                                $('#validation_alert').html('');
+                                loadingOpen('.modal-content');
+                            },
+                            success: function(response) {
+                                loadingClose('.modal-content');
+                                if(response.status == 200) {
+                                    success();
+                                    M.toast({
+                                        html: response.message
                                     });
-                                });
-                            } else {
-                                M.toast({
-                                    html: response.message
+                                } else if(response.status == 422) {
+                                    $('#validation_alert').show();
+                                    $('.modal-content').scrollTop(0);
+                                    
+                                    swal({
+                                        title: 'Ups! Validation',
+                                        text: 'Check your form.',
+                                        icon: 'warning'
+                                    });
+
+                                    $.each(response.error, function(i, val) {
+                                        $.each(val, function(i, val) {
+                                            $('#validation_alert').append(`
+                                                <div class="card-alert card red">
+                                                    <div class="card-content white-text">
+                                                        <p>` + val + `</p>
+                                                    </div>
+                                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                        <span aria-hidden="true">×</span>
+                                                    </button>
+                                                </div>
+                                            `);
+                                        });
+                                    });
+                                } else {
+                                    M.toast({
+                                        html: response.message
+                                    });
+                                }
+                            },
+                            error: function() {
+                                $('.modal-content').scrollTop(0);
+                                loadingClose('.modal-content');
+                                swal({
+                                    title: 'Ups!',
+                                    text: 'Check your internet connection.',
+                                    icon: 'error'
                                 });
                             }
-                        },
-                        error: function() {
-                            $('.modal-content').scrollTop(0);
-                            loadingClose('.modal-content');
-                            swal({
-                                title: 'Ups!',
-                                text: 'Check your internet connection.',
-                                icon: 'error'
-                            });
-                        }
-                    });
+                        });
+                    }else{
+                        swal({
+                            title: 'Ups!',
+                            text: 'Foto cctv timbang masuk tidak boleh kosong.',
+                            icon: 'warning'
+                        });
+                    }
                 }else{
                     swal({
                         title: 'Ups!',
-                        text: 'Foto cctv timbang masuk tidak boleh kosong.',
-                        icon: 'warning'
+                        text: 'Salah satu item belum diatur satuannya.',
+                        icon: 'error'
                     });
                 }
             }
@@ -1775,7 +1806,9 @@
                                         <span id="qtyBalance` + count + `">` + val.qty_balance + `</span>
                                     </td>
                                     <td class="center">
-                                        <span id="arr_satuan` + count + `">` + val.unit + `</span>
+                                        <select class="browser-default" id="arr_satuan` + count + `" name="arr_satuan[]" required>
+                                            <option value="">--Silahkan pilih item--</option>    
+                                        </select>
                                     </td>
                                     <td>
                                         <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan 1..." style="width:100%;" value="` + val.note + `">
@@ -1816,7 +1849,9 @@
                                         <span id="qtyBalance` + count + `">` + val.qty_balance + `</span>
                                     </td>
                                     <td class="center">
-                                        <span id="arr_satuan` + count + `">` + val.unit + `</span>
+                                        <select class="browser-default" id="arr_satuan` + count + `" name="arr_satuan[]" required>
+                                            <option value="">--Silahkan pilih item--</option>    
+                                        </select>
                                     </td>
                                     <td>
                                         <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan 1..." style="width:100%;" value="` + val.note + `">
@@ -1857,6 +1892,15 @@
                             $('#arr_warehouse' + count).val(val.warehouse_id);
 
                             select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+                        }
+
+                        if(val.buy_units.length > 0){
+                            $('#arr_satuan' + count).empty();
+                            $.each(val.buy_units, function(i, value) {
+                                $('#arr_satuan' + count).append(`
+                                    <option value="` + value.id + `" ` + (value.id == val.item_unit_id ? 'selected' : '') + `>` + value.code + `</option>
+                                `);
+                            });
                         }
                     });
                 }

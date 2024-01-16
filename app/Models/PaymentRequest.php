@@ -154,7 +154,8 @@ class PaymentRequest extends Model
           '2'   => 'Transfer',
           '3'   => 'Cek',
           '4'   => 'BG',
-          '5'   => 'Rekonsiliasi',
+          '5'   => 'Rekonsiliasi Tanpa Dokumen',
+          '6'   => 'Rekonsiliasi Dengan Dokumen',
           default => 'Invalid',
         };
 

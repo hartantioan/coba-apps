@@ -114,7 +114,9 @@ class AttendancePeriodController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light yellow darken-2 btn-small" data-popup="tooltip" title="Laporan Presensi" onclick="reportPresence(' . $val->id . ')"><i class="material-icons dp48" style="color:black">directions_walk</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light yellow darken-2  btn-small" data-popup="tooltip" title="Laporan Monthly" onclick="goToMonth(`'.CustomHelper::encrypt($val->id).'`)"><i class="material-icons dp48" style="color:black">event</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light yellow darken-2  btn-small" data-popup="tooltip" title="Laporan Denda" onclick="reportPunishment(`'.CustomHelper::encrypt($val->id).'`)"><i class="material-icons dp48" style="color:black">money_off</i></button>
+
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light yellow darken-2  btn-small" data-popup="tooltip" title="Laporan Salary" onclick="reportSalaryMonthly(`'.CustomHelper::encrypt($val->id).'`)"><i class="material-icons dp48" style="color:black">money_off</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light yellow darken-2  btn-small" data-popup="tooltip" title="Buka Kembali " onclick="reOpen(`'.CustomHelper::encrypt($val->id).'`)"><i class="material-icons dp48" style="color:black">lock_open</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light yellow darken-2  btn-small" data-popup="tooltip" title="Excel" onclick="exportExcel(`'.$val->id.'`)"><i class="material-icons dp48" style="color:black">view_list</i></button>
                     ';
                       
@@ -323,6 +325,8 @@ class AttendancePeriodController extends Controller
                     foreach($query_data as $key=> $row_schedule_filter){//perlusd
                         $query_lembur= null;
                         $lembur = 0;
+                        $query_data[$key]->is_closed = '2';
+                        $query_data[$key]->save();
                         $lembur_awal_shift = 0;
                         $time_in = $row_schedule_filter->shift->time_in;
                         $time_out = $row_schedule_filter->shift->time_out;
@@ -541,7 +545,7 @@ class AttendancePeriodController extends Controller
                                         } 
                                     }
                                     if($row_schedule_filter->status == 5 && $query_lembur && $lembur_awal_shift == 1){////perhitungan untuk time in dimana lembur tidak masuk tapi ada jadwal lembur yang bergabung dengan jam
-                                        info('masukkkkksd'.$date);
+                                      
                                         $time_in_temp = $row_schedule_filter->shift->time_in;
                                         $time_out_temp = $row_schedule_filter->shift->time_out;
                                         $real_time_in_temp =$date->format('Y-m-d') . ' ' . $time_in_temp;
@@ -1761,7 +1765,7 @@ class AttendancePeriodController extends Controller
                 
                 try {
                     $query_close = AttendancePeriod::find($request->id);
-                    $query_close->status            = "1";
+                    $query_close->status            = "2";
                     $query_close->save();
                     DB::commit();
                 }catch(\Exception $e){
@@ -2167,6 +2171,46 @@ class AttendancePeriodController extends Controller
                 'message'  =>$attendance_detail,
                 'punishment' => $counter_user_monthly,
             ];
+        }else{
+            $response =[
+                'status'  =>500,
+                'message' =>'ada yang error'
+            ];
+        }
+        return response()->json($response);
+    }
+
+    public function reopen(Request $request){
+        $query_salary_report = SalaryReport::where('period_id',CustomHelper::decrypt($request->id))->first();
+        $query_salary_report->salaryReportUser->each(function ($salaryReportUser) {
+            $salaryReportUser->salaryReportDetail()->delete();
+        });
+        $query_salary_report->salaryReportUser()->delete();
+        $query_salary_report->salaryReportTemplate()->delete();
+        
+        AttendanceMonthlyReport::where('period_id',CustomHelper::decrypt($request->id))->delete();
+        AttendancePunishment::where('period_id',CustomHelper::decrypt($request->id))->delete();
+        PresenceReport::where('period_id',CustomHelper::decrypt($request->id))->delete();
+        AttendanceDailyReports::where('period_id',CustomHelper::decrypt($request->id))->delete();
+        EmployeeRewardPunishmentPayment::where('period_id',CustomHelper::decrypt($request->id))->delete();
+        if($query_salary_report){
+            $response =[
+                'status'   =>200,
+                'message'  =>'sep',
+            ];
+            $query_close = AttendancePeriod::find(CustomHelper::decrypt($request->id));
+            $date = $query_close->start_date->copy();
+            while($date->lte($query_close->end_date)){
+                $query_data = EmployeeSchedule::whereDate('date', $date->toDateString())->get();
+                foreach($query_data as $key=>$row_schedule){
+                    $query_data[$key]->is_closed = '1';
+                    $query_data[$key]->save();
+                }
+                
+                $date->addDay();
+            }
+            $query_close->status            = "1";
+            $query_close->save();
         }else{
             $response =[
                 'status'  =>500,

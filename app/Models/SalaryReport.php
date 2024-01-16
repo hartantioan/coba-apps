@@ -39,4 +39,12 @@ class SalaryReport extends Model
 
         return substr($prefix,0,9).'-'.$no;
     }
+
+    public function salaryReportUser(){
+        return $this->hasMany('App\Models\SalaryReportUser');
+    }
+
+    public function salaryReportTemplate(){
+        return $this->hasMany('App\Models\SalaryReportTemplate');
+    }
 }

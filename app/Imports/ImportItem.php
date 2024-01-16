@@ -6,7 +6,9 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 
 use App\Models\Item;
+use App\Models\ItemGroup;
 use App\Models\ItemShading;
+use App\Models\Unit;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Validators\ValidationException;
@@ -16,38 +18,33 @@ use Maatwebsite\Excel\Row;
 
 class ImportItem implements OnEachRow, WithHeadingRow, WithValidation, WithBatchInserts
 {
-
+    
     public function onRow(Row $row)
     {
         $row = $row->toArray();
-
+        if (empty(array_filter($row))) {
+            // Stop the import process if all values in the row are empty
+            return;
+        }
+        $item_group_code = explode('#',$row['item_group_id'])[0];
+        $item_group_id=ItemGroup::where('code',$item_group_code)->first();
+        
+        $item_unit_code = explode('#',$row['uom_unit'])[0];
+        $item_unit_id=Unit::where('code',$item_unit_code)->first();
+      
         $query = Item::create([
             'code' => $row['code'],
             'name' => $row['name'],
-            'item_group_id' => $row['item_group_id'],
-            'uom_unit' => $row['uom_unit'],
-            'buy_unit' => $row['buy_unit'],
-            'buy_convert' => $row['buy_convert'],
-            'sell_unit' => $row['sell_unit'],
-            'sell_convert' => $row['sell_convert'],
-            'pallet_unit' => $row['pallet_unit'],
-            'pallet_convert' => $row['pallet_convert'],
-            'production_unit' => $row['production_unit'],
-            'production_convert' => $row['production_convert'],
+            'item_group_id' => $item_group_id->id,
+            'uom_unit' => $item_unit_id->id,
             'tolerance_gr' => $row['tolerance_gr'],
             'is_inventory_item' => $row['is_inventory_item'],
             'is_sales_item' => $row['is_sales_item'],
             'is_purchase_item' => $row['is_purchase_item'],
             'is_service' => $row['is_service'],
             'note' => $row['note'],
-            'status' => $row['status'],
-            'type_id' => $row['type_id'] ? $row['type_id'] : NULL,
-            'size_id' => $row['size_id'] ? $row['size_id'] : NULL,
-            'variety_id' => $row['variety_id'] ? $row['variety_id'] : NULL,
-            'pattern_id' => $row['pattern_id'] ? $row['pattern_id'] : NULL,
-            'color_id' => $row['color_id'] ? $row['color_id'] : NULL,
-            'grade_id' => $row['grade_id'] ? $row['grade_id'] : NULL,
-            'brand_id' => $row['brand_id'] ? $row['brand_id'] : NULL,
+            'status' => '1',
+            'shading' => $row['shading'],
         ]);
 
         if($row['shading']){
@@ -63,34 +60,21 @@ class ImportItem implements OnEachRow, WithHeadingRow, WithValidation, WithBatch
 
     public function rules(): array
     {
+      
         return [
             '*.code' => 'required|unique:items,code',
             '*.name' => 'required|string',
-            '*.item_group_id' => 'required|integer',
+            '*.item_group_id' => 'required',
             '*.uom_unit' => 'required',
-            '*.buy_unit' => 'required',
-            '*.buy_convert' => 'required|numeric',
-            '*.sell_unit' => 'required',
-            '*.sell_convert' => 'required|numeric',
-            '*.pallet_unit' => 'required',
-            '*.pallet_convert' => 'required|numeric',
-            '*.production_unit' => 'required',
-            '*.production_convert' => 'required|numeric',
             '*.tolerance_gr' => 'required|numeric',
             '*.is_inventory_item' => 'nullable',
             '*.is_sales_item' => 'nullable',
             '*.is_purchase_item' => 'nullable',
             '*.is_service' => 'nullable',
             '*.note' => 'nullable',
-            '*.status' => 'required',
-            '*.type_id' => 'nullable',
-            '*.size_id' => 'nullable',
-            '*.variety_id' => 'nullable',
-            '*.pattern_id' => 'nullable',
-            '*.color_id' => 'nullable',
-            '*.grade_id' => 'nullable',
-            '*.brand_id' => 'nullable',
-            '*.shading' => 'nullable',
+            '*.min_stock' => 'nullable|required_with:max_stock', // Allow empty, but if min_stock is present, max_stock must also be present
+            '*.max_stock' => 'nullable|required_with:min_stock', // Allow empty, but if max_stock is present, min_stock must also be present
+            '*.shading'   => 'nullable',
         ];
     }
 

@@ -13,6 +13,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use App\Exports\ExportTemplateMasterItem;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -21,6 +22,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Item;
 use App\Models\Unit;
 use App\Models\ItemGroup;
+
 use App\Models\Warehouse;
 use Illuminate\Support\Facades\DB;
 use App\Imports\ImportItem;
@@ -784,6 +786,10 @@ class ItemController extends Controller
             ];
             return response()->json($response);
         }
+    }
+
+    public function getImportExcel(){
+        return Excel::download(new ExportTemplateMasterItem(), 'format_master_item'.uniqid().'.xlsx');
     }
     
 }

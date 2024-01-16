@@ -629,6 +629,7 @@ Route::prefix('admin')->group(function () {
                         Route::post('print',[ItemController::class, 'print']);
                         Route::post('print_barcode',[ItemController::class, 'printBarcode']);
                         Route::get('export',[ItemController::class, 'export']);
+                        Route::get('get_import_excel',[ItemController::class, 'getImportExcel']);
                         Route::post('import',[ItemController::class, 'import'])->middleware('operation.access:item,update');
                         Route::post('create',[ItemController::class, 'create'])->middleware('operation.access:item,update');
                         Route::post('create_shading',[ItemController::class, 'createShading'])->middleware('operation.access:item,update');
@@ -882,6 +883,7 @@ Route::prefix('admin')->group(function () {
                         Route::post('punishment_report',[AttendancePeriodController::class, 'punishmentReport']);
                         Route::post('daily_report',[AttendancePeriodController::class, 'dailyReport']);
                         Route::post('close',[AttendancePeriodController::class, 'close'])->middleware('operation.access:attendance_period,update');
+                        Route::post('reopen',[AttendancePeriodController::class, 'reopen'])->middleware('operation.access:attendance_period,update');
                         Route::get('export',[AttendancePeriodController::class, 'export'])->middleware('operation.access:attendance_period,view');
                         Route::post('destroy', [AttendancePeriodController::class, 'destroy'])->middleware('operation.access:attendance_period,delete');
                     });

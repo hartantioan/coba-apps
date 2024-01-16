@@ -216,7 +216,7 @@
                         </div>
                     </div>
                     <div class="input-field col m6 s12">
-                        Download format disini : <a href="{{ asset(Storage::url('format_imports/format_item.xlsx')) }}" target="_blank">File</a>
+                        <h6>Anda bisa menggunakan fitur copy paste dari format excel yang telah disediakan. Silahkan klik <a href="{{-- {{ asset(Storage::url('format_imports/format_copas_ap_invoice_2.xlsx')) }} --}}{{ Request::url() }}/get_import_excel" target="_blank">disini</a> untuk mengunduh. Jangan menyalin kolom paling atas (bagian header), dan tempel pada isian paling kiri di tabel di bawah ini.</h6>
                     </div>
                     <div class="input-field col m12 s12">
                         <button type="submit" class="btn cyan btn-primary btn-block right">Kirim</button>

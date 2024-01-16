@@ -418,7 +418,7 @@
             onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
-                
+                $('#salary_canvas2').empty();
                 $('#salary_canvas').empty();
                 M.updateTextFields();
             }
@@ -802,6 +802,51 @@
             if (willDelete) {
                 $.ajax({
                     url: '{{ Request::url() }}/close',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        id: id
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('#main');
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        loadingClose('#main');
+                        loadDataTable();
+                        M.updateTextFields();
+                    },
+                    error: function() {
+                        
+                        loadingClose('#main');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    function reOpen(id){
+        swal({
+            title: "Apakah anda yakin?",
+            text: "Anda tidak bisa mengembalikan Periode yang telah ditutup!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                $.ajax({
+                    url: '{{ Request::url() }}/reopen',
                     type: 'POST',
                     dataType: 'JSON',
                     data: {

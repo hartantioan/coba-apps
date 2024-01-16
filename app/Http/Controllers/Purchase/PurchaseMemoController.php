@@ -1096,7 +1096,7 @@ class PurchaseMemoController extends Controller
                                 'properties'=> [
                                     ['name'=> "Tanggal: ".$data_gs->goodReceiptDetail->goodReceipt->post_date],
                                     ['name'=> "Vendor  : ".$data_gs->goodReceiptDetail->goodReceipt->supplier->name],
-                                    ['name'=> "Nominal : Rp.:".number_format($data_gs->goodReceiptDetail->goodReceipt->grandtotal,2,',','.')]
+                                    // ['name'=> "Nominal : Rp.:".number_format($data_gs->goodReceiptDetail->goodReceipt->grandtotal,2,',','.')]
                                 ],
                                 'key'=>$data_gs->goodReceiptDetail->goodReceipt->code,
                                 'name'=>$data_gs->goodReceiptDetail->goodReceipt->code,
@@ -1126,7 +1126,7 @@ class PurchaseMemoController extends Controller
                         $data_good_receipt = [
                             "name"=>$good_return_detail->goodReceiptDetail->goodReceipt->code,
                             "key" => $good_return_detail->goodReceiptDetail->goodReceipt->code,
-                            "color"=>"lightblue",
+                   
                             'properties'=> [
                                 ['name'=> "Tanggal :".$good_return_detail->goodReceiptDetail->goodReceipt->post_date],
                             ],
@@ -1206,7 +1206,7 @@ class PurchaseMemoController extends Controller
                             $data_good_receipt=[
                                 'properties'=> [
                                     ['name'=> "Tanggal :".$row->lookable->goodReceipt->post_date],
-                                    ['name'=> "Nominal : Rp.".number_format($row->lookable->goodReceipt->grandtotal,2,',','.')]
+                                    // ['name'=> "Nominal : Rp.".number_format($row->lookable->goodReceipt->grandtotal,2,',','.')]
                                 ],
                                 "key" => $row->lookable->goodReceipt->code,
                                 "name" => $row->lookable->goodReceipt->code,
@@ -1572,10 +1572,10 @@ class PurchaseMemoController extends Controller
                         }
                         
                         if($row_pyr_detail->paymentRequest->paymentRequestCross()->exists()){
-           
+                          
                            
                             foreach($row_pyr_detail->paymentRequest->paymentRequestCross as $row_pyr_cross){
-                                
+                                 
                                 $data_pyrc_tempura = [
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row_pyr_cross->lookable->post_date],
@@ -1592,8 +1592,9 @@ class PurchaseMemoController extends Controller
                                     'to'=>$row_pyr_detail->paymentRequest->code,
                                     'string_link'=>$row_pyr_cross->lookable->code.$row_pyr_detail->paymentRequest->code,
                                 ];
-                                if(!in_array($row_pyr_cross->lookable->id, $data_id_pyrcs)){
-                                    $data_id_pyrcs[] = $row_pyr_cross->lookable->id;
+                                if(!in_array($row_pyr_cross->id, $data_id_pyrcs)){
+                                    $data_id_pyrcs[] = $row_pyr_cross->id;
+                                    
                                 }
                             }
 
@@ -1604,8 +1605,9 @@ class PurchaseMemoController extends Controller
                 }
 
                 foreach($data_id_pyrcs as $payment_request_cross_id){
+                     
                     $query_pyrc = PaymentRequestCross::find($payment_request_cross_id);
-                    if($query_pyrc->paymentRequest->exists()){
+                    if($query_pyrc->paymentRequest()->exists()){
                         $data_pyr_tempura = [
                             'key'   => $query_pyrc->paymentRequest->code,
                             "name"  => $query_pyrc->paymentRequest->code,
@@ -1622,8 +1624,8 @@ class PurchaseMemoController extends Controller
                             'string_link'=>$query_pyrc->code.$query_pyrc->paymentRequest->code,
                         ];
                         
-                        if(!in_array($query_pyrc->id, $data_id_pyrs)){
-                            $data_id_pyrs[] = $query_pyrc->id;
+                        if(!in_array($query_pyrc->paymentRequest->id, $data_id_pyrs)){
+                            $data_id_pyrs[] = $query_pyrc->paymentRequest->id;
                             $added=true;
                         }
                     }
@@ -1891,7 +1893,7 @@ class PurchaseMemoController extends Controller
                                 'name'=> $lc_detail->lookable->goodReceipt->code,
                                 'properties'=> [
                                     ['name'=> "Tanggal :".$lc_detail->lookable->goodReceipt->post_date],
-                                    ['name'=> "Nominal : Rp.:".number_format($lc_detail->lookable->goodReceipt->grandtotal,2,',','.')],
+                                    // ['name'=> "Nominal : Rp.:".number_format($lc_detail->lookable->goodReceipt->grandtotal,2,',','.')],
                                  ],
                                 'url'=>request()->root()."/admin/purchase/good_receipt?code=".CustomHelper::encrypt($lc_detail->lookable->goodReceipt->code),
                             ];
@@ -2047,7 +2049,7 @@ class PurchaseMemoController extends Controller
                                 $data_good_receipt = [
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$good_receipt_detail->goodReceipt->post_date],
-                                        ['name'=> "Nominal : Rp.".number_format($good_receipt_detail->goodReceipt->grandtotal,2,',','.')]
+                                        // ['name'=> "Nominal : Rp.".number_format($good_receipt_detail->goodReceipt->grandtotal,2,',','.')]
                                     ],
                                     "key" => $good_receipt_detail->goodReceipt->code,
                                     "name" => $good_receipt_detail->goodReceipt->code,

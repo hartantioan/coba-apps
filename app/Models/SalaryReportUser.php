@@ -28,5 +28,9 @@ class SalaryReportUser extends Model
     public function salaryReport(){
         return $this->belongsTo('App\Models\SalaryReport', 'salary_report_id', 'id')->withTrashed();
     }
+
+    public function salaryReportDetail(){
+        return $this->hasMany('App\Models\SalaryReportDetail');
+    }
     
 }

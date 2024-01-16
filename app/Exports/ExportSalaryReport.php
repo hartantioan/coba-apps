@@ -58,19 +58,27 @@ class ExportSalaryReport implements  FromView,ShouldAutoSize,WithTitle
 
             $plant_for_user[$row_plant->id]['thead'][] ='Nama';
             $plant_for_user[$row_plant->id]['thead'][] ='NIK';
+            $plant_for_user[$row_plant->id]['thead'][] ='Bagian';
+            $plant_for_user[$row_plant->id]['thead'][] ='Total Hari';
 
         }
+        $total_component = [];
         foreach($salary_report_template as $row_template){
-            if($row_template->lookable_type == 'salary_components' && $row_template->lookable_id != 2 ){
+            if($row_template->lookable_type == 'salary_components' && $row_template->lookable_id != 1 ){
                 foreach($plant_for_user as $key=>$rowws){
+                    $total_component[$row_template->salaryComponent->name]= 0 ;
                     $plant_for_user[$key]['thead'][]=$row_template->salaryComponent->name;
                 }
             }
             if($row_template->lookable_type == 'punishments'){
+                $total_component[$row_template->punishment->name]= 0 ;
                 $plant_for_user[$row_template->punishment->place_id]['thead'][]=$row_template->punishment->name;
-            }
+            } 
             
         }
+        $total_component['Total Lembur Kusus']= 0 ;
+        $total_component['Total Lembur']= 0 ;
+        $total_component['Total Hari']= 0 ;
         foreach($plant_for_user as $key=>$rowws){
             $plant_for_user[$key]['thead'][]='Total Lembur';
             $plant_for_user[$key]['thead'][]='Total Lembur Kusus';
@@ -79,15 +87,23 @@ class ExportSalaryReport implements  FromView,ShouldAutoSize,WithTitle
             $plant_for_user[$key]['thead'][]='Total Tunjangan Kinerja';
             $plant_for_user[$key]['thead'][]='Total Gaji';
         }
-
-        foreach($salary_report_user as $row_user_report){
+        $total_semua = 0;
+        $total_efektif_day = 0;
+        $total_hukuman = 0;
+        $total_minus_denda = 0;
+        $total_tunjangan=0;
+        foreach($salary_report_user as $key_tbody=>$row_user_report){
             $query_detail = SalaryReportDetail::where('salary_report_user_id',$row_user_report->id)
             ->where('lookable_type','!=','overtime_requests')->get();
             $query_detail_overtime = SalaryReportDetail::where('salary_report_user_id',$row_user_report->id)
             ->where('lookable_type','overtime_requests')->get();
-            $plant_for_user[$row_user_report->user->place_id]['tbody'][]=$row_user_report->user->name;
-            $plant_for_user[$row_user_report->user->place_id]['tbody'][]=$row_user_report->user->employee_no;
-            
+            $query_monthly_report_by_user = AttendanceMonthlyReport::where('period_id', $this->period_id)->
+            where('user_id',$row_user_report->user->id)->first();
+            $total_efektif_day += $query_monthly_report_by_user->effective_day;
+            $plant_for_user[$row_user_report->user->place_id]['tbody'][$key_tbody][]=$row_user_report->user->name;
+            $plant_for_user[$row_user_report->user->place_id]['tbody'][$key_tbody][]=$row_user_report->user->employee_no;
+            $plant_for_user[$row_user_report->user->place_id]['tbody'][$key_tbody][]=$row_user_report->user->position->name;
+            $plant_for_user[$row_user_report->user->place_id]['tbody'][$key_tbody][]=$query_monthly_report_by_user->effective_day;
             $nominal_plus = 0 ;
             $nominal_minus = 0 ;
             foreach($salary_report_template as $row_template){
@@ -97,11 +113,20 @@ class ExportSalaryReport implements  FromView,ShouldAutoSize,WithTitle
                     if($row_detail->lookable_type == $row_template->lookable_type && $row_detail->lookable_id == $row_template->lookable_id){
                         if($row_detail->lookable_type == 'punishments'){
                             $nominal_minus+=$row_detail->nominal;
+                            $total_component[$row_template->punishment->name]+=$row_detail->nominal;
                         }
-                       
-                        $plant_for_user[$row_user_report->user->place_id]['tbody'][]=$row_detail->nominal;
+                        if($row_detail->lookable_type == 'salary_components'){
+                            $total_component[$row_template->salaryComponent->name]+=$row_detail->nominal;
+                           
+                        }
+                        
+                        $plant_for_user[$row_user_report->user->place_id]['tbody'][$key_tbody][]=number_format($row_detail->nominal,2,',','.');
+                        
+                        
                     }
-                    
+                   
+
+                 
                 }
             }
             $query_payment = EmployeeRewardPunishmentPayment::where('period_id',$this->period_id)->
@@ -114,20 +139,39 @@ class ExportSalaryReport implements  FromView,ShouldAutoSize,WithTitle
             }
             foreach($query_detail_overtime as $row_overtime_detail){
                 $nominal_plus += $row_overtime_detail->nominal ;
-                $plant_for_user[$row_user_report->user->place_id]['tbody'][]=$row_overtime_detail->nominal;
-                
+               
+                $plant_for_user[$row_user_report->user->place_id]['tbody'][$key_tbody][]=number_format($row_overtime_detail->nominal,2,',','.');
+                if($row_overtime_detail->lookable_id == -1 ){
+                        
+                    $total_component['Total Lembur']+=$row_overtime_detail->nominal;
+                }
+                if( $row_overtime_detail->lookable_id == -2){
+                    
+                    $total_component['Total Lembur Kusus']+=$row_overtime_detail->nominal;
+                }
             }  
            
-            $plant_for_user[$row_user_report->user->place_id]['tbody'][]=$nominal_minus;
-            $plant_for_user[$row_user_report->user->place_id]['tbody'][]=$row_user_report->total_minus;
-            $plant_for_user[$row_user_report->user->place_id]['tbody'][]=$nominal_plus;
-            $plant_for_user[$row_user_report->user->place_id]['tbody'][]=$row_user_report->total_received;
-            
+            $plant_for_user[$row_user_report->user->place_id]['tbody'][$key_tbody][]=number_format($nominal_minus,2,',','.');
+            $plant_for_user[$row_user_report->user->place_id]['tbody'][$key_tbody][]=number_format($row_user_report->total_minus,2,',','.');
+            $plant_for_user[$row_user_report->user->place_id]['tbody'][$key_tbody][]=number_format($nominal_plus,2,',','.');
+            $plant_for_user[$row_user_report->user->place_id]['tbody'][$key_tbody][]=number_format($row_user_report->total_received,2,',','.');
+            $total_semua+=$row_user_report->total_received;
+            $total_hukuman+=$nominal_minus;
+            $total_minus_denda += $row_user_report->total_minus;
+            $total_tunjangan +=$nominal_plus; 
         }
-            
+        $total_component['Total Hukuman']=$total_hukuman;
+        $total_component['Total Denda']=$total_minus_denda;     
+        $total_component['Total Tunjangan Kinerja']=$total_tunjangan;     
+        $total_component['Total Gaji']=$total_semua;          
+        $formattedData = array_map(function ($value) {
+            return is_numeric($value) ? number_format($value, 2, ',', '.') : $value;
+        }, $total_component);
+        
       
         return view('admin.exports.salary_report', [
             'data' => $plant_for_user,
+            'last_total'=>$formattedData,
             'title'=> $title,
         ]);
         

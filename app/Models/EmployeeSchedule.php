@@ -19,6 +19,7 @@ class EmployeeSchedule extends Model
         'shift_id',
         'date',
         'status',
+        'is_closed',
         'shift_request_id'
     ];
     public function user(){

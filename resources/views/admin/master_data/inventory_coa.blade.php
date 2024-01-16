@@ -71,7 +71,7 @@
                                                         <th>Kode</th>
                                                         <th>Nama</th>
                                                         <th>Coa</th>
-                                                        <th>Tipe</th>
+                                                        <th>Tipe Pengeluaran</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>

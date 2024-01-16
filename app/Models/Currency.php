@@ -19,8 +19,19 @@ class Currency extends Model
         'name',
         'document_text',
         'symbol',
+        'type',
         'status'
     ];
+
+    public function type(){
+        $type = match ($this->type) {
+            '1' => 'Lokal',
+            '2' => 'Asing',
+            default => 'Invalid',
+        };
+
+        return $type;
+    }
 
     public function status(){
         switch($this->status) {

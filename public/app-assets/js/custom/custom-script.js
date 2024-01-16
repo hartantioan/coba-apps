@@ -264,10 +264,26 @@ $(document).on('focus', '.select2.select2-container', function (e) {
 	}
 });
 
+Date.prototype.yyyymmdd = function(showtime) {
+	var dateString = this.getFullYear() +"-"+
+		("0" + (this.getMonth()+1)).slice(-2) +"-"+
+		("0" + this.getDate()).slice(-2) + " ";
+	if (showtime || false) {
+		dateString += ("0" + this.getHours()).slice(-2) + ":" +
+		("0" + this.getMinutes()).slice(-2) + ":" +
+		("0" + this.getSeconds()).slice(-2) + "." +
+		("00" + this.getMilliseconds()).slice(-3)
+	}
+	return dateString;
+}
+
 function loadCurrency(){
-	let code = $('#currency_id').find(':selected').data('code');
+	let code = $('#currency_id').find(':selected').data('code'), date = $('#post_date').val();
+	var yesterday = new Date(date);
+	yesterday.setDate(yesterday.getDate() -1);
+	let dateString = yesterday.yyyymmdd();
 	$.ajax({
-		url: 'https://api.freecurrencyapi.com/v1/latest?apikey=fca_live_sJNdkvotKpFObXVFuzKSo0VBkrTkePfvixsZHBlz&currencies=IDR&base_currency=' + code,
+		url: 'https://api.freecurrencyapi.com/v1/historical?apikey=fca_live_sJNdkvotKpFObXVFuzKSo0VBkrTkePfvixsZHBlz&currencies=IDR&base_currency=' + code + '&date=' + dateString,
 		type: 'GET',
 		beforeSend: function() {
 			loadingOpen('#currency_rate');
@@ -277,7 +293,10 @@ function loadCurrency(){
 		},
 		success: function(response) {
 			loadingClose('#currency_rate');
-			$('#currency_rate').val(formatRupiahIni(parseFloat(response.data.IDR).toFixed(2).toString().replace('.',',')));
+			let keys = Object.keys(response.data);
+			keys.forEach(function (k) {
+				$('#currency_rate').val(formatRupiahIni(parseFloat(response.data[k].IDR).toFixed(2).toString().replace('.',',')));
+			});
 		},
 		error: function() {
 			swal({

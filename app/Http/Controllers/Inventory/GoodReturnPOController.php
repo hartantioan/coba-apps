@@ -519,7 +519,7 @@ class GoodReturnPOController extends Controller
                 <td class="center-align">'.$rowdetail->itemUnit->unit->code.'</td>
                 <td class="">'.$rowdetail->note.'</td>
                 <td class="">'.$rowdetail->note2.'</td>
-                <td class="center-align">'.$rowdetail->goodReceiptDetail->place->name.' - '.$rowdetail->goodReceiptDetail->place->company->name.'</td>
+                <td class="center-align">'.$rowdetail->goodReceiptDetail->place->code.'</td>
                 <td class="center-align">'.($rowdetail->goodReceiptDetail->department_id ? $rowdetail->goodReceiptDetail->department->name : '-').'</td>
                 <td class="center-align">'.$rowdetail->goodReceiptDetail->warehouse->name.'</td>
                 <td class="center-align">'.$rowdetail->goodReceiptDetail->goodReceipt->code.'</td>

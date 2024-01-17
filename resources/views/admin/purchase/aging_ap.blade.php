@@ -43,7 +43,7 @@
                                                 <div class="row">
                                                     <div class="col m2 s6 ">
                                                         <label for="date" style="font-size:1rem;">Tanggal Batas :</label>
-                                                        <input type="date" id="date" name="date" value="{{ date('Y-m-d') }}">
+                                                        <input type="date" max="{{ date('Y'.'-12-31') }}" id="date" name="date" value="{{ date('Y-m-d') }}">
                                                     </div>
                                                     <div class="col m2 s6 ">
                                                         <label for="interval" style="font-size:1rem;">Interval (Ex: 30 hari) :</label>

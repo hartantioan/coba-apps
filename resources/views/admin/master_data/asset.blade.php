@@ -196,7 +196,7 @@
                             <label class="" for="method">Metode Hitung</label>
                         </div>
                         <div class="input-field col m4 s6">
-                            <input id="date" name="date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. kapitalisasi" readonly>
+                            <input id="date" name="date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('Y'.'-12-31') }}" placeholder="Tgl. kapitalisasi" readonly>
                             <label class="active" for="date">Tgl. Kapitalisasi (Dari form kapitalisasi)</label>
                         </div>
                         <div class="input-field col m4 s6">

@@ -125,7 +125,7 @@
                                         <label class="active" for="outlet_id">Outlet</label>
                                     </div>
                                     <div class="input-field col s3">
-                                        <input id="date" name="date" type="date" placeholder="Tgl.posting" value="{{ date('Y-m-d') }}">
+                                        <input id="date" name="date" type="date" max="{{ date('Y'.'-12-31') }}" placeholder="Tgl.posting" value="{{ date('Y-m-d') }}">
                                         <label class="active" for="date">Tgl. Posting</label>
                                     </div>
                                     <div class="input-field col s3">

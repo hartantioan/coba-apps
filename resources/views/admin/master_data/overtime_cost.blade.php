@@ -144,11 +144,11 @@
                             <label class="active" for="nominal">Nominal</label>
                         </div>
                         <div class="input-field col s6">
-                            <input id="start_date" name="start_date" type="date" placeholder="mm/dd/yyyy">
+                            <input id="start_date" name="start_date" type="date" max="{{ date('Y'.'-12-31') }}" placeholder="mm/dd/yyyy">
                             <label class="active" for="start_date">Tanggal Mulai</label>
                         </div>
                         <div class="input-field col s6">
-                            <input id="end_date" name="end_date" type="date" placeholder="mm/dd/yyyy">
+                            <input id="end_date" name="end_date" type="date" max="{{ date('Y'.'-12-31') }}" placeholder="mm/dd/yyyy">
                             <label class="active" for="end_date">Tanggal Akhir</label>
                         </div>
                         <div class="input-field col s4">

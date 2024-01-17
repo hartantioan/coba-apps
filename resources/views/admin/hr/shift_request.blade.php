@@ -158,7 +158,7 @@
                                                 <select class="browser-default item-array" id="arr_schedule0" name="arr_schedule[]"></select>
                                             </td>
                                             <td>
-                                                <input name="arr_date[]" type="date">
+                                                <input name="arr_date[]" type="date" max="{{ date('Y'.'-12-31') }}">
                                             </td>
                                             <td class="center">
                                                 <select class="browser-default shift_array" id="arr_shift0" name="arr_shift[]"></select>
@@ -183,7 +183,7 @@
                         </div>
                     
                         <div class="file-field input-field col m3 s12 step16">
-                            <input id="post_date" name="post_date"   type="date" placeholder="Tanggal Post">
+                            <input id="post_date" name="post_date"   type="date" max="{{ date('Y'.'-12-31') }}" placeholder="Tanggal Post">
                             <label class="active" for="post_date">Tanggal Post</label>
                         </div>
                         
@@ -447,7 +447,7 @@
                     <select class="browser-default item-array" id="arr_schedule` + count + `" name="arr_schedule[]"></select>
                 </td>
                 <td>
-                    <input name="arr_date[]" type="date">
+                    <input name="arr_date[]" type="date" max="{{ date('Y'.'-12-31') }}">
                 </td>
                 <td class="center">
                     <select class="browser-default shift_array" id="arr_shift`+count+`" name="arr_shift[]"></select>

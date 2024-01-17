@@ -93,13 +93,13 @@
                                             <div class="col m4 s6 ">
                                                 <label for="start_date" style="font-size:1rem;">Tanggal Mulai :</label>
                                                 <div class="input-field col s12">
-                                                <input type="date" id="start_date" name="start_date"  onchange="loadDataTable()">
+                                                <input type="date" max="{{ date('Y'.'-12-31') }}" id="start_date" name="start_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
                                                 <label for="finish_date" style="font-size:1rem;">Tanggal Akhir :</label>
                                                 <div class="input-field col s12">
-                                                    <input type="date" id="finish_date" name="finish_date"  onchange="loadDataTable()">
+                                                    <input type="date" max="{{ date('Y'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
                                         </div>  
@@ -619,7 +619,7 @@
                         <div class="row">
                             <div class="col s12">
                                 <div class="input-field col m4 s12">
-                                    <input id="post_date_return" name="post_date_return" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                                    <input id="post_date_return" name="post_date_return" type="date" max="{{ date('Y'.'-12-31') }}" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                     <label class="active" for="post_date_return">Tgl.Kembali</label>
                                 </div>
                                 <div class="file-field input-field col m4 s12">

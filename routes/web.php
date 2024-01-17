@@ -20,6 +20,7 @@ use App\Http\Controllers\Inventory\GoodScaleController;
 use App\Http\Controllers\Inventory\InventoryReportController;
 use App\Http\Controllers\Inventory\StockInRupiahController;
 use App\Http\Controllers\Inventory\StockInQtyController;
+use App\Http\Controllers\Inventory\MinimumStockController;
 use App\Http\Controllers\MasterData\AttendanceMachineController;
 use App\Http\Controllers\MasterData\AttendancePeriodController;
 use App\Http\Controllers\MasterData\DivisionController;
@@ -1785,6 +1786,11 @@ Route::prefix('admin')->group(function () {
                         Route::get('/',[StockInQtyController::class, 'index']);
                         Route::post('filter',[StockInQtyController::class, 'filter']);
                         Route::get('export',[StockInQtyController::class, 'export']);
+                    });
+                    Route::prefix('minimum_stock')->middleware('operation.access:stock_in_qty,view')->group(function () {
+                        Route::get('/',[MinimumStockController::class, 'index']);
+                        Route::post('filter',[MinimumStockController::class, 'filter']);
+                        Route::get('export',[MinimumStockController::class, 'export']);
                     });
                     Route::prefix('stock_in_rupiah')->middleware('operation.access:stock_in_rupiah,view')->group(function () {
                         Route::get('/',[StockInRupiahController::class, 'index']);

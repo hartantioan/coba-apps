@@ -67,13 +67,13 @@
                                             <div class="col m4 s6 ">
                                                 <label for="start_date" style="font-size:1rem;">Tanggal Mulai :</label>
                                                 <div class="input-field col s12">
-                                                    <input type="date" id="start_date" name="start_date"  onchange="loadDataTable()">
+                                                    <input type="date" max="{{ date('Y'.'-12-31') }}" id="start_date" name="start_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
                                                 <label for="finish_date" style="font-size:1rem;">Tanggal Akhir :</label>
                                                 <div class="input-field col s12">
-                                                    <input type="date" id="finish_date" name="finish_date"  onchange="loadDataTable()">
+                                                    <input type="date" max="{{ date('Y'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
                                         </div>
@@ -156,7 +156,7 @@
                                     <label class="active" for="post_date">Tgl. Posting</label>
                                 </div>
                                 <div class="input-field col m4 s12 step4">
-                                    <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" max="{{ date('Y').'-12-31' }}" type="date" placeholder="Tgl. posting">
+                                    <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" max="{{ date('Y').'-12-31' }}" type="date" max="{{ date('Y'.'-12-31') }}" placeholder="Tgl. posting">
                                     <label class="active" for="due_date">Tgl. Jatuh Tempo</label>
                                 </div>
                                 <div class="file-field input-field col m4 s12 step6">
@@ -246,7 +246,7 @@
                                                         <input name="arr_note2[]" type="text" placeholder="Keterangan barang 2...">
                                                     </td>
                                                     <td>
-                                                        <input name="arr_required_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}">
+                                                        <input name="arr_required_date[]" type="date" max="{{ date('Y'.'-12-31') }}" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}">
                                                     </td>
                                                     <td>
                                                         <select class="browser-default" id="arr_place0" name="arr_place[]">
@@ -1437,7 +1437,7 @@
                                     <input name="arr_note2[]" type="text" placeholder="Keterangan barang 2..." value="` + val.note2 + `">
                                 </td>
                                 <td>
-                                    <input name="arr_required_date[]" type="date" value="` + val.date + `" min="` + $('#post_date').val() + `">
+                                    <input name="arr_required_date[]" type="date" max="{{ date('Y'.'-12-31') }}" value="` + val.date + `" min="` + $('#post_date').val() + `">
                                 </td>
                                 <td>
                                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
@@ -1603,7 +1603,7 @@
                                             <input name="arr_note2[]" type="text" placeholder="Keterangan barang 2..." value="` + val.note2 + `">
                                         </td>
                                         <td>
-                                            <input name="arr_required_date[]" type="date" value="` + val.date + `" min="` + $('#post_date').val() + `">
+                                            <input name="arr_required_date[]" type="date" max="{{ date('Y'.'-12-31') }}" value="` + val.date + `" min="` + $('#post_date').val() + `">
                                         </td>
                                         <td>
                                             <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
@@ -1798,7 +1798,7 @@
                                         <input name="arr_note2[]" type="text" placeholder="Keterangan barang 2..." value="` + val.note2 + `">
                                     </td>
                                     <td>
-                                        <input name="arr_required_date[]" type="date" value="` + val.date + `">
+                                        <input name="arr_required_date[]" type="date" max="{{ date('Y'.'-12-31') }}" value="` + val.date + `">
                                     </td>
                                     <td>
                                         <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
@@ -1989,7 +1989,7 @@
                     <input name="arr_note2[]" type="text" placeholder="Keterangan barang 2...">
                 </td>
                 <td>
-                    <input name="arr_required_date[]" type="date" value="{{ date('Y-m-d') }}" min="` + $('#post_date').val() + `">
+                    <input name="arr_required_date[]" type="date" max="{{ date('Y'.'-12-31') }}" value="{{ date('Y-m-d') }}" min="` + $('#post_date').val() + `">
                 </td>
                 <td>
                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
@@ -2082,7 +2082,7 @@
                             <input name="arr_note2[]" type="text" placeholder="Keterangan barang 2...">
                         </td>
                         <td>
-                            <input name="arr_required_date[]" type="date" value="{{ date('Y-m-d') }}" min="` + $('#post_date').val() + `">
+                            <input name="arr_required_date[]" type="date" max="{{ date('Y'.'-12-31') }}" value="{{ date('Y-m-d') }}" min="` + $('#post_date').val() + `">
                         </td>
                         <td>
                             <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">

@@ -41,7 +41,7 @@
                                                 <div class="row">
                                                     <div class="col m3 s6 ">
                                                         <label for="date" style="font-size:1rem;">Tanggal Posting :</label>
-                                                        <input type="date" id="date" name="date" value="{{ date('Y-m-d') }}">
+                                                        <input type="date" max="{{ date('Y'.'-12-31') }}" id="date" name="date" value="{{ date('Y-m-d') }}">
                                                     </div>
                                                     <div class="col m4 s6 pt-2">
                                                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="filterByDate();">

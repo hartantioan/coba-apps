@@ -75,13 +75,13 @@
                                             <div class="col m3 s6 ">
                                                 <label for="start_date" style="font-size:1rem;">Tanggal Mulai :</label>
                                                 <div class="input-field col s12">
-                                                <input type="date" id="start_date" name="start_date"  onchange="loadDataTable()">
+                                                <input type="date" max="{{ date('Y'.'-12-31') }}" id="start_date" name="start_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
                                             <div class="col m3 s6 ">
                                                 <label for="finish_date" style="font-size:1rem;">Tanggal Akhir :</label>
                                                 <div class="input-field col s12">
-                                                    <input type="date" id="finish_date" name="finish_date"  onchange="loadDataTable()">
+                                                    <input type="date" max="{{ date('Y'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
                                         </div>
@@ -629,7 +629,7 @@
                                     <input name="arr_note[]" type="text" placeholder="Keterangan barang..." value="` + val.note + `">
                                 </td>
                                 <td>
-                                    <input name="arr_required_date[]" type="date" value="` + val.date + `" min="` + $('#post_date').val() + `">
+                                    <input name="arr_required_date[]" type="date" max="{{ date('Y'.'-12-31') }}" value="` + val.date + `" min="` + $('#post_date').val() + `">
                                 </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">

@@ -73,13 +73,13 @@
                                             <div class="col m4 s6 ">
                                                 <label for="start_date" style="font-size:1rem;">Tanggal Mulai :</label>
                                                 <div class="input-field col s12">
-                                                <input class="form-control" type="date" id="start_date" name="start_date"  onchange="loadDataTable()">
+                                                <input class="form-control" type="date" max="{{ date('Y'.'-12-31') }}" id="start_date" name="start_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
                                                 <label for="finish_date" style="font-size:1rem;">Tanggal Akhir :</label>
                                                 <div class="input-field col s12">
-                                                    <input class="form-control" type="date" id="finish_date" name="finish_date"  onchange="loadDataTable()">
+                                                    <input class="form-control" type="date" max="{{ date('Y'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
                                         </div>  

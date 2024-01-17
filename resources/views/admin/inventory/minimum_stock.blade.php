@@ -1,3 +1,8 @@
+<style>
+    .select-wrapper, .select2-container {
+        height:3.7rem !important;
+    }
+</style>
 <div id="main">
     <div class="row">
         <div class="pt-3 pb-1" id="breadcrumbs-wrapper">
@@ -34,14 +39,16 @@
                                     <div class="row">
                                         <div class="input-field col m3 s12">
                                             <select class="form-control" id="plant" name="plant">
+                                                <option value="all">SEMUA</option>
                                                 @foreach ($place as $row)
-                                                    <option value="{{ $row->id }}">{{ $row->code }}</option>
+                                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
                                                 @endforeach
                                             </select>
                                             <label class="" for="plant">Plant</label>
                                         </div>
                                         <div class="input-field col m3 s12">
                                             <select class="form-control" id="warehouse" name="warehouse">
+                                                <option value="all">SEMUA</option>
                                                 @foreach ($warehouse as $row)
                                                     <option value="{{ $row->id }}">{{ $row->name }}</option>
                                                 @endforeach
@@ -49,16 +56,9 @@
                                             <label class="" for="warehouse">WareHouse</label>
                                         </div>
                                         <div class="input-field col m3 s12">
-                                            <input id="hari" name="hari" type="number">
-                                            <label class="active" for="hari">Jumlah Hari</label>
                                         </div>
-                                        <div class="input-field col m3 s12">
-                                            <input id="date" name="date"  type="date" max="{{ date('Y'.'-12-31') }}" placeholder="" value="{{ date('Y-m-d') }}">
-                                            <label class="active" for="date">Masukkan Tanggal</label>
-                                        </div>
-                                        <div class="col s12 mt-3">
-                                            
-                                            <button class="btn waves-effect waves-light right submit" onclick="filter();">Cari <i class="material-icons right">file_download</i></button>
+                                        <div class="col m3 mt-2">
+                                            <button class="btn waves-effect waves-light submit" onclick="filter();">Cari <i class="material-icons right">file_download</i></button>
                                         </div>
                                     </div>
                                 </div>
@@ -73,9 +73,10 @@
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Item</th>
-                                <th class="center-align">Keterangan</th>
-                                <th class="center-align">Tgl Terakhir</th>
-                                <th class="center-align">Lama Hari</th>
+                                <th class="center-align">Minimum</th>
+                                <th class="center-align">Qty</th>
+                                <th class="center-align">Required</th>
+                                <th class="center-align">Satuan</th>
                             </tr>
                         </thead>
                         <tbody id="table_body">
@@ -92,7 +93,16 @@
 
 <script>
     $('#export_button').hide();
+    $(function() {
+        $(".select2").select2({
+            dropdownAutoWidth: true,
+            width: '100%',
+        });
+        select2ServerSide('#item_id', '{{ url("admin/select2/item") }}');
+    });
+ 
     function filter(){
+      
         var formData = new FormData($('#form_data')[0]);
         $.ajax({
             url: '{{ Request::url() }}/filter',
@@ -120,15 +130,16 @@
                                 <tr>
                                     <td class="center-align">`+(i+1)+`</td>
                                     <td >`+val.item+`</td>
-                                    <td >`+val.keterangan+`</td>
-                                    <td >`+val.date+`</td>
-                                    <td >`+val.lamahari+`</td>
+                                    <td >`+val.minimum+`</td>
+                                    <td >`+val.final+`</td>
+                                    <td >`+val.needed+`</td>
+                                    <td >`+val.satuan+`</td>
                                 </tr>
                             `);
                         });
                         $('#table_body').append(`
                                 <tr>
-                                    <td class="center-align" colspan="5">`+response.time+`</td>
+                                    <td class="center-align" colspan="4">`+response.time+`</td>
                                 </tr>
                             `);
                         M.toast({
@@ -144,7 +155,7 @@
                 } else if(response.status == 422) {
                     $('#validation_alert_multi').show();
                     $('.modal-content').scrollTop(0);
-                    
+                  
                     swal({
                         title: 'Ups! Validation',
                         text: 'Check your form.',
@@ -183,11 +194,11 @@
             
         });
     }
+
     function exportExcel(){
-        var jumlahhari = $('#hari').val();
         var plant = $('#plant').val();
         var warehouse = $('#warehouse').val();
-        var date = $('#date').val();
-        window.location = "{{ Request::url() }}/export?plant=" + plant + "&warehouse=" + warehouse+"&date=" + date+"&hari="+jumlahhari;
+        
+        window.location = "{{ Request::url() }}/export?plant=" + plant + "&warehouse=" + warehouse
     }
 </script>

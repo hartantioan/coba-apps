@@ -89,13 +89,13 @@
                                             <div class="col m3 s6 ">
                                                 <label for="start_date" style="font-size:1rem;">Tanggal Mulai :</label>
                                                 <div class="input-field col s12">
-                                                <input type="date" id="start_date" name="start_date"  onchange="loadDataTable()">
+                                                <input type="date" max="{{ date('Y'.'-12-31') }}" id="start_date" name="start_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
                                             <div class="col m3 s6 ">
                                                 <label for="finish_date" style="font-size:1rem;">Tanggal Akhir :</label>
                                                 <div class="input-field col s12">
-                                                    <input type="date" id="finish_date" name="finish_date"  onchange="loadDataTable()">
+                                                    <input type="date" max="{{ date('Y'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
                                         </div>  
@@ -202,7 +202,7 @@
                                 <label class="active" for="return_tax_no">No. Faktur Pajak Balikan</label>
                             </div>
                             <div class="input-field col m3 s12 step7"> 
-                                <input id="return_date" name="return_date" type="date" value="{{ date('Y-m-d') }}">
+                                <input id="return_date" name="return_date" type="date" max="{{ date('Y'.'-12-31') }}" >
                                 <label class="active" for="return_date">Tgl. Retur</label>
                             </div>
                             <div class="file-field input-field col m3 s12 step8">

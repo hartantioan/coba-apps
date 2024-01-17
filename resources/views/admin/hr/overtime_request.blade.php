@@ -139,7 +139,7 @@
                             <label class="active" for="account_id">Select Employee</label>
                         </div>
                         <div class="input-field col s6">
-                            <input id="date" name="date"  type="date" placeholder="Tanggal" onchange="resetSchedule()">
+                            <input id="date" name="date"  type="date" max="{{ date('Y'.'-12-31') }}" placeholder="Tanggal" onchange="resetSchedule()">
                             <label class="active" for="date">Tanggal</label>
                         </div>
                         
@@ -167,7 +167,7 @@
                         </div>
                         
                         <div class="file-field input-field col m3 s12 step16">
-                            <input id="post_date" name="post_date"   type="date" placeholder="Tanggal Post">
+                            <input id="post_date" name="post_date"   type="date" max="{{ date('Y'.'-12-31') }}" placeholder="Tanggal Post">
                             <label class="active" for="post_date">Tanggal Post</label>
                         </div>
                         

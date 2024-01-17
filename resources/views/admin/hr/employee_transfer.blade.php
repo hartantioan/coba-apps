@@ -168,7 +168,7 @@
                             <label class="active" for="post_date">Tanggal Post</label>
                         </div>
                         <div class="input-field col s6">
-                            <input id="valid_date" name="valid_date"  min="{{ date('Y-m-d') }}" type="date" placeholder="Tanggal Efektif">
+                            <input id="valid_date" name="valid_date"  min="{{ date('Y-m-d') }}" type="date" max="{{ date('Y'.'-12-31') }}" placeholder="Tanggal Efektif">
                             <label class="active" for="valid_date">Tanggal Efektif</label>
                         </div>
                         <div class="input-field col s6">

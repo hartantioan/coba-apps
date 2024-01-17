@@ -1140,7 +1140,7 @@
                                                 <input id="arr_total` + count + `" name="arr_total[]" onfocus="emptyThis(this);" data-limit="` + val.balance + `" class="browser-default" type="text" value="` + val.balance + `" onkeyup="formatRupiah(this);countRow('` + count + `');countAll();" style="width:150px;text-align:right;" ` + readonly + `>
                                             </td>
                                             <td class="center">
-                                                <input id="arr_rounding` + count + `" name="arr_rounding[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;" ` + readonly + `>
+                                                <input id="arr_rounding` + count + `" name="arr_rounding[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;" ` + readonly + `>
                                             </td>
                                             <td class="center">
                                                 <input id="arr_subtotal` + count + `" name="arr_subtotal[]" onfocus="emptyThis(this);" data-limit="0" class="browser-default" type="text" value="` + val.balance + `" onkeyup="formatRupiah(this);" style="width:150px;text-align:right;" readonly>
@@ -1639,7 +1639,7 @@
                                     <input id="arr_total` + count + `" name="arr_total[]" onfocus="emptyThis(this);" data-limit="0" class="browser-default" type="text" value="` + val.total + `" onkeyup="formatRupiah(this);countRow('` + count + `');countAll();" style="width:150px;text-align:right;" ` + readonly + `>
                                 </td>
                                 <td class="center">
-                                    <input id="arr_rounding` + count + `" name="arr_rounding[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.rounding + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;" ` + readonly + `>
+                                    <input id="arr_rounding` + count + `" name="arr_rounding[]" class="browser-default" type="text" value="` + val.rounding + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;" ` + readonly + `>
                                 </td>
                                 <td class="center">
                                     <input id="arr_subtotal` + count + `" name="arr_subtotal[]" onfocus="emptyThis(this);" data-limit="0" class="browser-default" type="text" value="` + val.subtotal + `" onkeyup="formatRupiah(this);" style="width:150px;text-align:right;" readonly>

@@ -432,8 +432,24 @@
 
     function checkBenchmark(){
         if($('#is_check_nominal').is(':checked')){
-            $('#is_check_nominal').prop( "checked", false);
+            $('select[name^="arr_approval_menu"]').each(function(){
+                if($(this).val()){
+                    if($(this).select2('data')[0].hasGrandtotal == '0'){
+                        swal({
+                            title: 'Ups!',
+                            text: 'Menu ini tidak memiliki grandtotal.',
+                            icon: 'warning'
+                        });
+                        $(this).empty();
+                    }else{
+                        if($('#is_check_nominal').is(':checked')){
+                            $('#is_check_nominal').prop( "checked", false);
+                        }
+                    }
+                }
+            });
         }
+        
     }
 
     function checkGrandtotal(){
@@ -447,13 +463,15 @@
                             icon: 'warning'
                         });
                         $(this).empty();
+                    }else{
+                        if($('#is_check_benchmark').is(':checked')){
+                            $('#is_check_benchmark').prop( "checked", false);
+                        }
                     }
                 }
             });
         }
-        if($('#is_check_benchmark').is(':checked')){
-            $('#is_check_benchmark').prop( "checked", false);
-        }
+        
     }
 
     function loadDataTable() {

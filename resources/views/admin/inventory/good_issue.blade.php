@@ -1216,6 +1216,15 @@
 
                 if(passedSerial){
                     if(passed){
+                        var path = window.location.pathname;
+                    path = path.replace(/^\/|\/$/g, '');
+
+                    // Split the path by slashes and get the last segment
+                    var segments = path.split('/');
+                    var lastSegment = segments[segments.length - 1];
+                
+                    formData.append('lastsegment',lastSegment);
+                    
                         $.ajax({
                             url: '{{ Request::url() }}/create',
                             type: 'POST',

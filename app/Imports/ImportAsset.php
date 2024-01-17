@@ -3,26 +3,40 @@
 namespace App\Imports;
 
 use App\Models\Asset;
-
-use Maatwebsite\Excel\Concerns\ToModel;
+use App\Models\AssetGroup;
+use App\Models\Place;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Validators\ValidationException;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
+use Maatwebsite\Excel\Concerns\OnEachRow;
+use Maatwebsite\Excel\Row;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
-class ImportAsset implements ToModel, WithHeadingRow, WithValidation,WithBatchInserts
+class ImportAsset implements OnEachRow, WithHeadingRow, WithValidation, WithBatchInserts,WithMultipleSheets
 {
-    public function model(array $row)
+    public function sheets(): array
     {
-        return new Asset([
+        return [
+            0 => $this,
+        ];
+    }
+    public function onRow(Row $row)
+    {
+        $place = Place::where('code',$row['place_id'])->first();
+        $asset_group_code=explode('#',$row['asset_group_id'])[0];
+        $asset_group = AssetGroup::where('code',$asset_group_code)->first();
+        $method =explode('#',$row['method'])[0];
+        $row = $row->toArray();
+        $query = Asset::create([
             'code' => $row['code'],
             'user_id' => session('bo_id'),
-            'place_id' => $row['place_id'],
+            'place_id' => $place->id,
             'name' => $row['name'],
-            'asset_group_id' => $row['asset_group_id'],
-            'method' => $row['method'],
+            'asset_group_id' =>$asset_group->id,
+            'method' => $method,
             'note' => $row['note'],
-            'status' => $row['status']
+            'status' => '1',
         ]);
     }
 
@@ -34,7 +48,8 @@ class ImportAsset implements ToModel, WithHeadingRow, WithValidation,WithBatchIn
             '*.name'            => 'required',
             '*.asset_group_id'  => 'required',
             '*.method'          => 'required',
-            '*.status'          => 'required',
+            '*.note'          => 'required',
+            '*.status'          => 'nullable',
         ];
     }
 

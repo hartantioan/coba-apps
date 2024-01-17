@@ -206,6 +206,7 @@ class MarketingOrderPlanController extends Controller
     public function create(Request $request){
         
         $validation = Validator::make($request->all(), [
+            'code'                      => 'required',
             'code'			            => $request->temp ? ['required', Rule::unique('marketing_order_plans', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_plans,code',
             'code_place_id'             => 'required',
             'company_id'			    => 'required',
@@ -218,9 +219,11 @@ class MarketingOrderPlanController extends Controller
             'arr_note'                  => 'required|array',
         ], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
-            'code.string'                       => 'Kode harus dalam bentuk string.',
+            /* 'code.string'                       => 'Kode harus dalam bentuk string.',
             'code.min'                          => 'Kode harus minimal 18 karakter.',
-            'code.unique'                       => 'Kode telah dipakai',
+            'code.unique'                       => 'Kode telah dipakai', */
+            'code_place_id.required'            => 'Plant Tidak boleh kosong',
+                
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
             'place_id.required' 			    => 'Plant tidak boleh kosong.',
             'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
@@ -311,9 +314,13 @@ class MarketingOrderPlanController extends Controller
                 }
 			}else{
                 DB::beginTransaction();
+                $lastSegment = $request->lastsegment;
+                $menu = Menu::where('url', $lastSegment)->first();
+                $newCode=MarketingOrderPlan::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    
                 try {
                     $query = MarketingOrderPlan::create([
-                        'code'			            => $request->code,
+                        'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $request->company_id,
                         'place_id'	                => $request->place_id,

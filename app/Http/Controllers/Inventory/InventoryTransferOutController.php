@@ -228,8 +228,10 @@ class InventoryTransferOutController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('inventory_transfer_outs', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:inventory_transfer_outs,code',
-            'company_id'                => 'required',
+            'code'                      => 'required',
+            'code_place_id'             => 'required',
+            /* 'code'			            => $request->temp ? ['required', Rule::unique('inventory_transfer_outs', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:inventory_transfer_outs,code',
+            */ 'company_id'                => 'required',
 			'post_date'		            => 'required',
             'place_from'                => 'required',
             'warehouse_from'            => 'required',
@@ -241,9 +243,10 @@ class InventoryTransferOutController extends Controller
             'arr_area'                  => 'required|array',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
-            'code.string'                       => 'Kode harus dalam bentuk string.',
+            'code_place_id.required'            => 'Plant Tidak boleh kosong',
+            /* 'code.string'                       => 'Kode harus dalam bentuk string.',
             'code.min'                          => 'Kode harus minimal 18 karakter.',
-            'code.unique'                       => 'Kode telah dipakai.',
+            'code.unique'                       => 'Kode telah dipakai.', */
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
             'place_from.required' 				=> 'Plant asal tidak boleh kosong.',
@@ -415,8 +418,12 @@ class InventoryTransferOutController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
+                    $lastSegment = $request->lastsegment;
+                    $menu = Menu::where('url', $lastSegment)->first();
+                    $newCode=InventoryTransferOut::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    
                     $query = InventoryTransferOut::create([
-                        'code'			        => $request->code,
+                        'code'			        => $newCode,
                         'user_id'		        => session('bo_id'),
                         'company_id'		    => $request->company_id,
                         'place_from'            => $request->place_from,

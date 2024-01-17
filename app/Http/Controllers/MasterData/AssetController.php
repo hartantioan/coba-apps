@@ -13,7 +13,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
-
+use App\Exports\ExportTemplateMasterAsset;
 use App\Models\Asset;
 use App\Models\Place;
 use App\Models\Department;
@@ -406,5 +406,9 @@ class AssetController extends Controller
 		
 		return response()->json($response);
 
+    }
+
+    public function getImportExcel(){
+        return Excel::download(new ExportTemplateMasterAsset(), 'format_master_asset'.uniqid().'.xlsx');
     }
 }

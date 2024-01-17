@@ -330,8 +330,10 @@ class GoodReceiptPOController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('good_receipts', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:good_receipts,code',
-            'account_id'                => 'required',
+            'code'                      => 'required',
+            'code_place_id'             => 'required',
+           /*  'code'			            => $request->temp ? ['required', Rule::unique('good_receipts', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:good_receipts,code',
+             */'account_id'                => 'required',
             'company_id'                => 'required',
 			'receiver_name'			    => 'required',
 			'post_date'		            => 'required',
@@ -341,10 +343,7 @@ class GoodReceiptPOController extends Controller
             'arr_qty'                   => 'required|array',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
-            'code.string'                       => 'Kode harus dalam bentuk string.',
-            'code.min'                          => 'Kode harus minimal 18 karakter.',
-            'code.unique'                       => 'Kode telah dipakai',
-            'account_id.required'               => 'Supplier/vendor tidak boleh kosong.',
+            'code_place_id.required'            => 'Plant Tidak boleh kosong','account_id.required'               => 'Supplier/vendor tidak boleh kosong.',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'receiver_name.required'            => 'Nama penerima tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
@@ -531,8 +530,12 @@ class GoodReceiptPOController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
+                    $lastSegment = $request->lastsegment;
+                    $menu = Menu::where('url', $lastSegment)->first();
+                    $newCode=GoodReceipt::generateCode($menu->document_code.date('y').$request->code_place_id);
+                   
                     $query = GoodReceipt::create([
-                        'code'			        => $request->code,
+                        'code'			        => $newCode,
                         'user_id'		        => session('bo_id'),
                         'account_id'            => $request->account_id,
                         'company_id'            => $request->company_id,

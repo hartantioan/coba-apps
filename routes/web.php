@@ -954,6 +954,7 @@ Route::prefix('admin')->group(function () {
                         Route::get('export',[AssetController::class, 'export']);
                         Route::post('create',[AssetController::class, 'create'])->middleware('operation.access:asset,update');
                         Route::post('destroy', [AssetController::class, 'destroy'])->middleware('operation.access:asset,delete');
+                        Route::get('get_import_excel',[AssetController::class, 'getImportExcel']);
                         Route::post('import', [AssetController::class, 'import'])->middleware('operation.access:asset,update');
                     });
 

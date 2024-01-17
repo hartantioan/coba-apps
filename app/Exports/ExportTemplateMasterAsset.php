@@ -24,14 +24,13 @@ class ExportTemplateMasterAsset implements WithEvents
         $place = Place::where('status','1')->get();
         
         $startRow = 2;
-        foreach($asset_group as $row){
+        foreach($place as $row){
             $event->getWriter()->getSheetByIndex(1)->setCellValue('A'.$startRow,$row->code);
-            $event->getWriter()->getSheetByIndex(1)->setCellValue('B'.$startRow,$row->name);
             $startRow++;
         }
 
         $startRow = 2;
-        foreach($place as $row){
+        foreach($asset_group as $row){
             $event->getWriter()->getSheetByIndex(2)->setCellValue('A'.$startRow,$row->code);
             $event->getWriter()->getSheetByIndex(2)->setCellValue('B'.$startRow,$row->name);
             $startRow++;

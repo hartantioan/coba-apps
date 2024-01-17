@@ -523,8 +523,10 @@ class LandedCostController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('landed_costs', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:landed_costs,code',
-            'company_id' 			    => 'required',
+            'code'                      => 'required',
+            'code_place_id'             => 'required',
+            /* 'code'			            => $request->temp ? ['required', Rule::unique('landed_costs', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:landed_costs,code',
+             */'company_id' 			    => 'required',
 			'account_id'                => 'required',
             'post_date'                 => 'required',
             'currency_id'               => 'required',
@@ -536,10 +538,11 @@ class LandedCostController extends Controller
             'arr_price'                 => 'required|array',
             'arr_qty'                   => 'required|array'
 		], [
+            'code_place_id.required'            => 'Plant Tidak boleh kosong',
             'code.required' 	                => 'Kode tidak boleh kosong.',
-            'code.string'                       => 'Kode harus dalam bentuk string.',
+            /* 'code.string'                       => 'Kode harus dalam bentuk string.',
             'code.min'                          => 'Kode harus minimal 18 karakter.',
-            'code.unique'                       => 'Kode telah dipakai',
+            'code.unique'                       => 'Kode telah dipakai', */
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
 			'account_id.required'               => 'Broker / Ekspeditor tidak boleh kosong',
             'post_date.required'                => 'Tgl post tidak boleh kosong.',
@@ -652,9 +655,12 @@ class LandedCostController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
-
+                    $lastSegment = $request->lastsegment;
+                    $menu = Menu::where('url', $lastSegment)->first();
+                    $newCode=LandedCost::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    
                     $query = LandedCost::create([
-                        'code'			            => $request->code,
+                        'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
                         'supplier_id'               => $request->supplier_id ? $request->supplier_id : NULL,
                         'account_id'                => $request->account_id,

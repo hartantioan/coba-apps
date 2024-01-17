@@ -180,7 +180,9 @@ class RetirementController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-			'code' 				    => $request->temp ? ['required', Rule::unique('retirements', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:retirements,code',
+            'code'                      => 'required',
+            'code_place_id'             => 'required',
+			/* 'code' 				    => $request->temp ? ['required', Rule::unique('retirements', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:retirements,code', */
 			'post_date'			    => 'required',
 			'company_id'		    => 'required',
             'currency_id'		    => 'required',
@@ -192,9 +194,7 @@ class RetirementController extends Controller
             'arr_total'             => 'required|array',
 		], [
 			'code.required' 				    => 'Kode/No tidak boleh kosong.',
-            'code.string'                       => 'Kode harus dalam bentuk string.',
-            'code.min'                          => 'Kode harus minimal 18 karakter.',
-            'code.unique' 				        => 'Kode/No telah dipakai.',
+            'code_place_id.required'            => 'Plant Tidak boleh kosong',
 			'post_date.required' 			    => 'Tanggal post tidak boleh kosong.',
 			'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
             'currency_id.required' 			    => 'Mata uang tidak boleh kosong.',
@@ -274,8 +274,11 @@ class RetirementController extends Controller
                     ]);
                 }
 			}else{
+                $lastSegment = $request->lastsegment;
+                $menu = Menu::where('url', $lastSegment)->first();
+                $newCode=Retirement::generateCode($menu->document_code.date('y').$request->code_place_id);
                 $query = Retirement::create([
-                    'code'			=> $request->code,
+                    'code'			=> $newCode,
                     'user_id'		=> session('bo_id'),
                     'company_id'    => $request->company_id,
                     'currency_id'   => $request->currency_id,

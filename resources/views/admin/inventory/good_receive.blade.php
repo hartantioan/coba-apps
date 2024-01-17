@@ -930,6 +930,15 @@
                     formData.append('arr_machine[]',($('#arr_machine' + $(this).data('id')).val() ? $('#arr_machine' + $(this).data('id')).val() : '' ));
                     formData.append('arr_project[]',($('#arr_project' + $(this).data('id')).val() ? $('#arr_project' + $(this).data('id')).val() : '' ));
                 });
+                var path = window.location.pathname;
+                    path = path.replace(/^\/|\/$/g, '');
+
+                    // Split the path by slashes and get the last segment
+                    var segments = path.split('/');
+                    var lastSegment = segments[segments.length - 1];
+                
+                    formData.append('lastsegment',lastSegment);
+                    
         
                 $.ajax({
                     url: '{{ Request::url() }}/create',

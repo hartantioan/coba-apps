@@ -264,8 +264,10 @@ class MarketingOrderReceiptController extends Controller
     public function create(Request $request){
         
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('marketing_order_receipts', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_receipts,code',
+            'code'                      => 'required',
             'code_place_id'             => 'required',
+            /* 'code'			            => $request->temp ? ['required', Rule::unique('marketing_order_receipts', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_receipts,code',
+            'code_place_id'             => 'required', */
             'company_id'			    => 'required',
             'account_id'			    => 'required',
             'post_date'		            => 'required',
@@ -273,9 +275,9 @@ class MarketingOrderReceiptController extends Controller
             'arr_type'                  => 'required|array',
         ], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
-            'code.string'                       => 'Kode harus dalam bentuk string.',
+            /* 'code.string'                       => 'Kode harus dalam bentuk string.',
             'code.min'                          => 'Kode harus minimal 18 karakter.',
-            'code.unique'                       => 'Kode telah dipakai',
+            'code.unique'                       => 'Kode telah dipakai', */
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
             'account_id.required' 			    => 'Customer tidak boleh kosong.',
             'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
@@ -365,8 +367,12 @@ class MarketingOrderReceiptController extends Controller
                         ]);
                     }
                 }else{
+                    $lastSegment = $request->lastsegment;
+                    $menu = Menu::where('url', $lastSegment)->first();
+                    $newCode=MarketingOrderReceipt::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    
                     $query = MarketingOrderReceipt::create([
-                        'code'			            => $request->code,
+                        'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $request->company_id,
                         'account_id'                => $request->account_id,

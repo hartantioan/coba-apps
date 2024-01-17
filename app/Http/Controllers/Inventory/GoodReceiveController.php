@@ -205,8 +205,10 @@ class GoodReceiveController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('good_receives', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:good_receives,code',
-            'company_id'                => 'required',
+            'code'                      => 'required',
+            'code_place_id'             => 'required',
+            /* 'code'			            => $request->temp ? ['required', Rule::unique('good_receives', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:good_receives,code',
+             */'company_id'                => 'required',
 			'post_date'		            => 'required',
 			'currency_id'		        => 'required',
             'currency_rate'		        => 'required',
@@ -217,10 +219,7 @@ class GoodReceiveController extends Controller
             'arr_warehouse'             => 'required|array',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
-            'code.string'                       => 'Kode harus dalam bentuk string.',
-            'code.min'                          => 'Kode harus minimal 18 karakter.',
-            'code.unique'                       => 'Kode telah dipakai',
-            'company_id.required'               => 'Perusahaan tidak boleh kosong.',
+            'code_place_id.required'            => 'Plant Tidak boleh kosong','company_id.required'               => 'Perusahaan tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
 			'currency_id.required' 				=> 'Mata uang tidak boleh kosong.',
             'Currency_rate.required' 			=> 'Konversi tidak boleh kosong.',
@@ -401,8 +400,12 @@ class GoodReceiveController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
+                    $lastSegment = $request->lastsegment;
+                    $menu = Menu::where('url', $lastSegment)->first();
+                    $newCode=GoodReceive::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    
                     $query = GoodReceive::create([
-                        'code'			        => $request->code,
+                        'code'			        => $newCode,
                         'user_id'		        => session('bo_id'),
                         'company_id'		    => $request->company_id,
                         'post_date'             => $request->post_date,

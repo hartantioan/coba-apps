@@ -207,8 +207,9 @@ class ProductionScheduleController extends Controller
     public function create(Request $request){
         
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('production_schedules', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:production_schedules,code',
-            'code_place_id'             => 'required',
+            'code'                      => 'required',
+           /*  'code'			            => $request->temp ? ['required', Rule::unique('production_schedules', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:production_schedules,code',
+            */ 'code_place_id'             => 'required',
             'company_id'			    => 'required',
             'place_id'		            => 'required',
             'marketing_order_plan_id'   => 'required',
@@ -223,10 +224,11 @@ class ProductionScheduleController extends Controller
             'arr_group'                 => 'required|array',
             'arr_qty_detail'            => 'required|array',
         ], [
+            'code_place_id.required'            => 'Plant Tidak boleh kosong',
             'code.required' 	                => 'Kode tidak boleh kosong.',
-            'code.string'                       => 'Kode harus dalam bentuk string.',
+            /* 'code.string'                       => 'Kode harus dalam bentuk string.',
             'code.min'                          => 'Kode harus minimal 18 karakter.',
-            'code.unique'                       => 'Kode telah dipakai',
+            'code.unique'                       => 'Kode telah dipakai', */
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
             'place_id.required' 			    => 'Plant tidak boleh kosong.',
             'marketing_order_plan_id.required'  => 'MOP tidak boleh kosong.',
@@ -332,8 +334,12 @@ class ProductionScheduleController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
+                    $lastSegment = $request->lastsegment;
+                    $menu = Menu::where('url', $lastSegment)->first();
+                    $newCode=ProductionSchedule::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    
                     $query = ProductionSchedule::create([
-                        'code'			            => $request->code,
+                        'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $request->company_id,
                         'place_id'	                => $request->place_id,

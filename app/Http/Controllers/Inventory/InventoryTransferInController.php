@@ -254,16 +254,19 @@ class InventoryTransferInController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('inventory_transfer_ins', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:inventory_transfer_ins,code',
-            'company_id'                => 'required',
+            'code'                      => 'required',
+            'code_place_id'             => 'required',
+           /*  'code'			            => $request->temp ? ['required', Rule::unique('inventory_transfer_ins', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:inventory_transfer_ins,code',
+             */'company_id'                => 'required',
             'inventory_transfer_out_id' => 'required',
 			'post_date'		            => 'required',
 		], [
+            'code_place_id.required'            => 'Plant Tidak boleh kosong',
             'code.required' 	                => 'Kode tidak boleh kosong.',
-            'code.string'                       => 'Kode harus dalam bentuk string.',
+           /*  'code.string'                       => 'Kode harus dalam bentuk string.',
             'code.min'                          => 'Kode harus minimal 18 karakter.',
             'code.unique'                       => 'Kode telah dipakai.',
-            'company_id.required'               => 'Perusahaan tidak boleh kosong.',
+             */'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'inventory_transfer_out_id.required'=> 'Inventori Transfer Asal tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
 		]);
@@ -339,8 +342,12 @@ class InventoryTransferInController extends Controller
                         ]);
                     }
                 }else{
+                    $lastSegment = $request->lastsegment;
+                    $menu = Menu::where('url', $lastSegment)->first();
+                    $newCode=InventoryTransferIn::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    
                     $query = InventoryTransferIn::create([
-                        'code'			            => $request->code,
+                        'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
                         'company_id'		        => $request->company_id,
                         'inventory_transfer_out_id' => $request->inventory_transfer_out_id,

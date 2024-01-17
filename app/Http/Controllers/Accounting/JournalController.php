@@ -300,7 +300,9 @@ class JournalController extends Controller
         DB::beginTransaction();
         try {
             $validation = Validator::make($request->all(), [
-                'code' 				        => $request->temp ? ['required', Rule::unique('journals', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:journals,code',
+                'code'                      => 'required',
+               /*  'code' 				        => $request->temp ? ['required', Rule::unique('journals', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:journals,code', */
+                'code_place_id'             => 'required',
                 'company_id'                => 'required',
                 'note'                      => 'required',
                 'post_date'                 => 'required',
@@ -312,7 +314,7 @@ class JournalController extends Controller
                 'arr_nominal'               => 'required|array',
             ], [
                 'code.required' 				    => 'Kode/No tidak boleh kosong.',
-                'code.unique' 				        => 'Kode/No telah dipakai.',
+                'code_place_id.required'            => 'Plant Tidak boleh kosong',
                 'company_id.required'               => 'Perusahaan tidak boleh kosong',
                 'note.required'                     => 'Catatan tidak boleh kosong',
                 'post_date.required'                => 'Tgl post tidak boleh kosong.',
@@ -405,8 +407,11 @@ class JournalController extends Controller
                         ]);
                     }
                 }else{
+                    $lastSegment = $request->lastsegment;
+                    $menu = Menu::where('url', $lastSegment)->first();
+                    $newCode=Journal::generateCode($menu->document_code.date('y').$request->code_place_id);
                     $query = Journal::create([
-                        'code'			            => $request->code,
+                        'code'			            => $newCode,
                         'lookable_type'             => $request->journal_id ? 'journals' : NULL,
                         'lookable_id'               => $request->journal_id ? $request->journal_id : NULL,
                         'user_id'		            => session('bo_id'),

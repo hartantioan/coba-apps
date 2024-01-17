@@ -882,8 +882,10 @@ class FundRequestController extends Controller
 
     public function userCreate(Request $request){
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('fund_requests', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:fund_requests,code',
-            'account_id'                => 'required',
+            'code'                      => 'required',
+            'code_place_id'             => 'required',
+            /* 'code'			            => $request->temp ? ['required', Rule::unique('fund_requests', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:fund_requests,code',
+             */'account_id'                => 'required',
             'type'                      => 'required',
 			'post_date' 				=> 'required',
 			'required_date'		        => 'required',
@@ -900,9 +902,7 @@ class FundRequestController extends Controller
             'arr_total'                 => 'required|array',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
-            'code.string'                       => 'Kode harus dalam bentuk string.',
-            'code.min'                          => 'Kode harus minimal 18 karakter.',
-            'code.unique'                       => 'Kode telah dipakai',
+            'code_place_id.required'            => 'Plant Tidak boleh kosong',
             'account_id.required'               => 'Target Partner Bisnis tidak boleh kosong',
             'type.required'                     => 'Tipe tidak boleh kosong',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
@@ -1016,8 +1016,12 @@ class FundRequestController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
+                    $lastSegment = $request->lastsegment;
+                    $menu = Menu::where('url', $lastSegment)->first();
+                    $newCode=FundRequest::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    
                     $query = FundRequest::create([
-                        'code'			=> $request->code,
+                        'code'			=> $newCode,
                         'user_id'		=> session('bo_id'),
                         'place_id'      => $request->place_id,
                         'department_id'	=> $request->department_id,

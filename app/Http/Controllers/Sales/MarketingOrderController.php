@@ -356,8 +356,9 @@ class MarketingOrderController extends Controller
     public function create(Request $request){
         
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('marketing_orders', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_orders,code',
-            'code_place_id'             => 'required',
+            'code'                      => 'required',
+           /*  'code'			            => $request->temp ? ['required', Rule::unique('marketing_orders', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_orders,code',
+             */'code_place_id'             => 'required',
             'account_id' 				=> 'required',
             'company_id'			    => 'required',
             'type'			            => 'required',
@@ -409,9 +410,10 @@ class MarketingOrderController extends Controller
             'total_after_tax'           => 'required',
         ], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
-            'code.string'                       => 'Kode harus dalam bentuk string.',
+            /* 'code.string'                       => 'Kode harus dalam bentuk string.',
             'code.min'                          => 'Kode harus minimal 18 karakter.',
-            'code.unique'                       => 'Kode telah dipakai',
+            'code.unique'                       => 'Kode telah dipakai', */
+            'code_place_id.required'            => 'Plant Tidak boleh kosong',
             'account_id.required' 				=> 'Customer tidak boleh kosong.',
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
             'type.required' 			        => 'Tipe Penjualan tidak boleh kosong.',
@@ -608,8 +610,12 @@ class MarketingOrderController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
+                    $lastSegment = $request->lastsegment;
+                    $menu = Menu::where('url', $lastSegment)->first();
+                    $newCode=MarketingOrder::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    
                     $query = MarketingOrder::create([
-                        'code'			            => $request->code,
+                        'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->account_id,
                         'company_id'                => $request->company_id,

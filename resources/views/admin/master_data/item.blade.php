@@ -59,11 +59,11 @@
                             <span class="hide-on-small-onl">Excel</span>
                             <i class="material-icons right">view_list</i>
                         </a>
-                        {{-- <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3 modal-trigger" href="#modal2">
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3 modal-trigger" href="#modal2">
                             <i class="material-icons hide-on-med-and-up">file_download</i>
                             <span class="hide-on-small-onl">Import</span>
                             <i class="material-icons right">file_download</i>
-                        </a> --}}
+                        </a>
                     </div>
                 </div>
             </div>
@@ -107,7 +107,30 @@
                             </ul>
                             <div class="card">
                                 <div class="card-content">
-                                    <h4 class="card-title">List Data</h4>
+                                    <div class="row">
+                                        <div class="col s4">
+                                            <h4 class="card-title">List Data</h4>
+                                            
+                                        </div>
+                                        <div class="col s8">
+                                            @if ($itemsh == 1)
+                                                <input type="hidden" id="adaSh" name="adaSh">
+                                                <a class="btn btn-floating waves-effect waves-light red darken-4 breadcrumbs-btn right" href="javascript:void(0);" onclick="filterShade()">
+                                                    <i class="material-icons hide-on-med-and-up">no shade</i>
+                                            
+                                                    <i class="material-icons right">sim_card_alert</i>
+                                                </a>
+                                            @endif
+                                            @if ($itemex == 1)
+                                                <input type="hidden" id="adaUnit" name="adaUnit">
+                                                <a class="btn btn-floating waves-effect waves-light red darken-4 breadcrumbs-btn right" href="javascript:void(0);" onclick="filterUnit()">
+                                                    <i class="material-icons hide-on-med-and-up">no unit</i>
+                                            
+                                                    <i class="material-icons right">perm_scan_wifi</i>
+                                                </a>
+                                            @endif
+                                        </div>
+                                    </div>
                                     <div class="row">
                                         <div class="col s12">
                                             <div class="card-alert card green">
@@ -479,7 +502,7 @@
     var selected = [], arrCode = [], arrName = [], mainUnit = '';
     
     $(function() {
-
+        
         M.Modal.prototype._handleFocus = function (e) {
             if (!this.el.contains(e.target) && this._nthModalOpened === M.Modal._modalsOpen) {
                 var s2 = 'select2-search__field';
@@ -542,8 +565,8 @@
                     }else if(response.status == 432) {
                         $('#validation_alertImport').show();
                         $('.modal-content').scrollTop(0);
-
-                        $.each(response.error, function(i, val) {
+                        
+                        /* $.each(response.error, function(i, val) {
                             $('#validation_alertImport').append(`
                                     <div class="card-alert card red">
                                         <div class="card-content white-text">
@@ -554,9 +577,10 @@
                                         </button>
                                     </div>
                                 `);
-                        });
+                        }); */
                     } else {
-                        $.each(response.error, function(i, val) {
+                        console.log(response);
+                       /*  $.each(response.error, function(i, val) {
                             $('#validation_alertImport').append(`
                                     <div class="card-alert card red">
                                         <div class="card-content white-text">
@@ -567,7 +591,7 @@
                                         </button>
                                     </div>
                                 `);
-                        });
+                        }); */
                     }
                     loadingClose('.modal-content');
                 },
@@ -953,6 +977,8 @@
                 url: '{{ Request::url() }}/datatable',
                 type: 'GET',
                 data: {
+                    adaUnit : $('#adaUnit').val(),
+                    adaShading : $('#adaSh').val(),
                     status : $('#filter_status').val(),
                     'type[]' : $('#filter_type').val()
                 },
@@ -1225,6 +1251,30 @@
     function successImport(){
         loadDataTable();
         $('#modal2').modal('close');
+    }
+
+    function filterUnit(){
+        if($('#adaUnit').val()==1){
+            $('#adaUnit').val('');
+        }else{
+            $('#adaUnit').val('{{$itemex}}');
+        }
+       
+        $('#adaSh').val('');
+        
+        loadDataTable();
+    }
+
+    function filterShade(){
+        if($('#adaSh').val()==1){
+            $('#adaSh').val('');
+        }else{
+            $('#adaSh').val('{{$itemsh}}');
+        }
+        
+        $('#adaUnit').val('');
+        
+        loadDataTable();
     }
 
     function show(id){

@@ -1241,6 +1241,15 @@
                         formData.append('arr_note[]',($('input[name^="arr_note[]"]').eq(index).val() ? $('input[name^="arr_note[]"]').eq(index).val() : ''));
                         formData.append('arr_nominal[]',($('input[name^="arr_nominal"]').eq(index).val() ? $('input[name^="arr_nominal"]').eq(index).val() : 'NULL'));
                     });
+
+                    var path = window.location.pathname;
+                    path = path.replace(/^\/|\/$/g, '');
+
+                    // Split the path by slashes and get the last segment
+                    var segments = path.split('/');
+                    var lastSegment = segments[segments.length - 1];
+                
+                    formData.append('lastsegment',lastSegment);
                     
                     $.ajax({
                         url: '{{ Request::url() }}/create',

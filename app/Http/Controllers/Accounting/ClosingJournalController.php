@@ -266,7 +266,9 @@ class ClosingJournalController extends Controller
         DB::beginTransaction();
         try {
             $validation = Validator::make($request->all(), [
-                'code' 				    => $request->temp ? ['required', Rule::unique('closing_journals', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:closing_journals,code',
+                'code'                      => 'required',
+                'code_place_id'             => 'required',
+                /* 'code' 				    => $request->temp ? ['required', Rule::unique('closing_journals', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:closing_journals,code', */
                 'post_date'			    => 'required',
                 'company_id'		    => 'required',
                 'month'		            => 'required',
@@ -274,9 +276,10 @@ class ClosingJournalController extends Controller
                 'arr_nominal'           => 'required|array',
             ], [
                 'code.required' 				    => 'Kode/No tidak boleh kosong.',
-                'code.string'                       => 'Kode harus dalam bentuk string.',
+             /*    'code.string'                       => 'Kode harus dalam bentuk string.',
                 'code.min'                          => 'Kode harus minimal 18 karakter.',
-                'code.unique' 				        => 'Kode/No telah dipakai.',
+                'code.unique' 				        => 'Kode/No telah dipakai.', */
+                'code_place_id.required'            => 'Plant Tidak boleh kosong',
                 'post_date.required' 			    => 'Tanggal post tidak boleh kosong.',
                 'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
                 'month.required' 			        => 'Periode bulan tidak boleh kosong.',
@@ -365,8 +368,11 @@ class ClosingJournalController extends Controller
                         ]);
                     }
                 }else{
+                    $lastSegment = $request->lastsegment;
+                    $menu = Menu::where('url', $lastSegment)->first();
+                    $newCode=ClosingJournal::generateCode($menu->document_code.date('y').$request->code_place_id);
                     $query = ClosingJournal::create([
-                        'code'			=> $request->code,
+                        'code'			=> $newCode,
                         'user_id'		=> session('bo_id'),
                         'company_id'    => $request->company_id,
                         'post_date'	    => $request->post_date,

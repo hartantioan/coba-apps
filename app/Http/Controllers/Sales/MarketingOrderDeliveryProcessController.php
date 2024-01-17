@@ -340,8 +340,10 @@ class MarketingOrderDeliveryProcessController extends Controller
     public function create(Request $request){
         
         $validation = Validator::make($request->all(), [
-            'code'			                => $request->temp ? ['required', Rule::unique('marketing_order_delivery_processes', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_delivery_processes,code',
-            'code_place_id'                 => 'required',
+            'code'                      => 'required',
+            'code_place_id'             => 'required',
+            /* 'code'			                => $request->temp ? ['required', Rule::unique('marketing_order_delivery_processes', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_delivery_processes,code',
+            'code_place_id'                 => 'required', */
             'company_id'			        => 'required',
             'marketing_order_delivery_id'	=> 'required',
             'post_date'		                => 'required',
@@ -351,9 +353,9 @@ class MarketingOrderDeliveryProcessController extends Controller
             'vehicle_no'                    => 'required',
         ], [
             'code.required' 	                    => 'Kode tidak boleh kosong.',
-            'code.string'                           => 'Kode harus dalam bentuk string.',
+            /* 'code.string'                           => 'Kode harus dalam bentuk string.',
             'code.min'                              => 'Kode harus minimal 18 karakter.',
-            'code.unique'                           => 'Kode telah dipakai.',
+            'code.unique'                           => 'Kode telah dipakai.', */
             'code_place_id.required'                => 'No plant dokumen tidak boleh kosong.',
             'marketing_order_delivery_id.required' 	=> 'MOD tidak boleh kosong.',
             'company_id.required' 			        => 'Perusahaan tidak boleh kosong.',
@@ -494,8 +496,12 @@ class MarketingOrderDeliveryProcessController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
+                    $lastSegment = $request->lastsegment;
+                    $menu = Menu::where('url', $lastSegment)->first();
+                    $newCode=MarketingOrderDeliveryProcess::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    
                     $query = MarketingOrderDeliveryProcess::create([
-                        'code'			                => $request->code,
+                        'code'			                => $newCode,
                         'user_id'		                => session('bo_id'),
                         'account_id'                    => $mod->account_id,
                         'company_id'                    => $request->company_id,

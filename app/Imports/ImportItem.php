@@ -15,27 +15,30 @@ use Maatwebsite\Excel\Validators\ValidationException;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\OnEachRow;
 use Maatwebsite\Excel\Row;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
-class ImportItem implements OnEachRow, WithHeadingRow, WithValidation, WithBatchInserts
+class ImportItem implements OnEachRow, WithHeadingRow, WithValidation, WithBatchInserts,WithMultipleSheets
 {
-    
+    public function sheets(): array
+    {
+        return [
+            0 => $this,
+        ];
+    }
     public function onRow(Row $row)
     {
         $row = $row->toArray();
-        if (empty(array_filter($row))) {
-            // Stop the import process if all values in the row are empty
-            return;
-        }
+      
         $item_group_code = explode('#',$row['item_group_id'])[0];
         $item_group_id=ItemGroup::where('code',$item_group_code)->first();
         
         $item_unit_code = explode('#',$row['uom_unit'])[0];
         $item_unit_id=Unit::where('code',$item_unit_code)->first();
-      
+        
         $query = Item::create([
             'code' => $row['code'],
             'name' => $row['name'],
-            'item_group_id' => $item_group_id->id,
+            'item_group_id' =>$item_group_id->id,
             'uom_unit' => $item_unit_id->id,
             'tolerance_gr' => $row['tolerance_gr'],
             'is_inventory_item' => $row['is_inventory_item'],
@@ -66,7 +69,7 @@ class ImportItem implements OnEachRow, WithHeadingRow, WithValidation, WithBatch
             '*.name' => 'required|string',
             '*.item_group_id' => 'required',
             '*.uom_unit' => 'required',
-            '*.tolerance_gr' => 'required|numeric',
+            '*.tolerance_gr' => 'nullable',
             '*.is_inventory_item' => 'nullable',
             '*.is_sales_item' => 'nullable',
             '*.is_purchase_item' => 'nullable',
@@ -97,5 +100,17 @@ class ImportItem implements OnEachRow, WithHeadingRow, WithValidation, WithBatch
     public function batchSize(): int
     {
         return 1000;
+    }
+
+    public function onSheetStart(int $sheetIndex)
+    {
+        // Check if the current sheet is the target sheet
+        $sheetName = $row->getDelegate()->getActiveSheet()->getTitle();
+
+        if ($sheetName !== $this->targetSheetName) {
+            return false; // Skip this sheet
+        }
+
+        return true; // Process rows for the target sheet
     }
 }

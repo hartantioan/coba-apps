@@ -924,6 +924,14 @@
                             formData.append('arr_area[]',($('#arr_area' + code).length > 0 ? ($('#arr_area' + code).val() ? $('#arr_area' + code).val() : '' ) : ''));
                         }
                     });
+                    var path = window.location.pathname;
+                    path = path.replace(/^\/|\/$/g, '');
+
+                    // Split the path by slashes and get the last segment
+                    var segments = path.split('/');
+                    var lastSegment = segments[segments.length - 1];
+                
+                    formData.append('lastsegment',lastSegment);
                     
                     $.ajax({
                         url: '{{ Request::url() }}/create',

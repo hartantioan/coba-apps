@@ -220,9 +220,11 @@ class ProductionOrderController extends Controller
     public function create(Request $request){
         
         $validation = Validator::make($request->all(), [
-            'code'			                => $request->temp ? ['required', Rule::unique('production_orders', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:production_orders,code',
+            'code'                      => 'required',
+            'code_place_id'             => 'required',
+          /*   'code'			                => $request->temp ? ['required', Rule::unique('production_orders', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:production_orders,code',
             'code_place_id'                 => 'required',
-            'company_id'			        => 'required',
+             */'company_id'			        => 'required',
             'post_date'		                => 'required',
             'production_schedule_id'        => 'required',
             'production_schedule_detail_id' => 'required',
@@ -235,10 +237,11 @@ class ProductionOrderController extends Controller
             'arr_nominal'                   => 'required|array',
             'arr_total'                     => 'required|array',
         ], [
+            'code_place_id.required'            => 'Plant Tidak boleh kosong',
             'code.required' 	                        => 'Kode tidak boleh kosong.',
-            'code.string'                               => 'Kode harus dalam bentuk string.',
+            /* 'code.string'                               => 'Kode harus dalam bentuk string.',
             'code.min'                                  => 'Kode harus minimal 18 karakter.',
-            'code.unique'                               => 'Kode telah dipakai',
+            'code.unique'                               => 'Kode telah dipakai', */
             'company_id.required' 			            => 'Perusahaan tidak boleh kosong.',
             'post_date.required' 			            => 'Tanggal posting tidak boleh kosong.',
             'production_schedule_id.required'           => 'Jadwal Produksi tidak boleh kosong.',
@@ -355,8 +358,12 @@ class ProductionOrderController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
+                    $lastSegment = $request->lastsegment;
+                    $menu = Menu::where('url', $lastSegment)->first();
+                    $newCode=ProductionOrder::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    
                     $query = ProductionOrder::create([
-                        'code'			                => $request->code,
+                        'code'			                => $newCode,
                         'user_id'		                => session('bo_id'),
                         'company_id'                    => $request->company_id,
                         'production_schedule_id'	    => $request->production_schedule_id,

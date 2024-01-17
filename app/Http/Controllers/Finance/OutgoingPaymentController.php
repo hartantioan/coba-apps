@@ -425,6 +425,8 @@ class OutgoingPaymentController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
+            'code'                  => 'required',
+            'code_place_id'         => 'required',
 			'account_id' 			=> 'required',
             'company_id'            => 'required',
             'coa_source_id'         => 'required',
@@ -435,6 +437,8 @@ class OutgoingPaymentController extends Controller
             'admin'                 => 'required',
             'grandtotal'            => 'required',
 		], [
+            'code_place_id.required'            => 'Plant Tidak boleh kosong',
+            'code.required' 				    => 'Kode/No tidak boleh kosong.',
 			'account_id.required' 			    => 'Supplier/Vendor tidak boleh kosong.',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'coa_source_id.required'            => 'Kas/Bank tidak boleh kosong.',
@@ -524,8 +528,12 @@ class OutgoingPaymentController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
+                    $lastSegment = $request->lastsegment;
+                    $menu = Menu::where('url', $lastSegment)->first();
+                    $newCode=OutgoingPayment::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    
                     $query = OutgoingPayment::create([
-                        'code'			            => OutgoingPayment::generateCode($request->post_date),
+                        'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->account_id,
                         'company_id'                => $request->company_id,

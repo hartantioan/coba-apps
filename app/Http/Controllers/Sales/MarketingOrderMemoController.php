@@ -278,8 +278,9 @@ class MarketingOrderMemoController extends Controller
     public function create(Request $request){
         
         $validation = Validator::make($request->all(), [
-            'code'			                => $request->temp ? ['required', Rule::unique('marketing_order_memos', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_memos,code',
-            'code_place_id'                 => 'required',
+            'code'                      => 'required',
+            /* 'code'			                => $request->temp ? ['required', Rule::unique('marketing_order_memos', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_memos,code',
+             */'code_place_id'                 => 'required',
             'company_id'			        => 'required',
             'account_id'	                => 'required',
             'post_date'		                => 'required',
@@ -288,10 +289,10 @@ class MarketingOrderMemoController extends Controller
             'arr_total'                     => 'required|array', */
         ], [
             'code.required' 	                    => 'Kode tidak boleh kosong.',
-            'code.string'                           => 'Kode harus dalam bentuk string.',
+           /*  'code.string'                           => 'Kode harus dalam bentuk string.',
             'code.min'                              => 'Kode harus minimal 18 karakter.',
             'code.unique'                           => 'Kode telah dipakai.',
-            'code_place_id.required'                => 'No plant dokumen tidak boleh kosong.',
+             */'code_place_id.required'                => 'No plant dokumen tidak boleh kosong.',
             'account_id.required' 	                => 'Akun Partner Bisnis tidak boleh kosong.',
             'company_id.required' 			        => 'Perusahaan tidak boleh kosong.',
             'post_date.required' 			        => 'Tanggal post tidak boleh kosong.',
@@ -422,8 +423,12 @@ class MarketingOrderMemoController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
+                    $lastSegment = $request->lastsegment;
+                    $menu = Menu::where('url', $lastSegment)->first();
+                    $newCode=MarketingOrderMemo::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    
                     $query = MarketingOrderMemo::create([
-                        'code'			                => $request->code,
+                        'code'			                => $newCode,
                         'user_id'		                => session('bo_id'),
                         'account_id'                    => $request->account_id,
                         'company_id'                    => $request->company_id,

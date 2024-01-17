@@ -35,6 +35,29 @@ class ItemController extends Controller
 {
     public function index()
     {
+        
+        $itemWithoutRelations = Item::whereDoesntHave('itemUnit')
+        ->first();
+
+        if ($itemWithoutRelations) {
+        
+            $result = 1;
+        } else {
+        
+            $result = 0;
+        }
+
+        $itemWithoutShading = Item::where('is_sales_item', 1)
+        ->whereDoesntHave('itemShading')
+        ->first();
+        if ($itemWithoutShading) {
+        
+            $result1 = 1;
+        } else {
+        
+            $result1 = 0;
+        }
+
         $data = [
             'title'     => 'Item',
             'content'   => 'admin.master_data.item',
@@ -42,6 +65,8 @@ class ItemController extends Controller
             'unit'      => Unit::where('status','1')->get(),
             'warehouse' => Warehouse::where('status','1')->get(),
             'pallet'    => Pallet::where('status','1')->get(),
+            'itemex'    => $result,
+            'itemsh'    => $result1,
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -74,6 +99,15 @@ class ItemController extends Controller
 
                 if($request->status){
                     $query->where('status', $request->status);
+                }
+
+                if($request->adaUnit == 1){
+                    $query->whereDoesntHave('itemUnit');
+                }
+
+                if($request->adaShading == 1){
+                    $query->where('is_sales_item', true)
+                    ->whereDoesntHave('itemShading');
                 }
 
                 if($request->type){

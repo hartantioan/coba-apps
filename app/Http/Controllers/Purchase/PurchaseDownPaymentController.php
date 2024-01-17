@@ -356,8 +356,10 @@ class PurchaseDownPaymentController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('purchase_down_payments', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:purchase_down_payments,code',
-			'supplier_id' 				=> 'required',
+            'code'                      => 'required',
+            'code_place_id'             => 'required',
+           /*  'code'			            => $request->temp ? ['required', Rule::unique('purchase_down_payments', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:purchase_down_payments,code',
+			 */'supplier_id' 				=> 'required',
 			'type'                      => 'required',
             'top'                       => 'required',
             'company_id'                => 'required',
@@ -366,9 +368,10 @@ class PurchaseDownPaymentController extends Controller
             'currency_rate'             => 'required',
             'subtotal'                  => 'required',
 		], [
-            'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code_place_id.required'            => 'Plant Tidak boleh kosong',
+            /* 'code.required' 	                => 'Kode tidak boleh kosong.',
             'code.string'                       => 'Kode harus dalam bentuk string.',
-            'code.min'                          => 'Kode harus minimal 18 karakter.',
+            'code.min'                          => 'Kode harus minimal 18 karakter.', */
             'code.unique'                       => 'Kode telah dipakai',
 			'supplier_id.required' 				=> 'Supplier tidak boleh kosong.',
 			'type.required'                     => 'Tipe tidak boleh kosong',
@@ -502,8 +505,12 @@ class PurchaseDownPaymentController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
+                    $lastSegment = $request->lastsegment;
+                    $menu = Menu::where('url', $lastSegment)->first();
+                    $newCode=PurchaseDownPayment::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    
                     $query = PurchaseDownPayment::create([
-                        'code'			            => $request->code,
+                        'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->supplier_id,
                         'type'	                    => $request->type,

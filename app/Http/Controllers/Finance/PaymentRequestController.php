@@ -698,8 +698,10 @@ class PaymentRequestController extends Controller
     public function create(Request $request){
         
         $validation = Validator::make($request->all(), [
-            'code'			        => $request->temp ? ['required', Rule::unique('payment_requests', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:payment_requests,code',
-			'account_id' 			=> 'required',
+            'code'                      => 'required',
+            'code_place_id'             => 'required',
+            /* 'code'			        => $request->temp ? ['required', Rule::unique('payment_requests', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:payment_requests,code',
+			 */'account_id' 			=> 'required',
             'company_id'            => 'required',
             'coa_source_id'         => $request->payment_type == '5' || ($request->payment_type == '6' && str_replace(',','.',str_replace('.','',$request->balance)) <= 0) ? '' : 'required',
             'payment_type'          => 'required',
@@ -718,10 +720,8 @@ class PaymentRequestController extends Controller
             'arr_note_cost'         => $request->arr_coa_cost ? 'required|array' : '',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
-            'code.string'                       => 'Kode harus dalam bentuk string.',
-            'code.min'                          => 'Kode harus minimal 18 karakter.',
-            'code.unique'                       => 'Kode telah dipakai.',
-			'account_id.required' 			    => 'Supplier/Vendor tidak boleh kosong.',
+            'code_place_id.required'            => 'Plant Tidak boleh kosong',
+            'account_id.required' 			    => 'Supplier/Vendor tidak boleh kosong.',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'coa_source_id.required'            => 'Kas/Bank tidak boleh kosong.',
             'payment_type.required'             => 'Tipe pembayaran tidak boleh kosong.',
@@ -881,8 +881,12 @@ class PaymentRequestController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
+                    $lastSegment = $request->lastsegment;
+                    $menu = Menu::where('url', $lastSegment)->first();
+                    $newCode=PaymentRequest::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    
                     $query = PaymentRequest::create([
-                        'code'			            => $request->code,
+                        'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->account_id,
                         'company_id'                => $request->company_id,

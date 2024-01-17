@@ -742,8 +742,10 @@ class PurchaseInvoiceController extends Controller
     public function create(Request $request){
         if($request->type_detail == '1'){
             $validation = Validator::make($request->all(), [
-                'code'			            => $request->temp ? ['required', Rule::unique('purchase_invoices', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:purchase_invoices,code',
-                'account_id' 			    => 'required',
+                'code'                      => 'required',
+                'code_place_id'             => 'required',
+               /*  'code'			            => $request->temp ? ['required', Rule::unique('purchase_invoices', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:purchase_invoices,code',
+                 */'account_id' 			    => 'required',
                 'type'                      => 'required',
                 'company_id'                => 'required',
                 'post_date'                 => 'required',
@@ -755,10 +757,11 @@ class PurchaseInvoiceController extends Controller
                 'arr_tax'                   => 'required|array',
                 'arr_grandtotal'            => 'required|array'
             ], [
+                'code_place_id.required'            => 'Plant Tidak boleh kosong',
                 'code.required' 	                => 'Kode tidak boleh kosong.',
-                'code.string'                       => 'Kode harus dalam bentuk string.',
+                /* 'code.string'                       => 'Kode harus dalam bentuk string.',
                 'code.min'                          => 'Kode harus minimal 18 karakter.',
-                'code.unique'                       => 'Kode telah dipakai',
+                'code.unique'                       => 'Kode telah dipakai', */
                 'account_id.required' 			    => 'Supplier/Vendor tidak boleh kosong.',
                 'type.required'                     => 'Tipe invoice tidak boleh kosong',
                 'company_id.required'               => 'Perusahaan tidak boleh kosong.',
@@ -928,8 +931,12 @@ class PurchaseInvoiceController extends Controller
             }else{
                 DB::beginTransaction();
                 try {
+                    $lastSegment = $request->lastsegment;
+                    $menu = Menu::where('url', $lastSegment)->first();
+                    $newCode=PurchaseInvoice::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    
                     $query = PurchaseInvoice::create([
-                        'code'			            => $request->code,
+                        'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->account_id,
                         'company_id'                => $request->company_id,

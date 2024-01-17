@@ -198,7 +198,9 @@ class DepreciationController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code'			        => $request->temp ? ['required', Rule::unique('depreciations', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:depreciations,code',
+            'code'                      => 'required',
+            'code_place_id'             => 'required',
+           /*  'code'			        => $request->temp ? ['required', Rule::unique('depreciations', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:depreciations,code', */
 			'company_id'		    => 'required',
             'post_date'             => 'required',
             'period'		        => 'required',
@@ -207,8 +209,9 @@ class DepreciationController extends Controller
             'arr_total'             => 'required|array',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
-            'code.unique'                       => 'Kode telah dipakai.',
-			'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
+            /* 'code.unique'                       => 'Kode telah dipakai.', */
+            'code_place_id.required'            => 'Plant Tidak boleh kosong',
+            'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
             'post_date.required' 			    => 'Tanggal post tidak boleh kosong.',
             'period.required' 			        => 'Periode tidak boleh kosong.',
 			'note.required'				        => 'Keterangan tidak boleh kosong',
@@ -276,8 +279,11 @@ class DepreciationController extends Controller
                     ]);
                 }
 			}else{
+                $lastSegment = $request->lastsegment;
+                $menu = Menu::where('url', $lastSegment)->first();
+                $newCode=Depreciation::generateCode($menu->document_code.date('y').$request->code_place_id);
                 $query = Depreciation::create([
-                    'code'			=> $request->code,
+                    'code'			=> $newCode,
                     'user_id'		=> session('bo_id'),
                     'company_id'    => $request->company_id,
                     'post_date'	    => $request->post_date,

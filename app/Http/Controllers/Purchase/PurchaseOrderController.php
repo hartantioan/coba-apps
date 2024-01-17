@@ -444,8 +444,10 @@ class PurchaseOrderController extends Controller
     public function create(Request $request){
         if($request->inventory_type == '1'){
             $validation = Validator::make($request->all(), [
-                'code'			            => $request->temp ? ['required', Rule::unique('purchase_orders', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:purchase_orders,code',
-                'supplier_id' 				=> 'required',
+                'code'                      => 'required',
+                'code_place_id'             => 'required',
+                /* 'code'			            => $request->temp ? ['required', Rule::unique('purchase_orders', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:purchase_orders,code',
+                 */'supplier_id' 				=> 'required',
                 'inventory_type'			=> 'required',
                 'shipping_type'		        => 'required',
                 'payment_type'		        => 'required',
@@ -465,9 +467,10 @@ class PurchaseOrderController extends Controller
                 'discount'                  => 'required',
             ], [
                 'code.required' 	                => 'Kode tidak boleh kosong.',
-                'code.unique'                       => 'Kode telah dipakai',
+                /* 'code.unique'                       => 'Kode telah dipakai',
                 'code.string'                       => 'Kode harus dalam bentuk string.',
-                'code.min'                          => 'Kode harus minimal 18 karakter.',
+                'code.min'                          => 'Kode harus minimal 18 karakter.', */
+                'code_place_id.required'            => 'Plant Tidak boleh kosong',
                 'supplier_id.required' 				=> 'Supplier tidak boleh kosong.',
                 'inventory_type.required' 			=> 'Tipe persediaan/jasa tidak boleh kosong.',
                 'shipping_type.required' 			=> 'Tipe pengiriman tidak boleh kosong.',
@@ -672,8 +675,12 @@ class PurchaseOrderController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
+                    $lastSegment = $request->lastsegment;
+                    $menu = Menu::where('url', $lastSegment)->first();
+                    $newCode=PurchaseOrder::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    
                     $query = PurchaseOrder::create([
-                        'code'			            => $request->code,
+                        'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->supplier_id,
                         'inventory_type'	        => $request->inventory_type,

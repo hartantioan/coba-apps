@@ -201,8 +201,9 @@ class ProductionIssueReceiveController extends Controller
     public function create(Request $request){
         
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('production_issue_receives', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:production_issue_receives,code',
-            'code_place_id'             => 'required',
+            'code'                      => 'required',
+            /* 'code'			            => $request->temp ? ['required', Rule::unique('production_issue_receives', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:production_issue_receives,code',
+             */'code_place_id'             => 'required',
             'company_id'			    => 'required',
             'post_date'		            => 'required',
             'production_order_id'       => 'required',
@@ -217,11 +218,12 @@ class ProductionIssueReceiveController extends Controller
             'arr_qty'                   => 'required|array',
             'arr_batch'                 => 'required|array',
         ], [
+            'code_place_id.required'            => 'Plant Tidak boleh kosong',
             'code.required' 	                => 'Kode tidak boleh kosong.',
-            'code.string'                       => 'Kode harus dalam bentuk string.',
+            /* 'code.string'                       => 'Kode harus dalam bentuk string.',
             'code.min'                          => 'Kode harus minimal 18 karakter.',
             'code.unique'                       => 'Kode telah dipakai',
-            'code_place_id.required' 			=> 'Kode plant tidak boleh kosong.',
+            'code_place_id.required' 			=> 'Kode plant tidak boleh kosong.', */
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
             'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
             'production_order_id.required'      => 'Order Produksi tidak boleh kosong.',
@@ -322,8 +324,12 @@ class ProductionIssueReceiveController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
+                    $lastSegment = $request->lastsegment;
+                    $menu = Menu::where('url', $lastSegment)->first();
+                    $newCode=ProductionIssueReceive::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    
                     $query = ProductionIssueReceive::create([
-                        'code'			            => $request->code,
+                        'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $request->company_id,
                         'production_order_id'       => $request->production_order_id,

@@ -241,7 +241,17 @@ class PurchaseInvoice extends Model
         return $ada;
     }
 
-    
+    public function hasGoodReceiptThatHasLandedCost(){
+        $has = false;
+        foreach($this->purchaseInvoiceDetail as $row){
+            if($row->goodReceiptDetail()){
+                if($row->lookable->landedCostDetail()->exists()){
+                    $has = true;
+                }
+            }
+        }
+        return $has;
+    }
 
     public function hasChildDocument(){
         $hasRelation = false;

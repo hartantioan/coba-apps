@@ -205,7 +205,6 @@
                             </div>
                         </div>
                     </div>
-                    
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -284,7 +283,7 @@
                                 <label class="active" for="payment_term">Termin Pembayaran (hari)</label>
                             </div>
                             <div class="input-field col m3 s12 step11">
-                                <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
+                                <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();refreshTotal();">
                                     @foreach ($currency as $row)
                                         <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
                                     @endforeach
@@ -300,7 +299,7 @@
                                 <label class="active" for="post_date">Tgl. Posting</label>
                             </div>
                             <div class="input-field col m3 s12 step14">
-                                <input id="delivery_date" name="delivery_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. kirim">
+                                <input id="delivery_date" name="delivery_date" min="{{ date('Y-m-d') }}" max="{{ date('Y'.'-12-31') }}" type="date" placeholder="Tgl. kirim">
                                 <label class="active" for="delivery_date">Tgl. Kirim</label>
                             </div>
                             <div class="input-field col m3 s12 step15">
@@ -432,44 +431,55 @@
                                     </table>
                                 </p>
                             </div>
-                            <div class="input-field col m4 s12 step23">
+                            <div class="input-field col m3 s12 step23">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
-                            <div class="input-field col m4 s12 step24">
+                            <div class="input-field col m3 s12 step24">
                                 <textarea class="materialize-textarea preserveLines" id="note_external" name="note_external" placeholder="Keterangan Tambahan" rows="3"></textarea>
                                 <label class="active" for="note_external">Keterangan Tambahan (muncul pada printout)</label>
                             </div>
-                            <div class="input-field col m4 s12 step25">
+                            <div class="input-field col m6 s12 step25">
                                 <table width="100%" class="bordered">
                                     <thead>
                                         <tr>
-                                            <td width="50%">Subtotal Sblm Diskon</td>
-                                            <td width="50%" class="right-align"><span id="subtotal">0,00</span></td>
+                                            <td width="33%"></td>
+                                            <td width="33%" class="center-align">Mata Uang Asli</td>
+                                            <td width="33%" class="center-align">Mata Uang Konversi</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Subtotal Sblm Diskon</td>
+                                            <td class="right-align"><span id="subtotal">0,00</span></td>
+                                            <td class="right-align"><span id="subtotal-convert">0,00</span></td>
                                         </tr>
                                         <tr>
                                             <td>Diskon</td>
                                             <td class="right-align">
                                                 <input class="browser-default" onfocus="emptyThis(this);" id="discount" name="discount" type="text" value="0" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
                                             </td>
+                                            <td class="right-align"><span id="discount-convert">0,00</span></td>
                                         </tr>
                                         <tr>
                                             <td>Subtotal Setelah Diskon</td>
                                             <td class="right-align"><span id="total">0,00</span></td>
+                                            <td class="right-align"><span id="total-convert">0,00</span></td>
                                         </tr>
                                         <tr>
                                             <td>PPN</td>
                                             <td class="right-align"><span id="tax">0,00</span></td>
+                                            <td class="right-align"><span id="tax-convert">0,00</span></td>
                                         </tr>
                                         <tr>
                                             <td>PPh</td>
                                             <td class="right-align">
                                                 <input class="browser-default" onfocus="emptyThis(this);" id="wtax" name="wtax" type="text" value="0,00" onkeyup="formatRupiah(this);countGrandtotal(this.value);" style="text-align:right;width:100%;">
+                                                <td class="right-align"><span id="wtax-convert">0,00</span></td>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>Grandtotal</td>
                                             <td class="right-align"><span id="grandtotal">0,00</span></td>
+                                            <td class="right-align"><span id="grandtotal-convert">0,00</span></td>
                                         </tr>
                                     </thead>
                                 </table>
@@ -725,7 +735,7 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('input').css('border', 'none');
-                        $('input').css('border-bottom', '0.5px solid black');
+                $('input').css('border-bottom', '0.5px solid black');
                 $('#form_data')[0].reset();
                 $('input').css('border', 'none');
                 $('input').css('border-bottom', '0.5px solid black');
@@ -736,7 +746,7 @@
                     $(this).remove();
                 });
                 M.updateTextFields();
-                $('#subtotal,#total,#tax,#grandtotal').text('0,00');
+                $('#subtotal,#total,#tax,#grandtotal,#subtotal-convert,#discount-convert,#total-convert,#tax-convert,#wtax-convert,#grandtotal-convert').text('0,00');
                 $('#purchase_request_id,#good_issue_id,#marketing_order_delivery_process_id').empty();
                 if($('.data-used').length > 0){
                     $('.data-used').trigger('click');
@@ -823,6 +833,14 @@
             minWidth: 100,
         });
     });
+
+    function refreshTotal(){
+        if($('.row_item').length > 0){
+            setTimeout(function() {
+                countAll();
+            }, 750); 
+        }
+    }
     
     function printMultiSelect(){
         var formData = new FormData($('#form_data_print_multi')[0]);
@@ -2692,7 +2710,9 @@
     }
 
     function countAll(){
-        var subtotal = 0, tax = 0, discount = parseFloat($('#discount').val().replaceAll(".", "").replaceAll(",",".")), total = 0, grandtotal = 0, wtax = 0;
+        var subtotal = 0, tax = 0, discount = parseFloat($('#discount').val().replaceAll(".", "").replaceAll(",",".")), total = 0, grandtotal = 0, wtax = 0, currency_rate = parseFloat($('#currency_rate').val().replaceAll(".", "").replaceAll(",",".")), subtotalconvert = 0, taxconvert = 0, discountconvert = 0, totalconvert = 0, grandtotalconvert = 0, wtaxconvert = 0;
+
+        discountconvert = discount * currency_rate;
 
         $('.arr_subtotal').each(function(index){
 			subtotal += parseFloat($(this).text().replaceAll(".", "").replaceAll(",","."));
@@ -2729,11 +2749,23 @@
 
         grandtotal = total + tax - wtax;
 
+        subtotalconvert = subtotal * currency_rate;
+        totalconvert = total * currency_rate;
+        taxconvert = tax * currency_rate;
+        wtaxconvert = wtax * currency_rate;
+        grandtotalconvert = grandtotal * currency_rate;
+
         $('#subtotal').text(
             (subtotal >= 0 ? '' : '-') + formatRupiahIni(subtotal.toFixed(2).toString().replace('.',','))
         );
         $('#savesubtotal').val(
             (subtotal >= 0 ? '' : '-') + formatRupiahIni(subtotal.toFixed(2).toString().replace('.',','))
+        );
+        $('#subtotal-convert').text(
+            (subtotalconvert >= 0 ? '' : '-') + formatRupiahIni(subtotalconvert.toFixed(2).toString().replace('.',','))
+        );
+        $('#discount-convert').text(
+            (discountconvert >= 0 ? '' : '-') + formatRupiahIni(discountconvert.toFixed(2).toString().replace('.',','))
         );
         $('#total').text(
             (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
@@ -2741,11 +2773,17 @@
         $('#savetotal').val(
             (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
         );
+        $('#total-convert').text(
+            (totalconvert >= 0 ? '' : '-') + formatRupiahIni(totalconvert.toFixed(2).toString().replace('.',','))
+        );
         $('#tax').text(
             (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(2).toString().replace('.',','))
         );
         $('#savetax').val(
             (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(2).toString().replace('.',','))
+        );
+        $('#tax-convert').text(
+            (taxconvert >= 0 ? '' : '-') + formatRupiahIni(taxconvert.toFixed(2).toString().replace('.',','))
         );
         $('#wtax').val(
             (wtax >= 0 ? '' : '-') + formatRupiahIni(wtax.toFixed(2).toString().replace('.',','))
@@ -2753,11 +2791,17 @@
         $('#savewtax').val(
             (wtax >= 0 ? '' : '-') + formatRupiahIni(wtax.toFixed(2).toString().replace('.',','))
         );
+        $('#wtax-convert').val(
+            (wtaxconvert >= 0 ? '' : '-') + formatRupiahIni(wtaxconvert.toFixed(2).toString().replace('.',','))
+        );
         $('#grandtotal').text(
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
         );
         $('#savegrandtotal').val(
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
+        );
+        $('#grandtotal-convert').text(
+            (grandtotalconvert >= 0 ? '' : '-') + formatRupiahIni(grandtotalconvert.toFixed(2).toString().replace('.',','))
         );
     }
 

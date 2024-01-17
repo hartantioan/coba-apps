@@ -114,30 +114,57 @@
                             </div>
                         </div>
                         <div class="col s12 row">
-                            <h6 class="center-align">Apakah ada syarat nominal?</h6>
-                            <div class="input-field col s12 center-align">
-                                <div class="switch mb-1">
-                                    <label class="center">
-                                        Tidak
-                                        <input type="checkbox" id="is_check_nominal" name="is_check_nominal" value="1" onclick="checkGrandtotal();">
-                                        <span class="lever"></span>
-                                        Ya
-                                    </label>
+                            <div class="col s6 row">
+                                <h6 class="center-align">Apakah ada syarat nominal?</h6>
+                                <div class="input-field col s12 center-align">
+                                    <div class="switch mb-1">
+                                        <label class="center">
+                                            Tidak
+                                            <input type="checkbox" id="is_check_nominal" name="is_check_nominal" value="1" onclick="checkGrandtotal();">
+                                            <span class="lever"></span>
+                                            Ya
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>  
+                            <div class="col s6 row">
+                                <h6 class="center-align">Apakah ada syarat benchmark?</h6>
+                                <div class="input-field col s12 center-align">
+                                    <div class="switch mb-1">
+                                        <label class="center">
+                                            Tidak
+                                            <input type="checkbox" id="is_check_benchmark" name="is_check_benchmark" value="1" onclick="checkBenchmark();">
+                                            <span class="lever"></span>
+                                            Ya
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="input-field col s6">
+                            <div class="input-field col s3">
+                                <select class="form-control" disabled id="nominal_type" name="nominal_type">
+                                    <option value="1">Grandtotal (Rp)</option>
+                                    <option value="2">Prosentase (%)</option>
+                                </select>
+                                <label class="" for="nominal_type">Tipe Nominal</label>
+                            </div>
+                            <div class="input-field col s3">
                                 <select class="form-control" disabled id="sign" name="sign">
-                                    <option value=">">> (lebih dari) Grandtotal</option>
-                                    <option value=">=">>= (lebih dari sama dengan) Grandtotal</option>
-                                    <option value="=">= (sama dengan) Grandtotal</option>
-                                    <option value="<">< (kurang dari) Grandtotal</option>
-                                    <option value="<="><= (kurang dari sama dengan) Grandtotal</option>
+                                    <option value=">">> (lebih dari) Nominal</option>
+                                    <option value=">=">>= (lebih dari sama dengan) Nominal</option>
+                                    <option value="=">= (sama dengan) Nominal</option>
+                                    <option value="<">< (kurang dari) Nominal</option>
+                                    <option value="<="><= (kurang dari sama dengan) Nominal</option>
+                                    <option value="~">~ (dalam range) Nominal</option>
                                 </select>
                                 <label class="" for="sign">Operasi</label>
                             </div>
-                            <div class="input-field col s6">
+                            <div class="input-field col s3">
                                 <input id="nominal" name="nominal" disabled type="text" placeholder="Nominal" onkeyup="formatRupiah(this)">
-                                <label class="active" for="nominal">Nominal Batas</label>
+                                <label class="active" for="nominal">Nominal Batas Awal</label>
+                            </div>
+                            <div class="input-field col s3" id="final-border">
+                                <input id="nominal_final" name="nominal_final" disabled type="text" placeholder="Nominal" onkeyup="formatRupiah(this)">
+                                <label class="active" for="nominal">Nominal Batas Akhir</label>
                             </div>
                         </div>
                         <div class="col m12 s12">
@@ -403,6 +430,12 @@
         select2ServerSide('#arr_approval_menu' + count, '{{ url("admin/select2/menu") }}');
     }
 
+    function checkBenchmark(){
+        if($('#is_check_nominal').is(':checked')){
+            $('#is_check_nominal').prop( "checked", false);
+        }
+    }
+
     function checkGrandtotal(){
         if($('#is_check_nominal').is(':checked')){
             $('select[name^="arr_approval_menu"]').each(function(){
@@ -417,6 +450,9 @@
                     }
                 }
             });
+        }
+        if($('#is_check_benchmark').is(':checked')){
+            $('#is_check_benchmark').prop( "checked", false);
         }
     }
 

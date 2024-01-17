@@ -1014,10 +1014,11 @@ class FundRequestController extends Controller
                     DB::rollback();
                 }
 			}else{
-                DB::beginTransaction();
-                try {
+                /* DB::beginTransaction();
+                try { */
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
+                    info($lastSegment);
                     $newCode=FundRequest::generateCode($menu->document_code.date('y').$request->code_place_id);
                     
                     $query = FundRequest::create([
@@ -1046,14 +1047,14 @@ class FundRequestController extends Controller
                         'status'        => '1',
                     ]);
 
-                    DB::commit();
+                    /* DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
-                }
+                } */
 			}
 			
 			if($query) {
-                DB::beginTransaction();
+                /* DB::beginTransaction();
                 try {
                     foreach($request->arr_item as $key => $row){
                         FundRequestDetail::create([
@@ -1085,7 +1086,7 @@ class FundRequestController extends Controller
                     ->performedOn(new FundRequest())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit fund request.');
+                    ->log('Add / edit fund request.'); */
 
 				$response = [
 					'status'    => 200,

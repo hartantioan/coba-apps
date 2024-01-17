@@ -19,8 +19,11 @@ class ApprovalTemplate extends Model
         'user_id',
         'name',
         'is_check_nominal',
+        'is_check_benchmark',
+        'nominal_type',
         'sign',
         'nominal',
+        'nominal_final',
         'min_approve',
         'min_reject',
         'status',
@@ -33,6 +36,11 @@ class ApprovalTemplate extends Model
     public function approvalTemplateMenu()
     {
         return $this->hasMany('App\Models\ApprovalTemplateMenu');
+    }
+
+    public function approvalTemplateItemGroup()
+    {
+        return $this->hasMany('App\Models\ApprovalTemplateItemGroup');
     }
     
     public function approvalTemplateOriginator()

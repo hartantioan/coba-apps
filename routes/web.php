@@ -343,7 +343,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('journal', [Select2Controller::class, 'journal']);
                 Route::get('user_bank_by_account', [Select2Controller::class, 'userBankByAccount']);
                 Route::get('all_user_bank', [Select2Controller::class, 'allUserBank']);
-                Route::get('good_receipt_serial_number', [Select2Controller::class, 'goodReceiptSerialNumber']);
+                Route::get('item_serial', [Select2Controller::class, 'itemSerial']);
             });
 
             Route::prefix('menu')->group(function () {

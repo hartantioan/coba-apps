@@ -91,13 +91,13 @@ class GoodReceiptDetail extends Model
         });
     }
 
-    public function goodReceiptDetailSerial(){
-        return $this->hasMany('App\Models\GoodReceiptDetailSerial','good_receipt_detail_id','id');
+    public function itemSerial(){
+        return $this->hasMany('App\Models\ItemSerial','lookable_id','id')->where('lookable_type',$this->table);
     }
 
     public function listSerial(){
         $arr = [];
-        foreach($this->goodReceiptDetailSerial as $row){
+        foreach($this->itemSerial as $row){
             $arr[] = $row->serial_number;
         }
 

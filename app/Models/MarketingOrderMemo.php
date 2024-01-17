@@ -216,6 +216,20 @@ class MarketingOrderMemo extends Model
         return $total;
     }
 
+    public function balancePaymentRequest(){
+        $total = $this->grandtotal;
+
+        foreach($this->incomingPaymentDetail as $row){
+            $total += $row->total;
+        }
+
+        foreach($this->paymentRequestDetail as $row){
+            $total -= $row->nominal;
+        }
+
+        return $total;
+    }
+
     public function totalUsed(){
         $total = 0;
 

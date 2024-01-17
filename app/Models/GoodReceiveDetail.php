@@ -85,4 +85,17 @@ class GoodReceiveDetail extends Model
     {
         return $this->belongsTo('App\Models\Coa', 'coa_id', 'id')->withTrashed();
     }
+
+    public function itemSerial(){
+        return $this->hasMany('App\Models\ItemSerial','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
+    public function listSerial(){
+        $arr = [];
+        foreach($this->itemSerial as $row){
+            $arr[] = $row->serial_number;
+        }
+
+        return implode(', ',$arr);
+    }
 }

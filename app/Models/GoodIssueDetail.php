@@ -116,9 +116,8 @@ class GoodIssueDetail extends Model
         });
     }
 
-    public function goodReceiptDetailSerial()
-    {
-        return $this->hasMany('App\Models\GoodReceiptDetailSerial', 'good_issue_detail_id', 'id');
+    public function itemSerial(){
+        return $this->hasMany('App\Models\ItemSerial','usable_id','id')->where('usable_type',$this->table);
     }
 
     public function goodReturnIssueDetail()
@@ -130,7 +129,7 @@ class GoodIssueDetail extends Model
 
     public function listSerial(){
         $arr = [];
-        foreach($this->goodReceiptDetailSerial as $row){
+        foreach($this->itemSerial as $row){
             $arr[] = $row->serial_number;
         }
 
@@ -140,7 +139,7 @@ class GoodIssueDetail extends Model
     public function arrSerial(){
         $arr = [];
         
-        foreach($this->goodReceiptDetailSerial as $row){
+        foreach($this->itemSerial as $row){
             $arr[] = [
                 'serial_id'     => $row->id,
                 'serial_number' => $row->serial_number,

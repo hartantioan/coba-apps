@@ -316,8 +316,8 @@
                             <div class="row">
                                 <div class="col m12 s12">
                                     <ul class="collapsible">
-                                        <li class="active step18" id="main-tab" onclick="changeMode();">
-                                            <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">library_books</i>Pembayaran BS / AP DP / AP Invoice / AR Memo</div>
+                                        <li class="active step18" id="main-tab">
+                                            <div class="collapsible-header purple darken-1 text-white" style="color:white;" onclick="changeMode();"><i class="material-icons">library_books</i>Pembayaran BS / AP DP / AP Invoice / AR Memo</div>
                                             <div class="collapsible-body" style="display:block;">
                                                 <div class="mt-2 mb-2" style="overflow:scroll;width:100% !important;">
                                                     <table class="bordered" style="min-width:3250px !important;" id="table-detail">
@@ -347,12 +347,11 @@
                                                                 <th class="center">Departemen</th>
                                                                 <th class="center">Proyek</th>
                                                                 <th class="center">Rekening</th>
-                                                                <th class="center">Salin Baris</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody id="body-detail">
                                                             <tr id="empty-detail">
-                                                                <td colspan="20" class="center">
+                                                                <td colspan="19" class="center">
                                                                     Pilih partner bisnis untuk memulai...
                                                                 </td>
                                                             </tr>
@@ -361,8 +360,8 @@
                                                 </div>
                                             </div>
                                         </li>
-                                        <li id="cost-tab" class="step19" onclick="changeMode();">
-                                            <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">library_books</i>Tutup BS dengan Coa Biaya (REKONSILIASI)</div>
+                                        <li id="cost-tab" class="step19">
+                                            <div class="collapsible-header purple darken-1 text-white" style="color:white;" onclick="changeMode();"><i class="material-icons">library_books</i>Tutup BS dengan Coa Biaya (REKONSILIASI)</div>
                                             <div class="collapsible-body">
                                                 <p class="mt-2 mb-2">
                                                     <h6>Gunakan fitur ini untuk rekonsiliasi biaya dengan piutang karyawan, pastikan anda menentukan daftar piutang mana yang ingin anda gunakan.</h6>
@@ -623,7 +622,7 @@
                                 <div class="collapsible-header purple lightrn-1 white-text">
                                     <i class="material-icons">layers</i> Fund Requests / AP Down Payment / AP Invoice / AR Memo
                                 </div>
-                                <div class="collapsible-body">
+                                <div class="collapsible-body" style="zoom:0.8;">
                                     <div id="datatable_buttons_multi"></div>
                                     <i class="right">Gunakan *pilih semua* untuk memilih seluruh data yang anda inginkan. Atau pilih baris untuk memilih data yang ingin dipindahkan.</i>
                                     <table id="table_multi" class="display" width="100%">
@@ -641,6 +640,7 @@
                                                 <th class="center-align">Memo</th>
                                                 <th class="center-align">Final</th>
                                                 <th class="center-align">Keterangan</th>
+                                                <th class="center-align">Pecah Dokumen</th>
                                             </tr>
                                         </thead>
                                         <tbody id="body-detail-multi"></tbody>
@@ -938,7 +938,7 @@
                 M.updateTextFields();
                 $('#body-detail').empty().append(`
                     <tr id="empty-detail">
-                        <td colspan="20" class="center">
+                        <td colspan="19" class="center">
                             Pilih partner bisnis untuk memulai...
                         </td>
                     </tr>
@@ -1048,7 +1048,7 @@
             },
             onOpenEnd: function(modal, trigger) {
                 table_multi = $('#table_multi').DataTable({
-                    "responsive": true,
+                    /* "responsive": true, */
                     "ordering": false,
                     scrollY: '50vh',
                     scrollCollapse: true,
@@ -1087,7 +1087,7 @@
                 $('select[name="table_multi_length"]').addClass('browser-default');
 
                 table_multi_op = $('#table_multi_op').DataTable({
-                    "responsive": true,
+                    /* "responsive": true, */
                     "ordering": false,
                     scrollY: '50vh',
                     scrollCollapse: true,
@@ -1132,6 +1132,10 @@
                 $('#table_multi').DataTable().clear().destroy();
                 $('#table_multi_op').DataTable().clear().destroy();
             }
+        });
+
+        $('#table_multi,#table_multi_op').on('click', 'input', function(event) {
+            event.stopPropagation();
         });
 
         $('#body-detail').on('click', '.delete-data-detail', function() {
@@ -1505,6 +1509,9 @@
                                     <td class="center-align">
                                         ` + val.note + `
                                     </td>
+                                    <td class="center-align">
+                                        ` + (val.type_fr == '1' && val.document_status == '2' ?  `<input name="arr_qty_duplicate[]" id="arr_qty_duplicate` + val.id + `" onfocus="emptyThis(this);" value="1" min="1" type="number">` : '-') + `
+                                    </td>
                                 </tr>
                             `);
                         });
@@ -1590,10 +1597,10 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                let /* passed = false, */ arr_id = [], arr_type = [], sametype = true, arr_op_id = [];
+                let arr_id = [], arr_type = [], sametype = true, arr_op_id = [], arr_qty_duplicate = [];
                 $.map(table_multi.rows('.selected').nodes(), function (item) {
-                    /* passed = true; */
                     arr_id.push($(item).data('id'));
+                    arr_qty_duplicate.push(($('#arr_qty_duplicate' + $(item).data('id')).length > 0 ? $('#arr_qty_duplicate' + $(item).data('id')).val() : '1'));
                     arr_type.push($(item).data('type'));
                 });
 
@@ -1601,252 +1608,242 @@
                     arr_op_id.push($(item).data('id'));
                 });
 
-                /* if(passed == true){ */
-                    $.ajax({
-                        url: '{{ Request::url() }}/get_account_data',
-                        type: 'POST',
-                        dataType: 'JSON',
-                        data: {
-                            arr_id: arr_id,
-                            arr_type: arr_type,
-                            arr_op_id: arr_op_id,
-                        },
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        beforeSend: function() {
-                            loadingOpen('.modal-content');
-                        },
-                        success: function(response) {
-                            loadingClose('.modal-content');
+                $.ajax({
+                    url: '{{ Request::url() }}/get_account_data',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        arr_id: arr_id,
+                        arr_type: arr_type,
+                        arr_op_id: arr_op_id,
+                        arr_qty_duplicate: arr_qty_duplicate,
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
 
-                            $('#body-detail').empty();
-                            if(response.details.length > 0){
-                                $.each(response.details, function(i, val) {
-                                    var count = makeid(10);
-                                    $('#list-used-data').append(`
-                                        <div class="chip purple darken-4 gradient-shadow white-text">
+                        $('#body-detail').empty();
+                        if(response.details.length > 0){
+                            $.each(response.details, function(i, val) {
+                                var count = makeid(10);
+                                $('#list-used-data').append(`
+                                    <div class="chip purple darken-4 gradient-shadow white-text">
+                                        ` + val.rawcode + `
+                                        <i class="material-icons close data-used" onclick="removeUsedData('` + val.type + `',` + val.id + `,'` + val.rawcode + `')">close</i>
+                                    </div>
+                                `);
+                                $('#body-detail').append(`
+                                    <tr class="row_detail" data-code="` + val.rawcode + `">
+                                        <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_account_bank[]" value="` + val.bank_account + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_account_no[]" value="` + val.no_account + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_account_name[]" value="` + val.name_account + `" data-id="` + count + `">
+                                        ` + ( val.coa_id ? `<input type="hidden" id="arr_coa` + count + `" name="arr_coa[]" value="` + val.coa_id + `" data-id="` + count + `">` : `` ) + `
+                                        <td class="center-align">
+                                            <label>
+                                                <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.code + `" onclick="countAll();" data-id="` + count + `" checked>
+                                                <span>Pilih</span>
+                                            </label>
+                                        </td>
+                                        <td>
                                             ` + val.rawcode + `
-                                            <i class="material-icons close data-used" onclick="removeUsedData('` + val.type + `',` + val.id + `,'` + val.rawcode + `')">close</i>
-                                        </div>
-                                    `);
-                                    $('#body-detail').append(`
-                                        <tr class="row_detail" data-code="` + val.rawcode + `">
-                                            <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
-                                            <input type="hidden" name="arr_account_bank[]" value="` + val.bank_account + `" data-id="` + count + `">
-                                            <input type="hidden" name="arr_account_no[]" value="` + val.no_account + `" data-id="` + count + `">
-                                            <input type="hidden" name="arr_account_name[]" value="` + val.name_account + `" data-id="` + count + `">
-                                            ` + ( val.coa_id ? `<input type="hidden" id="arr_coa` + count + `" name="arr_coa[]" value="` + val.coa_id + `" data-id="` + count + `">` : `` ) + `
-                                            <td class="center-align">
-                                                <label>
-                                                    <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.code + `" onclick="countAll();" data-id="` + count + `" checked>
-                                                    <span>Pilih</span>
-                                                </label>
-                                            </td>
-                                            <td>
-                                                ` + val.rawcode + `
-                                            </td>
-                                            <td class="center">
-                                                ` + val.post_date + `
-                                            </td>
-                                            <td class="center">
-                                                ` + val.due_date + `
-                                            </td>
-                                            <td class="right-align">
-                                                ` + val.total + `
-                                            </td>
-                                            <td class="right-align">
-                                                ` + val.tax + `
-                                            </td>
-                                            <td class="right-align" id="row_wtax` + count + `">
-                                                ` + val.wtax + `
-                                            </td>
-                                            <td class="right-align" id="row_grandtotal` + count + `">
-                                                ` + val.grandtotal + `
-                                            </td>
-                                            <td class="right-align" id="row_memo` + count + `">
-                                                ` + val.memo + `
-                                            </td>
-                                            <td class="center">
-                                                <input id="arr_pay` + count + `" name="arr_pay[]" onfocus="emptyThis(this);" data-grandtotal="` + val.balance + `" class="browser-default" type="text" value="`+ val.balance + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
-                                            </td>
-                                            <td class="center">
-                                                <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:150px;" value="` + val.note + `">
-                                            </td>
-                                            <td class="center">
-                                                ` + ( val.coa_id ? `-` : `<select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="applyCoa('` + count + `');"></select>` ) + `
-                                            </td>
-                                            <td class="center">
-                                                ` + ( val.coa_id ? `-` : `<select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" required style="width: 100%"></select>` ) + `
-                                            </td>
-                                            <td class="center">
-                                                ` + ( val.coa_id ? `-` 
-                                                : 
-                                                `<select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:200px !important;">
-                                                    <option value="">--Kosong--</option>
-                                                    @foreach ($place as $row)
-                                                        <option value="{{ $row->id }}">{{ $row->code }}</option>
-                                                    @endforeach
-                                                </select>` 
-                                                ) + `
-                                            </td>
-                                            <td class="center">
-                                                ` + ( val.coa_id ? `-` 
-                                                : 
-                                                `<select class="browser-default" id="arr_line` + count + `" name="arr_line[]" style="width:200px !important;" onchange="changePlace(this);">
-                                                    <option value="">--Kosong--</option>
-                                                    @foreach ($line as $rowline)
-                                                        <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
-                                                    @endforeach
-                                                </select>` 
-                                                ) + `
-                                            </td>
-                                            <td class="center">
-                                                ` + ( val.coa_id ? `-` 
-                                                : 
-                                                `<select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" style="width:200px !important;" onchange="changeLine(this);">
-                                                    <option value="">--Kosong--</option>
-                                                    @foreach ($machine as $row)
-                                                        <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
-                                                    @endforeach    
-                                                </select>` 
-                                                ) + `
-                                            </td>
-                                            <td class="center">
-                                                ` + ( val.coa_id ? `-` 
-                                                : 
-                                                `<select class="browser-default" id="arr_department` + count + `" name="arr_department[]" style="width:200px !important;">
-                                                    <option value="">--Kosong--</option>
-                                                    @foreach ($department as $row)
-                                                        <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                                    @endforeach
-                                                </select>` 
-                                                ) + `
-                                            </td>
-                                            <td class="center">
-                                                ` + ( val.coa_id ? `-` 
-                                                : 
-                                                `<select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>` 
-                                                ) + `
-                                            </td>
-                                            <td>
-                                                ` + val.bank_account + ` ` + val.no_account + ` ` + val.name_account + `    
-                                            </td>
-                                            <td class="center">
-                                                ` + (val.type == 'fund_requests' ? `<button type="button" class="btn-floating mb-1 btn-flat orange accent-2 white-text btn-small" data-popup="tooltip" title="Salin" onclick="duplicate('` + count + `','`+ val.code + `')"><i class="material-icons dp48">content_copy</i></button>` : '') + `    
-                                            </td>
-                                        </tr>
-                                    `);
-                                    
-                                    if(!val.coa_id){
-                                        $('#arr_place' + count).val(val.place_id);
-                                        $('#arr_department' + count).val(val.department_id);
-                                        select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
-                                        select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
-                                        select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
-                                    }
-                                    
-                                    $('#currency_id').val(val.currency_id).formSelect();
-                                    $('#currency_rate').val(val.currency_rate);
-
-                                    $('#account_no').val(val.no_account);
-                                    $('#account_bank').val(val.bank_account);
-                                    $('#account_name').val(val.name_account);
-                                });
+                                        </td>
+                                        <td class="center">
+                                            ` + val.post_date + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.due_date + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.total + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.tax + `
+                                        </td>
+                                        <td class="right-align" id="row_wtax` + count + `">
+                                            ` + val.wtax + `
+                                        </td>
+                                        <td class="right-align" id="row_grandtotal` + count + `">
+                                            ` + val.grandtotal + `
+                                        </td>
+                                        <td class="right-align" id="row_memo` + count + `">
+                                            ` + val.memo + `
+                                        </td>
+                                        <td class="center">
+                                            <input id="arr_pay` + count + `" name="arr_pay[]" onfocus="emptyThis(this);" data-grandtotal="` + val.balance + `" class="browser-default" type="text" value="`+ val.balance_duplicate + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
+                                        </td>
+                                        <td class="center">
+                                            <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:150px;" value="` + val.note + `">
+                                        </td>
+                                        <td class="center">
+                                            ` + ( val.coa_id ? `-` : `<select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="applyCoa('` + count + `');"></select>` ) + `
+                                        </td>
+                                        <td class="center">
+                                            ` + ( val.coa_id ? `-` : `<select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" required style="width: 100%"></select>` ) + `
+                                        </td>
+                                        <td class="center">
+                                            ` + ( val.coa_id ? `-` 
+                                            : 
+                                            `<select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:200px !important;">
+                                                <option value="">--Kosong--</option>
+                                                @foreach ($place as $row)
+                                                    <option value="{{ $row->id }}">{{ $row->code }}</option>
+                                                @endforeach
+                                            </select>` 
+                                            ) + `
+                                        </td>
+                                        <td class="center">
+                                            ` + ( val.coa_id ? `-` 
+                                            : 
+                                            `<select class="browser-default" id="arr_line` + count + `" name="arr_line[]" style="width:200px !important;" onchange="changePlace(this);">
+                                                <option value="">--Kosong--</option>
+                                                @foreach ($line as $rowline)
+                                                    <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
+                                                @endforeach
+                                            </select>` 
+                                            ) + `
+                                        </td>
+                                        <td class="center">
+                                            ` + ( val.coa_id ? `-` 
+                                            : 
+                                            `<select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" style="width:200px !important;" onchange="changeLine(this);">
+                                                <option value="">--Kosong--</option>
+                                                @foreach ($machine as $row)
+                                                    <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                                                @endforeach    
+                                            </select>` 
+                                            ) + `
+                                        </td>
+                                        <td class="center">
+                                            ` + ( val.coa_id ? `-` 
+                                            : 
+                                            `<select class="browser-default" id="arr_department` + count + `" name="arr_department[]" style="width:200px !important;">
+                                                <option value="">--Kosong--</option>
+                                                @foreach ($department as $row)
+                                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                                @endforeach
+                                            </select>` 
+                                            ) + `
+                                        </td>
+                                        <td class="center">
+                                            ` + ( val.coa_id ? `-` 
+                                            : 
+                                            `<select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>` 
+                                            ) + `
+                                        </td>
+                                        <td>
+                                            ` + val.bank_account + ` ` + val.no_account + ` ` + val.name_account + `    
+                                        </td>
+                                    </tr>
+                                `);
                                 
-                            }else{
-                                $('#body-detail').empty().append(`
-                                    <tr id="empty-detail">
-                                        <td colspan="20" class="center">
-                                            Pilih partner bisnis untuk memulai...
-                                        </td>
-                                    </tr>
-                                `);
+                                if(!val.coa_id){
+                                    $('#arr_place' + count).val(val.place_id);
+                                    $('#arr_department' + count).val(val.department_id);
+                                    select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+                                    select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
+                                    select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
+                                }
+                                
+                                $('#currency_id').val(val.currency_id).formSelect();
+                                $('#currency_rate').val(val.currency_rate);
 
-                                $('#grandtotal,#admin').val('0,00');
-                            }
-
-                            $('#body-detail-payment').empty();
-                            if(response.payments.length > 0){
-                                $.each(response.payments, function(i, val) {
-                                    var count = makeid(10);
-                                    $('#list-used-data').append(`
-                                        <div class="chip purple darken-4 gradient-shadow white-text">
-                                            ` + val.rawcode + `
-                                            <i class="material-icons close data-used" onclick="removeUsedData('` + val.type + `',` + val.id + `,'` + val.rawcode + `')">close</i>
-                                        </div>
-                                    `);
-                                    $('#body-detail-payment').append(`
-                                        <tr class="row_detail_payment" data-id="` + val.id + `" data-code="` + val.rawcode + `">
-                                            <td class="center-align">
-                                                <label>
-                                                    <input type="checkbox" id="arr_cd_payment` + count + `" name="arr_cd_payment[]" value="` + val.id + `" onclick="countAll();" data-id="` + count + `" checked>
-                                                    <span>Pilih</span>
-                                                </label>
-                                            </td>
-                                            <td class="center">
-                                                ` + val.code + `
-                                            </td>
-                                            <td class="center">
-                                                ` + val.payment_request_code + `
-                                            </td>
-                                            <td>
-                                                ` + val.name + `
-                                            </td>
-                                            <td>
-                                                ` + val.post_date + `
-                                            </td>
-                                            <td>
-                                                ` + val.coa_name + `
-                                            </td>
-                                            <td class="right-align">
-                                                ` + val.admin + `
-                                            </td>
-                                            <td class="right-align">
-                                                ` + val.total + `
-                                            </td>
-                                            <td class="right-align">
-                                                ` + val.grandtotal + `
-                                            </td>
-                                            <td class="center-align">
-                                                <input id="arr_payment` + count + `" name="arr_payment[]" onfocus="emptyThis(this);" data-balance="` + val.balance + `" class="browser-default" type="text" value="`+ val.balance + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
-                                            </td>
-                                        </tr>
-                                    `);
-                                });
-                            }else{
-                                $('#body-detail-payment').append(`
-                                    <tr id="empty-detail-payment">
-                                        <td colspan="10" class="center">
-                                            Pilih partner bisnis untuk memulai...
-                                        </td>
-                                    </tr>
-                                `);
-                            }
-                            
-                            $('.modal-content').scrollTop(0);
-                            M.updateTextFields();
-
-                            $('#modal6').modal('close');
-                            countAll();
-                        },
-                        error: function() {
-                            $('.modal-content').scrollTop(0);
-                            loadingClose('.modal-content');
-                            swal({
-                                title: 'Ups!',
-                                text: 'Check your internet connection.',
-                                icon: 'error'
+                                $('#account_no').val(val.no_account);
+                                $('#account_bank').val(val.bank_account);
+                                $('#account_name').val(val.name_account);
                             });
+                            
+                        }else{
+                            $('#body-detail').empty().append(`
+                                <tr id="empty-detail">
+                                    <td colspan="19" class="center">
+                                        Pilih partner bisnis untuk memulai...
+                                    </td>
+                                </tr>
+                            `);
+
+                            $('#grandtotal,#admin').val('0,00');
                         }
-                    });
-                /* }else{
-                    swal({
-                        title: 'Ups!',
-                        text: 'Silahkan, pilih Fund Request, A/P Down Payment, atau A/P Invoice yang ingin anda masukkan.',
-                        icon: 'warning'
-                    });
-                } */
+
+                        $('#body-detail-payment').empty();
+                        if(response.payments.length > 0){
+                            $.each(response.payments, function(i, val) {
+                                var count = makeid(10);
+                                $('#list-used-data').append(`
+                                    <div class="chip purple darken-4 gradient-shadow white-text">
+                                        ` + val.rawcode + `
+                                        <i class="material-icons close data-used" onclick="removeUsedData('` + val.type + `',` + val.id + `,'` + val.rawcode + `')">close</i>
+                                    </div>
+                                `);
+                                $('#body-detail-payment').append(`
+                                    <tr class="row_detail_payment" data-id="` + val.id + `" data-code="` + val.rawcode + `">
+                                        <td class="center-align">
+                                            <label>
+                                                <input type="checkbox" id="arr_cd_payment` + count + `" name="arr_cd_payment[]" value="` + val.id + `" onclick="countAll();" data-id="` + count + `" checked>
+                                                <span>Pilih</span>
+                                            </label>
+                                        </td>
+                                        <td class="center">
+                                            ` + val.code + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.payment_request_code + `
+                                        </td>
+                                        <td>
+                                            ` + val.name + `
+                                        </td>
+                                        <td>
+                                            ` + val.post_date + `
+                                        </td>
+                                        <td>
+                                            ` + val.coa_name + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.admin + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.total + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.grandtotal + `
+                                        </td>
+                                        <td class="center-align">
+                                            <input id="arr_payment` + count + `" name="arr_payment[]" onfocus="emptyThis(this);" data-balance="` + val.balance + `" class="browser-default" type="text" value="`+ val.balance + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
+                                        </td>
+                                    </tr>
+                                `);
+                            });
+                        }else{
+                            $('#body-detail-payment').append(`
+                                <tr id="empty-detail-payment">
+                                    <td colspan="10" class="center">
+                                        Pilih partner bisnis untuk memulai...
+                                    </td>
+                                </tr>
+                            `);
+                        }
+                        
+                        $('.modal-content').scrollTop(0);
+                        M.updateTextFields();
+
+                        $('#modal6').modal('close');
+                        countAll();
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('.modal-content');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
             }
         });
     }
@@ -1895,7 +1892,9 @@
     function changeMode(){
         setTimeout(function() {
             if($('#main-tab').hasClass('active')){
-                $('#payment_type').val('2').trigger('change').formSelect();
+                if($('#payment_type').val() == '5'){
+                    $('#payment_type').val('2').trigger('change').formSelect();
+                }
             }
             if($('#cost-tab').hasClass('active')){
                 $('#payment_type').val('5').trigger('change').formSelect();
@@ -1994,6 +1993,16 @@
             success: function(response) {
                 $('.row_detail[data-code="' + code + '"]').remove();
                 $('.row_detail_payment[data-code="' + code + '"]').remove();
+                if($('.row_detail').length == 0){
+                    $('#body-detail').empty().append(`
+                        <tr id="empty-detail">
+                            <td colspan="19" class="center">
+                                Pilih partner bisnis untuk memulai...
+                            </td>
+                        </tr>
+                    `);
+                }
+                
                 countAll();
             },
             error: function() {
@@ -2602,7 +2611,7 @@
                                         ` + val.memo + `
                                     </td>
                                     <td class="center">
-                                        <input id="arr_pay` + count + `" name="arr_pay[]" onfocus="emptyThis(this);" class="browser-default" type="text" value=" `+ val.nominal + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
+                                        <input id="arr_pay` + count + `" name="arr_pay[]" data-grandtotal="` + val.balance + `" onfocus="emptyThis(this);" class="browser-default" type="text" value=" `+ val.nominal + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
                                     </td>
                                     <td class="center">
                                         <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:150px;" value="` + val.note + `">

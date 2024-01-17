@@ -203,6 +203,7 @@
                                                     <th class="center">Stok Skrg</th>
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan Stock</th>
+                                                    <th class="center">Nomor Serial (Jika ada)</th>
                                                     <th class="center">Harga</th>
                                                     <th class="center">Total</th>
                                                     <th class="center">Keterangan</th>
@@ -220,7 +221,7 @@
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
-                                                    <td colspan="17">
+                                                    <td colspan="18">
                                                         <button class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> Tambah Item
                                                         </button>
@@ -799,6 +800,9 @@
                 </td>
                 <td class="center">
                     <span id="arr_unit` + count + `">-</span>
+                </td>
+                <td>
+                    <input name="arr_serial_number[]" class="materialize-textarea" type="text" placeholder="Pisahkan koma jika > 1">
                 </td>
                 <td class="center">
                     <input list="tempPrice` + count + `" onfocus="emptyThis(this);" name="arr_price[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowPrice`+ count +`">

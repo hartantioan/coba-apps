@@ -22,6 +22,7 @@ use App\Models\Company;
 use App\Models\Department;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportGoodReceive;
+use App\Models\ItemSerial;
 use App\Models\Line;
 use App\Models\Machine;
 use App\Models\Menu;
@@ -246,7 +247,11 @@ class GoodReceiveController extends Controller
         } else {
 
             $passed = true;
+            $passedSerialEmpty = true;
+            $passedSerialDuplicate = true;
+            $passedSerialQty = true;
             $passedArea = true;
+            $arrErrorSerial = [];
 
             foreach($request->arr_item as $key => $row){
                 if(isset($request->arr_price[$key]) && isset($request->arr_qty[$key])){
@@ -262,12 +267,52 @@ class GoodReceiveController extends Controller
                         $passedArea = false;
                     }
                 }
+                if($item->itemGroup->is_activa){
+                    if(!$request->arr_serial_number[$key]){
+                        $passedSerialEmpty = false;
+                    }else{
+                        if(!$request->temp){
+                            $arrSerial = explode(',',$request->arr_serial_number[$key]);
+                            foreach($arrSerial as $keyserial => $rowserial){
+                                $itemcek = ItemSerial::where('item_id',intval($row))->where('serial_number',trim($rowserial))->first();
+                                if($itemcek){
+                                    $passedSerialDuplicate = false;
+                                    $arrErrorSerial[] = $itemcek->item->name.' - '.trim($rowserial);
+                                }
+                            }
+                            if(count($arrSerial) !== intval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key])))){
+                                $passedSerialQty = false;
+                            }
+                        }
+                    }
+                }
             }
 
             if(!$passed){
                 return response()->json([
                     'status'  => 500,
                     'message' => 'Silahkan cek detail form anda, tidak boleh ada data 0 atau kosong.'
+                ]);
+            }
+
+            if(!$passedSerialEmpty){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Item aktiva harus memiliki nomor serial.'
+                ]);
+            }
+
+            if(!$passedSerialDuplicate){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Terdapat serial yang telah terpakai untuk item yang diterima. Daftarnya adalah sbb : '.implode(', ',$arrErrorSerial).'.',
+                ]);
+            }
+
+            if(!$passedSerialQty){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Terdapat qty item aktiva dan jumlah nomor serial tidak sama.',
                 ]);
             }
 
@@ -339,6 +384,7 @@ class GoodReceiveController extends Controller
                         $query->save();
 
                         foreach($query->goodReceiveDetail as $row){
+                            $row->itemSerial()->delete();
                             $row->delete();
                         }
 
@@ -379,7 +425,7 @@ class GoodReceiveController extends Controller
                 try {
                     foreach($request->arr_item as $key => $row){
                         
-                        GoodReceiveDetail::create([
+                        $grd = GoodReceiveDetail::create([
                             'good_receive_id'       => $query->id,
                             'item_id'               => $row,
                             'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
@@ -396,6 +442,18 @@ class GoodReceiveController extends Controller
                             'item_shading_id'       => $request->arr_shading[$key] ? $request->arr_shading[$key] : NULL,
                             'project_id'            => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
                         ]);
+
+                        if($request->arr_serial_number[$key]){
+                            $arrSerial = explode(',',$request->arr_serial_number[$key]);
+                            foreach($arrSerial as $keyserial => $rowserial){
+                                ItemSerial::create([
+                                    'lookable_type'             => $grd->getTable(),
+                                    'lookable_id'               => $grd->id,
+                                    'item_id'                   => $row,
+                                    'serial_number'             => trim($rowserial),
+                                ]);
+                            }
+                        }
 
                     }
 
@@ -475,6 +533,8 @@ class GoodReceiveController extends Controller
                 <td class="center-align">'.($row->area()->exists() ? $row->area->name : '-').'</td>
                 <td class="center-align">'.($row->itemShading()->exists() ? $row->itemShading->code : '-').'</td>
                 <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
+            </tr><tr>
+                <td colspan="15">No.Serial : '.$row->listSerial().'</td>
             </tr>';
         }
         

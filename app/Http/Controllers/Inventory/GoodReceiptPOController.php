@@ -44,7 +44,7 @@ use App\Models\Department;
 use App\Models\GoodReceiptDetail;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportGoodReceipt;
-use App\Models\GoodReceiptDetailSerial;
+use App\Models\ItemSerial;
 use App\Models\Menu;
 
 class GoodReceiptPOController extends Controller
@@ -369,6 +369,27 @@ class GoodReceiptPOController extends Controller
             $grandtotalall = 0;
             $overtolerance = false;
             $arrDetail = [];
+            $passedSerial = true;
+            $arrErrorSerial = [];
+
+            if(!$request->temp){
+                if($request->arr_serial){
+                    foreach($request->arr_serial as $keyserial => $rowserial){
+                        $itemcek = ItemSerial::where('item_id',intval($request->arr_serial_item[$keyserial]))->where('serial_number',$rowserial)->first();
+                        if($itemcek){
+                            $passedSerial = false;
+                            $arrErrorSerial[] = $itemcek->item->name.' - '.$rowserial;
+                        }
+                    }
+                }
+            }
+
+            if(!$passedSerial){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Terdapat serial yang telah terpakai untuk item yang diterima. Daftarnya adalah sbb : '.implode(', ',$arrErrorSerial).'.',
+                ]);
+            }
 
             foreach($request->arr_purchase as $key => $row){
                 $wtax = 0;
@@ -493,7 +514,7 @@ class GoodReceiptPOController extends Controller
                         $query->save();
 
                         foreach($query->goodReceiptDetail as $row){
-                            $row->goodReceiptDetailSerial()->delete();
+                            $row->itemSerial()->delete();
                             $row->delete();
                         }
 
@@ -563,9 +584,9 @@ class GoodReceiptPOController extends Controller
                         if($request->arr_serial_po){
                             foreach($request->arr_serial_po as $keyserial => $rowserial){
                                 if($rowserial == $row){
-                                    GoodReceiptDetailSerial::create([
-                                        'good_receipt_id'           => $query->id,
-                                        'good_receipt_detail_id'    => $grd->id,
+                                    ItemSerial::create([
+                                        'lookable_type'             => $grd->getTable(),
+                                        'lookable_id'               => $grd->id,
                                         'item_id'                   => $request->arr_serial_item[$keyserial],
                                         'serial_number'             => $request->arr_serial[$keyserial],
                                     ]);
@@ -759,10 +780,10 @@ class GoodReceiptPOController extends Controller
         }
 
         foreach($grm->goodReceiptDetail as $row){
-            if($row->goodReceiptDetailSerial()->exists()){
+            if($row->itemSerial()->exists()){
                 $rowserials = [];
 
-                foreach($row->goodReceiptDetailSerial as $rowserial){
+                foreach($row->itemSerial as $rowserial){
                     $rowserials[] = $rowserial->serial_number;
                 }
 
@@ -813,6 +834,10 @@ class GoodReceiptPOController extends Controller
                 ]);
 
                 $query->updateRootDocumentStatusProcess();
+
+                foreach($query->goodReceiptDetail as $row){
+                    $row->itemSerial()->delete();
+                }
 
                 CustomHelper::removeJournal('good_receipts',$query->id);
                 CustomHelper::removeCogs('good_receipts',$query->id);
@@ -880,6 +905,10 @@ class GoodReceiptPOController extends Controller
                 'delete_id'     => session('bo_id'),
                 'delete_note'   => $request->msg,
             ]);
+
+            foreach($query->goodReceiptDetail as $row){
+                $row->itemSerial()->delete();
+            }
 
             CustomHelper::removeJournal('good_receipts',$query->id);
             CustomHelper::removeCogs('good_receipts',$query->id);

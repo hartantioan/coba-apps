@@ -31,6 +31,7 @@ use App\Helpers\CustomHelper;
 use App\Exports\ExportGoodIssue;
 use App\Models\GoodReceiptDetailSerial;
 use App\Models\InventoryCoa;
+use App\Models\ItemSerial;
 use App\Models\Line;
 use App\Models\Machine;
 use App\Models\Menu;
@@ -375,9 +376,10 @@ class GoodIssueController extends Controller
                         $query->save();
 
                         foreach($query->goodIssueDetail as $row){
-                            foreach($row->goodReceiptDetailSerial as $rowdetail){
+                            foreach($row->itemSerial as $rowdetail){
                                 $rowdetail->update([
-                                    'good_issue_detail_id'  => NULL,
+                                    'usable_id'  => NULL,
+                                    'usable_type'=> NULL,
                                 ]);
                             }
                             $row->delete();
@@ -434,8 +436,9 @@ class GoodIssueController extends Controller
                         if($request->arr_serial[$key]){
                             $rowArr = explode(',',$request->arr_serial[$key]);
                             foreach($rowArr as $rowdetail){
-                                GoodReceiptDetailSerial::find(intval($rowdetail))->update([
-                                    'good_issue_detail_id' => $gid->id
+                                ItemSerial::find(intval($rowdetail))->update([
+                                    'usable_type'   => $gid->getTable(),
+                                    'usable_id'     => $gid->id
                                 ]);
                             }
                         }
@@ -647,6 +650,14 @@ class GoodIssueController extends Controller
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
 
+                foreach($query->goodIssueDetail as $row){
+                    $row->itemSerial()->update([
+                        'usable_id'  => NULL,
+                        'usable_type'=> NULL,
+                    ]);
+                    $row->delete();
+                }
+
                 CustomHelper::removeJournal($query->getTable(),$query->id);
                 CustomHelper::removeCogs($query->getTable(),$query->id);
     
@@ -714,6 +725,13 @@ class GoodIssueController extends Controller
                 'delete_id'     => session('bo_id'),
                 'delete_note'   => $request->msg,
             ]);
+
+            foreach($query->goodIssueDetail as $row){
+                $row->itemSerial()->update([
+                    'usable_type'   => NULL,
+                    'usable_id'     => NULL,
+                ]);
+            }
 
             CustomHelper::removeJournal('good_issues',$query->id);
             CustomHelper::removeCogs('good_issues',$query->id);

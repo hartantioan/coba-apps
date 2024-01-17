@@ -318,6 +318,9 @@
                                     <td class="center-align">{{ $row->project()->exists() ? $row->project->name : '-' }}</td>
                                     <td>{{ $row->note }}</td>
                                 </tr>
+                                <tr>
+                                    <td colspan="15">No. Serial : {{ $row->listSerial() }}</td>
+                                </tr>
                                 @endforeach
                             </tbody>
                         </table>

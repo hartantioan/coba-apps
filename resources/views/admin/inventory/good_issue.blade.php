@@ -230,9 +230,9 @@
                                                     <tr>
                                                         <th class="center">Item</th>
                                                         <th class="center">Stok</th>
-                                                        <th class="center" width="300px">No.Serial</th>
                                                         <th class="center">Qty</th>
                                                         <th class="center">Satuan</th>
+                                                        <th class="center" width="300px">No.Serial</th>
                                                         <th class="center">Keterangan</th>
                                                         <th class="center">Tipe Biaya</th>
                                                         <th class="center">Line</th>
@@ -799,14 +799,14 @@
                                     <td class="center" id="stock` + count + `">
                                         -
                                     </td>
-                                    <td class="center" id="serial` + count + `">
-                                        -
-                                    </td>
                                     <td>
                                         <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_balance + `" onkeyup="formatRupiah(this);setStock('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
                                     </td>
                                     <td class="center" id="unit` + count + `">
                                         ` + val.unit + `
+                                    </td>
+                                    <td class="center" id="serial` + count + `">
+                                        -
                                     </td>
                                     <td>
                                         <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="Untuk ` + val.place_name + ` ` + val.warehouse_name + `">
@@ -896,8 +896,9 @@
                                     cache: true,
                                     width: 'resolve',
                                     dropdownParent: $('body').parent(),
+                                    maximumSelectionLength: parseInt(val.qty_balance.toString().replaceAll(".", "").replaceAll(",",".")),
                                     ajax: {
-                                        url: '{{ url("admin/select2/good_receipt_serial_number") }}',
+                                        url: '{{ url("admin/select2/item_serial") }}',
                                         type: 'GET',
                                         dataType: 'JSON',
                                         data: function(params) {
@@ -972,13 +973,13 @@
                 <td class="center" id="stock` + count + `">
                     -
                 </td>
-                <td class="center" id="serial` + count + `">
-                    -
-                </td>
                 <td>
                     <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0,000" onkeyup="formatRupiah(this);setStock('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
                 </td>
                 <td class="center" id="unit` + count + `">
+                    -
+                </td>
+                <td class="center" id="serial` + count + `">
                     -
                 </td>
                 <td>
@@ -1076,9 +1077,10 @@
                     allowClear: true,
                     cache: true,
                     width: 'resolve',
+                    maximumSelectionLength: parseInt($('#rowQty' + val).val().replaceAll(".", "").replaceAll(",",".")),
                     dropdownParent: $('body').parent(),
                     ajax: {
-                        url: '{{ url("admin/select2/good_receipt_serial_number") }}',
+                        url: '{{ url("admin/select2/item_serial") }}',
                         type: 'GET',
                         dataType: 'JSON',
                         data: function(params) {
@@ -1116,6 +1118,31 @@
             if(qtyInput > qtyMax){
                 $('#rowQty' + val).val(formatRupiahIni(qtyMax.toFixed(3).toString().replace('.',',')));
             }
+            $('#arr_serial' + val).select2({
+                placeholder: '-- Kosong --',
+                minimumInputLength: 1,
+                allowClear: true,
+                cache: true,
+                width: 'resolve',
+                maximumSelectionLength: parseInt($('#rowQty' + val).val().replaceAll(".", "").replaceAll(",",".")),
+                dropdownParent: $('body').parent(),
+                ajax: {
+                    url: '{{ url("admin/select2/item_serial") }}',
+                    type: 'GET',
+                    dataType: 'JSON',
+                    data: function(params) {
+                        return {
+                            search: params.term,
+                            item_id: $("#arr_item" + val).val(),
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data.items
+                        }
+                    }
+                }
+            });
         }else{
             $('#rowQty' + val).val('0,000');
         }
@@ -1318,14 +1345,14 @@
                                 <td class="center" id="stock` + count + `">
                                     -
                                 </td>
-                                <td class="center" id="serial` + count + `">
-                                    -
-                                </td>
                                 <td>
                                     <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);setStock('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
                                 </td>
                                 <td class="center" id="unit` + count + `">
                                     ` + val.uom + `
+                                </td>
+                                <td class="center" id="serial` + count + `">
+                                    -
                                 </td>
                                 <td>
                                     <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
@@ -1424,8 +1451,9 @@
                                 cache: true,
                                 width: 'resolve',
                                 dropdownParent: $('body').parent(),
+                                maximumSelectionLength: parseInt(val.qty.toString().replaceAll(".", "").replaceAll(",",".")),
                                 ajax: {
-                                    url: '{{ url("admin/select2/good_receipt_serial_number") }}',
+                                    url: '{{ url("admin/select2/item_serial") }}',
                                     type: 'GET',
                                     dataType: 'JSON',
                                     data: function(params) {

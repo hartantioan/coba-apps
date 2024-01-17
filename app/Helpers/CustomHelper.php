@@ -296,6 +296,16 @@ class CustomHelper {
 		return $passed;
 	}
 
+	public static function compareRange($value1,$value2,$value3){
+		$passed = false;
+
+		if($value1 >= $value2 && $value1 <= $value3){
+			$passed = true;
+		}
+
+		return $passed;
+	}
+
 	public static function sendApproval($table_name,$table_id,$note){
 		$resetdata = ApprovalSource::where('lookable_type',$table_name)->where('lookable_id',$table_id)->get();
 
@@ -331,9 +341,29 @@ class CustomHelper {
 
 			$passed = true;
 
+			$isGroupItem = false;
+
+			if($row->approvalTemplateItemGroup()->exists()){
+				$isGroupItem = true;
+			}
+
 			if($row->is_check_nominal){
-				if(!self::compare($data->grandtotal,$row->sign,$row->nominal)){
-					$passed = false;
+				if($row->sign !== '~'){
+					if($isGroupItem){
+
+					}else{
+						if(!self::compare($data->grandtotal,$row->sign,$row->nominal)){
+							$passed = false;
+						}
+					}					
+				}else{
+					if($isGroupItem){
+						
+					}else{
+						if(!self::compareRange($data->grandtotal,$row->nominal,$row->nominal_final)){
+							$passed = false;
+						}
+					}
 				}
 			}
 

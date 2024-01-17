@@ -15,6 +15,8 @@ use App\Models\ApprovalTemplateOriginator;
 use App\Models\ApprovalTemplateStage;
 use App\Models\ApprovalStage;
 use App\Models\Approval;
+use App\Models\ApprovalTemplateItemGroup;
+use App\Models\ItemGroup;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -27,6 +29,7 @@ class ApprovalTemplateController extends Controller
         $data = [
             'title'         => 'Approval Template',
             'content'       => 'admin.setting.approval_template',
+            'item_group'    => ItemGroup::whereNull('parent_id')->where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -121,7 +124,7 @@ class ApprovalTemplateController extends Controller
     }
 
     public function create(Request $request){
-        if($request->is_check_nominal){
+        if($request->is_check_nominal || $request->is_check_benchmark){
             $validation = Validator::make($request->all(), [
                 'code' 				    => $request->temp ? ['required', Rule::unique('approval_templates', 'code')->ignore($request->temp)] : 'required|unique:approval_templates,code',
                 'name'                  => 'required',
@@ -202,9 +205,12 @@ class ApprovalTemplateController extends Controller
                     $query->code = $request->code;
                     $query->user_id = session('bo_id');
                     $query->name = $request->name;
+                    $query->is_check_benchmark = $request->is_check_benchmark ? $request->is_check_benchmark : NULL;
                     $query->is_check_nominal = $request->is_check_nominal ? $request->is_check_nominal : NULL;
-                    $query->sign = $request->is_check_nominal ? $request->sign : NULL;
-                    $query->nominal = $request->is_check_nominal ? str_replace(',','.',str_replace('.','',$request->nominal)) : NULL;
+                    $query->nominal_type = $request->nominal_type ? $request->nominal_type : NULL;
+                    $query->sign = $request->is_check_nominal || $request->is_check_benchmark ? $request->sign : NULL;
+                    $query->nominal = $request->is_check_nominal || $request->is_check_benchmark ? str_replace(',','.',str_replace('.','',$request->nominal)) : NULL;
+                    $query->nominal_final = $request->nominal_final ? str_replace(',','.',str_replace('.','',$request->nominal_final)) : NULL;
                     $query->status = $request->status ? $request->status : '2';
                     
                     $query->save();
@@ -212,6 +218,7 @@ class ApprovalTemplateController extends Controller
                     $query->approvalTemplateOriginator()->delete();
                     $query->approvalTemplateStage()->delete();
                     $query->approvalTemplateMenu()->delete();
+                    $query->approvalTemplateItemGroup()->delete();
 
                     DB::commit();
                 }catch(\Exception $e){
@@ -227,8 +234,11 @@ class ApprovalTemplateController extends Controller
                         'user_id'			    => session('bo_id'),
                         'name'                  => $request->name,
                         'is_check_nominal'      => $request->is_check_nominal ? $request->is_check_nominal : NULL,
-                        'sign'                  => $request->is_check_nominal ? $request->sign : NULL,
-                        'nominal'               => $request->is_check_nominal ? str_replace(',','.',str_replace('.','',$request->nominal)) : NULL,
+                        'is_check_benchmark'    => $request->is_check_benchmark ? $request->is_check_benchmark : NULL,
+                        'nominal_type'          => $request->nominal_type ? $request->nominal_type : NULL,
+                        'sign'                  => $request->is_check_nominal || $request->is_check_benchmark ? $request->sign : NULL,
+                        'nominal'               => $request->is_check_nominal || $request->is_check_benchmark ? str_replace(',','.',str_replace('.','',$request->nominal)) : NULL,
+                        'nominal_final'         => $request->nominal_final ? str_replace(',','.',str_replace('.','',$request->nominal_final)) : NULL,
                         'status'                => $request->status ? $request->status : '2',
                     ]);
                     DB::commit();
@@ -265,6 +275,15 @@ class ApprovalTemplateController extends Controller
                                 'approval_template_id'      => $query->id,
                                 'menu_id'                   => $row,
                                 'table_name'                => Menu::find(intval($row))->table_name,
+                            ]);
+                        }
+                    }
+
+                    if($request->item_group){
+                        foreach($request->item_group as $row){
+                            ApprovalTemplateItemGroup::create([
+                                'approval_template_id'  => $query->id,
+                                'item_group_id'         => intval($row),
                             ]);
                         }
                     }
@@ -355,10 +374,13 @@ class ApprovalTemplateController extends Controller
 
     public function show(Request $request){
         $approval = ApprovalTemplate::find($request->id);
+        $approval['nominal'] = $approval->nominal ? number_format($approval->nominal,2,',','.') : '0,00';
+        $approval['nominal_final'] = $approval->nominal_final ? number_format($approval->nominal_final,2,',','.') : '0,00';
         
         $details = [];
         $stages = [];
         $menus = [];
+        $itemgroups = [];
 
         foreach($approval->approvalTemplateOriginator as $row){
             $details[] = [
@@ -381,9 +403,14 @@ class ApprovalTemplateController extends Controller
             ];
         }
 
+        foreach($approval->approvalTemplateItemGroup as $row){
+            $itemgroups[] = $row->item_group_id;
+        }
+
         $approval['details'] = $details;
         $approval['stages'] = $stages;
         $approval['menus'] = $menus;
+        $approval['itemgroups'] = $itemgroups;
         				
 		return response()->json($approval);
     }

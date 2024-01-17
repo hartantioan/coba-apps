@@ -113,6 +113,14 @@
                                 </label>
                             </div>
                         </div>
+                        <div class="input-field col s6">
+                            <select class="select2 browser-default" multiple="multiple" id="item_group" name="item_group[]">
+                                @foreach ($item_group as $row)
+                                    <option value="{{ $row->id }}">{{ $row->code.' - '.$row->name }}</option>
+                                @endforeach
+                            </select>
+                            <label class="active" for="item_group">Grup Item (Kosongi untuk tipe semua grup item)</label>
+                        </div>
                         <div class="col s12 row">
                             <div class="col s6 row">
                                 <h6 class="center-align">Apakah ada syarat nominal?</h6>
@@ -148,7 +156,7 @@
                                 <label class="" for="nominal_type">Tipe Nominal</label>
                             </div>
                             <div class="input-field col s3">
-                                <select class="form-control" disabled id="sign" name="sign">
+                                <select class="form-control" disabled id="sign" name="sign" onchange="applySign();">
                                     <option value=">">> (lebih dari) Nominal</option>
                                     <option value=">=">>= (lebih dari sama dengan) Nominal</option>
                                     <option value="=">= (sama dengan) Nominal</option>
@@ -159,12 +167,12 @@
                                 <label class="" for="sign">Operasi</label>
                             </div>
                             <div class="input-field col s3">
-                                <input id="nominal" name="nominal" disabled type="text" placeholder="Nominal" onkeyup="formatRupiah(this)">
-                                <label class="active" for="nominal">Nominal Batas Awal</label>
+                                <input id="nominal" name="nominal" disabled type="text" placeholder="Nominal" onkeyup="formatRupiah(this)" value="0,00">
+                                <label class="active" for="nominal">Nominal Batas Bawah</label>
                             </div>
-                            <div class="input-field col s3" id="final-border">
-                                <input id="nominal_final" name="nominal_final" disabled type="text" placeholder="Nominal" onkeyup="formatRupiah(this)">
-                                <label class="active" for="nominal">Nominal Batas Akhir</label>
+                            <div class="input-field col s3" id="final-border" style="display:none;">
+                                <input id="nominal_final" name="nominal_final" type="text" placeholder="Nominal" onkeyup="formatRupiah(this)">
+                                <label class="active" for="nominal">Nominal Batas Atas</label>
                             </div>
                         </div>
                         <div class="col m12 s12">
@@ -280,11 +288,8 @@
 <script>
     $(function() {
         $(".select2").select2({
-            dropdownAutoWidth: true,
             width: '100%',
         });
-
-        
         
         loadDataTable();
 
@@ -316,8 +321,11 @@
                 M.updateTextFields();
                 $('#status').prop( "checked", true);
                 $('#is_check_nominal').prop( "checked", false);
+                $('#is_check_benchmark').prop( "checked", false);
                 $('#sign').attr('disabled',true).formSelect();
+                $('#nominal_type').attr('disabled',true).formSelect();
                 $('#nominal').attr('disabled',true);
+                $('#final-border').hide();
                 $('#form_data')[0].reset();
                 $('.row_user').each(function(){
                     $(this).remove();
@@ -343,16 +351,35 @@
             $(this).closest('tr').remove();
         });
 
-        $('#is_check_nominal').click(function(){
+        $('#is_check_nominal,#is_check_benchmark').click(function(){
             if($(this).is(':checked')){
                 $('#sign').attr('disabled',false).formSelect();
                 $('#nominal').attr('disabled',false);
+                $('#nominal_type').attr('disabled',false).formSelect();
+                if($('#is_check_benchmark').is(':checked')){
+                    $('#nominal_type').val('2').formSelect();
+                }
+                if($('#is_check_nominal').is(':checked')){
+                    $('#nominal_type').val('1').formSelect();
+                }
             }else{
+                $('#sign').val('>').trigger('change').formSelect();
+                $('#final-border').hide();
                 $('#sign').attr('disabled',true).formSelect();
                 $('#nominal').attr('disabled',true);
+                $('#nominal_type').attr('disabled',true).formSelect();
             }
         });
     });
+
+    function applySign(){
+        $('#nominal_final').val('0,00');
+        if($('#sign').val() == '~'){
+            $('#final-border').show();
+        }else{
+            $('#final-border').hide();
+        }
+    }
 
     function rowDetail(data) {
         $.ajax({
@@ -431,25 +458,12 @@
     }
 
     function checkBenchmark(){
-        if($('#is_check_nominal').is(':checked')){
-            $('select[name^="arr_approval_menu"]').each(function(){
-                if($(this).val()){
-                    if($(this).select2('data')[0].hasGrandtotal == '0'){
-                        swal({
-                            title: 'Ups!',
-                            text: 'Menu ini tidak memiliki grandtotal.',
-                            icon: 'warning'
-                        });
-                        $(this).empty();
-                    }else{
-                        if($('#is_check_nominal').is(':checked')){
-                            $('#is_check_nominal').prop( "checked", false);
-                        }
-                    }
-                }
-            });
+        if($('#is_check_benchmark').is(':checked')){
+            
         }
-        
+        if($('#is_check_nominal').is(':checked')){
+            $('#is_check_nominal').prop( "checked", false);
+        }
     }
 
     function checkGrandtotal(){
@@ -463,15 +477,13 @@
                             icon: 'warning'
                         });
                         $(this).empty();
-                    }else{
-                        if($('#is_check_benchmark').is(':checked')){
-                            $('#is_check_benchmark').prop( "checked", false);
-                        }
                     }
                 }
             });
         }
-        
+        if($('#is_check_benchmark').is(':checked')){
+            $('#is_check_benchmark').prop( "checked", false);
+        }
     }
 
     function loadDataTable() {
@@ -534,88 +546,112 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                var passed = true;
+                var passed = true, passedNominal = true;
 
                 if($('#is_check_nominal').is(':checked')){
                     passed = false;
 
-                    if($('#sign').val() && $('#nominal').val()){
+                    if($('#sign').val() && parseFloat($('#nominal').val().replaceAll(".", "").replaceAll(",",".")) > 0){
                         passed = true;
+                    }
+                    if($('#sign').val() == '~'){
+                        if(parseFloat($('#nominal').val().replaceAll(".", "").replaceAll(",",".")) > parseFloat($('#nominal_final').val().replaceAll(".", "").replaceAll(",","."))){
+                            passedNominal = false;
+                        }
+                    }
+                }
+
+                if($('#is_check_benchmark').is(':checked')){
+                    passed = false;
+
+                    if($('#sign').val() && parseFloat($('#nominal').val().replaceAll(".", "").replaceAll(",",".")) > 0){
+                        passed = true;
+                    }
+                    if($('#sign').val() == '~'){
+                        if(parseFloat($('#nominal').val().replaceAll(".", "").replaceAll(",",".")) > parseFloat($('#nominal_final').val().replaceAll(".", "").replaceAll(",","."))){
+                            passedNominal = false;
+                        }
                     }
                 }
 
                 if(passed == true){
-                    var formData = new FormData($('#form_data')[0]);
-            
-                    $.ajax({
-                        url: '{{ Request::url() }}/create',
-                        type: 'POST',
-                        dataType: 'JSON',
-                        data: formData,
-                        contentType: false,
-                        processData: false,
-                        cache: true,
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        beforeSend: function() {
-                            $('#validation_alert').hide();
-                            $('#validation_alert').html('');
-                            loadingOpen('.modal-content');
-                        },
-                        success: function(response) {
-                            loadingClose('.modal-content');
-                            if(response.status == 200) {
-                                $('#parent_id').empty();
+                    if(passedNominal == true){
+                        var formData = new FormData($('#form_data')[0]);
+                
+                        $.ajax({
+                            url: '{{ Request::url() }}/create',
+                            type: 'POST',
+                            dataType: 'JSON',
+                            data: formData,
+                            contentType: false,
+                            processData: false,
+                            cache: true,
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            beforeSend: function() {
+                                $('#validation_alert').hide();
+                                $('#validation_alert').html('');
+                                loadingOpen('.modal-content');
+                            },
+                            success: function(response) {
+                                loadingClose('.modal-content');
+                                if(response.status == 200) {
+                                    $('#parent_id').empty();
 
-                                $.each(response.data, function(i, val) {
-                                    $('#parent_id').append(val);
-                                });
-                                
-                                success();
-                                M.toast({
-                                    html: response.message
-                                });
-                            } else if(response.status == 422) {
-                                $('#validation_alert').show();
-                                $('.modal-content').scrollTop(0);
-                                
-                                swal({
-                                    title: 'Ups! Validation',
-                                    text: 'Check your form.',
-                                    icon: 'warning'
-                                });
-
-                                $.each(response.error, function(i, val) {
-                                    $.each(val, function(i, val) {
-                                        $('#validation_alert').append(`
-                                            <div class="card-alert card red">
-                                                <div class="card-content white-text">
-                                                    <p>` + val + `</p>
-                                                </div>
-                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                    <span aria-hidden="true">×</span>
-                                                </button>
-                                            </div>
-                                        `);
+                                    $.each(response.data, function(i, val) {
+                                        $('#parent_id').append(val);
                                     });
-                                });
-                            } else {
-                                M.toast({
-                                    html: response.message
+                                    
+                                    success();
+                                    M.toast({
+                                        html: response.message
+                                    });
+                                } else if(response.status == 422) {
+                                    $('#validation_alert').show();
+                                    $('.modal-content').scrollTop(0);
+                                    
+                                    swal({
+                                        title: 'Ups! Validation',
+                                        text: 'Check your form.',
+                                        icon: 'warning'
+                                    });
+
+                                    $.each(response.error, function(i, val) {
+                                        $.each(val, function(i, val) {
+                                            $('#validation_alert').append(`
+                                                <div class="card-alert card red">
+                                                    <div class="card-content white-text">
+                                                        <p>` + val + `</p>
+                                                    </div>
+                                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                        <span aria-hidden="true">×</span>
+                                                    </button>
+                                                </div>
+                                            `);
+                                        });
+                                    });
+                                } else {
+                                    M.toast({
+                                        html: response.message
+                                    });
+                                }
+                            },
+                            error: function() {
+                                $('.modal-content').scrollTop(0);
+                                loadingClose('.modal-content');
+                                swal({
+                                    title: 'Ups!',
+                                    text: 'Check your internet connection.',
+                                    icon: 'error'
                                 });
                             }
-                        },
-                        error: function() {
-                            $('.modal-content').scrollTop(0);
-                            loadingClose('.modal-content');
-                            swal({
-                                title: 'Ups!',
-                                text: 'Check your internet connection.',
-                                icon: 'error'
-                            });
-                        }
-                    });
+                        });
+                    }else{
+                        M.toast({
+                            html: 'Syarat nominal untuk range adalah nominal batas bawah tidak boleh lebih dari nominal batas atas.'
+                        });
+                    }
                 }else{
                     M.toast({
                         html: 'Tanda operasi matematika dan nominal tidak boleh kosong.'
@@ -651,6 +687,7 @@
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
+                $('#item_group').val(response.itemgroups).trigger('change');
 
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
@@ -738,12 +775,35 @@
                     });
                 }
 
+                if(response.sign == '~'){
+                    $('#final-border').show();
+                    $('#nominal_final').val(response.nominal_final);
+                }else{
+                    $('#final-border').hide();
+                }
+
+                if(response.is_check_benchmark == '1'){
+                    $('#is_check_benchmark').prop( "checked", true);
+                    $('#sign').attr('disabled',false).formSelect();
+                    $('#nominal').attr('disabled',false);
+                    $('#nominal_type').attr('disabled',false).formSelect();
+                    $('#sign').val(response.sign).formSelect();
+                    $('#nominal').val(response.nominal);
+                    $('#nominal_type').val(response.nominal_type).formSelect();
+                }else{
+                    $('#is_check_benchmark').prop( "checked", false);
+                    $('#sign').attr('disabled',true).formSelect();
+                    $('#nominal').attr('disabled',true);
+                }
+
                 if(response.is_check_nominal == '1'){
                     $('#is_check_nominal').prop( "checked", true);
                     $('#sign').attr('disabled',false).formSelect();
                     $('#nominal').attr('disabled',false);
+                    $('#nominal_type').attr('disabled',false).formSelect();
                     $('#sign').val(response.sign).formSelect();
                     $('#nominal').val(response.nominal);
+                    $('#nominal_type').val(response.nominal_type).formSelect();
                 }else{
                     $('#is_check_nominal').prop( "checked", false);
                     $('#sign').attr('disabled',true).formSelect();

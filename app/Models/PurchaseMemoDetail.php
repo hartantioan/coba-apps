@@ -20,6 +20,7 @@ class PurchaseMemoDetail extends Model
         'lookable_id',
         'qty',
         'description',
+        'description2',
         'is_include_tax',
         'tax_id',
         'wtax_id',

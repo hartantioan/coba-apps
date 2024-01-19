@@ -409,6 +409,9 @@ class ApprovalController extends Controller
                 }
                 if($query->approvalSource->lookable_type == 'material_requests'){
                     if($request->arr_status_material_request){
+                        $query->approvalSource->lookable->MaterialRequestDetail()->whereNotIn('id',$request->arr_status_material_request)->update([
+                            'status'    => '2'
+                        ]);
                         foreach($request->arr_status_material_request as $key => $row){
                             MaterialRequestDetail::find(intval($row))->update([
                                 'status'    => '1'

@@ -88,7 +88,6 @@ class DashboardController extends Controller
                     foreach($attendance_otd as $row_attendance_filter){
                         
                         $dateAttd = Carbon::parse($row_attendance_filter->date);
-                        info($dateAttd);
                         $timePart = $dateAttd->format('H:i:s');
                         $min_time_in = $schedule_otd->shift->min_time_in;
                         $time_in = $schedule_otd->shift->time_in;

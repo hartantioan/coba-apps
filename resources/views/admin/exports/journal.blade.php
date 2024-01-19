@@ -24,8 +24,10 @@
             <th>Item</th>
             <th>Departemen</th>
             <th>Gudang</th>
-            <th>Debit</th>
-            <th>Kredit</th>
+            <th>Debit Real</th>
+            <th>Kredit Real</th>
+            <th>Debit Convert</th>
+            <th>Kredit Convert</th>
         </tr>
     </thead>
     <tbody>
@@ -39,9 +41,6 @@
                 })
                 ->orderBy('type');
             })->get() as $rowdetail)
-            @php
-                info($row->code);
-            @endphp
             <tr align="center" style="background-color:#d6d5d5;">
                 <td>{{ $no }}</td>
                 <td>{{ $row->user->name}}</td>
@@ -66,6 +65,8 @@
                 <td align="center">{{ ($rowdetail->item()->exists() ? $rowdetail->item->code.' - '.$rowdetail->item->name : '-') }}</td>
                 <td align="center">{{ ($rowdetail->department()->exists() ? $rowdetail->department->name : '-') }}</td>
                 <td align="center">{{ ($rowdetail->warehouse()->exists() ? $rowdetail->warehouse->name : '-') }}</td>
+                <td align="right">{{ ($rowdetail->type == '1' ? number_format($rowdetail->nominal_fc,3,',','.') : '') }}</td>
+                <td align="right">{{ ($rowdetail->type == '2' ? number_format($rowdetail->nominal_fc,3,',','.') : '') }}</td>
                 <td align="right">{{ ($rowdetail->type == '1' ? number_format($rowdetail->nominal,3,',','.') : '') }}</td>
                 <td align="right">{{ ($rowdetail->type == '2' ? number_format($rowdetail->nominal,3,',','.') : '') }}</td>
             </tr>

@@ -408,7 +408,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->name,
+                'text' 			=> $d->code.' - '.$d->name,
             ];
         }
 
@@ -3110,7 +3110,6 @@ class Select2Controller extends Controller {
 
         $search     = $request->search;
         $plant      = $request->plant;
-        info($request);
         $data = Punishment::where(function($query) use($search,$plant,$request){
             $query->where(function($query) use ($search,$plant,$request){
                 $query->where('place_id',$plant);
@@ -3120,7 +3119,6 @@ class Select2Controller extends Controller {
         })
         ->whereNotIn('status',['2','3'])
         ->get();
-        info($data);
         foreach($data as $d) {
             $response[] = [
                 'id'   			    => $d->id,
@@ -3149,7 +3147,6 @@ class Select2Controller extends Controller {
         })
         ->whereNotIn('status',['2','3'])
         ->get();
-        info($data);
         foreach($data as $d) {
             $response[] = [
                 'id'   			    => $d->id,

@@ -153,6 +153,11 @@
                                     </h4>
                                     <div class="row">
                                         <div class="col s12">
+                                            <div class="card-alert card red">
+                                                <div class="card-content white-text">
+                                                    <p>Info : Khusus untuk Tipe Pembelian Persediaan Barang : 1 Dokumen PO hanya untuk 1 macam jenis grup item.</p>
+                                                </div>
+                                            </div>
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
@@ -850,7 +855,7 @@
         var path = window.location.pathname;
         path = path.replace(/^\/|\/$/g, '');
 
-        // Split the path by slashes and get the last segment
+        
         var segments = path.split('/');
         var lastSegment = segments[segments.length - 1];
         formData.append('tabledata',etNumbers);
@@ -2131,7 +2136,7 @@
                     var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
 
-                    // Split the path by slashes and get the last segment
+                    
                     var segments = path.split('/');
                     var lastSegment = segments[segments.length - 1];
                 
@@ -2158,7 +2163,7 @@
                             $('input').css('border-bottom', '0.5px solid black');
                             loadingClose('.modal-content');
                             if(response.status == 200) {
-                                success();
+                                /* success(); */
                                 M.toast({
                                     html: response.message
                                 });
@@ -2276,6 +2281,13 @@
                 $('#savewtax').val(response.wtax);
                 $('#grandtotal').text(response.grandtotal);
                 $('#savegrandtotal').val(response.grandtotal);
+
+                $('#subtotal-convert').text(response.subtotal_convert);
+                $('#discount-convert').text(response.discount_convert);
+                $('#total-convert').text(response.total_convert);
+                $('#tax-convert').text(response.tax_convert);
+                $('#wtax-convert').text(response.wtax_convert);
+                $('#grandtotal-convert').text(response.grandtotal_convert);
 
                 tempTerm = response.top_master;
                 

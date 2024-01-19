@@ -2040,10 +2040,6 @@ class MarketingOrderController extends Controller
                 $new_array = array_values($new_array);
                 return $new_array;
             }
-        
-            // foreach($data_go_chart as $row_dg){
-            //     info($row_dg);
-            // }
             $data_go_chart = unique_key($data_go_chart,'name');
             $data_link=unique_key($data_link,'string_link');
 

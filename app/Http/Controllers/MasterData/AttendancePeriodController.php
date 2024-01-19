@@ -516,8 +516,6 @@ class AttendancePeriodController extends Controller
                                         if($masuk_awal==null){
                                             $masuk_awal=$timePart;
                                         }elseif($masuk_awal > $timePart){
-                                            info($masuk_awal);
-                                            info($timePart);
                                             $masuk_awal=$timePart;
                                         }
                                         $login[$key] = $timePart;

@@ -238,7 +238,7 @@ class User extends Authenticatable
     }
 
     public function userBank(){
-        return $this->hasMany('App\Models\UserBank');
+        return $this->hasMany('App\Models\UserBank','user_id','id');
     }
 
     public function userData(){

@@ -969,8 +969,11 @@ class MarketingOrderDeliveryProcessController extends Controller
                 'status'    => 200,
                 'message'   => $query->journal,
                 'user'      => $query->user->name,
-                'reference' =>  $query->lookable_id ? $query->lookable->code : '-',
-                'company' => $query->company()->exists() ? $query->company->name : '-',
+                'reference' => $query->code,
+                'company'   => $query->company()->exists() ? $query->company->name : '-',
+                'code'      => $query->journal->code,
+                'note'      => $query->note,
+                'post_date' => date('d/m/y',strtotime($query->post_date)),
             ];
             $string='';
             $no = 1;
@@ -2133,9 +2136,6 @@ class MarketingOrderDeliveryProcessController extends Controller
                 return $new_array;
             }
         
-            // foreach($data_go_chart as $row_dg){
-            //     info($row_dg);
-            // }
             $data_go_chart = unique_key($data_go_chart,'name');
             $data_link=unique_key($data_link,'string_link');
 

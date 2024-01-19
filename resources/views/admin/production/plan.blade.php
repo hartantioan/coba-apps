@@ -686,7 +686,7 @@
         var path = window.location.pathname;
         path = path.replace(/^\/|\/$/g, '');
 
-        // Split the path by slashes and get the last segment
+        
         var segments = path.split('/');
         var lastSegment = segments[segments.length - 1];
         formData.append('tabledata',etNumbers);
@@ -985,7 +985,7 @@
                 var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
 
-                    // Split the path by slashes and get the last segment
+                    
                     var segments = path.split('/');
                     var lastSegment = segments[segments.length - 1];
                 

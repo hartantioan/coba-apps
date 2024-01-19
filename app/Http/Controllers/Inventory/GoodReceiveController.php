@@ -1081,8 +1081,11 @@ class GoodReceiveController extends Controller
                 'status'    => 200,
                 'message'   => $query->journal,
                 'user'      => $query->user->name,
-                'reference' =>  $query->lookable_id ? $query->lookable->code : '-',
-                'company' => $query->company()->exists() ? $query->company->name : '-',
+                'reference' => $query->code,
+                'company'   => $query->company()->exists() ? $query->company->name : '-',
+                'code'      => $query->journal->code,
+                'note'      => $query->note,
+                'post_date' => date('d/m/y',strtotime($query->post_date)),
             ];
             $string='';
             foreach($query->journal->journalDetail()->where(function($query){
@@ -1102,6 +1105,8 @@ class GoodReceiveController extends Controller
                     <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
                     <td class="center-align">'.($row->project_id ? $row->project->name : '-').'</td>
                     <td class="center-align">'.($row->note ? $row->note : '').'</td>
+                    <td class="right-align">'.($row->type == '1' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
+                    <td class="right-align">'.($row->type == '2' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
                     <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
                     <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
                 </tr>';

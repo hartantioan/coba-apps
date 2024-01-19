@@ -328,6 +328,8 @@ class CustomHelper {
 		
 		$count = 0;
 
+		$currency_rate = isset($data->currency_rate) ? $data->currency_rate : 1;
+
 		foreach($approvalTemplate as $row){
 			
 			$source = ApprovalSource::create([
@@ -350,19 +352,112 @@ class CustomHelper {
 			if($row->is_check_nominal){
 				if($row->sign !== '~'){
 					if($isGroupItem){
+						#groupitem, checknominal dan bukanrange
+						$arrGroupItem = [];
+						$passedGroupItem = false;
 
+						foreach($row->approvalTemplateItemGroup as $rowgroupitem){
+							$arrGroupItem[] = $rowgroupitem->item_group_id;
+						}
+
+						foreach($source->lookable->details as $rowdetail){
+							if($rowdetail->item()->exists()){
+								$topGroupId = $rowdetail->item->itemGroup->getTopParent($rowdetail->item->itemGroup);
+								if(in_array($topGroupId,$arrGroupItem)){
+									$passedGroupItem = true;
+								}
+							}
+						}
+
+						if($passedGroupItem){
+							if(!self::compare($data->grandtotal * $currency_rate,$row->sign,$row->nominal)){
+								$passed = false;
+							}
+						}else{
+							$passed = false;
+						}
 					}else{
-						if(!self::compare($data->grandtotal,$row->sign,$row->nominal)){
+						#checknominal dan bukanrange
+						if(!self::compare($data->grandtotal * $currency_rate,$row->sign,$row->nominal)){
 							$passed = false;
 						}
 					}					
 				}else{
 					if($isGroupItem){
-						
-					}else{
-						if(!self::compareRange($data->grandtotal,$row->nominal,$row->nominal_final)){
+						#groupitem, checknominal dan range
+						$arrGroupItem = [];
+						$passedGroupItem = false;
+
+						foreach($row->approvalTemplateItemGroup as $rowgroupitem){
+							$arrGroupItem[] = $rowgroupitem->item_group_id;
+						}
+
+						foreach($source->lookable->details as $rowdetail){
+							if($rowdetail->item()->exists()){
+								$topGroupId = $rowdetail->item->itemGroup->getTopParent($rowdetail->item->itemGroup);
+								if(in_array($topGroupId,$arrGroupItem)){
+									$passedGroupItem = true;
+								}
+							}
+						}
+
+						if($passedGroupItem){
+							if(!self::compareRange($data->grandtotal * $currency_rate,$row->nominal,$row->nominal_final)){
+								$passed = false;
+							}
+						}else{
 							$passed = false;
 						}
+					}else{
+						#checknominal dan range
+						if(!self::compareRange($data->grandtotal * $currency_rate,$row->nominal,$row->nominal_final)){
+							$passed = false;
+						}
+					}
+				}
+			}
+
+			if($row->is_check_benchmark){
+				if($isGroupItem){
+					#groupitem, checknominal dan bukanrange
+					$arrGroupItem = [];
+					$passedGroupItem = false;
+
+					foreach($row->approvalTemplateItemGroup as $rowgroupitem){
+						$arrGroupItem[] = $rowgroupitem->item_group_id;
+					}
+
+					foreach($source->lookable->details as $rowdetail){
+						if($rowdetail->item()->exists()){
+							$topGroupId = $rowdetail->item->itemGroup->getTopParent($rowdetail->item->itemGroup);
+							if(in_array($topGroupId,$arrGroupItem)){
+								$passedGroupItem = true;
+							}
+						}
+					}
+
+					if($passedGroupItem){
+						$totalDoc = 0;
+						$totalBench = 0;
+						$percentDiff = 0;
+						foreach($source->lookable->details as $rowdetail){
+							$priceDoc = round(($rowdetail->priceAfterDiscount() * $currency_rate) / $rowdetail->qty_conversion,2);
+							$priceBench = $rowdetail->item->lastBenchmarkPricePlant($rowdetail->place_id);
+							$totalDoc += $priceDoc * $rowdetail->qty_conversion * $rowdetail->qty;
+							$totalBench += $priceBench * $rowdetail->qty_conversion * $rowdetail->qty;
+						}
+						$percentDiff = $totalBench > 0 ? ((($totalDoc - $totalBench) / $totalBench) * 100) : 0;
+						if($row->sign !== '~'){
+							if(!self::compare($percentDiff,$row->sign,$row->nominal)){
+								$passed = false;
+							}
+						}else{
+							if(!self::compareRange($percentDiff,$row->nominal,$row->nominal_final)){
+								$passed = false;
+							}
+						}
+					}else{
+						$passed = false;
 					}
 				}
 			}
@@ -2126,10 +2221,7 @@ class CustomHelper {
 							'nominal_fc'	=> $type == '1' || $type == '' ? 0 : $row->grandtotal,
 						]);
 					}
-
-					$coacode = '200.01.03.01.02';
-					$coamodel = Coa::where('code',$coacode)->where('company_id',$pm->company_id)->first();
-					$coahutangbelumditagih = Coa::where('code','200.01.03.01.02')->where('company_id',$pm->company_id)->first();
+					
 					if($row->total > 0){
 						$total = 0;
 						if($row->lookable->lookable_type == 'coas'){
@@ -2146,23 +2238,6 @@ class CustomHelper {
 							$total = $row->total * $row->lookable->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
 							$currency_rate = $row->lookable->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
 							$type = $row->lookable->lookable->purchaseOrderDetail->purchaseOrder->currency->type;
-							
-							if($coahutangbelumditagih){
-								JournalDetail::create([
-									'journal_id'	=> $query->id,
-									'coa_id'		=> $coahutangbelumditagih->id,
-									'place_id'		=> $row->lookable->lookable->place_id,
-									'line_id'		=> $row->lookable->lookable->line_id ? $row->lookable->lookable->line_id : NULL,
-									'machine_id'	=> $row->lookable->lookable->machine_id ? $row->lookable->lookable->machine_id : NULL,
-									'account_id'	=> $coahutangbelumditagih->bp_journal ? $pm->account_id : NULL,
-									'department_id'	=> $row->lookable->lookable->department_id ? $row->lookable->lookable->department_id : NULL,
-									'warehouse_id'	=> $row->lookable->lookable->warehouse_id,
-									'project_id'	=> $row->lookable->lookable->purchaseOrderDetail->project_id ? $row->lookable->lookable->purchaseOrderDetail->project_id : NULL,
-									'type'			=> '1',
-									'nominal'		=> $total,
-									'nominal_fc'	=> $type == '1' || $type == '' ? 0 : $row->total,
-								]);
-							}
 
 							JournalDetail::create([
 								'journal_id'	=> $query->id,
@@ -2202,21 +2277,6 @@ class CustomHelper {
 								NULL,
 							);
 						}
-
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $coamodel->id,
-							'place_id'		=> $row->lookable->place_id ? $row->lookable->place_id : NULL,
-							'line_id'		=> $row->lookable->line_id ? $row->lookable->line_id : NULL,
-							'machine_id'	=> $row->lookable->line_id ? $row->lookable->line_id : NULL,
-							'account_id'	=> $coamodel->bp_journal ? $row->lookable->purchaseInvoice->account_id : NULL,
-							'department_id'	=> $row->lookable->department_id ? $row->lookable->department_id : NULL,
-							'warehouse_id'	=> $row->lookable->warehouse_id ? $row->lookable->warehouse_id : NULL,
-							'project_id'	=> $row->lookable->project_id ? $row->lookable->project_id : NULL,
-							'type'			=> '2',
-							'nominal'		=> $total,
-							'nominal_fc'	=> $type == '1' || $type == '' ? 0 : $row->total,
-						]);
 					}
 
 					if($row->tax > 0){

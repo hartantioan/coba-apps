@@ -295,8 +295,9 @@ function loadCurrency(){
 			loadingClose('#currency_rate');
 			let keys = Object.keys(response.data);
 			keys.forEach(function (k) {
-				$('#currency_rate').val(formatRupiahIni(parseFloat(response.data[k].IDR).toFixed(2).toString().replace('.',',')));
+				$('#currency_rate').val(formatRupiahIni(parseFloat(response.data[k].IDR).toFixed(2).toString().replace('.',','))).trigger('change');
 			});
+			return 
 		},
 		error: function() {
 			swal({

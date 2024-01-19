@@ -46,7 +46,7 @@ class SubsidiaryLedgerController extends Controller
 
         $start_time = microtime(true);
 
-        #logic here
+        #logic here LANJUTKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANNNNNNNNNNNNN
         
         $html = '<table class="bordered" id="table-result" style="min-width:2500px !important;zoom:0.6;">
                     <thead class="sidebar-sticky" style="background-color:white;">
@@ -61,6 +61,7 @@ class SubsidiaryLedgerController extends Controller
                             <th class="center-align">Total</th>
                             <th class="center-align">Keterangan 1</th>
                             <th class="center-align">Keterangan 2</th>
+                            <th class="center-align">Keterangan 3</th>
                             <th class="center-align">Plant</th>
                             <th class="center-align">Gudang</th>
                             <th class="center-align">Line</th>
@@ -82,7 +83,7 @@ class SubsidiaryLedgerController extends Controller
                             <td width="200px">'.$row->name.'</td>
                             <td colspan="5"></td>
                             <td class="right-align">'.number_format($balance,2,',','.').'</td>
-                            <td colspan="8"></td>
+                            <td colspan="9"></td>
                         </tr>';
             if(count($rowdata) > 0){
                 foreach($rowdata as $key => $detail){
@@ -97,6 +98,7 @@ class SubsidiaryLedgerController extends Controller
                                 <td class="right-align">'.($detail->type == '2' ? number_format($detail->nominal,2,',','.') : '-').'</td>
                                 <td class="right-align">'.number_format($balance,2,',','.').'</td>
                                 <td>'.$detail->journal->note.'</td>
+                                <td>'.$detail->note.'</td>
                                 <td>'.$detail->note.'</td>
                                 <td>'.($detail->place()->exists() ? $detail->place->code : '-').'</td>
                                 <td>'.($detail->warehouse()->exists() ? $detail->warehouse->name : '-').'</td>

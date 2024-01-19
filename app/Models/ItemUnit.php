@@ -20,6 +20,7 @@ class ItemUnit extends Model
         'conversion',
         'is_sell_unit',
         'is_buy_unit',
+        'is_default',
     ];
 
     public function item(){

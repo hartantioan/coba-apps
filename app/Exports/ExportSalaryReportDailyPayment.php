@@ -144,7 +144,6 @@ class ExportSalaryReportDailyPayment implements  FromView,ShouldAutoSize,WithTit
          
             foreach($query_detail_overtime as $row_overtime_detail){
                 $nominal_plus += $row_overtime_detail->nominal ;
-                info($row_overtime_detail);
                 $plant_for_user[$row_user_report->user->place_id]['tbody'][$key_tbody][]=number_format($row_overtime_detail->nominal,2,',','.');
                 if($row_overtime_detail->lookable_id == -1 ){
                         
@@ -173,7 +172,6 @@ class ExportSalaryReportDailyPayment implements  FromView,ShouldAutoSize,WithTit
         $formattedData = array_map(function ($value) {
             return is_numeric($value) ? number_format($value, 2, ',', '.') : $value;
         }, $total_component);
-        info($formattedData);
         return view('admin.exports.salary_report', [
             'data' => $plant_for_user,
             'last_total'=>$formattedData,

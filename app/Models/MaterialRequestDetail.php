@@ -116,10 +116,11 @@ class MaterialRequestDetail extends Model
 
     public function status(){
         $status = match ($this->status) {
-            '1' => in_array($this->materialRequest->status,['2','3']) ? '<b style="font-weight:900;color:green;">&#x2713;</b>' : '<b style="font-weight:900;color:yellow;">&#9898;</b>',
-            default => in_array($this->materialRequest->status,['2','3']) ? '<b style="font-weight:900;color:red;">&#x2715;</b>' : '<b style="font-weight:900;color:yellow;">&#9898;</b>',
+            '1' => '<b style="font-weight:900;color:green;">&#x2713;</b>',
+            '2' => '<b style="font-weight:900;color:red;">&#10060;</b>',
+            default => '<b style="font-weight:900;color:yellow;">&#9898;</b>',
         };
   
-          return $status;
+        return $status;
     }
 }

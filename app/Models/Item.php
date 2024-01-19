@@ -323,6 +323,20 @@ class Item extends Model
         return $this->hasMany('App\Models\ItemStock','item_id','id');
     }
 
+    public function benchmarkPrice()
+    {
+        return $this->hasMany('App\Models\BenchmarkPrice','item_id','id')->where('status','1');
+    }
+
+    public function lastBenchmarkPricePlant($place){
+        $price = 0;
+        $bp = $this->benchmarkPrice()->where('place_id',$place)->orderByDesc('id')->first();
+        if($bp){
+            $price = $bp->price;
+        }
+        return $price;
+    }
+
     public function itemShading()
     {
         return $this->hasMany('App\Models\ItemShading','item_id','id');
@@ -354,7 +368,7 @@ class Item extends Model
 
     public function arrBuyUnits(){
         $arr = [];
-        foreach($this->itemUnit()->whereNotNull('is_buy_unit')->get() as $row){
+        foreach($this->itemUnit()->whereNotNull('is_buy_unit')->orderByDesc('is_default')->get() as $row){
             $arr[] = [
                 'id'            => $row->id,
                 'code'          => $row->unit->code,
@@ -366,7 +380,7 @@ class Item extends Model
 
     public function arrSellUnits(){
         $arr = [];
-        foreach($this->itemUnit()->whereNotNull('is_sell_unit')->get() as $row){
+        foreach($this->itemUnit()->whereNotNull('is_sell_unit')->orderByDesc('is_default')->get() as $row){
             $arr[] = [
                 'id'            => $row->id,
                 'code'          => $row->unit->code,

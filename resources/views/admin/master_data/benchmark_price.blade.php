@@ -106,7 +106,7 @@
                         </div>
                         <div class="input-field col s6">
                             <input id="price" name="price" type="text" onkeyup="formatRupiah(this)" value="0">
-                            <label class="active" for="price">Harga</label>
+                            <label class="active" for="price">Harga Satuan Stock</label>
                         </div>
                         <div class="input-field col s6">
                             <div class="switch mb-1">

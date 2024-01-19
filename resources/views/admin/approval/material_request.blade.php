@@ -206,7 +206,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($data->materialRequestDetail as $key => $row)
+                    @foreach($data->materialRequestDetail()->whereIn('status',[NULL,'1'])->get() as $key => $row)
                     <tr>
                         <td class="center-align">
                             <label>

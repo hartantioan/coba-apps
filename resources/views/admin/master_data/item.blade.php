@@ -15,12 +15,20 @@
         padding: 5px !important;
     }
 
+    .select2-container {
+        min-width: 200px !important;
+    }
+
     .modal {
         top:0px !important;
     }
 
     #modal3 {
         top:50px !important;
+    }
+
+    .form-control-feedback {
+        right:0px !important;
     }
 </style>
 <!-- BEGIN: Page Main-->
@@ -365,21 +373,22 @@
                                 <table class="bordered">
                                     <thead>
                                         <tr>
-                                            <th class="center">Satuan</th>
+                                            <th class="center" width="10%">Satuan</th>
                                             <th class="center">Konversi</th>
                                             <th class="center">Jual</th>
                                             <th class="center">Beli</th>
+                                            <th class="center">Default</th>
                                             <th class="center">Hapus</th>
                                         </tr>
                                     </thead>
                                     <tbody id="body-unit">
                                         <tr id="empty-unit">
-                                            <td colspan="5" class="center">Silahkan tambahkan satuan konversi</td>
+                                            <td colspan="6" class="center">Silahkan tambahkan satuan konversi</td>
                                         </tr>
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <th colspan="5" class="center">
+                                            <th colspan="6" class="center">
                                                 <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addUnit();" href="javascript:void(0);">
                                                     <i class="material-icons left">add</i> Tambah
                                                 </a>
@@ -693,7 +702,7 @@
                 arrName = [];
                 $('#body-unit').empty().append(`
                     <tr id="empty-unit">
-                        <td colspan="5" class="center">Silahkan tambahkan satuan konversi</td>
+                        <td colspan="6" class="center">Silahkan tambahkan satuan konversi</td>
                     </tr>
                 `);
                 $('.unit-inputs').css('pointer-events','auto');
@@ -754,7 +763,7 @@
             if($('.row_unit').length == 0){
                 $('#body-unit').append(`
                     <tr id="empty-unit">
-                        <td colspan="5" class="center">Silahkan tambahkan satuan konversi</td>
+                        <td colspan="6" class="center">Silahkan tambahkan satuan konversi</td>
                     </tr>
                 `);
             }
@@ -791,6 +800,12 @@
                 <td class="center-align">
                     <label>
                         <input type="checkbox" id="arr_buy_unit` + count + `" name="arr_buy_unit[]" value="1">
+                        <span>Pilih</span>
+                    </label>
+                </td>
+                <td class="center-align">
+                    <label>
+                        <input type="radio" id="arr_default` + count + `" name="arr_default" value="1">
                         <span>Pilih</span>
                     </label>
                 </td>
@@ -1062,6 +1077,7 @@
 
         formData.delete("arr_sell_unit[]");
         formData.delete("arr_buy_unit[]");
+        formData.delete("arr_default");
 
         let arrUnit = [];
         $('select[name^="arr_unit[]"]').each(function(index){
@@ -1084,6 +1100,9 @@
         });
         $('input[name^="arr_buy_unit[]"]').each(function(index){
             formData.append('arr_buy_unit[]',($(this).is(':checked') ? $(this).val() : ''));
+        });
+        $('input[name^="arr_default"]').each(function(index){
+            formData.append('arr_default[]',($(this).is(':checked') ? $(this).val() : ''));
         });
         
         if(passedSameUnit){
@@ -1405,6 +1424,12 @@
                                 <td class="center-align">
                                     <label>
                                         <input type="checkbox" id="arr_buy_unit` + count + `" name="arr_buy_unit[]" value="1" ` + (val.is_buy_unit ? 'checked' : '' ) + `>
+                                        <span>Pilih</span>
+                                    </label>
+                                </td>
+                                <td class="center-align">
+                                    <label>
+                                        <input type="radio" id="arr_default` + count + `" name="arr_default" value="1" ` + (val.is_default ? 'checked' : '' ) + `>
                                         <span>Pilih</span>
                                     </label>
                                 </td>

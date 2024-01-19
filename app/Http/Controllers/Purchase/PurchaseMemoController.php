@@ -130,6 +130,7 @@ class PurchaseMemoController extends Controller
                             'wtax'          => number_format($row->wtax,2,',','.'),
                             'grandtotal'    => number_format($data->grandtotal,2,',','.'),
                             'note'          => $row->note ? $row->note : '',
+                            'note2'         => $row->note2 ? $row->note2 : '',
                             'account_name'  => $data->account->name,
                             'is_include_tax'=> $row->is_include_tax,
                             'percent_tax'   => $row->percent_tax,
@@ -171,6 +172,7 @@ class PurchaseMemoController extends Controller
                     $data['balance'] = $data->balanceMemo();
                     $data['balanceformat'] = number_format($data->balanceMemo(),2,',','.');
                     $data['qty'] = 1;
+                    $data['note2'] = '';
                 }
 
             }else{
@@ -532,6 +534,7 @@ class PurchaseMemoController extends Controller
                                 'lookable_id'           => $request->arr_code[$key],
                                 'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                                 'description'           => $request->arr_description[$key],
+                                'description2'          => $request->arr_description2[$key],
                                 'is_include_tax'        => $request->arr_is_include_tax[$key],
                                 'tax_id'                => $request->arr_id_tax[$key] ? $request->arr_id_tax[$key] : NULL,
                                 'wtax_id'               => $request->arr_id_wtax[$key] ? $request->arr_id_wtax[$key] : NULL,
@@ -579,13 +582,14 @@ class PurchaseMemoController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="8">Daftar Order Pembelian</th>
+                                <th class="center-align" colspan="9">Daftar Order Pembelian</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">AP Inv./AP DP</th>
                                 <th class="center-align">Qty</th>
-                                <th class="center-align">Keterangan</th>
+                                <th class="center-align">Keterangan 1</th>
+                                <th class="center-align">Keterangan 2</th>
                                 <th class="center-align">Total</th>
                                 <th class="center-align">PPN</th>
                                 <th class="center-align">PPh</th>
@@ -600,6 +604,7 @@ class PurchaseMemoController extends Controller
                     <td class="center-align">'.$row->getCode().'</td>
                     <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                     <td class="center-align">'.$row->description.'</td>
+                    <td class="center-align">'.$row->description2.'</td>
                     <td class="right-align">'.number_format($row->total,2,',','.').'</td>
                     <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
                     <td class="right-align">'.number_format($row->wtax,2,',','.').'</td>
@@ -608,7 +613,7 @@ class PurchaseMemoController extends Controller
             }
         }else{
             $string .= '<tr>
-                <td class="center-align" colspan="8">Data detail tidak ditemukan.</td>
+                <td class="center-align" colspan="9">Data detail tidak ditemukan.</td>
             </tr>';
         }
         
@@ -698,6 +703,7 @@ class PurchaseMemoController extends Controller
                     'wtax'          => number_format($row->wtax,2,',','.'),
                     'grandtotal'    => number_format($row->grandtotal,2,',','.'),
                     'note'          => $row->description ? $row->description : '',
+                    'note2'         => $row->description2 ? $row->description2 : '',
                     'account_name'  => $row->lookable->purchaseInvoice->account->name,
                     'is_include_tax'=> $row->is_include_tax,
                     'percent_tax'   => $row->percent_tax,
@@ -726,6 +732,7 @@ class PurchaseMemoController extends Controller
                     'wtax'          => number_format($row->wtax,2,',','.'),
                     'grandtotal'    => number_format($row->grandtotal,2,',','.'),
                     'note'          => $row->description ? $row->description : '',
+                    'note2'         => $row->description2 ? $row->description2 : '',
                     'account_name'  => $row->lookable->supplier->name,
                     'is_include_tax'=> $row->is_include_tax,
                     'percent_tax'   => $row->percent_tax,
@@ -2316,8 +2323,11 @@ class PurchaseMemoController extends Controller
                 'status'    => 200,
                 'message'   => $query->journal,
                 'user'      => $query->user->name,
-                'reference' =>  $query->lookable_id ? $query->lookable->code : '-',
-                'company' => $query->company()->exists() ? $query->company->name : '-',
+                'reference' => $query->code,
+                'company'   => $query->company()->exists() ? $query->company->name : '-',
+                'code'      => $query->journal->code,
+                'note'      => $query->note,
+                'post_date' => date('d/m/y',strtotime($query->post_date)),
             ];
             $string='';
             foreach($query->journal->journalDetail()->where(function($query){
@@ -2337,6 +2347,8 @@ class PurchaseMemoController extends Controller
                     <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
                     <td class="center-align">'.($row->project_id ? $row->project->name : '-').'</td>
                     <td class="center-align">'.($row->note ? $row->note : '').'</td>
+                    <td class="right-align">'.($row->type == '1' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
+                    <td class="right-align">'.($row->type == '2' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
                     <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
                     <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
                 </tr>';

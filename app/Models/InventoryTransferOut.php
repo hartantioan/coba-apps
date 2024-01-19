@@ -89,6 +89,11 @@ class InventoryTransferOut extends Model
         return $this->hasMany('App\Models\InventoryTransferOutDetail');
     }
 
+    public function details()
+    {
+        return $this->hasMany('App\Models\InventoryTransferOutDetail');
+    }
+
     public function status(){
         $status = match ($this->status) {
           '1' => '<span class="amber medium-small white-text padding-3">Menunggu</span>',

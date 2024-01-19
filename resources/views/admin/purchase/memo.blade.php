@@ -255,7 +255,7 @@
                                 <p class="mt-2 mb-2">
                                     <h6>Detail Transaksi</h6>
                                     <div style="overflow:auto;">
-                                        <table class="bordered" id="table-detail" style="min-width:2300px;">
+                                        <table class="bordered" id="table-detail" style="min-width:2500px;">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Ref.Dokumen / Coa</th>
@@ -265,7 +265,8 @@
                                                     <th class="center">No. SPK</th>
                                                     <th class="center">No. Invoice Vendor</th>
                                                     <th class="center">Tgl.Post</th>
-                                                    <th class="center">Keterangan</th>
+                                                    <th class="center">Keterangan 1</th>
+                                                    <th class="center">Keterangan 2</th>
                                                     <th class="center">Edit Qty</th>
                                                     <th class="center">Edit Nominal</th>
                                                     <th class="center">Total</th>
@@ -277,7 +278,7 @@
                                             </thead>
                                             <tbody id="body-detail">
                                                 <tr id="last-row-detail">
-                                                    <td colspan="15" class="center">
+                                                    <td colspan="16" class="center">
                                                         Silahkan pilih A/P Invoice atau A/P Down Payment
                                                     </td>
                                                 </tr>
@@ -497,16 +498,22 @@
             <table class="bordered Highlight striped">
                 <thead>
                         <tr>
-                            <th class="center-align">No</th>
-                            <th class="center-align">Coa</th>
-                            <th class="center-align">Partner Bisnis</th>
-                            <th class="center-align">Plant</th>
-                            <th class="center-align">Line</th>
-                            <th class="center-align">Mesin</th>
-                            <th class="center-align">Department</th>
-                            <th class="center-align">Gudang</th>
-                            <th class="center-align">Proyek</th>
-                            <th class="center-align">Keterangan</th>
+                            <th class="center-align" rowspan="2">No</th>
+                            <th class="center-align" rowspan="2">Coa</th>
+                            <th class="center-align" rowspan="2">Partner Bisnis</th>
+                            <th class="center-align" rowspan="2">Plant</th>
+                            <th class="center-align" rowspan="2">Line</th>
+                            <th class="center-align" rowspan="2">Mesin</th>
+                            <th class="center-align" rowspan="2">Department</th>
+                            <th class="center-align" rowspan="2">Gudang</th>
+                            <th class="center-align" rowspan="2">Proyek</th>
+                            <th class="center-align" rowspan="2">Keterangan</th>
+                            <th class="center-align" colspan="2">Mata Uang Asli</th>
+                            <th class="center-align" colspan="2">Mata Uang Konversi</th>
+                        </tr>
+                        <tr>
+                            <th class="center-align">Debit</th>
+                            <th class="center-align">Kredit</th>
                             <th class="center-align">Debit</th>
                             <th class="center-align">Kredit</th>
                         </tr>
@@ -591,7 +598,7 @@
                 if($('#last-row-detail').length == 0){
                     $('#body-detail').append(`
                         <tr id="last-row-detail">
-                            <td colspan="15" class="center">
+                            <td colspan="16" class="center">
                                 Silahkan pilih A/P Invoice atau A/P Down Payment
                             </td>
                         </tr>
@@ -734,7 +741,7 @@
             if($('.row_detail').length == 0){
                 $('#body-detail').append(`
                     <tr id="last-row-detail">
-                        <td colspan="15" class="center">
+                        <td colspan="16" class="center">
                             Silahkan pilih A/P Invoice atau A/P Down Payment
                         </td>
                     </tr>
@@ -882,7 +889,10 @@
                                         ` + response.post_date + `
                                     </td>
                                     <td>
-                                        <input name="arr_description[]" type="text" placeholder="Keterangan" value="` + response.note + ` - ` + response.account_name + `">
+                                        <input name="arr_description[]" type="text" placeholder="Keterangan 1" value="` + response.note + `">
+                                    </td>
+                                    <td>
+                                        <input name="arr_description2[]" type="text" placeholder="Keterangan 2" value="` + response.note2 + `">
                                     </td>
                                     <td>
                                         <input type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="1" data-id="` + count + `" onkeyup="formatRupiah(this);countQty(this);" style="text-align:right;" data-max="1" readonly>
@@ -944,7 +954,10 @@
                                             ` + val.post_date + `
                                         </td>
                                         <td>
-                                            <input name="arr_description[]" type="text" placeholder="Keterangan" value="` + val.note + ` - ` + val.account_name + `">
+                                            <input name="arr_description[]" type="text" placeholder="Keterangan 1" value="` + val.note + `">
+                                        </td>
+                                        <td>
+                                            <input name="arr_description2[]" type="text" placeholder="Keterangan 2" value="` + val.note2 + `">
                                         </td>
                                         <td>
                                             <input type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty + `" data-id="` + count + `" onkeyup="formatRupiah(this);countQty(this);" style="text-align:right;" data-max="` + val.qty + `">
@@ -1104,7 +1117,7 @@
                 if($('.row_detail').length == 0 || $('#last-row-detail').length == 0){
                     $('#body-detail').append(`
                         <tr id="last-row-detail">
-                            <td colspan="15" class="center">
+                            <td colspan="16" class="center">
                                 Silahkan pilih A/P Invoice atau A/P Down Payment
                             </td>
                         </tr>
@@ -1255,7 +1268,6 @@
         var path = window.location.pathname;
         path = path.replace(/^\/|\/$/g, '');
 
-        // Split the path by slashes and get the last segment
         var segments = path.split('/');
         var lastSegment = segments[segments.length - 1];
         formData.append('tabledata',etNumbers);
@@ -1570,7 +1582,6 @@
                     var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
 
-                    // Split the path by slashes and get the last segment
                     var segments = path.split('/');
                     var lastSegment = segments[segments.length - 1];
                 
@@ -1762,7 +1773,10 @@
                                     ` + val.post_date + `
                                 </td>
                                 <td>
-                                    <input name="arr_description[]" type="text" placeholder="Keterangan" value="` + val.note + ` - ` + val.account_name + `">
+                                    <input name="arr_description[]" type="text" placeholder="Keterangan 1" value="` + val.note + `">
+                                </td>
+                                <td>
+                                    <input name="arr_description[]" type="text" placeholder="Keterangan 2" value="` + val.note2 + `">
                                 </td>
                                 <td>
                                     <input type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty + `" data-id="` + count + `" onkeyup="formatRupiah(this);countQty(this);" style="text-align:right;" data-max="` + val.qty_max + `" readonly>
@@ -1913,13 +1927,13 @@
                 }else{
                     $('#modal6').modal('open');
                     $('#title_data').append(``+data.title+``);
-                    $('#code_data').append(data.message.code);
+                    $('#code_data').append(data.code);
                     $('#body-journal-table').append(data.tbody);
                     $('#user_jurnal').append(`Pengguna : `+data.user);
-                    $('#note_jurnal').append(`Keterangan : `+data.message.note);
+                    $('#note_jurnal').append(`Keterangan : `+data.note);
                     $('#ref_jurnal').append(`Referensi : `+data.reference);
                     $('#company_jurnal').append(`Perusahaan : `+data.company);
-                    $('#post_date_jurnal').append(`Tanggal : `+data.message.post_date);
+                    $('#post_date_jurnal').append(`Tanggal : `+data.post_date);
                 }
             }
         });

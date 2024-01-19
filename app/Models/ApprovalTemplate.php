@@ -62,4 +62,28 @@ class ApprovalTemplate extends Model
 
         return $status;
     }
+
+    public function nominalType(){
+        $status = match ($this->nominal_type) {
+          '1' => 'Grandtotal (Rp)',
+          '2' => 'Prosentase (%)',
+          default => 'Kosong',
+        };
+
+        return $status;
+    }
+
+    public function sign(){
+        $status = match ($this->sign) {
+            '>'     => 'lebih dari',
+            '>='    => 'lebih dari sama dengan',
+            '='     => 'sama dengan',
+            '<'     => 'kurang dari',
+            '<='    => 'kurang dari sama dengan',
+            '~'     => 'dalam range',
+            default => 'Kosong',
+        };
+
+        return $status;
+    }
 }

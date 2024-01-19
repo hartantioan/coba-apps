@@ -221,14 +221,6 @@
     </div>
 </div>
 
-<div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
-    <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
-        <i class="material-icons">add</i>
-    </a>
-</div>
-
-
-
 <!-- END: Page Main-->
 <script>
     var arrgroup = @json($group);
@@ -316,7 +308,6 @@
                 $('fc-events-container').empty();
                 calendar.removeAllEvents();
 
-                // Rerender the calendar to display the new events
                 calendar.render();
             }
         });

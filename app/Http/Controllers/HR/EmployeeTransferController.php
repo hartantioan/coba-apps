@@ -45,14 +45,13 @@ class EmployeeTransferController extends Controller
     
     public function datatable(Request $request){
         $column = [
-            'user_id',
+            'id',
+            'code',
             'account_id',
             'type',
-            'code',
+            'post_date',
             'note',
             'status',
-            'post_date',
-            'void_id',
         ];
 
         $start  = $request->start;
@@ -124,7 +123,7 @@ class EmployeeTransferController extends Controller
                     $val->code,
                     $val->account->name ?? '-',
                     $val->typeRaw(),
-                    $val->post_date,
+                    date('d/m/y',strtotime($val->post_date)),
                     $val->note,
                     $val->status(),
                     $btn
@@ -244,7 +243,6 @@ class EmployeeTransferController extends Controller
                 try {
                     
                     $query = EmployeeTransfer::find(CustomHelper::decrypt($request->temp));
-                    info($request->temp);
                     $approved = false;
                     $revised = false;
 

@@ -233,8 +233,6 @@ class ClosingJournalController extends Controller
                 'nominal'   => $profitLoss,
             ];
 
-            info($result);
-
             $response = [
                 'status'    => 200,
                 'message'   => '',
@@ -913,8 +911,11 @@ class ClosingJournalController extends Controller
                 'status'    => 200,
                 'message'   => $query->journal,
                 'user'      => $query->user->name,
-                'reference' =>  $query->lookable_id ? $query->lookable->code : '-',
-                'company' => $query->company()->exists() ? $query->company->name : '-',
+                'reference' => $query->code,
+                'company'   => $query->company()->exists() ? $query->company->name : '-',
+                'code'      => $query->journal->code,
+                'note'      => $query->note,
+                'post_date' => date('d/m/y',strtotime($query->post_date)),
             ];
             $string='';
             foreach($query->journal as $rowmain){

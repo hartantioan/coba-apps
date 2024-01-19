@@ -128,12 +128,14 @@ class ItemGroupController extends Controller
         $validation = Validator::make($request->all(), [
             'code'			=> $request->temp ? ['required', Rule::unique('item_groups', 'code')->ignore($request->temp)] : 'required|unique:item_groups,code',
             'name'          => 'required',
-            'coa_id'        => 'required',
+            'coa_id'        => $request->parent_id ? 'required' : '',
+            'warehouse_id'  => $request->parent_id ? 'required' : '',
         ], [
             'code.required' 	    => 'Kode tidak boleh kosong.',
             'code.unique'           => 'Kode telah dipakai',
             'name.required'         => 'Nama tidak boleh kosong.',
-            'coa_id.required'       => 'Coa tidak boleh kosong.'
+            'coa_id.required'       => 'Coa tidak boleh kosong.',
+            'warehouse_id.required' => 'Gudang tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {

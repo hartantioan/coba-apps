@@ -1038,8 +1038,11 @@ class MarketingOrderInvoiceController extends Controller
                 'status'    => 200,
                 'message'   => $query->journal,
                 'user'      => $query->user->name,
-                'reference' =>  $query->lookable_id ? $query->lookable->code : '-',
-                'company' => $query->company()->exists() ? $query->company->name : '-',
+                'reference' => $query->code,
+                'company'   => $query->company()->exists() ? $query->company->name : '-',
+                'code'      => $query->journal->code,
+                'note'      => $query->note,
+                'post_date' => date('d/m/y',strtotime($query->post_date)),
             ];
             $string='';
             foreach($query->journal->journalDetail()->where(function($query){
@@ -1059,6 +1062,8 @@ class MarketingOrderInvoiceController extends Controller
                     <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
                     <td class="center-align">'.($row->project_id ? $row->project->name : '-').'</td>
                     <td class="center-align">'.($row->note ? $row->note : '').'</td>
+                    <td class="right-align">'.($row->type == '1' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
+                    <td class="right-align">'.($row->type == '2' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
                     <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
                     <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
                 </tr>';
@@ -1206,7 +1211,6 @@ class MarketingOrderInvoiceController extends Controller
                         CustomHelper::addDeposit($row->lookable->account_id,$row->grandtotal * $row->lookable->currency_rate);
                     }
                     CustomHelper::removeCountLimitCredit($query->account_id,$query->balance);
-                    info('asd');
                 }
 
                 $query->update([
@@ -2006,9 +2010,6 @@ class MarketingOrderInvoiceController extends Controller
                 return $new_array;
             }
         
-            // foreach($data_go_chart as $row_dg){
-            //     info($row_dg);
-            // }
             $data_go_chart = unique_key($data_go_chart,'name');
             $data_link=unique_key($data_link,'string_link');
 

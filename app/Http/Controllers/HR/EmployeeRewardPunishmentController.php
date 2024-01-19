@@ -238,7 +238,6 @@ class EmployeeRewardPunishmentController extends Controller
         } else {
     
 			if($request->temp){
-                info($request->temp);
                 DB::beginTransaction();
                 
                 try{
@@ -269,7 +268,6 @@ class EmployeeRewardPunishmentController extends Controller
                     }
 
                     if(in_array($query->status,['1','6'])){
-                        info($query);
                         $query->user_id         = session('bo_id');
                         $query->post_date       = $request->post_date;
                         $query->period_id       = $request->period_id;

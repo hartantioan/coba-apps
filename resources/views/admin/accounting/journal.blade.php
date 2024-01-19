@@ -186,7 +186,7 @@
                                         <label class="" for="currency_id">Mata Uang</label>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this);">
+                                        <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this);" onchange="convertThis();">
                                         <label class="active" for="currency_rate">Konversi</label>
                                     </div>
                                     {{-- <div class="input-field col m3 s12">
@@ -219,25 +219,31 @@
                                     <div class="col s12 mt-2" style="overflow:auto;width:100% !important;">
                                         <h5>Detail Coa</h5>
                                         <p class="mt-2 mb-2">
-                                            <table class="bordered" style="min-width:2500px;" id="table-detail">
+                                            <table class="bordered" style="min-width:2800px;" id="table-detail">
                                                 <thead>
                                                     <tr>
-                                                        <th class="center">BP</th>
-                                                        <th class="center">Coa</th>
-                                                        <th class="center">Plant</th>
-                                                        <th class="center">Line</th>
-                                                        <th class="center">Mesin</th>
-                                                        <th class="center">Departemen</th>
-                                                        <th class="center">Proyek</th>
-                                                        <th class="center">Keterangan</th>
-                                                        <th class="center">Debit</th>
-                                                        <th class="center">Kredit</th>
-                                                        <th class="center">Hapus</th>
+                                                        <th class="center" rowspan="2">BP</th>
+                                                        <th class="center" rowspan="2">Coa</th>
+                                                        <th class="center" rowspan="2">Plant</th>
+                                                        <th class="center" rowspan="2">Line</th>
+                                                        <th class="center" rowspan="2">Mesin</th>
+                                                        <th class="center" rowspan="2">Departemen</th>
+                                                        <th class="center" rowspan="2">Proyek</th>
+                                                        <th class="center" rowspan="2">Keterangan</th>
+                                                        <th class="center" colspan="2">Mata Uang Asli</th>
+                                                        <th class="center" colspan="2">Mata Uang Konversi</th>
+                                                        <th class="center" rowspan="2" width="75px">Hapus</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th class="center-align" width="200px">Debit</th>
+                                                        <th class="center-align" width="200px">Kredit</th>
+                                                        <th class="center-align" width="200px">Debit</th>
+                                                        <th class="center-align" width="200px">Kredit</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-coa">
                                                     <tr id="last-row-coa">
-                                                        <td colspan="11">
+                                                        <td colspan="13">
                                                             <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addCoa('1')" href="javascript:void(0);">
                                                                 <i class="material-icons left">add</i> Tambah Debit
                                                             </a>
@@ -289,6 +295,8 @@
                                                         <th class="center" style="width:75px;">Departemen</th>
                                                         <th class="center">Debit</th>
                                                         <th class="center">Kredit</th>
+                                                        <th class="center">Debit</th>
+                                                        <th class="center">Kredit</th>
                                                         <th class="center">Keterangan</th>
                                                         <th class="center">Hapus</th>
                                                     </tr>
@@ -308,8 +316,8 @@
                                             </table>
                                         </p>
                                     </div>
-                                    <div class="col s6 mt-1 center"><h5>Total Debit : <b id="totalDebitMulti">0,000</b></h5></div>
-                                    <div class="col s6 mt-1 center"><h5>Total Credit : <b id="totalCreditMulti">0,000</b></h5></div>
+                                    <div class="col s6 mt-1 center"><h6>Total Debit Konversi: <b id="totalDebitMulti">0,000</b></h6></div>
+                                    <div class="col s6 mt-1 center"><h6>Total Credit Konversi: <b id="totalCreditMulti">0,000</b></h6></div>
                                     <div class="col s12 mt-3">
                                         <button class="btn waves-effect waves-light right submit" onclick="saveMulti();">Simpan <i class="material-icons right">send</i></button>
                                     </div>
@@ -771,10 +779,16 @@
                     <input name="arr_note[]" type="text" placeholder="Keterangan...">
                 </td>
                 <td>
-                    ` + (type == '1' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="0" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
+                    ` + (type == '1' ? `<input name="arr_nominal_fc[]" onfocus="emptyThis(this);" type="text" value="0" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">` : `-`) + `
                 </td>
                 <td>
-                    ` + (type == '2' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="0" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
+                    ` + (type == '2' ? `<input name="arr_nominal_fc[]" onfocus="emptyThis(this);" type="text" value="0" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">` : `-`) + `
+                </td>
+                <td>
+                    ` + (type == '1' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="0" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">` : `-`) + `
+                </td>
+                <td>
+                    ` + (type == '2' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="0" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">` : `-`) + `
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" href="javascript:void(0);">
@@ -813,6 +827,26 @@
                 }
             }
         });
+    }
+
+    function convertThis(){
+        $('input[name^="arr_nominal"]').each(function(index){
+            if($(this).attr('name') == 'arr_nominal_fc[]'){
+                let val = parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")), currency_rate = parseFloat($('#currency_rate').val().replaceAll(".", "").replaceAll(",","."));
+                let newVal = val * currency_rate;
+                $(this).closest("tr").find('input[name="arr_nominal[]"]').val(
+                    formatRupiahIni(newVal.toString().replace('.',','))
+                );
+            }else if($(this).attr('name') == 'arr_nominal[]'){
+                let val = parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")), currency_rate = parseFloat($('#currency_rate').val().replaceAll(".", "").replaceAll(",","."));
+                let newVal = val / currency_rate;
+                $(this).closest("tr").find('input[name="arr_nominal_fc[]"]').val(
+                    formatRupiahIni(newVal.toString().replace('.',','))
+                );
+            }
+        });
+        
+        countAll();
     }
 
     function changePlace(element){
@@ -1053,9 +1087,9 @@
     function countAll(){
         let totalDebit = 0, totalCredit = 0;
 
-        $('input[name^="arr_nominal"]').each(function(index){
+        $('input[name^="arr_nominal[]"]').each(function(index){
             let nominal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-            if($('input[name^="arr_type"]').eq(index).val() == '1'){
+            if($('input[name^="arr_type[]"]').eq(index).val() == '1'){
                 totalDebit += nominal;
             }else{
                 totalCredit += nominal;
@@ -1069,10 +1103,10 @@
     function countAllMulti(){
         let totalDebit = 0, totalCredit = 0;
 
-        $('input[name^="arr_multi_debit"]').each(function(index){
+        $('input[name^="arr_multi_debit[]"]').each(function(index){
             totalDebit += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
         });
-        $('input[name^="arr_multi_kredit"]').each(function(index){
+        $('input[name^="arr_multi_kredit[]"]').each(function(index){
             totalCredit += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
         });
 
@@ -1226,6 +1260,7 @@
                     formData.delete("arr_project[]");
                     formData.delete("arr_note[]");
                     formData.delete("arr_nominal[]");
+                    formData.delete("arr_nominal_fc[]");
 
                     $('input[name^="arr_type"]').each(function(index){
                         formData.append('arr_type[]',$(this).val());
@@ -1239,13 +1274,14 @@
                         formData.append('arr_department[]',$('select[name^="arr_department"]').eq(index).val());
                         formData.append('arr_project[]',($('select[name^="arr_project[]"]').eq(index).val() ? $('select[name^="arr_project[]"]').eq(index).val() : 'NULL'));
                         formData.append('arr_note[]',($('input[name^="arr_note[]"]').eq(index).val() ? $('input[name^="arr_note[]"]').eq(index).val() : ''));
-                        formData.append('arr_nominal[]',($('input[name^="arr_nominal"]').eq(index).val() ? $('input[name^="arr_nominal"]').eq(index).val() : 'NULL'));
+                        formData.append('arr_nominal[]',($('input[name^="arr_nominal[]"]').eq(index).val() ? $('input[name^="arr_nominal[]"]').eq(index).val() : 'NULL'));
+                        formData.append('arr_nominal_fc[]',($('input[name^="arr_nominal_fc[]"]').eq(index).val() ? $('input[name^="arr_nominal_fc[]"]').eq(index).val() : 'NULL'));
                     });
 
                     var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
 
-                    // Split the path by slashes and get the last segment
+                    
                     var segments = path.split('/');
                     var lastSegment = segments[segments.length - 1];
                 
@@ -1770,7 +1806,7 @@
         var path = window.location.pathname;
         path = path.replace(/^\/|\/$/g, '');
 
-        // Split the path by slashes and get the last segment
+        
         var segments = path.split('/');
         var lastSegment = segments[segments.length - 1];
         formData.append('tabledata',etNumbers);

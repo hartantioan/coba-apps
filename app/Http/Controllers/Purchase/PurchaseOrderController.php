@@ -446,8 +446,7 @@ class PurchaseOrderController extends Controller
             $validation = Validator::make($request->all(), [
                 'code'                      => 'required',
                 'code_place_id'             => 'required',
-                /* 'code'			            => $request->temp ? ['required', Rule::unique('purchase_orders', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:purchase_orders,code',
-                 */'supplier_id' 				=> 'required',
+                'supplier_id' 				=> 'required',
                 'inventory_type'			=> 'required',
                 'shipping_type'		        => 'required',
                 'payment_type'		        => 'required',
@@ -467,9 +466,6 @@ class PurchaseOrderController extends Controller
                 'discount'                  => 'required',
             ], [
                 'code.required' 	                => 'Kode tidak boleh kosong.',
-                /* 'code.unique'                       => 'Kode telah dipakai',
-                'code.string'                       => 'Kode harus dalam bentuk string.',
-                'code.min'                          => 'Kode harus minimal 18 karakter.', */
                 'code_place_id.required'            => 'Plant Tidak boleh kosong',
                 'supplier_id.required' 				=> 'Supplier tidak boleh kosong.',
                 'inventory_type.required' 			=> 'Tipe persediaan/jasa tidak boleh kosong.',
@@ -500,7 +496,8 @@ class PurchaseOrderController extends Controller
             ]);
         }elseif($request->inventory_type == '2'){
             $validation = Validator::make($request->all(), [
-                'code'			            => $request->temp ? ['required', Rule::unique('purchase_orders', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:purchase_orders,code',
+                'code'			            => 'required',
+                'code_place_id'             => 'required',
                 'supplier_id' 				=> 'required',
                 'inventory_type'			=> 'required',
                 'shipping_type'		        => 'required',
@@ -519,9 +516,7 @@ class PurchaseOrderController extends Controller
                 'discount'                  => 'required',
             ], [
                 'code.required' 	                => 'Kode tidak boleh kosong.',
-                'code.string'                       => 'Kode harus dalam bentuk string.',
-                'code.min'                          => 'Kode harus minimal 18 karakter.',
-                'code.unique'                       => 'Kode telah dipakai',
+                'code_place_id.required'            => 'Plant Tidak boleh kosong',
                 'supplier_id.required' 				=> 'Supplier tidak boleh kosong.',
                 'inventory_type.required' 			=> 'Tipe persediaan/jasa tidak boleh kosong.',
                 'shipping_type.required' 			=> 'Tipe pengiriman tidak boleh kosong.',
@@ -566,6 +561,40 @@ class PurchaseOrderController extends Controller
                     return response()->json([
                         'status'  => 500,
                         'message' => 'Harga item tidak boleh 0.'
+                    ]);
+                }
+            }
+
+            if($request->inventory_type == '1'){
+                $arrGroupItem = [];
+                foreach($request->arr_item as $key => $row){
+                    $item = Item::find(intval($row));
+                    $topGroupId = $item->itemGroup->getTopParent($item->itemGroup);
+                    $topGroupName = $item->itemGroup->getTopParentName($item->itemGroup);
+                    $index = -1;
+                    foreach($arrGroupItem as $keyitem => $row){
+                        if($topGroupId == $row['group_id']){
+                            $index = $keyitem;
+                        }
+                    }
+                    if($index >= 0){
+
+                    }else{
+                        $arrGroupItem[] = [
+                            'item_name'     => $item->code.' - '.$item->name,
+                            'group_name'    => $topGroupName,
+                            'group_id'      => $topGroupId,
+                        ];
+                    }
+                }
+                if(count($arrGroupItem) > 1){
+                    $arrError = [];
+                    foreach($arrGroupItem as $row){
+                        $arrError[] = $row['item_name'].' Grup : '.$row['group_name'];
+                    }
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Mohon maaf PO tidak bisa memiliki lebih dari 1 macam group item. Daftarnya : '.implode(', ',$arrError),
                     ]);
                 }
             }
@@ -982,12 +1011,26 @@ class PurchaseOrderController extends Controller
         $po['code_place_id'] = substr($po->code,7,2);
         $po['supplier_name'] = $po->supplier->name;
         $po['top_master'] = $po->supplier->top;
+        $subtotal_convert = $po->subtotal * $po->currency_rate;
+        $discount_convert = $po->discount * $po->currency_rate;
+        $total_convert = $po->total * $po->currency_rate;
+        $tax_convert = $po->tax * $po->currency_rate;
+        $wtax_convert = $po->wtax * $po->currency_rate;
+        $grandtotal_convert = $po->grandtotal * $po->currency_rate;
+        $po['currency_rate'] = number_format($po->currency_rate,2,',','.');
         $po['subtotal'] = number_format($po->subtotal,2,',','.');
         $po['discount'] = number_format($po->discount,2,',','.');
         $po['total'] = number_format($po->total,2,',','.');
         $po['tax'] = number_format($po->tax,2,',','.');
         $po['wtax'] = number_format($po->wtax,2,',','.');
         $po['grandtotal'] = number_format($po->grandtotal,2,',','.');
+
+        $po['subtotal_convert'] = number_format($subtotal_convert,2,',','.');
+        $po['discount_convert'] = number_format($discount_convert,2,',','.');
+        $po['total_convert'] = number_format($total_convert,2,',','.');
+        $po['tax_convert'] = number_format($tax_convert,2,',','.');
+        $po['wtax_convert'] = number_format($wtax_convert,2,',','.');
+        $po['grandtotal_convert'] = number_format($grandtotal_convert,2,',','.');
 
         $arr = [];
         

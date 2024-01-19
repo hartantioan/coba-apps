@@ -204,16 +204,22 @@ class JournalController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align">No.</th>
-                                <th class="center-align">Coa</th>
-                                <th class="center-align">Perusahaan</th>
-                                <th class="center-align">Partner Bisnis</th>
-                                <th class="center-align">Plant</th>
-                                <th class="center-align">Line</th>
-                                <th class="center-align">Mesin</th>
-                                <th class="center-align">Departemen</th>
-                                <th class="center-align">Proyek</th>
-                                <th class="center-align">Keterangan</th>
+                                <th class="center-align" rowspan="2">No.</th>
+                                <th class="center-align" rowspan="2">Coa</th>
+                                <th class="center-align" rowspan="2">Perusahaan</th>
+                                <th class="center-align" rowspan="2">Partner Bisnis</th>
+                                <th class="center-align" rowspan="2">Plant</th>
+                                <th class="center-align" rowspan="2">Line</th>
+                                <th class="center-align" rowspan="2">Mesin</th>
+                                <th class="center-align" rowspan="2">Departemen</th>
+                                <th class="center-align" rowspan="2">Proyek</th>
+                                <th class="center-align" rowspan="2">Keterangan</th>
+                                <th class="center-align" colspan="2">Mata Uang Asli</th>
+                                <th class="center-align" colspan="2">Mata Uang Konversi</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">Debit</th>
+                                <th class="center-align">Kredit</th>
                                 <th class="center-align">Debit</th>
                                 <th class="center-align">Kredit</th>
                             </tr>
@@ -237,6 +243,8 @@ class JournalController extends Controller
                 <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
                 <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
                 <td class="">'.$row->note.'</td>
+                <td class="right-align">'.($row->type == '1' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
+                <td class="right-align">'.($row->type == '2' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
                 <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
                 <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
             </tr>';
@@ -441,6 +449,7 @@ class JournalController extends Controller
                                 'note'                          => $request->arr_note[$key] == '' ? NULL : $request->arr_note[$key],
                                 'type'                          => $row,
                                 'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
+                                'nominal_fc'                    => str_replace(',','.',str_replace('.','',$request->arr_nominal_fc[$key])),
                             ]);
                         }
                     }

@@ -25,6 +25,43 @@ class ItemGroup extends Model
         'status'
     ];
 
+    public function getTopParent($itemgroup)
+    {
+        if ($itemgroup->parent_id == null)
+        {
+            return $itemgroup->id;
+        }
+
+        $parent = ItemGroup::find($itemgroup->parent_id);
+
+        return $this->getTopParent($parent);
+    }
+
+    public function getTopParentName($itemgroup)
+    {
+        if ($itemgroup->parent_id == null)
+        {
+            return $itemgroup->name;
+        }
+
+        $parent = ItemGroup::find($itemgroup->parent_id);
+
+        return $this->getTopParentName($parent);
+    }
+
+    public function getListParent($itemgroup, $name)
+    {
+        if ($itemgroup->parent_id == null)
+        {
+            return $name;
+        }
+
+        $parent = ItemGroup::find($itemgroup->parent_id);
+        $name = $name.' > '.$parent->name;
+
+        return $this->getTopParent($parent, $name);
+    }
+
     public function itemGroupWarehouse(){
         return $this->hasMany('App\Models\ItemGroupWarehouse');
     }

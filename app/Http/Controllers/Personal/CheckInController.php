@@ -28,7 +28,6 @@ class CheckInController extends Controller
 
     public function create(Request $request)
     {   
-        info($request);
         $validation = Validator::make($request->all(), [
             'latitude'             => 'required',
             'longitude'			    => 'required',

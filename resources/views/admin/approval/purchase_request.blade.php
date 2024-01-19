@@ -200,49 +200,49 @@
         </div>
         <div class="divider mb-3 mt-3"></div>
         <!-- product details table-->
-        <div class="invoice-product-details">
-        <table class="bordered">
-            <thead>
-                <tr>
-                    <th class="center">No</th>
-                    <th class="center">Item</th>
-                    <th class="center">Jum.</th>
-                    <th class="center">Sat.</th>
-                    <th class="center">Catatan 1</th>
-                    <th class="center">Catatan 2</th>
-                    <th class="center">Tgl.Dipakai</th>
-                    <th class="center">Plant</th>
-                    <th class="center">Line</th>
-                    <th class="center">Gudang</th>
-                    <th class="center">Departemen</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($data->purchaseRequestDetail as $key => $row)
-                <tr>
-                    <td align="center" rowspan="2">{{ $key+1 }}.</td>
-                    <td>{{ $row->item->code.' - '.$row->item->name }}</td>
-                    <td class="center">{{ $row->qty }}</td>
-                    <td class="center">{{ $row->itemUnit->unit->code }}</td>
-                    <td>{{ $row->note }}</td>
-                    <td>{{ $row->note2 }}</td>
-                    <td class="indigo-text center">{{ date('d/m/y',strtotime($row->required_date)) }}</td>
-                    <td class="center">{{ $row->place->code.' - '.$row->place->company->name }}</td>
-                    <td class="center">{{ $row->line()->exists() ? $row->line->name : '-' }}</td>
-                    <td class="center">{{ $row->warehouse->name }}</td>
-                    <td class="center">{{ $row->department()->exists() ? $row->department->name : '-' }}</td>
-                </tr>
-                <tr>
-                    <td colspan="10">
-                        <b>Mesin</b> : {{ $row->machine()->exists() ? $row->machine->name : '-' }},
-                        <b>Requester</b> : {{ $row->requester }},
-                        <b>Proyek</b> : {{ $row->project()->exists() ? $row->project->name : '-' }}
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
+        <div class="invoice-product-details" style="overflow:auto;width:100%;">
+            <table class="bordered" style="min-width:1600px !important;">
+                <thead>
+                    <tr>
+                        <th class="center">No</th>
+                        <th class="center">Item</th>
+                        <th class="center">Jum.</th>
+                        <th class="center">Sat.</th>
+                        <th class="center">Catatan 1</th>
+                        <th class="center">Catatan 2</th>
+                        <th class="center">Tgl.Dipakai</th>
+                        <th class="center">Plant</th>
+                        <th class="center">Line</th>
+                        <th class="center">Gudang</th>
+                        <th class="center">Departemen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($data->purchaseRequestDetail as $key => $row)
+                    <tr>
+                        <td align="center" rowspan="2">{{ $key+1 }}.</td>
+                        <td>{{ $row->item->code.' - '.$row->item->name }}</td>
+                        <td class="center">{{ $row->qty }}</td>
+                        <td class="center">{{ $row->itemUnit->unit->code }}</td>
+                        <td>{{ $row->note }}</td>
+                        <td>{{ $row->note2 }}</td>
+                        <td class="indigo-text center">{{ date('d/m/y',strtotime($row->required_date)) }}</td>
+                        <td class="center">{{ $row->place->code.' - '.$row->place->company->name }}</td>
+                        <td class="center">{{ $row->line()->exists() ? $row->line->name : '-' }}</td>
+                        <td class="center">{{ $row->warehouse->name }}</td>
+                        <td class="center">{{ $row->department()->exists() ? $row->department->name : '-' }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="10">
+                            <b>Mesin</b> : {{ $row->machine()->exists() ? $row->machine->name : '-' }},
+                            <b>Requester</b> : {{ $row->requester }},
+                            <b>Proyek</b> : {{ $row->project()->exists() ? $row->project->name : '-' }}
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     <!-- invoice subtotal -->
     <div class="divider mt-3 mb-3"></div>
         <div class="invoice-subtotal">

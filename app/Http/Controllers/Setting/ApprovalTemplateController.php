@@ -41,9 +41,12 @@ class ApprovalTemplateController extends Controller
             'code',
             'user_id',
             'name',
+            'nominal_type',
             'is_check_nominal',
+            'is_check_benchmark',
             'sign',
             'nominal',
+            'nominal_final',
         ];
 
         $start  = $request->start;
@@ -72,7 +75,7 @@ class ApprovalTemplateController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = ApprovalStage::where(function($query) use ($search, $request) {
+        $total_filtered = ApprovalTemplate::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search) {
                         $query->where('code', 'like', "%$search%")
@@ -96,9 +99,12 @@ class ApprovalTemplateController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->name,
+                    $val->nominalType(),
                     $val->is_check_nominal ? 'Ya' : 'Tidak',
-                    $val->sign,
-                    number_format($val->nominal,2,',','.'),
+                    $val->is_check_benchmark ? 'Ya' : 'Tidak',
+                    $val->sign.' ('.$val->sign().')',
+                    number_format($val->nominal,2,',','.').($val->nominal_type == '1' ? ' Rupiah' : ' %'),
+                    number_format($val->nominal_final,2,',','.').($val->nominal_type == '1' ? ' Rupiah' : ' %'),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -128,7 +134,8 @@ class ApprovalTemplateController extends Controller
             $validation = Validator::make($request->all(), [
                 'code' 				    => $request->temp ? ['required', Rule::unique('approval_templates', 'code')->ignore($request->temp)] : 'required|unique:approval_templates,code',
                 'name'                  => 'required',
-                'is_check_nominal'      => 'required',
+                /* 'is_check_nominal'      => 'required', */
+                'item_group'            => $request->is_check_benchmark ? 'required' : '',
                 'sign'                  => 'required',
                 'nominal'               => 'required',
                 'arr_user'              => 'required|array',
@@ -138,7 +145,8 @@ class ApprovalTemplateController extends Controller
                 'code.required' 	            => 'Kode tidak boleh kosong.',
                 'code.unique' 	                => 'Kode telah terpakai.',
                 'name.required' 	            => 'Nama tidak boleh kosong.',
-                'is_check_nominal.required'     => 'is Check nominal tidak boleh kosong.',
+                /* 'is_check_nominal.required'     => 'is Check nominal tidak boleh kosong.', */
+                'item_group.required'           => 'Grup item wajib untuk pengecekan harga benchmark.',
                 'sign.required'                 => 'Tanda matematika tidak boleh kosong.',
                 'nominal.required'              => 'Nominal tidak boleh kosong.',
                 'arr_user.required'             => 'Originator tidak boleh kosong.',
@@ -321,6 +329,7 @@ class ApprovalTemplateController extends Controller
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="'.count($data->approvalTemplateOriginator).'">Originator</th>
+                            </tr><tr>
                             ';
 
         foreach($data->approvalTemplateOriginator as $key => $row){                
@@ -343,7 +352,7 @@ class ApprovalTemplateController extends Controller
                 </tr>
             </thead>';
             
-        foreach($data->approvalTemplateStage as $key => $row){
+        foreach($data->approvalTemplateStage()->orderBy('id')->get() as $key => $row){
             $string .= '<tr>
                     <td class="center-align">'.($key + 1).'.</td>
                     <td class="center-align">'.$row->approvalStage->code.'</td>
@@ -364,6 +373,26 @@ class ApprovalTemplateController extends Controller
             $string .= '<tr>
                     <td class="center-align">'.($key + 1).'.</td>
                     <td class="center-align">'.$row->menu->fullName().'</td>
+            </tr>';
+        }
+
+        $string .= '</table><table style="max-width:500px;" class="bordered mt-6">
+        <thead>
+            <tr>
+                <th class="center-align" colspan="2">Grup Item</th>
+            </tr>
+        </thead>';
+
+        if($data->approvalTemplateItemGroup()->exists()){
+            foreach($data->approvalTemplateItemGroup as $key => $row){
+                $string .= '<tr>
+                        <td class="center-align">'.($key + 1).'.</td>
+                        <td>'.$row->itemGroup->name.'</td>
+                </tr>';
+            }
+        }else{
+            $string .= '<tr>
+                    <td class="center-align" colspan="2">Data tidak ditemukan</td>
             </tr>';
         }
 
@@ -389,7 +418,7 @@ class ApprovalTemplateController extends Controller
             ];
         }
 
-        foreach($approval->approvalTemplateStage as $row){
+        foreach($approval->approvalTemplateStage()->orderBy('id')->get() as $row){
             $stages[] = [
                 'approval_stage_id'     => $row->approval_stage_id,
                 'approval_stage_code'   => $row->approvalStage->code.' - '.$row->approvalStage->approval->name,

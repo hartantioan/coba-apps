@@ -136,7 +136,6 @@ class OutStandingAPController extends Controller
             foreach($query_data2 as $row_dp){
                 $total = $row_dp->balancePaymentRequestByDate($request->date);
                 $due_date = $row_dp->due_date ? $row_dp->due_date : date('Y-m-d', strtotime($row_dp->post_date. ' + '.$row_dp->top.' day'));
-                info($total);
                 $data_tempura = [
                     'code' => $row_dp->code,
                     'vendor' => $row_dp->supplier->name,

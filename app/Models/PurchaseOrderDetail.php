@@ -137,6 +137,27 @@ class PurchaseOrderDetail extends Model
         });
     }
 
+    public function priceAfterDiscount(){
+        $total = 0;
+        $rowprice = 0;
+        $po = $this->purchaseOrder;
+        $discount = $po->discount;
+        $subtotal = $po->subtotal;
+
+        $bobot = $this->subtotal / $subtotal;
+        $rowprice = $this->subtotal / $this->qty;
+
+        $total = ($rowprice * $this->qty) - ($bobot * $discount);
+
+        if($this->is_tax == '1' && $this->is_include_tax == '1'){
+            $total = $total / (1 + ($this->percent_tax / 100));
+        }
+
+        $finalprice = $total / $this->qty;
+
+        return round($finalprice,2);
+    }
+
     public function getArrayTotal(){
         $wtax = 0;
         $total = 0;

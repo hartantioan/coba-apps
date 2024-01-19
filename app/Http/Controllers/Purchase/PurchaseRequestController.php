@@ -527,7 +527,6 @@ class PurchaseRequestController extends Controller
 		]);
 
         if($validation->fails()) {
-            info( $validation->errors());
             $response = [
                 'status' => 422,
                 'error'  => $validation->errors()

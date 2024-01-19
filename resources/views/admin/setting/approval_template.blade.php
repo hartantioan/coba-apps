@@ -62,9 +62,12 @@
                                                         <th>Kode</th>
                                                         <th>Pengguna</th>
                                                         <th>Nama</th>
+                                                        <th>Tipe</th>
                                                         <th>Cek Nominal?</th>
+                                                        <th>Cek Benchmark?</th>
                                                         <th>Tanda</th>
-                                                        <th>Nominal</th>
+                                                        <th>Nominal Bawah</th>
+                                                        <th>Nominal Atas</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -336,6 +339,7 @@
                 $('.row_menu').each(function(){
                     $(this).remove();
                 });
+                $('#item_group').val(null).trigger("change");
             }
         });
 
@@ -351,7 +355,27 @@
             $(this).closest('tr').remove();
         });
 
-        $('#is_check_nominal,#is_check_benchmark').click(function(){
+        $('#is_check_nominal').click(function(){
+            if($(this).is(':checked')){
+                $('#sign').attr('disabled',false).formSelect();
+                $('#nominal').attr('disabled',false);
+                $('#nominal_type').attr('disabled',false).formSelect();
+                if($('#is_check_nominal').is(':checked')){
+                    $('#nominal_type').val('1').formSelect();
+                }
+                if($('#is_check_benchmark').is(':checked')){
+                    $('#is_check_benchmark').prop( "checked", false);
+                }
+            }else{
+                $('#sign').val('>').trigger('change').formSelect();
+                $('#final-border').hide();
+                $('#sign').attr('disabled',true).formSelect();
+                $('#nominal').attr('disabled',true);
+                $('#nominal_type').attr('disabled',true).formSelect();
+            }
+        });
+
+        $('#is_check_benchmark').click(function(){
             if($(this).is(':checked')){
                 $('#sign').attr('disabled',false).formSelect();
                 $('#nominal').attr('disabled',false);
@@ -360,7 +384,7 @@
                     $('#nominal_type').val('2').formSelect();
                 }
                 if($('#is_check_nominal').is(':checked')){
-                    $('#nominal_type').val('1').formSelect();
+                    $('#is_check_nominal').prop( "checked", false);
                 }
             }else{
                 $('#sign').val('>').trigger('change').formSelect();
@@ -445,7 +469,7 @@
         $('#last-row-menu').before(`
             <tr class="row_menu">
                 <td>
-                    <select class="browser-default" id="arr_approval_menu` + count + `" name="arr_approval_menu[]" onchange="checkGrandtotal();"></select>
+                    <select class="browser-default" id="arr_approval_menu` + count + `" name="arr_approval_menu[]" onchange="checkGrandtotal();checkBenchmark();"></select>
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-menu" href="javascript:void(0);">
@@ -459,10 +483,18 @@
 
     function checkBenchmark(){
         if($('#is_check_benchmark').is(':checked')){
-            
-        }
-        if($('#is_check_nominal').is(':checked')){
-            $('#is_check_nominal').prop( "checked", false);
+            $('select[name^="arr_approval_menu"]').each(function(){
+                if($(this).val()){
+                    if($(this).select2('data')[0].hasGrandtotal == '0'){
+                        swal({
+                            title: 'Ups!',
+                            text: 'Menu ini tidak memiliki grandtotal.',
+                            icon: 'warning'
+                        });
+                        $(this).empty();
+                    }
+                }
+            });
         }
     }
 
@@ -480,9 +512,6 @@
                     }
                 }
             });
-        }
-        if($('#is_check_benchmark').is(':checked')){
-            $('#is_check_benchmark').prop( "checked", false);
         }
     }
 
@@ -524,9 +553,12 @@
                 { name: 'code', className: 'center-align' },
                 { name: 'user_id', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
+                { name: 'nominal_type', className: 'center-align' },
                 { name: 'is_check_nominal', className: 'center-align' },
+                { name: 'is_check_benchmark', className: 'center-align' },
                 { name: 'sign', className: 'center-align' },
                 { name: 'nominal', className: 'center-align' },
+                { name: 'nominal_final', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ]

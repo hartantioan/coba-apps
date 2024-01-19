@@ -427,16 +427,22 @@
             <table class="bordered Highlight striped">
                 <thead>
                         <tr>
-                            <th class="center-align">No</th>
-                            <th class="center-align">Coa</th>
-                            <th class="center-align">Partner Bisnis</th>
-                            <th class="center-align">Plant</th>
-                            <th class="center-align">Line</th>
-                            <th class="center-align">Mesin</th>
-                            <th class="center-align">Department</th>
-                            <th class="center-align">Gudang</th>
-                            <th class="center-align">Proyek</th>
-                            <th class="center-align">Keterangan</th>
+                            <th class="center-align" rowspan="2">No</th>
+                            <th class="center-align" rowspan="2">Coa</th>
+                            <th class="center-align" rowspan="2">Partner Bisnis</th>
+                            <th class="center-align" rowspan="2">Plant</th>
+                            <th class="center-align" rowspan="2">Line</th>
+                            <th class="center-align" rowspan="2">Mesin</th>
+                            <th class="center-align" rowspan="2">Department</th>
+                            <th class="center-align" rowspan="2">Gudang</th>
+                            <th class="center-align" rowspan="2">Proyek</th>
+                            <th class="center-align" rowspan="2">Keterangan</th>
+                            <th class="center-align" colspan="2">Mata Uang Asli</th>
+                            <th class="center-align" colspan="2">Mata Uang Konversi</th>
+                        </tr>
+                        <tr>
+                            <th class="center-align">Debit</th>
+                            <th class="center-align">Kredit</th>
                             <th class="center-align">Debit</th>
                             <th class="center-align">Kredit</th>
                         </tr>
@@ -1219,7 +1225,7 @@
                         var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
 
-                    // Split the path by slashes and get the last segment
+                    
                     var segments = path.split('/');
                     var lastSegment = segments[segments.length - 1];
                 
@@ -1654,7 +1660,7 @@
         var path = window.location.pathname;
         path = path.replace(/^\/|\/$/g, '');
 
-        // Split the path by slashes and get the last segment
+        
         var segments = path.split('/');
         var lastSegment = segments[segments.length - 1];
         formData.append('tabledata',etNumbers);
@@ -1795,13 +1801,13 @@
                 }else{
                     $('#modal6').modal('open');
                     $('#title_data').append(``+data.title+``);
-                    $('#code_data').append(data.message.code);
+                    $('#code_data').append(data.code);
                     $('#body-journal-table').append(data.tbody);
                     $('#user_jurnal').append(`Pengguna : `+data.user);
-                    $('#note_jurnal').append(`Keterangan : `+data.message.note);
+                    $('#note_jurnal').append(`Keterangan : `+data.note);
                     $('#ref_jurnal').append(`Referensi : `+data.reference);
                     $('#company_jurnal').append(`Perusahaan : `+data.company);
-                    $('#post_date_jurnal').append(`Tanggal : `+data.message.post_date);
+                    $('#post_date_jurnal').append(`Tanggal : `+data.post_date);
                 }
             }
         });

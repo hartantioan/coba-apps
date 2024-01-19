@@ -132,7 +132,7 @@
                         </div>
                         <div class="input-field col s6">
                             <select class="select2 browser-default" id="coa_id" name="coa_id">
-                                <option value="">-- Pilih Coa --</option>
+                                <option value="">-- Kosong --</option>
                                 @foreach($coa as $c)
                                     <option value="{{ $c->id }}">{{ $c->code.' - '.$c->name }}</option>
                                 @endforeach

@@ -559,8 +559,6 @@ class AttendancePresenceReportController extends Controller
                         'max_time_out'=>$max_time_outs,
                         'nama_shift'=>$nama_shifts,
                     ];
-                    info('kont');
-                    info($attendance_detail);
 
                     $parse_date = Carbon::parse($date->format('Y-m-d'))->toDateString();
                 
@@ -924,7 +922,6 @@ class AttendancePresenceReportController extends Controller
             $end_time = microtime(true);
         
             $execution_time = ($end_time - $start_time);
-            info($attendance_detail);
             $response =[
                 'status'=>200,
                 'message'  =>$attendance_detail,

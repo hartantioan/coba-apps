@@ -272,7 +272,8 @@
                                     <th class="center-align">No.</th>
                                     <th class="center-align">PO Inv./PO DP</th>
                                     <th class="center-align">Qty</th>
-                                    <th class="center-align">Keterangan</th>
+                                    <th class="center-align">Keterangan 1</th>
+                                    <th class="center-align">Keterangan 2</th>
                                     <th class="center-align">Total</th>
                                     <th class="center-align">PPN</th>
                                     <th class="center-align">PPh</th>
@@ -286,6 +287,7 @@
                                     <td align="center">{{$row->getCode()}}</td>
                                     <td align="right">{{number_format($row->qty,3,',','.')}}</td>
                                     <td align="center">{{$row->description}}</td>
+                                    <td align="center">{{$row->description2}}</td>
                                     <td align="right">{{number_format($row->total,2,',','.')}}</td>
                                     <td align="right">{{number_format($row->tax,2,',','.')}}</td>
                                     <td align="right">{{number_format($row->wtax,2,',','.')}}</td>

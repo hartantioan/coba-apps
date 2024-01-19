@@ -28,7 +28,7 @@ class EmployeeController extends Controller
     public function index()
     {
         $data = [
-            'title'         => 'Partner Bisnis',
+            'title'         => 'Karyawan',
             'company'       => Company::where('status','1')->get(),
             'place'         => Place::where('status','1')->get(),
             'warehouse'     => Warehouse::where('status','1')->get(),

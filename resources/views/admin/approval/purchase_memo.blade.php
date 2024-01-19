@@ -220,7 +220,10 @@
                         <td class="right-align">{{ number_format($row->grandtotal,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td colspan="7">Keterangan : {{ $row->description }}</td>
+                        <td colspan="7">Keterangan 1 : {{ $row->description }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="7">Keterangan 2 : {{ $row->description2 }}</td>
                     </tr>
                     @endforeach
                     <tr>

@@ -188,15 +188,21 @@
             <table class="bordered">
                 <thead>
                     <tr>
-                        <th class="center">Coa</th>
-                        <th class="center">Perusahaan</th>
-                        <th class="center">Partner Bisnis</th>
-                        <th class="center">Plant</th>
-                        <th class="center">Line</th>
-                        <th class="center">Mesin</th>
-                        <th class="center">Departemen</th>
-                        <th class="center">Proyek</th>
-                        <th class="center">Keterangan</th>
+                        <th class="center" rowspan="2">Coa</th>
+                        <th class="center" rowspan="2">Perusahaan</th>
+                        <th class="center" rowspan="2">Partner Bisnis</th>
+                        <th class="center" rowspan="2">Plant</th>
+                        <th class="center" rowspan="2">Line</th>
+                        <th class="center" rowspan="2">Mesin</th>
+                        <th class="center" rowspan="2">Departemen</th>
+                        <th class="center" rowspan="2">Proyek</th>
+                        <th class="center" rowspan="2">Keterangan</th>
+                        <th class="center" colspan="2">Nominal Asli</th>
+                        <th class="center" colspan="2">Nominal Konversi</th>
+                    </tr>
+                    <tr>
+                        <th class="center">Debit</th>
+                        <th class="center">Kredit</th>
                         <th class="center">Debit</th>
                         <th class="center">Kredit</th>
                     </tr>
@@ -218,8 +224,10 @@
                             <td class="center-align">{{ $row->department_id ? $row->department->name : '-' }}</td>
                             <td class="center-align">{{ $row->project_id ? $row->project->name : '-' }}</td>
                             <td class="center-align">{{ $row->note ? $row->note : '' }}</td>
-                            <td class="right-align">{{ $row->type == '1' ? number_format($row->nominal,3,',','.') : '' }}</td>
-                            <td class="right-align">{{ $row->type == '2' ? number_format($row->nominal,3,',','.') : '' }}</td>
+                            <td class="right-align">{{ $row->type == '1' ? number_format($row->nominal_fc,2,',','.') : '' }}</td>
+                            <td class="right-align">{{ $row->type == '2' ? number_format($row->nominal_fc,2,',','.') : '' }}</td>
+                            <td class="right-align">{{ $row->type == '1' ? number_format($row->nominal,2,',','.') : '' }}</td>
+                            <td class="right-align">{{ $row->type == '2' ? number_format($row->nominal,2,',','.') : '' }}</td>
                         </tr>
                     @endforeach
                 </tbody>

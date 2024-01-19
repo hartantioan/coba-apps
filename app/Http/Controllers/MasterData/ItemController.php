@@ -311,6 +311,7 @@ class ItemController extends Controller
                                 'conversion'    => str_replace(',','.',str_replace('.','',$request->arr_conversion[$key])),
                                 'is_sell_unit'  => $request->arr_sell_unit[$key] ? $request->arr_sell_unit[$key] : NULL,
                                 'is_buy_unit'   => $request->arr_buy_unit[$key] ? $request->arr_buy_unit[$key] : NULL,
+                                'is_default'    => $request->arr_default[$key] ? $request->arr_default[$key] : NULL,
                             ]);
                         }else{
                             $itemUnit = ItemUnit::where('item_id',$query->id)->where('unit_id',intval($row))->first();
@@ -319,6 +320,7 @@ class ItemController extends Controller
                                     'conversion'    => str_replace(',','.',str_replace('.','',$request->arr_conversion[$key])),
                                     'is_sell_unit'  => $request->arr_sell_unit[$key] ? $request->arr_sell_unit[$key] : NULL,
                                     'is_buy_unit'   => $request->arr_buy_unit[$key] ? $request->arr_buy_unit[$key] : NULL,
+                                    'is_default'    => $request->arr_default[$key] ? $request->arr_default[$key] : NULL,
                                 ]);
                             }
                         }
@@ -415,6 +417,7 @@ class ItemController extends Controller
             $units .= '<td class="center-align">'.$data->uomUnit->name.'</td>';
             $units .= '<td>'.($row->is_sell_unit ? 'Ya' : 'Tidak').'</td>';
             $units .= '<td>'.($row->is_buy_unit ? 'Ya' : 'Tidak').'</td>';
+            $units .= '<td class="center-align">'.($row->is_default ? '<span style="color:green;">&#10004;</span>' : '<span style="color:red;">&#10008;</span>').'</td>';
             $units .= '</tr>';
         }
 
@@ -433,6 +436,7 @@ class ItemController extends Controller
                                             <th>Stock</th>
                                             <th>Jual</th>
                                             <th>Beli</th>
+                                            <th>Default</th>
                                         </tr>
                                         '.$units.'
                                     </table>
@@ -549,6 +553,7 @@ class ItemController extends Controller
                 'conversion'    => number_format($row->conversion,2,',','.'),
                 'is_sell_unit'  => $row->is_sell_unit ? $row->is_sell_unit : '',
                 'is_buy_unit'   => $row->is_buy_unit ? $row->is_buy_unit : '',
+                'is_default'    => $row->is_default ? $row->is_default : '', 
             ];
         }
         $item['units'] = $units;

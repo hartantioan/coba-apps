@@ -203,9 +203,9 @@
             <thead>
                 <tr>
                     <th class="center">Dari</th>
-                    <th class="center">{{ $data->inventoryTransferOut->placeFrom->name.' - '.$data->inventoryTransferOut->warehouseFrom->name }}</th>
+                    <th class="center">{{ $data->inventoryTransferOut->placeFrom->code.' - '.$data->inventoryTransferOut->warehouseFrom->name }}</th>
                     <th class="center">Tujuan</th>
-                    <th class="center">{{ $data->inventoryTransferOut->placeTo->name.' - '.$data->inventoryTransferOut->warehouseTo->name }}</th>
+                    <th class="center">{{ $data->inventoryTransferOut->placeTo->code.' - '.$data->inventoryTransferOut->warehouseTo->name }}</th>
                 </tr>
             </thead>
         </table>
@@ -227,6 +227,9 @@
                     <td class="center-align">{{ $row->item->uomUnit->code }}</td>
                     <td>{{ $row->note }}</td>
                     <td>{{ $row->area()->exists() ? $row->area->name : '' }}</td>
+                </tr>
+                <tr>
+                    <td colspan="5">Serial : {{ $row->listSerialIn() }}</td>
                 </tr>
                 @endforeach
             </tbody>

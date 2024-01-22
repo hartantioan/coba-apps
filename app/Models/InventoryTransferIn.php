@@ -167,4 +167,30 @@ class InventoryTransferIn extends Model
     public function journal(){
         return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
     }
+
+    public function listSerial(){
+        $arr = [];
+        foreach($this->itemSerial as $row){
+            $arr[] = $row->serial_number;
+        }
+
+        return implode(', ',$arr);
+    }
+
+    public function arrSerial(){
+        $arr = [];
+        
+        foreach($this->itemSerial as $row){
+            $arr[] = [
+                'serial_id'     => $row->id,
+                'serial_number' => $row->serial_number,
+            ];
+        }
+
+        return $arr;
+    }
+
+    public function itemSerial(){
+        return $this->hasMany('App\Models\ItemSerial','lookable_id','id')->where('lookable_type',$this->table);
+    }
 }

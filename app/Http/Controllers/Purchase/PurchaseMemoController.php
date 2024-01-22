@@ -40,6 +40,7 @@ use App\Helpers\CustomHelper;
 use App\Models\User;
 use App\Models\PurchaseMemoDetail;
 use App\Exports\ExportPurchaseMemo;
+use App\Models\PurchaseInvoiceDetail;
 
 class PurchaseMemoController extends Controller
 {
@@ -407,12 +408,35 @@ class PurchaseMemoController extends Controller
             $rounding = str_replace(',','.',str_replace('.','',$request->rounding));
 
             $passed = true;
+            $passedQtyReturn = true;
+            $arrErrorQtyReturn = [];
 
             foreach($request->arr_total as $key => $row){
                 $total += str_replace(',','.',str_replace('.','',$row));
                 $tax += str_replace(',','.',str_replace('.','',$request->arr_tax[$key]));
                 $wtax += str_replace(',','.',str_replace('.','',$request->arr_wtax[$key]));
                 $grandtotal += str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key]));
+                
+                if($request->arr_type[$key] == 'purchase_invoice_details'){
+                    $pid = PurchaseInvoiceDetail::find(intval($request->arr_code[$key]));
+                    if($pid){
+                        if($pid->lookable_type == 'good_receipt_details'){
+                            $stock = $pid->lookable->item->getStockPlaceWarehouse($pid->lookable->place_id,$pid->lookable->warehouse_id);
+                            $qtyReturn = str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) * $pid->lookable->qty_conversion;
+                            if($qtyReturn > $stock){
+                                $passedQtyReturn = false;
+                                $arrErrorQtyReturn[] = $pid->lookable->item->name;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if(!$passedQtyReturn){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Stok item tidak ada pada gudang. Daftarnya adalah sbb : '.implode(', ',$arrErrorQtyReturn),
+                ]);
             }
 
             $grandtotal += $rounding;

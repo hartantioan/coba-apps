@@ -1069,6 +1069,9 @@
                                 <td class="center">
                                     <span id="arr_unit` + count + `">` + val.unit + `</span>
                                 </td>
+                                <td>
+                                    <input name="arr_serial_number[]" class="materialize-textarea" type="text" placeholder="Pisahkan koma jika > 1" value="` + val.list_serial + `">
+                                </td>
                                 <td class="center">
                                     <input name="arr_price[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowPrice`+ count +`">
                                     <datalist id="tempPrice` + count + `"></datalist>

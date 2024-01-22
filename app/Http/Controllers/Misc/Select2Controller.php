@@ -1972,6 +1972,7 @@ class Select2Controller extends Controller {
                 'stock_list'        => $d->currentStockPlaceWarehouse($place,$warehouse),
                 'list_warehouse'    => $d->warehouseList(),
                 'is_sales_item'     => $d->is_sales_item ? $d->is_sales_item : '',
+                'is_activa'         => $d->itemGroup->is_activa ? $d->itemGroup->is_activa : '',
             ];
         }
 
@@ -2043,12 +2044,13 @@ class Select2Controller extends Controller {
 
                 foreach($d->inventoryTransferOutDetail as $row){
                     $details[] = [
-                        'name'      => $row->item->code.' - '.$row->item->name,
-                        'origin'    => $row->itemStock->place->name.' - '.$row->itemStock->warehouse->name.' - '.($row->itemStock->area()->exists() ? $row->itemStock->area->name : '').' - Shading : '.($row->itemStock->itemShading()->exists() ? $row->itemStock->itemShading->code : '-'),
-                        'qty'       => number_format($row->qty,3,',','.'),
-                        'unit'      => $row->item->uomUnit->code,
-                        'note'      => $row->note ? $row->note : '',
-                        'area'      => $row->area()->exists() ? $row->area->name : '-',
+                        'name'          => $row->item->code.' - '.$row->item->name,
+                        'origin'        => $row->itemStock->place->code.' - '.$row->itemStock->warehouse->name.' - '.($row->itemStock->area()->exists() ? $row->itemStock->area->name : '').' - Shading : '.($row->itemStock->itemShading()->exists() ? $row->itemStock->itemShading->code : '-'),
+                        'qty'           => number_format($row->qty,3,',','.'),
+                        'unit'          => $row->item->uomUnit->code,
+                        'note'          => $row->note ? $row->note : '',
+                        'area'          => $row->area()->exists() ? $row->area->name : '-',
+                        'list_serial'   => $row->listSerial(),
                     ];
                 }
     

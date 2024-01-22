@@ -30,6 +30,7 @@ class JournalDetail extends Model
         'nominal',
         'nominal_fc',
         'note',
+        'note2',
     ];
 
     public function journal(){

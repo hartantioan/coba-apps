@@ -625,7 +625,7 @@ class CustomHelper {
 				'lookable_type'	=> 'good_receipts',
 				'lookable_id'	=> $gr->id,
 				'post_date'		=> $data->post_date,
-				'note'			=> $data->code,
+				'note'			=> $data->code.' - '.$gr->account->name,
 				'status'		=> '3'
 			]);
 
@@ -654,6 +654,7 @@ class CustomHelper {
 					'type'			=> '1',
 					'nominal'		=> $rowtotal,
 					'nominal_fc'	=> $rowdetail->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? 0 : $rowdetail->getRowTotal(),
+					'note'			=> $gr->delivery_no,
 				]);
 
 				if($coa_credit){
@@ -1115,8 +1116,8 @@ class CustomHelper {
 
 			foreach($op->paymentRequest->paymentRequestDetail as $row){
 
-				if(self::checkArrayRaw($arrNote,$row->lookable->code) < 0){
-					$arrNote[] = $row->lookable->code;
+				if(self::checkArrayRaw($arrNote,$row->note) < 0){
+					$arrNote[] = $row->note;
 				}
 
 				$mustpay = 0;
@@ -1459,7 +1460,7 @@ class CustomHelper {
 				'lookable_type'	=> 'good_returns',
 				'lookable_id'	=> $gr->id,
 				'post_date'		=> $gr->post_date,
-				'note'			=> $gr->code,
+				'note'			=> $gr->code.' - '.$gr->account->name,
 				'status'		=> '3'
 			]);
 
@@ -1552,20 +1553,47 @@ class CustomHelper {
 
 			foreach($gr->goodIssueDetail as $row){
 
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $row->coa_id,
-					'place_id'		=> $row->itemStock->place_id,
-					'item_id'		=> $row->itemStock->item_id,
-					'warehouse_id'	=> $row->itemStock->warehouse_id,
-					'line_id'		=> $row->line_id ? $row->line_id : NULL,
-					'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
-					'department_id'	=> $row->department_id ? $row->department_id : NULL,
-					'project_id'	=> $row->project_id ? $row->project_id : NULL,
-					'type'			=> '1',
-					'nominal'		=> $row->total,
-					'nominal_fc'	=> 0,
-				]);
+				if($row->cost_distribution_id){
+					$total = $row->total;
+					$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
+					$accumulation = 0;
+					foreach($row->costDistribution->costDistributionDetail as $key => $rowcost){
+						if($key == $lastIndex){
+							$nominal = $total - $accumulation;
+						}else{
+							$nominal = round(($rowcost->percentage / 100) * $total);
+							$accumulation += $nominal;
+						}
+						JournalDetail::create([
+							'journal_id'                    => $query->id,
+							'cost_distribution_detail_id'   => $rowcost->id,
+							'coa_id'                        => $row->coa_id,
+							'place_id'                      => $rowcost->place_id ? $rowcost->place_id : NULL,
+							'line_id'                       => $rowcost->line_id ? $rowcost->line_id : NULL,
+							'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : NULL,
+							'department_id'                 => $rowcost->department_id ? $rowcost->department_id : NULL,
+							'warehouse_id'                  => $rowcost->warehouse_id ? $rowcost->warehouse_id : NULL,
+							'project_id'					=> $row->project_id ? $row->project_id : NULL,
+							'type'                          => '1',
+							'nominal'						=> $nominal,
+							'nominal_fc'					=> 0,
+						]);
+					}
+				}else{
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->coa_id,
+						'place_id'		=> $row->place()->exists() ? $row->place_id : NULL,
+						'item_id'		=> $row->itemStock->item_id,
+						'line_id'		=> $row->line_id ? $row->line_id : NULL,
+						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+						'department_id'	=> $row->department_id ? $row->department_id : NULL,
+						'project_id'	=> $row->project_id ? $row->project_id : NULL,
+						'type'			=> '1',
+						'nominal'		=> $row->total,
+						'nominal_fc'	=> 0,
+					]);
+				}
 
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
@@ -1642,9 +1670,8 @@ class CustomHelper {
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $row->goodIssueDetail->coa_id,
-					'place_id'		=> $row->goodIssueDetail->itemStock->place_id,
+					'place_id'		=> $row->goodIssueDetail->place()->exists() ? $row->goodIssueDetail->place_id : NULL,
 					'item_id'		=> $row->goodIssueDetail->itemStock->item_id,
-					'warehouse_id'	=> $row->goodIssueDetail->itemStock->warehouse_id,
 					'line_id'		=> $row->goodIssueDetail->line_id ? $row->goodIssueDetail->line_id : NULL,
 					'machine_id'	=> $row->goodIssueDetail->machine_id ? $row->goodIssueDetail->machine_id : NULL,
 					'department_id'	=> $row->goodIssueDetail->department_id ? $row->goodIssueDetail->department_id : NULL,
@@ -1693,7 +1720,7 @@ class CustomHelper {
 					'lookable_type'	=> 'landed_costs',
 					'lookable_id'	=> $lc->id,
 					'post_date'		=> $data->post_date,
-					'note'			=> $data->code,
+					'note'			=> 'LANDED COST - '.$data->code,
 					'status'		=> '3'
 				]);
 
@@ -1952,7 +1979,7 @@ class CustomHelper {
 					'lookable_type'	=> $table_name,
 					'lookable_id'	=> $table_id,
 					'post_date'		=> $data->post_date,
-					'note'			=> $data->code,
+					'note'			=> 'TRANSFER OUT - '.$data->code,
 					'status'		=> '3'
 				]);
 	
@@ -2037,7 +2064,7 @@ class CustomHelper {
 					'lookable_type'	=> $table_name,
 					'lookable_id'	=> $table_id,
 					'post_date'		=> $data->post_date,
-					'note'			=> $data->code,
+					'note'			=> 'TRANSFER IN - '.$data->code,
 					'status'		=> '3'
 				]);
 	
@@ -2191,6 +2218,8 @@ class CustomHelper {
 							'type'			=> '1',
 							'nominal'		=> $wtax,
 							'nominal_fc'	=> $type == '1' || $type == '' ? 0 : $row->wtax,
+							'note'			=> $pm->return_tax_no,
+							'note2'			=> date('d/m/y',strtotime($pm->return_date))
 						]);
 					}
 					
@@ -2303,6 +2332,8 @@ class CustomHelper {
 							'type'			=> '2',
 							'nominal'		=> $tax,
 							'nominal_fc'	=> $type == '1' || $type == '' ? 0 : $row->tax,
+							'note'			=> $pm->return_tax_no,
+							'note2'			=> date('d/m/y',strtotime($pm->return_date))
 						]);
 					}
 				}
@@ -2321,6 +2352,8 @@ class CustomHelper {
 							'type'			=> '1',
 							'nominal'		=> $row->wtax * $row->lookable->currency_rate,
 							'nominal_fc'	=> $row->lookable->currency->type == '1' ? 0 : $row->wtax,
+							'note'			=> $pm->return_tax_no,
+							'note2'			=> date('d/m/y',strtotime($pm->return_date))
 						]);
 					}
 					
@@ -2354,6 +2387,8 @@ class CustomHelper {
 							'type'			=> '2',
 							'nominal'		=> $row->tax * $row->lookable->currency_rate,
 							'nominal_fc'	=> $row->lookable->currency->type == '1' ? 0 : $row->tax,
+							'note'			=> $pm->return_tax_no,
+							'note2'			=> date('d/m/y',strtotime($pm->return_date))
 						]);
 					}
 				}
@@ -2747,7 +2782,8 @@ class CustomHelper {
 							'type'			=> '1',
 							'nominal'		=> $row->tax,
 							'nominal_fc'	=> 0,
-							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date)).' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
+							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
+							'note2'			=> 'Tgl. FP/BP '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date))
 						]);
 					}
 	
@@ -2765,7 +2801,8 @@ class CustomHelper {
 							'type'			=> '2',
 							'nominal'		=> $row->wtax,
 							'nominal_fc'	=> 0,
-							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date)).' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
+							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
+							'note2'			=> 'Tgl. FP/BP '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date))
 						]);
 					}
 	
@@ -2823,7 +2860,8 @@ class CustomHelper {
 							'type'			=> '1',
 							'nominal'		=> $row->tax * $pod->purchaseOrder->currency_rate,
 							'nominal_fc'	=> $pod->purchaseOrder->currency->type == '1' ? 0 : $row->tax,
-							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date)).' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
+							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
+							'note2'			=> 'Tgl. FP/BP '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date))
 						]);
 					}
 	
@@ -2841,7 +2879,8 @@ class CustomHelper {
 							'type'			=> '2',
 							'nominal'		=> $row->wtax * $pod->purchaseOrder->currency_rate,
 							'nominal_fc'	=> $pod->purchaseOrder->currency->type == '1' ? 0 : $row->wtax,
-							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date)).' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
+							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
+							'note2'			=> 'Tgl. FP/BP '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date))
 						]);
 					}
 	
@@ -2889,7 +2928,8 @@ class CustomHelper {
 							'type'			=> '1',
 							'nominal'		=> $row->tax * $row->lookable->landedCost->currency_rate,
 							'nominal_fc'	=> $row->lookable->landedCost->currency->type == '1' ? 0 : $row->tax,
-							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date)).' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
+							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
+							'note2'			=> 'Tgl. FP/BP '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date))
 						]);
 					}
 	
@@ -2901,7 +2941,8 @@ class CustomHelper {
 							'type'			=> '2',
 							'nominal'		=> $row->wtax * $row->lookable->landedCost->currency_rate,
 							'nominal_fc'	=> $row->lookable->landedCost->currency->type == '1' ? 0 : $row->wtax,
-							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date)).' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
+							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
+							'note2'			=> 'Tgl. FP/BP '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date))
 						]);
 					}
 	
@@ -2953,7 +2994,8 @@ class CustomHelper {
 							'type'			=> '1',
 							'nominal'		=> $row->tax * $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate,
 							'nominal_fc'	=> $row->lookable->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? 0 : $row->tax,
-							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date)).' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
+							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
+							'note2'			=> 'Tgl. FP/BP '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date))
 						]);
 					}
 	
@@ -2971,7 +3013,8 @@ class CustomHelper {
 							'type'			=> '2',
 							'nominal'		=> $row->wtax * $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate,
 							'nominal_fc'	=> $row->lookable->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? 0 : $row->wtax,
-							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date)).' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
+							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
+							'note2'			=> 'Tgl. FP/BP '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date))
 						]);
 					}
 	

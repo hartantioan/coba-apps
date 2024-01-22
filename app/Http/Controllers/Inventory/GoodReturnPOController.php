@@ -624,7 +624,7 @@ class GoodReturnPOController extends Controller
                 'unit'                      => $row->itemUnit->unit->code,
                 'note'                      => $row->note ? $row->note : '',
                 'note2'                     => $row->note2 ? $row->note2 : '',
-                'place_name'                => $row->goodReceiptDetail->place->name.' - '.$row->goodReceiptDetail->place->company->name,
+                'place_name'                => $row->goodReceiptDetail->place->code,
                 'line_name'                 => $row->goodReceiptDetail->line_id ? $row->goodReceiptDetail->line->name : '-',
                 'machine_name'              => $row->goodReceiptDetail->machine_id ? $row->goodReceiptDetail->machine->name : '-',
                 'department_name'           => $row->goodReceiptDetail->department_id ? $row->goodReceiptDetail->department->name : '-',

@@ -443,10 +443,10 @@
                                     <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                     <label class="active" for="note">Keterangan</label>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m2 s12">
                                     
                                 </div>
-                                <div class="input-field col m5 s12 step22">
+                                <div class="input-field col m6 s12 step22">
                                     <table width="100%" class="bordered">
                                         <thead>
                                             <tr>

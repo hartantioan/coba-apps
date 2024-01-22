@@ -245,6 +245,7 @@
                                                     <th class="center">Ambil Dari (Stok saat ini)</th>
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan Stock</th>
+                                                    <th class="center" width="300px">No.Serial</th>
                                                     <th class="center">Keterangan</th>
                                                     <th class="center">Area Tujuan</th>
                                                     <th class="center">Hapus</th>
@@ -252,7 +253,7 @@
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
-                                                    <td colspan="7" class="center">
+                                                    <td colspan="8" class="center">
                                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> Tambah Item
                                                         </a>
@@ -644,6 +645,7 @@
     function getRowUnit(val){
         $("#arr_warehouse" + val).empty();
         $('#area' + val).empty();
+        $('#serial' + val).empty();
         if($("#arr_itemkuy" + val).val()){
             if($("#arr_itemkuy" + val).select2('data')[0].stock_list.length){
                 $('#arr_item_stock' + val).empty();
@@ -670,12 +672,47 @@
             }else{
                 $('#area' + val).append(` - `);
             }
+
+            if($("#arr_itemkuy" + val).select2('data')[0].is_activa){
+                $('#serial' + val).append(`
+                    <select class="browser-default" id="arr_serial` + val + `" name="arr_serial[]" multiple="multiple"></select>
+                `);
+
+                $('#arr_serial' + val).select2({
+                    placeholder: '-- Kosong --',
+                    minimumInputLength: 1,
+                    allowClear: true,
+                    cache: true,
+                    width: 'resolve',
+                    maximumSelectionLength: parseInt($('#rowQty' + val).val().replaceAll(".", "").replaceAll(",",".")),
+                    dropdownParent: $('body').parent(),
+                    ajax: {
+                        url: '{{ url("admin/select2/item_serial") }}',
+                        type: 'GET',
+                        dataType: 'JSON',
+                        data: function(params) {
+                            return {
+                                search: params.term,
+                                item_id: $("#arr_itemkuy" + val).val(),
+                            };
+                        },
+                        processResults: function(data) {
+                            return {
+                                results: data.items
+                            }
+                        }
+                    }
+                });
+            }else{
+                $('#serial' + val).append(` - `);
+            }
         }else{
             $("#arr_itemkuy" + val).empty();
             $('#arr_item_stock' + val).empty().append(`
                 <option value="">--Silahkan pilih item--</option>
             `);
             $('#area' + val).append(` - `);
+            $('#serial' + val).append(` - `);
         }
     }
 
@@ -693,6 +730,32 @@
             }); */
             $('#rowQty' + val).val(formatRupiahIni(qtystock.toFixed(2).toString().replace('.',',')));
         }
+
+        $('#arr_serial' + val).select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            maximumSelectionLength: parseInt($('#rowQty' + val).val().replaceAll(".", "").replaceAll(",",".")),
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/item_serial") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        item_id: $("#arr_itemkuy" + val).val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
     }
 
     function resetWarehouseTo(){
@@ -731,6 +794,9 @@
                 </td>
                 <td class="center">
                     <span id="arr_unit` + count + `">-</span>
+                </td>
+                <td class="center" id="serial` + count + `">
+                    -
                 </td>
                 <td>
                     <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ...">
@@ -902,7 +968,7 @@
         }).then(function (willDelete) {
             if (willDelete) {
 
-                /* var place_from = $('#place_from').val(), warehouse_from = $('#warehouse_from').val(), place_to = $('#place_to').val(), warehouse_to = $('#warehouse_to').val();
+                var place_from = $('#place_from').val(), warehouse_from = $('#warehouse_from').val(), place_to = $('#place_to').val(), warehouse_to = $('#warehouse_to').val();
 
                 if(place_from == place_to && warehouse_from == warehouse_to){
                     swal({
@@ -910,7 +976,7 @@
                         text: 'Plant Asal dan Tujuan, dan Gudang Asal dan Tujuan tidak boleh sama.',
                         icon: 'warning'
                     });
-                }else{ */
+                }else{
 
                     var formData = new FormData($('#form_data')[0]);
 
@@ -919,8 +985,9 @@
                     formData.delete("arr_qty[]");
                     formData.delete("arr_note[]");
                     formData.delete("arr_area[]");
+                    formData.delete('arr_serial[]');
 
-                    $('select[name^="arr_itemkuy"]').each(function(index){
+                    $('select[name^="arr_itemkuy[]"]').each(function(index){
                         if($(this).val()){
                             let code = $(this).data('code');
                             formData.append('arr_item[]',$(this).val());
@@ -930,6 +997,20 @@
                             formData.append('arr_area[]',($('#arr_area' + code).length > 0 ? ($('#arr_area' + code).val() ? $('#arr_area' + code).val() : '' ) : ''));
                         }
                     });
+
+                    $('select[name^="arr_itemkuy[]"]').each(function(index){
+                        if($('#arr_serial' + $(this).data('code')).length > 0){
+                            let arr = $('#arr_serial' + $(this).data('code')).val();
+                            if(arr.length > 0){
+                                formData.append('arr_serial[]',$('#arr_serial' + $(this).data('code')).val());
+                            }else{
+                                passedSerial = false;
+                            }
+                        }else{
+                            formData.append('arr_serial[]','');
+                        }
+                    });
+
                     var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
 
@@ -1002,7 +1083,7 @@
                             });
                         }
                     });
-                /* } */
+                }
             }
         });
     }
@@ -1062,6 +1143,9 @@
                             </td>
                             <td class="center">
                                 <span id="arr_unit` + count + `">` + val.unit + `</span>
+                            </td>
+                            <td class="center" id="serial` + count + `">
+                                -
                             </td>
                             <td>
                                 <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
@@ -1123,6 +1207,45 @@
                                 <option value="` + val.area_id + `">` + val.area_name + `</option>
                             `);
                             select2ServerSide('#arr_area' + count, '{{ url("admin/select2/area") }}');
+                        }
+
+                        if(val.is_activa){
+                            $('#serial' + count).empty();
+                            $('#serial' + count).append(`
+                                <select class="select2 browser-default" id="arr_serial` + count + `" name="arr_serial[]" multiple="multiple"></select>
+                            `);
+
+                            $.each(val.list_serial, function(i, value) {
+                                $('#arr_serial' + count).append(`
+                                    <option value="` + value.serial_id + `" selected>` + value.serial_number + `</value>
+                                `);
+                            });
+
+                            $('#arr_serial' + count).select2({
+                                placeholder: '-- Kosong --',
+                                minimumInputLength: 1,
+                                allowClear: true,
+                                cache: true,
+                                width: 'resolve',
+                                dropdownParent: $('body').parent(),
+                                maximumSelectionLength: parseInt(val.qty.toString().replaceAll(".", "").replaceAll(",",".")),
+                                ajax: {
+                                    url: '{{ url("admin/select2/item_serial") }}',
+                                    type: 'GET',
+                                    dataType: 'JSON',
+                                    data: function(params) {
+                                        return {
+                                            search: params.term,
+                                            item_id: $("#arr_itemkuy" + count).val(),
+                                        };
+                                    },
+                                    processResults: function(data) {
+                                        return {
+                                            results: data.items
+                                        }
+                                    }
+                                }
+                            });
                         }
                     });
                 }

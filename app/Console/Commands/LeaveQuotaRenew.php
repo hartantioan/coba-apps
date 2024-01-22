@@ -8,6 +8,7 @@ use App\Models\User;
 use DB;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB as FacadesDB;
 
 class LeaveQuotaRenew extends Command
 {
@@ -34,7 +35,7 @@ class LeaveQuotaRenew extends Command
         $year_later = Carbon::now()->addYear();
         $todayWithoutYear = $today->format('m-d');
 
-        $oldestTransfers = EmployeeTransfer::select('account_id', DB::raw('MIN(post_date) as post_date'))
+        $oldestTransfers = EmployeeTransfer::select('account_id', FacadesDB::raw('MIN(post_date) as post_date'))
             ->groupBy('account_id')
             ->get();
         //mengambil transfer dengan postdate terlama per user

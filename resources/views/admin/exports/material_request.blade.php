@@ -65,7 +65,7 @@
                     <td>{{ ($rowdetail->department()->exists() ? $rowdetail->department->name : '-') }}</td>
                     <td>{{ ($rowdetail->project()->exists() ? $rowdetail->project->name : '-') }}</td>
                     <td>{{ $rowdetail->requester }}</td>
-                    <td style="font-size:20px !important;">{!! $rowdetail->status() !!}</td>
+                    <td style="font-size:20px !important;">{!! $rowdetail->statusConvert() !!}</td>
                 </tr>
                 @php
                     $no++;

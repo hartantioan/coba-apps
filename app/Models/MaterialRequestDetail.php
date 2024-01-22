@@ -123,4 +123,14 @@ class MaterialRequestDetail extends Model
   
         return $status;
     }
+
+    public function statusConvert(){
+        $status = match ($this->status) {
+            '1' => 'Disetujui',
+            '2' => 'Ditolak',
+            default => 'Menunggu',
+        };
+  
+        return $status;
+    }
 }

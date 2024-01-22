@@ -785,31 +785,31 @@
                         @endforeach
                     </select>
                 </td>
-                <td>
+                <td class="unit-inputs">
                     <div class="input-field">
                         <input name="arr_conversion[]" onfocus="emptyThis(this);" type="text" value="0" onkeyup="formatRupiahNoMinus(this)">
                         <div class="form-control-feedback stock-unit">` + unit + `</div>
                     </div>
                 </td>
-                <td class="center-align">
+                <td class="center-align unit-inputs">
                     <label>
                         <input type="checkbox" id="arr_sell_unit` + count + `" name="arr_sell_unit[]" value="1">
                         <span>Pilih</span>
                     </label>
                 </td>
-                <td class="center-align">
+                <td class="center-align unit-inputs">
                     <label>
                         <input type="checkbox" id="arr_buy_unit` + count + `" name="arr_buy_unit[]" value="1">
                         <span>Pilih</span>
                     </label>
                 </td>
-                <td class="center-align">
+                <td class="center-align unit-inputs">
                     <label>
                         <input type="radio" id="arr_default` + count + `" name="arr_default" value="1">
                         <span>Pilih</span>
                     </label>
                 </td>
-                <td class="center-align">
+                <td class="center-align unit-inputs">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-unit" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
                     </a>
@@ -1409,31 +1409,31 @@
                                         @endforeach
                                     </select>
                                 </td>
-                                <td>
+                                <td class="unit-inputs">
                                     <div class="input-field">
                                         <input name="arr_conversion[]" onfocus="emptyThis(this);" type="text" value="` + val.conversion + `" onkeyup="formatRupiahNoMinus(this)">
                                         <div class="form-control-feedback stock-unit">` + unit + `</div>
                                     </div>
                                 </td>
-                                <td class="center-align">
+                                <td class="center-align unit-inputs">
                                     <label>
                                         <input type="checkbox" id="arr_sell_unit` + count + `" name="arr_sell_unit[]" value="1" ` + (val.is_sell_unit ? 'checked' : '' ) + `>
                                         <span>Pilih</span>
                                     </label>
                                 </td>
-                                <td class="center-align">
+                                <td class="center-align unit-inputs">
                                     <label>
                                         <input type="checkbox" id="arr_buy_unit` + count + `" name="arr_buy_unit[]" value="1" ` + (val.is_buy_unit ? 'checked' : '' ) + `>
                                         <span>Pilih</span>
                                     </label>
                                 </td>
-                                <td class="center-align">
+                                <td class="center-align unit-inputs">
                                     <label>
                                         <input type="radio" id="arr_default` + count + `" name="arr_default" value="1" ` + (val.is_default ? 'checked' : '' ) + `>
                                         <span>Pilih</span>
                                     </label>
                                 </td>
-                                <td class="center-align">
+                                <td class="center-align unit-inputs">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-unit" href="javascript:void(0);">
                                         <i class="material-icons">delete</i>
                                     </a>

@@ -84,10 +84,10 @@
                                                         <th class="center-align">No Invoice</th>
                                                         <th class="center-align">Supplier/Vendor</th>
                                                         <th class="center-align">No Referensi</th>
-                                                        <th class="center-align">TGL Post</th>
-                                                        <th class="center-align">TGL Terima</th>
+                                                        <th class="center-align">Tgl.Post</th>
+                                                        <th class="center-align">Tgl.Terima</th>
                                                         <th class="center-align">TOP(Hari)</th>
-                                                        <th class="center-align">TGL Tenggat</th>
+                                                        <th class="center-align">Tgl.Jatuh Tempo</th>
                                                         <th class="center-align">Nama Item</th>
                                                         <th class="center-align">Note 1</th>
                                                         <th class="center-align">Note 2</th>

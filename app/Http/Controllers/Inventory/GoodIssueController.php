@@ -376,12 +376,10 @@ class GoodIssueController extends Controller
                         $query->save();
 
                         foreach($query->goodIssueDetail as $row){
-                            foreach($row->itemSerial as $rowdetail){
-                                $rowdetail->update([
-                                    'usable_id'  => NULL,
-                                    'usable_type'=> NULL,
-                                ]);
-                            }
+                            $row->itemSerial()->update([
+                                'usable_id'     => NULL,
+                                'usable_type'   => NULL,
+                            ]);
                             $row->delete();
                         }
                     }else{
@@ -396,7 +394,7 @@ class GoodIssueController extends Controller
                     $newCode=GoodIssue::generateCode($menu->document_code.date('y').$request->code_place_id);
                    
                     $query = GoodIssue::create([
-                        'code'			        => $request->code,
+                        'code'			        => $newCode,
                         'user_id'		        => session('bo_id'),
                         'company_id'		    => $request->company_id,
                         'post_date'             => $request->post_date,
@@ -425,7 +423,8 @@ class GoodIssueController extends Controller
                             'coa_id'                => $inventory_coa->coa_id,
                             'lookable_type'         => $request->arr_lookable_type[$key] ? $request->arr_lookable_type[$key] : NULL,
                             'lookable_id'           => $request->arr_lookable_id[$key] ? $request->arr_lookable_id[$key] : NULL,
-                            'place_id'              => $item_stock->place_id,
+                            'cost_distribution_id'  => $request->arr_cost_distribution[$key] ? $request->arr_cost_distribution[$key] : NULL,
+                            'place_id'              => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
                             'warehouse_id'          => $item_stock->warehouse_id,
                             'area_id'               => $item_stock->area_id ? $item_stock->area_id : NULL,
                             'item_shading_id'       => $item_stock->item_shading_id ? $item_stock->item_shading_id : NULL,
@@ -494,7 +493,6 @@ class GoodIssueController extends Controller
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Tipe Biaya</th>
                                 <th class="center-align">Plant</th>
-                                <th class="center-align">Gudang</th>
                                 <th class="center-align">Area</th>
                                 <th class="center-align">Shading</th>
                                 <th class="center-align">Line</th>
@@ -514,8 +512,7 @@ class GoodIssueController extends Controller
                 <td class="center-align">'.$row->itemStock->item->uomUnit->code.'</td>
                 <td class="">'.$row->note.'</td>
                 <td class="">'.$row->inventoryCoa->name.'</td>
-                <td class="center-align">'.$row->itemStock->place->name.'</td>
-                <td class="center-align">'.$row->itemStock->warehouse->name.'</td>
+                <td class="center-align">'.($row->place()->exists() ? $row->place->code : '-').'</td>
                 <td class="center-align">'.($row->itemStock->area()->exists() ? $row->itemStock->area->name : '-').'</td>
                 <td class="center-align">'.($row->itemShading()->exists() ? $row->itemShading->code : '-').'</td>
                 <td class="center-align">'.($row->line()->exists() ? $row->line->name : '-').'</td>
@@ -592,30 +589,33 @@ class GoodIssueController extends Controller
         
         foreach($gr->goodIssueDetail as $row){
             $arr[] = [
-                'item_id'           => $row->itemStock->item_id,
-                'item_name'         => $row->itemStock->item->code.' - '.$row->itemStock->item->name,
-                'uom'               => $row->itemStock->item->uomUnit->code,
-                'item_stock_id'     => $row->item_stock_id,
-                'qty'               => number_format($row->qty,3,',','.'),
-                'qtyraw'            => in_array($gr->status,['2','3']) ? number_format($row->qty + $row->itemStock->qty,3,',','.') : number_format($row->itemStock->qty,3,',','.'),
-                'price'             => number_format($row->price,2,',','.'),
-                'total'             => number_format($row->total,2,',','.'),
-                'inventory_coa_id'  => $row->inventory_coa_id,
-                'inventory_coa_name'=> $row->inventoryCoa->name,
-                'note'              => $row->note ? $row->note : '',
-                'lookable_type'     => $row->lookable_type ? $row->lookable_type : '',
-                'lookable_id'       => $row->lookable_id ? $row->lookable_id : '',
-                'reference_id'      => $row->lookable_type ? $row->lookable->materialRequest->id : '',
-                'stock_list'        => $row->itemStock->item->currentStock($this->dataplaces,$this->datawarehouses),
-                'line_id'           => $row->line_id,
-                'machine_id'        => $row->machine_id,
-                'department_id'     => $row->department_id,
-                'project_id'        => $row->project()->exists() ? $row->project->id : '',
-                'project_name'      => $row->project()->exists() ? $row->project->name : '',
-                'requester'         => $row->requester,
-                'qty_return'        => number_format($row->qty_return,3,',','.'),
-                'is_activa'         => $row->itemStock->item->itemGroup->is_activa ? $row->itemStock->item->itemGroup->is_activa : '',
-                'list_serial'       => $row->arrSerial(),
+                'item_id'                   => $row->itemStock->item_id,
+                'item_name'                 => $row->itemStock->item->code.' - '.$row->itemStock->item->name,
+                'uom'                       => $row->itemStock->item->uomUnit->code,
+                'item_stock_id'             => $row->item_stock_id,
+                'qty'                       => number_format($row->qty,3,',','.'),
+                'qtyraw'                    => in_array($gr->status,['2','3']) ? number_format($row->qty + $row->itemStock->qty,3,',','.') : number_format($row->itemStock->qty,3,',','.'),
+                'price'                     => number_format($row->price,2,',','.'),
+                'total'                     => number_format($row->total,2,',','.'),
+                'inventory_coa_id'          => $row->inventory_coa_id,
+                'inventory_coa_name'        => $row->inventoryCoa->name,
+                'note'                      => $row->note ? $row->note : '',
+                'lookable_type'             => $row->lookable_type ? $row->lookable_type : '',
+                'lookable_id'               => $row->lookable_id ? $row->lookable_id : '',
+                'reference_id'              => $row->lookable_type ? $row->lookable->materialRequest->id : '',
+                'stock_list'                => $row->itemStock->item->currentStock($this->dataplaces,$this->datawarehouses),
+                'place_id'                  => $row->place_id,
+                'line_id'                   => $row->line_id,
+                'machine_id'                => $row->machine_id,
+                'department_id'             => $row->department_id,
+                'project_id'                => $row->project()->exists() ? $row->project->id : '',
+                'project_name'              => $row->project()->exists() ? $row->project->name : '',
+                'requester'                 => $row->requester,
+                'qty_return'                => number_format($row->qty_return,3,',','.'),
+                'is_activa'                 => $row->itemStock->item->itemGroup->is_activa ? $row->itemStock->item->itemGroup->is_activa : '',
+                'list_serial'               => $row->arrSerial(),
+                'cost_distribution_id'      => $row->cost_distribution_id ? $row->cost_distribution_id : '',
+                'cost_distribution_name'    => $row->cost_distribution_id ? $row->costDistribution->code.' - '.$row->costDistribution->name : '',
             ];
         }
 

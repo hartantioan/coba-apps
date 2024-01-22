@@ -197,9 +197,9 @@
             <thead>
                 <tr>
                     <th class="center">Dari</th>
-                    <th class="center">{{ $data->placeFrom->name.' - '.$data->warehouseFrom->name }}</th>
+                    <th class="center">{{ $data->placeFrom->code.' - '.$data->warehouseFrom->name }}</th>
                     <th class="center">Tujuan</th>
-                    <th class="center">{{ $data->placeTo->name.' - '.$data->warehouseTo->name }}</th>
+                    <th class="center">{{ $data->placeTo->code.' - '.$data->warehouseTo->name }}</th>
                 </tr>
             </thead>
         </table>
@@ -209,6 +209,7 @@
                     <th class="center">Item</th>
                     <th class="center">Jum.</th>
                     <th class="center">Sat.</th>
+                    <th class="center">Serial</th>
                     <th class="center">Keterangan</th>
                     <th class="center">Area Tujuan</th>
                 </tr>
@@ -219,6 +220,7 @@
                     <td>{{ $row->item->code.' - '.$row->item->name.' - '.($row->itemStock->area()->exists() ? $row->itemStock->area->name : '') }}</td>
                     <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
                     <td class="center-align">{{ $row->item->uomUnit->code }}</td>
+                    <td>{{ $row->listSerial() }}</td>
                     <td>{{ $row->note }}</td>
                     <td class="center-align">{{ $row->area()->exists() ? $row->area->name : '' }}</td>
                 </tr>

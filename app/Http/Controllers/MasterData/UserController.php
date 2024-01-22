@@ -92,7 +92,7 @@ class UserController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = User::where('type','<>','1')->count();
+        $total_data = User::/* where('type','<>','1')-> */count();
         
         $query_data = User::where(function($query) use ($search, $request) {
                 if($search) {
@@ -113,7 +113,7 @@ class UserController extends Controller
                     $query->where('type', $request->type);
                 }
             })
-            ->where('type','<>','1')
+            /* ->where('type','<>','1') */
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -138,7 +138,7 @@ class UserController extends Controller
                     $query->where('type', $request->type);
                 }
             })
-            ->where('type','<>','1')
+            /* ->where('type','<>','1') */
             ->count();
 
         $response['data'] = [];
@@ -441,7 +441,7 @@ class UserController extends Controller
     public function create(Request $request){
         if($request->type == '1'){
             $validation = Validator::make($request->all(), [
-                'name' 				=> 'required',
+                'name' 				=> 'required|uppercase',
                 'username'			=> $request->temp ? ['required', Rule::unique('users', 'username')->ignore($request->temp)] : 'required|unique:users,username',
                 'phone'		        => $request->temp ? ['required', Rule::unique('users', 'phone')->ignore($request->temp)] : 'required|unique:users,phone',
                 'email'             => $request->temp ? ['required', Rule::unique('users', 'email')->ignore($request->temp)] : 'required|unique:users,email',
@@ -460,6 +460,7 @@ class UserController extends Controller
                 'place_id'          => 'required',
             ], [
                 'name.required' 	            => 'Nama tidak boleh kosong.',
+                'name.uppercase' 	            => 'Nama harus menggunakan huruf kapital.',
                 'username.required'             => 'Username tidak boleh kosong.',
                 'username.unique'               => 'Username telah terpakai.',
                 'phone.required'                => 'Telepon tidak boleh kosong.',
@@ -482,7 +483,7 @@ class UserController extends Controller
             ]);
         }else{
             $validation = Validator::make($request->all(), [
-                'name' 				=> 'required',
+                'name' 				=> 'required|uppercase',
                 'phone'		        => $request->temp ? ['required', Rule::unique('users', 'phone')->ignore($request->temp)] : 'required|unique:users,phone',
                 'email'             => $request->temp ? ['required', Rule::unique('users', 'email')->ignore($request->temp)] : 'required|unique:users,email',
                 'address'           => 'required',
@@ -498,6 +499,7 @@ class UserController extends Controller
                 'country_id'        => 'required',
             ], [
                 'name.required' 	            => 'Nama tidak boleh kosong.',
+                'name.uppercase' 	            => 'Nama harus menggunakan huruf kapital.',
                 'phone.required'                => 'Telepon tidak boleh kosong.',
                 'phone.unique'                  => 'Telepon telah terpakai.',
                 'email.required'	            => 'Email tidak boleh kosong.',

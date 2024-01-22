@@ -626,6 +626,7 @@ class GoodReceiveController extends Controller
                 'item_shading_id'   => $row->item_shading_id,
                 'list_shading'      => $row->item->arrShading(),
                 'is_sales_item'     => $row->item->is_sales_item ? $row->item->is_sales_item : '',
+                'list_serial'       => $row->listSerial(),
             ];
         }
 

@@ -186,8 +186,6 @@
                     </td>
                     <td width="33%" class="right-align">
                         
-                        
-                   
                     </td>
                     
                     <td width="34%" class="right-align">
@@ -284,6 +282,9 @@
                                     <td>{{ $rowdetail->item->uomUnit->code }}</td>
                                     <td>{{ $rowdetail->note }}</td>
                                     <td>{{ $rowdetail->area()->exists() ? $rowdetail->area->name : '' }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5">Serial : {{ $rowdetail->listSerialIn() }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>

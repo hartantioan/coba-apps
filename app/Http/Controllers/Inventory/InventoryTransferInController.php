@@ -26,6 +26,7 @@ use App\Models\User;
 use App\Models\Company;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportInventoryTransferIn;
+use App\Models\ItemSerial;
 use App\Models\Menu;
 
 class InventoryTransferInController extends Controller
@@ -277,8 +278,8 @@ class InventoryTransferInController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-            /* DB::beginTransaction();
-            try { */
+            DB::beginTransaction();
+            try {
                 if($request->temp){
                     
                     $query = InventoryTransferIn::where('code',CustomHelper::decrypt($request->temp))->first();
@@ -330,8 +331,8 @@ class InventoryTransferInController extends Controller
 
                         $query->save();
 
-                        foreach($query->inventoryTransferDetail as $row){
-                            $row->delete();
+                        foreach($query->inventoryTransferOut->inventoryTransferOutDetail as $row){
+                            $row->itemSerialIn()->delete();
                         }
 
                         DB::commit();
@@ -359,6 +360,16 @@ class InventoryTransferInController extends Controller
                 }
                 
                 if($query) {
+                    foreach($query->inventoryTransferOut->inventoryTransferOutDetail as $row){
+                        foreach($row->itemSerial as $rowserial){
+                            ItemSerial::create([
+                                'lookable_type'             => $row->getTable(),
+                                'lookable_id'               => $row->id,
+                                'item_id'                   => $rowserial->item_id,
+                                'serial_number'             => $rowserial->serial_number,
+                            ]);
+                        }
+                    }
 
                     CustomHelper::sendApproval('inventory_transfer_ins',$query->id,$query->note);
                     CustomHelper::sendNotification('inventory_transfer_ins',$query->id,'Barang Transfer - Masuk No. '.$query->code,$query->note,session('bo_id'));
@@ -380,10 +391,10 @@ class InventoryTransferInController extends Controller
                     ];
                 }
                 
-                /* DB::commit();
+                DB::commit();
             }catch(\Exception $e){
                 DB::rollback();
-            } */
+            }
 		}
 		
 		return response()->json($response);
@@ -396,13 +407,14 @@ class InventoryTransferInController extends Controller
                     <table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="6">Daftar Item</th>
+                                <th class="center-align" colspan="7">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Item</th>
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
+                                <th class="center-align">Serial</th>
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Area Tujuan</th>
                             </tr>
@@ -414,6 +426,7 @@ class InventoryTransferInController extends Controller
                 <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
                 <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->item->uomUnit->code.'</td>
+                <td>'.$row->listSerialIn().'</td>
                 <td class="center-align">'.$row->note.'</td>
                 <td class="center-align">'.($row->area()->exists() ? $row->area->name : '').'</td>
             </tr>';
@@ -482,11 +495,12 @@ class InventoryTransferInController extends Controller
 
         foreach($iti->inventoryTransferOut->inventoryTransferOutDetail as $row){
             $details[] = [
-                'name'      => $row->item->code.' - '.$row->item->name,
-                'origin'    => $row->itemStock->place->name.' - '.$row->itemStock->warehouse->name,
-                'qty'       => number_format($row->qty,3,',','.'),
-                'unit'      => $row->item->uomUnit->code,
-                'note'      => $row->note ? $row->note : '',
+                'name'          => $row->item->code.' - '.$row->item->name,
+                'origin'        => $row->itemStock->place->code.' - '.$row->itemStock->warehouse->name,
+                'qty'           => number_format($row->qty,3,',','.'),
+                'unit'          => $row->item->uomUnit->code,
+                'note'          => $row->note ? $row->note : '',
+                'list_serial'   => $row->listSerialIn(),
             ];
         }
 
@@ -568,6 +582,10 @@ class InventoryTransferInController extends Controller
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
 
+                foreach($query->inventoryTransferOut->inventoryTransferOutDetail as $row){
+                    $row->itemSerialIn()->delete();
+                }
+
                 if(in_array($query->status,['2','3','4','5'])){
                     CustomHelper::removeJournal('inventory_transfer_ins',$query->id);
                     CustomHelper::removeCogs('inventory_transfer_ins',$query->id);
@@ -632,6 +650,10 @@ class InventoryTransferInController extends Controller
         }
         
         if($query->delete()) {
+
+            foreach($query->inventoryTransferOut->inventoryTransferOutDetail as $row){
+                $row->itemSerialIn()->delete();
+            }
 
             $query->update([
                 'delete_id'     => session('bo_id'),

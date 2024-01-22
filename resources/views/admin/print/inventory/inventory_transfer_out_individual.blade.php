@@ -310,6 +310,9 @@
                                     <td>{{ $rowdetail->note }}</td>
                                     <td>{{ $rowdetail->area()->exists() ? $rowdetail->area->name : '' }}</td>
                                 </tr>
+                                <tr>
+                                    <td colspan="5">Serial : {{ $rowdetail->listSerial() }}</td>
+                                </tr>
                                 @endforeach
                             </tbody>
                         </table>

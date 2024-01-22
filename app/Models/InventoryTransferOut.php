@@ -209,4 +209,14 @@ class InventoryTransferOut extends Model
     public function journal(){
         return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
     }
+
+    public function hasChildDocument(){
+        $hasRelation = false;
+
+        if($this->inventoryTransferIn()->exists()){
+            $hasRelation = true;
+        }
+
+        return $hasRelation;
+    }
 }

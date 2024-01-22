@@ -258,7 +258,7 @@
                                         <table class="bordered" id="table-detail" style="min-width:2500px;">
                                             <thead>
                                                 <tr>
-                                                    <th class="center">Ref.Dokumen / Coa</th>
+                                                    <th class="center">Ref.Dokumen / Deskripsi</th>
                                                     <th class="center">No. Faktur Pajak</th>
                                                     <th class="center">No. Bukti Potong</th>
                                                     <th class="center">Tgl. Bukti Potong</th>

@@ -96,6 +96,6 @@ class GoodReceiveDetail extends Model
             $arr[] = $row->serial_number;
         }
 
-        return implode(', ',$arr);
+        return implode(',',$arr);
     }
 }

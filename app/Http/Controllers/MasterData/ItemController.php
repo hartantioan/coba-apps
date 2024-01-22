@@ -206,8 +206,8 @@ class ItemController extends Controller
     public function create(Request $request){
         
         $validation = Validator::make($request->all(), [
-            'code'			    => $request->temp ? ['required', Rule::unique('items', 'code')->ignore($request->temp)] : 'required|unique:items,code',
-            'name'              => 'required',
+            'code'			    => $request->temp ? ['required', Rule::unique('items', 'code')->ignore($request->temp), 'uppercase'] : 'required|unique:items,code|uppercase',
+            'name'              => 'required|uppercase',
             'item_group_id'     => 'required',
             'uom_unit'          => 'required',
             'arr_unit'          => 'required',
@@ -218,7 +218,9 @@ class ItemController extends Controller
         ], [
             'code.required' 	        => 'Kode tidak boleh kosong.',
             'code.unique'               => 'Kode telah dipakai',
-            'name.required'             => 'Nama tidak boleh kosong.',
+            'code.uppercase'            => 'Kode harus huruf capital',
+            'name.required'             => 'Nama tidak boleh kosong',
+            'name.uppercase'            => 'Nama harus huruf capital',
             'item_group_id.required'    => 'Grup item tidak boleh kosong.',
             'uom_unit.required'         => 'Satuan stok & produksi tidak boleh kosong.',
             'arr_unit.required'         => 'Satuan konversi tidak boleh kosong.',

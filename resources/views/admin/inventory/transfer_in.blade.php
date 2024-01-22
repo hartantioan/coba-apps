@@ -215,13 +215,14 @@
                                                     <th class="center">Ambil Dari</th>
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan Stock</th>
+                                                    <th class="center">Serial</th>
                                                     <th class="center">Keterangan</th>
                                                     <th class="center">Area</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
-                                                    <td colspan="6" class="center">
+                                                    <td colspan="7" class="center">
                                                         Silahkan pilih Inventori Transfer Keluar
                                                     </td>
                                                 </tr>
@@ -482,7 +483,7 @@
                 $('#temp').val('');
                 $('#body-item').empty().append(`
                     <tr id="last-row-item">
-                        <td colspan="6" class="center">
+                        <td colspan="7" class="center">
                             Silahkan pilih Inventori Transfer Keluar
                         </td>
                     </tr>
@@ -807,6 +808,7 @@
                                     <td>` + val.origin + `</td>
                                     <td class="center-align">` + val.qty + `</td>
                                     <td>` + val.unit + `</td>
+                                    <td>` + val.list_serial + `</td>
                                     <td>` + val.note + `</td>
                                     <td>` + val.area + `</td>
                                 </tr
@@ -827,7 +829,7 @@
         }else{
             $('#body-item').empty().append(`
                 <tr id="last-row-item">
-                    <td colspan="6" class="center">
+                    <td colspan="7" class="center">
                         Silahkan pilih Inventori Transfer Keluar
                     </td>
                 </tr>
@@ -855,7 +857,7 @@
             success: function(response) {
                 $('#body-item').empty().append(`
                     <tr id="last-row-item">
-                        <td colspan="6" class="center">
+                        <td colspan="7" class="center">
                             Silahkan pilih Inventori Transfer Keluar
                         </td>
                     </tr>
@@ -1005,6 +1007,7 @@
                             <td>` + val.origin + `</td>
                             <td class="center-align">` + val.qty + `</td>
                             <td>` + val.unit + `</td>
+                            <td>` + val.list_serial + `</td>
                             <td>` + val.note + `</td>
                         </tr
                     `);

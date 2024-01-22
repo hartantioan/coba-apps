@@ -478,6 +478,12 @@ class Item extends Model
         return $total;
     }
 
+    public function getStockPlaceWarehouse($place_id,$warehouse_id){
+        $total = $this->itemStock()->where('place_id',$place_id)->where('warehouse_id',$warehouse_id)->sum('qty');
+
+        return $total;
+    }
+
     public function getStockWarehousePlaceArea($place_id){
         $arr = [];
 

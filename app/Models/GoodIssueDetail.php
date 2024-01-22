@@ -25,6 +25,7 @@ class GoodIssueDetail extends Model
         'coa_id',
         'lookable_type',
         'lookable_id',
+        'cost_distribution_id',
         'place_id',
         'warehouse_id',
         'area_id',
@@ -72,6 +73,11 @@ class GoodIssueDetail extends Model
     public function line()
     {
         return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();
+    }
+
+    public function costDistribution()
+    {
+        return $this->belongsTo('App\Models\CostDistribution', 'cost_distribution_id', 'id')->withTrashed();
     }
 
     public function place()

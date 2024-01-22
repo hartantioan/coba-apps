@@ -280,7 +280,7 @@ Date.prototype.yyyymmdd = function(showtime) {
 function loadCurrency(){
 	let code = $('#currency_id').find(':selected').data('code'), date = $('#post_date').val();
 	var yesterday = new Date(date);
-	yesterday.setDate(yesterday.getDate() -1);
+	yesterday.setDate(yesterday.getDate() -2);
 	let dateString = yesterday.yyyymmdd();
 	$.ajax({
 		url: 'https://api.freecurrencyapi.com/v1/historical?apikey=fca_live_sJNdkvotKpFObXVFuzKSo0VBkrTkePfvixsZHBlz&currencies=IDR&base_currency=' + code + '&date=' + dateString,

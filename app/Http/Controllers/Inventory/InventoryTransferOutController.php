@@ -23,6 +23,7 @@ use App\Models\User;
 use App\Models\Company;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportInventoryTransferOut;
+use App\Models\ItemSerial;
 use App\Models\Menu;
 use Illuminate\Support\Str;
 class InventoryTransferOutController extends Controller
@@ -329,6 +330,25 @@ class InventoryTransferOutController extends Controller
                 ]);
             }
 
+            if($request->arr_serial){
+                $passedQtyAndSerial = true;
+                foreach($request->arr_serial as $key => $row){
+                    if($row){
+                        $rowArr = explode(',',$row);
+                        if(count($rowArr) != floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key])))){
+                            $passedQtyAndSerial = false;
+                        }
+                    }
+                }
+
+                if($passedQtyAndSerial == false){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Maaf, salah satu item aktiva jumlah qty dengan jumlah nomor serial tidak sama.',
+                    ]);
+                }
+            }
+
             foreach($request->arr_item as $key => $row){
                 if(isset($request->arr_qty[$key])){
                     if(str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) == 0){
@@ -402,6 +422,10 @@ class InventoryTransferOutController extends Controller
                         $query->save();
 
                         foreach($query->inventoryTransferDetail as $row){
+                            $row->itemSerial()->update([
+                                'usable_id'     => NULL,
+                                'usable_type'   => NULL,
+                            ]);
                             $row->delete();
                         }
 
@@ -456,6 +480,16 @@ class InventoryTransferOutController extends Controller
                             'area_id'                   => $request->arr_area[$key] ? $request->arr_area[$key] : NULL,
                         ]);
 
+                        if($request->arr_serial[$key]){
+                            $rowArr = explode(',',$request->arr_serial[$key]);
+                            foreach($rowArr as $rowdetail){
+                                ItemSerial::find(intval($rowdetail))->update([
+                                    'usable_type'   => $querydetail->getTable(),
+                                    'usable_id'     => $querydetail->id
+                                ]);
+                            }
+                        }
+
                     }
 
                     CustomHelper::sendApproval('inventory_transfer_outs',$query->id,$query->note);
@@ -494,7 +528,7 @@ class InventoryTransferOutController extends Controller
                     <table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="6">Daftar Item</th>
+                                <th class="center-align" colspan="7">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -502,6 +536,7 @@ class InventoryTransferOutController extends Controller
                                 <th class="center-align">Shading</th>
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
+                                <th class="center-align">Serial</th>
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Area Tujuan</th>
                             </tr>
@@ -514,6 +549,7 @@ class InventoryTransferOutController extends Controller
                 <td class="center-align">'.($row->itemStock->itemShading()->exists() ? $row->itemStock->itemShading->code : '-').'</td>
                 <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->item->uomUnit->code.'</td>
+                <td class="">'.$row->listSerial().'</td>
                 <td class="center-align">'.$row->note.'</td>
                 <td class="center-align">'.($row->area()->exists() ? $row->area->name : '').'</td>
             </tr>';
@@ -590,6 +626,8 @@ class InventoryTransferOutController extends Controller
                 'stock_list'    => $row->item->currentStock($this->dataplaces,$this->datawarehouses),
                 'area_id'       => $row->area_id ? $row->area_id : '',
                 'area_name'     => $row->area()->exists() ? $row->area->name : '',
+                'is_activa'     => $row->item->itemGroup->is_activa ? $row->item->itemGroup->is_activa : '',
+                'list_serial'   => $row->arrSerial(),
             ];
         }
 
@@ -615,6 +653,11 @@ class InventoryTransferOutController extends Controller
                     'status'  => 500,
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
                 ];
+            }elseif($query->hasChildDocument()){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah digunakan pada Inventory Transfer Masuk.'
+                ];
             }else{
                 $query->update([
                     'status'    => '5',
@@ -622,6 +665,13 @@ class InventoryTransferOutController extends Controller
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
+
+                foreach($query->inventoryTransferOutDetail as $row){
+                    $row->itemSerial()->update([
+                        'usable_id'     => NULL,
+                        'usable_type'   => NULL,
+                    ]);
+                }
 
                 if(in_array($query->status,['2','3','4','5'])){
                     CustomHelper::removeJournal('inventory_transfer_outs',$query->id);
@@ -692,6 +742,13 @@ class InventoryTransferOutController extends Controller
                 'delete_id'     => session('bo_id'),
                 'delete_note'   => $request->msg,
             ]);
+
+            foreach($query->inventoryTransferOutDetail as $row){
+                $row->itemSerial()->update([
+                    'usable_id'     => NULL,
+                    'usable_type'   => NULL,
+                ]);
+            }
 
             $query->inventoryTransferDetail()->delete();
 

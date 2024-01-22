@@ -20,6 +20,7 @@
             <th>Item</th>
             <th>Qty</th>
             <th>Satuan</th>
+            <th>Serial</th>
             <th>Keterangan</th>
         </tr>
     </thead>
@@ -49,6 +50,7 @@
                 <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name }}</td>
                 <td>{{ number_format($rowdetail->qty,3,',','.') }}</td>
                 <td>{{ $rowdetail->item->uomUnit->code }}</td>
+                <td>{{ $rowdetail->listSerial() }}</td>
                 <td>{{ $rowdetail->note }}</td>
             </tr>
             @php

@@ -213,7 +213,8 @@ class JournalController extends Controller
                                 <th class="center-align" rowspan="2">Mesin</th>
                                 <th class="center-align" rowspan="2">Departemen</th>
                                 <th class="center-align" rowspan="2">Proyek</th>
-                                <th class="center-align" rowspan="2">Keterangan</th>
+                                <th class="center-align" rowspan="2">Keterangan 1</th>
+                                <th class="center-align" rowspan="2">Keterangan 2</th>
                                 <th class="center-align" colspan="2">Mata Uang Asli</th>
                                 <th class="center-align" colspan="2">Mata Uang Konversi</th>
                             </tr>
@@ -243,6 +244,7 @@ class JournalController extends Controller
                 <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
                 <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
                 <td class="">'.$row->note.'</td>
+                <td class="">'.$row->note2.'</td>
                 <td class="right-align">'.($row->type == '1' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
                 <td class="right-align">'.($row->type == '2' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
                 <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
@@ -447,6 +449,7 @@ class JournalController extends Controller
                                 'department_id'                 => $request->arr_department[$key],
                                 'project_id'                    => $request->arr_project[$key] == 'NULL' ? NULL : $request->arr_project[$key],
                                 'note'                          => $request->arr_note[$key] == '' ? NULL : $request->arr_note[$key],
+                                'note2'                         => $request->arr_note2[$key] == '' ? NULL : $request->arr_note2[$key],
                                 'type'                          => $row,
                                 'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
                                 'nominal_fc'                    => str_replace(',','.',str_replace('.','',$request->arr_nominal_fc[$key])),
@@ -656,7 +659,9 @@ class JournalController extends Controller
                 'project_id'                    => $row->project()->exists() ? $row->project_id : '',
                 'project_name'                  => $row->project()->exists() ? $row->project->name : '',
                 'nominal'                       => number_format($row->nominal,2,',','.'),
+                'nominal_fc'                    => number_format($row->nominal_fc,2,',','.'),
                 'note'                          => $row->note ? $row->note : '',
+                'note2'                         => $row->note2 ? $row->note2 : '',
             ];
         }
 

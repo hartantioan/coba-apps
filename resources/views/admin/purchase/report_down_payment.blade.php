@@ -87,7 +87,7 @@
                                                         <th class="center-align">Supplier</th>
                                                         <th class="center-align">Tipe</th>
                                                         <th class="center-align">Tgl.Post</th>
-                                                        <th class="center-align">Tgl.Tenggat</th>
+                                                        <th class="center-align">Tgl.Jatuh Tempo</th>
                                                         <th class="center-align">Keterangan</th>
                                                         <th class="center-align">Subtotal</th>
                                                         <th class="center-align">Diskon</th>

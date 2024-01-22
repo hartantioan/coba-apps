@@ -229,7 +229,8 @@
                                                         <th class="center" rowspan="2">Mesin</th>
                                                         <th class="center" rowspan="2">Departemen</th>
                                                         <th class="center" rowspan="2">Proyek</th>
-                                                        <th class="center" rowspan="2">Keterangan</th>
+                                                        <th class="center" rowspan="2">Keterangan 1</th>
+                                                        <th class="center" rowspan="2">Keterangan 2</th>
                                                         <th class="center" colspan="2">Mata Uang Asli</th>
                                                         <th class="center" colspan="2">Mata Uang Konversi</th>
                                                         <th class="center" rowspan="2" width="75px">Hapus</th>
@@ -243,7 +244,7 @@
                                                 </thead>
                                                 <tbody id="body-coa">
                                                     <tr id="last-row-coa">
-                                                        <td colspan="13">
+                                                        <td colspan="14">
                                                             <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addCoa('1')" href="javascript:void(0);">
                                                                 <i class="material-icons left">add</i> Tambah Debit
                                                             </a>
@@ -776,7 +777,10 @@
                     <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
                 </td>
                 <td>
-                    <input name="arr_note[]" type="text" placeholder="Keterangan...">
+                    <input name="arr_note[]" type="text" placeholder="Keterangan 1...">
+                </td>
+                <td>
+                    <input name="arr_note2[]" type="text" placeholder="Keterangan 2...">
                 </td>
                 <td>
                     ` + (type == '1' ? `<input name="arr_nominal_fc[]" onfocus="emptyThis(this);" type="text" value="0" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">` : `-`) + `
@@ -785,10 +789,10 @@
                     ` + (type == '2' ? `<input name="arr_nominal_fc[]" onfocus="emptyThis(this);" type="text" value="0" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">` : `-`) + `
                 </td>
                 <td>
-                    ` + (type == '1' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="0" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">` : `-`) + `
+                    ` + (type == '1' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="0" style="width:150px !important;" onkeyup="formatRupiah(this);" readonly>` : `-`) + `
                 </td>
                 <td>
-                    ` + (type == '2' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="0" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">` : `-`) + `
+                    ` + (type == '2' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="0" style="width:150px !important;" onkeyup="formatRupiah(this);" readonly>` : `-`) + `
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" href="javascript:void(0);">
@@ -1259,6 +1263,7 @@
                     formData.delete("arr_department[]");
                     formData.delete("arr_project[]");
                     formData.delete("arr_note[]");
+                    formData.delete("arr_note2[]");
                     formData.delete("arr_nominal[]");
                     formData.delete("arr_nominal_fc[]");
 
@@ -1274,6 +1279,7 @@
                         formData.append('arr_department[]',$('select[name^="arr_department"]').eq(index).val());
                         formData.append('arr_project[]',($('select[name^="arr_project[]"]').eq(index).val() ? $('select[name^="arr_project[]"]').eq(index).val() : 'NULL'));
                         formData.append('arr_note[]',($('input[name^="arr_note[]"]').eq(index).val() ? $('input[name^="arr_note[]"]').eq(index).val() : ''));
+                        formData.append('arr_note2[]',($('input[name^="arr_note2[]"]').eq(index).val() ? $('input[name^="arr_note2[]"]').eq(index).val() : ''));
                         formData.append('arr_nominal[]',($('input[name^="arr_nominal[]"]').eq(index).val() ? $('input[name^="arr_nominal[]"]').eq(index).val() : 'NULL'));
                         formData.append('arr_nominal_fc[]',($('input[name^="arr_nominal_fc[]"]').eq(index).val() ? $('input[name^="arr_nominal_fc[]"]').eq(index).val() : 'NULL'));
                     });
@@ -1590,13 +1596,22 @@
                                 <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
                             </td>
                             <td>
-                                <input name="arr_note[]" type="text" placeholder="Keterangan..." value="` + val.note + `">
+                                <input name="arr_note[]" type="text" placeholder="Keterangan 1..." value="` + val.note + `">
                             </td>
                             <td>
-                                ` + (val.type == '1' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal + `" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
+                                <input name="arr_note2[]" type="text" placeholder="Keterangan 2..." value="` + val.note2 + `">
                             </td>
                             <td>
-                                ` + (val.type == '2' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal + `" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
+                                ` + (val.type == '1' ? `<input name="arr_nominal_fc[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal_fc + `" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">` : `-`) + `
+                            </td>
+                            <td>
+                                ` + (val.type == '2' ? `<input name="arr_nominal_fc[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal_fc + `" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">` : `-`) + `
+                            </td>
+                            <td>
+                                ` + (val.type == '1' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal + `" style="width:150px !important;" onkeyup="formatRupiah(this);" readonly>` : `-`) + `
+                            </td>
+                            <td>
+                                ` + (val.type == '2' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal + `" style="width:150px !important;" onkeyup="formatRupiah(this);" readonly>` : `-`) + `
                             </td>
                             <td class="center">
                                 <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" href="javascript:void(0);">
@@ -1655,6 +1670,7 @@
                 $('#code').focus();
                 M.updateTextFields();
                 countAll();
+                convertThis();
             },
             error: function() {
                 $('.modal-content').scrollTop(0);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Inventory;
 
+use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
 use App\Models\ItemStock;
 use App\Models\Place;
@@ -10,6 +11,8 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
 use App\Exports\ExportMinimumStock;
+use App\Models\Item;
+
 class MinimumStockController extends Controller
 {
     public function index(Request $request)
@@ -28,35 +31,40 @@ class MinimumStockController extends Controller
 
     public function filter(Request $request){
         $start_time = microtime(true);
-
-        $query_data = ItemStock::where(function($query) use ( $request) {
-       
-            $query->whereHas('item',function($query) use($request){
-                $query->whereRaw('items.min_stock > item_stocks.qty');;
-            });
-            
-            if($request->plant != 'all'){
-                $query->whereHas('place',function($query) use($request){
-                    $query->where('id',$request->plant);
-                });
+        info($request);
+        $query_data = Item::where(function($querys) use ( $request) {
+            if($request->item_id){
+                $querys->where('id',$request->item_id);
             }
-            if($request->warehouse != 'all'){
-                $query->whereHas('warehouse',function($query) use($request){
-                    $query->where('id',$request->warehouse);
-                });
-            }
-        })->get();
+    
+        })
+        ->get();
         
         $array_filter=[];
+        
         foreach($query_data as $row){
+            if($row->itemStock()->exists()){
+                $perlu = 1;
+                $qty = $row->getStockAll();
+            }
+            else{
+                $qty = 0;
+                $perlu = 0;
+            }
             $data_tempura = [
-                'item' => $row->item->code.'-'.$row->item->name,
-                'minimum'=>number_format($row->item->min_stock),
-                'needed'=>number_format($row->item->min_stock-$row->qty),
-                'final'=>number_format($row->qty,3,',','.'),
-                'satuan'=>$row->item->uomUnit->code
+                'item_id' => CustomHelper::encrypt($row->code),
+                'item' => $row->code.'-'.$row->name,
+                'minimum'=>number_format($row->min_stock),
+                'needed'=>number_format($row->min_stock-$qty),
+                'maximum'=>number_format($row->max_stock),
+                'final'=>number_format($qty,3,',','.'),
+                'satuan'=>$row->uomUnit->code,
+                'perlu' =>$perlu,
             ];
-            $array_filter[]=$data_tempura;
+            if($qty < $row->min_stock){
+                $array_filter[]=$data_tempura;
+            }
+            
         }
         $end_time = microtime(true);
   
@@ -69,9 +77,37 @@ class MinimumStockController extends Controller
         return response()->json($response);
     }
     public function export(Request $request){
-		$plant = $request->plant ? $request->plant:'';
-        $warehouse = $request->warehouse?$request->warehouse:'';
+		$item_id = $request->item_id ? $request->item_id:'';
+       
       
-		return Excel::download(new ExportMinimumStock($plant,$warehouse), 'minimum_stock'.uniqid().'.xlsx');
+		return Excel::download(new ExportMinimumStock($item_id), 'minimum_stock'.uniqid().'.xlsx');
+    }
+
+    public function showDetail(Request $request){
+        $show = Item::where('code',CustomHelper::decrypt($request->id))->first();
+
+        $warehouse = Warehouse::where('status',1)->get();
+
+        $array_warehouse = [];
+
+        foreach($warehouse as $rowWarehouse){
+            $temp = ItemStock::where('warehouse_id',$rowWarehouse->id)
+            ->where('item_id',$show->id)->first();
+            if($temp){
+                $array_warehouse[]=[
+                    'plant' =>$temp->place->name,
+                    'nama'  =>$rowWarehouse->name,
+                    'stock' =>$temp->qty
+                ];
+            }
+            
+
+        }
+
+        $response =[
+            'status'=>200,
+            'message'  =>$array_warehouse,  
+        ];
+        return response()->json($response);
     }
 }

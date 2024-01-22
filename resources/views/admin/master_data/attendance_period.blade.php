@@ -150,11 +150,11 @@
                             <label for="plant_id">Plant</label>
                         </div>
                         <div class="input-field col m6 s12">
-                            <input id="start_date" name="start_date" type="date" max="{{ date('Y'.'-12-31') }}" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                            <input id="start_date" name="start_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                             <label class="active" for="start_date">Tanggal Awal</label>
                         </div>
                         <div class="input-field col m6 s12">
-                            <input id="end_date" name="end_date"  type="date" max="{{ date('Y'.'-12-31') }}" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                            <input id="end_date" name="end_date"  type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                             <label class="active" for="end_date">Tanggal Akhir</label>
                         </div>
                         <div class="col s12 mt-3">

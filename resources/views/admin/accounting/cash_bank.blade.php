@@ -65,11 +65,11 @@
                                             </div>
                                             <div class="col m2 s6 ">
                                                 <label for="start_date" style="font-size:1rem;">Tanggal Mulai :</label>
-                                                <input type="date" max="{{ date('Y'.'-12-31') }}" id="start_date" name="start_date" value="{{ date('Y-m'.'-01') }}" onchange="loadDataTable();">
+                                                <input type="date" max="{{ date('9999'.'-12-31') }}" id="start_date" name="start_date" value="{{ date('Y-m'.'-01') }}" onchange="loadDataTable();">
                                             </div>
                                             <div class="col m2 s6 ">
                                                 <label for="finish_date" style="font-size:1rem;">Tanggal Akhir :</label>
-                                                <input type="date" max="{{ date('Y'.'-12-31') }}" id="finish_date" name="finish_date" value="{{ date('Y-m-d') }}" onchange="loadDataTable();">
+                                                <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date" value="{{ date('Y-m-d') }}" onchange="loadDataTable();">
                                             </div>
                                             <div class="col m2 s6 pt-2">
                                                 <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="reset();">

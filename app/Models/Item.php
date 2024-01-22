@@ -337,6 +337,12 @@ class Item extends Model
         return $price;
     }
 
+    public function getStockAll(){
+        $total = $this->itemStock()->sum('qty');
+
+        return $total;
+    }
+
     public function itemShading()
     {
         return $this->hasMany('App\Models\ItemShading','item_id','id');

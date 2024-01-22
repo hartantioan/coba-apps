@@ -175,7 +175,7 @@
                         </div>
                         
                         <div class="input-field col s6">
-                            <input id="birth_date" name="birth_date" type="date" max="{{ date('Y'.'-12-31') }}" placeholder="mm/dd/yyyy">
+                            <input id="birth_date" name="birth_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="mm/dd/yyyy">
                             <label class="birth_date" for="birth_date">Tanggal Lahir</label>
                         </div>
                         <div class="col s12 mt-3">

@@ -67,11 +67,11 @@
                                             </div>
                                             <div class="col m2 s6 ">
                                                 <label for="date_start" style="font-size:1rem;">Tanggal Mulai :</label>
-                                                <input type="date" max="{{ date('Y'.'-12-31') }}" id="date_start" name="date_start" value="{{ date('Y-m'.'-01') }}">
+                                                <input type="date" max="{{ date('9999'.'-12-31') }}" id="date_start" name="date_start" value="{{ date('Y-m'.'-01') }}">
                                             </div>
                                             <div class="col m2 s6 ">
                                                 <label for="date_end" style="font-size:1rem;">Tanggal Akhir :</label>
-                                                <input type="date" max="{{ date('Y'.'-12-31') }}" id="date_end" name="date_end" value="{{ date('Y-m-d') }}">
+                                                <input type="date" max="{{ date('9999'.'-12-31') }}" id="date_end" name="date_end" value="{{ date('Y-m-d') }}">
                                             </div>
                                             <div class="col m2 s6 pt-2">
                                                 <a class="btn btn-small green waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="process();">

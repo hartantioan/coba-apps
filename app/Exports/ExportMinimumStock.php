@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Models\Item;
 use App\Models\ItemStock;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\FromCollection;
@@ -13,46 +14,46 @@ class ExportMinimumStock implements FromView,ShouldAutoSize
     /**
     * @return \Illuminate\Support\Collection
     */
-    public function __construct(string $plant,string $warehouse)
+    public function __construct(string $item_id)
     {
-        $this->plant = $plant ? $plant : '';
-		
-        $this->warehouse = $warehouse ? $warehouse : '';
+        $this->item_id = $item_id ? $item_id : '';
 
     }
 
     public function view(): View
     {
         
-        $query_data = ItemStock::where(function($query) {
-            $query->whereHas('item',function($query){
-                $query->whereRaw('items.min_stock > item_stocks.qty');;
-            });
-            if($this->plant !== 'all'){
+        $query_data = Item::where(function($querys){
+            if($this->item_id ){
         
        
-                $query->whereHas('place',function($query){
-                    $query->where('id',$this->plant);
-                });
+                $querys->where('id',$this->item_id);
             }
-            if($this->warehouse !== 'all'){
-                $query->whereHas('warehouse',function($query){
-                    $query->where('id',$this->warehouse);
-                });
-            }
-        })->get();
+    
+        })
+        ->get();
         
         $array_filter = [];
         $array_filter=[];
         foreach($query_data as $row){
+            if($row->itemStock()->exists()){
+                
+                $qty = $row->getStockAll();
+            }
+            else{
+                $qty = 0;
+            }
             $data_tempura = [
-                'item' => $row->item->code.'-'.$row->item->name,
-                'minimum'=>number_format($row->item->min_stock),
-                'needed'=>number_format($row->item->min_stock-$row->qty),
-                'final'=>number_format($row->qty,3,',','.'),
-                'satuan'=>$row->item->uomUnit->code
+                'item' => $row->code.'-'.$row->name,
+                'minimum'=>number_format($row->min_stock),
+                'needed'=>number_format($row->min_stock-$qty),
+                'maximum'=>number_format($row->max_stock),
+                'final'=>number_format($qty,3,',','.'),
+                'satuan'=>$row->uomUnit->code
             ];
-            $array_filter[]=$data_tempura;
+            if($qty < $row->min_stock){
+                $array_filter[]=$data_tempura;
+            }
         }
       
         return view('admin.exports.minimum_stock', [

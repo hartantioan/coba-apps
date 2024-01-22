@@ -38,11 +38,11 @@
                                 <div class="col s12">
                                     <div class="row">
                                         <div class="input-field col m3 s12">
-                                            <input id="start_date" name="start_date" type="date" max="{{ date('Y'.'-12-31') }}" placeholder="Tgl. posting" value="{{ date('Y-m').'-01' }}">
+                                            <input id="start_date" name="start_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. posting" value="{{ date('Y-m').'-01' }}">
                                             <label class="active" for="start_date">Tanggal Awal</label>
                                         </div>
                                         <div class="input-field col m3 s12">
-                                            <input id="finish_date" name="finish_date"  type="date" max="{{ date('Y'.'-12-31') }}" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                                            <input id="finish_date" name="finish_date"  type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                             <label class="active" for="finish_date">Tanggal Akhir</label>
                                         </div>
                                         <div class="input-field col m3 s12">

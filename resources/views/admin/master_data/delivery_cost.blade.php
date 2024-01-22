@@ -58,13 +58,13 @@
                                             <div class="col m4 s6 ">
                                                 <label for="start_date" style="font-size:1rem;">Tanggal Mulai :</label>
                                                 <div class="input-field col s12">
-                                                <input type="date" max="{{ date('Y'.'-12-31') }}" id="start_date" name="start_date"  onchange="loadDataTable()">
+                                                <input type="date" max="{{ date('9999'.'-12-31') }}" id="start_date" name="start_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
                                                 <label for="finish_date" style="font-size:1rem;">Tanggal Akhir :</label>
                                                 <div class="input-field col s12">
-                                                    <input type="date" max="{{ date('Y'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
+                                                    <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
                                         </div>  
@@ -140,7 +140,7 @@
                             <label class="active" for="valid_from">Valid Dari</label>
                         </div>
                         <div class="input-field col s6">
-                            <input id="valid_to" name="valid_to" type="date" max="{{ date('Y'.'-12-31') }}" min="{{ date('Y-m-d') }}">
+                            <input id="valid_to" name="valid_to" type="date" max="{{ date('9999'.'-12-31') }}" min="{{ date('Y-m-d') }}">
                             <label class="active" for="valid_to">Valid Sampai</label>
                         </div>
                         <div class="col s12">

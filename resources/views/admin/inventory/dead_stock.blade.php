@@ -53,7 +53,7 @@
                                             <label class="active" for="hari">Jumlah Hari</label>
                                         </div>
                                         <div class="input-field col m3 s12">
-                                            <input id="date" name="date"  type="date" max="{{ date('Y'.'-12-31') }}" placeholder="" value="{{ date('Y-m-d') }}">
+                                            <input id="date" name="date"  type="date" max="{{ date('9999'.'-12-31') }}" placeholder="" value="{{ date('Y-m-d') }}">
                                             <label class="active" for="date">Masukkan Tanggal</label>
                                         </div>
                                         <div class="col s12 mt-3">

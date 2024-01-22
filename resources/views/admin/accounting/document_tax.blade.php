@@ -64,13 +64,13 @@
                                             <div class="col m4 s6 ">
                                                 <label for="start-date" style="font-size:1rem;">Tanggal Mulai :</label>
                                                 <div class="input-field col s12">
-                                                <input type="date" max="{{ date('Y'.'-12-31') }}" id="start-date" name="start-date"  onchange="loadDataTable()">
+                                                <input type="date" max="{{ date('9999'.'-12-31') }}" id="start-date" name="start-date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
                                                 <label for="finish-date" style="font-size:1rem;">Tanggal Akhir :</label>
                                                 <div class="input-field col s12">
-                                                    <input type="date" max="{{ date('Y'.'-12-31') }}" id="finish-date" name="finish-date"  onchange="loadDataTable()">
+                                                    <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish-date" name="finish-date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
                                         </div>  

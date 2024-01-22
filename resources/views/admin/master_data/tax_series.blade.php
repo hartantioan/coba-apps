@@ -122,11 +122,11 @@
                         </div>
                         
                         <div class="input-field col s6">
-                            <input id="start_date" name="start_date" type="date" max="{{ date('Y'.'-12-31') }}">
+                            <input id="start_date" name="start_date" type="date" max="{{ date('9999'.'-12-31') }}">
                             <label class="active" for="start_date">Tgl.Mulai Berlaku</label>
                         </div>
                         <div class="input-field col s6">
-                            <input id="end_date" name="end_date" type="date" max="{{ date('Y'.'-12-31') }}">
+                            <input id="end_date" name="end_date" type="date" max="{{ date('9999'.'-12-31') }}">
                             <label class="active" for="end_date">Tgl.Berakhir Berlaku</label>
                         </div>
                         <div class="input-field col s6">

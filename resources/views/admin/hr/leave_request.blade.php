@@ -158,11 +158,11 @@
                             <label for="company_id">Perusahaan</label>
                         </div>
                         <div class="input-field col s6" >
-                            <input id="start_date" name="start_date"  type="date" max="{{ date('Y'.'-12-31') }}" placeholder="Tanggal Mulai" onchange="resetSchedule()">
+                            <input id="start_date" name="start_date"  type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tanggal Mulai" onchange="resetSchedule()">
                             <label class="active" for="start_date">Tanggal Awal</label>
                         </div>
                         <div class="input-field col s6" id="end_date_field">
-                            <input id="end_date" name="end_date"   type="date" max="{{ date('Y'.'-12-31') }}" placeholder="Tanggal Akhir">
+                            <input id="end_date" name="end_date"   type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tanggal Akhir">
                             <label class="active" for="end_date">Tanggal Akhir</label>
                         </div>
                         <div class="input-field col s6" id="start_time_div" hidden>
@@ -175,7 +175,7 @@
                         </div>
                         
                         <div class="file-field input-field col m3 s12 step16">
-                            <input id="post_date" name="post_date"   type="date" max="{{ date('Y'.'-12-31') }}" placeholder="Tanggal Post">
+                            <input id="post_date" name="post_date"   type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tanggal Post">
                             <label class="active" for="post_date">Tanggal Post</label>
                         </div>
                         <div class="col m12 s12 step9" style="overflow:auto;width:100% !important;" id="table_schedule" hidden>

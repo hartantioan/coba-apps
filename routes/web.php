@@ -14,6 +14,7 @@ use App\Http\Controllers\Accounting\AccountingReportController;
 use App\Http\Controllers\Finance\FinanceReportController;
 use App\Http\Controllers\HR\LeaveRequestController;
 use App\Http\Controllers\HR\ShiftRequestController;
+use App\Http\Controllers\HR\RevisionAttendanceHRDController;
 use App\Http\Controllers\Inventory\DeadStockController;
 use App\Http\Controllers\Inventory\GoodScaleController;
 
@@ -1551,7 +1552,16 @@ Route::prefix('admin')->group(function () {
                     });
                 });
 
-                
+                Route::prefix('revision_attendance_hrd')->middleware('operation.access:revision_attendance_hrd,view')->group(function () {
+                    Route::get('/',[RevisionAttendanceHRDController::class, 'index']);
+                    Route::get('datatable',[RevisionAttendanceHRDController::class, 'datatable']);
+                    Route::get('row_detail', [RevisionAttendanceHRDController::class, 'rowDetail']);
+                    Route::post('show', [RevisionAttendanceHRDController::class, 'show']);
+                    Route::post('create',[RevisionAttendanceHRDController::class, 'create'])->middleware('operation.access:revision_attendance_hrd,update');
+                    Route::post('destroy', [RevisionAttendanceHRDController::class, 'destroy'])->middleware('operation.access:revision_attendance_hrd,delete');
+                    Route::post('get_code', [RevisionAttendanceHRDController::class, 'getCode']);
+                    Route::get('approval/{id}',[RevisionAttendanceHRDController::class, 'approval'])->withoutMiddleware('direct.access');
+                });
 
                 Route::prefix('leave_request')->middleware('operation.access:leave_request,view')->group(function () {
                     Route::get('/',[LeaveRequestController::class, 'index']);
@@ -1790,6 +1800,7 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('minimum_stock')->middleware('operation.access:stock_in_qty,view')->group(function () {
                         Route::get('/',[MinimumStockController::class, 'index']);
                         Route::post('filter',[MinimumStockController::class, 'filter']);
+                        Route::post('show_detail',[MinimumStockController::class, 'showDetail']);
                         Route::get('export',[MinimumStockController::class, 'export']);
                     });
                     Route::prefix('stock_in_rupiah')->middleware('operation.access:stock_in_rupiah,view')->group(function () {

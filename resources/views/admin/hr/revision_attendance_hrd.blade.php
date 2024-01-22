@@ -79,8 +79,8 @@
                                                         <th>#</th>
                                                         <th>Kode</th>
                                                         <th>User</th>
-                                                        <th>Tipe</th>
-                                                        <th>Tanggal</th>
+                                                        <th>Periode</th>
+                                                        <th>Tanggal Post</th>
                                                         <th>Note</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
@@ -125,55 +125,80 @@
                     </div>
                     <div class="col s12">
                         <input type="hidden" id="temp" name="temp">
-                        <div class="input-field col s6">
-                            <select class="select2 browser-default" id="employee_id" name="employee_id" onchange="userDetail()">
-                                <option value="">--Pilih ya--</option>
-                            </select>
-                            <label class="active" for="employee_id">Select Employee</label>
+                        <div class="input-field col m2 s12 step1">
+                            <input type="hidden" id="temp" name="temp">
+                            <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
+                            <label class="active" for="code">No. Dokumen</label>
                         </div>
-                        <div class="input-field col s6">
-                            <select id="type" name="type" onchange="hideShow()">
-                                <option value="1">Promotion</option>
-                                <option value="2">Demotion</option>
-                                <option value="3">Mutation</option>
-                                <option value="4">Resign</option>
-                            </select>
-                            <label for="type">Tipe</label>
-                        </div>
-                        <div class="input-field col s6 employee_inputs" id="place_select">
-                            <select id="plant_id" name="plant_id">
-                                <option value=""></option>
-                                @foreach($place as $row)
-                                    <option value="{{ $row->id }}">{{ $row->code }}</option>
+                        <div class="input-field col m1 s12 step2">
+                            <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
+                                <option value="">--Pilih--</option>
+                                @foreach ($place as $rowplace)
+                                    <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
                                 @endforeach
                             </select>
-                            <label for="plant_id">Penempatan</label>
                         </div>
-                        <div class="input-field col s6 employee_inputs" id="position_select">
-                            <select  class="select2 browser-default" id="position_id" name="position_id">
-                                <option value=""></option>
-                                
+                        <div class="input-field col m3 s12 step7">
+                            <select class="form-control" id="company_id" name="company_id" onchange="getCompanyAddress();">
+                                @foreach ($company as $rowcompany)
+                                    <option value="{{ $rowcompany->id }}" data-address="{{ $rowcompany->address }}">{{ $rowcompany->name }}</option>
+                                @endforeach
                             </select>
-                            <label class="active" for="position_id">Posisi/Level</label>
+                            <label class="" for="company_id">Perusahaan</label>
                         </div>
-                        <div class="input-field col s6" id="manager_select">
-                            <select class="select2 browser-default" id="manager_id" name="manager_id">
-                                <option value="">--Pilih ya--</option>
-                            </select>
-                            <label class="active" for="manager_id">Select Manager</label>
+                        <div class="input-field col m12 s12">
+                            <select class="browser-default" id="period_id" name="period_id"></select>
+                            <label class="active" for="period_id">Periode Mulai</label>
+                        </div>
+                        <div class="input-field col m3 s12 step4">
+                            <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                            <label class="active" for="post_date">Tgl. Posting</label>
                         </div>
                         
-                        <div class="input-field col s6" >
-                            <input id="post_date" name="post_date"  min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tanggal Post">
-                            <label class="active" for="post_date">Tanggal Post</label>
+                        <div class="col m12 s12">
+                            <div style="overflow:auto;">
+                                <table class="bordered">
+                                    <thead>
+                                        <tr>
+                                            <th class="center">NIK</th>
+                                            <th class="center">Tanggal</th>
+                                            <th class="center">Jam</th>
+                                            <th class="center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="body-detail">
+                                        <tr class="row_item" data-id="">
+                                            <td>
+                                                <select class="browser-default uid-array" id="arr_uid0" name="arr_uid[]"></select>
+                                            </td>
+                                            <td>
+                                                <input name="arr_date[]" type="date">
+                                            </td>
+                                            <td>
+                                                <input name="arr_time[]" id="arr_time" type="time">
+                                            </td>
+                                            <td class="center">
+                                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                                    <i class="material-icons">delete</i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        <tr id="last-row-item">
+                                            <td colspan="12">
+                                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
+                                                    <i class="material-icons left">add</i> Tambah 1
+                                                </a>
+                                                
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                        <div class="input-field col s6">
-                            <input id="valid_date" name="valid_date"  min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tanggal Efektif">
-                            <label class="active" for="valid_date">Tanggal Efektif</label>
-                        </div>
-                        <div class="input-field col s6">
-                            <input id="note" name="note" type="text" placeholder="">
-                            <label class="active" for="note">Keterangan Transfer</label>
+                        
+                        <div class="input-field col m3 s12 step12">
+                            <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
+                            <label class="active" for="note">Keterangan</label>
                         </div>
                         <div class="col s12 mt-3">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
@@ -305,7 +330,7 @@
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+                select2ServerSide('#arr_uid0', '{{ url("admin/select2/employee") }}');
             },
             onOpenEnd: function(modal, trigger) { 
                 $('#validation_alert').hide();
@@ -314,9 +339,36 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
+                $('#body-detail').empty();
+                $('#body-detail').append(`
+                <tr class="row_item" data-id="">
+                    <td>
+                        <select class="browser-default uid-array" id="arr_uid0" name="arr_uid[]"></select>
+                    </td>
+                    <td>
+                        <input name="arr_date[]" type="date">
+                    </td>
+                    <td>
+                        <input name="arr_time[]" id="arr_time" type="time">
+                    </td>
+                    <td class="center">
+                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                            <i class="material-icons">delete</i>
+                        </a>
+                    </td>
+                </tr>
+                <tr id="last-row-item">
+                    <td colspan="12">
+                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
+                            <i class="material-icons left">add</i> Tambah 1
+                        </a>
+                        
+                    </td>
+                </tr>`);
+
                 $('#temp').val('');
                 M.updateTextFields();
-                $('#manager_id,#employee_id,#position_id').empty();
+                $('#period_id').empty();
             }
         });
         
@@ -324,6 +376,10 @@
         loadDataTable();
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
+        });
+
+        $('#body_item').on('click', '.delete-data-item', function() {
+            $(this).closest('tr').remove();
         });
 
         $('#modal4_1').modal({
@@ -353,152 +409,50 @@
                 
             }
         });
-        select2ServerSide('#employee_id', '{{ url("admin/select2/employee") }}');
-        select2ServerSide('#manager_id', '{{ url("admin/select2/employee") }}');
-        select2ServerSide('#position_id', '{{ url("admin/select2/position") }}');
-        // ... Your other code ...
+        select2ServerSide('#arr_uid0', '{{ url("admin/select2/employee") }}');
+        select2ServerSide('#period_id', '{{ url("admin/select2/period") }}');
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
-        const employee_code = urlParams.get('employee_code');
-        const selectedCode = $('#selectedCode').val();
-        console.log(selectedCode);
-
-        if (code) {
-           
-            $.ajax({
-                url: '{{ Request::url() }}/show_from_code',
-                type: 'POST',
-                dataType: 'JSON',
-                data: {
-                    id: selectedCode
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                beforeSend: function() {
-                    loadingOpen('#main');
-                },
-                success: function(response) {
-                    loadingClose('#main');
-                    $('#modal1').modal('open');
-                    $('#temp').val(response.id);
-                    $('#employee_id').empty().append(`
-                        <option value="` + response.user_id + `">` + response.user.name + `</option>
-                    `);
-                    if(response.manager != null){
-                        $('#manager_id').empty().append(`
-                            <option value="` + response.manager_id + `">` + response.manager.name + `</option>
-                        `);
-                    }
-                    if(response.position != null){
-                        $('#position_id').empty().append(`
-                            <option value="` + response.position_id + `">` + response.position.name + `</option>
-                        `);
-                    }
-                    console.log(response);
-                  
-                    $('#plant_id').val(response.plant_id).formSelect();
-                    $('#post_date').val(response.post_date);
-                    $('#valid_date').val(response.valid_date);
-                    $('#note').val(response.note);
-                    $('.modal-content').scrollTop(0);
-                    $('#name').focus();
-                    
-                },
-                error: function() {
-                    $('.modal-content').scrollTop(0);
-                    loadingClose('#main');
-                    swal({
-                        title: 'Ups!',
-                        text: 'Check your internet connection.',
-                        icon: 'error'
-                    });
-                }
-            });
-           /*  $('#employee_id').val(selectedCode).trigger('change'); // Trigger 'change' event to update Select2 UI */
-        }
-
-        if (employee_code) {
-           
-           $.ajax({
-               url: '{{ Request::url() }}/instant_form_code',
-               type: 'POST',
-               dataType: 'JSON',
-               data: {
-                   id: employee_code
-               },
-               headers: {
-                   'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-               },
-               beforeSend: function() {
-                   loadingOpen('#main');
-               },
-               success: function(response) {
-                   loadingClose('#main');
-                   $('#modal1').modal('open');
-                   $('#employee_id').empty().append(`
-                       <option value="` + response.id + `">` + response.name + `</option>
-                   `);
-                   if(response.manager != null){
-                       $('#manager_id').empty().append(`
-                           <option value="` + response.manager_id + `">` + response.manager.name + `</option>
-                       `);
-                   }
-                   if(response.position != null){
-                       $('#position_id').empty().append(`
-                           <option value="` + response.position_id + `">` + response.position.name + `</option>
-                       `);
-                   }
-                   console.log(response);
-                 
-                   $('#plant_id').val(response.place_id).formSelect();
-                   $('#post_date').val(response.post_date);
-                   $('#valid_date').val(response.valid_date);
-                   $('#note').val(response.note);
-                   $('.modal-content').scrollTop(0);
-                   $('#name').focus();
-                   
-               },
-               error: function() {
-                   $('.modal-content').scrollTop(0);
-                   loadingClose('#main');
-                   swal({
-                       title: 'Ups!',
-                       text: 'Check your internet connection.',
-                       icon: 'error'
-                   });
-               }
-           });
-          /*  $('#employee_id').val(selectedCode).trigger('change'); // Trigger 'change' event to update Select2 UI */
-       }
+        
         
     });
 
-    function rowDetail(data) {
-        $.ajax({
-            url: '{{ Request::url() }}/row_detail',
-            type: 'GET',
-            beforeSend: function() {
-                loadingOpen('.modal-content');
-            },
-            data: {
-                id: data
-            },
-            success: function(response) {
-                $('#modal4_1').modal('open');
-                $('#show_detail').html(response);
-                loadingClose('.modal-content');
-            },
-            error: function() {
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
+    function getCode(val){
+        if(val){
+            if($('#temp').val()){
+                let newcode = $('#code').val().replaceAt(7,val);
+                $('#code').val(newcode);
+            }else{
+                if($('#code').val().length > 7){
+                    $('#code').val($('#code').val().slice(0, 7));
+                }
+                $.ajax({
+                    url: '{{ Request::url() }}/get_code',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        val: $('#code').val() + val,
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+                        $('#code').val(response);
+                    },
+                    error: function() {
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
                 });
             }
-        });
-	}
+        }
+    }
 
     function voidStatus(id){
         var msg = '';
@@ -541,39 +495,6 @@
         });
     }
 
-    function userDetail(){
-        $('#position_id').val($('#employee_id').select2('data')[0].arrinfo.position_id).formSelect();
-        $('#plant_id').val($('#employee_id').select2('data')[0].arrinfo.place_id).formSelect();
-       
-    }
-
-    function hideShow(){
-        const selectedValue = $('#type').val();
-        const $managerSelect = $('#manager_select');
-
-        if (selectedValue === "4") {
-            var today = new Date();
-            var year = today.getFullYear();
-            var month = today.getMonth() + 1;
-            var day = today.getDate();
-            var formattedDate = year + '-' + ('0' + month).slice(-2) + '-' + ('0' + day).slice(-2);
-
-            $('#valid_date').val(formattedDate);
-            $('#valid_date').prop('readonly', true);
-            $managerSelect.val('').hide();
-            $('#position_select').val('').hide();
-            $('#place_select').val('').hide();
-          
-        } else {
-            $('#valid_date').val('');
-            $('#valid_date').prop('readonly', false);
-            $managerSelect.val('').show();
-            $('#position_select').show().val('');
-            $('#place_select').show().val('');
-            
-        }
-    }
-
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
             "scrollCollapse": true,
@@ -609,10 +530,11 @@
                 }
             },
             columns: [
-                { name: 'user_id', searchable: false, className: 'center-align details-control' },
+                { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
-                { name: 'account_id', className: 'center-align' },
-                { name: 'type', className: 'center-align' },
+                { name: 'user_id', className: 'center-align' },
+                { name: 'period_id', className: 'center-align' },
+              
                 { name: 'post_date', className: 'center-align' },
                 { name: 'note', className: 'center-align' },
                 { name: 'status', className: 'center-align' },
@@ -651,12 +573,21 @@
         $('.dt-buttons').appendTo('#datatable_buttons');
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
+    
 
     function save(){
 		const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get('id');	
         var formData = new FormData($('#form_data')[0]);
         formData.append('id',id);
+        var path = window.location.pathname;
+        path = path.replace(/^\/|\/$/g, '');
+
+        // Split the path by slashes and get the last segment
+        var segments = path.split('/');
+        var lastSegment = segments[segments.length - 1];
+    
+        formData.append('lastsegment',lastSegment);
         $.ajax({
             url: '{{ Request::url() }}/create',
             type: 'POST',
@@ -722,6 +653,30 @@
         });
     }
 
+    function addItem(){
+        var count = makeid(10);
+        $('#last-row-item').before(`
+            <tr class="row_item" data-id="">
+              
+                <td>
+                    <select class="browser-default uid-array" id="arr_uid` + count + `" name="arr_uid[]"></select>
+                </td>
+                <td>
+                    <input name="arr_date[]" type="date" >
+                </td>
+                <td>
+                    <input name="arr_time[]" type="time" >
+                </td>
+                <td class="center">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
+            </tr>
+        `);
+        select2ServerSide('#arr_uid' + count, '{{ url("admin/select2/employee") }}');
+    }
+
 
     function success(){
         loadDataTable();
@@ -747,29 +702,49 @@
                 $('#modal1').modal('open');
 
                 $('#temp').val(id);
-                $('#type').val(response.type).formSelect();
-                $('#employee_id').empty().append(`
-                    <option value="` + response.employee_id + `">` + response.employee.name + `</option>
-                `);
-                if(response.manager != null){
-                    $('#manager_id').empty().append(`
-                        <option value="` + response.manager_id + `">` + response.manager.name + `</option>
-                    `);
+                $('#code').val(response.code);
+                if(response.details.length > 0){
+                    $('.row_item').each(function(){
+                        $(this).remove();
+                    });
+
+                    $.each(response.details, function(i, val) {
+                        var count = makeid(10);
+                        if(response.inventory_type == '1'){
+                            $('#last-row-item').before(`
+                                <tr class="row_item">
+                                    <td>
+                                        <select class="browser-default item-array" id="arr_uid` + count + `" name="arr_uid[]" ></select>
+                                    </td>
+                                    <td>
+                                        <input id="arr_date` + count + `" name="arr_date[]" type="date" >
+                                    </td>
+                                    <td>
+                                        <input id="arr_time` + count + `" name="arr_time[]" type="time" >
+                                    </td>
+                                </tr>
+                            `);
+                            $('#arr_uid' + count).append(`
+                                <option value="` + val.user_id + `">` + val.user + `</option>
+                            `);
+                            select2ServerSide('#arr_uid' + count, '{{ url("admin/select2/employee") }}');
+                            
+                            $('#arr_date' + count).val(val.date);
+                            $('#arr_time' + count).val(val.time);                            
+
+                        }
+
+
+                    });
                 }
-                console.log(response);
-                $('#position_id').empty().append(`
-                    <option value="` + response.position_id + `">` + response.position.code +" - "+response.position.name+ `</option>
-                `);
-                
-                $('#plant_id').val(response.plant_id).formSelect();
-          
-                
+               
+           
                 $("#post_date").val(response.post_date);
-                $("#valid_date").val(response.valid_date);
+            
                 $("#note").val(response.note);
                 
                 $('.modal-content').scrollTop(0);
-                $('#name').focus();
+            
                 
             },
             error: function() {
@@ -883,7 +858,7 @@
         var path = window.location.pathname;
         path = path.replace(/^\/|\/$/g, '');
 
-        
+        // Split the path by slashes and get the last segment
         var segments = path.split('/');
         var lastSegment = segments[segments.length - 1];
         formData.append('tabledata',etNumbers);

@@ -21,7 +21,8 @@ class Attendances extends Model
         'verify_type',
         'location',
         'latitude',
-        'longitude'
+        'longitude',
+        'revision_attendance_h_r_d_id',
     ];
 
     public function verifyType(){
@@ -30,6 +31,7 @@ class Attendances extends Model
             '2' => 'Application',
             '3' => 'Password',
             '4' => 'Web',
+            '5' => 'HRD revision',
             default => 'Invalid',
         };
 
@@ -38,7 +40,12 @@ class Attendances extends Model
 
     public function user()
     {
-        return $this->belongsTo('App\Models\User', 'employee_no', 'employee_no')->withTrashed();
+        return $this->belongsTo('App\Models\User', 'revision_id', 'id');
+    }
+
+    public function revisionAttendanceHRD()
+    {
+        return $this->belongsTo('App\Models\RevisionAttendanceHRD', 'employee_no', 'employee_no')->withTrashed();
     }
     
     public function plant(){

@@ -189,7 +189,7 @@
                             <label for="married_status">Status Pernikahan</label>
                         </div>
                         <div class="input-field col s4 employee_inputs" style="display:none;">
-                            <input id="married_date" name="married_date" type="date" max="{{ date('Y'.'-12-31') }}">
+                            <input id="married_date" name="married_date" type="date" max="{{ date('9999'.'-12-31') }}">
                             <label class="active" for="married_date">Tgl.Pernikahan</label>
                         </div>
                         <div class="input-field col s4 employee_inputs" style="display:none;">

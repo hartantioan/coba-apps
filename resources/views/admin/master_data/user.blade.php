@@ -870,7 +870,7 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                $('#type').val('1');
+                $('#type').val('2');
                 $('#province_id,#city_id,#country_id').empty();
                 M.updateTextFields();
                 $('.row_bank').remove();

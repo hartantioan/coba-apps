@@ -858,7 +858,7 @@
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                /* $('#type').trigger('change').formSelect(); */
+                $('#type').trigger('change').formSelect();
             },
             onOpenEnd: function(modal, trigger) { 
                 $('#name').focus();

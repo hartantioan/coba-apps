@@ -99,7 +99,7 @@ class SubsidiaryLedgerController extends Controller
                                 <td class="right-align">'.number_format($balance,2,',','.').'</td>
                                 <td>'.$detail->journal->note.'</td>
                                 <td>'.$detail->note.'</td>
-                                <td>'.$detail->note.'</td>
+                                <td>'.$detail->note2.'</td>
                                 <td>'.($detail->place()->exists() ? $detail->place->code : '-').'</td>
                                 <td>'.($detail->warehouse()->exists() ? $detail->warehouse->name : '-').'</td>
                                 <td>'.($detail->line()->exists() ? $detail->line->code : '-').'</td>

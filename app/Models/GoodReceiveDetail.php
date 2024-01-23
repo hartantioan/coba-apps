@@ -17,20 +17,96 @@ class GoodReceiveDetail extends Model
     protected $fillable = [
         'good_receive_id',
         'item_id',
+        'place_id',
+        'warehouse_id',
         'qty',
         'price',
         'total',
         'note',
+        'inventory_coa_id',
         'coa_id',
-        'place_id',
+        'cost_distribution_id',
+        'place_cost_id',
         'line_id',
         'machine_id',
         'department_id',
-        'warehouse_id',
         'area_id',
         'item_shading_id',
         'project_id',
     ];
+
+    public function getPlace(){
+        $place = '';
+        if($this->costDistribution()->exists()){
+            $arrplace = [];
+            foreach($this->costDistribution->costDistributionDetail as $row){
+                if($row->place()->exists()){
+                    $arrplace[] = $row->place->code;
+                }
+            }
+            $place = implode(',',$arrplace);
+        }else{
+            $place = $this->placeCost()->exists() ? $this->placeCost->code : '-';
+        }
+
+        return $place;
+    }
+
+    public function getLine(){
+        $line = '';
+        if($this->costDistribution()->exists()){
+            $arrtext = [];
+            foreach($this->costDistribution->costDistributionDetail as $row){
+                if($row->line()->exists()){
+                    $arrtext[] = $row->line->code;
+                }
+            }
+            $line = implode(',',$arrtext);
+        }else{
+            $line = $this->line()->exists() ? $this->line->code : '-';
+        }
+
+        return $line;
+    }
+
+    public function getMachine(){
+        $machine = '';
+        if($this->costDistribution()->exists()){
+            $arrtext = [];
+            foreach($this->costDistribution->costDistributionDetail as $row){
+                if($row->machine()->exists()){
+                    $arrtext[] = $row->machine->code;
+                }
+            }
+            $machine = implode(',',$arrtext);
+        }else{
+            $machine = $this->machine()->exists() ? $this->machine->code : '-';
+        }
+
+        return $machine;
+    }
+
+    public function getDepartment(){
+        $department = '';
+        if($this->costDistribution()->exists()){
+            $arrtext = [];
+            foreach($this->costDistribution->costDistributionDetail as $row){
+                if($row->department()->exists()){
+                    $arrtext[] = $row->department->code;
+                }
+            }
+            $department = implode(',',$arrtext);
+        }else{
+            $department = $this->department()->exists() ? $this->department->code : '-';
+        }
+
+        return $department;
+    }
+
+    public function inventoryCoa()
+    {
+        return $this->belongsTo('App\Models\InventoryCoa', 'inventory_coa_id', 'id')->withTrashed();
+    }
 
     public function goodReceive()
     {
@@ -74,6 +150,16 @@ class GoodReceiveDetail extends Model
     public function place()
     {
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
+    }
+
+    public function costDistribution()
+    {
+        return $this->belongsTo('App\Models\CostDistribution', 'cost_distribution_id', 'id')->withTrashed();
+    }
+
+    public function placeCost()
+    {
+        return $this->belongsTo('App\Models\Place', 'place_cost_id', 'id')->withTrashed();
     }
 
     public function department()

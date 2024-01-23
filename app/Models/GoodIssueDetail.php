@@ -38,6 +38,74 @@ class GoodIssueDetail extends Model
         'qty_return',
     ];
 
+    public function getPlace(){
+        $place = '';
+        if($this->costDistribution()->exists()){
+            $arrplace = [];
+            foreach($this->costDistribution->costDistributionDetail as $row){
+                if($row->place()->exists()){
+                    $arrplace[] = $row->place->code;
+                }
+            }
+            $place = implode(',',$arrplace);
+        }else{
+            $place = $this->place()->exists() ? $this->place->code : '-';
+        }
+
+        return $place;
+    }
+
+    public function getLine(){
+        $line = '';
+        if($this->costDistribution()->exists()){
+            $arrtext = [];
+            foreach($this->costDistribution->costDistributionDetail as $row){
+                if($row->line()->exists()){
+                    $arrtext[] = $row->line->code;
+                }
+            }
+            $line = implode(',',$arrtext);
+        }else{
+            $line = $this->line()->exists() ? $this->line->code : '-';
+        }
+
+        return $line;
+    }
+
+    public function getMachine(){
+        $machine = '';
+        if($this->costDistribution()->exists()){
+            $arrtext = [];
+            foreach($this->costDistribution->costDistributionDetail as $row){
+                if($row->machine()->exists()){
+                    $arrtext[] = $row->machine->code;
+                }
+            }
+            $machine = implode(',',$arrtext);
+        }else{
+            $machine = $this->machine()->exists() ? $this->machine->code : '-';
+        }
+
+        return $machine;
+    }
+
+    public function getDepartment(){
+        $department = '';
+        if($this->costDistribution()->exists()){
+            $arrtext = [];
+            foreach($this->costDistribution->costDistributionDetail as $row){
+                if($row->department()->exists()){
+                    $arrtext[] = $row->department->code;
+                }
+            }
+            $department = implode(',',$arrtext);
+        }else{
+            $department = $this->department()->exists() ? $this->department->code : '-';
+        }
+
+        return $department;
+    }
+
     public function lookable(){
         return $this->morphTo();
     }

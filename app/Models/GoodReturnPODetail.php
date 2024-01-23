@@ -59,4 +59,30 @@ class GoodReturnPODetail extends Model
 
         return $qty;
     }
+
+    public function itemSerial(){
+        return $this->hasMany('App\Models\ItemSerial','usable_id','id')->where('usable_type',$this->table);
+    }
+
+    public function listSerial(){
+        $arr = [];
+        foreach($this->itemSerial as $row){
+            $arr[] = $row->serial_number;
+        }
+
+        return implode(', ',$arr);
+    }
+
+    public function arrSerial(){
+        $arr = [];
+        
+        foreach($this->itemSerial as $row){
+            $arr[] = [
+                'serial_id'     => $row->id,
+                'serial_number' => $row->serial_number,
+            ];
+        }
+
+        return $arr;
+    }
 }

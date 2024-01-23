@@ -17,14 +17,14 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('good_receive_id')->nullable();
             $table->bigInteger('item_id')->nullable();
+            $table->bigInteger('place_id')->nullable();
+            $table->bigInteger('warehouse_id')->nullable();
             $table->double('qty')->nullable();
             $table->double('price')->nullable();
             $table->double('total')->nullable();
             $table->string('note')->nullable();
             $table->bigInteger('coa_id')->nullable();
-            $table->bigInteger('place_id')->nullable();
             $table->bigInteger('department_id')->nullable();
-            $table->bigInteger('warehouse_id')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
 

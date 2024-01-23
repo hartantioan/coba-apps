@@ -50,10 +50,10 @@ class InventoryCoa extends Model
     public function type(){
         switch($this->type) {
             case '1':
-                $type = 'Debit';
+                $type = 'Pengeluaran';
                 break;
             case '2':
-                $type = 'Kredit';
+                $type = 'Penerimaan';
                 break;
             default:
                 $type = 'Invalid';

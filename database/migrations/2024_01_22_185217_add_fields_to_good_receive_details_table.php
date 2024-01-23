@@ -12,9 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('good_receive_details', function (Blueprint $table) {
-            $table->bigInteger('line_id')->nullable()->after('coa_id')->index();
-            $table->bigInteger('machine_id')->nullable()->after('line_id')->index();
-            $table->bigInteger('project_id')->nullable()->after('area_id')->index();
+            $table->bigInteger('cost_distribution_id')->nullable()->after('coa_id')->index();
+            $table->bigInteger('place_cost_id')->nullable()->after('cost_distribution_id')->index();
         });
     }
 
@@ -24,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('good_receive_details', function (Blueprint $table) {
-            $table->dropColumn('line_id','machine_id','project_id');
+            $table->dropColumn('cost_distribution_id','place_cost_id');
         });
     }
 };

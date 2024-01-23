@@ -197,16 +197,18 @@
             <thead>
                 <tr>
                     <th class="center">Item</th>
+                    <th class="center">Tujuan</th>
                     <th class="center">Jum.</th>
                     <th class="center">Sat.</th>
                     <th class="center">Harga @</th>
                     <th class="center">Harga Total.</th>
+                    <th class="center">Tipe Penerimaan</th>
                     <th class="center">Coa</th>
+                    <th class="center">Dist.Biaya</th>
                     <th class="center">Plant</th>
                     <th class="center">Line</th>
                     <th class="center">Mesin</th>
                     <th class="center">Departemen</th>
-                    <th class="center">Ke Gudang</th>
                     <th class="center">Area</th>
                     <th class="center">Shading</th>
                     <th class="center">Proyek</th>
@@ -217,23 +219,25 @@
                 @foreach($data->goodReceiveDetail as $row)
                 <tr>
                     <td>{{ $row->item->code.' - '.$row->item->name }}</td>
+                    <td>{{ $row->place->code.' - '.$row->warehouse->name }}</td>
                     <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
                     <td class="center-align">{{ $row->item->uomUnit->code }}</td>
                     <td class="right-align">{{ number_format($row->price,3,',','.') }}</td>
                     <td class="right-align">{{ number_format($row->total,3,',','.') }}</td>
-                    <td class="center-align">{{ $row->coa->code.' - '.$row->coa->name }}</td>
-                    <td class="center-align">{{ $row->place->code }}</td>
-                    <td class="center-align">{{ $row->line()->exists() ? $row->line->code : '-' }}</td>
-                    <td class="center-align">{{ $row->machine()->exists() ? $row->machine->code : '-' }}</td>
-                    <td class="center-align">{{ $row->department_id ? $row->department->name : '-' }}</td>
-                    <td class="center-align">{{ $row->warehouse->name }}</td>
+                    <td class="center-align">{{ $row->inventoryCoa()->exists() ? $row->inventoryCoa->code.' - '.$row->inventoryCoa->name : '-' }}</td>
+                    <td class="center-align">{{ $row->coa()->exists() ? $row->coa->code.' - '.$row->coa->name : '-' }}</td>
+                    <td class="center-align">{{ $row->costDistribution()->exists() ? $row->costDistribution->name : '-' }}</td>
+                    <td class="center-align">{{ $row->getPlace() }}</td>
+                    <td class="center-align">{{ $row->getLine() }}</td>
+                    <td class="center-align">{{ $row->getMachine() }}</td>
+                    <td class="center-align">{{ $row->getDepartment() }}</td>
                     <td class="center-align">{{ $row->area()->exists() ? $row->area->name : '-' }}</td>
                     <td class="center-align">{{ $row->itemShading()->exists() ? $row->itemShading->name : '-' }}</td>
                     <td class="center-align">{{ $row->project()->exists() ? $row->project->code : '-' }}</td>
                     <td>{{ $row->note }}</td>
                 </tr>
                 <tr>
-                    <td colspan="15">No. Serial : {{ $row->listSerial() }}</td>
+                    <td colspan="17">No. Serial : {{ $row->listSerial() }}</td>
                 </tr>
                 @endforeach
             </tbody>

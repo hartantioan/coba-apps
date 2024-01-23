@@ -216,7 +216,8 @@ class GoodReceiveController extends Controller
             'arr_item'                  => 'required|array',
             'arr_qty'                   => 'required|array',
             'arr_coa'                   => 'required|array',
-            'arr_warehouse'             => 'required|array',
+            'arr_inventory_coa'         => 'required|array',
+            'arr_place_warehouse'       => 'required|array',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
             'code_place_id.required'            => 'Plant Tidak boleh kosong','company_id.required'               => 'Perusahaan tidak boleh kosong.',
@@ -232,10 +233,10 @@ class GoodReceiveController extends Controller
             'arr_qty.array'                     => 'Qty item harus dalam bentuk array',
             'arr_coa.required'                  => 'Coa tidak boleh kosong',
             'arr_coa.array'                     => 'Coa harus dalam bentuk array',
-            'arr_warehouse.required'            => 'Gudang tidak boleh kosong',
-            'arr_warehouse.array'               => 'Gudang harus dalam bentuk array',
-            'arr_area.required'                 => 'Area tidak boleh kosong',
-            'arr_area.array'                    => 'Area harus dalam bentuk array',
+            'arr_inventory_coa.required'        => 'Tipe Penerimaan tidak boleh kosong',
+            'arr_inventory_coa.array'           => 'Tipe Penerimaan harus dalam bentuk array',
+            'arr_place_warehouse.required'      => 'Plant & Gudang tujuan tidak boleh kosong',
+            'arr_place_warehouse.array'         => 'Plant & Gudang tujuan harus dalam bentuk array',
 		]);
 
         if($validation->fails()) {
@@ -427,17 +428,21 @@ class GoodReceiveController extends Controller
                 DB::beginTransaction();
                 try {
                     foreach($request->arr_item as $key => $row){
-                        
+                        $place = explode('-',$request->arr_place_warehouse[$key])[0];
+                        $warehouse = explode('-',$request->arr_place_warehouse[$key])[1];
                         $grd = GoodReceiveDetail::create([
                             'good_receive_id'       => $query->id,
                             'item_id'               => $row,
+                            'warehouse_id'          => $warehouse,
+                            'place_id'              => $place,
                             'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
                             'total'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])) * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'note'                  => $request->arr_note[$key],
-                            'coa_id'                => $request->arr_coa[$key],
-                            'warehouse_id'          => $request->arr_warehouse[$key],
-                            'place_id'              => $request->arr_place[$key],
+                            'inventory_coa_id'      => $request->arr_inventory_coa[$key] ? $request->arr_inventory_coa[$key] : NULL,
+                            'coa_id'                => $request->arr_coa[$key] ? $request->arr_coa[$key] : NULL,
+                            'cost_distribution_id'  => $request->arr_cost_distribution[$key] ? $request->arr_cost_distribution[$key] : NULL,
+                            'place_cost_id'         => $request->arr_place_cost[$key] ? $request->arr_place_cost[$key] : NULL,
                             'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
                             'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
                             'department_id'         => isset($request->arr_department[$key]) ? $request->arr_department[$key] : NULL,
@@ -496,22 +501,24 @@ class GoodReceiveController extends Controller
                     <table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="15">Daftar Item</th>
+                                <th class="center-align" colspan="18">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Item</th>
+                                <th class="center-align">Tujuan</th>
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
                                 <th class="right-align">Harga Satuan</th>
                                 <th class="right-align">Harga Total</th>
                                 <th class="center-align">Keterangan</th>
+                                <th class="center-align">Tipe Penerimaan</th>
                                 <th class="center-align">Coa</th>
+                                <th class="center-align">Dist.Biaya</th>
                                 <th class="center-align">Plant</th>
                                 <th class="center-align">Line</th>
                                 <th class="center-align">Mesin</th>
                                 <th class="center-align">Departemen</th>
-                                <th class="center-align">Gudang</th>
                                 <th class="center-align">Area</th>
                                 <th class="center-align">Shading</th>
                                 <th class="center-align">Proyek</th>
@@ -522,22 +529,24 @@ class GoodReceiveController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td>'.$row->item->code.' - '.$row->item->name.'</td>
+                <td class="center-align">'.$row->place->code.' - '.$row->warehouse->name.'</td>
                 <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->item->uomUnit->code.'</td>
                 <td class="center-align">'.number_format($row->price,2,',','.').'</td>
                 <td class="center-align">'.number_format($row->total,2,',','.').'</td>
                 <td class="center-align">'.$row->note.'</td>
-                <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
-                <td class="center-align">'.$row->place->code.'</td>
-                <td class="center-align">'.($row->line()->exists() ? $row->line->name : '-').'</td>
-                <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
-                <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
-                <td class="center-align">'.$row->warehouse->name.'</td>
+                <td class="center-align">'.($row->inventoryCoa()->exists() ? $row->inventoryCoa->name : '-').'</td>
+                <td class="center-align">'.($row->coa()->exists() ? $row->coa->code.' - '.$row->coa->name : '-').'</td>
+                <td class="center-align">'.($row->costDistribution()->exists() ? $row->costDistribution->name : '-').'</td>
+                <td class="center-align">'.$row->getPlace().'</td>
+                <td class="center-align">'.$row->getLine().'</td>
+                <td class="center-align">'.$row->getMachine().'</td>
+                <td class="center-align">'.$row->getDepartment().'</td>
                 <td class="center-align">'.($row->area()->exists() ? $row->area->name : '-').'</td>
                 <td class="center-align">'.($row->itemShading()->exists() ? $row->itemShading->code : '-').'</td>
                 <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
             </tr><tr>
-                <td colspan="15">No.Serial : '.$row->listSerial().'</td>
+                <td colspan="18">No.Serial : '.$row->listSerial().'</td>
             </tr>';
         }
         
@@ -604,29 +613,34 @@ class GoodReceiveController extends Controller
         
         foreach($gr->goodReceiveDetail as $row){
             $arr[] = [
-                'item_id'           => $row->item_id,
-                'item_name'         => $row->item->code.' - '.$row->item->name,
-                'qty'               => number_format($row->qty,3,',','.'),
-                'unit'              => $row->item->uomUnit->code,
-                'price'             => number_format($row->price,2,',','.'),
-                'total'             => number_format($row->total,2,',','.'),
-                'coa_id'            => $row->coa_id,
-                'coa_name'          => $row->coa->code.' - '.$row->coa->name,
-                'place_id'          => $row->place_id,
-                'line_id'           => $row->line_id,
-                'machine_id'        => $row->machine_id,
-                'department_id'     => $row->department_id,
-                'warehouse_id'      => $row->warehouse_id,
-                'warehouse_name'    => $row->warehouse->name,
-                'area_id'           => $row->area_id ? $row->area_id : '',
-                'area_name'         => $row->area()->exists() ? $row->area->name : '',
-                'project_id'        => $row->project()->exists() ? $row->project->id : '',
-                'project_name'      => $row->project()->exists() ? $row->project->name : '',
-                'note'              => $row->note ? $row->note : '',
-                'item_shading_id'   => $row->item_shading_id,
-                'list_shading'      => $row->item->arrShading(),
-                'is_sales_item'     => $row->item->is_sales_item ? $row->item->is_sales_item : '',
-                'list_serial'       => $row->listSerial(),
+                'item_id'                   => $row->item_id,
+                'item_name'                 => $row->item->code.' - '.$row->item->name,
+                'place_warehouse_id'        => $row->place_id.'-'.$row->warehouse_id,
+                'place_warehouse_name'      => $row->place->code.'-'.$row->warehouse->name,
+                'qty'                       => number_format($row->qty,3,',','.'),
+                'unit'                      => $row->item->uomUnit->code,
+                'price'                     => number_format($row->price,2,',','.'),
+                'total'                     => number_format($row->total,2,',','.'),
+                'inventory_coa_id'          => $row->inventoryCoa()->exists() ? $row->inventory_coa_id : '',
+                'inventory_coa_name'        => $row->inventoryCoa()->exists() ? $row->inventoryCoa->code.' - '.$row->inventoryCoa->name : '',
+                'coa_id'                    => $row->coa()->exists() ? $row->coa_id : '',
+                'coa_name'                  => $row->coa()->exists() ? $row->coa->code.' - '.$row->coa->name : '',
+                'cost_distribution_id'      => $row->cost_distribution_id ? $row->cost_distribution_id : '',
+                'cost_distribution_name'    => $row->cost_distribution_id ? $row->costDistribution->code.' - '.$row->costDistribution->name : '',
+                'place_cost_id'             => $row->place_cost_id,
+                'line_id'                   => $row->line_id,
+                'machine_id'                => $row->machine_id,
+                'department_id'             => $row->department_id,
+                'area_id'                   => $row->area_id ? $row->area_id : '',
+                'area_name'                 => $row->area()->exists() ? $row->area->name : '',
+                'project_id'                => $row->project()->exists() ? $row->project->id : '',
+                'project_name'              => $row->project()->exists() ? $row->project->name : '',
+                'note'                      => $row->note ? $row->note : '',
+                'item_shading_id'           => $row->item_shading_id,
+                'list_shading'              => $row->item->arrShading(),
+                'is_sales_item'             => $row->item->is_sales_item ? $row->item->is_sales_item : '',
+                'list_serial'               => $row->listSerial(),
+                'list_warehouse'            => $row->item->warehouseList(),
             ];
         }
 
@@ -659,6 +673,10 @@ class GoodReceiveController extends Controller
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
+
+                foreach($query->goodReceiveDetail as $row){
+                    $row->itemSerial()->delete();
+                }
 
                 CustomHelper::removeJournal('good_receives',$query->id);
                 CustomHelper::removeCogs('good_receives',$query->id);
@@ -723,7 +741,10 @@ class GoodReceiveController extends Controller
         
         if($query->delete()) {
 
-            $query->goodReceiveDetail()->delete();
+            foreach($query->goodReceiveDetail as $row){
+                $row->itemSerial()->delete();
+                $row->delete();
+            }
 
             $query->update([
                 'delete_id'     => session('bo_id'),
@@ -1086,7 +1107,7 @@ class GoodReceiveController extends Controller
                 'company'   => $query->company()->exists() ? $query->company->name : '-',
                 'code'      => $query->journal->code,
                 'note'      => $query->note,
-                'post_date' => date('d/m/y',strtotime($query->post_date)),
+                'post_date' => date('d/m/Y',strtotime($query->post_date)),
             ];
             $string='';
             foreach($query->journal->journalDetail()->where(function($query){

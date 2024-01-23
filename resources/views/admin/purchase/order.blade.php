@@ -2163,7 +2163,7 @@
                             $('input').css('border-bottom', '0.5px solid black');
                             loadingClose('.modal-content');
                             if(response.status == 200) {
-                                /* success(); */
+                                success();
                                 M.toast({
                                     html: response.message
                                 });

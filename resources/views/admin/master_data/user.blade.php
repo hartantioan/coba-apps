@@ -143,7 +143,7 @@
                     <div class="col s12">
                         <div class="input-field col s3">
                             <select id="type" name="type" onchange="changeMode(this);refreshGroup();">
-                                <option value="1">Pegawai</option>
+                                {{-- <option value="1">Pegawai</option> --}}
                                 <option value="2">Customer</option>
                                 <option value="3">Supplier</option>
                                 <option value="4">Ekspedisi</option>

@@ -232,6 +232,9 @@ td {
                     <td class="center">{{ $rowdetail->goodReceiptDetail->department->name }}</td>
                     <td class="center">{{ $rowdetail->goodReceiptDetail->warehouse->name }}</td>
                 </tr>
+                <tr>
+                    <td colspan="11">Serial : {{ $rowdetail->listSerial() }}</td>
+                </tr>
                 @endforeach
             </tbody>
         </table>

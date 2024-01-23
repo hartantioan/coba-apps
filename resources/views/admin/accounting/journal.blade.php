@@ -882,10 +882,10 @@
                     <input type="text" name="arr_multi_note[]" placeholder="Keterangan">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_post_date[]" placeholder="Tgl.Post format dd/mm/yy ex:15/12/23">
+                    <input type="text" name="arr_multi_post_date[]" placeholder="Tgl.Post format dd/mm/yyyy ex:15/12/23">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_due_date[]" placeholder="Tgl.Tenggat format dd/mm/yy ex:15/12/23">
+                    <input type="text" name="arr_multi_due_date[]" placeholder="Tgl.Tenggat format dd/mm/yyyy ex:15/12/23">
                 </td>
                 <td>
                     <input type="text" name="arr_multi_currency[]" placeholder="ID Mata Uang">
@@ -1002,10 +1002,10 @@
                                     <input type="text" name="arr_multi_note[]" placeholder="Keterangan">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_post_date[]" placeholder="Tgl.Post format dd/mm/yy ex:15/12/23">
+                                    <input type="text" name="arr_multi_post_date[]" placeholder="Tgl.Post format dd/mm/yyyy ex:15/12/23">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_due_date[]" placeholder="Tgl.Tenggat format dd/mm/yy ex:15/12/23">
+                                    <input type="text" name="arr_multi_due_date[]" placeholder="Tgl.Tenggat format dd/mm/yyyy ex:15/12/23">
                                 </td>
                                 <td>
                                     <input type="text" name="arr_multi_currency[]" placeholder="ID Mata Uang">

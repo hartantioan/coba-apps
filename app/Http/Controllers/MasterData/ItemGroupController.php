@@ -95,7 +95,7 @@ class ItemGroupController extends Controller
                     $val->code,
                     $val->name,
                     $val->parentSub()->exists() ? $val->parentSub->name : 'is Parent',
-                    $val->coa->name,
+                    $val->coa()->exists() ? $val->coa->name : '',
                     $val->listWarehouse(),
                     $val->productionType(),
                     $val->isActiva(),

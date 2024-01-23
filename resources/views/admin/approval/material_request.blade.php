@@ -206,13 +206,17 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($data->materialRequestDetail()->whereIn('status',[NULL,'1'])->get() as $key => $row)
+                    @foreach($data->materialRequestDetail as $key => $row)
                     <tr>
                         <td class="center-align">
-                            <label>
-                                <input type="checkbox" id="arr_status_material_request{{ $key }}" name="arr_status_material_request[]" value="{{ $row->id }}" {{ $row->status ? 'checked' : '' }}>
-                                <span>Pilih</span>
-                            </label>
+                            @if ($row->status == '2')
+                                {!! $row->status() !!}
+                            @else
+                                <label>
+                                    <input type="checkbox" id="arr_status_material_request{{ $key }}" name="arr_status_material_request[]" value="{{ $row->id }}" {{ $row->status ? 'checked' : '' }}>
+                                    <span>Pilih</span>
+                                </label>
+                            @endif
                         </td>
                         <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                         <td class="right-align">{{ number_format($row->qty,3,',','.') }}</td>

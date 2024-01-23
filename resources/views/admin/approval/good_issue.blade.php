@@ -200,10 +200,13 @@
                     <th class="center">Jum.</th>
                     <th class="center">Sat.</th>
                     <th class="center">Tipe Biaya</th>
-                    <th class="center">Plant</th>
+                    <th class="center">Coa</th>
+                    <th class="center">Dari Plant</th>
                     <th class="center">Dari Gudang</th>
                     <th class="center">Area</th>
                     <th class="center">Shading</th>
+                    <th class="center">Dist.Biaya</th>
+                    <th class="center">Plant</th>
                     <th class="center">Line</th>
                     <th class="center">Mesin</th>
                     <th class="center">Departemen</th>
@@ -218,11 +221,14 @@
                     <td>{{ $row->itemStock->item->code.' - '.$row->itemStock->item->name }}</td>
                     <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
                     <td class="center-align">{{ $row->itemStock->item->uomUnit->code }}</td>
-                    <td class="center-align">{{ $row->inventoryCoa->name }}</td>
+                    <td class="center-align">{{ $row->inventoryCoa()->exists() ? $row->inventoryCoa->name : '-' }}</td>
+                    <td class="center-align">{{ $row->coa()->exists() ? $row->coa->code.' - '.$row->coa->name : '-' }}</td>
                     <td class="center-align">{{ $row->itemStock->place->code }}</td>
                     <td class="center-align">{{ $row->itemStock->warehouse->name }}</td>
                     <td class="center-align">{{ $row->itemStock->area()->exists() ? $row->itemStock->area->name : '-' }}</td>
                     <td class="center-align">{{ $row->itemShading()->exists() ? $row->itemShading->code : '-' }}</td>
+                    <td class="center-align">{{ $row->costDistribution()->exists() ? $row->costDistribution->code.' - '.$row->costDistribution->name : '-' }}</td>
+                    <td class="center-align">{{ $row->place()->exists() ? $row->place->code : '-' }}</td>
                     <td class="center-align">{{ $row->line()->exists() ? $row->line->name : '-' }}</td>
                     <td class="center-align">{{ $row->machine()->exists() ? $row->machine->name : '-' }}</td>
                     <td class="center-align">{{ $row->department()->exists() ? $row->department->name : '-' }}</td>
@@ -231,10 +237,10 @@
                     <td class="center-align">{{ number_format($row->qty_return,3,',','.') }}</td>
                 </tr>
                 <tr>
-                    <td colspan="14">Keterangan : {{ $row->note }}</td>
+                    <td colspan="16">Keterangan : {{ $row->note }}</td>
                 </tr>
                 <tr>
-                    <td colspan="14">Serial : {{ $row->listSerial() }}</td>
+                    <td colspan="16">Serial : {{ $row->listSerial() }}</td>
                 </tr>
                 @endforeach
             </tbody>

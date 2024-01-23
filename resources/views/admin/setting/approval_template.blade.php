@@ -822,13 +822,7 @@
                     $('#sign').val(response.sign).formSelect();
                     $('#nominal').val(response.nominal);
                     $('#nominal_type').val(response.nominal_type).formSelect();
-                }else{
-                    $('#is_check_benchmark').prop( "checked", false);
-                    $('#sign').attr('disabled',true).formSelect();
-                    $('#nominal').attr('disabled',true);
-                }
-
-                if(response.is_check_nominal == '1'){
+                }else if(response.is_check_nominal == '1'){
                     $('#is_check_nominal').prop( "checked", true);
                     $('#sign').attr('disabled',false).formSelect();
                     $('#nominal').attr('disabled',false);
@@ -837,6 +831,7 @@
                     $('#nominal').val(response.nominal);
                     $('#nominal_type').val(response.nominal_type).formSelect();
                 }else{
+                    $('#is_check_benchmark').prop( "checked", false);
                     $('#is_check_nominal').prop( "checked", false);
                     $('#sign').attr('disabled',true).formSelect();
                     $('#nominal').attr('disabled',true);

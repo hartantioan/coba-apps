@@ -20,8 +20,19 @@
             <th>Satuan</th>
             <th>Keterangan</th>
             <th>Tipe Biaya</th>
+            <th>Coa</th>
+            <th>Dari Plant</th>
+            <th>Dari Gudang</th>
+            <th>Area</th>
+            <th>Shading</th>
+            <th>Dist.Biaya</th>
             <th>Plant</th>
-            <th>Gudang</th>
+            <th>Line</th>
+            <th>Mesin</th>
+            <th>Departemen</th>
+            <th>Proyek</th>
+            <th>Requester</th>
+            <th>Qty Kembali</th>
         </tr>
     </thead>
     <tbody>
@@ -49,9 +60,20 @@
                 <td>{{ number_format($rowdetail->qty,3,',','.') }}</td>
                 <td>{{ $rowdetail->itemStock->item->uomUnit->code }}</td>
                 <td>{{ $rowdetail->note }}</td>
-                <td>{{ $rowdetail->inventoryCoa->name }}</td>
-                <td>{{ $rowdetail->itemStock->place->name }}</td>
+                <td>{{ $rowdetail->inventoryCoa()->exists() ? $rowdetail->inventoryCoa->name : '-' }}</td>
+                <td>{{ $rowdetail->coa()->exists() ? $rowdetail->coa->code.' - '.$rowdetail->coa->name : '-' }}</td>
+                <td>{{ $rowdetail->itemStock->place->code }}</td>
                 <td>{{ $rowdetail->itemStock->warehouse->name }}</td>
+                <td>{{ $rowdetail->itemStock->area()->exists() ? $rowdetail->itemStock->area->name : '-' }}</td>
+                <td>{{ $rowdetail->itemShading()->exists() ? $rowdetail->itemShading->code : '-' }}</td>
+                <td>{{ $rowdetail->costDistribution()->exists() ? $rowdetail->costDistribution->code.' - '.$rowdetail->costDistribution->name : '-' }}</td>
+                <td>{{ $rowdetail->place()->exists() ? $rowdetail->place->code : '-' }}</td>
+                <td>{{ $rowdetail->line()->exists() ? $rowdetail->line->code : '-' }}</td>
+                <td>{{ $rowdetail->machine()->exists() ? $rowdetail->machine->name : '-' }}</td>
+                <td>{{ $rowdetail->department()->exists() ? $rowdetail->department->name : '-' }}</td>
+                <td>{{ $rowdetail->project()->exists() ? $rowdetail->project->name : '-' }}</td>
+                <td>{{ $rowdetail->requester }}</td>
+                <td>{{ number_format($rowdetail->qty_return,3,',','.') }}</td>
             </tr>
             @php
                 $no++;

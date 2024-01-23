@@ -644,7 +644,6 @@ class CustomHelper {
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
-					'account_id'	=> $gr->account_id,
 					'place_id'		=> $rowdetail->place_id,
 					'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
 					'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
@@ -1341,20 +1340,46 @@ class CustomHelper {
 					'item_id'		=> $row->item_id,
 				]);
 
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $row->coa_id,
-					'place_id'		=> $row->place_id,
-					'line_id'		=> $row->line_id ? $row->line_id : NULL,
-					'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
-					'department_id'	=> $row->department_id ? $row->department_id : NULL,
-					'warehouse_id'	=> $row->warehouse_id,
-					'project_id'	=> $row->project_id ? $row->project_id : NULL,
-					'type'			=> '2',
-					'nominal'		=> $row->total * $gr->currency_rate,
-					'nominal_fc'	=> $gr->currency->type == '1' ? 0 : $row->total,
-					'item_id'		=> $row->item_id,
-				]);
+				if($row->cost_distribution_id){
+					$total = $row->total * $gr->currency_rate;
+					$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
+					$accumulation = 0;
+					foreach($row->costDistribution->costDistributionDetail as $key => $rowcost){
+						if($key == $lastIndex){
+							$nominal = $total - $accumulation;
+						}else{
+							$nominal = round(($rowcost->percentage / 100) * $total);
+							$accumulation += $nominal;
+						}
+						JournalDetail::create([
+							'journal_id'                    => $query->id,
+							'cost_distribution_detail_id'   => $rowcost->id,
+							'coa_id'                        => $row->inventoryCoa()->exists() ? $row->inventoryCoa->coa_id : $row->coa_id,
+							'place_id'                      => $rowcost->place_id ? $rowcost->place_id : NULL,
+							'line_id'                       => $rowcost->line_id ? $rowcost->line_id : NULL,
+							'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : NULL,
+							'department_id'                 => $rowcost->department_id ? $rowcost->department_id : NULL,
+							'project_id'					=> $row->project_id ? $row->project_id : NULL,
+							'type'                          => '2',
+							'nominal'						=> $nominal,
+							'nominal_fc'					=> 0,
+						]);
+					}
+				}else{
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->inventoryCoa()->exists() ? $row->inventoryCoa->coa_id : $row->coa_id,
+						'place_id'		=> $row->place_cost_id ? $row->place_cost_id : NULL,
+						'line_id'		=> $row->line_id ? $row->line_id : NULL,
+						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+						'department_id'	=> $row->department_id ? $row->department_id : NULL,
+						'project_id'	=> $row->project_id ? $row->project_id : NULL,
+						'type'			=> '2',
+						'nominal'		=> $row->total * $gr->currency_rate,
+						'nominal_fc'	=> $gr->currency->type == '1' ? 0 : $row->total,
+						'item_id'		=> $row->item_id,
+					]);
+				}
 
 				self::sendCogs('good_receives',
 					$gr->id,
@@ -1567,7 +1592,7 @@ class CustomHelper {
 						JournalDetail::create([
 							'journal_id'                    => $query->id,
 							'cost_distribution_detail_id'   => $rowcost->id,
-							'coa_id'                        => $row->coa_id,
+							'coa_id'						=> $row->inventoryCoa()->exists() ? $row->inventoryCoa->coa_id : $row->coa_id,
 							'place_id'                      => $rowcost->place_id ? $rowcost->place_id : NULL,
 							'line_id'                       => $rowcost->line_id ? $rowcost->line_id : NULL,
 							'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : NULL,
@@ -1582,7 +1607,7 @@ class CustomHelper {
 				}else{
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
-						'coa_id'		=> $row->coa_id,
+						'coa_id'		=> $row->inventoryCoa()->exists() ? $row->inventoryCoa->coa_id : $row->coa_id,
 						'place_id'		=> $row->place()->exists() ? $row->place_id : NULL,
 						'item_id'		=> $row->itemStock->item_id,
 						'line_id'		=> $row->line_id ? $row->line_id : NULL,
@@ -1667,19 +1692,47 @@ class CustomHelper {
 					'nominal_fc'	=> 0,
 				]);
 
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $row->goodIssueDetail->coa_id,
-					'place_id'		=> $row->goodIssueDetail->place()->exists() ? $row->goodIssueDetail->place_id : NULL,
-					'item_id'		=> $row->goodIssueDetail->itemStock->item_id,
-					'line_id'		=> $row->goodIssueDetail->line_id ? $row->goodIssueDetail->line_id : NULL,
-					'machine_id'	=> $row->goodIssueDetail->machine_id ? $row->goodIssueDetail->machine_id : NULL,
-					'department_id'	=> $row->goodIssueDetail->department_id ? $row->goodIssueDetail->department_id : NULL,
-					'project_id'	=> $row->goodIssueDetail->project_id ? $row->goodIssueDetail->project_id : NULL,
-					'type'			=> '2',
-					'nominal'		=> $row->total,
-					'nominal_fc'	=> 0,
-				]);
+				if($row->goodIssueDetail->cost_distribution_id){
+					$total = $row->total;
+					$lastIndex = count($row->goodIssueDetail->costDistribution->costDistributionDetail) - 1;
+					$accumulation = 0;
+					foreach($row->goodIssueDetail->costDistribution->costDistributionDetail as $key => $rowcost){
+						if($key == $lastIndex){
+							$nominal = $total - $accumulation;
+						}else{
+							$nominal = round(($rowcost->percentage / 100) * $total);
+							$accumulation += $nominal;
+						}
+						JournalDetail::create([
+							'journal_id'                    => $query->id,
+							'cost_distribution_detail_id'   => $rowcost->id,
+							'coa_id'                        => $row->goodIssueDetail->inventoryCoa()->exists() ? $row->goodIssueDetail->inventoryCoa->coa_id : $row->goodIssueDetail->coa_id,
+							'place_id'                      => $rowcost->place_id ? $rowcost->place_id : NULL,
+							'line_id'                       => $rowcost->line_id ? $rowcost->line_id : NULL,
+							'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : NULL,
+							'department_id'                 => $rowcost->department_id ? $rowcost->department_id : NULL,
+							'warehouse_id'                  => $rowcost->warehouse_id ? $rowcost->warehouse_id : NULL,
+							'project_id'					=> $row->goodIssueDetail->project_id ? $row->goodIssueDetail->project_id : NULL,
+							'type'                          => '2',
+							'nominal'						=> $nominal,
+							'nominal_fc'					=> 0,
+						]);
+					}
+				}else{
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->goodIssueDetail->inventoryCoa()->exists() ? $row->goodIssueDetail->inventoryCoa->coa_id : $row->goodIssueDetail->coa_id,
+						'place_id'		=> $row->goodIssueDetail->place()->exists() ? $row->goodIssueDetail->place_id : NULL,
+						'item_id'		=> $row->goodIssueDetail->itemStock->item_id,
+						'line_id'		=> $row->goodIssueDetail->line_id ? $row->goodIssueDetail->line_id : NULL,
+						'machine_id'	=> $row->goodIssueDetail->machine_id ? $row->goodIssueDetail->machine_id : NULL,
+						'department_id'	=> $row->goodIssueDetail->department_id ? $row->goodIssueDetail->department_id : NULL,
+						'project_id'	=> $row->goodIssueDetail->project_id ? $row->goodIssueDetail->project_id : NULL,
+						'type'			=> '2',
+						'nominal'		=> $row->total,
+						'nominal_fc'	=> 0,
+					]);
+				}
 
 				self::sendCogs($gr->getTable(),
 					$gr->id,

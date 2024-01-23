@@ -252,7 +252,8 @@ Route::prefix('admin')->group(function () {
                 Route::get('purchase_item', [Select2Controller::class, 'purchaseItem']);
                 Route::get('sales_item', [Select2Controller::class, 'salesItem']);
                 Route::get('coa', [Select2Controller::class, 'coa']);
-                Route::get('inventory_coa', [Select2Controller::class, 'inventoryCoa']);
+                Route::get('inventory_coa_issue', [Select2Controller::class, 'inventoryCoaIssue']);
+                Route::get('inventory_coa_receive', [Select2Controller::class, 'inventoryCoaReceive']);
                 Route::get('coa_journal', [Select2Controller::class, 'coaJournal']);
                 Route::get('raw_coa', [Select2Controller::class, 'rawCoa']);
                 Route::get('employee', [Select2Controller::class, 'employee']);
@@ -346,6 +347,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('user_bank_by_account', [Select2Controller::class, 'userBankByAccount']);
                 Route::get('all_user_bank', [Select2Controller::class, 'allUserBank']);
                 Route::get('item_serial', [Select2Controller::class, 'itemSerial']);
+                Route::get('item_serial_return_po', [Select2Controller::class, 'itemSerialReturnPo']);
             });
 
             Route::prefix('menu')->group(function () {

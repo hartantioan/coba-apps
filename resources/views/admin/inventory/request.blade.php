@@ -258,7 +258,7 @@
                                                     </td>
                                                 </tr>
                                                 <tr id="last-row-item">
-                                                    <td colspan="13">
+                                                    <td colspan="15">
                                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> Tambah
                                                         </a>

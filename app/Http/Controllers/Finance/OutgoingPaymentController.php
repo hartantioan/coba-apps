@@ -2469,7 +2469,7 @@ class OutgoingPaymentController extends Controller
                 'company'   => $query->company()->exists() ? $query->company->name : '-',
                 'code'      => $query->journal->code,
                 'note'      => $query->note,
-                'post_date' => date('d/m/y',strtotime($query->post_date)),
+                'post_date' => date('d/m/Y',strtotime($query->post_date)),
             ];
             $string='';
             foreach($query->journal->journalDetail()->where(function($query){

@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('employee_no',155)->unique();
             $table->string('password')->nullable();
             $table->string('username')->nullable();
-            $table->string('phone')->unique();
+            $table->string('phone')->nullable();
             $table->text('address')->nullable();
             $table->bigInteger('province_id')->nullable();
             $table->bigInteger('city_id')->nullable();

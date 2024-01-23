@@ -393,7 +393,7 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
-    public function inventoryCoa(Request $request)
+    public function inventoryCoaIssue(Request $request)
     {   
         $response = [];
         $search   = $request->search;
@@ -401,6 +401,29 @@ class Select2Controller extends Controller {
                     $query->where('code', 'like', "%$search%")
                     ->orWhere('name', 'like', "%$search%");
                  })
+                ->where('type','1')
+                ->where('status','1')
+                ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function inventoryCoaReceive(Request $request)
+    {   
+        $response = [];
+        $search   = $request->search;
+        $data = InventoryCoa::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%");
+                 })
+                ->where('type','2')
                 ->where('status','1')
                 ->get();
 
@@ -3521,6 +3544,29 @@ class Select2Controller extends Controller {
                 })
                 ->whereNull('usable_type')
                 ->where('item_id',$request->item_id)
+                ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->serial_number,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function itemSerialReturnPo(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = ItemSerial::where(function($query) use($search){
+                    $query->where('serial_number', 'like', "%$search%");
+                })
+                ->whereNull('usable_type')
+                ->where('item_id',$request->item_id)
+                ->where('lookable_type','good_receipt_details')
+                ->where('lookable_id',$request->grd_id)
                 ->get();
 
         foreach($data as $d) {

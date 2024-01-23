@@ -225,7 +225,7 @@
                                         <h5>Detail Produk</h5>
                                         Coa debit mengikuti coa pada masing-masing grup item.
                                         <div>
-                                            <table class="bordered" style="min-width:2500px;" id="table-detail">
+                                            <table class="bordered" style="min-width:3000px;" id="table-detail">
                                                 <thead>
                                                     <tr>
                                                         <th class="center">Item</th>
@@ -234,7 +234,8 @@
                                                         <th class="center">Satuan</th>
                                                         <th class="center" width="300px">No.Serial</th>
                                                         <th class="center">Keterangan</th>
-                                                        <th class="center">Tipe Biaya</th>
+                                                        <th class="center">Tipe Pengeluaran</th>
+                                                        <th class="center">Coa</th>
                                                         <th class="center">Dist.Biaya</th>
                                                         <th class="center">Plant</th>
                                                         <th class="center">Line</th>
@@ -248,10 +249,8 @@
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td colspan="16" class="center">
-                                                            <button class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
-                                                                <i class="material-icons left">add</i> Tambah Item
-                                                            </button>
+                                                        <td colspan="17">
+                                                            
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -261,13 +260,16 @@
                                 </div>
                             </div>
                         </fieldset>
+                        <button class="waves-effect waves-light cyan btn-small mb-1 mr-1 right mt-1" onclick="addItem()" href="javascript:void(0);">
+                            <i class="material-icons left">add</i> Tambah Item
+                        </button>
                         <div class="row">
                             <div class="input-field col m4 s12 step7">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step8" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                
                             </div>
                         </div>
                     </div>
@@ -276,8 +278,9 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn waves-effect waves-light purple " onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat  ">Close</a>
+        <button class="btn waves-effect waves-light purple mr-1" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+        <button class="btn waves-effect waves-light submit mr-1 step8" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
 
@@ -890,7 +893,7 @@
                                 `);
                             }
                             select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
-                            select2ServerSide('#arr_inventory_coa' + count, '{{ url("admin/select2/inventory_coa") }}');
+                            select2ServerSide('#arr_inventory_coa' + count, '{{ url("admin/select2/inventory_coa_issue") }}');
 
                             if(val.is_activa){
                                 $('#serial' + count).append(`
@@ -993,8 +996,11 @@
                 <td>
                     <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ...">
                 </td>
-                <td class="center">
-                    <select class="browser-default" id="arr_inventory_coa` + count + `" name="arr_inventory_coa[]"></select>
+                <td class="center" id="inventory_coa` + count + `">
+                    <select class="browser-default" id="arr_inventory_coa` + count + `" name="arr_inventory_coa[]" onchange="applyLock('` + count + `');"></select>
+                </td>
+                <td class="center" id="coa` + count + `">
+                    <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" onchange="applyLock('` + count + `');"></select>
                 </td>
                 <td class="center">
                     <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>
@@ -1048,9 +1054,22 @@
             </tr>
         `);
         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item_issue") }}');
-        select2ServerSide('#arr_inventory_coa' + count, '{{ url("admin/select2/inventory_coa") }}');
+        select2ServerSide('#arr_inventory_coa' + count, '{{ url("admin/select2/inventory_coa_issue") }}');
         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
         select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
+        select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+    }
+
+    function applyLock(code){
+        $('#inventory_coa' + code + ',#coa' + code).css('pointer-events','auto');
+        if($('#arr_inventory_coa' + code).val()){
+            $('#coa' + code).css('pointer-events','none');
+            $('#arr_coa' + code).empty();
+        }
+        if($('#arr_coa' + code).val()){
+            $('#inventory_coa' + code).css('pointer-events','none');
+            $('#arr_inventory_coa' + code).empty();
+        }
     }
 
     function setQtyReturn(element){
@@ -1146,31 +1165,34 @@
             if(qtyInput > qtyMax){
                 $('#rowQty' + val).val(formatRupiahIni(qtyMax.toFixed(3).toString().replace('.',',')));
             }
-            $('#arr_serial' + val).select2({
-                placeholder: '-- Kosong --',
-                minimumInputLength: 1,
-                allowClear: true,
-                cache: true,
-                width: 'resolve',
-                maximumSelectionLength: parseInt($('#rowQty' + val).val().replaceAll(".", "").replaceAll(",",".")),
-                dropdownParent: $('body').parent(),
-                ajax: {
-                    url: '{{ url("admin/select2/item_serial") }}',
-                    type: 'GET',
-                    dataType: 'JSON',
-                    data: function(params) {
-                        return {
-                            search: params.term,
-                            item_id: $("#arr_item" + val).val(),
-                        };
-                    },
-                    processResults: function(data) {
-                        return {
-                            results: data.items
+            if($('#arr_serial' + val).length > 0){
+                $('#arr_serial' + val).empty();
+                $('#arr_serial' + val).select2({
+                    placeholder: '-- Kosong --',
+                    minimumInputLength: 1,
+                    allowClear: true,
+                    cache: true,
+                    width: 'resolve',
+                    maximumSelectionLength: parseInt($('#rowQty' + val).val().replaceAll(".", "").replaceAll(",",".")),
+                    dropdownParent: $('body').parent(),
+                    ajax: {
+                        url: '{{ url("admin/select2/item_serial") }}',
+                        type: 'GET',
+                        dataType: 'JSON',
+                        data: function(params) {
+                            return {
+                                search: params.term,
+                                item_id: $("#arr_item" + val).val(),
+                            };
+                        },
+                        processResults: function(data) {
+                            return {
+                                results: data.items
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
         }else{
             $('#rowQty' + val).val('0,000');
         }
@@ -1192,8 +1214,8 @@
 
                 formData.delete('arr_item_stock[]');
                 formData.delete('arr_qty[]');
-                formData.delete('arr_note[]');
                 formData.delete('arr_inventory_coa[]');
+                formData.delete('arr_coa[]');
                 formData.delete('arr_place[]');
                 formData.delete('arr_line[]');
                 formData.delete('arr_machine[]');
@@ -1232,12 +1254,14 @@
                 });
 
                 $('select[name^="arr_inventory_coa"]').each(function(index){
-                    if(!$(this).val()){
+                    if(!$(this).val() && !$('select[name^="arr_coa[]"]').eq(index).val()){
                         passed = false;
-                    }else{
-                        formData.append('arr_inventory_coa[]',$(this).val());
-                        formData.append('arr_note[]',($('input[name^="arr_note[]"]').eq(index).val() ? $('input[name^="arr_note[]"]').eq(index).val() : ''));
                     }
+                });
+
+                $('select[name^="arr_inventory_coa"]').each(function(index){
+                    formData.append('arr_inventory_coa[]',($(this).val() ? $(this).val() : ''));
+                    formData.append('arr_coa[]',($('select[name^="arr_coa[]"]').eq(index).val() ? $('select[name^="arr_coa[]"]').eq(index).val() : ''));
                     formData.append('arr_cost_distribution[]',($('select[name^="arr_cost_distribution[]"]').eq(index).val() ? $('select[name^="arr_cost_distribution[]"]').eq(index).val() : ''));
                     formData.append('arr_place[]',($('select[name^="arr_place[]"]').eq(index).val() ? $('select[name^="arr_place[]"]').eq(index).val() : ''));
                     formData.append('arr_line[]',($('select[name^="arr_line[]"]').eq(index).val() ? $('select[name^="arr_line[]"]').eq(index).val() : ''));
@@ -1323,7 +1347,7 @@
                     }else{
                         swal({
                             title: 'Ups!',
-                            text: 'Mohon maaf, stok item / qty / coa tidak boleh kosong atau diisi 0.',
+                            text: 'Mohon maaf, stok item / qty / coa tidak boleh kosong atau diisi 0. Dan coa atau tipe pengeluaran harus dipilih salah satu.',
                             icon: 'warning'
                         });
                     }
@@ -1398,8 +1422,11 @@
                                 <td>
                                     <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
                                 </td>
-                                <td class="center">
-                                    <select class="browser-default" id="arr_inventory_coa` + count + `" name="arr_inventory_coa[]"></select>
+                                <td class="center" id="inventory_coa` + count + `">
+                                    <select class="browser-default" id="arr_inventory_coa` + count + `" name="arr_inventory_coa[]" onchange="applyLock('` + count + `');"></select>
+                                </td>
+                                <td class="center" id="coa` + count + `">
+                                    <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" onchange="applyLock('` + count + `');"></select>
                                 </td>
                                 <td class="center">
                                     <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>
@@ -1469,11 +1496,19 @@
                         $('#arr_item' + count).append(`
                             <option value="` + val.item_id + `">` + val.item_name + `</option>
                         `);
-                        $('#arr_inventory_coa' + count).append(`
-                            <option value="` + val.inventory_coa_id + `">` + val.inventory_coa_name + `</option>
-                        `);
+                        if(val.coa_id){
+                            $('#arr_coa' + count).append(`
+                                <option value="` + val.coa_id + `">` + val.coa_name + `</option>
+                            `);
+                        }
+                        if(val.inventory_coa_id){
+                            $('#arr_inventory_coa' + count).append(`
+                                <option value="` + val.inventory_coa_id + `">` + val.inventory_coa_name + `</option>
+                            `);
+                        }
+                        select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
                         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item_issue") }}');
-                        select2ServerSide('#arr_inventory_coa' + count, '{{ url("admin/select2/coa") }}');
+                        select2ServerSide('#arr_inventory_coa' + count, '{{ url("admin/select2/inventory_coa_issue") }}');
                         $('#arr_place' + count).val(val.place_id);
                         $('#arr_line' + count).val(val.line_id);
                         $('#arr_machine' + count).val(val.machine_id);

@@ -71,7 +71,7 @@
                                                         <th>Kode</th>
                                                         <th>Nama</th>
                                                         <th>Coa</th>
-                                                        <th>Tipe Pengeluaran</th>
+                                                        <th>Tipe</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -116,8 +116,8 @@
                         </div>
                         <div class="input-field col s6">
                             <select class="form-control" id="type" name="type">
-                                <option value="1">Debit</option>
-                                <option value="2">Kredit</option>
+                                <option value="1">Pengeluaran</option>
+                                <option value="2">Penerimaan</option>
                             </select>
                             <label class="" for="type">Tipe</label>
                         </div>
@@ -135,7 +135,7 @@
                         <div class="input-field col s6">
                             <div class="card-alert card green">
                                 <div class="card-content white-text">
-                                    <p>Info : Untuk form Good Issue silahkan pilih tipe <b>Debit</b>.</p>
+                                    <p>Info : Untuk form Good Issue silahkan pilih tipe <b>Pengeluaran</b>. Untuk form Good Receive silahkan pilih tipe <b>Penerimaan</b></p>
                                 </div>
                             </div>
                         </div>

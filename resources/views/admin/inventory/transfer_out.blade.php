@@ -968,7 +968,7 @@
         }).then(function (willDelete) {
             if (willDelete) {
 
-                var place_from = $('#place_from').val(), warehouse_from = $('#warehouse_from').val(), place_to = $('#place_to').val(), warehouse_to = $('#warehouse_to').val();
+                /* var place_from = $('#place_from').val(), warehouse_from = $('#warehouse_from').val(), place_to = $('#place_to').val(), warehouse_to = $('#warehouse_to').val();
 
                 if(place_from == place_to && warehouse_from == warehouse_to){
                     swal({
@@ -976,7 +976,7 @@
                         text: 'Plant Asal dan Tujuan, dan Gudang Asal dan Tujuan tidak boleh sama.',
                         icon: 'warning'
                     });
-                }else{
+                }else{ */
 
                     var formData = new FormData($('#form_data')[0]);
 
@@ -1083,7 +1083,7 @@
                             });
                         }
                     });
-                }
+                /* } */
             }
         });
     }

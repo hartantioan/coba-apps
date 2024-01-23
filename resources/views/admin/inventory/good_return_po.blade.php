@@ -201,13 +201,14 @@
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Produk</h4>
                                     <div style="overflow:auto;">
-                                        <table class="bordered" id="table-detail">
+                                        <table class="bordered" id="table-detail" style="min-width:1800px !important;">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Item</th>
                                                     <th class="center">Qty Diterima</th>
                                                     <th class="center">Qty Kembali</th>
                                                     <th class="center">Satuan</th>
+                                                    <th class="center" width="300px">No.Serial</th>
                                                     <th class="center">Keterangan 1</th>
                                                     <th class="center">Keterangan 2</th>
                                                     <th class="center">Plant</th>
@@ -220,7 +221,7 @@
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="empty-item">
-                                                    <td colspan="12" class="center">
+                                                    <td colspan="13" class="center">
                                                         Pilih good receipt po / penerimaan barang po untuk memulai...
                                                     </td>
                                                 </tr>
@@ -501,7 +502,7 @@
                 if($('#empty-item').length == 0){
                     $('#body-item').append(`
                         <tr id="empty-item">
-                            <td colspan="12" class="center">
+                            <td colspan="13" class="center">
                                 Pilih good receipt po / penerimaan barang po untuk memulai...
                             </td>
                         </tr>
@@ -601,7 +602,7 @@
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="12" class="center">
+                        <td colspan="13" class="center">
                             Pilih good receipt po / penerimaan barang po untuk memulai...
                         </td>
                     </tr>
@@ -945,7 +946,7 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                var formData = new FormData($('#form_data')[0]);
+                var formData = new FormData($('#form_data')[0]), passedSerial = true;
                 var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
 
@@ -954,70 +955,93 @@
                     var lastSegment = segments[segments.length - 1];
                 
                     formData.append('lastsegment',lastSegment);
-                    
-                $.ajax({
-                    url: '{{ Request::url() }}/create',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    cache: true,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        $('#validation_alert').hide();
-                        $('#validation_alert').html('');
-                        loadingOpen('.modal-content');
-                    },
-                    success: function(response) {
-                        loadingClose('.modal-content');
-                        if(response.status == 200) {
-                            success();
-                            M.toast({
-                                html: response.message
-                            });
-                        } else if(response.status == 422) {
-                            $('#validation_alert').show();
-                            $('.modal-content').scrollTop(0);
-                            
-                            swal({
-                                title: 'Ups! Validation',
-                                text: 'Check your form.',
-                                icon: 'warning'
-                            });
 
-                            $.each(response.error, function(i, val) {
-                                $.each(val, function(i, val) {
-                                    $('#validation_alert').append(`
-                                        <div class="card-alert card red">
-                                            <div class="card-content white-text">
-                                                <p>` + val + `</p>
-                                            </div>
-                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                <span aria-hidden="true">×</span>
-                                            </button>
-                                        </div>
-                                    `);
-                                });
-                            });
-                        } else {
-                            M.toast({
-                                html: response.message
-                            });
+                formData.delete('arr_serial[]');
+
+                $('input[name^="arr_item[]"]').each(function(index){
+                    if($('#arr_serial' + $(this).data('id')).length > 0){
+                        let arr = $('#arr_serial' + $(this).data('id')).val();
+                        if(arr.length > 0){
+                            formData.append('arr_serial[]',$('#arr_serial' + $(this).data('id')).val());
+                        }else{
+                            passedSerial = false;
                         }
-                    },
-                    error: function() {
-                        $('.modal-content').scrollTop(0);
-                        loadingClose('.modal-content');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
-                        });
+                    }else{
+                        formData.append('arr_serial[]','');
                     }
                 });
+                
+                if(passedSerial){
+                    $.ajax({
+                        url: '{{ Request::url() }}/create',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        cache: true,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            $('#validation_alert').hide();
+                            $('#validation_alert').html('');
+                            loadingOpen('.modal-content');
+                        },
+                        success: function(response) {
+                            loadingClose('.modal-content');
+                            if(response.status == 200) {
+                                success();
+                                M.toast({
+                                    html: response.message
+                                });
+                            } else if(response.status == 422) {
+                                $('#validation_alert').show();
+                                $('.modal-content').scrollTop(0);
+                                
+                                swal({
+                                    title: 'Ups! Validation',
+                                    text: 'Check your form.',
+                                    icon: 'warning'
+                                });
+
+                                $.each(response.error, function(i, val) {
+                                    $.each(val, function(i, val) {
+                                        $('#validation_alert').append(`
+                                            <div class="card-alert card red">
+                                                <div class="card-content white-text">
+                                                    <p>` + val + `</p>
+                                                </div>
+                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                        `);
+                                    });
+                                });
+                            } else {
+                                M.toast({
+                                    html: response.message
+                                });
+                            }
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('.modal-content');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                }else{
+                    swal({
+                        title: 'Maaf!',
+                        text: 'Nomor serial tidak boleh kosong.',
+                        icon: 'error'
+                    });
+                }
             }
         });
     }
@@ -1080,8 +1104,8 @@
                                 var count = makeid(10);
                                 $('#body-item').append(`
                                     <tr class="row_item" data-gr="` + response.id + `">
-                                        <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
-                                        <input type="hidden" name="arr_good_receipt_detail[]" value="` + val.good_receipt_detail_id + `">
+                                        <input type="hidden" id="arr_item` + count + `" name="arr_item[]" value="` + val.item_id + `" data-id="` + count + `">
+                                        <input type="hidden" id="arr_good_receipt_detail` + count + `" name="arr_good_receipt_detail[]" value="` + val.good_receipt_detail_id + `">
                                         <td>
                                             ` + val.item_name + `
                                         </td>
@@ -1089,10 +1113,13 @@
                                             <span>` + val.qty + `</span>
                                         </td>
                                         <td>
-                                            <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_balance + `" onkeyup="formatRupiah(this);checkRow(this);" style="text-align:right;width:100px;" data-max="` + val.qty_balance + `">
+                                            <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_balance + `" onkeyup="formatRupiah(this);checkRow(this);setStock('` + count + `')" id="rowQty` + count + `" style="text-align:right;width:100px;" data-max="` + val.qty_balance + `">
                                         </td>
                                         <td class="center">
                                             <span>` + val.unit + `</span>
+                                        </td>
+                                        <td class="center">
+                                            ` + (val.is_activa ? `<select class="browser-default" id="arr_serial` + count + `" name="arr_serial[]" multiple="multiple"></select>` : `-`) + `
                                         </td>
                                         <td>
                                             <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan 1..." value="` + val.note + `" style="width:100%;">
@@ -1122,6 +1149,35 @@
                                         </td>
                                     </tr>
                                 `);
+
+                                if(val.is_activa){
+                                    $('#arr_serial' + count).select2({
+                                        placeholder: '-- Kosong --',
+                                        minimumInputLength: 1,
+                                        allowClear: true,
+                                        cache: true,
+                                        width: 'resolve',
+                                        maximumSelectionLength: parseInt($('#rowQty' + count).val().replaceAll(".", "").replaceAll(",",".")),
+                                        dropdownParent: $('body').parent(),
+                                        ajax: {
+                                            url: '{{ url("admin/select2/item_serial_return_po") }}',
+                                            type: 'GET',
+                                            dataType: 'JSON',
+                                            data: function(params) {
+                                                return {
+                                                    search: params.term,
+                                                    item_id: val.item_id,
+                                                    grd_id: val.good_receipt_detail_id
+                                                };
+                                            },
+                                            processResults: function(data) {
+                                                return {
+                                                    results: data.items
+                                                }
+                                            }
+                                        }
+                                    });
+                                }
                             });
                         }
                         $('#good_receipt_id').empty();
@@ -1144,6 +1200,38 @@
         }
     }
 
+    function setStock(val){
+        if($('#arr_serial' + val).length > 0){
+            $('#arr_serial' + val).empty();
+            $('#arr_serial' + val).select2({
+                placeholder: '-- Kosong --',
+                minimumInputLength: 1,
+                allowClear: true,
+                cache: true,
+                width: 'resolve',
+                maximumSelectionLength: parseInt($('#rowQty' + val).val().replaceAll(".", "").replaceAll(",",".")),
+                dropdownParent: $('body').parent(),
+                ajax: {
+                    url: '{{ url("admin/select2/item_serial_return_po") }}',
+                    type: 'GET',
+                    dataType: 'JSON',
+                    data: function(params) {
+                        return {
+                            search: params.term,
+                            item_id: $('#arr_item' + val).val(),
+                            grd_id: $('#arr_good_receipt_detail' + val).val(),
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data.items
+                        }
+                    }
+                }
+            });
+        }
+    }
+
     function removeUsedData(id){
         $.ajax({
             url: '{{ Request::url() }}/remove_used_data',
@@ -1163,7 +1251,7 @@
                 if($('.row_item').length == 0 && $('#empty-item').length == 0){
                     $('#body-item').append(`
                         <tr id="empty-item">
-                            <td colspan="12" class="center">
+                            <td colspan="13" class="center">
                                 Pilih good receipt po / penerimaan barang po untuk memulai...
                             </td>
                         </tr>
@@ -1215,8 +1303,8 @@
                         var count = makeid(10);
                         $('#body-item').append(`
                             <tr class="row_item" data-gr="` + val.id + `">
-                                <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
-                                <input type="hidden" name="arr_good_receipt_detail[]" value="` + val.good_receipt_detail_id + `">
+                                <input type="hidden" id="arr_item` + count + `" name="arr_item[]" value="` + val.item_id + `" data-id="` + count + `">
+                                <input type="hidden" id="arr_good_receipt_detail` + count + `" name="arr_good_receipt_detail[]" value="` + val.good_receipt_detail_id + `">
                                 <td>
                                     ` + val.item_name + `
                                 </td>
@@ -1224,10 +1312,13 @@
                                     <span>` + val.qty_received + `</span>
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_returned + `" onkeyup="formatRupiah(this);checkRow(this);" style="text-align:right;width:100px;" data-max="` + val.qty_balance + `">
+                                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_returned + `" onkeyup="formatRupiah(this);checkRow(this);setStock('` + count + `')" id="rowQty` + count + `" style="text-align:right;width:100px;" data-max="` + val.qty_balance + `">
                                 </td>
                                 <td class="center">
                                     <span>` + val.unit + `</span>
+                                </td>
+                                <td class="center">
+                                    ` + (val.is_activa ? `<select class="browser-default" id="arr_serial` + count + `" name="arr_serial[]" multiple="multiple"></select>` : `-`) + `
                                 </td>
                                 <td>
                                     <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + val.note + `" style="width:100%;">
@@ -1257,6 +1348,39 @@
                                 </td>
                             </tr>
                         `);
+                        if(val.is_activa){
+                            $.each(val.list_serial, function(i, value) {
+                                $('#arr_serial' + count).append(`
+                                    <option value="` + value.serial_id + `" selected>` + value.serial_number + `</value>
+                                `);
+                            });
+                            $('#arr_serial' + count).select2({
+                                placeholder: '-- Kosong --',
+                                minimumInputLength: 1,
+                                allowClear: true,
+                                cache: true,
+                                width: 'resolve',
+                                maximumSelectionLength: parseInt($('#rowQty' + count).val().replaceAll(".", "").replaceAll(",",".")),
+                                dropdownParent: $('body').parent(),
+                                ajax: {
+                                    url: '{{ url("admin/select2/item_serial_return_po") }}',
+                                    type: 'GET',
+                                    dataType: 'JSON',
+                                    data: function(params) {
+                                        return {
+                                            search: params.term,
+                                            item_id: val.item_id,
+                                            grd_id: val.good_receipt_detail_id
+                                        };
+                                    },
+                                    processResults: function(data) {
+                                        return {
+                                            results: data.items
+                                        }
+                                    }
+                                }
+                            });
+                        }
                     });
                 }
 

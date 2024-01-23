@@ -248,8 +248,8 @@ class GoodIssueController extends Controller
             ];
         } else {
 
-            DB::beginTransaction();
-            try {
+            /* DB::beginTransaction();
+            try { */
 
                 $grandtotal = 0;
                 $passed = true;
@@ -411,7 +411,6 @@ class GoodIssueController extends Controller
                         $rowprice = NULL;
                         $item_stock = ItemStock::find(intval($row));
                         $rowprice = $item_stock->priceNow();
-                        $inventory_coa = InventoryCoa::find(intval($request->arr_inventory_coa[$key]));
                         $gid = GoodIssueDetail::create([
                             'good_issue_id'         => $query->id,
                             'item_stock_id'         => $row,
@@ -419,8 +418,8 @@ class GoodIssueController extends Controller
                             'price'                 => $rowprice,
                             'total'                 => round($rowprice * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),2),
                             'note'                  => $request->arr_note[$key],
-                            'inventory_coa_id'      => $request->arr_inventory_coa[$key],
-                            'coa_id'                => $inventory_coa->coa_id,
+                            'inventory_coa_id'      => $request->arr_inventory_coa[$key] ? $request->arr_inventory_coa[$key] : NULL,
+                            'coa_id'                => $request->arr_coa[$key] ? $request->arr_coa[$key] : NULL,
                             'lookable_type'         => $request->arr_lookable_type[$key] ? $request->arr_lookable_type[$key] : NULL,
                             'lookable_id'           => $request->arr_lookable_id[$key] ? $request->arr_lookable_id[$key] : NULL,
                             'cost_distribution_id'  => $request->arr_cost_distribution[$key] ? $request->arr_cost_distribution[$key] : NULL,
@@ -467,10 +466,10 @@ class GoodIssueController extends Controller
                     ];
                 }
 
-                DB::commit();
+                /* DB::commit();
             }catch(\Exception $e){
                 DB::rollback();
-            }
+            } */
 		}
 		
 		return response()->json($response);
@@ -483,7 +482,7 @@ class GoodIssueController extends Controller
                     <table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="16">Daftar Item</th>
+                                <th class="center-align" colspan="18">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -492,6 +491,10 @@ class GoodIssueController extends Controller
                                 <th class="center-align">Satuan</th>
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Tipe Biaya</th>
+                                <th class="center-align">Coa</th>
+                                <th class="center-align">Dari Plant</th>
+                                <th class="center-align">Dari Gudang</th>
+                                <th class="center-align">Dist.Biaya</th>
                                 <th class="center-align">Plant</th>
                                 <th class="center-align">Area</th>
                                 <th class="center-align">Shading</th>
@@ -511,13 +514,17 @@ class GoodIssueController extends Controller
                 <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->itemStock->item->uomUnit->code.'</td>
                 <td class="">'.$row->note.'</td>
-                <td class="">'.$row->inventoryCoa->name.'</td>
-                <td class="center-align">'.($row->place()->exists() ? $row->place->code : '-').'</td>
+                <td class="">'.($row->inventoryCoa()->exists() ? $row->inventoryCoa->name : '-').'</td>
+                <td class="">'.($row->coa()->exists() ? $row->coa->code.' - '.$row->coa->name : '-').'</td>
+                <td class="center-align">'.$row->itemStock->place->code.'</td>
+                <td class="center-align">'.$row->itemStock->warehouse->name.'</td>
+                <td class="center-align">'.($row->costDistribution()->exists() ? $row->costDistribution->code.' - '.$row->costDistribution->name : '-').'</td>
+                <td class="center-align">'.$row->getPlace().'</td>
                 <td class="center-align">'.($row->itemStock->area()->exists() ? $row->itemStock->area->name : '-').'</td>
                 <td class="center-align">'.($row->itemShading()->exists() ? $row->itemShading->code : '-').'</td>
-                <td class="center-align">'.($row->line()->exists() ? $row->line->name : '-').'</td>
-                <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
-                <td class="center-align">'.($row->department()->exists() ? $row->department->name : '-').'</td>
+                <td class="center-align">'.$row->getLine().'</td>
+                <td class="center-align">'.$row->getMachine().'</td>
+                <td class="center-align">'.$row->getDepartment().'</td>
                 <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
                 <td class="center-align">'.($row->requester ? $row->requester : '-').'</td>
                 <td class="right-align">'.number_format($row->qty_return,3,',','.').'</td>
@@ -597,8 +604,10 @@ class GoodIssueController extends Controller
                 'qtyraw'                    => in_array($gr->status,['2','3']) ? number_format($row->qty + $row->itemStock->qty,3,',','.') : number_format($row->itemStock->qty,3,',','.'),
                 'price'                     => number_format($row->price,2,',','.'),
                 'total'                     => number_format($row->total,2,',','.'),
-                'inventory_coa_id'          => $row->inventory_coa_id,
-                'inventory_coa_name'        => $row->inventoryCoa->name,
+                'inventory_coa_id'          => $row->inventoryCoa()->exists() ? $row->inventory_coa_id : '',
+                'inventory_coa_name'        => $row->inventoryCoa()->exists() ? $row->inventoryCoa->name : '',
+                'coa_id'                    => $row->coa()->exists() ? $row->coa_id : '',
+                'coa_name'                  => $row->coa()->exists() ? $row->coa->code.' - '.$row->coa->name : '',
                 'note'                      => $row->note ? $row->note : '',
                 'lookable_type'             => $row->lookable_type ? $row->lookable_type : '',
                 'lookable_id'               => $row->lookable_id ? $row->lookable_id : '',
@@ -1097,7 +1106,7 @@ class GoodIssueController extends Controller
                 'company'   => $query->company()->exists() ? $query->company->name : '-',
                 'code'      => $query->journal->code,
                 'note'      => $query->note,
-                'post_date' => date('d/m/y',strtotime($query->post_date)),
+                'post_date' => date('d/m/Y',strtotime($query->post_date)),
             ];
             $string='';
             foreach($query->journal->journalDetail()->where(function($query){

@@ -196,23 +196,25 @@
                                     <h4>Detail Produk</h4>
                                     Coa debit mengikuti coa pada masing-masing grup item.
                                     <div style="overflow:auto;">
-                                        <table class="bordered" style="min-width:2800px !important;" id="table-detail">
+                                        <table class="bordered" style="min-width:3000px !important;" id="table-detail">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Item</th>
                                                     <th class="center">Stok Skrg</th>
+                                                    <th class="center">Tujuan</th>
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan Stock</th>
                                                     <th class="center">Nomor Serial (Jika ada)</th>
                                                     <th class="center">Harga</th>
                                                     <th class="center">Total</th>
                                                     <th class="center">Keterangan</th>
+                                                    <th class="center">Tipe Penerimaan</th>
                                                     <th class="center">Coa</th>
+                                                    <th class="center">Dist.Biaya</th>
                                                     <th class="center">Plant</th>
                                                     <th class="center">Line</th>
                                                     <th class="center">Mesin</th>
                                                     <th class="center">Departemen</th>
-                                                    <th class="center">Gudang</th>
                                                     <th class="center">Area</th>
                                                     <th class="center">Shading</th>
                                                     <th class="center">Proyek</th>
@@ -221,15 +223,16 @@
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
-                                                    <td colspan="18">
-                                                        <button class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
-                                                            <i class="material-icons left">add</i> Tambah Item
-                                                        </button>
+                                                    <td colspan="20">
+                                                        
                                                     </td>
                                                 </tr>
                                             </tbody>
                                         </table>
                                     </div>
+                                    <button class="waves-effect waves-light cyan btn-small mb-1 mr-1 mt-1 right" onclick="addItem()" href="javascript:void(0);">
+                                        <i class="material-icons left">add</i> Tambah Item
+                                    </button>
                                 </p>
                             </div>
                             <div class="input-field col m4 s12 step8">
@@ -237,7 +240,7 @@
                                 <label class="active" for="note">Keterangan</label>
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step9" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                
                             </div>
                         </div>
                     </div>
@@ -246,7 +249,8 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn waves-effect waves-light purple step10" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+        <button class="btn waves-effect waves-light purple step10 mr-1" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+        <button class="btn waves-effect waves-light submit step9 mr-1" onclick="save();">Simpan <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -615,7 +619,7 @@
 
     function getRowUnit(val){
         $('#tempPrice' + val).empty();
-        $("#arr_warehouse" + val).empty();
+        $("#arr_place_warehouse" + val).empty();
         $('#area' + val).empty();
         $('#shading' + val).empty();
         if($("#arr_item" + val).val()){
@@ -636,13 +640,15 @@
                 });
             }
             if($("#arr_item" + val).select2('data')[0].list_warehouse.length > 0){
-                $.each($("#arr_item" + val).select2('data')[0].list_warehouse, function(i, value) {
-                    $('#arr_warehouse' + val).append(`
-                        <option value="` + value.id + `">` + value.name + `</option>
-                    `);
-                });
+                @foreach ($place as $row)
+                    $.each($("#arr_item" + val).select2('data')[0].list_warehouse, function(i, value) {
+                        $('#arr_place_warehouse' + val).append(`
+                            <option value="{{ $row->id }}-` + value.id + `">{{ $row->code }} - ` + value.name + `</option>
+                        `);
+                    });
+                @endforeach
             }else{
-                $("#arr_warehouse" + val).append(`
+                $("#arr_place_warehouse" + val).append(`
                     <option value="">--Gudang tidak diatur di master data Grup Item--</option>
                 `);
             }
@@ -669,7 +675,7 @@
             $("#arr_item" + val).empty();
             $('#tempPrice' + val).empty();
             $('#arr_stock' + val).text('-');
-            $("#arr_warehouse" + val).append(`
+            $("#arr_place_warehouse" + val).append(`
                 <option value="">--Silahkan pilih item--</option>
             `);
             $('#area' + val).append(` - `);
@@ -801,6 +807,11 @@
                 <td class="center">
                     <span id="arr_stock` + count + `">-</span>
                 </td>
+                <td class="center">
+                    <select class="browser-default" id="arr_place_warehouse` + count + `" name="arr_place_warehouse[]">
+                        <option value="">--Silahkan pilih item--</option>    
+                    </select>
+                </td>
                 <td>
                     <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
                 </td>
@@ -820,11 +831,18 @@
                 <td>
                     <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ...">
                 </td>
+                <td class="center" id="inventory_coa` + count + `">
+                    <select class="browser-default" id="arr_inventory_coa` + count + `" name="arr_inventory_coa[]" onchange="applyLock('` + count + `');"></select>
+                </td>
+                <td class="center" id="coa` + count + `">
+                    <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" onchange="applyLock('` + count + `');"></select>
+                </td>
                 <td class="center">
-                    <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                    <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>
                 </td>
                 <td>
-                    <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                    <select class="browser-default" id="arr_place_cost` + count + `" name="arr_place_cost[]">
+                        <option value="">--Kosong--</option>
                         @foreach ($place as $rowplace)
                             <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                         @endforeach
@@ -854,11 +872,6 @@
                         @endforeach
                     </select>    
                 </td>
-                <td class="center">
-                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                        <option value="">--Silahkan pilih item--</option>    
-                    </select>
-                </td>
                 <td class="center" id="area` + count + `">
                     -
                 </td>
@@ -878,9 +891,23 @@
         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item_receive") }}');
         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
+        select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
+        select2ServerSide('#arr_inventory_coa' + count, '{{ url("admin/select2/inventory_coa_receive") }}');
         $('#arr_place' + count).formSelect();
         $('#arr_department' + count).formSelect();
         M.updateTextFields();
+    }
+
+    function applyLock(code){
+        $('#inventory_coa' + code + ',#coa' + code).css('pointer-events','auto');
+        if($('#arr_inventory_coa' + code).val()){
+            $('#coa' + code).css('pointer-events','none');
+            $('#arr_coa' + code).empty();
+        }
+        if($('#arr_coa' + code).val()){
+            $('#inventory_coa' + code).css('pointer-events','none');
+            $('#arr_inventory_coa' + code).empty();
+        }
     }
 
     function changePlace(element){
@@ -921,13 +948,23 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                var formData = new FormData($('#form_data')[0]);
+                var formData = new FormData($('#form_data')[0]), passed = true;
 
                 formData.delete("arr_area[]");
                 formData.delete("arr_shading[]");
                 formData.delete("arr_line[]");
                 formData.delete("arr_machine[]");
                 formData.delete("arr_project[]");
+                formData.delete("arr_coa[]");
+                formData.delete("arr_inventory_coa[]");
+                formData.delete("arr_cost_distribution[]");
+                formData.delete("arr_place_cost[]");
+
+                $('select[name^="arr_place_warehouse[]"]').each(function(index){
+                    if(!$(this).val()){
+                        passed = false;
+                    }
+                });
 
                 $('select[name^="arr_item[]"]').each(function(index){
                     formData.append('arr_area[]',($('#arr_area' + $(this).data('id')).length > 0 ? ($('#arr_area' + $(this).data('id')).val() ? $('#arr_area' + $(this).data('id')).val() : '' )  : ''));
@@ -935,6 +972,10 @@
                     formData.append('arr_line[]',($('#arr_line' + $(this).data('id')).val() ? $('#arr_line' + $(this).data('id')).val() : '' ));
                     formData.append('arr_machine[]',($('#arr_machine' + $(this).data('id')).val() ? $('#arr_machine' + $(this).data('id')).val() : '' ));
                     formData.append('arr_project[]',($('#arr_project' + $(this).data('id')).val() ? $('#arr_project' + $(this).data('id')).val() : '' ));
+                    formData.append('arr_coa[]',($('#arr_coa' + $(this).data('id')).val() ? $('#arr_coa' + $(this).data('id')).val() : '' ));
+                    formData.append('arr_inventory_coa[]',($('#arr_inventory_coa' + $(this).data('id')).val() ? $('#arr_inventory_coa' + $(this).data('id')).val() : '' ));
+                    formData.append('arr_cost_distribution[]',($('#arr_cost_distribution' + $(this).data('id')).val() ? $('#arr_cost_distribution' + $(this).data('id')).val() : '' ));
+                    formData.append('arr_place_cost[]',($('#arr_place_cost' + $(this).data('id')).val() ? $('#arr_place_cost' + $(this).data('id')).val() : '' ));
                 });
                 var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
@@ -945,70 +986,77 @@
                 
                     formData.append('lastsegment',lastSegment);
                     
-        
-                $.ajax({
-                    url: '{{ Request::url() }}/create',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    cache: true,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        $('#validation_alert').hide();
-                        $('#validation_alert').html('');
-                        loadingOpen('.modal-content');
-                    },
-                    success: function(response) {
-                        loadingClose('.modal-content');
-                        if(response.status == 200) {
-                            success();
-                            M.toast({
-                                html: response.message
-                            });
-                        } else if(response.status == 422) {
-                            $('#validation_alert').show();
-                            $('.modal-content').scrollTop(0);
-                            
-                            swal({
-                                title: 'Ups! Validation',
-                                text: 'Check your form.',
-                                icon: 'warning'
-                            });
-
-                            $.each(response.error, function(i, val) {
-                                $.each(val, function(i, val) {
-                                    $('#validation_alert').append(`
-                                        <div class="card-alert card red">
-                                            <div class="card-content white-text">
-                                                <p>` + val + `</p>
-                                            </div>
-                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                <span aria-hidden="true">×</span>
-                                            </button>
-                                        </div>
-                                    `);
+                if(passed){
+                    $.ajax({
+                        url: '{{ Request::url() }}/create',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        cache: true,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            $('#validation_alert').hide();
+                            $('#validation_alert').html('');
+                            loadingOpen('.modal-content');
+                        },
+                        success: function(response) {
+                            loadingClose('.modal-content');
+                            if(response.status == 200) {
+                                success();
+                                M.toast({
+                                    html: response.message
                                 });
-                            });
-                        } else {
-                            M.toast({
-                                html: response.message
+                            } else if(response.status == 422) {
+                                $('#validation_alert').show();
+                                $('.modal-content').scrollTop(0);
+                                
+                                swal({
+                                    title: 'Ups! Validation',
+                                    text: 'Check your form.',
+                                    icon: 'warning'
+                                });
+
+                                $.each(response.error, function(i, val) {
+                                    $.each(val, function(i, val) {
+                                        $('#validation_alert').append(`
+                                            <div class="card-alert card red">
+                                                <div class="card-content white-text">
+                                                    <p>` + val + `</p>
+                                                </div>
+                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                        `);
+                                    });
+                                });
+                            } else {
+                                M.toast({
+                                    html: response.message
+                                });
+                            }
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('.modal-content');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
                             });
                         }
-                    },
-                    error: function() {
-                        $('.modal-content').scrollTop(0);
-                        loadingClose('.modal-content');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
-                        });
-                    }
-                });
+                    });
+                }else{
+                    swal({
+                        title: 'Ups!',
+                        text: 'Plant & gudang tujuan tidak boleh kosong.',
+                        icon: 'error'
+                    });
+                }
             }
         });
     }
@@ -1063,6 +1111,11 @@
                                 <td class="center">
                                     <span id="arr_stock` + count + `">-</span>
                                 </td>
+                                <td class="center">
+                                    <select class="browser-default" id="arr_place_warehouse` + count + `" name="arr_place_warehouse[]">
+                                        <option value="">--Silahkan pilih item--</option>    
+                                    </select>
+                                </td>
                                 <td>
                                     <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
                                 </td>
@@ -1082,11 +1135,18 @@
                                 <td>
                                     <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
                                 </td>
+                                <td class="center" id="inventory_coa` + count + `" ` + (val.coa_id ? `style="pointer-events: none;"` : '' ) + `>
+                                    <select class="browser-default" id="arr_inventory_coa` + count + `" name="arr_inventory_coa[]" onchange="applyLock('` + count + `');"></select>
+                                </td>
+                                <td class="center" id="coa` + count + `" ` + (val.inventory_coa_id ? `style="pointer-events: none;"` : '' ) + `>
+                                    <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" onchange="applyLock('` + count + `');"></select>
+                                </td>
                                 <td class="center">
-                                    <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                                    <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>
                                 </td>
                                 <td>
-                                    <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                                    <select class="browser-default" id="arr_place_cost` + count + `" name="arr_place_cost[]">
+                                        <option value="">--Kosong--</option>
                                         @foreach ($place as $rowplace)
                                             <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                         @endforeach
@@ -1116,9 +1176,6 @@
                                         @endforeach
                                     </select>    
                                 </td>
-                                <td class="center">
-                                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
-                                </td>
                                 <td class="center" id="area` + count + `">
                                     ` + ( val.area_id ? '<select class="browser-default" id="arr_area' + count + '" name="arr_area[]"></select>' : '-' ) + `
                                 </td>
@@ -1138,15 +1195,35 @@
                         $('#arr_item' + count).append(`
                             <option value="` + val.item_id + `">` + val.item_name + `</option>
                         `);
-                        $('#arr_coa' + count).append(`
-                            <option value="` + val.coa_id + `">` + val.coa_name + `</option>
-                        `);
-                        $('#arr_warehouse' + count).append(`
-                            <option value="` + val.warehouse_id + `">` + val.warehouse_name + `</option>
-                        `);
+                        if(val.coa_id){
+                            $('#arr_coa' + count).append(`
+                                <option value="` + val.coa_id + `">` + val.coa_name + `</option>
+                            `);
+                        }
+                        if(val.inventory_coa_id){
+                            $('#arr_inventory_coa' + count).append(`
+                                <option value="` + val.inventory_coa_id + `">` + val.inventory_coa_name + `</option>
+                            `);
+                        }
+                        select2ServerSide('#arr_inventory_coa' + count, '{{ url("admin/select2/inventory_coa_receive") }}');
+                        $("#arr_place_warehouse" + count).empty();
+                        if(val.list_warehouse.length > 0){
+                            @foreach ($place as $row)
+                                $.each(val.list_warehouse, function(i, value) {
+                                    $('#arr_place_warehouse' + count).append(`
+                                        <option value="{{ $row->id }}-` + value.id + `">{{ $row->code }} - ` + value.name + `</option>
+                                    `);
+                                });
+                            @endforeach
+                        }else{
+                            $("#arr_place_warehouse" + count).append(`
+                                <option value="">--Gudang tidak diatur di master data Grup Item--</option>
+                            `);
+                        }
+                        $('#arr_place_warehouse' + count).val(val.place_warehouse_id).formSelect();
                         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item_receive") }}');
                         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
-                        $('#arr_place' + count).val(val.place_id).formSelect();
+                        $('#arr_place_cost' + count).val(val.place_cost_id).formSelect();
                         $('#arr_department' + count).val(val.department_id).formSelect();
                         $('#arr_line' + count).val(val.line_id);
                         $('#arr_machine' + count).val(val.machine_id);
@@ -1176,6 +1253,14 @@
                             optionShading += '</select>';
                             $('#shading' + val).append(optionShading);
                         }
+
+                        if(val.cost_distribution_id){
+                            $('#arr_cost_distribution' + count).append(`
+                                <option value="` + val.cost_distribution_id + `">` + val.cost_distribution_name + `</option>
+                            `);
+                        }
+
+                        select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
                     });
                 }
                 

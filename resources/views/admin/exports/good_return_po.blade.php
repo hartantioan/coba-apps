@@ -19,6 +19,7 @@
             <th>Jum.Diterima</th>
             <th>Jum.Kembali</th>
             <th>Sat.</th>
+            <th>Serial</th>
             <th>Catatan</th>
             <th>Plant</th>
             <th>Departemen</th>
@@ -50,6 +51,7 @@
                 <td align="center">{{ $rowdetail->goodReceiptDetail->qty }}</td>
                 <td align="center">{{ $rowdetail->qty }}</td>
                 <td align="center">{{ $rowdetail->itemUnit->unit->code }}</td>
+                <td>{{ $rowdetail->listSerial() }}</td>
                 <td>{{ $rowdetail->note }}</td>
                 <td align="center">{{ $rowdetail->goodReceiptDetail->place->name.' - '.$rowdetail->goodReceiptDetail->place->company->name }}</td>
                 <td align="center">{{ $rowdetail->goodReceiptDetail->department->name ?? ''  }}</td>

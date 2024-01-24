@@ -11,6 +11,9 @@
                             <h5>Daftar Menu yang bisa anda akses</h5>
                             <div class="card padding-4 animate fadeLeft">
                                 @foreach ($user->menuUser()->where('type','view')->get() as $row)
+                                    @php
+                                        info($row->menu_id);
+                                    @endphp
                                     <a class="waves-effect waves-light btn-small mr-1 mt-1" href="{{ $row->menu->fullUrl() }}"><i class="material-icons left">{{ $row->icon }}</i>{{ $row->menu->name }}</a>
                                 @endforeach
                             </div>

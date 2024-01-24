@@ -434,6 +434,8 @@ class MenuController extends Controller
         $query = Menu::find($request->id);
 		
         if($query->delete()) {
+            $query->menuUser()->delete();
+
             activity()
                 ->performedOn(new Menu())
                 ->causedBy(session('bo_id'))

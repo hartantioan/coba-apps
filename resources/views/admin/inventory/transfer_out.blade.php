@@ -968,9 +968,9 @@
         }).then(function (willDelete) {
             if (willDelete) {
 
-                /* var place_from = $('#place_from').val(), warehouse_from = $('#warehouse_from').val(), place_to = $('#place_to').val(), warehouse_to = $('#warehouse_to').val();
+                var place_from = $('#place_from').val(), warehouse_from = $('#warehouse_from').val(), place_to = $('#place_to').val(), warehouse_to = $('#warehouse_to').val();
 
-                if(place_from == place_to && warehouse_from == warehouse_to){
+                /* if(place_from == place_to && warehouse_from == warehouse_to){
                     swal({
                         title: 'Ups!',
                         text: 'Plant Asal dan Tujuan, dan Gudang Asal dan Tujuan tidak boleh sama.',
@@ -978,7 +978,7 @@
                     });
                 }else{ */
 
-                    var formData = new FormData($('#form_data')[0]);
+                    var formData = new FormData($('#form_data')[0]), passedArea = true, passedSerial = true;
 
                     formData.delete("arr_itemkuy[]");
                     formData.delete("arr_item_stock[]");
@@ -995,6 +995,15 @@
                             formData.append('arr_qty[]',$('input[name^="arr_qty"]').eq(index).val());
                             formData.append('arr_note[]',$('input[name^="arr_note[]"]').eq(index).val());
                             formData.append('arr_area[]',($('#arr_area' + code).length > 0 ? ($('#arr_area' + code).val() ? $('#arr_area' + code).val() : '' ) : ''));
+                            if(place_from == place_to && warehouse_from == warehouse_to){
+                                if($('#arr_area' + code).length > 0){
+                                    if(!$('#arr_area' + code).val()){
+                                        passedArea = false;
+                                    }
+                                }else{
+                                    passedArea = false;
+                                }
+                            }
                         }
                     });
 
@@ -1020,69 +1029,85 @@
                 
                     formData.append('lastsegment',lastSegment);
                     
-                    $.ajax({
-                        url: '{{ Request::url() }}/create',
-                        type: 'POST',
-                        dataType: 'JSON',
-                        data: formData,
-                        contentType: false,
-                        processData: false,
-                        cache: true,
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        beforeSend: function() {
-                            $('#validation_alert').hide();
-                            $('#validation_alert').html('');
-                            loadingOpen('.modal-content');
-                        },
-                        success: function(response) {
-                            loadingClose('.modal-content');
-                            if(response.status == 200) {
-                                success();
-                                M.toast({
-                                    html: response.message
-                                });
-                            } else if(response.status == 422) {
-                                $('#validation_alert').show();
-                                $('.modal-content').scrollTop(0);
-                                
-                                swal({
-                                    title: 'Ups! Validation',
-                                    text: 'Check your form.',
-                                    icon: 'warning'
-                                });
+                    if(passedSerial){
+                        if(passedArea){
+                            $.ajax({
+                                url: '{{ Request::url() }}/create',
+                                type: 'POST',
+                                dataType: 'JSON',
+                                data: formData,
+                                contentType: false,
+                                processData: false,
+                                cache: true,
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                beforeSend: function() {
+                                    $('#validation_alert').hide();
+                                    $('#validation_alert').html('');
+                                    loadingOpen('.modal-content');
+                                },
+                                success: function(response) {
+                                    loadingClose('.modal-content');
+                                    if(response.status == 200) {
+                                        success();
+                                        M.toast({
+                                            html: response.message
+                                        });
+                                    } else if(response.status == 422) {
+                                        $('#validation_alert').show();
+                                        $('.modal-content').scrollTop(0);
+                                        
+                                        swal({
+                                            title: 'Ups! Validation',
+                                            text: 'Check your form.',
+                                            icon: 'warning'
+                                        });
 
-                                $.each(response.error, function(i, val) {
-                                    $.each(val, function(i, val) {
-                                        $('#validation_alert').append(`
-                                            <div class="card-alert card red">
-                                                <div class="card-content white-text">
-                                                    <p>` + val + `</p>
-                                                </div>
-                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                    <span aria-hidden="true">×</span>
-                                                </button>
-                                            </div>
-                                        `);
+                                        $.each(response.error, function(i, val) {
+                                            $.each(val, function(i, val) {
+                                                $('#validation_alert').append(`
+                                                    <div class="card-alert card red">
+                                                        <div class="card-content white-text">
+                                                            <p>` + val + `</p>
+                                                        </div>
+                                                        <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                            <span aria-hidden="true">×</span>
+                                                        </button>
+                                                    </div>
+                                                `);
+                                            });
+                                        });
+                                    } else {
+                                        M.toast({
+                                            html: response.message
+                                        });
+                                    }
+                                },
+                                error: function() {
+                                    $('.modal-content').scrollTop(0);
+                                    loadingClose('.modal-content');
+                                    swal({
+                                        title: 'Ups!',
+                                        text: 'Check your internet connection.',
+                                        icon: 'error'
                                     });
-                                });
-                            } else {
-                                M.toast({
-                                    html: response.message
-                                });
-                            }
-                        },
-                        error: function() {
-                            $('.modal-content').scrollTop(0);
-                            loadingClose('.modal-content');
+                                }
+                            });
+                        }else{
                             swal({
                                 title: 'Ups!',
-                                text: 'Check your internet connection.',
+                                text: 'Untuk transfer plant dan gudang yang sama, area harus ditentukan.',
                                 icon: 'error'
                             });
                         }
-                    });
+                    }else{
+                        swal({
+                            title: 'Ups!',
+                            text: 'Serial tidak boleh kosong.',
+                            icon: 'error'
+                        });
+                    }
                 /* } */
             }
         });

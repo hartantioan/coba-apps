@@ -193,4 +193,9 @@ class InventoryTransferIn extends Model
     public function itemSerial(){
         return $this->hasMany('App\Models\ItemSerial','lookable_id','id')->where('lookable_type',$this->table);
     }
+
+    public function details()
+    {
+        return $this->hasMany('App\Models\InventoryTransferOutDetail','inventory_transfer_out_id','inventory_transfer_out_id');
+    }
 }

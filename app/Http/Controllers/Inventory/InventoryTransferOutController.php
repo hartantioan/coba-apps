@@ -274,6 +274,7 @@ class InventoryTransferOutController extends Controller
             $passed = true;
             $passedQtyMinus = true;
             $passedWarehouse = true;
+            $passedSameStockAndArea = true;
             $passedQty = true;
             $arrItemNotPassed = [];
             
@@ -307,12 +308,28 @@ class InventoryTransferOutController extends Controller
                 if(!in_array(intval($request->warehouse_to),$item->arrWarehouse())){
                     $passedWarehouse = false;
                 }
+
+                $itemstock = ItemStock::find(intval($request->arr_item_stock[$key]));
+                if($itemstock){
+                    if($request->arr_area[$key]){
+                        if($itemstock->area_id == $request->arr_area[$key]){
+                           $passedSameStockAndArea = false; 
+                        }
+                    }
+                }
             }
 
             if($passedQtyMinus == false){
                 return response()->json([
                     'status'  => 500,
                     'message' => 'Maaf, pada tanggal setelah tanggal posting terdapat qty minus pada stok.',
+                ]);
+            }
+
+            if($passedSameStockAndArea == false){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Maaf, Stok dan Area tujuan tidak boleh sama.',
                 ]);
             }
 

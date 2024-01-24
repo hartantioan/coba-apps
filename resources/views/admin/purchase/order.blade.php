@@ -66,7 +66,7 @@
                                                     <select class="form-control" id="filter_inventory" onchange="loadDataTable()">
                                                         <option value="">Semua</option>
                                                         <option value="1">Persediaan Barang</option>
-                                                        <option value="2">Jasa</option>
+                                                        <option value="2">Manual</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -253,7 +253,7 @@
                             <div class="input-field col m3 s12 step4">
                                 <select class="form-control" id="inventory_type" name="inventory_type">
                                     <option value="1">Persediaan Barang</option>
-                                    <option value="2">Jasa</option>
+                                    <option value="2">Manual</option>
                                 </select>
                                 <label class="" for="inventory_type">Tipe Pembelian</label>
                             </div>
@@ -386,47 +386,52 @@
                             <div class="col m12 s12 step22" style="overflow:auto;width:100% !important;">
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Produk</h4>
-                                    <table class="bordered" style="width:2800px;" id="table-detail">
+                                    <table class="bordered" style="width:3300px;font-size:0.9rem !important;" id="table-detail">
                                         <thead>
                                             <tr>
-                                                <th class="center">Item / Coa Jasa</th>
-                                                <th class="center">Qty</th>
-                                                <th class="center">Satuan</th>
-                                                <th class="center">Harga</th>
-                                                <th class="center">
+                                                <th>Item / Coa Jasa</th>
+                                                <th width="100px">Qty PO</th>
+                                                <th width="100px">Satuan PO</th>
+                                                <th width="100px">Qty Stok</th>
+                                                <th width="100px">Satuan Stok</th>
+                                                <th>Harga</th>
+                                                <th>
                                                     PPN
                                                     <label class="pl-2">
                                                         <input type="checkbox" onclick="chooseAllPpn(this)">
                                                         <span style="padding-left: 25px;">Semua</span>
                                                     </label>
                                                 </th>
-                                                <th class="center">Termasuk PPN</th>
-                                                <th class="center">
+                                                <th>Termasuk PPN</th>
+                                                <th>
                                                     PPh
                                                     <label class="pl-2">
                                                         <input type="checkbox" onclick="chooseAllPph(this)">
                                                         <span style="padding-left: 25px;">Semua</span>
                                                     </label>
                                                 </th>
-                                                <th class="center">Disc1(%)</th>
-                                                <th class="center">Disc2(%)</th>
-                                                <th class="center">Disc3(Rp)</th>
-                                                <th class="center">Subtotal</th>
-                                                <th class="center">Keterangan 1</th>
-                                                <th class="center">Keterangan 2</th>
-                                                <th class="center">Plant</th>
-                                                <th class="center">Line</th>
-                                                <th class="center">Mesin</th>
-                                                <th class="center">Departemen</th>
-                                                <th class="center">Gudang</th>
-                                                <th class="center">Requester</th>
-                                                <th class="center">Proyek</th>
-                                                <th class="center">Hapus</th>
+                                                <th>Disc1(%)</th>
+                                                <th>Disc2(%)</th>
+                                                <th>Disc3(Rp)</th>
+                                                <th>Subtotal</th>
+                                                <th>Keterangan 1</th>
+                                                <th>Keterangan 2</th>
+                                                <th>Plant</th>
+                                                <th>Line</th>
+                                                <th>Mesin</th>
+                                                <th>Departemen</th>
+                                                <th>Gudang</th>
+                                                <th>Requester</th>
+                                                <th>Proyek</th>
+                                                <th>Hapus</th>
+                                            </tr>
+                                            <tr>
+                                                
                                             </tr>
                                         </thead>
                                         <tbody id="body-item">
                                             <tr id="last-row-item">
-                                                <td colspan="21">
+                                                <td colspan="23">
                                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                         <i class="material-icons left">add</i> New Item
                                                     </a>
@@ -1138,6 +1143,8 @@
     function getRowUnit(val){
         $('#tempPrice' + val).empty();
         $("#arr_warehouse" + val).empty();
+        $("#unit_stock" + val).empty();
+        $("#qty_stock" + val).empty().text('-');
         if($("#arr_item" + val).val()){
             if($("#arr_item" + val).select2('data')[0].old_prices.length > 0){
                 $.each($("#arr_item" + val).select2('data')[0].old_prices, function(i, value) {
@@ -1169,7 +1176,7 @@
             if($("#arr_item" + val).select2('data')[0].buy_units.length > 0){
                 $.each($("#arr_item" + val).select2('data')[0].buy_units, function(i, value) {
                     $('#arr_unit' + val).append(`
-                        <option value="` + value.id + `">` + value.code + `</option>
+                        <option value="` + value.id + `" data-conversion="` + value.conversion + `">` + value.code + `</option>
                     `);
                 });
             }else{
@@ -1177,6 +1184,7 @@
                     <option value="">--Satuan tidak diatur di master data Item--</option>
                 `);
             }
+            $("#unit_stock" + val).text($("#arr_item" + val).select2('data')[0].uom);
         }else{
             $("#arr_item" + val).empty();
             $("#arr_unit" + val).empty().append(`
@@ -1185,7 +1193,9 @@
             $("#arr_warehouse" + val).append(`
                 <option value="">--Silahkan pilih item--</option>
             `);
+            $("#unit_stock" + val).text('-');
         }
+        countRow(val);
     }
 
     var tempTerm = 0;
@@ -1606,9 +1616,15 @@
                         <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;width:100px;" id="rowQty`+ count +`">
                     </td>
                     <td class="center">
-                        <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" required>
+                        <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" required onchange="countRow('` + count + `')">
                             <option value="">--Silahkan pilih item--</option>    
                         </select>
+                    </td>
+                    <td class="center" id="qty_stock` + count + `">
+                        -
+                    </td>
+                    <td class="center" id="unit_stock` + count + `">
+                        -
                     </td>
                     <td class="center">
                         <input list="tempPrice` + count + `" name="arr_price[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
@@ -1719,6 +1735,12 @@
                     </td>
                     <td class="center">
                         <span id="arr_unit` + count + `">-</span>
+                    </td>
+                    <td class="center" id="qty_stock` + count + `">
+                        -
+                    </td>
+                    <td class="center" id="unit_stock` + count + `">
+                        -
                     </td>
                     <td class="center">
                         <input name="arr_price[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
@@ -2694,31 +2716,38 @@
     }
 
     function countRow(id){
-        var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")), 
-            qtylimit = parseFloat($('#rowQty' + id).data('qty').toString().replaceAll(".", "").replaceAll(",",".")), 
-            price = parseFloat($('#rowPrice' + id).val().replaceAll(".", "").replaceAll(",",".")), 
-            disc1 = parseFloat($('#rowDisc1' + id).val().replaceAll(".", "").replaceAll(",",".")), 
-            disc2 = parseFloat($('#rowDisc2' + id).val().replaceAll(".", "").replaceAll(",",".")), 
-            disc3 = parseFloat($('#rowDisc3' + id).val().replaceAll(".", "").replaceAll(",","."));
+        if($('#arr_item' + id).val()){
+            var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")), 
+                qtylimit = parseFloat($('#rowQty' + id).data('qty').toString().replaceAll(".", "").replaceAll(",",".")), 
+                price = parseFloat($('#rowPrice' + id).val().replaceAll(".", "").replaceAll(",",".")), 
+                disc1 = parseFloat($('#rowDisc1' + id).val().replaceAll(".", "").replaceAll(",",".")), 
+                disc2 = parseFloat($('#rowDisc2' + id).val().replaceAll(".", "").replaceAll(",",".")), 
+                disc3 = parseFloat($('#rowDisc3' + id).val().replaceAll(".", "").replaceAll(",",".")),
+                conversion = parseFloat($('#arr_unit' + id).find(':selected').data('conversion').toString().replaceAll(".", "").replaceAll(",","."));
 
-        if(qtylimit > 0){
-            if(qty > qtylimit){
-                qty = qtylimit;
-                $('#rowQty' + id).val(formatRupiahIni(qty.toFixed(3).toString().replace('.',',')));
+            if(qtylimit > 0){
+                if(qty > qtylimit){
+                    qty = qtylimit;
+                    $('#rowQty' + id).val(formatRupiahIni(qty.toFixed(3).toString().replace('.',',')));
+                }
             }
+
+            let qtyConversion = qty * conversion;
+
+            $('#qty_stock' + id).text(formatRupiahIni(qtyConversion.toFixed(3).toString().replace('.',',')));
+
+            var finalpricedisc1 = price - (price * (disc1 / 100));
+            var finalpricedisc2 = finalpricedisc1 - (finalpricedisc1 * (disc2 / 100));
+            var finalpricedisc3 = finalpricedisc2 - disc3;
+
+            if((finalpricedisc3 * qty).toFixed(2) >= 0){
+                $('#arr_subtotal' + id).text(formatRupiahIni((finalpricedisc3 * qty).toFixed(2).toString().replace('.',',')));
+            }else{
+                $('#arr_subtotal' + id).text('-' + formatRupiahIni((finalpricedisc3 * qty).toFixed(2).toString().replace('.',',')));
+            }
+
+            countAll();
         }
-
-        var finalpricedisc1 = price - (price * (disc1 / 100));
-        var finalpricedisc2 = finalpricedisc1 - (finalpricedisc1 * (disc2 / 100));
-        var finalpricedisc3 = finalpricedisc2 - disc3;
-
-        if((finalpricedisc3 * qty).toFixed(2) >= 0){
-            $('#arr_subtotal' + id).text(formatRupiahIni((finalpricedisc3 * qty).toFixed(2).toString().replace('.',',')));
-        }else{
-            $('#arr_subtotal' + id).text('-' + formatRupiahIni((finalpricedisc3 * qty).toFixed(2).toString().replace('.',',')));
-        }
-
-        countAll();
     }
 
     function countAll(){

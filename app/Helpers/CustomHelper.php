@@ -349,6 +349,7 @@ class CustomHelper {
 				$isGroupItem = true;
 			}
 
+			#if check nominal
 			if($row->is_check_nominal){
 				if($row->sign !== '~'){
 					if($isGroupItem){
@@ -417,6 +418,7 @@ class CustomHelper {
 				}
 			}
 
+			#if check benchmark
 			if($row->is_check_benchmark){
 				if($isGroupItem){
 					#groupitem, checknominal dan bukanrange
@@ -459,6 +461,28 @@ class CustomHelper {
 					}else{
 						$passed = false;
 					}
+				}
+			}
+
+			#if group item saja tanpa check nominal dan check benchmark
+			if(!$row->is_check_nominal && !$row->is_check_benchmark &&$isGroupItem){
+				$arrGroupItem = [];
+				$passedGroupItem = false;
+				foreach($row->approvalTemplateItemGroup as $rowgroupitem){
+					$arrGroupItem[] = $rowgroupitem->item_group_id;
+				}
+
+				foreach($source->lookable->details as $rowdetail){
+					if($rowdetail->item()->exists()){
+						$topGroupId = $rowdetail->item->itemGroup->getTopParent($rowdetail->item->itemGroup);
+						if(in_array($topGroupId,$arrGroupItem)){
+							$passedGroupItem = true;
+						}
+					}
+				}
+
+				if(!$passedGroupItem){
+					$passed = false;
 				}
 			}
 

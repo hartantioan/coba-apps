@@ -4,6 +4,7 @@ namespace App\Exports;
 
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseMemo;
+use App\Models\PurchaseMemoDetail;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromView;
@@ -27,44 +28,45 @@ class ExportPurchaseMemo implements FromCollection, WithTitle, WithHeadings, Sho
     }
 
     private $headings = [
-        'NO',
-        'POSTING DATE',
-        'CODE',
-        'SUPPLIER CODE',
-        'SUPPLIER NAME',
-        'TGL.POST',
-        'TGL.RETUR',
-        'TAX CODE',
-        'TIPE',
-        'KETERANGAN',
-        'TOTAL',
+        'No',
+        'No.Dokumen',
+        'Status',
+        'Voider',
+        'Tgl.Void',
+        'Ket.Void',
+        'Deleter',
+        'Tgl.Delete',
+        'Ket.Delete',
+        'Tgl.Posting',
+        'Tgl.Retur',
+        'No.Faktur Pajak Balikan',
+        'Kode Supplier',
+        'Nama Supplier',
+        'Keterangan',
+        'Ref.Dokumen',
+        'No.SPK',
+        'No.Invoice',
+        'Qty',
+        'Nominal',
+        'Total',
         'PPN',
-        'PPH',
-        'ROUNDING',
-        'GRANDTOTAL',
-        'STATUS',
-        'VOIDER',
-        'TGL.VOID',
-        'KET.VOID',
-        'DELETER',
-        'TGL.DELETE',
-        'KET.DELETE',
+        'PPh',
+        'Grandtotal',
+        'Based On',
     ];
 
     public function collection()
     {
         if($this->mode == '1'){
-            $data = PurchaseMemo::where(function ($query) {
+            $data = PurchaseMemoDetail::whereHas('purchaseMemo',function($query){
                 $query->where('post_date', '>=',$this->start_date)
                 ->where('post_date', '<=', $this->end_date);
-            })
-            ->get();
+            })->get();
         }elseif($this->mode == '2'){
-            $data = PurchaseMemo::withTrashed()->where(function ($query) {
+            $data = PurchaseMemo::withTrashed()->whereHas('purchaseMemo',function($query){
                 $query->where('post_date', '>=',$this->start_date)
                 ->where('post_date', '<=', $this->end_date);
-            })
-            ->get();
+            })->get();
         }
 
         $arr = [];
@@ -72,27 +74,30 @@ class ExportPurchaseMemo implements FromCollection, WithTitle, WithHeadings, Sho
         foreach($data as $key => $row){
             $arr[] = [
                 '1'                 => ($key + 1),
-                '2'                 => date('d/m/Y',strtotime($row->post_date)),
-                '3'                 => $row->code,
-                '4'                 => $row->supplier->employee_no ?? '',
-                '5'                 => $row->supplier->name ?? '',
-                '6'                 => date('d/m/Y',strtotime($row->post_date)),
-                '8'                 => date('d/m/Y',strtotime($row->return_date)),
-                '11'                => $row->return_tax_no,
-                '7'                 => $row->type,
-                '9'                 => $row->note,
+                '3'                 => $row->purchaseMemo->code,
+                '14'                => $row->purchaseMemo->statusRaw(),
+                'voider'            => $row->purchaseMemo->voidUser()->exists() ? $row->purchaseMemo->voidUser->name : '',
+                'void_date'         => $row->purchaseMemo->voidUser()->exists() ? $row->purchaseMemo->void_date : '',
+                'void_note'         => $row->purchaseMemo->voidUser()->exists() ? $row->purchaseMemo->void_note : '',
+                'deleter'           => $row->purchaseMemo->deleteUser()->exists() ? $row->purchaseMemo->deleteUser->name : '',
+                'delete_date'       => $row->purchaseMemo->deleteUser()->exists() ? $row->purchaseMemo->deleted_at : '',
+                'delete_note'       => $row->purchaseMemo->deleteUser()->exists() ? $row->purchaseMemo->delete_note : '',
+                '6'                 => date('d/m/Y',strtotime($row->purchaseMemo->post_date)),
+                '8'                 => date('d/m/Y',strtotime($row->purchaseMemo->return_date)),
+                '11'                => $row->purchaseMemo->return_tax_no,
+                '4'                 => $row->purchaseMemo->account->employee_no ?? '',
+                '5'                 => $row->purchaseMemo->account->name ?? '',
+                '9'                 => $row->purchaseMemo->note,
+                'ref'               => $row->getCode(),
+                'spk'               => $row->getSpk(),
+                'invoice'           => $row->getInvoiceNo(),
+                'qty'               => number_format($row->qty,3,',','.'),
+                'nominal'           => number_format($row->getNominal(),2,',','.'),
                 'total'             => number_format($row->total,2,',','.'),
                 'tax'               => number_format($row->tax,2,',','.'),
                 'wtax'              => number_format($row->wtax,2,',','.'),
-                'rounding'          => number_format($row->rounding,2,',','.'),
                 'grandtotal'        => number_format($row->grandtotal,2,',','.'),
-                '14'                => $row->statusRaw(),
-                'voider'            => $row->voidUser()->exists() ? $row->voidUser->name : '',
-                'void_date'         => $row->voidUser()->exists() ? $row->void_date : '',
-                'void_note'         => $row->voidUser()->exists() ? $row->void_note : '',
-                'deleter'           => $row->deleteUser()->exists() ? $row->deleteUser->name : '',
-                'delete_date'       => $row->deleteUser()->exists() ? $row->deleted_at : '',
-                'delete_note'       => $row->deleteUser()->exists() ? $row->delete_note : '',
+                'based_on'          => $row->getCode(),
             ];
         }
 

@@ -63,6 +63,14 @@ class PurchaseRequestDetail extends Model
         }
     }
 
+    public function getBaseDocument(){
+        $code = '';
+        if($this->materialRequestDetail()){
+            $code = $this->lookable->materialRequest->code;
+        }
+        return $code;
+    }
+
     public function item()
     {
         return $this->belongsTo('App\Models\Item', 'item_id', 'id')->withTrashed();

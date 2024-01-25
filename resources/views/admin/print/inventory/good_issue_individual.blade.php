@@ -177,7 +177,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <h2 class="indigo-text">Barang Masuk</h2>
+                                <h2 class="indigo-text">Barang Keluar</h2>
                             </td>
                         </tr>
                                 
@@ -294,7 +294,7 @@
                                     <td class="center-align">{{ $row->itemStock->area()->exists() ? $row->itemStock->area->name : '-' }}</td>
                                     <td class="center-align">{{ $row->itemShading()->exists() ? $row->itemShading->code : '-' }}</td>
                                     <td class="center-align">{{ $row->costDistribution()->exists() ? $row->costDistribution->code.' - '.$row->costDistribution->name : '-' }}</td>
-                                    <td class="center-align">{{ $row->place()->exists() ? $row->place->name : '-' }}</td>
+                                    <td class="center-align">{{ $row->place()->exists() ? $row->place->code : '-' }}</td>
                                     <td class="center-align">{{ $row->line()->exists() ? $row->line->name : '-' }}</td>
                                     <td class="center-align">{{ $row->machine()->exists() ? $row->machine->name : '-' }}</td>
                                     <td class="center-align">{{ $row->department()->exists() ? $row->department->name : '-' }}</td>
@@ -320,7 +320,6 @@
                             <table style="width:100%">
                                 <tr class="break-row">
                                     <td>
-                                        {!! ucwords(strtolower($data->user->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
                                         <div class="mt-3">
                                             Catatan : {{ $data->note }}
                                         </div>

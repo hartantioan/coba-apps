@@ -399,6 +399,7 @@ class PurchaseOrderController extends Controller
                                 'project_id'                    => $row->project()->exists() ? $row->project->id : '',
                                 'project_name'                  => $row->project()->exists() ? $row->project->name : '-',
                                 'buy_units'                     => $row->item->arrBuyUnits(),
+                                'uom'                           => $row->item->uomUnit->code,
                             ];
                         }
                     }
@@ -423,6 +424,7 @@ class PurchaseOrderController extends Controller
                             'project_id'                    => $row->project()->exists() ? $row->project->id : '',
                             'project_name'                  => $row->project()->exists() ? $row->project->name : '-',
                             'buy_units'                     => $row->itemStock->item->arrBuyUnits(),
+                            'uom'                           => $row->itemStock->item->uomUnit->code,
                         ];
                     }
                 }elseif($request->type == 'sj'){

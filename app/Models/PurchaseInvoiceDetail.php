@@ -134,6 +134,30 @@ class PurchaseInvoiceDetail extends Model
         return $code;
     }
 
+    public function getCodeExport(){
+        $code = match ($this->lookable_type) {
+            'good_receipt_details'      => $this->lookable->item->code,
+            'landed_cost_fee_details'   => $this->lookable->landedCostFee->code,
+            'purchase_order_details'    => $this->lookable->item_id ? $this->lookable->item->code : $this->lookable->coa->code,
+            'coas'                      => $this->lookable->code,
+            default                     => '-',
+        };
+
+        return $code;
+    }
+
+    public function getNameExport(){
+        $code = match ($this->lookable_type) {
+            'good_receipt_details'      => $this->lookable->item->name,
+            'landed_cost_fee_details'   => $this->lookable->landedCostFee->name,
+            'purchase_order_details'    => $this->lookable->item_id ? $this->lookable->item->name : $this->lookable->coa->name,
+            'coas'                      => $this->lookable->name,
+            default                     => '-',
+        };
+
+        return $code;
+    }
+
     public function getHeaderCode(){
         $code = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->goodReceipt->code,
@@ -215,6 +239,18 @@ class PurchaseInvoiceDetail extends Model
     public function getUnitStock(){
         $code = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->item->uomUnit->code,
+            'landed_cost_fee_details'   => '-',
+            'purchase_order_details'    => '-',
+            'coas'                      => '-',
+            default                     => '-',
+        };
+
+        return $code;
+    }
+
+    public function getUnitConversion(){
+        $code = match ($this->lookable_type) {
+            'good_receipt_details'      => $this->lookable->itemUnit->unit->code,
             'landed_cost_fee_details'   => '-',
             'purchase_order_details'    => '-',
             'coas'                      => '-',

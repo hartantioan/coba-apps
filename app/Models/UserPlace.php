@@ -20,9 +20,9 @@ class UserPlace extends Model
     ];
 
     public function user(){
-        return $this->belongsTo('App\Models\User','user_id','id');
+        return $this->belongsTo('App\Models\User','user_id','id')->withTrashed();
     }
     public function place(){
-        return $this->belongsTo('App\Models\Place','place_id','id');
+        return $this->belongsTo('App\Models\Place','place_id','id')->withTrashed();
     }
 }

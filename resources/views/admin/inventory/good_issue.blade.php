@@ -823,7 +823,21 @@
                                         <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="Untuk ` + val.place_name + ` ` + val.warehouse_name + `">
                                     </td>
                                     <td class="center">
-                                        <select class="browser-default" id="arr_inventory_coa` + count + `" name="arr_inventory_coa[]"></select>
+                                        <select class="browser-default" id="arr_inventory_coa` + count + `" name="arr_inventory_coa[]" onchange="applyLock('` + count + `');"></select>
+                                    </td>
+                                    <td class="center" id="coa` + count + `">
+                                        <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" onchange="applyLock('` + count + `');"></select>
+                                    </td>
+                                    <td class="center">
+                                        <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>
+                                    </td>
+                                    <td class="center">
+                                        <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:100px !important;">
+                                            <option value="">--Kosong--</option>
+                                            @foreach ($place as $row)
+                                                <option value="{{ $row->id }}">{{ $row->code }}</option>
+                                            @endforeach
+                                        </select>
                                     </td>
                                     <td>
                                         <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
@@ -877,6 +891,7 @@
                             optionStock += '</select>';
 
                             $('#stock' + count).append(optionStock);
+                            $('#arr_place' + count).val(val.place_id);
                             $('#arr_line' + count).val(val.line_id);
                             $('#arr_machine' + count).val(val.machine_id);
                             $('#arr_department' + count).val(val.department_id);
@@ -894,6 +909,8 @@
                             }
                             select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
                             select2ServerSide('#arr_inventory_coa' + count, '{{ url("admin/select2/inventory_coa_issue") }}');
+                            select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
+                            select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
 
                             if(val.is_activa){
                                 $('#serial' + count).append(`

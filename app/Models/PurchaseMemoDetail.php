@@ -47,6 +47,33 @@ class PurchaseMemoDetail extends Model
         return $code;
     }
 
+    public function getSpk(){
+        $code = match ($this->lookable_type) {
+            'purchase_invoice_details'  => $this->lookable->purchaseInvoice->spk_no,
+            default => '-',
+        };
+
+        return $code;
+    }
+
+    public function getNominal(){
+        $code = match ($this->lookable_type) {
+            'purchase_invoice_details'  => $this->lookable->price,
+            default => 1,
+        };
+
+        return $code;
+    }
+
+    public function getInvoiceNo(){
+        $code = match ($this->lookable_type) {
+            'purchase_invoice_details'  => $this->lookable->purchaseInvoice->invoice_no,
+            default => '-',
+        };
+
+        return $code;
+    }
+
     public function taxMaster()
     {
         return $this->belongsTo('App\Models\Tax', 'tax_id', 'id')->withTrashed();

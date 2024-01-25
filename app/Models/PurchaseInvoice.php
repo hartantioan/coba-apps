@@ -54,6 +54,14 @@ class PurchaseInvoice extends Model
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
     }
 
+    public function top(){
+        $dateStart = strtotime($this->received_date);
+        $dateEnd = strtotime($this->due_date);
+        $diff = $dateEnd - $dateStart;
+        $days = floor($diff / (60 * 60 * 24));
+        return $days;
+    }
+
     public function voidUser()
     {
         return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();

@@ -28,21 +28,7 @@ class ExportPurchaseInvoice implements FromCollection, WithTitle, WithHeadings, 
 
     private $headings = [
         'No',
-        'Posting Date',
-        'Document Number',
-        'Account Code',
-        'Account Name',
-        'Document Date',
-        'Received Date',
-        'Due Date',
-        'Cut Date',
-        'Total',
-        'PPN',
-        'PPh',
-        'Rounding',
-        'Grandtotal',
-        'Downpayment',
-        'Balance',
+        'No.Dokumen',
         'Status',
         'Voider',
         'Tgl.Void',
@@ -50,19 +36,53 @@ class ExportPurchaseInvoice implements FromCollection, WithTitle, WithHeadings, 
         'Deleter',
         'Tgl.Delete',
         'Ket.Delete',
+        'Tgl.Posting',
+        'Tgl.Terima',
+        'Tgl.Dokumen',
+        'TOP',
+        'Tgl.Jatuh Tempo',
+        'No.Invoice',
+        'No.Faktur Pajak',
+        'No.Bukti Potong',
+        'No.SPK',
+        'Kode Supplier',
+        'Nama Supplier',
+        'Keterangan',
+        'GR/LC/PO/Coa No.',
+        'NO.PO/GRPO',
+        'No. SJ',
+        'Kode Item / COA',
+        'Nama Item / COA',
+        'Plant',
+        'Qty',
+        'Satuan',
+        'Line',
+        'Mesin',
+        'Departemen',
+        'Gudang',
+        'Proyek',
+        'Harga',
+        'Total',
+        'PPN',
+        'PPh',
+        'Grandtotal',
     ];
 
     public function collection()
     {
         if($this->mode == '1'){
-            $data = PurchaseInvoice::where( function($query) {
-                $query->where('post_date', '>=',$this->start_date)
-                    ->where('post_date', '<=', $this->end_date);
+            $data = PurchaseInvoiceDetail::whereHas('purchaseInvoice',function($query){
+                $query->where( function($query) {
+                    $query->where('post_date', '>=',$this->start_date)
+                        ->where('post_date', '<=', $this->end_date);
+                });
             })->get();
         }elseif($this->mode == '2'){
-            $data = PurchaseInvoice::withTrashed()->where( function($query) {
-                $query->where('post_date', '>=',$this->start_date)
-                    ->where('post_date', '<=', $this->end_date);
+            $data = PurchaseInvoiceDetail::withTrashed()->whereHas('purchaseInvoice',function($query){
+                $query->where( function($query) {
+                    $query->where('post_date', '>=',$this->start_date)
+                        ->where('post_date', '<=', $this->end_date);
+                });
             })->get();
         }
 
@@ -71,28 +91,44 @@ class ExportPurchaseInvoice implements FromCollection, WithTitle, WithHeadings, 
         foreach($data as $key => $row){
             $arr[] = [
                 '1'                 => ($key + 1),
-                '2'                 => date('d/m/Y',strtotime($row->post_date)),
-                '3'                 => $row->code,
-                '4'                 => $row->account->employee_no,
-                '5'                 => $row->account->name,
-                '6'                 => date('d/m/Y',strtotime($row->document_date)),
-                '7'                 => date('d/m/Y',strtotime($row->received_date)),
-                '8'                 => date('d/m/Y',strtotime($row->due_date)),
-                '11'                => date('d/m/Y',strtotime($row->cut_date)),
+                '3'                 => $row->purchaseInvoice->code,
+                '4'                 => $row->purchaseInvoice->statusRaw(),
+                'voider'            => $row->purchaseInvoice->voidUser()->exists() ? $row->purchaseInvoice->voidUser->name : '',
+                'void_date'         => $row->purchaseInvoice->voidUser()->exists() ? $row->purchaseInvoice->void_date : '',
+                'void_note'         => $row->purchaseInvoice->voidUser()->exists() ? $row->purchaseInvoice->void_note : '',
+                'deleter'           => $row->purchaseInvoice->deleteUser()->exists() ? $row->purchaseInvoice->deleteUser->name : '',
+                'delete_date'       => $row->purchaseInvoice->deleteUser()->exists() ? $row->purchaseInvoice->deleted_at : '',
+                'delete_note'       => $row->purchaseInvoice->deleteUser()->exists() ? $row->purchaseInvoice->delete_note : '',
+                '6'                 => date('d/m/Y',strtotime($row->purchaseInvoice->post_date)),
+                '7'                 => date('d/m/Y',strtotime($row->purchaseInvoice->received_date)),
+                '8'                 => date('d/m/Y',strtotime($row->purchaseInvoice->document_date)),
+                'top'               => $row->purchaseInvoice->top(),
+                '11'                => date('d/m/Y',strtotime($row->purchaseInvoice->due_date)),
+                '5'                 => $row->purchaseInvoice->invoice_no,
+                'fp'                => $row->purchaseInvoice->tax_no,
+                'fp_cut'            => $row->purchaseInvoice->tax_cut_no,
+                'spk'               => $row->purchaseInvoice->spk_no,
+                'supplier_code'     => $row->purchaseInvoice->account->employee_no,
+                'supplier_name'     => $row->purchaseInvoice->account->name,
+                'note'              => $row->purchaseInvoice->note,
+                'code'              => $row->getHeaderCode(),
+                'po_no'             => $row->getPurchaseCode(),
+                'no_sj'             => $row->getDeliveryCode(),
+                'item_code'         => $row->getCodeExport(),
+                'item_name'         => $row->getNameExport(),
+                'plant'             => $row->place->code,
+                'qty'               => number_format($row->qty,3,',','.'),
+                'unit'              => $row->getUnitConversion(),
+                'line'              => $row->line()->exists() ? $row->line->code : '',
+                'machine'           => $row->machine()->exists() ? $row->machine->name : '',
+                'department'        => $row->department()->exists() ? $row->department->name : '',
+                'warehouse'         => $row->warehouse()->exists() ? $row->warehouse->name : '',
+                'project'           => $row->project()->exists() ? $row->project->name : '',
+                'price'             => number_format($row->price,2,',','.'),
                 'total'             => number_format($row->total,2,',','.'),
                 'tax'               => number_format($row->tax,2,',','.'),
                 'wtax'              => number_format($row->wtax,2,',','.'),
-                '12'                => number_format($row->rounding,2,',','.'),
                 'grandtotal'        => number_format($row->grandtotal,2,',','.'),
-                'downpayment'       => number_format($row->downpayment,2,',','.'),
-                '13'                => number_format($row->balance,2,',','.'),
-                '14'                => $row->statusRaw(),
-                'voider'            => $row->voidUser()->exists() ? $row->voidUser->name : '',
-                'void_date'         => $row->voidUser()->exists() ? $row->void_date : '',
-                'void_note'         => $row->voidUser()->exists() ? $row->void_note : '',
-                'deleter'           => $row->deleteUser()->exists() ? $row->deleteUser->name : '',
-                'delete_date'       => $row->deleteUser()->exists() ? $row->deleted_at : '',
-                'delete_note'       => $row->deleteUser()->exists() ? $row->delete_note : '',
             ];
             
         }

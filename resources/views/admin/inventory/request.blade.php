@@ -1284,7 +1284,6 @@
                         $('#arr_warehouse' + count).val(val.warehouse_id);
 
                         $('#arr_stock' + count).empty();
-                        alert(val.stock_list.length);
                         if(val.stock_list.length > 0){
                             let html = `<div>`;
                             $.each(val.stock_list, function(i, value) {

@@ -372,45 +372,24 @@
                             </table>
                         </div>
                         </div>
-
-                        <div class="row">
-                            <div class="col">
-                                {!! ucwords(strtolower($data->user->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
-                            </div>
-                            <div class="col">
-                                
-                            </div>
-                        </div>
-                        <table class="mt-3" width="100%" border="0">
+                        <table width="100%" border="0" style="margin-top:50px;">
                             <tr>
-                                <td align="center">
-                                    Dibuat oleh,
-                                    @if($data->user->signature)
-                                        <div>{!! $data->user->signature() !!}</div>
-                                    @endif
-                                    <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $data->user->name }}</div>
-                                    <div class="mt-1">{{ $data->user->position->Level->name.' - '.$data->user->position->division->name }}</div>
+                                <td style="vertical-align:top;" width="25%">
+                                    Dibuat oleh, {{ $data->user->name }}
                                 </td>
-                                @if($data->approval())
-                                    @foreach ($data->approval() as $detail)
-                                        @foreach ($detail->approvalMatrix()->where('status','2')->get() as $row)
-                                            <td align="center">
-                                                {{ $row->approvalTemplateStage->approvalStage->approval->document_text }}
-                                                @if($row->user->signature)
-                                                    <div>{!! $row->user->signature() !!}</div>
-                                                @endif
-                                                <div class="{{ $row->user->signature ? '' : 'mt-5' }}">{{ $row->user->name }}</div>
-                                                @if ($row->user->position()->exists())
-                                        <div class="mt-1">{{ $row->user->position->Level->name.' - '.$row->user->position->division->name }}</div>
+                                <td style="vertical-align:top;" width="25%">
+                                    Tgl : {{ date('d/m/Y') }}
+                                </td>
+                                <td style="vertical-align:top;" width="25%">
+                                    TTD : 
+                                    @if($data->user->signature)
+                                        <span style="float: right;margin-right:50px;margin-top:-15px;">{!! $data->user->signature() !!}</span>
+                                    @else
+                                        _______________
                                     @endif
-                                            </td>
-                                        @endforeach
-                                    @endforeach
-                                @endif
-                                <td align="center">
-                                    Supplier,
-                                    <br><br><br><br>
-                                    (......................................)
+                                </td>
+                                <td style="vertical-align:top;" width="25%">
+                                    Supplier : _______________
                                 </td>
                             </tr>
                         </table>  

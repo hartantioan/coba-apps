@@ -233,10 +233,15 @@
                         <td class="center">{{ $row->department()->exists() ? $row->department->name : '-' }}</td>
                     </tr>
                     <tr>
-                        <td colspan="10">
+                        <td colspan="11">
                             <b>Mesin</b> : {{ $row->machine()->exists() ? $row->machine->name : '-' }},
                             <b>Requester</b> : {{ $row->requester }},
                             <b>Proyek</b> : {{ $row->project()->exists() ? $row->project->name : '-' }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="11">
+                            Based on : {{ $row->getBaseDocument() }}
                         </td>
                     </tr>
                     @endforeach

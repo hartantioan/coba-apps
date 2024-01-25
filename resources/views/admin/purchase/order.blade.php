@@ -1239,10 +1239,8 @@
 
         if(type == 'po'){
             nil = $('#purchase_request_id').val();
-            $('#gi-show,#sj-show').hide();
         }else if(type == 'gi'){
             nil = $('#good_issue_id').val();
-            $('#pr-show,#sj-show').hide();
         }else if(type == 'sj'){
             /* nil = $('#marketing_order_delivery_process_id').val();
             $('#inventory_type').val('2').trigger('change').formSelect();
@@ -1270,6 +1268,14 @@
         mode = type;
 
         if(nil){
+            if(type == 'po'){
+                $('#gi-show,#sj-show').hide();
+            }else if(type == 'gi'){
+                $('#pr-show,#sj-show').hide();
+            }else if(type == 'sj'){
+                
+            }
+
             $.ajax({
                 url: '{{ Request::url() }}/get_details',
                 type: 'POST',
@@ -1323,6 +1329,12 @@
                                             </td>
                                             <td class="center">
                                                 <span id="arr_unit` + count + `">-</span>
+                                            </td>
+                                            <td class="center" id="qty_stock` + count + `">
+                                                -
+                                            </td>
+                                            <td class="center" id="unit_stock` + count + `">
+                                                ` + val.uom + `
                                             </td>
                                             <td class="center">
                                                 <input name="arr_price[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
@@ -1424,12 +1436,18 @@
                                                 <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                                             </td>
                                             <td>
-                                                <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="` + val.qty + `" data-stockqty="` + val.qty + `" style="text-align:right;width:100px;" id="rowQty`+ count +`">
+                                                <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `');" data-qty="` + val.qty + `" data-stockqty="` + val.qty + `" style="text-align:right;width:100px;" id="rowQty`+ count +`">
                                             </td>
                                             <td class="center">
-                                                <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" required onchange="applyConversion('` + count + `');">
+                                                <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" required onchange="countRow('` + count + `');">
                                                     <option value="">--Silahkan pilih item--</option>    
                                                 </select>
+                                            </td>
+                                            <td class="center" id="qty_stock` + count + `">
+                                                ` + (type == 'po' ? '' : val.qty) + `
+                                            </td>
+                                            <td class="center" id="unit_stock` + count + `">
+                                                ` + val.uom + `
                                             </td>
                                             <td class="center">
                                                 <input list="tempPrice` + count + `" name="arr_price[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
@@ -1568,6 +1586,8 @@
                                 }
 
                                 if(!val.item_unit_id){
+                                    applyConversion(count);
+                                }else{
                                     $('#arr_unit' + count).trigger('change');
                                 }
                             });

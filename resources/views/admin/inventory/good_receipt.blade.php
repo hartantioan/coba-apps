@@ -154,7 +154,7 @@
                             </div>
                             <div class="input-field col m3 s12 step3">
                                 <input type="hidden" id="temp" name="temp">
-                                <select class="browser-default" id="account_id" name="account_id" onchange="/* getPurchaseOrderAll(this.value); */"></select>
+                                <select class="browser-default" id="account_id" name="account_id" onchange="resetDetails();"></select>
                                 <label class="active" for="account_id">Supplier</label>
                             </div>
                             <div class="input-field col m3 s12 step4">
@@ -641,8 +641,32 @@
             }
         });
 
-        select2ServerSide('#purchase_order_id', '{{ url("admin/select2/purchase_order") }}');
         select2ServerSide('#account_id', '{{ url("admin/select2/supplier") }}');
+
+        $('#purchase_order_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/purchase_order") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        account_id: $('#account_id').val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
 
         $('#body-item').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();
@@ -659,6 +683,39 @@
             }
         });
     });
+
+    function resetDetails(){
+        if($('#account_id').val()){
+            if($('.data-used').length > 0){
+                $('.data-used').trigger('click');
+            }else{
+                $('.row_item').each(function(){
+                    $(this).remove();
+                });
+                $('.row_item_serial').each(function(){
+                    $(this).remove();
+                });
+                if($('#empty-item').length == 0){
+                    $('#body-item').append(`
+                        <tr id="empty-item">
+                            <td colspan="15" class="center">
+                                Pilih purchase order untuk memulai...
+                            </td>
+                        </tr>
+                    `);
+                }
+                if($('#empty-item-serial').length == 0){
+                    $('#body-item-serial').append(`
+                        <tr id="empty-item-serial">
+                            <td class="center">
+                                Pilih purchase order untuk memulai...
+                            </td>
+                        </tr>
+                    `);
+                }
+            }
+        }
+    }
 
     String.prototype.replaceAt = function(index, replacement) {
         return this.substring(0, index) + replacement + this.substring(index + replacement.length);

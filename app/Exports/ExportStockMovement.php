@@ -55,7 +55,7 @@ class ExportStockMovement implements FromView,ShouldAutoSize
         foreach($query_data as $row){
             $data_tempura = [
                 'keterangan' => $row->lookable->code.'-'.$row->lookable->note,
-                'date' =>  date('d/m/y',strtotime($row->date)),
+                'date' =>  date('d/m/Y',strtotime($row->date)),
                 'masuk'=> number_format($row->qty_in,3,',','.') ?? '-',
                 'keluar'=>number_format($row->qty_out,3,',','.') ?? '-',
                 'final'=>number_format($row->qty_final,3,',','.'),

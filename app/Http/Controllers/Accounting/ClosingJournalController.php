@@ -144,7 +144,7 @@ class ClosingJournalController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->company->name,
-                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
                     date('F Y',strtotime($val->month)),
                     $val->note,
                     number_format($val->grandtotal,2,',','.'),
@@ -1018,7 +1018,7 @@ class ClosingJournalController extends Controller
                 $balance += ($detail->type == '1' ? $detail->nominal : -1 * $detail->nominal);
                 if($balance < 0){
                     $arrError[] = [
-                        'date'      => date('d/m/y',strtotime($detail->journal->post_date)),
+                        'date'      => date('d/m/Y',strtotime($detail->journal->post_date)),
                         'code'      => $detail->journal->code,
                         'note'      => ($detail->journal->note ? $detail->journal->note : '').' - '.($detail->note ? $detail->note : ''),
                         'balance'   => number_format($balance,2,',','.'),
@@ -1072,7 +1072,7 @@ class ClosingJournalController extends Controller
                 $balance += ($detail->type == '1' ? $detail->nominal : -1 * $detail->nominal);
                 if($balance < 0){
                     $arrError[] = [
-                        'date'      => date('d/m/y',strtotime($detail->journal->post_date)),
+                        'date'      => date('d/m/Y',strtotime($detail->journal->post_date)),
                         'code'      => $detail->journal->code,
                         'note'      => ($detail->journal->note ? $detail->journal->note : '').' - '.($detail->note ? $detail->note : ''),
                         'balance'   => number_format($balance,2,',','.'),
@@ -1123,7 +1123,7 @@ class ClosingJournalController extends Controller
                     'item_name'         => $row->item->code.' - '.$row->item->name,
                     'place_name'        => $row->place->code,
                     'warehouse_code'    => $row->warehouse->code,
-                    'date'              => date('d/m/y',strtotime($row->date)),
+                    'date'              => date('d/m/Y',strtotime($row->date)),
                     'code'              => $row->lookable->code,
                     'note'              => $row->lookable->note ? $row->lookable->note : '',
                     'balance'           => number_format($row->qty_final,2,',','.'),

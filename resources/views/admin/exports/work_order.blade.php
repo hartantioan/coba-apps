@@ -25,8 +25,8 @@
                 <td>{{ $row->equipment->name }}</td>
                 <td>{{ $row->activity->title }}</td>
                 <td>{{ $row->area->name }}</td>
-                <td>{{ date('d/m/y',strtotime($row->request_date)) }}</td>
-                <td>{{ date('d/m/y',strtotime($row->suggested_completion_date)) }}</td>
+                <td>{{ date('d/m/Y',strtotime($row->request_date)) }}</td>
+                <td>{{ date('d/m/Y',strtotime($row->suggested_completion_date)) }}</td>
                 <td>{{ $row->detail_issue }}</td>
                 <td>{!! $row->statusRaw() !!}</td>
             </tr>

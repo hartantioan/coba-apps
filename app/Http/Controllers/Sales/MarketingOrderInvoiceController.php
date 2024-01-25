@@ -220,9 +220,9 @@ class MarketingOrderInvoiceController extends Controller
                     $val->user->name,
                     $val->account->name,
                     $val->company->name,
-                    date('d/m/y',strtotime($val->post_date)),
-                    date('d/m/y',strtotime($val->due_date)),
-                    date('d/m/y',strtotime($val->document_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->due_date)),
+                    date('d/m/Y',strtotime($val->document_date)),
                     $val->type(),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->tax_no,
@@ -627,7 +627,7 @@ class MarketingOrderInvoiceController extends Controller
         if($data->marketingOrderHandoverInvoiceDetail()->exists()){
             foreach($data->marketingOrderHandoverInvoiceDetail as $key => $row){
                 $string .= '<tr>
-                    <td class="center-align">'.date('d/m/y',strtotime($row->marketingOrderHandoverInvoice->post_date)).'</td>
+                    <td class="center-align">'.date('d/m/Y',strtotime($row->marketingOrderHandoverInvoice->post_date)).'</td>
                     <td class="">'.$row->marketingOrderHandoverInvoice->code.'</td>
                     <td class="">'.$row->marketingOrderHandoverInvoice->status().'</td>
                     <td class="">'.$row->marketingOrderHandoverInvoice->note.'</td>

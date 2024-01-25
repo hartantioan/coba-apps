@@ -184,8 +184,8 @@ class PurchaseRequestController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->company->name,
-                    date('d/m/y',strtotime($val->post_date)),
-                    date('d/m/y',strtotime($val->due_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->due_date)),
                     $val->note,
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
@@ -253,7 +253,7 @@ class PurchaseRequestController extends Controller
                 <td class="center-align">'.$row->itemUnit->unit->code.'</td>
                 <td class="">'.$row->note.'</td>
                 <td class="">'.$row->note2.'</td>
-                <td class="center-align">'.date('d/m/y',strtotime($row->required_date)).'</td>
+                <td class="center-align">'.date('d/m/Y',strtotime($row->required_date)).'</td>
                 <td class="center-align">'.$row->place->code.'</td>
                 <td class="center-align">'.($row->line()->exists() ? $row->line->name : '-').'</td>
                 <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
@@ -796,7 +796,7 @@ class PurchaseRequestController extends Controller
                 "name"  => $query->code,
                 "color" => "lightblue",
                 'properties'=> [
-                     ['name'=> "Tanggal: ".date('d/m/y',strtotime($query->post_date))],
+                     ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query->post_date))],
                   ],
                 'url'   =>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($query->code),
                 "title" =>$query->code,
@@ -1567,7 +1567,7 @@ class PurchaseRequestController extends Controller
                             'key'   => $query_pyrc->paymentRequest->code,
                             "name"  => $query_pyrc->paymentRequest->code,
                             'properties'=> [
-                                 ['name'=> "Tanggal: ".date('d/m/y',strtotime($query_pyrc->paymentRequest->post_date))],
+                                 ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query_pyrc->paymentRequest->post_date))],
                               ],
                             'url'   =>request()->root()."/admin/finance/payment_request_cross?code=".CustomHelper::encrypt($query_pyrc->paymentRequest->code),
                             "title" =>$query_pyrc->paymentRequest->code,
@@ -2616,7 +2616,7 @@ class PurchaseRequestController extends Controller
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td class="center-align">'.$row->purchaseRequest->code.'</td>
-                    <td class="center-align">'.date('d/m/y',strtotime($row->purchaseRequest->post_date)).'</td>
+                    <td class="center-align">'.date('d/m/Y',strtotime($row->purchaseRequest->post_date)).'</td>
                     <td class="">'.$row->purchaseRequest->note.'</td>
                     <td class="center-align">'.$row->purchaseRequest->status().'</td>
                     <td class="">'.$row->item->code.' - '.$row->item->name.'</td>

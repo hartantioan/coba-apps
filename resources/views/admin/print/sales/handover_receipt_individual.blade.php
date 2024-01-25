@@ -149,7 +149,7 @@
                         <h5>
                             {{ $data->company->name }}
                             <br>TANDA TERIMA
-                            <br>{{ date('d/m/y',strtotime($data->post_date)) }}
+                            <br>{{ date('d/m/Y',strtotime($data->post_date)) }}
                             <br><br>{{ $data->account->name }}
                         </h5>
                     </td>
@@ -175,7 +175,7 @@
                                 <tr>
                                     <td align="center">{{ ($key + 1)  }}</td>
                                     <td>{{ $row->lookable->code }}</td>
-                                    <td align="center">{{ date('d/m/y',strtotime($row->lookable->post_date)) }}</td>
+                                    <td align="center">{{ date('d/m/Y',strtotime($row->lookable->post_date)) }}</td>
                                     <td align="right">{{ number_format($row->lookable->balance,2,',','.') }}</td>
                                     <td>{{ $row->lookable->listDeliveryProcess() }}</td>
                                 </tr>

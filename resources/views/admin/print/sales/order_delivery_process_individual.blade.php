@@ -160,7 +160,7 @@
                         <tr>
                             <td style="margin-top: -2px;">
                                 <small style="font-size:10px">Tanggal:</small>
-                                <span style="font-size:10px;">{{ date('d/m/y',strtotime($data->post_date)) }}</span>
+                                <span style="font-size:10px;">{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                             </td>
                         </tr>
                         <tr>
@@ -270,7 +270,7 @@
                                         </td>
                                         <td width="1%">:</td>
                                         <td>
-                                            {{ date('d/m/y',strtotime($data->post_date)) }}
+                                            {{ date('d/m/Y',strtotime($data->post_date)) }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -399,7 +399,7 @@
                             <tbody>
                                 <tr>
                                     <td width="50%">Komplain harap menyertakan bukti foto dan/atau video sebelum saat proses bongkar.</td>
-                                    <td width="50%">Dicetak pada : {{ date('d/m/y H:i') }}</td>
+                                    <td width="50%">Dicetak pada : {{ date('d/m/Y H:i') }}</td>
                                 </tr>
                                 <tr>
                                     <td width="100%" colspan="2">

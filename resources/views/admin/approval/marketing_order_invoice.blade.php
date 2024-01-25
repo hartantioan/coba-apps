@@ -126,11 +126,11 @@
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
                     <div class="mr-2">
                         <small>Diajukan:</small>
-                        <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span>
+                        <span>{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                     </div>
                     <div class="mr-2">
                         <small>Valid Hingga:</small>
-                        <span>{{ date('d/m/y',strtotime($data->due_date)) }}</span>
+                        <span>{{ date('d/m/Y',strtotime($data->due_date)) }}</span>
                     </div>
                 </div>
             </div>

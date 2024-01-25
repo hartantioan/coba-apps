@@ -168,7 +168,7 @@
                 <tr>
                     <td width="33%" class="left-align" >
                         <span class="invoice-number mr-1"># {{ $data->code }}</span>
-                        <small>Diajukan:{{ date('d/m/y',strtotime($data->post_date)) }}</small>
+                        <small>Diajukan:{{ date('d/m/Y',strtotime($data->post_date)) }}</small>
                         <h2 class="indigo-text">Penerimaan Barang</h2>
                     </td>
                     <td width="33%" class="right-align">
@@ -201,7 +201,7 @@
                                             Status
                                         </td>
                                         <td width="60%">
-                                            {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d/m/y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
+                                            {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d/m/Y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
                                         </td>
                                     </tr>
                                 </table>

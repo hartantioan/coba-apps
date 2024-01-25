@@ -286,7 +286,7 @@ class MarketingOrderPaymentController extends Controller
                     <td class="center-align">'.($key + 1).'</td>
                     <td class="center-align">'.$row->incomingPayment->code.'</td>
                     <td>'.$row->incomingPayment->coa->name.'</td>
-                    <td class="center-align">'.date('d/m/y',strtotime($row->incomingPayment->post_date)).'</td>
+                    <td class="center-align">'.date('d/m/Y',strtotime($row->incomingPayment->post_date)).'</td>
                     <td>'.$row->incomingPayment->note.' - '.$row->note.'</td>
                     <td class="right-align">'.number_format($row->total,2,',','.').'</td>
                     <td class="right-align">'.number_format($row->rounding,2,',','.').'</td>
@@ -362,7 +362,7 @@ class MarketingOrderPaymentController extends Controller
                     <td class="center-align">'.($key + 1).'</td>
                     <td class="center-align">'.$row->incomingPayment->code.'</td>
                     <td>'.$row->incomingPayment->coa->name.'</td>
-                    <td class="center-align">'.date('d/m/y',strtotime($row->incomingPayment->post_date)).'</td>
+                    <td class="center-align">'.date('d/m/Y',strtotime($row->incomingPayment->post_date)).'</td>
                     <td>'.$row->incomingPayment->note.' - '.$row->note.'</td>
                     <td class="right-align">'.number_format($row->total,2,',','.').'</td>
                     <td class="right-align">'.number_format($row->rounding,2,',','.').'</td>

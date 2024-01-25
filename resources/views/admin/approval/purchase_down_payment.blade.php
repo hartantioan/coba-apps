@@ -135,7 +135,7 @@
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
                     <div class="mr-2">
                         <small>Diajukan:</small>
-                        <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span>
+                        <span>{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                     </div>
                 </div>
             </div>
@@ -213,7 +213,7 @@
                             Status
                         </div>
                         <div class="col s6">
-                            {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d/m/y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
+                            {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d/m/Y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
                         </div>
                     </div>
                 </td>
@@ -239,9 +239,9 @@
                                 <th class="center-align">PR No.</th>
                                 <th class="center-align">{{ implode(', ',$arr_pr) }}</th>
                                 <th class="center-align">Tgl.Post</th>
-                                <th class="center-align">{{ date('d/m/y',strtotime($row->purchaseOrder->post_date)) }}</th>
+                                <th class="center-align">{{ date('d/m/Y',strtotime($row->purchaseOrder->post_date)) }}</th>
                                 <th class="center-align">Tgl.Kirim</th>
-                                <th class="center-align">{{ date('d/m/y',strtotime($row->purchaseOrder->delivery_date)) }}</th>
+                                <th class="center-align">{{ date('d/m/Y',strtotime($row->purchaseOrder->delivery_date)) }}</th>
                             </tr>
                             <tr>
                                 <th class="center-align">Keterangan</th>

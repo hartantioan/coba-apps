@@ -37,7 +37,7 @@ class OperationAccess
                 if($request->post_date < $minDate || $request->post_date > $maxDate){
                     return response()->json([
                         'status'  => 500,
-                        'message' => 'Ups, Tanggal post anda tidak boleh kurang dari '.date('d/m/y',strtotime($minDate)).' atau lebih dari '.date('d/m/y',strtotime($maxDate)).'.',
+                        'message' => 'Ups, Tanggal post anda tidak boleh kurang dari '.date('d/m/Y',strtotime($minDate)).' atau lebih dari '.date('d/m/Y',strtotime($maxDate)).'.',
                     ]);
                 }
             }

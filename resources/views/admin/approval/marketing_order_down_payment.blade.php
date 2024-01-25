@@ -131,7 +131,7 @@
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
                     <div class="mr-2">
                         <small>Diajukan:</small>
-                        <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span>
+                        <span>{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                     </div>
                 </div>
             </div>
@@ -214,7 +214,7 @@
                         @foreach($data->marketingOrderDownPaymentDetail as $row)
                         <tr>
                             <td class="center-align">{{ $row->marketingOrder->code }}</td>
-                            <td class="center-align">{{ date('d/m/y',strtotime($row->marketingOrder->post_date)) }}</td>
+                            <td class="center-align">{{ date('d/m/Y',strtotime($row->marketingOrder->post_date)) }}</td>
                             <td class="">{{ $row->marketingOrder->note_internal.' - '.$row->marketingOrder->note_external }}</td>
                             <td class="right-align">{{ number_format($row->marketingOrder->grandtotal,2,',','.') }}</td>
                         </tr>

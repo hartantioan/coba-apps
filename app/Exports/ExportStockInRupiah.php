@@ -59,7 +59,7 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                 'final'=>number_format($row->price_final,2,',','.'),
                 'totalfinal'=>number_format($row->total_final,2,',','.'),
                 'qtyfinal'=>number_format($row->qty_final,3,',','.'),
-                'date' =>  date('d/m/y',strtotime($row->date)),
+                'date' =>  date('d/m/Y',strtotime($row->date)),
             ];
             $array_filter[]=$data_tempura;
         }

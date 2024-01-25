@@ -39,6 +39,11 @@ class MaterialRequestDetail extends Model
         return $this->belongsTo('App\Models\MaterialRequest', 'material_request_id', 'id')->withTrashed();
     }
 
+    public function header()
+    {
+        return $this->belongsTo('App\Models\MaterialRequest', 'material_request_id', 'id')->withTrashed();
+    }
+
     public function line()
     {
         return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();

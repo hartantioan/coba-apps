@@ -37,7 +37,7 @@ class ExportPresenceReport implements FromView,ShouldAutoSize,WithTitle
                     return $date;
                 })
                 ->map(function ($date) {
-                    return $date->format('d/m/Y'); // Format the date as 'dd/mm/yyyy'
+                    return $date->format('d/m/Y'); // Format the date as 'd/m/Y'
                 })
                 ->toArray();
         

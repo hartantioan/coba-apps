@@ -54,7 +54,7 @@ class ExportPriceHistoryPO implements FromView
                 'supplier'=> $val->purchaseOrder->supplier->name,
                 'code'=> $val->purchaseOrder->code,
                 'item'=> $isi,
-                'date'=>date('d/m/y',strtotime($val->purchaseOrder->post_date)),
+                'date'=>date('d/m/Y',strtotime($val->purchaseOrder->post_date)),
                 'price'=> number_format($val->price,2,',','.'),
                 'disc1'=> number_format($disc1,2,',','.'),
                 'disc2'=> number_format($disc2,2,',','.'),

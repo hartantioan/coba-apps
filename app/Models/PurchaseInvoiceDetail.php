@@ -169,9 +169,9 @@ class PurchaseInvoiceDetail extends Model
 
     public function getPostDate(){
         $date = match ($this->lookable_type) {
-            'good_receipt_details'      => date('d/m/y',strtotime($this->lookable->goodReceipt->post_date)),
-            'landed_cost_fee_details'   => date('d/m/y',strtotime($this->lookable->landedCost->post_date)),
-            'purchase_order_details'    => date('d/m/y',strtotime($this->lookable->purchaseOrder->post_date)),
+            'good_receipt_details'      => date('d/m/Y',strtotime($this->lookable->goodReceipt->post_date)),
+            'landed_cost_fee_details'   => date('d/m/Y',strtotime($this->lookable->landedCost->post_date)),
+            'purchase_order_details'    => date('d/m/Y',strtotime($this->lookable->purchaseOrder->post_date)),
             default                     => '-',
         };
 
@@ -180,8 +180,8 @@ class PurchaseInvoiceDetail extends Model
 
     public function getDueDate(){
         $date = match ($this->lookable_type) {
-            'good_receipt_details'      => $this->lookable->goodReceipt->due_date ? date('d/m/y',strtotime($this->lookable->goodReceipt->due_date)) : '-',
-            'purchase_order_details'    => $this->lookable->purchaseOrder->due_date ? date('d/m/y',strtotime($this->lookable->purchaseOrder->due_date)) : '-',
+            'good_receipt_details'      => $this->lookable->goodReceipt->due_date ? date('d/m/Y',strtotime($this->lookable->goodReceipt->due_date)) : '-',
+            'purchase_order_details'    => $this->lookable->purchaseOrder->due_date ? date('d/m/Y',strtotime($this->lookable->purchaseOrder->due_date)) : '-',
             default                     => '-',
         };
 
@@ -194,6 +194,42 @@ class PurchaseInvoiceDetail extends Model
             'landed_cost_fee_details'   => $this->lookable->landedCost->getGoodReceiptNo(),
             'purchase_order_details'    => $this->lookable->purchaseOrder->code.' - '.$this->lookable->purchaseOrder->code,
             'coas'                      => $this->lookable->code.' - '.$this->lookable->name,
+            default                     => '-',
+        };
+
+        return $code;
+    }
+
+    public function getQtyStock(){
+        $code = match ($this->lookable_type) {
+            'good_receipt_details'      => $this->qty * $this->lookable->qty_conversion,
+            'landed_cost_fee_details'   => 1,
+            'purchase_order_details'    => 1,
+            'coas'                      => 1,
+            default                     => 1,
+        };
+
+        return $code;
+    }
+
+    public function getUnitStock(){
+        $code = match ($this->lookable_type) {
+            'good_receipt_details'      => $this->lookable->item->uomUnit->code,
+            'landed_cost_fee_details'   => '-',
+            'purchase_order_details'    => '-',
+            'coas'                      => '-',
+            default                     => '-',
+        };
+
+        return $code;
+    }
+
+    public function getQtyConversion(){
+        $code = match ($this->lookable_type) {
+            'good_receipt_details'      => $this->lookable->qty_conversion,
+            'landed_cost_fee_details'   => '-',
+            'purchase_order_details'    => '-',
+            'coas'                      => '-',
             default                     => '-',
         };
 

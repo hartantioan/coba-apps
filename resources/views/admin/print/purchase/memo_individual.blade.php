@@ -169,7 +169,7 @@
                         </tr>
                         <tr>
                             <td style="margin-top: -2px;">
-                                <small style="font-size:1em">Diajukan: {{ date('d/m/y',strtotime($data->post_date)) }}</small>
+                                <small style="font-size:1em">Diajukan: {{ date('d/m/Y',strtotime($data->post_date)) }}</small>
                             </td>
                         </tr>
                         <tr>
@@ -244,7 +244,7 @@
                                             Tanggal Retur
                                         </td>
                                         <td width="60%">
-                                            {{ date('d/m/y',strtotime($data->return_date)) }}
+                                            {{ date('d/m/Y',strtotime($data->return_date)) }}
                                         </td>
                                     </tr>
                                 </table>

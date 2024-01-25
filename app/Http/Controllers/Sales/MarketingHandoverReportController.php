@@ -92,7 +92,7 @@ class MarketingHandoverReportController extends Controller
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->account->name,
-                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
                     number_format($val->balance,2,',','.'),
                     number_format($val->balancePaymentIncoming(),2,',','.'),
                     $val->latestHandoverInvoice(),
@@ -219,7 +219,7 @@ class MarketingHandoverReportController extends Controller
         if($data->marketingOrderHandoverInvoiceDetail()->exists()){
             foreach($data->marketingOrderHandoverInvoiceDetail as $key => $row){
                 $string .= '<tr>
-                    <td class="center-align">'.date('d/m/y',strtotime($row->marketingOrderHandoverInvoice->post_date)).'</td>
+                    <td class="center-align">'.date('d/m/Y',strtotime($row->marketingOrderHandoverInvoice->post_date)).'</td>
                     <td class="">'.$row->marketingOrderHandoverInvoice->code.'</td>
                     <td class="">'.$row->marketingOrderHandoverInvoice->status().'</td>
                     <td class="">'.$row->marketingOrderHandoverInvoice->note.'</td>

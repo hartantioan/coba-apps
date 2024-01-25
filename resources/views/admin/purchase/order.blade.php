@@ -66,7 +66,7 @@
                                                     <select class="form-control" id="filter_inventory" onchange="loadDataTable()">
                                                         <option value="">Semua</option>
                                                         <option value="1">Persediaan Barang</option>
-                                                        <option value="2">Manual</option>
+                                                        <option value="2">Lain-lain</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -253,7 +253,7 @@
                             <div class="input-field col m3 s12 step4">
                                 <select class="form-control" id="inventory_type" name="inventory_type">
                                     <option value="1">Persediaan Barang</option>
-                                    <option value="2">Manual</option>
+                                    <option value="2">Lain-lain</option>
                                 </select>
                                 <label class="" for="inventory_type">Tipe Pembelian</label>
                             </div>
@@ -2332,9 +2332,15 @@
                                         <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="` + val.qty + `" style="text-align:right;width:100px;" id="rowQty`+ count +`">
                                     </td>
                                     <td class="center">
-                                        <select class="browser-default" id="arr_satuan` + count + `" name="arr_satuan[]" required>
+                                        <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" required onchange="countRow('` + count + `')">
                                             <option value="">--Silahkan pilih item--</option>    
                                         </select>
+                                    </td>
+                                    <td class="center" id="qty_stock` + count + `">
+                                        ` + val.qty_stock + `
+                                    </td>
+                                    <td class="center" id="unit_stock` + count + `">
+                                        ` + val.unit_stock + `
                                     </td>
                                     <td class="center">
                                         <input name="arr_price[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
@@ -2444,10 +2450,10 @@
                             $("#arr_wtax" + count + " option[data-id='" + val.wtax_id + "']").prop("selected",true);
 
                             if(val.buy_units.length > 0){
-                                $('#arr_satuan' + count).empty();
+                                $('#arr_unit' + count).empty();
                                 $.each(val.buy_units, function(i, value) {
-                                    $('#arr_satuan' + count).append(`
-                                        <option value="` + value.id + `" ` + (value.id == val.item_unit_id ? 'selected' : '') + `>` + value.code + `</option>
+                                    $('#arr_unit' + count).append(`
+                                        <option value="` + value.id + `" ` + (value.id == val.item_unit_id ? 'selected' : '') + ` data-conversion="` + value.conversion + `">` + value.code + `</option>
                                     `);
                                 });
                             }
@@ -2466,6 +2472,12 @@
                                     </td>
                                     <td class="center">
                                         <span id="arr_unit` + count + `">` + val.item_unit_id + `</span>
+                                    </td>
+                                    <td class="center" id="qty_stock` + count + `">
+                                        -
+                                    </td>
+                                    <td class="center" id="unit_stock` + count + `">
+                                        -
                                     </td>
                                     <td class="center">
                                         <input name="arr_price[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">

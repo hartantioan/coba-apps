@@ -126,11 +126,11 @@
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
                     <div class="mr-2">
                         <small>Diajukan:</small>
-                        <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span>
+                        <span>{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                     </div>
                     <div class="mr-2">
                         <small>Dikirimkan:</small>
-                        <span>{{ date('d/m/y',strtotime($data->delivery_date)) }}</span>
+                        <span>{{ date('d/m/Y',strtotime($data->delivery_date)) }}</span>
                     </div>
                 </div>
             </div>
@@ -205,7 +205,7 @@
                     Tgl.Kirim
                 </div>
                 <div class="col s8">
-                    {{ date('d/m/y',strtotime($data->delivery_date)) }}
+                    {{ date('d/m/Y',strtotime($data->delivery_date)) }}
                 </div>
                 <div class="col s4">
                     Almt Tujuan

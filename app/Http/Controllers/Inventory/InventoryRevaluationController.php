@@ -164,7 +164,7 @@ class InventoryRevaluationController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->company->name,
-                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
                     $val->status(),
                     '
@@ -269,7 +269,7 @@ class InventoryRevaluationController extends Controller
                 if($passed == false){
                     return response()->json([
                         'status'  => 500,
-                        'message' => 'Maaf, pada tanggal '.date('d/m/y',strtotime($request->post_date)).', barang '.implode(", ",$arrItemNotPassed).', stok tidak tersedia atau melebihi stok yang tersedia.',
+                        'message' => 'Maaf, pada tanggal '.date('d/m/Y',strtotime($request->post_date)).', barang '.implode(", ",$arrItemNotPassed).', stok tidak tersedia atau melebihi stok yang tersedia.',
                     ]);
                 }
                 

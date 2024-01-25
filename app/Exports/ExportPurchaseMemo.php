@@ -72,12 +72,12 @@ class ExportPurchaseMemo implements FromCollection, WithTitle, WithHeadings, Sho
         foreach($data as $key => $row){
             $arr[] = [
                 '1'                 => ($key + 1),
-                '2'                 => date('d/m/y',strtotime($row->post_date)),
+                '2'                 => date('d/m/Y',strtotime($row->post_date)),
                 '3'                 => $row->code,
                 '4'                 => $row->supplier->employee_no ?? '',
                 '5'                 => $row->supplier->name ?? '',
-                '6'                 => date('d/m/y',strtotime($row->post_date)),
-                '8'                 => date('d/m/y',strtotime($row->return_date)),
+                '6'                 => date('d/m/Y',strtotime($row->post_date)),
+                '8'                 => date('d/m/Y',strtotime($row->return_date)),
                 '11'                => $row->return_tax_no,
                 '7'                 => $row->type,
                 '9'                 => $row->note,

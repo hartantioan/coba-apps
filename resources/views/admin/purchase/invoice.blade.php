@@ -315,7 +315,7 @@
                                         <p class="mt-2 mb-2">
                                             <h6>Detail Goods Receipt PO / Landed Cost / Purchase Order Jasa / Coa</h6>
                                             <div style="overflow:auto;">
-                                                <table class="bordered" style="width:3000px !important;" id="table-detail">
+                                                <table class="bordered" style="width:3500px !important;" id="table-detail">
                                                     <thead>
                                                         <tr>
                                                             <th class="center">GR/LC/PO/Coa No.</th>
@@ -326,6 +326,8 @@
                                                             <th class="center">Qty Diterima</th>
                                                             <th class="center">Qty Kembali</th>
                                                             <th class="center">Qty Sisa</th>
+                                                            <th class="center">Qty Stok</th>
+                                                            <th class="center">Satuan Stok</th>
                                                             <th class="center">Harga@</th>
                                                             <th class="center">Tgl.Post</th>
                                                             <th class="center">Tgl.Tenggat</th>
@@ -348,7 +350,7 @@
                                                     </thead>
                                                     <tbody id="body-detail">
                                                         <tr id="last-row-detail">
-                                                            <td colspan="26">
+                                                            <td colspan="28">
                                                                 <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                                     <i class="material-icons left">add</i> Pembulatan Manual
                                                                 </a>
@@ -1805,7 +1807,13 @@
                                                     ` + val.qty_returned + `
                                                 </td>
                                                 <td class="center">
-                                                    <input class="browser-default" type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                                                    <input class="browser-default" type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();countStock(this);" data-conversion="` + val.qty_conversion + `">
+                                                </td>
+                                                <td class="center" id="qty_stock` + count + `">
+                                                    ` + val.qty_stock + `
+                                                </td>
+                                                <td class="center" id="unit_stock` + count + `">
+                                                    ` + val.unit_stock + `
                                                 </td>
                                                 <td class="right-align">
                                                     ` + val.price + `
@@ -1963,7 +1971,16 @@
                 }
             }
         });
-    } 
+    }
+
+    function countStock(element){
+        let code = $(element).data('id'),
+        qty = parseFloat($(element).val().replaceAll(".", "").replaceAll(",",".")),
+        conversion = parseFloat($(element).data('conversion').toString().replaceAll(".", "").replaceAll(",",".")),
+        qtyConversion = conversion * qty;
+        
+        $('#qty_stock' + code).text(formatRupiahIni(qtyConversion.toFixed(3).toString().replace('.',',')));
+    }
 
     function viewStructureTree(id){
         $.ajax({
@@ -3002,6 +3019,12 @@
                                     <td class="center">
                                         <input class="browser-default" type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="width:75px !important;">
                                     </td>
+                                    <td class="center" id="qty_stock` + count + `">
+                                        ` + val.qty_stock + `
+                                    </td>
+                                    <td class="center" id="unit_stock` + count + `">
+                                        ` + val.unit_stock + `
+                                    </td>
                                     <td class="center">
                                         <input class="browser-default" type="text" name="arr_price[]" onfocus="emptyThis(this);" value="` + val.price + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
                                     </td>
@@ -3159,7 +3182,13 @@
                                         ` + val.qty_returned + `
                                     </td>
                                     <td class="center">
-                                        <input class="browser-default" type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                                        <input class="browser-default" type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();countStock(this);" data-conversion="` + val.qty_conversion + `">
+                                    </td>
+                                    <td class="center" id="qty_stock` + count + `">
+                                        ` + val.qty_stock + `
+                                    </td>
+                                    <td class="center" id="unit_stock` + count + `">
+                                        ` + val.unit_stock + `
                                     </td>
                                     <td class="right-align">
                                         ` + val.price + `

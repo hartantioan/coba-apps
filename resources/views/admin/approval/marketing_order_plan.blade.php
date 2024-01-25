@@ -126,7 +126,7 @@
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
                     <div class="mr-2">
                         <small>Diajukan:</small>
-                        <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span>
+                        <span>{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                     </div>
                 </div>
             </div>
@@ -174,7 +174,7 @@
                     Tgl.Post
                 </div>
                 <div class="col s8">
-                    {{ date('d/m/y',strtotime($data->post_date)) }}
+                    {{ date('d/m/Y',strtotime($data->post_date)) }}
                 </div>
                 <div class="col s4">
                     Tipe
@@ -204,7 +204,7 @@
                         <td class="center-align">{{ $row->item->code.' - '.$row->item->name }}</td>
                         <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
                         <td class="center-align">{{ $row->item->sellUnit->code }}</td>
-                        <td class="center-align">{{ date('d/m/y',strtotime($row->request_date)) }}</td>
+                        <td class="center-align">{{ date('d/m/Y',strtotime($row->request_date)) }}</td>
                         <td class="center-align">{{ $row->isUrgent() }}</td>
                     </tr>
                     <tr>

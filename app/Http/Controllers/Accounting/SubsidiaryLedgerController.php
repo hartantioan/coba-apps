@@ -91,7 +91,7 @@ class SubsidiaryLedgerController extends Controller
                     $html .= '<tr>
                                 <td>'.$detail->coa->code.'</td>
                                 <td>'.$detail->coa->name.'</td>
-                                <td>'.date('d/m/y',strtotime($detail->journal->post_date)).'</td>
+                                <td>'.date('d/m/Y',strtotime($detail->journal->post_date)).'</td>
                                 <td>'.$detail->journal->code.'</td>
                                 <td>'.($detail->journal->lookable_id ? $detail->journal->lookable->code : '-').'</td>
                                 <td class="right-align">'.($detail->type == '1' ? number_format($detail->nominal,2,',','.') : '-').'</td>

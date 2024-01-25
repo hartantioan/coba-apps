@@ -185,7 +185,7 @@
                     <td class="">{{ $row->marketingOrderReceipt->code }}</td>
                     <td class="">{{ $row->marketingOrderReceipt->account->name }}</td>
                     <td class="">{{ $row->marketingOrderReceipt->account->address }}</td>
-                    <td class="center-align">{{ date('d/m/y',strtotime($row->marketingOrderReceipt->post_date)) }}</td>
+                    <td class="center-align">{{ date('d/m/Y',strtotime($row->marketingOrderReceipt->post_date)) }}</td>
                     <td class="right-align">{{ number_format($row->marketingOrderReceipt->grandtotal,2,',','.') }}</td>
                 </tr>
                 @endforeach

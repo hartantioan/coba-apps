@@ -35,7 +35,7 @@ class ExportMarketingRecapitulation implements FromView , WithEvents
             $array_filter[] = [
                 'code'              => $row->code,
                 'customer'          => $row->account->name,
-                'post_date'         => date('d/m/y',strtotime($row->post_date)),
+                'post_date'         => date('d/m/Y',strtotime($row->post_date)),
                 'top'               => $row->top_customer,
                 'note'              => $row->note,
                 'subtotal'          => round($row->subtotal,2),

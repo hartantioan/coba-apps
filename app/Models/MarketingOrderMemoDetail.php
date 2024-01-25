@@ -68,9 +68,9 @@ class MarketingOrderMemoDetail extends Model
     public function getDate(){
         $date = '-';
         if($this->lookable_type == 'marketing_order_down_payments'){
-            $date = date('d/m/y',strtotime($this->lookable->post_date));
+            $date = date('d/m/Y',strtotime($this->lookable->post_date));
         }elseif($this->lookable_type == 'marketing_order_invoice_details'){
-            $date = date('d/m/y',strtotime($this->lookable->marketingOrderInvoice->post_date));
+            $date = date('d/m/Y',strtotime($this->lookable->marketingOrderInvoice->post_date));
         }
 
         return $date;

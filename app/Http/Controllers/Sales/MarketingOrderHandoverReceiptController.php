@@ -92,7 +92,7 @@ class MarketingOrderHandoverReceiptController extends Controller
             $arr[] = [
                 'code'              => $row->code,
                 'enc_code'          => CustomHelper::encrypt($row->code),
-                'post_date'         => date('d/m/y',strtotime($row->post_date)),
+                'post_date'         => date('d/m/Y',strtotime($row->post_date)),
                 'customer_name'     => $row->account->name,
                 'address'           => $row->account->address,
                 'subdistrict'       => $row->account->subdistrict->name,
@@ -222,7 +222,7 @@ class MarketingOrderHandoverReceiptController extends Controller
                     $val->user->name,
                     $val->company->name,
                     $val->account->name,
-                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
                     number_format($val->grandtotal,2,',','.'),
                     $val->totalReceived(),
@@ -429,7 +429,7 @@ class MarketingOrderHandoverReceiptController extends Controller
             $arr[] = [
                 'code'              => $row->marketingOrderReceipt->code,
                 'enc_code'          => CustomHelper::encrypt($row->marketingOrderReceipt->code),
-                'post_date'         => date('d/m/y',strtotime($row->marketingOrderReceipt->post_date)),
+                'post_date'         => date('d/m/Y',strtotime($row->marketingOrderReceipt->post_date)),
                 'customer_name'     => $row->marketingOrderReceipt->account->name,
                 'address'           => $row->marketingOrderReceipt->account->address,
                 'subdistrict'       => $row->marketingOrderReceipt->account->subdistrict->name,
@@ -473,7 +473,7 @@ class MarketingOrderHandoverReceiptController extends Controller
                 <td class="">'.$row->marketingOrderReceipt->code.'</td>
                 <td class="">'.$row->marketingOrderReceipt->account->name.'</td>
                 <td class="">'.$row->marketingOrderReceipt->account->address.'</td>
-                <td class="center-align">'.date('d/m/y',strtotime($row->marketingOrderReceipt->post_date)).'</td>
+                <td class="center-align">'.date('d/m/Y',strtotime($row->marketingOrderReceipt->post_date)).'</td>
                 <td class="right-align">'.number_format($row->marketingOrderReceipt->grandtotal,2,',','.').'</td>
                 <td class="center-align">'.$row->status().'</td>
                 <td class="center-align">'.$row->note.'</td>

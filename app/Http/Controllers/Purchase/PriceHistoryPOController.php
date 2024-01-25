@@ -107,7 +107,7 @@ class PriceHistoryPOController extends Controller
                     $val->purchaseOrder->supplier->name,
                     $val->purchaseOrder->code,
                     $isi,
-                    date('d/m/y',strtotime($val->purchaseOrder->post_date)),
+                    date('d/m/Y',strtotime($val->purchaseOrder->post_date)),
                     number_format($val->price,2,',','.'),
                     number_format($finalpricedisc1,2,',','.'),
                     number_format($finalpricedisc2,2,',','.'),

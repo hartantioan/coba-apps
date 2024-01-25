@@ -234,7 +234,7 @@ class MarketingOrderDownPaymentController extends Controller
                     $val->company->name,
                     $val->type(),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
-                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
                     $val->currency->code,
                     number_format($val->currency_rate,2,',','.'),
                     $val->note,
@@ -510,7 +510,7 @@ class MarketingOrderDownPaymentController extends Controller
             foreach($data->marketingOrderDownPaymentDetail as $row){
                 $string .= '<tr>
                     <td class="center-align">'.$row->marketingOrder->code.'</td>
-                    <td class="center-align">'.date('d/m/y',strtotime($row->marketingOrder->post_date)).'</td>
+                    <td class="center-align">'.date('d/m/Y',strtotime($row->marketingOrder->post_date)).'</td>
                     <td class="">'.$row->marketingOrder->note_internal.' - '.$row->marketingOrder->note_external.'</td>
                     <td class="right-align">'.number_format($row->marketingOrder->grandtotal,2,',','.').'</td>
                 </tr>';
@@ -893,7 +893,7 @@ class MarketingOrderDownPaymentController extends Controller
             $arr[] = [
                 'id'   			=> $row->marketingOrder->id,
                 'type'          => $row->marketingOrder->getTable(),
-                'post_date'     => date('d/m/y',strtotime($row->marketingOrder->post_date)),
+                'post_date'     => date('d/m/Y',strtotime($row->marketingOrder->post_date)),
                 'note'          => $row->marketingOrder->note_internal.' - '.$row->marketingOrder->note_external,
                 'code'          => $row->marketingOrder->code,
                 'grandtotal'    => number_format($row->marketingOrder->grandtotal,2,',','.'),

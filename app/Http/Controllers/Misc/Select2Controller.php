@@ -2330,7 +2330,7 @@ class Select2Controller extends Controller {
                     'district'      => $d->district->name,
                     'subdistrict'   => $d->subdistrict->name,
                     'type'          => $d->getTable(),
-                    'post_date'     => date('d/m/y',strtotime($d->post_date)),
+                    'post_date'     => date('d/m/Y',strtotime($d->post_date)),
                     'note'          => ($d->note_internal ? $d->note_internal : '').' - '.($d->note_external ? $d->note_external : ''),
                     'code'          => $d->code,
                     'grandtotal'    => number_format($d->grandtotal,2,',','.'),
@@ -2378,7 +2378,7 @@ class Select2Controller extends Controller {
                 'district'      => $d->district->name,
                 'subdistrict'   => $d->subdistrict->name,
                 'type'          => $d->getTable(),
-                'post_date'     => date('d/m/y',strtotime($d->post_date)),
+                'post_date'     => date('d/m/Y',strtotime($d->post_date)),
                 'note'          => ($d->note_internal ? $d->note_internal : '').' - '.($d->note_external ? $d->note_external : ''),
                 'code'          => $d->code,
                 'grandtotal'    => number_format($d->grandtotal,2,',','.'),
@@ -2559,7 +2559,7 @@ class Select2Controller extends Controller {
                     'is_include_tax'    => $d->is_include_tax,
                     'percent_tax'       => $d->percent_tax,
                     'tax_id'            => $d->tax_id ? $d->tax_id : '0',
-                    'post_date'         => date('d/m/y',strtotime($d->post_date)),
+                    'post_date'         => date('d/m/Y',strtotime($d->post_date)),
                     'due_date'          => $d->due_date,
                     'subtotal'          => number_format($d->subtotal,2,',','.'),
                     'discount'          => number_format($d->discount,2,',','.'),
@@ -2611,7 +2611,7 @@ class Select2Controller extends Controller {
                     'is_include_tax'    => $d->is_include_tax,
                     'percent_tax'       => $d->percent_tax,
                     'tax_id'            => $d->tax_id ? $d->tax_id : '0',
-                    'post_date'         => date('d/m/y',strtotime($d->post_date)),
+                    'post_date'         => date('d/m/Y',strtotime($d->post_date)),
                     'due_date'          => $d->due_date,
                     'subtotal'          => number_format($d->subtotal,2,',','.'),
                     'discount'          => number_format($d->discount,2,',','.'),
@@ -2684,7 +2684,7 @@ class Select2Controller extends Controller {
                     'text' 			    => $d->code.' - Cust. '.$d->account->name,
                     'code'              => $d->code,
                     'type'              => $d->getTable(),
-                    'post_date'         => date('d/m/y',strtotime($d->post_date)),
+                    'post_date'         => date('d/m/Y',strtotime($d->post_date)),
                     'due_date'          => $d->due_date,
                     'total'             => number_format($d->total,2,',','.'),
                     'tax'               => number_format($d->tax,2,',','.'),
@@ -2851,7 +2851,7 @@ class Select2Controller extends Controller {
                         'sell_convert'      => $row->item->sell_convert,
                         'production_convert'=> $row->item->production_convert,
                         'pallet_convert'    => $row->item->pallet_convert,
-                        'request_date'      => date('d/m/y',strtotime($row->request_date)),
+                        'request_date'      => date('d/m/Y',strtotime($row->request_date)),
                         'note'              => $row->note ? $row->note : '',
                         'bom_link'          => $cekBom->exists() ? $cekBom->orderByDesc('id')->first()->code : '',
                         'is_urgent'         => $row->isUrgent(),
@@ -2865,7 +2865,7 @@ class Select2Controller extends Controller {
                 }
                 $response[] = [
                     'id'   			=> $d->id,
-                    'text' 			=> $d->code.' Tgl. '.date('d/m/y',strtotime($d->post_date)),
+                    'text' 			=> $d->code.' Tgl. '.date('d/m/Y',strtotime($d->post_date)),
                     'table'         => $d->getTable(),
                     'details'       => $details,
                     'code'          => $d->code,
@@ -3022,7 +3022,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code.' Tgl.Post '.date('d/m/y',strtotime($d->post_date)).' - Plant : '.$d->place->code,
+                'text' 			=> $d->code.' Tgl.Post '.date('d/m/Y',strtotime($d->post_date)).' - Plant : '.$d->place->code,
                 'table'         => $d->getTable(),
                 'code'          => $d->code,
             ];
@@ -3069,7 +3069,7 @@ class Select2Controller extends Controller {
                 'warehouses'    => $d->item->warehouseList(),
                 'details'       => $details,
                 'qty'           => number_format($d->qty,3,',','.').' '.$d->item->productionUnit->code,
-                'shift'         => date('d/m/y',strtotime($d->production_date)).' - '.$d->shift->code.' - '.$d->shift->name,
+                'shift'         => date('d/m/Y',strtotime($d->production_date)).' - '.$d->shift->code.' - '.$d->shift->name,
                 'group'         => $d->group,
                 'line'          => $d->line->code,
                 'is_sales_item' => $d->item->is_sales_item ? $d->item->is_sales_item : '',
@@ -3238,7 +3238,7 @@ class Select2Controller extends Controller {
 
                 $response[] = [
                     'id'   			=> $d->id,
-                    'text' 			=> $d->code.' Tgl. Post : '.date('d/m/y',strtotime($d->post_date)).' Keterangan : '.$d->note,
+                    'text' 			=> $d->code.' Tgl. Post : '.date('d/m/Y',strtotime($d->post_date)).' Keterangan : '.$d->note,
                     'code'          => $d->code,
                     'table'         => $d->getTable(),
                     'details'       => $details,
@@ -3306,7 +3306,7 @@ class Select2Controller extends Controller {
 
                 $response[] = [
                     'id'   			=> $d->id,
-                    'text' 			=> $d->code.' Tgl. Post : '.date('d/m/y',strtotime($d->post_date)).' Keterangan : '.$d->note,
+                    'text' 			=> $d->code.' Tgl. Post : '.date('d/m/Y',strtotime($d->post_date)).' Keterangan : '.$d->note,
                     'code'          => $d->code,
                     'table'         => $d->getTable(),
                     'details'       => $details,
@@ -3510,7 +3510,7 @@ class Select2Controller extends Controller {
 
             $response[] = [
                 'id'   			                => $d->id,
-                'text' 			                => $d->code.' Tgl.Post '.date('d/m/y',strtotime($d->post_date)).' - Plant : '.$d->productionSchedule->place->code,
+                'text' 			                => $d->code.' Tgl.Post '.date('d/m/Y',strtotime($d->post_date)).' - Plant : '.$d->productionSchedule->place->code,
                 'table'                         => $d->getTable(),
                 'code'                          => $d->code,
                 'item_receive_id'               => $d->productionScheduleDetail->item_id,
@@ -3525,7 +3525,7 @@ class Select2Controller extends Controller {
                 'sell_convert'                  => $d->productionScheduleDetail->item->sell_convert,
                 'pallet_convert'                => $d->productionScheduleDetail->item->pallet_convert,
                 'detail_issue'                  => $detail_issue,
-                'shift'                         => date('d/m/y',strtotime($d->productionScheduleDetail->production_date)).' - '.$d->productionScheduleDetail->shift->code.' - '.$d->productionScheduleDetail->shift->name,
+                'shift'                         => date('d/m/Y',strtotime($d->productionScheduleDetail->production_date)).' - '.$d->productionScheduleDetail->shift->code.' - '.$d->productionScheduleDetail->shift->name,
                 'group'                         => $d->productionScheduleDetail->group,
                 'line'                          => $d->productionScheduleDetail->line->code,
                 'list_shading'                  => $d->productionScheduleDetail->item->arrShading(),

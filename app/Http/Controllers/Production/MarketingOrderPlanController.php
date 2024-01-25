@@ -171,7 +171,7 @@ class MarketingOrderPlanController extends Controller
                     $val->user->name,
                     $val->company->name,
                     $val->place->name,
-                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
                     $val->type(),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
@@ -447,7 +447,7 @@ class MarketingOrderPlanController extends Controller
                 <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
                 <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->item->sellUnit->code.'</td>
-                <td class="center-align">'.date('d/m/y',strtotime($row->request_date)).'</td>
+                <td class="center-align">'.date('d/m/Y',strtotime($row->request_date)).'</td>
                 <td class="">'.$row->note.'</td>
                 <td class="center-align">'.$row->isUrgent().'</td>
             </tr>';

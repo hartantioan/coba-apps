@@ -161,7 +161,7 @@
                         </tr>
                         <tr>
                             <td style="margin-top: -2px;">
-                                <small style="font-size:1em">Diajukan: {{ date('d/m/y',strtotime($data->post_date)) }}</small>
+                                <small style="font-size:1em">Diajukan: {{ date('d/m/Y',strtotime($data->post_date)) }}</small>
                             </td>
                         </tr>
                         <tr>
@@ -294,7 +294,7 @@
                                             :
                                         </td>
                                         <td>
-                                            {{ date('d/m/y',strtotime($data->productionScheduleDetail->production_date)) }}
+                                            {{ date('d/m/Y',strtotime($data->productionScheduleDetail->production_date)) }}
                                         </td>
                                     </tr>
                                     <tr>

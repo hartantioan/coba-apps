@@ -189,7 +189,7 @@
                                         </td>
                                         <td width="1%">:</td>
                                         <td width="70%">
-                                            {{ date('d/m/y',strtotime($data->post_date)) }}
+                                            {{ date('d/m/Y',strtotime($data->post_date)) }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -198,7 +198,7 @@
                                         </td>
                                         <td width="1%">:</td>
                                         <td>
-                                            {{ date('d/m/y',strtotime($data->due_date)) }}
+                                            {{ date('d/m/Y',strtotime($data->due_date)) }}
                                         </td>
                                     </tr>
                                 </table>

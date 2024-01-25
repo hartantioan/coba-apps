@@ -52,7 +52,7 @@ class ExportOutstandingAR implements FromView , WithEvents
                     $array_filter[] = [
                         'code'              => $row->code,
                         'customer'          => $row->account->name,
-                        'post_date'         => date('d/m/y',strtotime($row->post_date)),
+                        'post_date'         => date('d/m/Y',strtotime($row->post_date)),
                         'top'               => $row->account->top,
                         'item_name'         => $rowdetail->lookable->item->name,
                         'qty_order'         => number_format($rowdetail->lookable->marketingOrderDetail->qty,3,',','.'),
@@ -83,7 +83,7 @@ class ExportOutstandingAR implements FromView , WithEvents
                 $array_filter[] = [
                     'code'              => $row->code,
                     'customer'          => $row->account->name,
-                    'post_date'         => date('d/m/y',strtotime($row->post_date)),
+                    'post_date'         => date('d/m/Y',strtotime($row->post_date)),
                     'top'               => $row->account->top,
                     'item_name'         => '-',
                     'qty_order'         => 1,

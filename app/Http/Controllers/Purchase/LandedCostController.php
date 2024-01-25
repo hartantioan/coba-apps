@@ -112,7 +112,7 @@ class LandedCostController extends Controller
                         'id'            => $row->id,
                         'code'          => $row->code,
                         'delivery_no'   => $row->delivery_no,
-                        'post_date'     => date('d/m/y',strtotime($row->post_date)),
+                        'post_date'     => date('d/m/Y',strtotime($row->post_date)),
                         'total'         => number_format($row->total,2,',','.'),
                         'tax'           => number_format($row->tax,2,',','.'),
                         'wtax'          => number_format($row->wtax,2,',','.'),
@@ -130,7 +130,7 @@ class LandedCostController extends Controller
                     $landed_cost[] = [
                         'id'            => $row->id,
                         'code'          => $row->code,
-                        'post_date'     => date('d/m/y',strtotime($row->post_date)),
+                        'post_date'     => date('d/m/Y',strtotime($row->post_date)),
                         'total'         => number_format($row->total,2,',','.'),
                         'tax'           => number_format($row->tax,2,',','.'),
                         'wtax'          => number_format($row->wtax,2,',','.'),
@@ -161,7 +161,7 @@ class LandedCostController extends Controller
                         'id'                => $row->id,
                         'code_iti'          => $row->code,
                         'code_ito'          => $row->inventoryTransferOut->code,
-                        'post_date'         => date('d/m/y',strtotime($row->post_date)),
+                        'post_date'         => date('d/m/Y',strtotime($row->post_date)),
                         'note'              => $row->note ? $row->note : '',
                     ];
                 }
@@ -482,7 +482,7 @@ class LandedCostController extends Controller
                     $val->supplier_id ? $val->supplier->name : '-',
                     $val->vendor->name,
                     $val->company->name,
-                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
                     $val->reference,
                     $val->currency()->exists() ? $val->currency->code : '',
                     number_format($val->currency_rate,2,',','.'),
@@ -2214,7 +2214,7 @@ class LandedCostController extends Controller
                             'key'   => $query_pyrc->paymentRequest->code,
                             "name"  => $query_pyrc->paymentRequest->code,
                             'properties'=> [
-                                 ['name'=> "Tanggal: ".date('d/m/y',strtotime($query_pyrc->paymentRequest->post_date))],
+                                 ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query_pyrc->paymentRequest->post_date))],
                               ],
                             'url'   =>request()->root()."/admin/finance/payment_request_cross?code=".CustomHelper::encrypt($query_pyrc->paymentRequest->code),
                             "title" =>$query_pyrc->paymentRequest->code,

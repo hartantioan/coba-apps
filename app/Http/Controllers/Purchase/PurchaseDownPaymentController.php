@@ -109,8 +109,8 @@ class PurchaseDownPaymentController extends Controller
             $details[] = [
                 'po_code'       => CustomHelper::encrypt($row->code),
                 'po_no'         => $row->code,
-                'post_date'     => date('d/m/y',strtotime($row->post_date)),
-                'delivery_date' => date('d/m/y',strtotime($row->delivery_date)),
+                'post_date'     => date('d/m/Y',strtotime($row->post_date)),
+                'delivery_date' => date('d/m/Y',strtotime($row->delivery_date)),
                 'grandtotal'    => number_format($row->grandtotal,2,',','.'),
                 'list_items'    => $list_items,
                 'note'          => $row->note ? $row->note : '',
@@ -314,7 +314,7 @@ class PurchaseDownPaymentController extends Controller
                     number_format($val->percent_tax,2,',','.'),
                     $val->wtaxModel()->exists() ? $val->wtaxModel->code : '-',
                     number_format($val->percent_wtax,2,',','.'),  
-                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
                     $val->top,
                     $val->currency->code,
                     number_format($val->currency_rate,2,',','.'),
@@ -624,8 +624,8 @@ class PurchaseDownPaymentController extends Controller
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td class="center-align">'.$row->purchaseOrder->code.'</td>
-                    <td class="center-align">'.date('d/m/y',strtotime($row->purchaseOrder->post_date)).'</td>
-                    <td class="center-align">'.date('d/m/y',strtotime($row->purchaseOrder->delivery_date)).'</td>
+                    <td class="center-align">'.date('d/m/Y',strtotime($row->purchaseOrder->post_date)).'</td>
+                    <td class="center-align">'.date('d/m/Y',strtotime($row->purchaseOrder->delivery_date)).'</td>
                     <td class="center-align">'.$row->note.'</td>
                     <td class="right-align">'.number_format($row->purchaseOrder->grandtotal,2,',','.').'</td>
                     <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
@@ -757,8 +757,8 @@ class PurchaseDownPaymentController extends Controller
                 'purchase_order_id'         => $row->purchase_order_id,
                 'purchase_order_code'       => $row->purchaseOrder->code,
                 'purchase_order_encrypt'    => CustomHelper::encrypt($row->purchaseOrder->code),
-                'post_date'                 => date('d/m/y',strtotime($row->purchaseOrder->post_date)),
-                'delivery_date'             => date('d/m/y',strtotime($row->purchaseOrder->delivery_date)),
+                'post_date'                 => date('d/m/Y',strtotime($row->purchaseOrder->post_date)),
+                'delivery_date'             => date('d/m/Y',strtotime($row->purchaseOrder->delivery_date)),
                 'note'                      => $row->note ? $row->note : '',
                 'total'                     => number_format($row->purchaseOrder->grandtotal,2,',','.'),
                 'total_dp'                  => number_format($row->nominal,2,',','.'),
@@ -2087,7 +2087,7 @@ class PurchaseDownPaymentController extends Controller
                             'key'   => $query_pyrc->paymentRequest->code,
                             "name"  => $query_pyrc->paymentRequest->code,
                             'properties'=> [
-                                 ['name'=> "Tanggal: ".date('d/m/y',strtotime($query_pyrc->paymentRequest->post_date))],
+                                 ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query_pyrc->paymentRequest->post_date))],
                               ],
                             'url'   =>request()->root()."/admin/finance/payment_request_cross?code=".CustomHelper::encrypt($query_pyrc->paymentRequest->code),
                             "title" =>$query_pyrc->paymentRequest->code,

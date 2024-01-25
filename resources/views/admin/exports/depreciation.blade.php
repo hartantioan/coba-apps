@@ -33,18 +33,18 @@
                 <td>{{ $row->code }}</td>
                 <td>{{ $row->user->name }}</td>
                 <td>{{ $row->company->name }}</td>
-                <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
+                <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                 <td>{{ date('F Y',strtotime($row->period)) }}</td>
                 <td>{{ $row->note }}</td>
                 <td>{!! $row->status() !!}</td>
                 <td>{{ $row->deleteUser()->exists() ? $row->deleteUser->name : '' }}</td>
-                <td>{{ $row->deleteUser()->exists() ? date('d/m/y',strtotime($row->deleted_at)) : '' }}</td>
+                <td>{{ $row->deleteUser()->exists() ? date('d/m/Y',strtotime($row->deleted_at)) : '' }}</td>
                 <td>{{ $row->deleteUser()->exists() ? $row->delete_note : '' }}</td>
                 <td>{{ $row->voidUser()->exists() ? $row->voidUser->name : '' }}</td>
-                <td>{{ $row->voidUser()->exists() ? date('d/m/y',strtotime($row->void_date)) : '' }}</td>
+                <td>{{ $row->voidUser()->exists() ? date('d/m/Y',strtotime($row->void_date)) : '' }}</td>
                 <td>{{ $row->voidUser()->exists() ? $row->void_note : '' }}</td>
                 <td>{{ $rowdetail->asset->code.' - '.$rowdetail->asset->name }}</td>
-                <td>{{ date('d/m/y',strtotime($rowdetail->asset->date)) }}</td>
+                <td>{{ date('d/m/Y',strtotime($rowdetail->asset->date)) }}</td>
                 <td align="right">{{ round($rowdetail->asset->nominal,2) }}</td>
                 <td align="center">{{ $rowdetail->depreciationNumber().' / '.$rowdetail->asset->assetGroup->depreciation_period }}</td>
                 <td align="right">{{ round($rowdetail->nominal,2) }}</td>

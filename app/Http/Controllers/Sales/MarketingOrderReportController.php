@@ -51,7 +51,7 @@ class MarketingOrderReportController extends Controller
             $newData[] = [
                 'code'              => $row->code,
                 'customer'          => $row->account->name,
-                'post_date'         => date('d/m/y',strtotime($row->post_date)),
+                'post_date'         => date('d/m/Y',strtotime($row->post_date)),
                 'top'               => $row->top_customer,
                 'note'              => $row->note_internal.' - '.$row->note_external,
                 'subtotal'          => number_format($row->subtotal,2,',','.'),

@@ -233,14 +233,14 @@ class MarketingOrderDeliveryProcessController extends Controller
                     $val->account->name,
                     $val->marketingOrderDelivery->marketingOrder->code,
                     $val->marketingOrderDelivery->code,
-                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
                     $val->driver_name,
                     $val->driver_hp,
                     $val->vehicle_name,
                     $val->vehicle_no,
                     $val->note_internal,
                     $val->note_external,
-                    $val->return_date ? date('d/m/y',strtotime($val->return_date)) : '-',
+                    $val->return_date ? date('d/m/Y',strtotime($val->return_date)) : '-',
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->marketingOrderDelivery->marketingOrder->destination_address
                     .' - '.ucwords(strtolower($val->marketingOrderDelivery->marketingOrder->subdistrict->name
@@ -1099,7 +1099,7 @@ class MarketingOrderDeliveryProcessController extends Controller
         foreach($data->marketingOrderDeliveryProcessTrack as $key => $row){
             $arrTracking[] = [
                 'status'    => $row->status,
-                'date'      => date('d/m/y H:i:s',strtotime($row->updated_at)),
+                'date'      => date('d/m/Y H:i:s',strtotime($row->updated_at)),
             ];
         }
 
@@ -1156,7 +1156,7 @@ class MarketingOrderDeliveryProcessController extends Controller
             $response = [
                 'status'    => 200,
                 'param'     => $cek->status,
-                'date'      => date('d/m/y H:i:s',strtotime($cek->updated_at)),
+                'date'      => date('d/m/Y H:i:s',strtotime($cek->updated_at)),
                 'message'   => 'Tracking succesfully updated.'
             ];
         }
@@ -1237,7 +1237,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     'status'    => 200,
                     'message'   => 'Data successfully saved.',
                     'param'     => $cek->status,
-                    'date'      => date('d/m/y H:i:s',strtotime($cek->updated_at)),
+                    'date'      => date('d/m/Y H:i:s',strtotime($cek->updated_at)),
                 ];
             }else{
                 $response = [

@@ -123,7 +123,7 @@
         <h5 align="center">
             {{ $title }}
             <br>{{ $data->code }}
-            <br>{{ date('d/m/y',strtotime($data->post_date)) }}
+            <br>{{ date('d/m/Y',strtotime($data->post_date)) }}
         </h5>
         <main>
             <div class="card break-row">
@@ -147,7 +147,7 @@
                                     <td align="center">{{ ($key + 1)  }}</td>
                                     <td>{{ $row->marketingOrderReceipt->code }}</td>
                                     <td>{{ $row->marketingOrderReceipt->account->name }}</td>
-                                    <td align="center">{{ date('d/m/y',strtotime($row->marketingOrderReceipt->post_date)) }}</td>
+                                    <td align="center">{{ date('d/m/Y',strtotime($row->marketingOrderReceipt->post_date)) }}</td>
                                     <td align="right">{{ number_format($row->marketingOrderReceipt->grandtotal,2,',','.') }}</td>
                                     <td align="center">{{ $row->status() }}</td>
                                     <td>{{ $row->note }}</td>

@@ -260,7 +260,7 @@
                                         </td>
                                         <td width="1%">:</td>
                                         <td>
-                                            {{ date('d/m/y',strtotime($data->delivery_date)) }}
+                                            {{ date('d/m/Y',strtotime($data->delivery_date)) }}
                                         </td>
                                     </tr>
                                 </table>

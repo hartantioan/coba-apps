@@ -148,7 +148,7 @@
                             <td>{{ $row->user->name }}</td>
                             <td>{{ $row->code }}</td>
                             <td>{{ $row->company->name }}</td>
-                            <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
+                            <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                             <td>{{ $row->currency->code }}</td>
                             <td>{{ number_format($row->currency_rate,3,',','.') }}</td>
                             <td>{{ $row->note }}</td>

@@ -15,6 +15,9 @@ class ExportDownPayment implements FromView , WithEvents
     /**
     * @return \Illuminate\Support\Collection
     */
+
+    protected $date;
+
     public function __construct(string $date)
     {
         $this->date = $date ? $date : '';
@@ -26,7 +29,7 @@ class ExportDownPayment implements FromView , WithEvents
         $array_filter = [];
         $query_data = DB::select("
                     SELECT 
-                    *,
+                    pdp.*,
                     pdp.type as typepdp,
                     IFNULL((SELECT 
                         SUM(nominal) 
@@ -49,10 +52,16 @@ class ExportDownPayment implements FromView , WithEvents
                             AND pm.post_date <= :date2
                     ),0) AS total_memo,
                     u.name AS account_name,
-                    u.employee_no AS account_code
+                    u.employee_no AS account_code,
+                    uvoid.name AS void_name,
+                    udelete.name AS delete_name
                     FROM purchase_down_payments pdp
                     LEFT JOIN users u
                         ON u.id = pdp.account_id
+                    LEFT JOIN users uvoid
+                        ON uvoid.id = pdp.void_id
+                    LEFT JOIN users udelete
+                        ON udelete.id = pdp.void_id
                     WHERE 
                         pdp.post_date <= :date3
                         AND pdp.grandtotal > 0
@@ -67,10 +76,11 @@ class ExportDownPayment implements FromView , WithEvents
                 if($balance > 0){
                     $array_filter[] = [
                         'code'          => $row_invoice->code,
-                        'supplier_name' => $row_invoice->name,
+                        'supplier_code' => $row_invoice->account_code,
+                        'supplier_name' => $row_invoice->account_name,
                         'type'          => PurchaseDownPayment::typeStatic($row_invoice->typepdp),
-                        'post_date'     => date('d/m/y',strtotime($row_invoice->post_date)),
-                        'due_date'      => date('d/m/y',strtotime($row_invoice->due_date)),
+                        'post_date'     => date('d/m/Y',strtotime($row_invoice->post_date)),
+                        'due_date'      => date('d/m/Y',strtotime($row_invoice->due_date)),
                         'note'          => $row_invoice->note,
                         'subtotal'      => round($row_invoice->subtotal,2),
                         'discount'      => round($row_invoice->discount,2),
@@ -78,6 +88,14 @@ class ExportDownPayment implements FromView , WithEvents
                         'used'          => round($row_invoice->total_used,2),
                         'memo'          => round($row_invoice->total_memo,2),
                         'balance'       => round($balance,2),
+                        'status'        => $this->getStatus($row_invoice->status),
+                        'void_name'     => $row_invoice->void_name,
+                        'void_date'     => date('d/m/Y',strtotime($row_invoice->void_date)),
+                        'void_note'     => $row_invoice->void_note,
+                        'delete_name'   => $row_invoice->delete_name,
+                        'delete_note'   => $row_invoice->delete_note,
+                        'delete_date'   => date('d/m/Y',strtotime($row_invoice->deleted_at)),
+                        'references'    => PurchaseDownPayment::getReference($row_invoice->code),
                     ];
                     $totalbalance += $balance;
                 }
@@ -86,6 +104,20 @@ class ExportDownPayment implements FromView , WithEvents
             'data'      => $array_filter,
             'totalall'  => round($totalbalance,2)
         ]);
+    }
+
+    public function getStatus($status){
+        $status = match ($status) {
+            '1' => 'Menunggu',
+            '2' => 'Proses',
+            '3' => 'Selesai',
+            '4' => 'Ditolak',
+            '5' => 'Ditutup',
+            '6' => 'Revisi',
+            default => 'Invalid',
+          };
+  
+          return $status;
     }
 
     public function registerEvents(): array

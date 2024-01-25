@@ -164,7 +164,7 @@
                     <td width="33%" class="left-align">
                         <span class="invoice-number mr-1" style="font-size:1em"># {{ $data->code }}</span>
                         <br>
-                        <small style="font-size:1em">Diajukan: {{ date('d/m/y',strtotime($data->post_date)) }}</small>
+                        <small style="font-size:1em">Diajukan: {{ date('d/m/Y',strtotime($data->post_date)) }}</small>
                     </td>
                     <td width="33%" align="center">
                         <h2>Landed Cost</h2>

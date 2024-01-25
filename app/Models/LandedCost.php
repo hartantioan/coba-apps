@@ -368,4 +368,18 @@ class LandedCost extends Model
 
         return $arr;
     }
+
+    public function getReference(){
+        $code = [];
+        foreach($this->landedCostDetail as $row){
+            if($row->goodReceiptDetail()){
+                $code[] = $row->lookable->goodReceipt->code;
+            }elseif($row->inventoryTransferOutDetail()){
+                $code[] = $row->lookable->inventoryTransferOut->code;
+            }elseif($row->landedCostDetail()){
+                $code[] = $row->lookable->landedCost->code;
+            }
+        }
+        return implode(', ',$code);
+    }
 }

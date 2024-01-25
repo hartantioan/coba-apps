@@ -178,14 +178,14 @@
                             <tr>
                                 <td style="margin-top: -2px;">
                                     <small>Diajukan:</small>
-                                    <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span>
+                                    <span>{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                                 </td>
                             </tr>
                             <tr>
                                 <td style="margin-top: -2px;">
                                     <small>Dibayar:</small>
                                     <span>
-                                        {{ date('d/m/y',strtotime($data->pay_date)) }}
+                                        {{ date('d/m/Y',strtotime($data->pay_date)) }}
                                     </span>
                                 </td>
                             </tr>
@@ -194,7 +194,7 @@
                                     <small>Outgoing Payment:</small>
                                     <span>
                                         @if ($data->outgoingPayment()->exists())
-                                            {{ date('d/m/y',strtotime($data->outgoingPayment->pay_date)) }}
+                                            {{ date('d/m/Y',strtotime($data->outgoingPayment->pay_date)) }}
                                         @else
                                             -
                                         @endif
@@ -323,7 +323,7 @@
                                 <tr>
                                     <td>{{ $row->lookable->code }}</td>
                                     <td align="center">{{ $row->type() }}</td>
-                                    <td align="center">{{ $row->purchaseInvoice() ? date('d/m/y',strtotime($row->lookable->due_date)) : '-' }}</td>
+                                    <td align="center">{{ $row->purchaseInvoice() ? date('d/m/Y',strtotime($row->lookable->due_date)) : '-' }}</td>
                                     <td>{{ $row->note }}</td>
                                     <td>{{ $row->coa->name }}</td>
                                     <td>{{ $row->place()->exists() ? $row->place->code : '-' }}</td>

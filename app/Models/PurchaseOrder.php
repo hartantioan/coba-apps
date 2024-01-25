@@ -87,7 +87,7 @@ class PurchaseOrder extends Model
     public function inventoryType(){
         $type = match ($this->inventory_type) {
           '1' => 'Persediaan Barang',
-          '2' => 'Manual',
+          '2' => 'Lain-lain',
           default => 'Invalid',
         };
 

@@ -120,12 +120,12 @@ class PurchaseMemoController extends Controller
                             'rawcode'       => $row->getCode(),
                             'tax_no'        => $data->tax_no,
                             'tax_cut_no'    => $data->tax_cut_no,
-                            'cut_date'      => date('d/m/y',strtotime($data->cut_date)),
+                            'cut_date'      => date('d/m/Y',strtotime($data->cut_date)),
                             'spk_no'        => $data->spk_no,
                             'invoice_no'    => $data->invoice_no,
                             'code'          => CustomHelper::encrypt($data->code),
                             'type'          => $row->getTable(),
-                            'post_date'     => date('d/m/y',strtotime($data->post_date)),
+                            'post_date'     => date('d/m/Y',strtotime($data->post_date)),
                             'total'         => number_format($row->total,2,',','.'),
                             'tax'           => number_format($row->tax,2,',','.'),
                             'wtax'          => number_format($row->wtax,2,',','.'),
@@ -158,7 +158,7 @@ class PurchaseMemoController extends Controller
                     $data['invoice_no'] = '-';
                     $data['code'] = CustomHelper::encrypt($data->code);
                     $data['type'] = $data->getTable();
-                    $data['post_date'] = date('d/m/y',strtotime($data->post_date));
+                    $data['post_date'] = date('d/m/Y',strtotime($data->post_date));
                     $data['total'] = number_format($data->total,2,',','.');
                     $data['tax'] = number_format($data->tax,2,',','.');
                     $data['wtax'] = number_format($data->wtax,2,',','.');
@@ -312,9 +312,9 @@ class PurchaseMemoController extends Controller
                     $val->user->name,
                     $val->account->name,
                     $val->company->name,
-                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
                     $val->return_tax_no,
-                    date('d/m/y',strtotime($val->return_date)),
+                    date('d/m/Y',strtotime($val->return_date)),
                     $val->note,
                     number_format($val->total,2,',','.'),
                     number_format($val->tax,2,',','.'),
@@ -716,12 +716,12 @@ class PurchaseMemoController extends Controller
                     'rawcode'       => $row->lookable->getCode(),
                     'tax_no'        => $row->lookable->purchaseInvoice->tax_no,
                     'tax_cut_no'    => $row->lookable->purchaseInvoice->tax_cut_no,
-                    'cut_date'      => date('d/m/y',strtotime($row->lookable->purchaseInvoice->cut_date)),
+                    'cut_date'      => date('d/m/Y',strtotime($row->lookable->purchaseInvoice->cut_date)),
                     'spk_no'        => $row->lookable->purchaseInvoice->spk_no,
                     'invoice_no'    => $row->lookable->purchaseInvoice->invoice_no,
                     'code'          => CustomHelper::encrypt($row->lookable->getCode()),
                     'type'          => $row->lookable_type,
-                    'post_date'     => date('d/m/y',strtotime($row->lookable->purchaseInvoice->post_date)),
+                    'post_date'     => date('d/m/Y',strtotime($row->lookable->purchaseInvoice->post_date)),
                     'total'         => number_format($row->total,2,',','.'),
                     'tax'           => number_format($row->tax,2,',','.'),
                     'wtax'          => number_format($row->wtax,2,',','.'),
@@ -750,7 +750,7 @@ class PurchaseMemoController extends Controller
                     'invoice_no'    => '-',
                     'code'          => $row->lookable->code,
                     'type'          => $row->lookable_type,
-                    'post_date'     => date('d/m/y',strtotime($row->lookable->post_date)),
+                    'post_date'     => date('d/m/Y',strtotime($row->lookable->post_date)),
                     'total'         => number_format($row->total,2,',','.'),
                     'tax'           => number_format($row->tax,2,',','.'),
                     'wtax'          => number_format($row->wtax,2,',','.'),
@@ -1650,7 +1650,7 @@ class PurchaseMemoController extends Controller
                             'key'   => $query_pyrc->paymentRequest->code,
                             "name"  => $query_pyrc->paymentRequest->code,
                             'properties'=> [
-                                 ['name'=> "Tanggal: ".date('d/m/y',strtotime($query_pyrc->paymentRequest->post_date))],
+                                 ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query_pyrc->paymentRequest->post_date))],
                               ],
                             'url'   =>request()->root()."/admin/finance/payment_request_cross?code=".CustomHelper::encrypt($query_pyrc->paymentRequest->code),
                             "title" =>$query_pyrc->paymentRequest->code,

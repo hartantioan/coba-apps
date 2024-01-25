@@ -93,7 +93,7 @@ class MarketingOrderReceiptController extends Controller
                 $arr[] = [
                     'code'              => $row->code,
                     'enc_code'          => CustomHelper::encrypt($row->code),
-                    'post_date'         => date('d/m/y',strtotime($row->post_date)),
+                    'post_date'         => date('d/m/Y',strtotime($row->post_date)),
                     'customer_name'     => $row->account->name,
                     'total'             => number_format($row->total,2,',','.'),
                     'tax'               => number_format($row->tax,2,',','.'),
@@ -229,7 +229,7 @@ class MarketingOrderReceiptController extends Controller
                     $val->user->name,
                     $val->company->name,
                     $val->account->name,
-                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
                     number_format($val->grandtotal,2,',','.'),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
@@ -434,7 +434,7 @@ class MarketingOrderReceiptController extends Controller
             $arr[] = [
                 'code'              => $row->lookable->code,
                 'enc_code'          => CustomHelper::encrypt($row->lookable->code),
-                'post_date'         => date('d/m/y',strtotime($row->lookable->post_date)),
+                'post_date'         => date('d/m/Y',strtotime($row->lookable->post_date)),
                 'customer_name'     => $row->lookable->account->name,
                 'total'             => number_format($row->lookable->total,2,',','.'),
                 'tax'               => number_format($row->lookable->tax,2,',','.'),
@@ -487,7 +487,7 @@ class MarketingOrderReceiptController extends Controller
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="">'.$row->lookable->code.'</td>
                 <td class="">'.$row->lookable->account->name.'</td>
-                <td class="center-align">'.date('d/m/y',strtotime($row->lookable->post_date)).'</td>
+                <td class="center-align">'.date('d/m/Y',strtotime($row->lookable->post_date)).'</td>
                 <td class="right-align">'.number_format($row->lookable->total,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->lookable->tax,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->lookable->total_after_tax,2,',','.').'</td>

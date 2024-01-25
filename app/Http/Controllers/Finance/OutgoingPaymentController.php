@@ -207,8 +207,8 @@ class OutgoingPaymentController extends Controller
                     $val->company->name,
                     $val->paymentRequest()->exists() ? $val->paymentRequest->code : '-',
                     $val->coaSource->name,
-                    date('d/m/y',strtotime($val->post_date)),
-                    date('d/m/y',strtotime($val->pay_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->pay_date)),
                     $val->currency->code,
                     number_format($val->currency_rate,2,',','.'),
                     number_format($val->admin,2,',','.'),
@@ -296,7 +296,7 @@ class OutgoingPaymentController extends Controller
                     <td class="center-align">'.$row->lookable->code.'</td>
                     <td class="center-align">'.$row->lookable->paymentRequest->code.'</td>
                     <td class="center-align">'.$row->lookable->account->name.'</td>
-                    <td class="center-align">'.date('d/m/y',strtotime($row->lookable->post_date)).'</td>
+                    <td class="center-align">'.date('d/m/Y',strtotime($row->lookable->post_date)).'</td>
                     <td class="center-align">'.$row->lookable->coaSource->name.'</td>
                     <td class="right-align">'.number_format($row->nominal,3,',','.').'</td>
                 </tr>';
@@ -998,7 +998,7 @@ class OutgoingPaymentController extends Controller
                 "name"  => $query->code,
                 "color" => "lightblue",
                 'properties'=> [
-                     ['name'=> "Tanggal: ".date('d/m/y',strtotime($query->post_date))],
+                     ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query->post_date))],
                      ['name'=> "Nominal: Rp".number_format($query->grandtotal,2,',','.')]
                   ],
                 'url'   =>request()->root()."/admin/finance/outgoing_payment?code=".CustomHelper::encrypt($query->code),
@@ -1768,7 +1768,7 @@ class OutgoingPaymentController extends Controller
                             'key'   => $query_pyrc->paymentRequest->code,
                             "name"  => $query_pyrc->paymentRequest->code,
                             'properties'=> [
-                                 ['name'=> "Tanggal: ".date('d/m/y',strtotime($query_pyrc->paymentRequest->post_date))],
+                                 ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query_pyrc->paymentRequest->post_date))],
                               ],
                             'url'   =>request()->root()."/admin/finance/payment_request_cross?code=".CustomHelper::encrypt($query_pyrc->paymentRequest->code),
                             "title" =>$query_pyrc->paymentRequest->code,

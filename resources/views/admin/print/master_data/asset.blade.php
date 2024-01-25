@@ -223,7 +223,7 @@
 									<td>{{ $row->name }}</td>
 									<td>{{ $row->place->code }}</td>
 									<td>{{ $row->assetGroup->name }}</td>
-									<td>{{ date('d/m/y',strtotime($row->date)) }}</td>
+									<td>{{ date('d/m/Y',strtotime($row->date)) }}</td>
 									<td>{{ number_format($row->nominal,2,',','.') }}</td>
 									<td>{{ number_format($row->totalDepreciation(),2,',','.') }}</td>
 									<td>{{ number_format($row->book_balance,2,',','.') }}</td>

@@ -482,7 +482,7 @@ class WorkOrderController extends Controller
         foreach($wo->workOrderAttachmentDetail as $row){
             $file = [
                 'id'=>$row->id,
-                'created_at'=> date('d/m/y',strtotime($row->created_at)),
+                'created_at'=> date('d/m/Y',strtotime($row->created_at)),
                 'file_name'=>$row->file_name,
                 'attachment'=>$row->attachment()
             ];
@@ -915,7 +915,7 @@ class WorkOrderController extends Controller
                 "name"  => $query->code,
                 "color" => "lightblue",
                 'properties'=> [
-                     ['name'=> "Tanggal : ".date('d/m/y',strtotime($query->request_date))],
+                     ['name'=> "Tanggal : ".date('d/m/Y',strtotime($query->request_date))],
                      ['name'=> "Requested By :".$query->user->name]
                   ],
                 'url'   =>request()->root()."/admin/maintenance/work_order?code=".CustomHelper::encrypt($query->code),
@@ -931,7 +931,7 @@ class WorkOrderController extends Controller
                     "name"  => $row_requestsp->code,
                   
                     'properties'=> [
-                        ['name'=> "Tanggal : ".date('d/m/y',strtotime($row_requestsp->request_date))],
+                        ['name'=> "Tanggal : ".date('d/m/Y',strtotime($row_requestsp->request_date))],
                         ['name'=> "Requested By :".$row_requestsp->user->name]
                     ],
                     'url'   =>request()->root()."/admin/maintenance/request_sparepart?code=".CustomHelper::encrypt($row_requestsp->code),

@@ -158,10 +158,10 @@
                             <td>{{ $row->user->name }}</td>
 							<td>{{ $row->account->name }}</td>
                             <td>{{ $row->company->name }}</td>
-                            <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
-							<td>{{ date('d/m/y',strtotime($row->received_date)) }}</td>
-                            <td>{{ date('d/m/y',strtotime($row->due_date)) }}</td>
-                            <td>{{ date('d/m/y',strtotime($row->document_date)) }}</td>
+                            <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
+							<td>{{ date('d/m/Y',strtotime($row->received_date)) }}</td>
+                            <td>{{ date('d/m/Y',strtotime($row->due_date)) }}</td>
+                            <td>{{ date('d/m/Y',strtotime($row->document_date)) }}</td>
 							<td>{{ $row->type() }}</td>
                             <td align="right">{{ number_format($row->total,2,',','.') }}</td>
                             <td align="right">{{ number_format($row->tax,2,',','.') }}</td>

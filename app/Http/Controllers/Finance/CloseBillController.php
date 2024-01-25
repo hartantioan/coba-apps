@@ -152,7 +152,7 @@ class CloseBillController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->company->name,
-                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
                     $val->status(),
                     '
@@ -196,8 +196,8 @@ class CloseBillController extends Controller
                 $data['code'] = CustomHelper::encrypt($data->code);
                 $data['grandtotal'] = number_format($data->grandtotal,'2',',','.');
                 $data['balance'] = number_format($balance,'2',',','.');
-                $data['post_date'] = date('d/m/y',strtotime($data->post_date));
-                $data['required_date'] = date('d/m/y',strtotime($data->required_date));
+                $data['post_date'] = date('d/m/Y',strtotime($data->post_date));
+                $data['required_date'] = date('d/m/Y',strtotime($data->required_date));
                 $data['bp_name'] = $data->account->employee_no.' - '.$data->account->name;
                 $data['coa_list'] = $data->getCoaPaymentRequestAll();
             }else{
@@ -339,8 +339,8 @@ class CloseBillController extends Controller
                 'code'              => CustomHelper::encrypt($row->fundRequest->code),
                 'grandtotal'        => number_format($row->fundRequest->grandtotal,'2',',','.'),
                 'balance'           => number_format($row->nominal,'2',',','.'),
-                'post_date'         => date('d/m/y',strtotime($row->fundRequest->post_date)),
-                'required_date'     => date('d/m/y',strtotime($row->fundRequest->required_date)),
+                'post_date'         => date('d/m/Y',strtotime($row->fundRequest->post_date)),
+                'required_date'     => date('d/m/Y',strtotime($row->fundRequest->required_date)),
                 'bp_name'           => $row->fundRequest->account->employee_no.' - '.$row->fundRequest->account->name,
                 'coa_list'          => $row->fundRequest->getCoaPaymentRequestAll(),
                 'coa_name'          => $row->coa->code.' - '.$row->coa->name,
@@ -906,7 +906,7 @@ class CloseBillController extends Controller
                 "name"  => $query->code,
                 "color" => "lightblue",
                 'properties'=> [
-                     ['name'=> "Tanggal: ".date('d/m/y',strtotime($query->post_date))],
+                     ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query->post_date))],
                      ['name'=> "Nominal: Rp".number_format($query->grandtotal,2,',','.')]
                   ],
                 'url'   =>request()->root()."/admin/finance/outgoing_payment?code=".CustomHelper::encrypt($query->code),
@@ -934,7 +934,7 @@ class CloseBillController extends Controller
                     "name"  => $row_bill_detail->fundRequest->code,
                     "color" => "lightblue",
                     'properties'=> [
-                        ['name'=> "Tanggal: ".date('d/m/y',strtotime($row_bill_detail->fundRequest->post_date))],
+                        ['name'=> "Tanggal: ".date('d/m/Y',strtotime($row_bill_detail->fundRequest->post_date))],
                         ['name'=> "Nominal: Rp".number_format($row_bill_detail->fundRequest->grandtotal,2,',','.')]
                     ],
                     'url'   =>request()->root()."/admin/finance/outgoing_payment?code=".CustomHelper::encrypt($row_bill_detail->fundRequest->code),
@@ -1551,7 +1551,7 @@ class CloseBillController extends Controller
                             'key'   => $query_pyrc->paymentRequest->code,
                             "name"  => $query_pyrc->paymentRequest->code,
                             'properties'=> [
-                                 ['name'=> "Tanggal: ".date('d/m/y',strtotime($query_pyrc->paymentRequest->post_date))],
+                                 ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query_pyrc->paymentRequest->post_date))],
                               ],
                             'url'   =>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($query_pyrc->paymentRequest->code),
                             "title" =>$query_pyrc->paymentRequest->code,

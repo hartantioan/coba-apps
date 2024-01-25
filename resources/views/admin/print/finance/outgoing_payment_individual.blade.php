@@ -170,7 +170,7 @@
                         <span class="invoice-number mr-1"># {{ $data->code }}</span>
                         <br>
                         <small style="font-size:1em"> <small>Tgl.Outgoing:</small>
-                        <small>{{ date('d/m/y',strtotime($data->post_date)) }}</small>
+                        <small>{{ date('d/m/Y',strtotime($data->post_date)) }}</small>
                         <h2 class="indigo-text">Outgoing Payment</h2>
                     </td>
                     <td width="33%" class="right-align">

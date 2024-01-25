@@ -180,7 +180,7 @@ class GoodReturnPOController extends Controller
                     $val->user->name,
                     $val->account->name,
                     $val->company->name,
-                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
@@ -231,6 +231,8 @@ class GoodReturnPOController extends Controller
                             'item_name'                 => $row->item->code.' - '.$row->item->name,
                             'qty'                       => number_format($row->qty,3,',','.'),
                             'qty_balance'               => number_format($row->getBalanceReturn(),3,',','.'),
+                            'qty_stock'                 => number_format($row->getBalanceReturn() * $row->qty_conversion,3,',','.'),
+                            'unit_stock'                => $row->item->uomUnit->code,
                             'unit'                      => $row->itemUnit->unit->code,
                             'place_id'                  => $row->place_id,
                             'place_name'                => $row->place->code,
@@ -245,6 +247,7 @@ class GoodReturnPOController extends Controller
                             'note'                      => $row->note ? $row->note : '',
                             'note2'                     => $row->note2 ? $row->note2 : '',
                             'is_activa'                 => $row->item->itemGroup->is_activa ? $row->item->itemGroup->is_activa : '',
+                            'qty_conversion'            => $row->qty_conversion,
                         ];
                     }
 
@@ -640,6 +643,8 @@ class GoodReturnPOController extends Controller
                 'qty_received'              => number_format($row->goodReceiptDetail->qty,3,',','.'),
                 'qty_balance'               => number_format($row->goodReceiptDetail->getBalanceReturn(),3,',','.'),
                 'unit'                      => $row->itemUnit->unit->code,
+                'qty_stock'                 => number_format($row->qty * $row->qty_conversion,3,',','.'),
+                'unit_stock'                => $row->item->uomUnit->code,
                 'note'                      => $row->note ? $row->note : '',
                 'note2'                     => $row->note2 ? $row->note2 : '',
                 'place_name'                => $row->goodReceiptDetail->place->code,
@@ -649,6 +654,7 @@ class GoodReturnPOController extends Controller
                 'warehouse_name'            => $row->goodReceiptDetail->warehouse->name,
                 'is_activa'                 => $row->item->itemGroup->is_activa ? $row->item->itemGroup->is_activa : '',
                 'list_serial'               => $row->arrSerial(),
+                'qty_conversion'            => $row->qty_conversion,
             ];
         }
 
@@ -1804,7 +1810,7 @@ class GoodReturnPOController extends Controller
                             'key'   => $query_pyrc->paymentRequest->code,
                             "name"  => $query_pyrc->paymentRequest->code,
                             'properties'=> [
-                                 ['name'=> "Tanggal: ".date('d/m/y',strtotime($query_pyrc->paymentRequest->post_date))],
+                                 ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query_pyrc->paymentRequest->post_date))],
                               ],
                             'url'   =>request()->root()."/admin/finance/payment_request_cross?code=".CustomHelper::encrypt($query_pyrc->paymentRequest->code),
                             "title" =>$query_pyrc->paymentRequest->code,

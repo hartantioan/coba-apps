@@ -31,8 +31,8 @@
                 <td>{{ $row->account->name }}</td>
                 <td>{{ $row->company->name }}</td>
                 <td>{{ $row->coaSource->name }}</td>
-                <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
-                <td>{{ date('d/m/y',strtotime($row->pay_date)) }}</td>
+                <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
+                <td>{{ date('d/m/Y',strtotime($row->pay_date)) }}</td>
                 <td>{{ $row->currency->code }}</td>
                 <td>{{ number_format($row->currency_rate,3,',','.') }}</td>
                 <td><a href="{{ $row->attachment() }}">File</a></td>

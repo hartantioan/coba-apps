@@ -350,7 +350,7 @@ class UserController extends Controller
                             </tr>
                             <tr>
                                 <th>Tgl. Menikah</th>
-                                <th>'.date('d/m/y',strtotime($data->married_date)).'</th>
+                                <th>'.date('d/m/Y',strtotime($data->married_date)).'</th>
                             </tr>
                             <tr>
                                 <th>Jumlah Anak</th>
@@ -1347,7 +1347,7 @@ class UserController extends Controller
                     $nomor,
                     $val->code,
                     $val->vendor->employee_no.' - '.$val->vendor->name,
-                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
                     $val->document_no,
                     $val->note,
                     $val->status(),

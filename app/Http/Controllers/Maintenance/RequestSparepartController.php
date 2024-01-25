@@ -614,7 +614,7 @@ class RequestSparepartController extends Controller
                 "name"  => $query->code,
                 "color" => "lightblue",
                 'properties'=> [
-                     ['name'=> "Tanggal : ".date('d/m/y',strtotime($query->request_date))],
+                     ['name'=> "Tanggal : ".date('d/m/Y',strtotime($query->request_date))],
                      ['name'=> "Requested By :".$query->user->name]
                   ],
                 'url'   =>request()->root()."/admin/maintenance/request_sparepart?code=".CustomHelper::encrypt($query->code),
@@ -632,7 +632,7 @@ class RequestSparepartController extends Controller
                 "name"  => $wo_main->code,
             
                 'properties'=> [
-                    ['name'=> "Tanggal : ".date('d/m/y',strtotime($wo_main->request_date))],
+                    ['name'=> "Tanggal : ".date('d/m/Y',strtotime($wo_main->request_date))],
                     ['name'=> "Requested By :".$wo_main->user->name]
                 ],
                 'url'   =>request()->root()."/admin/maintenance/work_order?code=".CustomHelper::encrypt($wo_main->code),
@@ -648,7 +648,7 @@ class RequestSparepartController extends Controller
                     "name"  => $row_requestsp->code,
                 
                     'properties'=> [
-                        ['name'=> "Tanggal : ".date('d/m/y',strtotime($row_requestsp->request_date))],
+                        ['name'=> "Tanggal : ".date('d/m/Y',strtotime($row_requestsp->request_date))],
                         ['name'=> "Requested By :".$row_requestsp->user->name]
                     ],
                     'url'   =>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($row_requestsp->code),

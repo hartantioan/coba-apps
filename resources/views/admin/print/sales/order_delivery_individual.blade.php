@@ -158,9 +158,9 @@
                         <tr>
                             <td style="margin-top: -2px;">
                                 <small style="font-size:10px">Diajukan:</small>
-                                <span style="font-size:10px;">{{ date('d/m/y',strtotime($data->post_date)) }}</span>
+                                <span style="font-size:10px;">{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                                 <small style="font-size:10px">Dikirimkan:</small>
-                                <span style="font-size:10px;">{{ date('d/m/y',strtotime($data->delivery_date)) }}</span>
+                                <span style="font-size:10px;">{{ date('d/m/Y',strtotime($data->delivery_date)) }}</span>
                             </td>
                         </tr>
                         <tr>
@@ -261,7 +261,7 @@
                                         </td>
                                         <td width="1%">:</td>
                                         <td>
-                                            {{ date('d/m/y',strtotime($data->delivery_date)) }}
+                                            {{ date('d/m/Y',strtotime($data->delivery_date)) }}
                                         </td>
                                     </tr>
                                     <tr>

@@ -170,7 +170,7 @@
                     </tr>
                     <tr>
                         <td style="margin-top: -2px;">
-                            <small style="font-size:1em">Diajukan: {{ date('d/m/y',strtotime($data->post_date)) }}</small>
+                            <small style="font-size:1em">Diajukan: {{ date('d/m/Y',strtotime($data->post_date)) }}</small>
                         </td>
                     </tr>
                     <tr>
@@ -245,7 +245,7 @@
                                 Tgl. Jatuh Tempo
                             </td>
                             <td width="50%">
-                                {{ date('d/m/y',strtotime($data->due_date)) }}
+                                {{ date('d/m/Y',strtotime($data->due_date)) }}
                             </td>
                         </tr>
                     </table>

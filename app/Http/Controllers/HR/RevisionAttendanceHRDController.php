@@ -149,7 +149,7 @@ class RevisionAttendanceHRDController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->period->name,
-                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
                     $val->status(),
                     '

@@ -161,7 +161,7 @@
                         </tr>
                         <tr>
                             <td style="margin-top: -2px;">
-                                <small style="font-size:1em">Diajukan: {{ date('d/m/y',strtotime($data->post_date)) }}</small>
+                                <small style="font-size:1em">Diajukan: {{ date('d/m/Y',strtotime($data->post_date)) }}</small>
                             </td>
                         </tr>
                         <tr>
@@ -282,7 +282,7 @@
                                 <td align="right">{{ number_format($row->qty,3,',','.') }}</td>
                                 <td align="right">{{ number_format($row->marketingOrderPlanDetail->qty * $row->marketingOrderPlanDetail->item->sell_convert,3,',','.') }}</td>
                                 <td align="center">{{ $row->marketingOrderPlanDetail->item->uomUnit->code }}</td>
-                                <td align="center">{{ date('d/m/y',strtotime($row->marketingOrderPlanDetail->request_date)) }}</td>
+                                <td align="center">{{ date('d/m/Y',strtotime($row->marketingOrderPlanDetail->request_date)) }}</td>
                             </tr>
                             <tr>
                                 <td colspan="6">Keterangan: {{ $row->marketingOrderPlanDetail->note }}</td>
@@ -314,7 +314,7 @@
                             @foreach($data->productionScheduleDetail as $key => $row)
                             <tr>
                                 <td align="center" rowspan="2">{{ ($key + 1) }}</td>
-                                <td align="center">{{ date('d/m/y',strtotime($row->production_date)) }}</td>
+                                <td align="center">{{ date('d/m/Y',strtotime($row->production_date)) }}</td>
                                 <td align="center">{{ $row->shift->code }}</td>
                                 <td align="center">{{ $row->item->code.' - '.$row->item->name }}</td>
                                 <td align="right">{{ number_format($row->qty,3,',','.') }}</td>

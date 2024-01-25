@@ -105,7 +105,7 @@ class ChangeLogController extends Controller
                     $nomor,
                     $val->version,
                     $val->user->name,
-                    date('d/m/y',strtotime($val->release_date)),
+                    date('d/m/Y',strtotime($val->release_date)),
                     $val->title,
                     substr(strip_tags($val->description), 0, 50),
                     $val->status(),

@@ -174,7 +174,7 @@ class ProductionScheduleController extends Controller
                     $val->user->name,
                     $val->company->name,
                     $val->place->name,
-                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
                     '
@@ -442,7 +442,7 @@ class ProductionScheduleController extends Controller
                 'sell_convert'          => $row->marketingOrderPlanDetail->item->sell_convert,
                 'production_convert'    => $row->marketingOrderPlanDetail->item->production_convert,
                 'pallet_convert'        => $row->marketingOrderPlanDetail->item->pallet_convert,
-                'request_date'          => date('d/m/y',strtotime($row->marketingOrderPlanDetail->request_date)),
+                'request_date'          => date('d/m/Y',strtotime($row->marketingOrderPlanDetail->request_date)),
                 'note'                  => $row->marketingOrderPlanDetail->note,
                 'qty_real'              => number_format($row->marketingOrderPlanDetail->qty * $row->marketingOrderPlanDetail->item->sell_convert,3,',','.'),
                 'bom_link'              => $cekBom->exists() ? $cekBom->orderByDesc('id')->first()->code : '',
@@ -525,7 +525,7 @@ class ProductionScheduleController extends Controller
                 <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="right-align">'.number_format(($row->marketingOrderPlanDetail->qty * $row->marketingOrderPlanDetail->item->sell_convert) / $row->marketingOrderPlanDetail->item->production_convert,3,',','.').'</td>
                 <td class="center-align">'.$row->marketingOrderPlanDetail->item->productionUnit->code.'</td>
-                <td class="center-align">'.date('d/m/y',strtotime($row->marketingOrderPlanDetail->request_date)).'</td>
+                <td class="center-align">'.date('d/m/Y',strtotime($row->marketingOrderPlanDetail->request_date)).'</td>
                 <td class="">'.$row->marketingOrderPlanDetail->note.'</td>
             </tr>';
         }
@@ -559,7 +559,7 @@ class ProductionScheduleController extends Controller
                 <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->item->productionUnit->code.'</td>
                 <td class="center-align">'.$row->warehouse->code.'</td>
-                <td class="center-align">'.date('d/m/y',strtotime($row->production_date)).'</td>
+                <td class="center-align">'.date('d/m/Y',strtotime($row->production_date)).'</td>
                 <td class="center-align">'.$row->shift->code.'</td>
                 <td class="center-align">'.$row->line->code.'</td>
                 <td class="center-align">'.$row->group.'</td>

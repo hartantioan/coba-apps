@@ -850,7 +850,7 @@ class EmployeeController extends Controller
                             </tr>
                             <tr>
                                 <th>Tgl. Menikah</th>
-                                <th>'.date('d/m/y',strtotime($data->married_date)).'</th>
+                                <th>'.date('d/m/Y',strtotime($data->married_date)).'</th>
                             </tr>
                             <tr>
                                 <th>Jumlah Anak</th>

@@ -2,6 +2,9 @@
     .select-wrapper, .select2-container {
         height:3.7rem !important;
     }
+    .modal {
+        top:0px !important;
+    }
 </style>
 <div id="main">
     <div class="row">

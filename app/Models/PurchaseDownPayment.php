@@ -148,6 +148,16 @@ class PurchaseDownPayment extends Model
         return $type;
     }
 
+    public function getReference(){
+        $arr = [];
+
+        foreach($this->purchaseDownPaymentDetail as $row){
+            $arr[] = $row->purchaseOrder->code;
+        }
+
+        return implode(', ',$arr);
+    }
+
     public function currency()
     {
         return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();

@@ -143,7 +143,7 @@
                             <td>{{ $row->code }}</td>
                             <td>{{ $row->user->name }}</td>
                             <td>{{ $row->company->name }}</td>
-                            <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
+                            <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                             <td>{{ date('F Y',strtotime($row->period)) }}</td>
                             <td>{{ $row->note }}</td>
                             <td>{!! $row->status() !!}</td>
@@ -166,7 +166,7 @@
                                             <tr>
                                                 <td align="center">{{ $key1 + 1 }}</td>
                                                 <td align="center">{{ $rowdetail->asset->code.' - '.$rowdetail->asset->name }}</td>
-                                                <td align="center">{{ date('d/m/y',strtotime($rowdetail->asset->date)) }}</td>
+                                                <td align="center">{{ date('d/m/Y',strtotime($rowdetail->asset->date)) }}</td>
                                                 <td align="right">{{ number_format($rowdetail->asset->nominal,2,',','.') }}</td>
                                                 <td align="center">{{ $rowdetail->depreciationNumber().' / '.$rowdetail->asset->assetGroup->depreciation_period }}</td>
                                                 <td align="right">{{ number_format($rowdetail->nominal,2,',','.') }}</td>

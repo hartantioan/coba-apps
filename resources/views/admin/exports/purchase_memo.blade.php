@@ -24,7 +24,7 @@
                 <td>{{ $row->user->name }}</td>
                 <td>{{ $row->account->name }}</td>
                 <td>{{ $row->company->name }}</td>
-                <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
+                <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                 <td align="right">{{ number_format($row->total,2,',','.') }}</td>
                 <td align="right">{{ number_format($row->tax,2,',','.') }}</td>
                 <td align="right">{{ number_format($row->wtax,2,',','.') }}</td>

@@ -163,8 +163,8 @@
                         </tr>
                         <tr>
                             <td style="margin-top: -2px;">
-                                <small style="font-size:1em">Diajukan: {{ date('d/m/y',strtotime($data->post_date)) }}</small>
-                                <small style="font-size:1em">Hingga: {{ date('d/m/y',strtotime($data->due_date)) }}</small>
+                                <small style="font-size:1em">Diajukan: {{ date('d/m/Y',strtotime($data->post_date)) }}</small>
+                                <small style="font-size:1em">Hingga: {{ date('d/m/Y',strtotime($data->due_date)) }}</small>
                             </td>
                         </tr>
                         <tr>
@@ -263,7 +263,7 @@
                                 <td align="center">{{ $row->itemUnit->unit->code }}</td>
                                 <td>{{ $row->note }}</td>
                                 <td>{{ $row->note2 }}</td>
-                                <td align="center">{{ date('d/m/y',strtotime($row->required_date)) }}</td>
+                                <td align="center">{{ date('d/m/Y',strtotime($row->required_date)) }}</td>
                                 <td align="center">{{ $row->place->code }}</td>
                                 <td align="center">{{ $row->warehouse->name }}</td>
                                 <td align="center">{{ $row->department()->exists() ? $row->department->name : '-' }}</td>

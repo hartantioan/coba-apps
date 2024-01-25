@@ -174,7 +174,7 @@ class CashBankController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.$no.'</td>
                 <td>'.$row->journal->code.'</td>
-                <td class="center-align">'.date('d/m/y',strtotime($row->journal->post_date)).'</td>
+                <td class="center-align">'.date('d/m/Y',strtotime($row->journal->post_date)).'</td>
                 <td>'.$row->journal->note.'</td>
                 <td>'.$row->note.'</td>
                 <td>'.($row->account_id ? $row->account->name : '-').'</td>

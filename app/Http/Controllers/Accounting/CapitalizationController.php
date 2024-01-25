@@ -162,7 +162,7 @@ class CapitalizationController extends Controller
                     $val->company->name,
                     $val->currency->code.' - '.$val->currency->name,
                     number_format($val->currency_rate,2,',','.'),
-                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
                     $val->status(),
                     '

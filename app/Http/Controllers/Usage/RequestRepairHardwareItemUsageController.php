@@ -287,7 +287,7 @@ class RequestRepairHardwareItemUsageController extends Controller
         foreach($attachment_request as $row){
             $file = [
                 'id'=>$row->id,
-                'created_at'=> date('d/m/y',strtotime($row->created_at)),
+                'created_at'=> date('d/m/Y',strtotime($row->created_at)),
                 'file_name'=>$row->file_name,
                 'attachment'=>$row->attachment()
             ];

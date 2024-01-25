@@ -631,7 +631,7 @@ class AgingAPController extends Controller
                     $results[] = [
                         'code'          => $dp->code,
                         'vendor'        => $dp->supplier->name,
-                        'post_date'     => date('d/m/y',strtotime($dp->post_date)),
+                        'post_date'     => date('d/m/Y',strtotime($dp->post_date)),
                         'rec_date'      => '-',
                         'due_date'      => $due_date,
                         'due_days'      => $this->dateDiffInDays($due_date,$date),
@@ -651,9 +651,9 @@ class AgingAPController extends Controller
                     $results[] = [
                         'code'          => $pi->code,
                         'vendor'        => $pi->account->name,
-                        'post_date'     => date('d/m/y',strtotime($pi->post_date)),
-                        'rec_date'      => date('d/m/y',strtotime($pi->received_date)),
-                        'due_date'      => date('d/m/y',strtotime($pi->due_date)),
+                        'post_date'     => date('d/m/Y',strtotime($pi->post_date)),
+                        'rec_date'      => date('d/m/Y',strtotime($pi->received_date)),
+                        'due_date'      => date('d/m/Y',strtotime($pi->due_date)),
                         'due_days'      => $this->dateDiffInDays($pi->due_date,$date),
                         'grandtotal'    => number_format($pi->balance,2,',','.'),
                         'memo'          => number_format($memo,2,',','.'),

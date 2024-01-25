@@ -17,7 +17,7 @@
                 <td>{{ $row->code }}</td>
                 <td>{{ $row->user->name }}</td>
                 <td>{{ $row->workOrder->code }}</td>
-                <td>{{ date('d/m/y',strtotime($row->request_date)) }}</td>
+                <td>{{ date('d/m/Y',strtotime($row->request_date)) }}</td>
                 <td>{{ $row->summary_issue }}</td>
                 <td>{!! $row->statusRaw() !!}</td>
             </tr>

@@ -317,8 +317,8 @@
                                             <tr>
                                                 <td class="center-align">{{ $row->purchaseOrder->code }}</td>
                                                 <td class="center-align">{{ implode(', ',$arr_pr) }}</td>
-                                                <td class="center-align">{{ date('d/m/y',strtotime($row->purchaseOrder->post_date)) }}</td>
-                                                <td class="center-align">{{ date('d/m/y',strtotime($row->purchaseOrder->delivery_date)) }}</td>
+                                                <td class="center-align">{{ date('d/m/Y',strtotime($row->purchaseOrder->post_date)) }}</td>
+                                                <td class="center-align">{{ date('d/m/Y',strtotime($row->purchaseOrder->delivery_date)) }}</td>
                                                 <td class="center-align">{{ $row->note }}</td>                                             
                                                 <td class="center-align" style="text-align: right">{{ number_format($row->purchaseOrder->grandtotal,2,',','.') }}</td>
                                                 <td class="center-align" style="text-align: right">{{ number_format($row->nominal,2,',','.') }}</td>
@@ -559,8 +559,8 @@
                                             <tr>
                                                 <td class="center-align">{{ $row->purchaseOrder->code }}</td>
                                                 <td class="center-align">{{ implode(', ',$arr_pr) }}</td>
-                                                <td class="center-align">{{ date('d/m/y',strtotime($row->purchaseOrder->post_date)) }}</td>
-                                                <td class="center-align">{{ date('d/m/y',strtotime($row->purchaseOrder->delivery_date)) }}</td>
+                                                <td class="center-align">{{ date('d/m/Y',strtotime($row->purchaseOrder->post_date)) }}</td>
+                                                <td class="center-align">{{ date('d/m/Y',strtotime($row->purchaseOrder->delivery_date)) }}</td>
                                                 <td class="center-align">{{ $row->note }}</td>                                             
                                                 <td class="center-align" style="text-align: right">{{ number_format($row->purchaseOrder->grandtotal,2,',','.') }}</td>
                                                 <td class="center-align" style="text-align: right">{{ number_format($row->nominal,2,',','.') }}</td>

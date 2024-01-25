@@ -150,7 +150,7 @@ class LockPeriodController extends Controller
                     ',
                     $val->user->name,
                     $val->company->name,
-                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
                     date('F Y',strtotime($val->month)),
                     $val->note,
                     $val->status(),

@@ -146,9 +146,9 @@
                             <td>{{ $key+1 }}</td>
                             <td>{{ $row->user->name }}</td>
                             <td>{{ $row->code }}</td>
-                            <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
-                            <td>{{ date('d/m/y',strtotime($row->due_date)) }}</td>
-                            <td>{{ date('d/m/y',strtotime($row->required_date)) }}</td>
+                            <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
+                            <td>{{ date('d/m/Y',strtotime($row->due_date)) }}</td>
+                            <td>{{ date('d/m/Y',strtotime($row->required_date)) }}</td>
                             <td>{{ $row->note }}</td>
                             <td><a href="{{ $row->attachment() }}">File</a></td>
                             <td>{!! $row->status() !!}</td>
@@ -159,7 +159,7 @@
                                 <ol>
                                 @foreach ($row->purchaseRequestDetail as $detail)
                                     <li>
-                                        {{ $detail->item->name.' qty '.$detail->qty.' '.$detail->itemUnit->unit->code.' Ket. '.$detail->note.' Tgl. pakai '.date('d/m/y',strtotime($detail->required_date)) }}
+                                        {{ $detail->item->name.' qty '.$detail->qty.' '.$detail->itemUnit->unit->code.' Ket. '.$detail->note.' Tgl. pakai '.date('d/m/Y',strtotime($detail->required_date)) }}
                                     </li>
                                 @endforeach
                                 </ol>

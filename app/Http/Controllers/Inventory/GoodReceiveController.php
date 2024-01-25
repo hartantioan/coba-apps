@@ -170,7 +170,7 @@ class GoodReceiveController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->company->name,
-                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
                     $val->currency->code,
                     number_format($val->currency_rate,3,',','.'),
                     $val->note,

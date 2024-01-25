@@ -42,14 +42,14 @@
                     <td>{{ $rowdetail->materialRequest->code }}</td>
                     <td>{{ $rowdetail->materialRequest->user->name }}</td>
                     <td>{{ $rowdetail->materialRequest->company->name }}</td>
-                    <td>{{ date('d/m/y',strtotime($rowdetail->materialRequest->post_date)) }}</td>
+                    <td>{{ date('d/m/Y',strtotime($rowdetail->materialRequest->post_date)) }}</td>
                     <td>{{ $rowdetail->materialRequest->note }}</td>
                     <td>{!! $rowdetail->materialRequest->statusRaw() !!}</td>
                     <td>{{ $rowdetail->materialRequest->deleteUser()->exists() ? $rowdetail->materialRequest->deleteUser->name : '' }}</td>
-                    <td>{{ $rowdetail->materialRequest->deleteUser()->exists() ? date('d/m/y',strtotime($rowdetail->materialRequest->deleted_at)) : '' }}</td>
+                    <td>{{ $rowdetail->materialRequest->deleteUser()->exists() ? date('d/m/Y',strtotime($rowdetail->materialRequest->deleted_at)) : '' }}</td>
                     <td>{{ $rowdetail->materialRequest->deleteUser()->exists() ? $rowdetail->materialRequest->delete_note : '' }}</td>
                     <td>{{ $rowdetail->materialRequest->voidUser()->exists() ? $rowdetail->materialRequest->voidUser->name : '' }}</td>
-                    <td>{{ $rowdetail->materialRequest->voidUser()->exists() ? date('d/m/y',strtotime($rowdetail->materialRequest->void_date)) : '' }}</td>
+                    <td>{{ $rowdetail->materialRequest->voidUser()->exists() ? date('d/m/Y',strtotime($rowdetail->materialRequest->void_date)) : '' }}</td>
                     <td>{{ $rowdetail->materialRequest->voidUser()->exists() ? $rowdetail->materialRequest->void_note : '' }}</td>
                     <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name }}</td>
                     <td>{{ number_format($rowdetail->qty,3,',','.') }}</td>
@@ -57,7 +57,7 @@
                     <td>{{ $rowdetail->itemUnit->unit->code }}</td>
                     <td>{{ $rowdetail->note }}</td>
                     <td>{{ $rowdetail->note2 }}</td>
-                    <td>{{ date('d/m/y',strtotime($rowdetail->required_date)) }}</td>
+                    <td>{{ date('d/m/Y',strtotime($rowdetail->required_date)) }}</td>
                     <td>{{ $rowdetail->place->code }}</td>
                     <td>{{ $rowdetail->warehouse->name }}</td>
                     <td>{{ ($rowdetail->line()->exists() ? $rowdetail->line->code : '-') }}</td>

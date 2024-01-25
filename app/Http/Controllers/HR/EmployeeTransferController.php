@@ -123,7 +123,7 @@ class EmployeeTransferController extends Controller
                     $val->code,
                     $val->account->name ?? '-',
                     $val->typeRaw(),
-                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
                     $val->status(),
                     $btn

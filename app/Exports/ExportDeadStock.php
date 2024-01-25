@@ -41,7 +41,7 @@ class ExportDeadStock implements FromView,ShouldAutoSize
                     $array_filter[]=[
                         'item'=>$row->item->name,
                         'keterangan'=>$row->lookable->code.'-'.$row->lookable->name,
-                        'date'=>date('d/m/y',strtotime($row->date)),
+                        'date'=>date('d/m/Y',strtotime($row->date)),
                         'lamahari'=>$dateDifference,
                     ];
                 }

@@ -178,7 +178,7 @@ class ProductionOrderController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->company->name,
-                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
                     $val->productionSchedule->code,
                     $val->productionScheduleDetail->item->code.' - '.$val->productionScheduleDetail->item->name,
@@ -434,7 +434,7 @@ class ProductionOrderController extends Controller
     public function show(Request $request){
         $po = ProductionOrder::where('code',CustomHelper::decrypt($request->id))->first();
         $warehouse = Warehouse::where('status','1')->whereNotNull('is_transit_warehouse')->first();
-        $po['production_schedule_code'] = $po->productionSchedule->code.' Tgl.Post '.date('d/m/y',strtotime($po->productionSchedule->post_date)).' - Plant : '.$po->productionSchedule->place->code;
+        $po['production_schedule_code'] = $po->productionSchedule->code.' Tgl.Post '.date('d/m/Y',strtotime($po->productionSchedule->post_date)).' - Plant : '.$po->productionSchedule->place->code;
         $po['production_schedule_detail_code'] = $po->productionScheduleDetail->item->code.' - '.$po->productionScheduleDetail->item->name;
         $po['warehouses'] = $po->productionScheduleDetail->item->warehouseList();
         $po['warehouse_transit_id'] = $warehouse ? $warehouse->id : '';

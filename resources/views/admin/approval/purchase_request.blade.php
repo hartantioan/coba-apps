@@ -126,15 +126,15 @@
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
                     <div class="mr-2">
                         <small>Diajukan:</small>
-                        <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span>
+                        <span>{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                     </div>
                     <div class="mr-2">
                         <small>Hingga:</small>
-                        <span>{{ date('d/m/y',strtotime($data->due_date)) }}</span>
+                        <span>{{ date('d/m/Y',strtotime($data->due_date)) }}</span>
                     </div>
                     <div>
                         <small>Dipakai:</small>
-                        <span>{{ date('d/m/y',strtotime($data->required_date)) }}</span>
+                        <span>{{ date('d/m/Y',strtotime($data->required_date)) }}</span>
                     </div>
                 </div>
             </div>
@@ -193,7 +193,7 @@
                         Status
                     </div>
                     <div class="col s9">
-                        {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d/m/y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
+                        {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d/m/Y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
                     </div>
                 </div>
             </div>
@@ -226,7 +226,7 @@
                         <td class="center">{{ $row->itemUnit->unit->code }}</td>
                         <td>{{ $row->note }}</td>
                         <td>{{ $row->note2 }}</td>
-                        <td class="indigo-text center">{{ date('d/m/y',strtotime($row->required_date)) }}</td>
+                        <td class="indigo-text center">{{ date('d/m/Y',strtotime($row->required_date)) }}</td>
                         <td class="center">{{ $row->place->code.' - '.$row->place->company->name }}</td>
                         <td class="center">{{ $row->line()->exists() ? $row->line->name : '-' }}</td>
                         <td class="center">{{ $row->warehouse->name }}</td>

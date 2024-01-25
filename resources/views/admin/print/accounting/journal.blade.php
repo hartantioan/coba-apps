@@ -149,8 +149,8 @@
                             <td>{{ $row->lookable_type ? $row->lookable->code : '-' }}</td>
                             <td>{{ $row->currency_id ? $row->currency->code : '-' }}</td>
                             <td>{{ number_format($row->currency_rate,3,',','.') }}</td>
-                            <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
-                            <td>{{ date('d/m/y',strtotime($row->due_date)) }}</td>
+                            <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
+                            <td>{{ date('d/m/Y',strtotime($row->due_date)) }}</td>
                             <td>{{ $row->note }}</td>
                             <td>{!! $row->status() !!}</td>
                         </tr>

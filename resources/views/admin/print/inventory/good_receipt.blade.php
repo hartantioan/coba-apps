@@ -152,9 +152,9 @@
                             <td>{{ $row->code }}</td>
                             <td>{{ $row->user->name }}</td>
 							<td>{{ $row->account->name }}</td>
-                            <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
-                            <td>{{ date('d/m/y',strtotime($row->due_date)) }}</td>
-                            <td>{{ date('d/m/y',strtotime($row->document_date)) }}</td>
+                            <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
+                            <td>{{ date('d/m/Y',strtotime($row->due_date)) }}</td>
+                            <td>{{ date('d/m/Y',strtotime($row->document_date)) }}</td>
 							<td>{{ $row->receiver_name }}</td>
                             <td><a href="{{ $row->attachment() }}" target="_blank">File</a></td>
                             <td>{{ $row->note }}</td>

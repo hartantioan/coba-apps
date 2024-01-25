@@ -164,8 +164,8 @@
                             <td>{{ $row->department->name }}</td>
                             <td>{{ $row->account->name }}</td>
 							<td>{{ $row->type() }}</td>
-                            <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
-                            <td>{{ date('d/m/y',strtotime($row->required_date)) }}</td>
+                            <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
+                            <td>{{ date('d/m/Y',strtotime($row->required_date)) }}</td>
                             <td>{{ $row->currency->code }}</td>
                             <td>{{ number_format($row->currency_rate,3,',','.') }}</td>
                             <td>{{ $row->note }}</td>

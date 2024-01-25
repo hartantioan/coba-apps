@@ -173,7 +173,7 @@
                         <tr>
                             <td style="margin-top: -2px;">
                                 <small>Diajukan:</small>
-                                <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span>
+                                <span>{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                             </td>
                         </tr>
                         <tr>

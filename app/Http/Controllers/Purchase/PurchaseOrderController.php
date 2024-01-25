@@ -305,8 +305,8 @@ class PurchaseOrderController extends Controller
                     $val->payment_term,
                     $val->currency->name,
                     number_format($val->currency_rate,2,',','.'),
-                    date('d/m/y',strtotime($val->post_date)),
-                    date('d/m/y',strtotime($val->delivery_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->delivery_date)),
                     $val->receiver_name,
                     $val->receiver_address,
                     $val->receiver_phone,
@@ -1043,6 +1043,8 @@ class PurchaseOrderController extends Controller
                 'item_name'                         => $row->item_id ? $row->item->code.' - '.$row->item->name : '',
                 'coa_name'                          => $row->coa_id ? $row->coa->name : '',
                 'qty'                               => number_format($row->qty,3,',','.'),
+                'qty_stock'                         => $row->item_id ? number_format($row->qty * $row->qty_conversion,3,',','.') : '-',
+                'unit_stock'                        => $row->item_id ? $row->item->uomUnit->code : '-',
                 'item_unit_id'                      => $row->item_id ? $row->item_unit_id : '-',
                 'note'                              => $row->note ? $row->note : '',
                 'note2'                             => $row->note2 ? $row->note2 : '',
@@ -2131,7 +2133,7 @@ class PurchaseOrderController extends Controller
                             'key'   => $query_pyrc->paymentRequest->code,
                             "name"  => $query_pyrc->paymentRequest->code,
                             'properties'=> [
-                                 ['name'=> "Tanggal: ".date('d/m/y',strtotime($query_pyrc->paymentRequest->post_date))],
+                                 ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query_pyrc->paymentRequest->post_date))],
                               ],
                             'url'   =>request()->root()."/admin/finance/payment_request_cross?code=".CustomHelper::encrypt($query_pyrc->paymentRequest->code),
                             "title" =>$query_pyrc->paymentRequest->code,
@@ -3188,7 +3190,7 @@ class PurchaseOrderController extends Controller
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td class="center-align">'.$row->purchaseOrder->code.'</td>
-                    <td class="center-align">'.date('d/m/y',strtotime($row->purchaseOrder->post_date)).'</td>
+                    <td class="center-align">'.date('d/m/Y',strtotime($row->purchaseOrder->post_date)).'</td>
                     <td class="">'.$row->purchaseOrder->note.'</td>
                     <td class="center-align">'.$row->purchaseOrder->status().'</td>
                     <td class="">'.$row->item->code.' - '.$row->item->name.'</td>

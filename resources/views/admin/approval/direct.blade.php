@@ -68,7 +68,7 @@
                             </div>
                         @else
                             <div class="col m12 mt-2">
-                                Dokumen ini telah anda <b>{{ $approval->statusApproval() }}</b> pada tanggal <b>{{ date('d/m/y H:i:s',strtotime($approval->date_process)) }}</b> dengan keterangan : <b>{{ $approval->note }}</b>
+                                Dokumen ini telah anda <b>{{ $approval->statusApproval() }}</b> pada tanggal <b>{{ date('d/m/Y H:i:s',strtotime($approval->date_process)) }}</b> dengan keterangan : <b>{{ $approval->note }}</b>
                             </div>
                         @endif
                     </div>

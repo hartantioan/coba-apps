@@ -158,7 +158,7 @@
                         <tr>
                             <td style="margin-top: -2px;">
                                 <small style="font-size:10px">Diproses:</small>
-                                <span style="font-size:10px;">{{ date('d/m/y',strtotime($data->post_date)) }}</span>
+                                <span style="font-size:10px;">{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                             </td>
                         </tr>
                         <tr>
@@ -220,7 +220,7 @@
                                     <td align="center">{{ ($key + 1) }}</td>
                                     <td class="">{{ $row->lookable->code }}</td>
                                     <td class="">{{ $row->lookable->account->name }}</td>
-                                    <td align="center">{{ date('d/m/y',strtotime($row->lookable->post_date)) }}</td>
+                                    <td align="center">{{ date('d/m/Y',strtotime($row->lookable->post_date)) }}</td>
                                     <td align="right">{{ number_format($row->lookable->balance,2,',','.') }}</td>
                                 </tr>
                                 @endforeach

@@ -147,7 +147,7 @@ class Item extends Model
         $price = ItemCogs::where('item_id',$this->id)->whereIn('place_id',$dataplaces)->orderByDesc('date')->orderByDesc('id')->first();
         if($price){
             $arrPrice[] = [
-                'description'   => $price->company->name.' - '.date('d/m/y',strtotime($price->date)),
+                'description'   => $price->company->name.' - '.date('d/m/Y',strtotime($price->date)),
                 'price'         => number_format($price->price_final,2,',','.'),
             ];
         }
@@ -168,7 +168,7 @@ class Item extends Model
                     'supplier_id'   => $row->account_id,
                     'supplier_name' => $row->supplier->name,
                     'price'         => number_format($rowdetail->price,2,',','.'),
-                    'post_date'     => date('d/m/y',strtotime($row->post_date)),
+                    'post_date'     => date('d/m/Y',strtotime($row->post_date)),
                 ];
             }
         }
@@ -189,7 +189,7 @@ class Item extends Model
                     'customer_id'   => $row->account_id,
                     'customer_name' => $row->account->name,
                     'price'         => number_format($rowdetail->price,2,',','.'),
-                    'post_date'     => date('d/m/y',strtotime($row->post_date)),
+                    'post_date'     => date('d/m/Y',strtotime($row->post_date)),
                 ];
             }
         }

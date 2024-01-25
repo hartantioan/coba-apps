@@ -163,9 +163,9 @@
                         </tr>
                         <tr>
                             <td style="margin-top: -2px;">
-                                <small style="font-size:1em">Diajukan: {{ date('d/m/y',strtotime($data->post_date)) }}</small>
-                                <small style="font-size:1em">Mulai: {{ date('d/m/y',strtotime($data->start_date)) }}</small>
-                                <small style="font-size:1em">Sampai: {{ date('d/m/y',strtotime($data->end_date)) }}</small>
+                                <small style="font-size:1em">Diajukan: {{ date('d/m/Y',strtotime($data->post_date)) }}</small>
+                                <small style="font-size:1em">Mulai: {{ date('d/m/Y',strtotime($data->start_date)) }}</small>
+                                <small style="font-size:1em">Sampai: {{ date('d/m/Y',strtotime($data->end_date)) }}</small>
                             </td>
                         </tr>
                         <tr>
@@ -294,7 +294,7 @@
                                 <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                                 <td align="center">{{ $row->qty }}</td>
                                 <td align="center">{{ $row->item->sellUnit->code }}</td>
-                                <td align="center">{{ date('d/m/y',strtotime($row->request_date)) }}</td>
+                                <td align="center">{{ date('d/m/Y',strtotime($row->request_date)) }}</td>
                                 <td>{{ $row->note }}</td>
                                 <td align="center">{{ $row->isUrgent() }}</td>
                             </tr>

@@ -117,7 +117,7 @@ class OutletPriceController extends Controller
                     $val->company->name,
                     $val->account->name,
                     $val->outlet->name,
-                    date('d/m/y',strtotime($val->date)),
+                    date('d/m/Y',strtotime($val->date)),
                     $val->note,
                     $val->status(),
                     '

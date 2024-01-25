@@ -2,18 +2,23 @@
     <thead>
         <tr align="center">
             <th class="center-align">No.</th>
-            <th class="center-align">No.PODP</th>
-            <th class="center-align">Supplier</th>
+            <th class="center-align">No.Dokumen</th>
+            <th class="center-align">Status</th>
+            <th class="center-align">Voider</th>
+            <th class="center-align">Tgl.Void</th>
+            <th class="center-align">Ket.Void</th>
+            <th class="center-align">Deleter</th>
+            <th class="center-align">Tgl.Delete</th>
+            <th class="center-align">Ket.Delete</th>
+            <th class="center-align">Tgl.Posting</th>
+            <th class="center-align">Kode Supplier</th>
+            <th class="center-align">Nama Supplier</th>
             <th class="center-align">Tipe</th>
-            <th class="center-align">Tgl.Post</th>
-            <th class="center-align">Tgl.Tenggat</th>
             <th class="center-align">Keterangan</th>
             <th class="center-align">Subtotal</th>
             <th class="center-align">Diskon</th>
-            <th class="center-align">Grandtotal</th>
-            <th class="center-align">Dipakai</th>
-            <th class="center-align">Memo</th>
-            <th class="center-align">Sisa</th>   
+            <th class="center-align">Total</th>
+            <th class="center-align">Based On</th>   
         </tr>
     </thead>
     <tbody>
@@ -21,17 +26,22 @@
             <tr align="center" style="background-color:#eee;">
                 <td class="center-align">{{ $key + 1 }}</td>
                 <td>{{ $row['code'] }}</td>
+                <td>{{ $row['status'] }}</td>
+                <td>{{ $row['void_name'] }}</td>
+                <td>{{ $row['void_date'] }}</td>
+                <td>{{ $row['void_note'] }}</td>
+                <td>{{ $row['delete_name'] }}</td>
+                <td>{{ $row['delete_date'] }}</td>
+                <td>{{ $row['delete_note'] }}</td>
+                <td>{{ $row['post_date'] }}</td>
+                <td>{{ $row['supplier_code'] }}</td>
                 <td>{{ $row['supplier_name'] }}</td>
                 <td>{{ $row['type'] }}</td>
-                <td>{{ $row['post_date'] }}</td>
-                <td>{{ $row['due_date'] }}</td>
                 <td>{{ $row['note'] }}</td>
                 <td class="right-align">{{ $row['subtotal'] }}</td>
                 <td class="right-align">{{ $row['discount'] }}</td>
                 <td class="right-align">{{ $row['total'] }}</td>
-                <td class="right-align">{{ $row['used'] }}</td>
-                <td class="right-align">{{ $row['memo'] }}</td>
-                <td class="right-align">{{ $row['balance'] }}</td>
+                <td class="right-align">{{ $row['references'] }}</td>
             </tr>
         @endforeach
         @if(count($data) == 0)

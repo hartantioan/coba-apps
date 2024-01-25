@@ -159,10 +159,10 @@ class ProductionIssueReceiveController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->company->name,
-                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
                     $val->productionOrder->code,
                     $val->productionOrder->productionSchedule->code,
-                    date('d/m/y',strtotime($val->productionOrder->productionScheduleDetail->production_date)).' - '.$val->productionOrder->productionScheduleDetail->shift->code.' - '.$val->productionOrder->productionScheduleDetail->shift->name,
+                    date('d/m/Y',strtotime($val->productionOrder->productionScheduleDetail->production_date)).' - '.$val->productionOrder->productionScheduleDetail->shift->code.' - '.$val->productionOrder->productionScheduleDetail->shift->name,
                     $val->productionOrder->productionScheduleDetail->line->code,
                     $val->productionOrder->productionScheduleDetail->group,
                     $val->productionOrder->productionSchedule->place->code,
@@ -471,7 +471,7 @@ class ProductionIssueReceiveController extends Controller
         $detailReceive = $po->productionIssueReceiveDetail()->where('type','2')->first();
 
         $po['code_place_id'] = substr($po->code,7,2);
-        $po['production_order_code'] = $po->productionOrder->code.' Tgl.Post '.date('d/m/y',strtotime($po->productionOrder->post_date)).' - Plant : '.$po->productionOrder->productionSchedule->place->code;
+        $po['production_order_code'] = $po->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($po->productionOrder->post_date)).' - Plant : '.$po->productionOrder->productionSchedule->place->code;
         $po['item_receive_id']                  = $po->productionOrder->productionScheduleDetail->item_id;
         $po['item_receive_code']                = $po->productionOrder->productionScheduleDetail->item->code;
         $po['item_receive_name']                = $po->productionOrder->productionScheduleDetail->item->name;
@@ -485,7 +485,7 @@ class ProductionIssueReceiveController extends Controller
         $po['sell_convert']                     = $po->productionOrder->productionScheduleDetail->item->sell_convert;
         $po['pallet_convert']                   = $po->productionOrder->productionScheduleDetail->item->pallet_convert;
         $po['detail_issue']                     = $detail_issue;
-        $po['shift']                            = date('d/m/y',strtotime($po->productionOrder->productionScheduleDetail->production_date)).' - '.$po->productionOrder->productionScheduleDetail->shift->code.' - '.$po->productionOrder->productionScheduleDetail->shift->name;
+        $po['shift']                            = date('d/m/Y',strtotime($po->productionOrder->productionScheduleDetail->production_date)).' - '.$po->productionOrder->productionScheduleDetail->shift->code.' - '.$po->productionOrder->productionScheduleDetail->shift->name;
         $po['group']                            = $po->productionOrder->productionScheduleDetail->group;
         $po['line']                             = $po->productionOrder->productionScheduleDetail->line->code;
         $po['shading']                          = $detailReceive->shading;

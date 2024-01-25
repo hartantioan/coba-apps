@@ -90,7 +90,7 @@
                             Tgl.Post
                         </div>
                         <div class="col l9 m9 s9 p-3">
-                            {{ date('d/m/y',strtotime($row->marketingOrderReceipt->post_date)) }}
+                            {{ date('d/m/Y',strtotime($row->marketingOrderReceipt->post_date)) }}
                         </div>
                         <div class="col l3 m3 s3 p-3">
                             Tagihan

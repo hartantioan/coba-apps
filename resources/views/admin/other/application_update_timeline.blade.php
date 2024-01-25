@@ -53,7 +53,7 @@
                                 @foreach($change_log as $log)
                                     <li class="update-card" data-update-id="{{$log->id}}">
                                         <div class="timeline-badge blue">
-                                            <a class="tooltipped" data-position="top" data-tooltip="{{date('d/m/y',strtotime($log->release_date))}}"><i class="material-icons white-text">disc_full</i></a>
+                                            <a class="tooltipped" data-position="top" data-tooltip="{{date('d/m/Y',strtotime($log->release_date))}}"><i class="material-icons white-text">disc_full</i></a>
                                         </div>
                                         <div class="timeline-panel">
                                             <div class="card m-0 hoverable gradient-45deg-orange-deep-orange" id="profile-card" style="overflow: visible;">
@@ -63,8 +63,8 @@
                                                         <h5 class="card-title activator grey-text text-darken-4 mt-1 ml-3">{{$log->user->name}}</h5>
                                                     </div>
                                                     <p><i class="material-icons profile-card-i">restore</i><b>Version:</b> {{$log->version}}</p>
-                                                    <p><i class="material-icons profile-card-i">date_range</i>{{date('d/m/y',strtotime($log->release_date))}}</p>
-                                                    <p style="position:absolute;right:10px;bottom:0;">Diupdate Tgl. {{ date('d/m/y H:i:s',strtotime($log->updated_at)) }}</p>
+                                                    <p><i class="material-icons profile-card-i">date_range</i>{{date('d/m/Y',strtotime($log->release_date))}}</p>
+                                                    <p style="position:absolute;right:10px;bottom:0;">Diupdate Tgl. {{ date('d/m/Y H:i:s',strtotime($log->updated_at)) }}</p>
                                                 </div>
                                             </div>
                                         </div>

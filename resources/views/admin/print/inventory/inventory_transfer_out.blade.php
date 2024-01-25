@@ -145,7 +145,7 @@
                             <td>{{ $row->user->name }}</td>
                             <td>{{ $row->code }}</td>
                             <td>{{ $row->company->name }}</td>
-                            <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
+                            <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
 							<td>{{ $row->placeFrom->name.' - '.$row->warehouseFrom->name }}</td>
 							<td>{{ $row->placeTo->name.' - '.$row->warehouseTo->name }}</td>
                             <td>{{ $row->note }}</td>

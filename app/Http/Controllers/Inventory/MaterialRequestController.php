@@ -179,7 +179,7 @@ class MaterialRequestController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->company->name,
-                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
                     $val->status(),
                     '
@@ -248,7 +248,7 @@ class MaterialRequestController extends Controller
                 <td class="center-align">'.$row->itemUnit->unit->code.'</td>
                 <td class="">'.$row->note.'</td>
                 <td class="">'.$row->note2.'</td>
-                <td class="center-align">'.date('d/m/y',strtotime($row->required_date)).'</td>
+                <td class="center-align">'.date('d/m/Y',strtotime($row->required_date)).'</td>
                 <td class="center-align">'.$row->place->code.'</td>
                 <td class="center-align">'.$row->warehouse->name.'</td>
                 <td class="center-align">'.($row->line()->exists() ? $row->line->code : '-').'</td>
@@ -728,7 +728,7 @@ class MaterialRequestController extends Controller
                 "name"  => $query->code,
                 "color" => "lightblue",
                 'properties'=> [
-                     ['name'=> "Tanggal: ".date('d/m/y',strtotime($query->post_date))],
+                     ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query->post_date))],
                   ],
                 'url'   =>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($query->code),
                 "title" =>$query->code,
@@ -1429,7 +1429,7 @@ class MaterialRequestController extends Controller
                             'key'   => $query_pyrc->paymentRequest->code,
                             "name"  => $query_pyrc->paymentRequest->code,
                             'properties'=> [
-                                 ['name'=> "Tanggal: ".date('d/m/y',strtotime($query_pyrc->paymentRequest->post_date))],
+                                 ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query_pyrc->paymentRequest->post_date))],
                               ],
                             'url'   =>request()->root()."/admin/finance/payment_request_cross?code=".CustomHelper::encrypt($query_pyrc->paymentRequest->code),
                             "title" =>$query_pyrc->paymentRequest->code,

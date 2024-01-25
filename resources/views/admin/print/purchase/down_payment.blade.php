@@ -117,8 +117,8 @@
 								<td>{{ $row->code }}</td>
 								<td>{{ $row->user->name }}</td>
 								<td>{{ $row->supplier->name }}</td>
-								<td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
-								<td>{{ date('d/m/y',strtotime($row->due_date)) }}</td>
+								<td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
+								<td>{{ date('d/m/Y',strtotime($row->due_date)) }}</td>
 								<td><a href="{{ $row->attachment() }}">File</a></td>
 								<td>{{ $row->type() }}</td>
 								<td>{{ $row->currency->symbol }}</td>

@@ -37,15 +37,15 @@
                 <td>{{ $row->code }}</td>
                 <td>{{ $row->user->name }}</td>
                 <td>{{ $row->account->name }}</td>
-                <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
+                <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                 <td><a href="{{ $row->attachment() }}" target="_blank">File</a></td>
                 <td>{{ $row->note }}</td>
                 <td>{!! $row->statusRaw() !!}</td>
                 <td>{{ $row->deleteUser()->exists() ? $row->deleteUser->name : '' }}</td>
-                <td>{{ $row->deleteUser()->exists() ? date('d/m/y',strtotime($row->deleted_at)) : '' }}</td>
+                <td>{{ $row->deleteUser()->exists() ? date('d/m/Y',strtotime($row->deleted_at)) : '' }}</td>
                 <td>{{ $row->deleteUser()->exists() ? $row->delete_note : '' }}</td>
                 <td>{{ $row->voidUser()->exists() ? $row->voidUser->name : '' }}</td>
-                <td>{{ $row->voidUser()->exists() ? date('d/m/y',strtotime($row->void_date)) : '' }}</td>
+                <td>{{ $row->voidUser()->exists() ? date('d/m/Y',strtotime($row->void_date)) : '' }}</td>
                 <td>{{ $row->voidUser()->exists() ? $row->void_note : '' }}</td>
                 <td>{{ $rowdetail->item->name.' - '.$rowdetail->item->name }}</td>
                 <td align="center">{{ $rowdetail->goodReceiptDetail->qty }}</td>

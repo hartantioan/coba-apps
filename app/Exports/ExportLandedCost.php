@@ -27,26 +27,26 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, Shoul
 
 
     private $headings = [
-        'NO',
-        'LC.NO',
-        'TGL.POST',
-        'VENDOR CODE',
-        'VENDOR',
-        'REFERENSI',
-        'ITEM CODE',
-        'ITEM NAME',
-        'QTY',
-        'UNIT',
-        'PENGGUNA',
-        'PERUSAHAAN',
-        'WAREHOUSE',
-        'STATUS',
-        'VOIDER',
-        'TGL.VOID',
-        'KET.VOID',
-        'DELETER',
-        'TGL.DELETE',
-        'KET.DELETE',
+        'No',
+        'No.Dokumen',
+        'Status',
+        'Voider',
+        'Tgl.Void',
+        'Ket.Void',
+        'Deleter',
+        'Tgl.Delete',
+        'Ket.Delete',
+        'Tgl.Posting',
+        'Kode Supplier',
+        'Nama Supplier',
+        'Keterangan',
+        'Kode Item',
+        'Nama Item',
+        'Plant',
+        'Qty',
+        'Satuan',
+        'Total',
+        'Based On',
     ];
 
     public function collection()
@@ -68,55 +68,28 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, Shoul
         $arr = [];
 
         foreach($data as $key => $row){
-
-            if($row->landedCost->supplier()->exists()){
-                $arr[] = [
-                    'id'            => ($key + 1),
-                    'code'          => $row->landedCost->code,
-                    'tgl_post'      => $row->landedCost->post_date,
-                    'vendor_code'   => $row->landedCost->supplier->employee_no,
-                    'vendor'        => $row->landedCost->supplier->name,
-                    'ref'           => $row->landedCost->reference,
-                    'item_code'     => $row->item->code,
-                    'item_name'     => $row->item->name,
-                    'qty'           => $row->qty,
-                    'unit'          => $row->item->uomUnit->code,
-                    'user'          => $row->landedCost->user->name,
-                    'company'       => $row->landedCost->company->name,
-                    'warehouse'     => $row->place->code,
-                    'status'        => $row->landedCost->statusRaw(),
-                    'voider'        => $row->landedCost->voidUser()->exists() ? $row->landedCost->voidUser->name : '',
-                    'void_date'     => $row->landedCost->voidUser()->exists() ? $row->landedCost->void_date : '',
-                    'void_note'     => $row->landedCost->voidUser()->exists() ? $row->landedCost->void_note : '',
-                    'deleter'       => $row->landedCost->deleteUser()->exists() ? $row->landedCost->deleteUser->name : '',
-                    'delete_date'   => $row->landedCost->deleteUser()->exists() ? $row->landedCost->deleted_at : '',
-                    'delete_note'   => $row->landedCost->deleteUser()->exists() ? $row->landedCost->delete_note : '',
-                ];
-            }else{
-                $arr[] = [
-                    'id'            => ($key + 1),
-                    'code'          => $row->landedCost->code,
-                    'tgl_post'      => $row->landedCost->post_date,
-                    'vendor_code'   => '',
-                    'vendor'        => '',
-                    'ref'           => $row->landedCost->reference,
-                    'item_code'     => $row->item->code,
-                    'item_name'     => $row->item->name,
-                    'qty'           => $row->qty,
-                    'unit'          => $row->item->uomUnit->code,
-                    'user'          => $row->landedCost->user->name,
-                    'company'       => $row->landedCost->company->name,
-                    'warehouse'     => $row->place->code,
-                    'status'        => $row->landedCost->statusRaw(),
-                    'voider'        => $row->landedCost->voidUser()->exists() ? $row->landedCost->voidUser->name : '',
-                    'void_date'     => $row->landedCost->voidUser()->exists() ? $row->landedCost->void_date : '',
-                    'void_note'     => $row->landedCost->voidUser()->exists() ? $row->landedCost->void_note : '',
-                    'deleter'       => $row->landedCost->deleteUser()->exists() ? $row->landedCost->deleteUser->name : '',
-                    'delete_date'   => $row->landedCost->deleteUser()->exists() ? $row->landedCost->deleted_at : '',
-                    'delete_note'   => $row->landedCost->deleteUser()->exists() ? $row->landedCost->delete_note : '',
-                ];
-            }
-            
+            $arr[] = [
+                'id'            => ($key + 1),
+                'code'          => $row->landedCost->code,
+                'status'        => $row->landedCost->statusRaw(),
+                'voider'        => $row->landedCost->voidUser()->exists() ? $row->landedCost->voidUser->name : '',
+                'void_date'     => $row->landedCost->voidUser()->exists() ? $row->landedCost->void_date : '',
+                'void_note'     => $row->landedCost->voidUser()->exists() ? $row->landedCost->void_note : '',
+                'deleter'       => $row->landedCost->deleteUser()->exists() ? $row->landedCost->deleteUser->name : '',
+                'delete_date'   => $row->landedCost->deleteUser()->exists() ? $row->landedCost->deleted_at : '',
+                'delete_note'   => $row->landedCost->deleteUser()->exists() ? $row->landedCost->delete_note : '',
+                'post_date'     => date('d/m/Y',strtotime($row->landedCost->post_date)),
+                'vendor_code'   => $row->landedCost->vendor->employee_no,
+                'vendor'        => $row->landedCost->vendor->name,
+                'note'          => $row->landedCost->reference.' - '.$row->landedCost->note,
+                'item_code'     => $row->item->code,
+                'item_name'     => $row->item->name,
+                'place'         => $row->place->code,
+                'qty'           => $row->qty,
+                'unit'          => $row->item->uomUnit->code,
+                'total'         => number_format($row->nominal,2,',','.'),
+                'based_on'      => $row->landedCost->getReference(),
+            ];
         }
 
         return collect($arr);

@@ -158,6 +158,11 @@ class PurchaseOrderDetail extends Model
         return round($finalprice,2);
     }
 
+    public function discountHeader(){
+        $bobot = $this->subtotal / $this->purchaseOrder->subtotal;
+        return $bobot * $this->purchaseOrder->discount;
+    }
+
     public function getArrayTotal(){
         $wtax = 0;
         $total = 0;
@@ -246,5 +251,17 @@ class PurchaseOrderDetail extends Model
         }
 
         return $total;
+    }
+
+    public function getReference(){
+        $code = '';
+        if($this->purchaseRequestDetail()->exists()){
+            $code = $this->purchaseRequestDetail->purchaseRequest->code;
+        }elseif($this->goodIssueDetail()->exists()){
+            $code = $this->goodIssueDetail->goodIssue->code;
+        }elseif($this->marketingOrderDeliveryProcess()->exists()){
+            $code = $this->marketingOrderDeliveryProcess->code;
+        }
+        return $code;
     }
 }

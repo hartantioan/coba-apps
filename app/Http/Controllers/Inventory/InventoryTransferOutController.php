@@ -196,7 +196,7 @@ class InventoryTransferOutController extends Controller
                     $val->warehouseFrom->name,
                     $val->placeTo->code,
                     $val->warehouseTo->name,
-                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
@@ -336,7 +336,7 @@ class InventoryTransferOutController extends Controller
             if($passed == false){
                 return response()->json([
                     'status'  => 500,
-                    'message' => 'Maaf, pada tanggal '.date('d/m/y',strtotime($request->post_date)).', barang '.implode(", ",$arrItemNotPassed).', stok tidak tersedia atau melebihi stok yang tersedia.',
+                    'message' => 'Maaf, pada tanggal '.date('d/m/Y',strtotime($request->post_date)).', barang '.implode(", ",$arrItemNotPassed).', stok tidak tersedia atau melebihi stok yang tersedia.',
                 ]);
             }
 

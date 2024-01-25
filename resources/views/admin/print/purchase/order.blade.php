@@ -143,8 +143,8 @@
 									<td>{{ $row->code }}</td>
 									<td>{{ $row->user->name }}</td>
 									<td>{{ $row->supplier->name }}</td>
-									<td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
-									<td>{{ date('d/m/y',strtotime($row->delivery_date)) }}</td>
+									<td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
+									<td>{{ date('d/m/Y',strtotime($row->delivery_date)) }}</td>
 									<td>{{ $row->receiver_name }}</td>
 									<td>{{ $row->receiver_address }}</td>
 									<td>{{ $row->receiver_phone }}</td>

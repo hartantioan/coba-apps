@@ -126,7 +126,7 @@
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
                     <div class="mr-2">
                         <small>Diajukan:</small>
-                        <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span>
+                        <span>{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                     </div>
                 </div>
             </div>
@@ -180,7 +180,7 @@
                     Tgl.Post
                 </div>
                 <div class="col s8">
-                    {{ date('d/m/y',strtotime($data->post_date)) }}
+                    {{ date('d/m/Y',strtotime($data->post_date)) }}
                 </div>
             </div>
         </div>
@@ -210,7 +210,7 @@
                         <td class="right-align">{{ number_format($row->qty,3,',','.') }}</td>
                         <td class="right-align">{{ number_format($row->marketingOrderPlanDetail->qty * $row->marketingOrderPlanDetail->item->sell_convert,3,',','.') }}</td>
                         <td class="center-align">{{ $row->marketingOrderPlanDetail->item->uomUnit->code }}</td>
-                        <td class="center-align">{{ date('d/m/y',strtotime($row->marketingOrderPlanDetail->request_date)) }}</td>
+                        <td class="center-align">{{ date('d/m/Y',strtotime($row->marketingOrderPlanDetail->request_date)) }}</td>
                     </tr>
                     <tr>
                         <td colspan="6">Keterangan: {{ $row->marketingOrderPlanDetail->note }}</td>
@@ -242,7 +242,7 @@
                     @foreach($data->productionScheduleDetail as $key => $row)
                     <tr>
                         <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
-                        <td class="center-align">{{ date('d/m/y',strtotime($row->production_date)) }}</td>
+                        <td class="center-align">{{ date('d/m/Y',strtotime($row->production_date)) }}</td>
                         <td class="center-align">{{ $row->shift->code }}</td>
                         <td class="center-align">{{ $row->item->code.' - '.$row->item->name }}</td>
                         <td class="right-align">{{ number_format($row->qty,3,',','.') }}</td>

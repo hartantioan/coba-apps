@@ -11,9 +11,6 @@
                             <h5>Daftar Menu yang bisa anda akses</h5>
                             <div class="card padding-4 animate fadeLeft">
                                 @foreach ($user->menuUser()->where('type','view')->get() as $row)
-                                    @php
-                                        info($row->menu_id);
-                                    @endphp
                                     <a class="waves-effect waves-light btn-small mr-1 mt-1" href="{{ $row->menu->fullUrl() }}"><i class="material-icons left">{{ $row->icon }}</i>{{ $row->menu->name }}</a>
                                 @endforeach
                             </div>
@@ -166,7 +163,7 @@
                                                         <td class="">{{ $row->item->code.' - '.$row->item->name }}</td>
                                                         <td class="center-align">{{ $row->place->code }}</td>
                                                         <td class="center-align">{{ $row->warehouse->name }}</td>
-                                                        <td class="center-align">{{ date('d/m/y',strtotime($row->date)) }}</td>
+                                                        <td class="center-align">{{ date('d/m/Y',strtotime($row->date)) }}</td>
                                                         <td class="right-align">{{ number_format($row->total_in,2,',','.') }}</td>
                                                         <td class="right-align">{{ number_format($row->total_out,2,',','.') }}</td>
                                                         <td class="right-align">{{ number_format($row->total_final,2,',','.') }}</td>

@@ -197,8 +197,8 @@ class GoodReceiptPOController extends Controller
                     $val->account->name,
                     $val->company->name,
                     $val->receiver_name,
-                    date('d/m/y',strtotime($val->post_date)),
-                    date('d/m/y',strtotime($val->document_date)),
+                    date('d/m/Y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->document_date)),
                     $val->note,
                     $val->delivery_no,
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
@@ -253,6 +253,8 @@ class GoodReceiptPOController extends Controller
                             'item_name'                 => $row->item->code.' - '.$row->item->name,
                             'qty'                       => number_format($qtyBalance,3,',','.'),
                             'unit'                      => $row->itemUnit->unit->code,
+                            'qty_stock'                 => number_format($qtyBalance * $row->qty_conversion,3,',','.'),
+                            'unit_stock'                => $row->item->uomUnit->code,
                             'place_id'                  => $row->place_id,
                             'place_name'                => $row->place->code,
                             'line_id'                   => $row->line_id ? $row->line_id : '',
@@ -265,6 +267,8 @@ class GoodReceiptPOController extends Controller
                             'warehouse_name'            => $row->warehouse->name,
                             'note'                      => $row->note ? $row->note2 : '',
                             'note2'                     => $row->note2 ? $row->note2 : '',
+                            'qty_conversion'            => $row->qty_conversion,
+                            'is_activa'                 => $row->item->itemGroup->is_activa ? $row->item->itemGroup->is_activa : '',
                         ];
                         if($row->item()->exists()){
                             if($row->item->itemGroup->is_activa){
@@ -766,6 +770,8 @@ class GoodReceiptPOController extends Controller
                 'item_name'                 => $row->item->name,
                 'qty'                       => number_format($row->qty,3,',','.'),
                 'unit'                      => $row->itemUnit->unit->code,
+                'qty_stock'                 => number_format($row->qty * $row->qty_conversion,3,',','.'),
+                'unit_stock'                => $row->item->uomUnit->code,
                 'note'                      => $row->note ? $row->note : '',
                 'note2'                     => $row->note2 ? $row->note2 : '',
                 'remark'                    => $row->remark,
@@ -779,6 +785,8 @@ class GoodReceiptPOController extends Controller
                 'department_name'           => $row->department_id ? $row->department->name : '-',
                 'warehouse_id'              => $row->warehouse_id,
                 'warehouse_name'            => $row->warehouse->name,
+                'is_activa'                 => $row->item->itemGroup->is_activa ? $row->item->itemGroup->is_activa : '',
+                'qty_conversion'            => $row->qty_conversion,
             ];
         }
 
@@ -1999,7 +2007,7 @@ class GoodReceiptPOController extends Controller
                             'key'   => $query_pyrc->paymentRequest->code,
                             "name"  => $query_pyrc->paymentRequest->code,
                             'properties'=> [
-                                 ['name'=> "Tanggal: ".date('d/m/y',strtotime($query_pyrc->paymentRequest->post_date))],
+                                 ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query_pyrc->paymentRequest->post_date))],
                               ],
                             'url'   =>request()->root()."/admin/finance/payment_request_cross?code=".CustomHelper::encrypt($query_pyrc->paymentRequest->code),
                             "title" =>$query_pyrc->paymentRequest->code,

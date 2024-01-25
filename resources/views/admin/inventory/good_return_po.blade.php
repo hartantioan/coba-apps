@@ -205,9 +205,11 @@
                                             <thead>
                                                 <tr>
                                                     <th class="center">Item</th>
-                                                    <th class="center">Qty Diterima</th>
-                                                    <th class="center">Qty Kembali</th>
-                                                    <th class="center">Satuan</th>
+                                                    <th class="center">Qty Diterima (PO)</th>
+                                                    <th class="center">Qty Kembali (PO)</th>
+                                                    <th class="center">Satuan PO</th>
+                                                    <th class="center">Qty Stok</th>
+                                                    <th class="center">Satuan Stok</th>
                                                     <th class="center" width="300px">No.Serial</th>
                                                     <th class="center">Keterangan 1</th>
                                                     <th class="center">Keterangan 2</th>
@@ -221,7 +223,7 @@
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="empty-item">
-                                                    <td colspan="13" class="center">
+                                                    <td colspan="15" class="center">
                                                         Pilih good receipt po / penerimaan barang po untuk memulai...
                                                     </td>
                                                 </tr>
@@ -502,7 +504,7 @@
                 if($('#empty-item').length == 0){
                     $('#body-item').append(`
                         <tr id="empty-item">
-                            <td colspan="13" class="center">
+                            <td colspan="15" class="center">
                                 Pilih good receipt po / penerimaan barang po untuk memulai...
                             </td>
                         </tr>
@@ -602,7 +604,7 @@
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="13" class="center">
+                        <td colspan="15" class="center">
                             Pilih good receipt po / penerimaan barang po untuk memulai...
                         </td>
                     </tr>
@@ -1113,10 +1115,16 @@
                                             <span>` + val.qty + `</span>
                                         </td>
                                         <td>
-                                            <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_balance + `" onkeyup="formatRupiah(this);checkRow(this);setStock('` + count + `')" id="rowQty` + count + `" style="text-align:right;width:100px;" data-max="` + val.qty_balance + `">
+                                            <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_balance + `" onkeyup="formatRupiah(this);checkRow(this);setStock('` + count + `')" id="rowQty` + count + `" style="text-align:right;width:100px;" data-max="` + val.qty_balance + `" data-activa="` + val.is_activa + `" data-conversion="` + val.qty_conversion + `">
                                         </td>
                                         <td class="center">
                                             <span>` + val.unit + `</span>
+                                        </td>
+                                        <td class="center" id="qty_stock` + count + `">
+                                            ` + val.qty_stock + `
+                                        </td>
+                                        <td class="center" id="unit_stock` + count + `">
+                                            ` + val.unit_stock + `
                                         </td>
                                         <td class="center">
                                             ` + (val.is_activa ? `<select class="browser-default" id="arr_serial` + count + `" name="arr_serial[]" multiple="multiple"></select>` : `-`) + `
@@ -1201,6 +1209,12 @@
     }
 
     function setStock(val){
+        let conversion = parseFloat($('#rowQty' + val).data('conversion').toString().replaceAll(".", "").replaceAll(",",".")),
+        qty = parseFloat($('#rowQty' + val).val().replaceAll(".", "").replaceAll(",",".")),
+        qtyConversion = conversion * qty;
+
+        $('#qty_stock' + val).text(formatRupiahIni(qtyConversion.toFixed(3).toString().replace('.',',')));
+
         if($('#arr_serial' + val).length > 0){
             $('#arr_serial' + val).empty();
             $('#arr_serial' + val).select2({
@@ -1251,7 +1265,7 @@
                 if($('.row_item').length == 0 && $('#empty-item').length == 0){
                     $('#body-item').append(`
                         <tr id="empty-item">
-                            <td colspan="13" class="center">
+                            <td colspan="15" class="center">
                                 Pilih good receipt po / penerimaan barang po untuk memulai...
                             </td>
                         </tr>
@@ -1312,10 +1326,16 @@
                                     <span>` + val.qty_received + `</span>
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_returned + `" onkeyup="formatRupiah(this);checkRow(this);setStock('` + count + `')" id="rowQty` + count + `" style="text-align:right;width:100px;" data-max="` + val.qty_balance + `">
+                                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_returned + `" onkeyup="formatRupiah(this);checkRow(this);setStock('` + count + `')" id="rowQty` + count + `" style="text-align:right;width:100px;" data-max="` + val.qty_balance + `" data-activa="` + val.is_activa + `" data-conversion="` + val.qty_conversion + `">
                                 </td>
                                 <td class="center">
                                     <span>` + val.unit + `</span>
+                                </td>
+                                <td class="center" id="qty_stock` + count + `">
+                                    ` + val.qty_stock + `
+                                </td>
+                                <td class="center" id="unit_stock` + count + `">
+                                    ` + val.unit_stock + `
                                 </td>
                                 <td class="center">
                                     ` + (val.is_activa ? `<select class="browser-default" id="arr_serial` + count + `" name="arr_serial[]" multiple="multiple"></select>` : `-`) + `

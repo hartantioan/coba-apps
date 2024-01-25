@@ -159,7 +159,7 @@
                         <tr>
                             <td style="margin-top: -2px;">
                                 <small style="font-size:10px">Tgl.Berlaku:</small>
-                                <span style="font-size:10px;">{{ date('d/m/y',strtotime($data->post_date)) }}</span>
+                                <span style="font-size:10px;">{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                             </td>
                         </tr>
                         <tr>

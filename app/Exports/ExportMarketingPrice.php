@@ -48,7 +48,7 @@ class ExportMarketingPrice implements FromView
                 'item'          => $val->item->code.' - '.$val->item->name,
                 'customer'      => $val->marketingOrder->account->name,
                 'code'          => $val->marketingOrder->code,
-                'date'          => date('d/m/y',strtotime($val->marketingOrder->post_date)),
+                'date'          => date('d/m/Y',strtotime($val->marketingOrder->post_date)),
                 'place'         => $val->place->code, 
                 'price'         => round($val->price,2),
                 'margin'        => round($val->margin,2),

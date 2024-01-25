@@ -168,7 +168,7 @@
                         <tr>
                             <td style="margin-top: -2px;">
                                 <small>Diajukan:</small>
-                                <span>{{ date('d/m/y',strtotime($data->date)) }}</span>
+                                <span>{{ date('d/m/Y',strtotime($data->date)) }}</span>
                                 <br>
                                 <h3 class="indigo-text">MEMO INTERNAL</h3>
                             </td>

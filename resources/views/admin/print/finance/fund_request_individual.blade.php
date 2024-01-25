@@ -244,7 +244,7 @@
                                             Tgl.Pengajuan
                                         </td>
                                         <td width="60%">
-                                            : {{ date('d/m/y',strtotime($data->post_date)) }}
+                                            : {{ date('d/m/Y',strtotime($data->post_date)) }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -252,7 +252,7 @@
                                             Req.Pembayaran
                                         </td>
                                         <td width="60%">
-                                            : {{ date('d/m/y',strtotime($data->required_date)) }}
+                                            : {{ date('d/m/Y',strtotime($data->required_date)) }}
                                         </td>
                                     </tr>
                                 </table>

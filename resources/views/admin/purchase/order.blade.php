@@ -179,6 +179,7 @@
                                                         <th colspan="2" class="center">Mata Uang</th>
                                                         <th colspan="2" class="center">Tanggal</th>
                                                         <th colspan="3" class="center">Penerima</th>
+                                                        <th colspan="8" class="center">Opsional</th>
                                                         <th rowspan="2">Keterangan</th>
                                                         <th rowspan="2">Subtotal</th>
                                                         <th rowspan="2">Diskon</th>
@@ -201,6 +202,14 @@
                                                         <th>Nama</th>
                                                         <th>Alamat</th>
                                                         <th>Telepon</th>
+                                                        <th>Tgl.Diterima</th>
+                                                        <th>Tgl.Jatuh Tempo</th>
+                                                        <th>Tgl.Dokumen</th>
+                                                        <th>No.FP</th>
+                                                        <th>NO.BP</th>
+                                                        <th>Tgl.Potong</th>
+                                                        <th>No.SPK</th>
+                                                        <th>No.Invoice</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -251,7 +260,7 @@
                                 <label class="active" for="supplier_id">Supplier</label>
                             </div>
                             <div class="input-field col m3 s12 step4">
-                                <select class="form-control" id="inventory_type" name="inventory_type">
+                                <select class="form-control" id="inventory_type" name="inventory_type" onchange="applyType()">
                                     <option value="1">Persediaan Barang</option>
                                     <option value="2">Lain-lain</option>
                                 </select>
@@ -284,8 +293,40 @@
                                 <label class="" for="payment_type">Tipe Pembayaran</label>
                             </div>
                             <div class="input-field col m3 s12 step10">
-                                <input id="payment_term" name="payment_term" type="number" value="0" min="0" step="1">
+                                <input id="payment_term" name="payment_term" type="number" value="0" min="0" step="1" onchange="addDays();">
                                 <label class="active" for="payment_term">Termin Pembayaran (hari)</label>
+                            </div>
+                            <div class="input-field col m3 s12 other-type" style="display:none;">
+                                <input id="received_date" name="received_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Terima" value="{{ date('Y-m-d') }}" onchange="addDays();">
+                                <label class="active" for="received_date">Tgl. Terima (Opsional)</label>
+                            </div>
+                            <div class="input-field col m3 s12 other-type" style="display:none;">
+                                <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Jatuh Tempo">
+                                <label class="active" for="due_date">Tgl. Jatuh Tempo (Opsional)</label>
+                            </div>
+                            <div class="input-field col m3 s12 other-type" style="display:none;">
+                                <input id="document_date" name="document_date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. dokumen">
+                                <label class="active" for="document_date">Tgl. Dokumen (Opsional)</label>
+                            </div>
+                            <div class="input-field col m3 s12 other-type" style="display:none;">
+                                <input id="tax_no" name="tax_no" type="text" placeholder="Nomor faktur pajak...">
+                                <label class="active" for="tax_no">No. Faktur Pajak (Opsional)</label>
+                            </div>
+                            <div class="input-field col m3 s12 other-type" style="display:none;">
+                                <input id="tax_cut_no" name="tax_cut_no" type="text" placeholder="Nomor bukti potong...">
+                                <label class="active" for="tax_cut_no">No. Bukti Potong (Opsional)</label>
+                            </div>
+                            <div class="input-field col m3 s12 other-type" style="display:none;">
+                                <input id="cut_date" name="cut_date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Bukti potong">
+                                <label class="active" for="cut_date">Tgl. Bukti Potong (Opsional)</label>
+                            </div>
+                            <div class="input-field col m3 s12 other-type" style="display:none;">
+                                <input id="spk_no" name="spk_no" type="text" placeholder="Nomor SPK...">
+                                <label class="active" for="spk_no">No. SPK (Opsional)</label>
+                            </div>
+                            <div class="input-field col m3 s12 other-type" style="display:none;">
+                                <input id="invoice_no" name="invoice_no" type="text" placeholder="Nomor Invoice dari Suppplier/Vendor">
+                                <label class="active" for="invoice_no">No. Invoice (Opsional)</label>
                             </div>
                             <div class="input-field col m3 s12 step11">
                                 <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();refreshTotal();">
@@ -361,7 +402,7 @@
                                         </div>
                                     </p>
                                 </div>
-                                <div class="col m3 s3 step20" id="sj-show">
+                                <div class="col m3 s3 step20" id="sj-show" style="display:none;">
                                     <p class="mt-2 mb-2">
                                         <h5>Surat Jalan / Penjualan</h5>
                                         <div class="row">
@@ -741,7 +782,8 @@
                     loadCurrency();
                     $('#company_id').trigger('change');
                 }
-                $('#pr-show,#gi-show,#sj-show').show();
+                /* $('#pr-show,#gi-show,#sj-show').show(); */
+                $('#inventory_type').formSelect().trigger('change');
             },
             onCloseEnd: function(modal, trigger){
                 $('input').css('border', 'none');
@@ -765,6 +807,7 @@
                     return null;
                 };
                 mode = '';
+                $('.other-type').hide();
             }
         });
 
@@ -843,6 +886,20 @@
             minWidth: 100,
         });
     });
+
+    function addDays(){
+        if($('#inventory_type').val() == '2'){
+            if($('#payment_term').val()){
+                var result = new Date($('#received_date').val());
+                result.setDate(result.getDate() + parseInt($('#payment_term').val()));
+                $('#due_date').val(result.toISOString().split('T')[0]);
+            }else{
+                $('#due_date').val('');
+            }
+        }else{
+            $('#due_date').val('');
+        }
+    }
 
     function refreshTotal(){
         if($('.row_item').length > 0){
@@ -1207,6 +1264,21 @@
             $('#payment_type').val('1').formSelect();
         }
         applyTerm();
+        addDays();
+    }
+
+    function applyType(){
+        if($('#inventory_type').val() == '1'){
+            $('#due_date').val('');
+            $('.other-type').hide();
+            $('#gi-show,#pr-show').show();
+            $('#sj-show').hide();
+        }else if($('#inventory_type').val() == '2'){
+            $('.other-type').show();
+            addDays();
+            $('#sj-show').show();
+            $('#gi-show,#pr-show').hide();
+        }
     }
 
     function applyTerm(){
@@ -2057,6 +2129,14 @@
                 { name: 'receiver_name', className: 'center-align' },
                 { name: 'receiver_address', className: 'center-align' },
                 { name: 'receiver_phone', className: 'center-align' },
+                { name: 'received_date', className: '' },
+                { name: 'due_date', className: '' },
+                { name: 'document_date', className: '' },
+                { name: 'tax_no', className: '' },
+                { name: 'tax_cut_no', className: '' },
+                { name: 'cut_date', className: '' },
+                { name: 'spk_no', className: '' },
+                { name: 'invoice_no', className: '' },
                 { name: 'note', className: 'center-align' },
                 { name: 'subtotal', className: 'right-align' },
                 { name: 'discount', className: 'right-align' },
@@ -2295,6 +2375,11 @@
                     <option value="` + response.account_id + `">` + response.supplier_name + `</option>
                 `);
                 $('#inventory_type').val(response.inventory_type).formSelect();
+                if(response.inventory_type == '2'){
+                    $('.other-type').show();
+                }else{
+                    $('.other-type').hide();
+                }
                 $('#shipping_type').val(response.shipping_type).formSelect(); 
                 $('#company_id').val(response.company_id).formSelect();
                 $('#document_no').val(response.document_no);
@@ -2304,6 +2389,14 @@
                 $('#currency_rate').val(response.currency_rate);
                 $('#post_date').val(response.post_date);
                 $('#delivery_date').val(response.delivery_date);
+                $('#received_date').val(response.received_date);
+                $('#due_date').val(response.due_date);
+                $('#document_date').val(response.document_date);
+                $('#tax_no').val(response.tax_no);
+                $('#tax_cut_no').val(response.tax_cut_no);
+                $('#cut_date').val(response.cut_date);
+                $('#spk_no').val(response.spk_no);
+                $('#invoice_no').val(response.invoice_no);
                 $('#percent_tax').val(response.percent_tax);
                 $('#receiver_name').val(response.receiver_name);
                 $('#receiver_address').val(response.receiver_address);
@@ -2614,6 +2707,8 @@
                         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
                     });
                 }
+
+                $('#inventory_type').trigger('change');
                 
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
@@ -2748,14 +2843,14 @@
     }
 
     function countRow(id){
-        if($('#arr_item' + id).val()){
+        if($('#arr_item' + id).val() || $('#arr_coa' + id).val()){
             var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")), 
                 qtylimit = parseFloat($('#rowQty' + id).data('qty').toString().replaceAll(".", "").replaceAll(",",".")), 
                 price = parseFloat($('#rowPrice' + id).val().replaceAll(".", "").replaceAll(",",".")), 
                 disc1 = parseFloat($('#rowDisc1' + id).val().replaceAll(".", "").replaceAll(",",".")), 
                 disc2 = parseFloat($('#rowDisc2' + id).val().replaceAll(".", "").replaceAll(",",".")), 
                 disc3 = parseFloat($('#rowDisc3' + id).val().replaceAll(".", "").replaceAll(",",".")),
-                conversion = parseFloat($('#arr_unit' + id).find(':selected').data('conversion').toString().replaceAll(".", "").replaceAll(",","."));
+                conversion = $('#arr_item' + id).val() ? parseFloat($('#arr_unit' + id).find(':selected').data('conversion').toString().replaceAll(".", "").replaceAll(",",".")) : 1;
 
             if(qtylimit > 0){
                 if(qty > qtylimit){

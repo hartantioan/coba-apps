@@ -379,7 +379,6 @@ class PurchaseInvoiceController extends Controller
                             'buy_unit'      => $rowdetail->item_id ? $rowdetail->itemUnit->unit->code : '-',
                             'rawcode'       => $datapo->code,
                             'post_date'     => date('d/m/Y',strtotime($datapo->post_date)),
-                            'due_date'      => date('d/m/Y',strtotime($datapo->post_date)),
                             'total'         => number_format($arrTotal['total'],2,',','.'),
                             'tax'           => number_format($arrTotal['tax'],2,',','.'),
                             'wtax'          => number_format($arrTotal['wtax'],2,',','.'),
@@ -408,6 +407,14 @@ class PurchaseInvoiceController extends Controller
                             'qty_stock'     => number_format($rowdetail->qty,3,',','.'),
                             'unit_stock'    => '-',
                             'qty_conversion'=> 1,
+                            'received_date' => $datapo->received_date ?? '',
+                            'due_date'      => $datapo->due_date ?? '',
+                            'document_date' => $datapo->document_date ?? '',
+                            'tax_no'        => $datapo->tax_no ?? '',
+                            'tax_cut_no'    => $datapo->tax_cut_no ?? '',
+                            'cut_date'      => $datapo->cut_date ?? '',
+                            'spk_no'        => $datapo->spk_no ?? '',
+                            'invoice_no'    => $datapo->invoice_no ?? '',
                         ];
                     }
                 }
@@ -464,6 +471,13 @@ class PurchaseInvoiceController extends Controller
                             'qty_stock'     => number_format(($rowdetail->qty - $rowdetail->qtyReturn()) * $rowdetail->qty_conversion,3,',','.'),
                             'unit_stock'    => $rowdetail->item->uomUnit->code,
                             'qty_conversion'=> $rowdetail->qty_conversion,
+                            'received_date' => '',
+                            'document_date' => '',
+                            'tax_no'        => '',
+                            'tax_cut_no'    => '',
+                            'cut_date'      => '',
+                            'spk_no'        => '',
+                            'invoice_no'    => '',
                         ];
                     }
                 }
@@ -512,6 +526,13 @@ class PurchaseInvoiceController extends Controller
                             'qty_stock'     => 1,
                             'unit_stock'    => '-',
                             'qty_conversion'=> 1,
+                            'received_date' => '',
+                            'document_date' => '',
+                            'tax_no'        => '',
+                            'tax_cut_no'    => '',
+                            'cut_date'      => '',
+                            'spk_no'        => '',
+                            'invoice_no'    => '',
                         ];
                     }
                 }

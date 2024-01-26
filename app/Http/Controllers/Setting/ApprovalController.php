@@ -459,6 +459,8 @@ class ApprovalController extends Controller
                                                     'status'    => '1'
                                                 ]);
                                             }
+                                        }else{
+                                            info('kambing');
                                         }
                                     }else{
                                         if($query->checkOtherApproval()){

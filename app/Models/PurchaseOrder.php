@@ -34,6 +34,14 @@ class PurchaseOrder extends Model
         'currency_rate',
         'post_date',
         'delivery_date',
+        'received_date',
+        'due_date',
+        'document_date',
+        'tax_no',
+        'tax_cut_no',
+        'cut_date',
+        'spk_no',
+        'invoice_no',
         'note',
         'note_external',
         'subtotal',
@@ -50,7 +58,7 @@ class PurchaseOrder extends Model
         'delete_note',
         'receiver_name',
         'receiver_address',
-        'receiver_phone'
+        'receiver_phone',
     ];
 
     public function user()

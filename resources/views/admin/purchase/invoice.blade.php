@@ -1765,7 +1765,6 @@
                                 loadingClose('.modal-content');
                                 $('.row_detail').remove();
                                 $('#body-detail-dp').empty();
-                                $('.row_detail').remove();
                                 if(response.details.length > 0){
                                     $.each(response.details, function(i, val) {
                                         var count = makeid(10);
@@ -1891,6 +1890,15 @@
 
                                         $('#top').val(val.top);
 
+                                        $('#received_date').val(val.received_date);
+                                        $('#due_date').val(val.due_date);
+                                        $('#document_date').val(val.document_date);
+                                        $('#tax_no').val(val.tax_no);
+                                        $('#tax_cut_no').val(val.tax_cut_no);
+                                        $('#cut_date').val(val.cut_date);
+                                        $('#spk_no').val(val.spk_no);
+                                        $('#invoice_no').val(val.invoice_no);
+
                                     });                        
                                 }else{
                                     $('.row_detail').remove();
@@ -1933,7 +1941,9 @@
                                     $('#downpayment').val('0,00');
                                 }
 
-                                addDays();
+                                if(!$('#due_date').val()){
+                                    addDays();
+                                }
                                 
                                 $('.modal-content').scrollTop(0);
                                 M.updateTextFields();

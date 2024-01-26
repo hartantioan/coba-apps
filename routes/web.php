@@ -635,6 +635,7 @@ Route::prefix('admin')->group(function () {
                         Route::get('export',[ItemController::class, 'export']);
                         Route::get('get_import_excel',[ItemController::class, 'getImportExcel']);
                         Route::post('import',[ItemController::class, 'import'])->middleware('operation.access:item,update');
+                        Route::post('import_master',[ItemController::class, 'importMaster'])->middleware('operation.access:item,update');
                         Route::post('create',[ItemController::class, 'create'])->middleware('operation.access:item,update');
                         Route::post('create_shading',[ItemController::class, 'createShading'])->middleware('operation.access:item,update');
                         Route::post('destroy', [ItemController::class, 'destroy'])->middleware('operation.access:item,delete');

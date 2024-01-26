@@ -83,7 +83,7 @@
                                         <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;">
                                             <select id="filter_type" name="filter_type" onchange="loadDataTable()">
                                                 <option value="">Semua</option>
-                                                {{-- <option value="1">Pegawai</option> --}}
+                                                <option value="1">Pegawai</option>
                                                 <option value="2">Customer</option>
                                                 <option value="3">Supplier</option>
                                                 <option value="4">Ekspedisi</option>

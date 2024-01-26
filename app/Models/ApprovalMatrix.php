@@ -39,7 +39,7 @@ class ApprovalMatrix extends Model
     }
 
     public function approvalSource(){
-        return $this->belongsTo('App\Models\ApprovalSource');
+        return $this->belongsTo('App\Models\ApprovalSource')->withTrashed();
     }
 
     public function statusApproval(){
@@ -89,7 +89,31 @@ class ApprovalMatrix extends Model
 
         $listTemplateStage = [];
 
-        foreach($this->approvalTemplateStage->approvalTemplate->approvalTemplateStage()->orderBy('id')->get() as $row){
+        /* foreach($this->approvalTemplateStage->approvalTemplate->approvalTemplateStage()->orderBy('id')->get() as $row){
+            $listTemplateStage[] = [
+                'approval_template_stage_id'    => $row->id,
+                'min_approve'                   => $row->approvalStage->min_approve,
+            ];
+        }
+
+        foreach($listTemplateStage as $rowstage){
+            $cek = null;
+            $cek = ApprovalMatrix::where('approval_template_stage_id',$rowstage['approval_template_stage_id'])->where('approval_source_id',$this->approval_source_id)->count();
+
+            if($cek > 0){
+                $countApproved = ApprovalMatrix::where('approval_template_stage_id',$rowstage['approval_template_stage_id'])->where('approval_source_id',$this->approval_source_id)->where('status','2')->whereNotNull('approved')->count();
+
+                if($rowstage['min_approve'] <= $countApproved){
+                    
+                }else{
+                    $arrTemp[] = [
+                        'id'    => $rowstage['approval_template_stage_id'],
+                    ];
+                }
+            }
+        } */
+
+        foreach($this->approvalTemplateStage->approvalTemplate->approvalTemplateStage()->withTrashed()->orderBy('id')->get() as $row){
             $listTemplateStage[] = [
                 'approval_template_stage_id'    => $row->id,
                 'min_approve'                   => $row->approvalStage->min_approve,

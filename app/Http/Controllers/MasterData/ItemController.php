@@ -29,6 +29,7 @@ use App\Imports\ImportItem;
 use Maatwebsite\Excel\Facades\Excel;
 
 use App\Exports\ExportItem;
+use App\Imports\ImportItemMaster;
 use App\Models\ItemUnit;
 
 class ItemController extends Controller
@@ -827,6 +828,16 @@ class ItemController extends Controller
             ];
             return response()->json($response);
         }
+    }
+
+    public function importMaster(Request $request)
+    {
+        Excel::import(new ImportItemMaster,$request->file('file'));
+
+        return response()->json([
+            'status'    => 200,
+            'message'   => 'Import sukses!'
+        ]);
     }
 
     public function getImportExcel(){

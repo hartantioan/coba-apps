@@ -14,6 +14,8 @@ class ExportPosition implements FromCollection, WithTitle, WithHeadings, WithCus
     * @return \Illuminate\Support\Collection
     */
 
+    protected $search, $status;
+
     public function __construct(string $search, string $status)
     {
         $this->search = $search ? $search : '';
@@ -24,11 +26,13 @@ class ExportPosition implements FromCollection, WithTitle, WithHeadings, WithCus
         'ID',
         'KODE', 
         'NAMA',
+        'DIVISI',
+        'LEVEL',
     ];
 
     public function collection()
     {
-        return Position::where(function($query) {
+        $position = Position::where(function($query) {
             if($this->search) {
                 $query->where(function($query) {
                     $query->where('code', 'like', "%$this->search%")
@@ -40,7 +44,20 @@ class ExportPosition implements FromCollection, WithTitle, WithHeadings, WithCus
             if($this->status){
                 $query->where('status', $this->status);
             }
-        })->get(['id','code','name']);
+        })->get();
+
+        $arr = [];
+        foreach($position as $row){
+            $arr[] = [
+                'id'        => $row->id,
+                'code'      => $row->code,
+                'name'      => $row->name,
+                'division'  => $row->division->name,
+                'level'     => $row->level->name,
+            ];
+        }
+
+        return collect($arr);
     }
 
     public function title(): string

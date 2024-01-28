@@ -141,13 +141,13 @@
                             <label for="type">Tipe</label>
                         </div>
                         <div class="input-field col s6 employee_inputs" id="place_select">
-                            <select id="plant_id" name="plant_id">
-                                <option value=""></option>
+                            <select id="place_id" name="place_id">
+                                <option value="">--Pilih--</option>
                                 @foreach($place as $row)
                                     <option value="{{ $row->id }}">{{ $row->code }}</option>
                                 @endforeach
                             </select>
-                            <label for="plant_id">Penempatan</label>
+                            <label for="place_id">Penempatan</label>
                         </div>
                         <div class="input-field col s6 employee_inputs" id="position_select">
                             <select  class="select2 browser-default" id="position_id" name="position_id">
@@ -398,7 +398,7 @@
                     }
                     console.log(response);
                   
-                    $('#plant_id').val(response.plant_id).formSelect();
+                    $('#place_id').val(response.plant_id).formSelect();
                     $('#post_date').val(response.post_date);
                     $('#valid_date').val(response.valid_date);
                     $('#note').val(response.note);
@@ -452,7 +452,7 @@
                    }
                    console.log(response);
                  
-                   $('#plant_id').val(response.place_id).formSelect();
+                   $('#place_id').val(response.plant_id).formSelect();
                    $('#post_date').val(response.post_date);
                    $('#valid_date').val(response.valid_date);
                    $('#note').val(response.note);
@@ -543,7 +543,7 @@
 
     function userDetail(){
         $('#position_id').val($('#employee_id').select2('data')[0].arrinfo.position_id).formSelect();
-        $('#plant_id').val($('#employee_id').select2('data')[0].arrinfo.place_id).formSelect();
+        $('#place_id').val($('#employee_id').select2('data')[0].arrinfo.place_id).formSelect();
        
     }
 
@@ -761,7 +761,7 @@
                     <option value="` + response.position_id + `">` + response.position.code +" - "+response.position.name+ `</option>
                 `);
                 
-                $('#plant_id').val(response.plant_id).formSelect();
+                $('#place_id').val(response.plant_id).formSelect();
           
                 
                 $("#post_date").val(response.post_date);

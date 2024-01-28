@@ -270,7 +270,7 @@ class EmployeeTransferController extends Controller
                     if(in_array($query->status,['1','6'])){
 
                         $query->account_id          = $request->employee_id;
-                        $query->plant_id         = $request->plant_id;
+                        $query->plant_id         = $request->place_id;
                         $query->manager_id               = $request->manager_id;
                        
                         $query->position_id               = $request->position_id;
@@ -299,7 +299,7 @@ class EmployeeTransferController extends Controller
                         'code'              => EmployeeTransfer::generateCode(),
                         'user_id'           => session('bo_id'),
                         'account_id'	    => $request->employee_id,
-                        'plant_id'          => $request->plant_id,
+                        'plant_id'          => $request->place_id,
                         'manager_id'        => $request->manager_id,
                         
                         'position_id'       => $request->position_id,

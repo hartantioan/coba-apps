@@ -574,6 +574,7 @@ class PaymentRequestController extends Controller
                                     'bank_account'  => $data->bank_account,
                                     'place_id'      => $data->place_id,
                                     'department_id' => $data->department_id,
+                                    'account_code'  => $data->account->employee_no,
                                 ];
                             }
                         }
@@ -611,6 +612,7 @@ class PaymentRequestController extends Controller
                                 'bank_account'  => '',
                                 'place_id'      => '',
                                 'department_id' => '',
+                                'account_code'  => $data->supplier->employee_no,
                             ];
                         }
                     }
@@ -647,6 +649,7 @@ class PaymentRequestController extends Controller
                                 'bank_account'  => '',
                                 'place_id'      => '',
                                 'department_id' => '',
+                                'account_code'  => $data->account->employee_no,
                             ];
                         }
                     }
@@ -683,6 +686,7 @@ class PaymentRequestController extends Controller
                                 'bank_account'  => '',
                                 'place_id'      => '',
                                 'department_id' => '',
+                                'account_code'  => $data->account->employee_no,
                             ];
                         }
                     }
@@ -1222,6 +1226,7 @@ class PaymentRequestController extends Controller
                 'department_id' => $row->department()->exists() ? $row->department->id : '',
                 'project_id'    => $row->project()->exists() ? $row->project->id : '',
                 'project_name'  => $row->project()->exists() ? $row->project->name : '',
+                'account_code'  => $row->getAccountCode(),
             ];
         }
 

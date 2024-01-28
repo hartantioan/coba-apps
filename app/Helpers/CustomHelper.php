@@ -1401,7 +1401,6 @@ class CustomHelper {
 						'type'			=> '2',
 						'nominal'		=> $row->total * $gr->currency_rate,
 						'nominal_fc'	=> $gr->currency->type == '1' ? 0 : $row->total,
-						'item_id'		=> $row->item_id,
 					]);
 				}
 
@@ -1633,7 +1632,6 @@ class CustomHelper {
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $row->inventoryCoa()->exists() ? $row->inventoryCoa->coa_id : $row->coa_id,
 						'place_id'		=> $row->place()->exists() ? $row->place_id : NULL,
-						'item_id'		=> $row->itemStock->item_id,
 						'line_id'		=> $row->line_id ? $row->line_id : NULL,
 						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
 						'department_id'	=> $row->department_id ? $row->department_id : NULL,
@@ -1648,7 +1646,6 @@ class CustomHelper {
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $row->itemStock->item->itemGroup->coa_id,
 					'place_id'		=> $row->itemStock->place_id,
-					'item_id'		=> $row->itemStock->item_id,
 					'warehouse_id'	=> $row->itemStock->warehouse_id,
 					'line_id'		=> $row->line_id ? $row->line_id : NULL,
 					'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,

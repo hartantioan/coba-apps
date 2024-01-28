@@ -248,6 +248,7 @@ class GoodReceiveController extends Controller
 
             $passed = true;
             $passedSerialEmpty = true;
+            $passedEmptySerial = true;
             $passedSerialDuplicate = true;
             $passedSerialQty = true;
             $passedArea = true;
@@ -285,6 +286,10 @@ class GoodReceiveController extends Controller
                             }
                         }
                     }
+                }else{
+                    if($request->arr_serial_number[$key]){
+                        $passedEmptySerial = false;
+                    }
                 }
             }
 
@@ -299,6 +304,13 @@ class GoodReceiveController extends Controller
                 return response()->json([
                     'status'  => 500,
                     'message' => 'Item aktiva harus memiliki nomor serial.'
+                ]);
+            }
+
+            if(!$passedEmptySerial){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Item bukan aktiva tidak perlu mengisi serial.'
                 ]);
             }
 
@@ -440,7 +452,7 @@ class GoodReceiveController extends Controller
                             'total'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])) * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'note'                  => $request->arr_note[$key],
                             'inventory_coa_id'      => $request->arr_inventory_coa[$key] ? $request->arr_inventory_coa[$key] : NULL,
-                            'coa_id'                => $request->arr_coa[$key] ? $request->arr_coa[$key] : NULL,
+                            'coa_id'                => $request->arr_inventory_coa[$key] ? NULL : ($request->arr_coa[$key] ? $request->arr_coa[$key] : NULL),
                             'cost_distribution_id'  => $request->arr_cost_distribution[$key] ? $request->arr_cost_distribution[$key] : NULL,
                             'place_cost_id'         => $request->arr_place_cost[$key] ? $request->arr_place_cost[$key] : NULL,
                             'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
@@ -623,6 +635,8 @@ class GoodReceiveController extends Controller
                 'total'                     => number_format($row->total,2,',','.'),
                 'inventory_coa_id'          => $row->inventoryCoa()->exists() ? $row->inventory_coa_id : '',
                 'inventory_coa_name'        => $row->inventoryCoa()->exists() ? $row->inventoryCoa->code.' - '.$row->inventoryCoa->name : '',
+                'coa_inventory_id'          => $row->inventoryCoa()->exists() ? $row->inventoryCoa->coa_id : '',
+                'coa_inventory_name'        => $row->inventoryCoa()->exists() ? $row->inventoryCoa->coa->name : '',
                 'coa_id'                    => $row->coa()->exists() ? $row->coa_id : '',
                 'coa_name'                  => $row->coa()->exists() ? $row->coa->code.' - '.$row->coa->name : '',
                 'cost_distribution_id'      => $row->cost_distribution_id ? $row->cost_distribution_id : '',

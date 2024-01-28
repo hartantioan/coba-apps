@@ -215,6 +215,10 @@
                                     <select class="browser-default" id="account_id" name="account_id" onchange="getAccountInfo();"></select>
                                     <label class="active" for="account_id">Partner Bisnis</label>
                                 </div>
+                                <div class="input-field col m3 s12">
+                                    <a href="javascript:void(0);" class="btn waves-effect waves-light cyan" onclick="getAccountInfo();" id="btn-show">Tampilkan Data<i class="material-icons right">assignment</i></a>
+                                    <label class="active">&nbsp;</label>
+                                </div>
                                 <div class="input-field col m3 s12 step4">
                                     <select class="form-control" id="payment_type" name="payment_type" onchange="showRekening();">
                                         <option value="2">Transfer</option>
@@ -347,11 +351,12 @@
                                                                 <th class="center">Departemen</th>
                                                                 <th class="center">Proyek</th>
                                                                 <th class="center">Rekening</th>
+                                                                <th class="center">Hapus</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody id="body-detail">
                                                             <tr id="empty-detail">
-                                                                <td colspan="19" class="center">
+                                                                <td colspan="20" class="center">
                                                                     Pilih partner bisnis untuk memulai...
                                                                 </td>
                                                             </tr>
@@ -944,7 +949,7 @@
                 M.updateTextFields();
                 $('#body-detail').empty().append(`
                     <tr id="empty-detail">
-                        <td colspan="19" class="center">
+                        <td colspan="20" class="center">
                             Pilih partner bisnis untuk memulai...
                         </td>
                     </tr>
@@ -1309,11 +1314,11 @@
     }
 
     function resetBp(){
-        $('#account_id').empty();
+        /* $('#account_id').empty();
         $('#user_bank_id').empty();
         $('#user_bank_id').append(`
             <option value="">--Pilih Partner Bisnis-</option>
-        `);
+        `); */
     }
 
     function addCoa(){
@@ -1633,9 +1638,11 @@
                     success: function(response) {
                         loadingClose('.modal-content');
 
-                        $('#body-detail').empty();
+                        /* $('#body-detail').empty(); */
+                        $('#empty-detail').remove();
                         if(response.details.length > 0){
                             $.each(response.details, function(i, val) {
+                                $('.row_detail[data-account!="' + val.account_code + '"]').remove();
                                 var count = makeid(10);
                                 $('#list-used-data').append(`
                                     <div class="chip purple darken-4 gradient-shadow white-text">
@@ -1644,7 +1651,7 @@
                                     </div>
                                 `);
                                 $('#body-detail').append(`
-                                    <tr class="row_detail" data-code="` + val.rawcode + `">
+                                    <tr class="row_detail" data-code="` + val.rawcode + `" data-account="` + val.account_code + `">
                                         <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
                                         <input type="hidden" name="arr_account_bank[]" value="` + val.bank_account + `" data-id="` + count + `">
                                         <input type="hidden" name="arr_account_no[]" value="` + val.no_account + `" data-id="` + count + `">
@@ -1745,6 +1752,11 @@
                                         <td>
                                             ` + val.bank_account + ` ` + val.no_account + ` ` + val.name_account + `    
                                         </td>
+                                        <td class="center">
+                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                                <i class="material-icons">delete</i>
+                                            </a>
+                                        </td>
                                     </tr>
                                 `);
                                 
@@ -1767,7 +1779,7 @@
                         }else{
                             $('#body-detail').empty().append(`
                                 <tr id="empty-detail">
-                                    <td colspan="19" class="center">
+                                    <td colspan="20" class="center">
                                         Pilih partner bisnis untuk memulai...
                                     </td>
                                 </tr>
@@ -2002,7 +2014,7 @@
                 if($('.row_detail').length == 0){
                     $('#body-detail').empty().append(`
                         <tr id="empty-detail">
-                            <td colspan="19" class="center">
+                            <td colspan="20" class="center">
                                 Pilih partner bisnis untuk memulai...
                             </td>
                         </tr>
@@ -2589,7 +2601,7 @@
                         $.each(response.details, function(i, val) {
                             var count = makeid(10);
                             $('#body-detail').append(`
-                                <tr class="row_detail" data-code="` + val.rawcode + `">
+                                <tr class="row_detail" data-code="` + val.rawcode + `" data-account="` + val.account_code + `">
                                     <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_account_bank[]" value="` + val.bank_account + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_account_no[]" value="` + val.no_account + `" data-id="` + count + `">
@@ -2675,6 +2687,11 @@
                                     </td>
                                     <td>
                                         ` + val.bank_account + ` ` + val.no_account + ` ` + val.name_account + `    
+                                    </td>
+                                    <td class="center">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                            <i class="material-icons">delete</i>
+                                        </a>
                                     </td>
                                 </tr>
                             `);

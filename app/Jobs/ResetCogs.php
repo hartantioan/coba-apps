@@ -87,17 +87,37 @@ class ResetCogs implements ShouldQueue
 							foreach($gi->goodIssueDetail()->whereHas('itemStock',function($query)use($row){ 
 								$query->where('item_id',$row->item_id);
 							})->get() as $rowgid){
+								if($rowgid->cost_distribution_id){
+									$total = $prevprice * $rowgid->qty;
+									$lastIndex = count($rowgid->costDistribution->costDistributionDetail) - 1;
+									$accumulation = 0;
+									if($journal){
+										$jd = $journal->journalDetail()->where('type','1')->get();
+										foreach($rowgid->costDistribution->costDistributionDetail as $key => $rowcost){
+											if($key == $lastIndex){
+												$nominal = $total - $accumulation;
+											}else{
+												$nominal = round(($rowcost->percentage / 100) * $total);
+												$accumulation += $nominal;
+											}
+											$jd[$key]->update([
+												'nominal'   => $nominal
+											]);
+										}
+									}
+								}else{
+									if($journal){
+										foreach($journal->journalDetail()->where('item_id',$rowgid->item_id)->get() as $rowupdate){
+											$rowupdate->update([
+												'nominal'   => $prevprice * $rowgid->qty
+											]);
+										}
+									}
+								}
 								$rowgid->update([
 									'price'	=> $prevprice,
 									'total'	=> $prevprice * $rowgid->qty,
 								]);
-								if($journal){
-									foreach($journal->journalDetail()->where('item_id',$rowgid->item_id)->get() as $rowupdate){
-										$rowupdate->update([
-											'nominal'   => $prevprice * $rowgid->qty
-										]);
-									}
-								}
 							}
 							GoodIssue::find($row->lookable_id)->updateGrandtotal();
 						}elseif($row->lookable_type == 'inventory_transfer_outs'){

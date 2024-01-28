@@ -704,6 +704,8 @@ class PurchaseRequestController extends Controller
                 'project_id'        => $row->project_id ? $row->project_id : '',
                 'project_name'      => $row->project_id ? $row->project->name : '',
                 'buy_units'         => $row->item->arrBuyUnits(),
+                'unit_stock'        => $row->item->uomUnit->code,
+                'qty_stock'         => number_format($row->qty * $row->qty_conversion,3,',','.'),
             ];
         }
 
@@ -2683,6 +2685,7 @@ class PurchaseRequestController extends Controller
                         'qty_request'   => number_format($balance,3,',','.'),
                         'list_warehouse'=> $row->warehouseList(),
                         'buy_units'     => $row->arrBuyUnits(),
+                        'uom_unit'      => $row->uomUnit->code,
                     ];
                 }
             }

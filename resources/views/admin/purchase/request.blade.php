@@ -205,12 +205,14 @@
                             <div class="row">
                                 <div class="col m12 s12 step12">
                                     <p class="mt-2 mb-2">
-                                        <table class="bordered" style="width:2000px;" id="table-detail">
+                                        <table class="bordered" style="width:2500px;" id="table-detail">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Item</th>
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan PO</th>
+                                                    <th class="center" width="100px">Qty Stok</th>
+                                                    <th class="center" width="100px">Satuan Stok</th>
                                                     <th class="center">Keterangan 1</th>
                                                     <th class="center">Keterangan 2</th>
                                                     <th class="center">Tgl.Dipakai</th>
@@ -232,12 +234,18 @@
                                                         <select class="browser-default item-array" id="arr_item0" name="arr_item[]" onchange="getRowUnit(0)"></select>
                                                     </td>
                                                     <td>
-                                                        <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="0" onkeyup="formatRupiahNoMinus(this)">
+                                                        <input name="arr_qty[]" id="rowQty0" onfocus="emptyThis(this);" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('0')">
                                                     </td>
                                                     <td class="center">
-                                                        <select class="browser-default" id="arr_satuan0" name="arr_satuan[]" required>
+                                                        <select class="browser-default" id="arr_satuan0" name="arr_satuan[]" required onchange="countRow('0')">
                                                             <option value="">--Silahkan pilih item--</option>    
                                                         </select>
+                                                    </td>
+                                                    <td class="center" id="qty_stock0">
+                                                        -
+                                                    </td>
+                                                    <td class="center" id="unit_stock0">
+                                                        -
                                                     </td>
                                                     <td>
                                                         <input name="arr_note[]" type="text" placeholder="Keterangan barang 1...">
@@ -297,7 +305,7 @@
                                                     </td>
                                                 </tr>
                                                 <tr id="last-row-item">
-                                                    <td colspan="14">
+                                                    <td colspan="16">
                                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> Tambah 1
                                                         </a>
@@ -1427,12 +1435,18 @@
                                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this)">
+                                    <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" id="rowQty` + count + `" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')">
                                 </td>
                                 <td class="center">
-                                    <select class="browser-default" id="arr_satuan` + count + `" name="arr_satuan[]" required>
+                                    <select class="browser-default" id="arr_satuan` + count + `" name="arr_satuan[]" required onchange="countRow('` + count + `')">
                                         <option value="">--Silahkan pilih item--</option>    
                                     </select>
+                                </td>
+                                <td class="center" id="qty_stock` + count + `">
+                                    ` + val.qty_stock + `
+                                </td>
+                                <td class="center" id="unit_stock` + count + `">
+                                    ` + val.unit_stock + `
                                 </td>
                                 <td>
                                     <input name="arr_note[]" type="text" placeholder="Keterangan barang 1..." value="` + val.note + `">
@@ -1511,7 +1525,7 @@
                             $('#arr_satuan' + count).empty();
                             $.each(val.buy_units, function(i, value) {
                                 $('#arr_satuan' + count).append(`
-                                    <option value="` + value.id + `" ` + (value.id == val.item_unit_id ? 'selected' : '') + `>` + value.code + `</option>
+                                    <option value="` + value.id + `" ` + (value.id == val.item_unit_id ? 'selected' : '') + ` data-conversion="` + value.conversion + `">` + value.code + `</option>
                                 `);
                             });
                         }
@@ -1707,8 +1721,19 @@
         });
     }
 
+    function countRow(id){
+        if($('#arr_item' + id).val()){
+            var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")),
+                conversion = parseFloat($('#arr_satuan' + id).find(':selected').data('conversion').toString().replaceAll(".", "").replaceAll(",","."));
+            let qtyConversion = qty * conversion;
+            $('#qty_stock' + id).text(formatRupiahIni(qtyConversion.toFixed(3).toString().replace('.',',')));
+        }
+    }
+
     function getRowUnit(val){
         $("#arr_warehouse" + val).empty();
+        $("#unit_stock" + val).empty();
+        $("#qty_stock" + val).empty().text('-');
         if($("#arr_item" + val).val()){
             if($("#arr_item" + val).select2('data')[0].list_warehouse.length > 0){
                 $.each($("#arr_item" + val).select2('data')[0].list_warehouse, function(i, value) {
@@ -1725,7 +1750,7 @@
             if($("#arr_item" + val).select2('data')[0].buy_units.length > 0){
                 $.each($("#arr_item" + val).select2('data')[0].buy_units, function(i, value) {
                     $('#arr_satuan' + val).append(`
-                        <option value="` + value.id + `">` + value.code + `</option>
+                        <option value="` + value.id + `" data-conversion="` + value.conversion + `">` + value.code + `</option>
                     `);
                 });
             }else{
@@ -1733,6 +1758,7 @@
                     <option value="">--Satuan tidak diatur di master data Item--</option>
                 `);
             }
+            $("#unit_stock" + val).text($("#arr_item" + val).select2('data')[0].uom);
         }else{
             $("#arr_item" + val).empty();
             $("#arr_satuan" + val).empty().append(`
@@ -1741,7 +1767,9 @@
             $("#arr_warehouse" + val).append(`
                 <option value="">--Silahkan pilih item--</option>
             `);
+            $("#unit_stock" + val).text('-');
         }
+        countRow(val);
     }
 
     function getMaterialRequest(){
@@ -1791,12 +1819,18 @@
                                         <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                                     </td>
                                     <td>
-                                        <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty_balance + `" onkeyup="formatRupiahNoMinus(this)">
+                                        <input name="arr_qty[]" onfocus="emptyThis(this);" id="rowQty` + count + `" type="text" value="` + val.qty_balance + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')">
                                     </td>
                                     <td class="center">
-                                        <select class="browser-default" id="arr_satuan` + count + `" name="arr_satuan[]" required>
+                                        <select class="browser-default" id="arr_satuan` + count + `" name="arr_satuan[]" required onchange="countRow('` + count + `')">
                                             <option value="">--Silahkan pilih item--</option>    
                                         </select>
+                                    </td>
+                                    <td class="center" id="qty_stock` + count + `">
+                                        ` + val.qty_stock + `
+                                    </td>
+                                    <td class="center" id="unit_stock` + count + `">
+                                        ` + val.unit_stock + `
                                     </td>
                                     <td>
                                         <input name="arr_note[]" type="text" placeholder="Keterangan barang 1..." value="` + val.note + `">
@@ -1881,7 +1915,7 @@
                                 $('#arr_satuan' + count).empty();
                                 $.each(val.buy_units, function(i, value) {
                                     $('#arr_satuan' + count).append(`
-                                        <option value="` + value.id + `" ` + (value.id == val.item_unit_id ? 'selected' : '') + `>` + value.code + `</option>
+                                        <option value="` + value.id + `" ` + (value.id == val.item_unit_id ? 'selected' : '') + ` data-conversion="` + value.conversion + `">` + value.code + `</option>
                                     `);
                                 });
                             }
@@ -1987,12 +2021,18 @@
                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                 </td>
                 <td>
-                    <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="0" onkeyup="formatRupiahNoMinus(this)">
+                    <input name="arr_qty[]" onfocus="emptyThis(this);" id="rowQty` + count + `" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')">
                 </td>
                 <td class="center">
-                    <select class="browser-default" id="arr_satuan` + count + `" name="arr_satuan[]" required>
+                    <select class="browser-default" id="arr_satuan` + count + `" name="arr_satuan[]" required onchange="countRow('` + count + `')">
                         <option value="">--Silahkan pilih item--</option>    
                     </select>
+                </td>
+                <td class="center" id="qty_stock` + count + `">
+                    -
+                </td>
+                <td class="center" id="unit_stock` + count + `">
+                    -
                 </td>
                 <td>
                     <input name="arr_note[]" type="text" placeholder="Keterangan barang 1...">
@@ -2057,7 +2097,7 @@
     }
 
     function useStock(){
-        let passed = false, arr_id = [], arr_name = [], arr_qty = [], arr_warehouse = [], arr_unit = [];
+        let passed = false, arr_id = [], arr_name = [], arr_qty = [], arr_warehouse = [], arr_unit = [], arr_unit_uom = [];
         $('input[name^="arr_value_stock[]"]').each(function(index){
             if($(this).is(':checked')){
                 passed = true;
@@ -2066,6 +2106,7 @@
                 arr_qty.push($('input[name^="arr_qty_order[]"]').eq(index).val());
                 arr_warehouse.push($('input[name^="arr_warehouse_item[]"]').eq(index).val());
                 arr_unit.push($('input[name^="arr_unit_item[]"]').eq(index).val());
+                arr_unit_uom.push($('input[name^="arr_unit_uom[]"]').eq(index).val());
             }
         });
         if(passed){
@@ -2080,12 +2121,18 @@
                             <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                         </td>
                         <td>
-                            <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + arr_qty[i] + `" onkeyup="formatRupiahNoMinus(this);" data-stockqty="` + arr_qty[i] + `" id="rowQty` + count + `">
+                            <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + arr_qty[i] + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-stockqty="` + arr_qty[i] + `" id="rowQty` + count + `">
                         </td>
                         <td class="center">
-                            <select class="browser-default" id="arr_satuan` + count + `" name="arr_satuan[]" required onchange="applyConversion('` + count + `');">
+                            <select class="browser-default" id="arr_satuan` + count + `" name="arr_satuan[]" required onchange="applyConversion('` + count + `');countRow('` + count + `');">
                                 <option value="">--Silahkan pilih item--</option>    
                             </select>
+                        </td>
+                        <td class="center" id="qty_stock` + count + `">
+                            -
+                        </td>
+                        <td class="center" id="unit_stock` + count + `">
+                            ` + arr_unit_uom[i] + `
                         </td>
                         <td>
                             <input name="arr_note[]" type="text" placeholder="Keterangan barang 1...">
@@ -2219,6 +2266,7 @@
                             $('#body-stock').append(`
                                 <tr class="row_stock">
                                     <input type="hidden" name="arr_id_item[]" id="arr_id_item` + count + `" value="` + val.item_id + `">
+                                    <input type="hidden" name="arr_unit_uom[]" id="arr_unit_uom` + count + `" value="` + val.uom_unit + `">
                                     <input type="hidden" name="arr_warehouse_item[]" id="arr_warehouse_item` + count + `" value='` + JSON.stringify(val.list_warehouse) + `'>
                                     <input type="hidden" name="arr_unit_item[]" id="arr_unit_item` + count + `" value='` + JSON.stringify(val.buy_units) + `'>
                                     <td class="center-align">

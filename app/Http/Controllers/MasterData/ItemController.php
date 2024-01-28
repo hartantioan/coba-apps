@@ -237,6 +237,22 @@ class ItemController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
+
+            $passedDefaultUnit = false;
+
+            foreach($request->arr_default as $key => $row){
+                if($row){
+                    $passedDefaultUnit = true;
+                }
+            }
+
+            if(!$passedDefaultUnit){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Mohon maaf default satuan konversi harus ditentukan.'
+                ]);
+            }
+
 			if($request->temp){
                 DB::beginTransaction();
                 try {

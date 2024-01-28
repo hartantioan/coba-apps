@@ -1078,12 +1078,16 @@
     }
 
     function applyLock(code){
-        $('#inventory_coa' + code + ',#coa' + code).css('pointer-events','auto');
+        $('#inventory_coa' + code + ',#coa' + code).css('pointer-events','auto'), passed = true;
         if($('#arr_inventory_coa' + code).val()){
+            passed = false;
             $('#coa' + code).css('pointer-events','none');
             $('#arr_coa' + code).empty();
+            $('#arr_coa' + code).append(`
+                <option value="` + $('#arr_inventory_coa' + code).select2('data')[0].coa_id + `">` + $('#arr_inventory_coa' + code).select2('data')[0].coa_name + `</option>
+            `);
         }
-        if($('#arr_coa' + code).val()){
+        if($('#arr_coa' + code).val() && passed == true){
             $('#inventory_coa' + code).css('pointer-events','none');
             $('#arr_inventory_coa' + code).empty();
         }
@@ -1516,6 +1520,11 @@
                         if(val.coa_id){
                             $('#arr_coa' + count).append(`
                                 <option value="` + val.coa_id + `">` + val.coa_name + `</option>
+                            `);
+                        }
+                        if(val.coa_inventory_id){
+                            $('#arr_coa' + count).append(`
+                                <option value="` + val.coa_inventory_id + `">` + val.coa_inventory_name + `</option>
                             `);
                         }
                         if(val.inventory_coa_id){

@@ -142,6 +142,18 @@ class PaymentRequestDetail extends Model
           return $type;
     }
 
+    public function getAccountCode(){
+        $code = match ($this->lookable_type) {
+            'fund_requests'             => $this->lookable->account->employee_no,
+            'purchase_invoices'         => $this->lookable->account->employee_no,
+            'purchase_down_payments'    => $this->lookable->supplier->employee_no,
+            'marketing_order_memos'     => $this->lookable->account->employee_no,
+            default                     => '',
+          };
+  
+          return $code;
+    }
+
     public function totalOutgoingUsedWeight(){
         $nominal = $this->nominal;
         $totalUsed = 0;

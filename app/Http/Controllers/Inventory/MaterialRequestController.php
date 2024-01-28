@@ -621,6 +621,8 @@ class MaterialRequestController extends Controller
                 'item_id'           => $row->item_id,
                 'item_name'         => $row->item->code.' - '.$row->item->name,
                 'qty'               => number_format($row->qty,3,',','.'),
+                'qty_stock'         => $row->item_id ? number_format($row->qty * $row->qty_conversion,3,',','.') : '-',
+                'unit_stock'        => $row->item_id ? $row->item->uomUnit->code : '-',
                 'item_unit_id'      => $row->item_unit_id,
                 'note'              => $row->note ? $row->note : '',
                 'note2'             => $row->note2 ? $row->note2 : '',

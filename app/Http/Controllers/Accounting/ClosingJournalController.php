@@ -906,41 +906,39 @@ class ClosingJournalController extends Controller
     public function viewJournal(Request $request,$id){
         $query = ClosingJournal::where('code',CustomHelper::decrypt($id))->first();
         if($query->journal()->exists()){
-
+            $rowmain = $query->journal()->first();
             $response = [
                 'title'     => 'Journal',
                 'status'    => 200,
-                'message'   => $query->journal,
+                'message'   => $rowmain,
                 'user'      => $query->user->name,
                 'reference' => $query->code,
                 'company'   => $query->company()->exists() ? $query->company->name : '-',
-                'code'      => $query->getJournalCode(),
+                'code'      => $rowmain->code,
                 'note'      => $query->note,
                 'post_date' => date('d/m/Y',strtotime($query->post_date)),
             ];
             $string='';
-            foreach($query->journal as $rowmain){
-                foreach($rowmain->journalDetail()->where(function($query){
-                    $query->whereHas('coa',function($query){
-                        $query->orderBy('code');
-                    })
-                    ->orderBy('type');
-                })->get() as $key => $row){
-                    $string .= '<tr>
-                        <td class="center-align">'.($key + 1).'</td>
-                        <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
-                        <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
-                        <td class="center-align">'.($row->place_id ? $row->place->code : '-').'</td>
-                        <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
-                        <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
-                        <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
-                        <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
-                        <td class="right-align">'.($row->type == '1' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
-                        <td class="right-align">'.($row->type == '2' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
-                        <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
-                        <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
-                    </tr>';
-                }
+            foreach($rowmain->journalDetail()->where(function($query){
+                $query->whereHas('coa',function($query){
+                    $query->orderBy('code');
+                })
+                ->orderBy('type');
+            })->get() as $key => $row){
+                $string .= '<tr>
+                    <td class="center-align">'.($key + 1).'</td>
+                    <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
+                    <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
+                    <td class="center-align">'.($row->place_id ? $row->place->code : '-').'</td>
+                    <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
+                    <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
+                    <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
+                    <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
+                    <td class="right-align">'.($row->type == '1' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
+                    <td class="right-align">'.($row->type == '2' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
+                    <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
+                    <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
+                </tr>';
             }
             $response["tbody"] = $string; 
         }else{

@@ -496,7 +496,6 @@
                             <th class="center-align" rowspan="2">Line</th>
                             <th class="center-align" rowspan="2">Mesin</th>
                             <th class="center-align" rowspan="2">Department</th>
-                            <th class="center-align" rowspan="2">Gudang</th>
                             <th class="center-align" rowspan="2">Proyek</th>
                             <th class="center-align" rowspan="2">Keterangan</th>
                             <th class="center-align" colspan="2">Mata Uang Asli</th>

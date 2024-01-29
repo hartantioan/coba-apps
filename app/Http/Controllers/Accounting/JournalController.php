@@ -812,7 +812,7 @@ class JournalController extends Controller
                     $img_base_64 = base64_encode($image_temp);
                     $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                     $data["image"]=$path_img;
-                    $pdf = Pdf::loadView('admin.print.accounting.journal_individual', $data)->setPaper('a5', 'landscape');
+                    $pdf = Pdf::loadView('admin.print.accounting.journal_individual', $data)->setPaper('a4', 'portrait');
                     $pdf->render();
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                     $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -909,7 +909,7 @@ class JournalController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.accounting.journal_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.accounting.journal_individual', $data)->setPaper('a4', 'portrait');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -985,7 +985,7 @@ class JournalController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.accounting.journal_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.accounting.journal_individual', $data)->setPaper('a4', 'portrait');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -1056,7 +1056,7 @@ class JournalController extends Controller
             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
             $data["image"]=$path_img;
              
-            $pdf = Pdf::loadView('admin.print.accounting.journal_individual', $data)->setPaper('a5', 'landscape');
+            $pdf = Pdf::loadView('admin.print.accounting.journal_individual', $data)->setPaper('a4', 'portrait');
             $pdf->render();
     
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");

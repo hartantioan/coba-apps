@@ -81,7 +81,7 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, Shoul
                 'post_date'     => date('d/m/Y',strtotime($row->landedCost->post_date)),
                 'vendor_code'   => $row->landedCost->vendor->employee_no,
                 'vendor'        => $row->landedCost->vendor->name,
-                'note'          => $row->landedCost->reference.' - '.$row->landedCost->note,
+                'note'          => $row->landedCost->note,
                 'item_code'     => $row->item->code,
                 'item_name'     => $row->item->name,
                 'place'         => $row->place->code,

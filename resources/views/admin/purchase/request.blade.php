@@ -9,6 +9,19 @@
     .error-input{
         border: 1px solid red;
     }
+
+    table > thead > tr > th {
+        font-size: 13px !important;
+    }
+
+    table.bordered th {
+        padding: 5px !important;
+    }
+
+    #modal7 input[type=text]:not(.browser-default){
+        height: 1rem !important;
+        font-size:13px !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -304,16 +317,6 @@
                                                         </a>
                                                     </td>
                                                 </tr>
-                                                <tr id="last-row-item">
-                                                    <td colspan="16">
-                                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
-                                                            <i class="material-icons left">add</i> Tambah 1
-                                                        </a>
-                                                        <a class="waves-effect waves-light green btn-small mb-1 mr-1" onclick="addItemFromStock()" href="javascript:void(0);">
-                                                            <i class="material-icons left">add</i> Tambah Dari Stok
-                                                        </a>
-                                                    </td>
-                                                </tr>
                                             </tbody>
                                         </table>
                                     </p>
@@ -321,10 +324,21 @@
                             </div>
                         </fieldset>
                         <div class="row">
-                            <div class="input-field col m4 s12 step13">
+                            <div class="input-field col m4 s12 step13 mt-1">
                                 <input type="hidden" id="temp" name="temp">
                                 <textarea id="note" name="note" placeholder="Catatan / Keterangan" rows="1" class="materialize-textarea"></textarea>
                                 <label class="active" for="note">Keterangan</label>
+                            </div>
+                            <div class="col m4 s12">
+
+                            </div>
+                            <div class="col m4 s12 mt-1" id="last-row-item">
+                                <a class="waves-effect waves-light green btn-small mb-1 mr-1 right" onclick="addItemFromStock()" href="javascript:void(0);">
+                                    <i class="material-icons left">add</i> Tambah Dari Stok
+                                </a>
+                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 right" onclick="addItem()" href="javascript:void(0);">
+                                    <i class="material-icons left">add</i> Tambah 1
+                                </a>
                             </div>
                             <div class="col s12 mt-3">
                                 <button class="btn waves-effect waves-light right submit step14" onclick="save();">Simpan <i class="material-icons right">send</i></button>
@@ -517,10 +531,11 @@
                 <div id="validation_alert_done" style="display:none;"></div>
                 <p class="mt-2 mb-2">
                     <h4>Daftar Item <= Min Stock</h4>
-                    <table class="bordered" style="width:100%;">
+                    <div id="datatable_buttons_multi"></div>
+                    <b class="right">Silahkan pilih baris dan masukkan qty barang yang ingin diorder pada kolom Qty Order.</b>
+                    <table id="table_multi" class="display" style="width:100%;">
                         <thead>
                             <tr>
-                                <th class="center">Pilih</th>
                                 <th class="center">Item</th>
                                 <th class="center">Satuan Stok</th>
                                 <th class="center">Qty Stok</th>
@@ -624,10 +639,47 @@
                 
             },
             onOpenEnd: function(modal, trigger) {
-
+                table_multi = $('#table_multi').DataTable({
+                    "ordering": false,
+                    scrollY: '50vh',
+                    scrollCollapse: true,
+                    "iDisplayInLength": 10,
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    "language": {
+                        "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Data tidak ditemukan / kosong",
+                        "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
+                        "infoEmpty": "Data tidak ditemukan / kosong",
+                        "infoFiltered": "(disaring dari _MAX_ total data)",
+                        "search": "Cari",
+                        "paginate": {
+                            first:      "<<",
+                            previous:   "<",
+                            next:       ">",
+                            last:       ">>"
+                        },
+                        "buttons": {
+                            selectAll: "Pilih semua",
+                            selectNone: "Hapus pilihan"
+                        },
+                        "select": {
+                            rows: "%d baris terpilih"
+                        }
+                    },
+                    select: {
+                        style: 'multi'
+                    }
+                });
+                $('#table_multi_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi');
+                $('select[name="table_multi_length"]').addClass('browser-default');
             },
             onCloseEnd: function(modal, trigger){
                 $('#body-stock').empty();
+                $('#table_multi').DataTable().clear().destroy();
             }
         });
 
@@ -1427,7 +1479,7 @@
 
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
-                        $('#last-row-item').before(`
+                        $('#body-item').append(`
                             <tr class="row_item" data-id="` + val.reference_id + `">
                                 <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
                                 <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
@@ -2013,7 +2065,7 @@
 
     function addItem(){
         var count = makeid(10);
-        $('#last-row-item').before(`
+        $('#body-item').append(`
             <tr class="row_item" data-id="">
                 <input type="hidden" name="arr_lookable_type[]" value="">
                 <input type="hidden" name="arr_lookable_id[]" value="">
@@ -2098,22 +2150,20 @@
 
     function useStock(){
         let passed = false, arr_id = [], arr_name = [], arr_qty = [], arr_warehouse = [], arr_unit = [], arr_unit_uom = [];
-        $('input[name^="arr_value_stock[]"]').each(function(index){
-            if($(this).is(':checked')){
-                passed = true;
-                arr_id.push($('input[name^="arr_id_item[]"]').eq(index).val());
-                arr_name.push($('span[name^="arr_item_name[]"]').eq(index).text());
-                arr_qty.push($('input[name^="arr_qty_order[]"]').eq(index).val());
-                arr_warehouse.push($('input[name^="arr_warehouse_item[]"]').eq(index).val());
-                arr_unit.push($('input[name^="arr_unit_item[]"]').eq(index).val());
-                arr_unit_uom.push($('input[name^="arr_unit_uom[]"]').eq(index).val());
-            }
+        $.map(table_multi.rows('.selected').nodes(), function (item) {
+            passed = true;
+            arr_id.push($(item).data('item'));
+            arr_name.push($(item).data('itemname'));
+            arr_qty.push($('#arr_qty_order' + $(item).data('code')).val());
+            arr_warehouse.push($(item).data('warehouse'));
+            arr_unit.push($(item).data('unit'));
+            arr_unit_uom.push($(item).data('uom'));
         });
         if(passed){
             $('.row_item').remove();
             for(let i = 0; i < arr_id.length;i++){
                 var count = makeid(10);
-                $('#last-row-item').before(`
+                $('#body-item').append(`
                     <tr class="row_item">
                         <input type="hidden" name="arr_lookable_type[]" value="">
                         <input type="hidden" name="arr_lookable_id[]" value="">
@@ -2198,8 +2248,8 @@
                     <option value="` + arr_id[i] + `">` + arr_name[i] + `</option>
                 `);
                 $("#arr_warehouse" + count).empty();
-                if(JSON.parse(arr_warehouse[i]).length > 0){
-                    $.each(JSON.parse(arr_warehouse[i]), function(i, value) {
+                if(arr_warehouse[i].length > 0){
+                    $.each(arr_warehouse[i], function(i, value) {
                         $('#arr_warehouse' + count).append(`
                             <option value="` + value.id + `">` + value.name + `</option>
                         `);
@@ -2210,8 +2260,8 @@
                     `);
                 }
                 $("#arr_satuan" + count).empty();
-                if(JSON.parse(arr_unit[i]).length > 0){
-                    $.each(JSON.parse(arr_unit[i]), function(i, value) {
+                if(arr_unit[i].length > 0){
+                    $.each(arr_unit[i], function(i, value) {
                         $('#arr_satuan' + count).append(`
                             <option value="` + value.id + `" data-conversion="` + value.conversion + `">` + value.code + `</option>
                         `);
@@ -2254,7 +2304,7 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             beforeSend: function() {
-                loadingOpen('#main');
+                loadingOpen('#modal1');
             },
             success: function(response) {
                 if(response.status == '200'){
@@ -2264,17 +2314,7 @@
                         $.each(response.details, function(i, val) {
                             var count = makeid(10);
                             $('#body-stock').append(`
-                                <tr class="row_stock">
-                                    <input type="hidden" name="arr_id_item[]" id="arr_id_item` + count + `" value="` + val.item_id + `">
-                                    <input type="hidden" name="arr_unit_uom[]" id="arr_unit_uom` + count + `" value="` + val.uom_unit + `">
-                                    <input type="hidden" name="arr_warehouse_item[]" id="arr_warehouse_item` + count + `" value='` + JSON.stringify(val.list_warehouse) + `'>
-                                    <input type="hidden" name="arr_unit_item[]" id="arr_unit_item` + count + `" value='` + JSON.stringify(val.buy_units) + `'>
-                                    <td class="center-align">
-                                        <label>
-                                            <input type="checkbox" id="arr_value_stock` + count + `" name="arr_value_stock[]" value="1">
-                                            <span>Pilih</span>
-                                        </label>
-                                    </td>
+                                <tr class="row_stock" data-item="` + val.item_id + `" data-uom="` + val.uom_unit + `" data-warehouse='` + JSON.stringify(val.list_warehouse) + `' data-unit='` + JSON.stringify(val.buy_units) + `' data-itemname="` + val.item_name + `" data-itemunit="`+ val.unit +`" data-code="` + count + `">
                                     <td class="">
                                         <span name="arr_item_name[]">` + val.item_name + `</span>
                                     </td>
@@ -2297,7 +2337,7 @@
                                         ` + val.max_stock + `
                                     </td>
                                     <td class="right-align">
-                                        <input name="arr_qty_order[]" onfocus="emptyThis(this);" type="text" value="` + val.qty_request + `" onkeyup="formatRupiahNoMinus(this)">
+                                        <input name="arr_qty_order[]" onfocus="emptyThis(this);" type="text" value="` + val.qty_request + `" onkeyup="formatRupiahNoMinus(this)" id="arr_qty_order` + count + `" style="text-align:right;width:100px;">
                                     </td>
                                 </tr>
                             `);
@@ -2313,11 +2353,11 @@
                         icon: 'warning'
                     });
                 }
-                loadingClose('#main');
+                loadingClose('#modal1');
             },
             error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('#main');
+                $('#modal1').scrollTop(0);
+                loadingClose('.modal-content');
                 swal({
                     title: 'Ups!',
                     text: 'Check your internet connection.',

@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportJournal;
+use App\Exports\ExportTemplateJournalCopy;
 use Illuminate\Database\Eloquent\Builder;
 use App\Helpers\CustomHelper;
 use App\Models\Menu;
@@ -1096,5 +1097,9 @@ class JournalController extends Controller
         }else{
             abort(404);
         }
+    }
+
+    public function getImportExcel(){
+        return Excel::download(new ExportTemplateJournalCopy(), 'format_journal_copy'.uniqid().'.xlsx');
     }
 }

@@ -39,7 +39,7 @@ class PurchaseMemoDetail extends Model
 
     public function getCode(){
         $code = match ($this->lookable_type) {
-            'purchase_invoice_details'  => $this->lookable->purchaseInvoice->code,
+            'purchase_invoice_details'  => $this->lookable->getCode(),
             'purchase_down_payments'    => $this->lookable->code,
             default => '-',
         };

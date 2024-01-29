@@ -1811,12 +1811,12 @@ class Select2Controller extends Controller {
                 ->whereIn('status',['2','3'])->get();
 
         foreach($data as $d) {
-            if($d->getTotalPaid() > 0 && !$d->hasGoodReceiptThatHasLandedCost()){
+            /* if($d->getTotalPaid() > 0 && !$d->hasGoodReceiptThatHasLandedCost()){ */
                 $response[] = [
                     'id'   			=> $d->id,
                     'text' 			=> $d->code.' - '.$d->note.' - Saldo '.number_format($d->balance,2,',','.').' - FP : '.$d->tax_no.' - '.$d->account->name,
                 ];
-            }
+            /* } */
         }
 
         return response()->json(['items' => $response]);

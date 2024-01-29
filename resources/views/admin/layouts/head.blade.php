@@ -41,7 +41,7 @@
     <!-- END: Page Level CSS-->
     <!-- BEGIN: Custom CSS-->
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/custom/custom.css?v=64') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/custom/waitMe.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/custom/waitMe.min.css?v=1') }}">
     <!-- END: Custom CSS-->
 	<script src="{{ url('app-assets/js/vendors.min.js') }}"></script>
     <script src="{{ url('app-assets/js/custom/websocket-printer.js') }}"></script>

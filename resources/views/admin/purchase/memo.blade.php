@@ -933,7 +933,7 @@
                                         <input type="hidden" name="arr_percent_wtax[]" value="` + val.percent_wtax + `" data-id="` + count + `">
                                         <input type="hidden" name="arr_limit[]" value="` + val.balance + `" data-id="` + count + `">
                                         <td>
-                                            ` + response.rawcode + `
+                                            ` + val.rawcode + `
                                         </td>
                                         <td>
                                             ` + response.tax_no + `

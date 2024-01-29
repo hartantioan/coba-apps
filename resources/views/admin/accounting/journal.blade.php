@@ -281,30 +281,34 @@
                                             <table class="bordered" style="min-width:2800px;zoom:0.7;" id="table-detail1">
                                                 <thead>
                                                     <tr>
-                                                        <th class="center">Kode Jurnal</th>
-                                                        <th class="center" style="width:75px;">Perusahaan</th>
-                                                        <th class="center">Keterangan</th>
-                                                        <th class="center">Tgl.Post</th>
-                                                        <th class="center">Tgl.Tenggat</th>
-                                                        <th class="center">Mata Uang</th>
-                                                        <th class="center" style="width:75px;">Konversi</th>
-                                                        <th class="center" style="width:75px;">BP</th>
-                                                        <th class="center" style="width:75px;">Coa</th>
-                                                        <th class="center" style="width:75px;">Plant</th>
-                                                        <th class="center" style="width:75px;">Line</th>
-                                                        <th class="center" style="width:75px;">Mesin</th>
-                                                        <th class="center" style="width:75px;">Departemen</th>
+                                                        <th class="center" rowspan="2">Kode Jurnal</th>
+                                                        <th class="center" style="width:75px;" rowspan="2">Perusahaan</th>
+                                                        <th class="center" rowspan="2">Keterangan Header</th>
+                                                        <th class="center" rowspan="2">Tgl.Post</th>
+                                                        <th class="center" rowspan="2">Mata Uang</th>
+                                                        <th class="center" style="width:75px;" rowspan="2">Konversi</th>
+                                                        <th class="center" style="width:75px;" rowspan="2">BP</th>
+                                                        <th class="center" style="width:75px;" rowspan="2">Coa</th>
+                                                        <th class="center" style="width:75px;" rowspan="2">Plant</th>
+                                                        <th class="center" style="width:75px;" rowspan="2">Line</th>
+                                                        <th class="center" style="width:75px;" rowspan="2">Mesin</th>
+                                                        <th class="center" style="width:75px;" rowspan="2">Proyek</th>
+                                                        <th class="center" style="width:75px;" rowspan="2">Departemen</th>
+                                                        <th class="center" colspan="2">Mata Uang Asli</th>
+                                                        <th class="center" colspan="2">Mata Uang Konversi</th>
+                                                        <th class="center" rowspan="2">Keterangan Detail</th>
+                                                        <th class="center" rowspan="2">Hapus</th>
+                                                    </tr>
+                                                    <tr>
                                                         <th class="center">Debit</th>
                                                         <th class="center">Kredit</th>
                                                         <th class="center">Debit</th>
                                                         <th class="center">Kredit</th>
-                                                        <th class="center">Keterangan</th>
-                                                        <th class="center">Hapus</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-coa-multi">
                                                     <tr id="last-row-coa-multi">
-                                                        <td colspan="18" class="center">
+                                                        <td colspan="19" class="center">
                                                             <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addLine()" href="javascript:void(0);">
                                                                 <i class="material-icons left">add</i> Tambah 1 Baris
                                                             </a>

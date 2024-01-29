@@ -444,7 +444,7 @@ class UserController extends Controller
                 'name' 				=> 'required|uppercase',
                 'username'			=> $request->temp ? ['required', Rule::unique('users', 'username')->ignore($request->temp)] : 'required|unique:users,username',
                 'phone'		        => $request->temp ? ['required', Rule::unique('users', 'phone')->ignore($request->temp)] : 'required|unique:users,phone',
-                'email'             => $request->temp ? ['required', Rule::unique('users', 'email')->ignore($request->temp)] : 'required|unique:users,email',
+                /* 'email'             => $request->temp ? ['required', Rule::unique('users', 'email')->ignore($request->temp)] : 'required|unique:users,email', */
                 'address'           => 'required',
                 'type'              => 'required',
                 'id_card'           => 'required',
@@ -465,8 +465,8 @@ class UserController extends Controller
                 'username.unique'               => 'Username telah terpakai.',
                 'phone.required'                => 'Telepon tidak boleh kosong.',
                 'phone.unique'                  => 'Telepon telah terpakai.',
-                'email.required'	            => 'Email tidak boleh kosong.',
-                'email.unique'                  => 'Email telah terpakai.',
+                /* 'email.required'	            => 'Email tidak boleh kosong.',
+                'email.unique'                  => 'Email telah terpakai.', */
                 'address.required'              => 'Alamat tidak boleh kosong.',
                 'type.required'	                => 'Tipe pengguna tidak boleh kosong.',
                 'id_card.required'              => 'No Identitas tidak boleh kosong.',
@@ -485,7 +485,7 @@ class UserController extends Controller
             $validation = Validator::make($request->all(), [
                 'name' 				=> 'required|uppercase',
                 'phone'		        => $request->temp ? ['required', Rule::unique('users', 'phone')->ignore($request->temp)] : 'required|unique:users,phone',
-                'email'             => $request->temp ? ['required', Rule::unique('users', 'email')->ignore($request->temp)] : 'required|unique:users,email',
+                /* 'email'             => $request->temp ? ['required', Rule::unique('users', 'email')->ignore($request->temp)] : 'required|unique:users,email', */
                 'address'           => 'required',
                 'type'              => 'required',
                 'province_id'       => 'required',
@@ -502,8 +502,8 @@ class UserController extends Controller
                 'name.uppercase' 	            => 'Nama harus menggunakan huruf kapital.',
                 'phone.required'                => 'Telepon tidak boleh kosong.',
                 'phone.unique'                  => 'Telepon telah terpakai.',
-                'email.required'	            => 'Email tidak boleh kosong.',
-                'email.unique'                  => 'Email telah terpakai.',
+                /* 'email.required'	            => 'Email tidak boleh kosong.',
+                'email.unique'                  => 'Email telah terpakai.', */
                 'address.required'              => 'Alamat tidak boleh kosong.',
                 'type.required'	                => 'Tipe pengguna tidak boleh kosong.',
                 'province_id.required'          => 'Provinsi tidak boleh kosong.',

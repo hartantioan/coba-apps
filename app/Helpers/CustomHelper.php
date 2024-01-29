@@ -2267,9 +2267,9 @@ class CustomHelper {
 						if($row->lookable->lookable_type == 'coas'){
 							$wtax = $row->wtax;
 						}elseif($row->lookable->lookable_type == 'purchase_order_details'){
-							$wtax = $row->wtax * $row->lookable->purchaseOrder->currency_rate;
-							$currency_rate = $row->lookable->purchaseOrder->currency_rate;
-							$type = $row->lookable->purchaseOrder->currency->type;
+							$wtax = $row->wtax * $row->lookable->lookable->purchaseOrder->currency_rate;
+							$currency_rate = $row->lookable->lookable->purchaseOrder->currency_rate;
+							$type = $row->lookable->lookable->purchaseOrder->currency->type;
 						}elseif($row->lookable->lookable_type == 'landed_cost_fee_details'){
 							$wtax = $row->wtax * $row->lookable->lookable->landedCost->currency_rate;
 							$currency_rate = $row->lookable->lookable->landedCost->currency_rate;
@@ -2303,9 +2303,9 @@ class CustomHelper {
 						if($row->lookable->lookable_type == 'coas'){
 							$grandtotal = $row->grandtotal;
 						}elseif($row->lookable->lookable_type == 'purchase_order_details'){
-							$grandtotal = $row->grandtotal * $row->lookable->purchaseOrder->currency_rate;
-							$currency_rate = $row->lookable->purchaseOrder->currency_rate;
-							$type = $row->lookable->purchaseOrder->currency->type;
+							$grandtotal = $row->grandtotal * $row->lookable->lookable->purchaseOrder->currency_rate;
+							$currency_rate = $row->lookable->lookable->purchaseOrder->currency_rate;
+							$type = $row->lookable->lookable->purchaseOrder->currency->type;
 						}elseif($row->lookable->lookable_type == 'landed_cost_fee_details'){
 							$grandtotal = $row->grandtotal * $row->lookable->lookable->landedCost->currency_rate;
 							$currency_rate = $row->lookable->lookable->landedCost->currency_rate;
@@ -2330,9 +2330,9 @@ class CustomHelper {
 						if($row->lookable->lookable_type == 'coas'){
 							$total = $row->total;
 						}elseif($row->lookable->lookable_type == 'purchase_order_details'){
-							$total = $row->total * $row->lookable->purchaseOrder->currency_rate;
-							$currency_rate = $row->lookable->purchaseOrder->currency_rate;
-							$type = $row->lookable->purchaseOrder->currency->type;
+							$total = $row->total * $row->lookable->lookable->purchaseOrder->currency_rate;
+							$currency_rate = $row->lookable->lookable->purchaseOrder->currency_rate;
+							$type = $row->lookable->lookable->purchaseOrder->currency->type;
 						}elseif($row->lookable->lookable_type == 'landed_cost_fee_details'){
 							$total = $row->total * $row->lookable->lookable->landedCost->currency_rate;
 							$currency_rate = $row->lookable->lookable->landedCost->currency_rate;

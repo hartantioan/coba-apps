@@ -43,7 +43,7 @@ class ExportPurchaseMemo implements FromCollection, WithTitle, WithHeadings, Sho
         'Kode Supplier',
         'Nama Supplier',
         'Keterangan',
-        'Ref.Dokumen',
+        'Item/Coa',
         'No.SPK',
         'No.Invoice',
         'Qty',

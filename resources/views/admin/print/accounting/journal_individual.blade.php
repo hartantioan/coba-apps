@@ -278,7 +278,6 @@
                         <thead>
                             <tr>
                                 <th class="center" rowspan="2">Coa</th>
-                                <th class="center" rowspan="2">Perusahaan</th>
                                 <th class="center" rowspan="2">Partner Bisnis</th>
                                 <th class="center" rowspan="2">Plant</th>
                                 <th class="center" rowspan="2">Line</th>
@@ -306,7 +305,6 @@
         })->get() as $key => $row)
                                 <tr>
                                     <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
-                                    <td class="center-align">{{ $row->coa->company->name }}</td>
                                     <td class="center-align">{{ $row->account_id ? $row->account->name : '-' }}</td>
                                     <td class="center-align">{{ $row->place_id ? $row->place->code : '-' }}</td>
                                     <td class="center-align">{{ $row->line_id ? $row->line->name : '-' }}</td>

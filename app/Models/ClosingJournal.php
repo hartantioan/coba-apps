@@ -158,4 +158,14 @@ class ClosingJournal extends Model
 
         return $hasRelation;
     }
+
+    public function getJournalCode(){
+        $code = [];
+        if($this->journal()->exists()){
+            foreach($this->journal as $row){
+                $code[] = $row->code;
+            }
+        }
+        return implode(', ',$code);
+    }
 }

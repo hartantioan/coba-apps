@@ -284,8 +284,8 @@
                                 <th class="center" rowspan="2">Mesin</th>
                                 <th class="center" rowspan="2">Departemen</th>
                                 <th class="center" rowspan="2">Proyek</th>
-                                <th class="center" rowspan="2">Keterangan 1</th>
-                                <th class="center" rowspan="2">Keterangan 2</th>
+                                <th class="center" rowspan="2">Ket.1</th>
+                                <th class="center" rowspan="2">Ket.2</th>
                                 <th class="center" colspan="2">Nominal Asli</th>
                                 <th class="center" colspan="2">Nominal Konversi</th>
                             </tr>

@@ -906,6 +906,7 @@ class ClosingJournalController extends Controller
     public function viewJournal(Request $request,$id){
         $query = ClosingJournal::where('code',CustomHelper::decrypt($id))->first();
         if($query->journal()->exists()){
+
             $response = [
                 'title'     => 'Journal',
                 'status'    => 200,
@@ -913,7 +914,7 @@ class ClosingJournalController extends Controller
                 'user'      => $query->user->name,
                 'reference' => $query->code,
                 'company'   => $query->company()->exists() ? $query->company->name : '-',
-                'code'      => $query->journal->code,
+                'code'      => $query->getJournalCode(),
                 'note'      => $query->note,
                 'post_date' => date('d/m/Y',strtotime($query->post_date)),
             ];

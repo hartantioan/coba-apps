@@ -676,7 +676,7 @@ class CustomHelper {
 					'project_id'	=> $rowdetail->purchaseOrderDetail->project_id ? $rowdetail->purchaseOrderDetail->project_id : NULL,
 					'type'			=> '1',
 					'nominal'		=> $rowtotal,
-					'nominal_fc'	=> $rowdetail->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? 0 : $rowdetail->getRowTotal(),
+					'nominal_fc'	=> $rowdetail->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? $rowtotal : $rowdetail->getRowTotal(),
 					'note'			=> $gr->delivery_no,
 				]);
 
@@ -693,7 +693,7 @@ class CustomHelper {
 						'project_id'	=> $rowdetail->purchaseOrderDetail->project_id ? $rowdetail->purchaseOrderDetail->project_id : NULL,
 						'type'			=> '2',
 						'nominal'		=> $rowtotal,
-						'nominal_fc'	=> $rowdetail->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? 0 : $rowdetail->getRowTotal(),
+						'nominal_fc'	=> $rowdetail->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? $rowtotal : $rowdetail->getRowTotal(),
 					]);
 				}
 
@@ -805,7 +805,7 @@ class CustomHelper {
 						'place_id'		=> $row->asset->place_id,
 						'type'			=> '1',
 						'nominal'		=> $totalDepre * $ret->currency_rate,
-						'nominal_fc'	=> $ret->currency->type == '1' ? 0 : $totalDepre,
+						'nominal_fc'	=> $ret->currency->type == '1' ? $totalDepre * $ret->currency_rate : $totalDepre,
 					]);
 				}
 
@@ -816,7 +816,7 @@ class CustomHelper {
 						'place_id'		=> $row->asset->place_id,
 						'type'			=> '1',
 						'nominal'		=> $row->asset->book_balance * $ret->currency_rate,
-						'nominal_fc'	=> $ret->currency->type == '1' ? 0 : $row->asset->book_balance,
+						'nominal_fc'	=> $ret->currency->type == '1' ? $row->asset->book_balance * $ret->currency_rate : $row->asset->book_balance,
 					]);
 				}
 
@@ -827,7 +827,7 @@ class CustomHelper {
 						'place_id'		=> $row->asset->place_id,
 						'type'			=> '1',
 						'nominal'		=> $row->retirement_nominal * $ret->currency_rate,
-						'nominal_fc'	=> $ret->currency->type == '1' ? 0 : $row->retirement_nominal,
+						'nominal_fc'	=> $ret->currency->type == '1' ? $row->retirement_nominal * $ret->currency_rate : $row->retirement_nominal,
 					]);
 
 					$balanceProfitLoss = ($totalDepre + $row->retirement_nominal) - $row->asset->nominal;
@@ -839,7 +839,7 @@ class CustomHelper {
 							'place_id'		=> $row->asset->place_id,
 							'type'			=> '2',
 							'nominal'		=> $balanceProfitLoss * $ret->currency_rate,
-							'nominal_fc'	=> $ret->currency->type == '1' ? 0 : $balanceProfitLoss,
+							'nominal_fc'	=> $ret->currency->type == '1' ? $balanceProfitLoss * $ret->currency_rate : $balanceProfitLoss,
 						]);
 					}
 
@@ -850,7 +850,7 @@ class CustomHelper {
 							'place_id'		=> $row->asset->place_id,
 							'type'			=> '1',
 							'nominal'		=> abs($balanceProfitLoss) * $ret->currency_rate,
-							'nominal_fc'	=> $ret->currency->type == '1' ? 0 : abs($balanceProfitLoss),
+							'nominal_fc'	=> $ret->currency->type == '1' ? abs($balanceProfitLoss) * $ret->currency_rate : abs($balanceProfitLoss),
 						]);
 					}
 				}
@@ -861,7 +861,7 @@ class CustomHelper {
 					'place_id'		=> $row->asset->place_id,
 					'type'			=> '2',
 					'nominal'		=> $row->asset->nominal * $ret->currency_rate,
-					'nominal_fc'	=> $ret->currency->type == '1' ? 0 : $row->asset->nominal,
+					'nominal_fc'	=> $ret->currency->type == '1' ? $row->asset->nominal * $ret->currency_rate : $row->asset->nominal,
 				]);
 
 				self::updateBalanceAsset($row->asset_id,$row->asset->book_balance,'OUT');
@@ -894,7 +894,7 @@ class CustomHelper {
 						'account_id'	=> $ip->wTaxMaster->coaPurchase->bp_journal ? ($ip->account_id ? $ip->account_id : NULL) : NULL,
 						'type'			=> '1',
 						'nominal'		=> $ip->wtax * $ip->currency_rate,
-						'nominal_fc'	=> $ip->currency->type == '1' ? 0 : $ip->wtax,
+						'nominal_fc'	=> $ip->currency->type == '1' ? $ip->wtax * $ip->currency_rate : $ip->wtax,
 					]);
 				}
 
@@ -904,7 +904,7 @@ class CustomHelper {
 					'account_id'	=> $ip->coa->bp_journal ? ($ip->account_id ? $ip->account_id : NULL) : NULL,
 					'type'			=> '1',
 					'nominal'		=> $ip->grandtotal * $ip->currency_rate,
-					'nominal_fc'	=> $ip->currency->type == '1' ? 0 : $ip->grandtotal,
+					'nominal_fc'	=> $ip->currency->type == '1' ? $ip->grandtotal * $ip->currency_rate : $ip->grandtotal,
 				]);
 
 				$coarounding = Coa::where('code','700.01.01.01.05')->where('company_id',$ip->company_id)->first();
@@ -936,7 +936,7 @@ class CustomHelper {
 									'warehouse_id'                  => $rowcost->warehouse_id ? $rowcost->warehouse_id : NULL,
 									'type'                          => '2',
 									'nominal'                       => $nominal * $ip->currency_rate,
-									'nominal_fc'					=> $ip->currency->type == '1' ? 0 : $nominal,
+									'nominal_fc'					=> $ip->currency->type == '1' ? $nominal * $ip->currency_rate : $nominal,
 									'note'							=> $row->note,
 								]);
 							}
@@ -947,7 +947,7 @@ class CustomHelper {
 								'account_id'	=> $ip->account_id ? $ip->account_id : NULL,
 								'type'			=> '2',
 								'nominal'		=> $row->total * $ip->currency_rate,
-								'nominal_fc'	=> $ip->currency->type == '1' ? 0 : $row->total,
+								'nominal_fc'	=> $ip->currency->type == '1' ? $row->total * $ip->currency_rate : $row->total,
 								'note'			=> $row->note,
 							]);
 						}
@@ -959,7 +959,7 @@ class CustomHelper {
 							'account_id'	=> $coareceivable->bp_journal ? ($ip->account_id ? $ip->account_id : NULL) : NULL,
 							'type'			=> '2',
 							'nominal'		=> $row->total * $ip->currency_rate,
-							'nominal_fc'	=> $ip->currency->type == '1' ? 0 : $row->total,
+							'nominal_fc'	=> $ip->currency->type == '1' ? $row->total * $ip->currency_rate : $row->total,
 							'note'			=> $row->note,
 						]);
 						CustomHelper::removeCountLimitCredit($row->lookable->account_id,$row->total * $ip->currency_rate);
@@ -974,7 +974,7 @@ class CustomHelper {
 								'account_id'	=> $coapiutangusaha->bp_journal ? ($ip->account_id ? $ip->account_id : NULL) : NULL,
 								'type'			=> '1',
 								'nominal'		=> abs($row->total * $ip->currency_rate),
-								'nominal_fc'	=> $ip->currency->type == '1' ? 0 : abs($row->total),
+								'nominal_fc'	=> $ip->currency->type == '1' ? abs($row->total * $ip->currency_rate) : abs($row->total),
 								'note'			=> $row->note,
 							]);
 						}else{
@@ -984,7 +984,7 @@ class CustomHelper {
 								'account_id'	=> $coapiutangusaha->bp_journal ? ($ip->account_id ? $ip->account_id : NULL) : NULL,
 								'type'			=> '2',
 								'nominal'		=> $row->total * $ip->currency_rate,
-								'nominal_fc'	=> $ip->currency->type == '1' ? 0 : $row->total,
+								'nominal_fc'	=> $ip->currency->type == '1' ? $row->total * $ip->currency_rate : $row->total,
 								'note'			=> $row->note,
 							]);
 							if($row->lookable_type == 'marketing_order_down_payments'){
@@ -1006,7 +1006,7 @@ class CustomHelper {
 							'account_id'	=> $coarounding->bp_journal ? ($ip->account_id ? $ip->account_id : NULL) : NULL,
 							'type'			=> $row->rounding > 0 ? '2' : '1',
 							'nominal'		=> abs($row->rounding * $ip->currency_rate),
-							'nominal_fc'	=> $ip->currency->type == '1' ? 0 : abs($row->rounding),
+							'nominal_fc'	=> $ip->currency->type == '1' ? abs($row->rounding * $ip->currency_rate) : abs($row->rounding),
 						]);
 					}
 				}
@@ -1059,7 +1059,7 @@ class CustomHelper {
 								'project_id'					=> $row->project_id ? $row->project_id : NULL,
 								'type'                          => '1',
 								'nominal'                       => $nominal * $pr->currency_rate,
-								'nominal_fc'					=> $pr->currency->type == '1' ? 0 : $nominal,
+								'nominal_fc'					=> $pr->currency->type == '1' ? $nominal * $pr->currency_rate : $nominal,
 							]);
 						}
 					}else{
@@ -1075,7 +1075,7 @@ class CustomHelper {
 							'project_id'	=> $row->project_id ? $row->project_id : NULL,
 							'type'			=> '1',
 							'nominal'		=> $row->nominal * $pr->currency_rate,
-							'nominal_fc'	=> $pr->currency->type == '1' ? 0 : $row->nominal,
+							'nominal_fc'	=> $pr->currency->type == '1' ? $row->nominal * $pr->currency_rate : $row->nominal,
 						]);
 					}
 				}
@@ -1090,7 +1090,7 @@ class CustomHelper {
 							'account_id'	=> $coarounding->bp_journal ? $account_id : NULL,
 							'type'			=> $pr->rounding > 0 ? '1' : '2',
 							'nominal'		=> abs($pr->rounding * $pr->currency_rate),
-							'nominal_fc'	=> $pr->currency->type == '1' ? 0 : abs($pr->rounding),
+							'nominal_fc'	=> $pr->currency->type == '1' ? abs($pr->rounding * $pr->currency_rate) : abs($pr->rounding),
 						]);
 					}
 				}
@@ -1103,7 +1103,7 @@ class CustomHelper {
 						'account_id'                    => $coa->bp_journal ? $row->lookable->account_id : NULL,
 						'type'                          => '2',
 						'nominal'                       => $row->nominal * $pr->currency_rate,
-						'nominal_fc'					=> $pr->currency->type == '1' ? 0 : $row->nominal,
+						'nominal_fc'					=> $pr->currency->type == '1' ? $row->nominal * $pr->currency_rate : $row->nominal,
 					]);
 					CustomHelper::removeCountLimitCredit($row->lookable->account_id,$row->nominal * $pr->currency_rate);
 				}
@@ -1162,7 +1162,7 @@ class CustomHelper {
 					}
 				}elseif($row->lookable_type == 'coas'){
 					$mustpay = $row->nominal;
-					$balanceReal = $row->nominal;
+					$balanceReal = $row->nominal * $op->currency_rate;
 				}elseif($row->lookable_type == 'purchase_down_payments'){
 					$mustpay = $row->lookable->balancePaidExcept($row->id);
 					$balanceReal = $row->lookable->balancePaidExcept($row->id) * $row->lookable->currency_rate;
@@ -1204,7 +1204,7 @@ class CustomHelper {
 							'project_id'					=> $row->project_id ? $row->project_id : NULL,
 							'type'                          => '1',
 							'nominal'                       => $nominal * $op->currency_rate,
-							'nominal_fc'					=> $op->currency->type == '1' ? 0 : $nominal,
+							'nominal_fc'					=> $op->currency->type == '1' ? $nominal * $op->currency_rate : $nominal,
 						]);
 					}
 				}else{
@@ -1220,7 +1220,7 @@ class CustomHelper {
 						'project_id'	=> $row->project_id ? $row->project_id : NULL,
 						'type'			=> '1',
 						'nominal'		=> $balanceReal,
-						'nominal_fc'	=> 0, #benerin
+						'nominal_fc'	=> $balanceReal, #benerin
 					]);
 					if($row->lookable_type == 'marketing_order_memos'){
 						CustomHelper::addCountLimitCredit($op->account_id,$balanceReal);
@@ -1238,7 +1238,7 @@ class CustomHelper {
 						'account_id'	=> $coarounding->bp_journal ? $account_id : NULL,
 						'type'			=> $op->rounding > 0 ? '1' : '2',
 						'nominal'		=> abs($op->rounding * $op->currency_rate),
-						'nominal_fc'	=> 0
+						'nominal_fc'	=> $op->currency->type == '1' ? abs($op->rounding * $op->currency_rate) : abs($op->rounding),
 					]);
 				}
 			}elseif($op->rounding > 0 && $op->currency_rate > 1){
@@ -1257,7 +1257,7 @@ class CustomHelper {
 						'department_id'	=> $row->lookable_type == 'fund_requests' ? $row->lookable->department_id : NULL,
 						'type'			=> $balanceKurs < 0  ? '1' : '2',
 						'nominal'		=> abs($balanceKurs),
-						'nominal_fc'	=> 0,
+						'nominal_fc'	=> abs($balanceKurs),
 					]);
 				}
 			}
@@ -1287,7 +1287,7 @@ class CustomHelper {
 							'warehouse_id'                  => $rowcost->warehouse_id ? $rowcost->warehouse_id : NULL,
 							'type'                          => '1',
 							'nominal'                       => $nominal * $op->currency_rate,
-							'nominal_fc'					=> $op->currency->type == '1' ? 0 : $nominal,
+							'nominal_fc'					=> $op->currency->type == '1' ? $nominal * $op->currency_rate : $nominal,
 						]);
 					}
 				}else{
@@ -1297,7 +1297,7 @@ class CustomHelper {
 						'account_id'	=> $coa_admin->bp_journal ? $op->account_id : NULL,
 						'type'			=> '1',
 						'nominal'		=> $row->nominal * $op->currency_rate,
-						'nominal_fc'	=> $op->currency->type == '1' ? 0 : $row->nominal,
+						'nominal_fc'	=> $op->currency->type == '1' ? $row->nominal * $op->currency_rate : $row->nominal,
 					]);
 				}
 			}
@@ -1310,7 +1310,7 @@ class CustomHelper {
 					'account_id'                    => $coa->bp_journal ? $row->lookable->account_id : NULL,
 					'type'                          => '2',
 					'nominal'                       => $row->nominal * $op->currency_rate,
-					'nominal_fc'					=> $op->currency->type == '1' ? 0 : $row->nominal,
+					'nominal_fc'					=> $op->currency->type == '1' ? $row->nominal * $op->currency_rate : $row->nominal,
 				]);
 			}
 
@@ -1320,7 +1320,7 @@ class CustomHelper {
 				'account_id'	=> $op->coaSource->bp_journal ? $op->account_id : NULL,
 				'type'			=> '2',
 				'nominal'		=> $totalPay,
-				'nominal_fc'	=> $op->currency->type == '1' ? 0 : ($totalPay / $op->currency_rate),
+				'nominal_fc'	=> $op->currency->type == '1' ? $totalPay : ($totalPay / $op->currency_rate),
 			]);
 
 			$journal = Journal::find($query->id);
@@ -1360,7 +1360,7 @@ class CustomHelper {
 					'project_id'	=> $row->project_id ? $row->project_id : NULL,
 					'type'			=> '1',
 					'nominal'		=> $row->total * $gr->currency_rate,
-					'nominal_fc'	=> $gr->currency->type == '1' ? 0 : $row->total,
+					'nominal_fc'	=> $gr->currency->type == '1' ? $row->total * $gr->currency_rate : $row->total,
 					'item_id'		=> $row->item_id,
 				]);
 
@@ -1386,7 +1386,7 @@ class CustomHelper {
 							'project_id'					=> $row->project_id ? $row->project_id : NULL,
 							'type'                          => '2',
 							'nominal'						=> $nominal,
-							'nominal_fc'					=> 0,
+							'nominal_fc'					=> $nominal,
 						]);
 					}
 				}else{
@@ -1400,7 +1400,7 @@ class CustomHelper {
 						'project_id'	=> $row->project_id ? $row->project_id : NULL,
 						'type'			=> '2',
 						'nominal'		=> $row->total * $gr->currency_rate,
-						'nominal_fc'	=> $gr->currency->type == '1' ? 0 : $row->total,
+						'nominal_fc'	=> $gr->currency->type == '1' ? $row->total * $gr->currency_rate : $row->total,
 					]);
 				}
 
@@ -1533,7 +1533,7 @@ class CustomHelper {
 						'project_id'	=> $row->goodReceiptDetail->purchaseOrderDetail->project_id ? $row->goodReceiptDetail->purchaseOrderDetail->project_id : NULL,
 						'type'			=> '1',
 						'nominal'		=> $rowtotal,
-						'nominal_fc'	=> $row->goodReceiptDetail->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? 0 : $row->getRowTotal(),
+						'nominal_fc'	=> $row->goodReceiptDetail->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? $rowtotal : $row->getRowTotal(),
 					]);
 				}
 
@@ -1547,7 +1547,7 @@ class CustomHelper {
 					'project_id'	=> $row->goodReceiptDetail->purchaseOrderDetail->project_id ? $row->goodReceiptDetail->purchaseOrderDetail->project_id : NULL,
 					'type'			=> '2',
 					'nominal'		=> $rowtotal,
-					'nominal_fc'	=> $row->goodReceiptDetail->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? 0 : $row->getRowTotal(),
+					'nominal_fc'	=> $row->goodReceiptDetail->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? $rowtotal : $row->getRowTotal(),
 				]);
 
 				self::sendCogs('good_returns',
@@ -1624,7 +1624,7 @@ class CustomHelper {
 							'project_id'					=> $row->project_id ? $row->project_id : NULL,
 							'type'                          => '1',
 							'nominal'						=> $nominal,
-							'nominal_fc'					=> 0,
+							'nominal_fc'					=> $nominal,
 						]);
 					}
 				}else{
@@ -1638,7 +1638,7 @@ class CustomHelper {
 						'project_id'	=> $row->project_id ? $row->project_id : NULL,
 						'type'			=> '1',
 						'nominal'		=> $row->total,
-						'nominal_fc'	=> 0,
+						'nominal_fc'	=> $row->total,
 					]);
 				}
 
@@ -1653,7 +1653,7 @@ class CustomHelper {
 					'project_id'	=> $row->project_id ? $row->project_id : NULL,
 					'type'			=> '2',
 					'nominal'		=> $row->total,
-					'nominal_fc'	=> 0,
+					'nominal_fc'	=> $row->total,
 				]);
 
 				self::sendCogs('good_issues',
@@ -1710,7 +1710,7 @@ class CustomHelper {
 					'project_id'	=> $row->goodIssueDetail->project_id ? $row->goodIssueDetail->project_id : NULL,
 					'type'			=> '1',
 					'nominal'		=> $row->total,
-					'nominal_fc'	=> 0,
+					'nominal_fc'	=> $row->total,
 				]);
 
 				if($row->goodIssueDetail->cost_distribution_id){
@@ -1736,7 +1736,7 @@ class CustomHelper {
 							'project_id'					=> $row->goodIssueDetail->project_id ? $row->goodIssueDetail->project_id : NULL,
 							'type'                          => '2',
 							'nominal'						=> $nominal,
-							'nominal_fc'					=> 0,
+							'nominal_fc'					=> $nominal,
 						]);
 					}
 				}else{
@@ -1751,7 +1751,7 @@ class CustomHelper {
 						'project_id'	=> $row->goodIssueDetail->project_id ? $row->goodIssueDetail->project_id : NULL,
 						'type'			=> '2',
 						'nominal'		=> $row->total,
-						'nominal_fc'	=> 0,
+						'nominal_fc'	=> $row->total,
 					]);
 				}
 
@@ -1828,7 +1828,7 @@ class CustomHelper {
 								'item_id'		=> $rowdetail->item_id,
 								'type'			=> '1',
 								'nominal'		=> $rowdetail->nominal * $lc->currency_rate,
-								'nominal_fc'	=> $lc->currency->type == '1' ? 0 : $rowdetail->nominal,
+								'nominal_fc'	=> $lc->currency->type == '1' ? $rowdetail->nominal * $lc->currency_rate : $rowdetail->nominal,
 							]);
 						}else{
 							JournalDetail::create([
@@ -1843,7 +1843,7 @@ class CustomHelper {
 								'item_id'		=> $rowdetail->item_id,
 								'type'			=> '1',
 								'nominal'		=> $rowdetail->nominal * $lc->currency_rate,
-								'nominal_fc'	=> $lc->currency->type == '1' ? 0 : $rowdetail->nominal,
+								'nominal_fc'	=> $lc->currency->type == '1' ? $rowdetail->nominal * $lc->currency_rate : $rowdetail->nominal,
 							]);
 						}
 					}
@@ -1856,7 +1856,7 @@ class CustomHelper {
 						'account_id'	=> $rowdetail->landedCostFee->coa->bp_journal ? $lc->account_id : NULL,
 						'type'			=> '2',
 						'nominal'		=> $rowdetail->total * $lc->currency_rate,
-						'nominal_fc'	=> $lc->currency->type == '1' ? 0 : $rowdetail->total,
+						'nominal_fc'	=> $lc->currency->type == '1' ? $rowdetail->total * $lc->currency_rate : $rowdetail->total,
 						'note'			=> $rowdetail->landedCostFee->name,
 					]);
 				}
@@ -1904,7 +1904,8 @@ class CustomHelper {
 							'department_id'	=> $rowdetail->department_id,
 							'project_id'	=> $rowdetail->project_id,
 							'type'			=> '1',
-							'nominal'		=> -1 * $rowdetail->nominal
+							'nominal'		=> -1 * $rowdetail->nominal,
+							'nominal_fc'	=> -1 * $rowdetail->nominal,
 						]);
 
 						JournalDetail::create([
@@ -1918,7 +1919,8 @@ class CustomHelper {
 							'department_id'	=> $rowdetail->department_id,
 							'project_id'	=> $rowdetail->project_id,
 							'type'			=> '2',
-							'nominal'		=> -1 * $rowdetail->nominal
+							'nominal'		=> -1 * $rowdetail->nominal,
+							'nominal_fc'	=> -1 * $rowdetail->nominal
 						]);
 					}else{
 						JournalDetail::create([
@@ -1932,7 +1934,8 @@ class CustomHelper {
 							'department_id'	=> $rowdetail->department_id,
 							'project_id'	=> $rowdetail->project_id,
 							'type'			=> '1',
-							'nominal'		=> $rowdetail->nominal
+							'nominal'		=> $rowdetail->nominal,
+							'nominal_fc'	=> $rowdetail->nominal,
 						]);
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -1945,7 +1948,8 @@ class CustomHelper {
 							'department_id'	=> $rowdetail->department_id,
 							'project_id'	=> $rowdetail->project_id,
 							'type'			=> '2',
-							'nominal'		=> $rowdetail->nominal
+							'nominal'		=> $rowdetail->nominal,
+							'nominal_fc'	=> $rowdetail->nominal,
 						]);
 					}
 				}
@@ -1993,7 +1997,7 @@ class CustomHelper {
 						'project_id'	=> $row->project_id ? $row->project_id : NULL,
 						'type'			=> '1',
 						'nominal'		=> $row->total * $cp->currency_rate,
-						'nominal_fc'	=> $cp->currency->type == '1' ? 0 : $row->total,
+						'nominal_fc'	=> $cp->currency->type == '1' ? $row->total * $cp->currency_rate : $row->total,
 					]);
 
 					$coaAyatSilangPembelianAset = Coa::where('code','100.01.01.99.04')->where('company_id',$row->asset->place->company_id)->first();
@@ -2021,7 +2025,7 @@ class CustomHelper {
 								'project_id'					=> $row->project_id ? $row->project_id : NULL,
 								'type'                          => '1',
 								'nominal'                       => $nominal * $cp->currency_rate,
-								'nominal_fc'					=> $cp->currency->type == '1' ? 0 : $nominal,
+								'nominal_fc'					=> $cp->currency->type == '1' ? $nominal * $cp->currency_rate : $nominal,
 							]);
 						}
 					}else{
@@ -2036,7 +2040,7 @@ class CustomHelper {
 							'project_id'	=> $row->project_id ? $row->project_id : NULL,
 							'type'			=> '2',
 							'nominal'		=> $row->total * $cp->currency_rate,
-							'nominal_fc'	=> $cp->currency->type == '1' ? 0 : $row->total,
+							'nominal_fc'	=> $cp->currency->type == '1' ? $row->total * $cp->currency_rate : $row->total,
 						]);
 					}
 				}
@@ -2076,7 +2080,7 @@ class CustomHelper {
 						'warehouse_id'	=> $rowdetail->itemStock->warehouse_id,
 						'type'			=> '1',
 						'nominal'		=> $nominal,
-						'nominal_fc'	=> 0,
+						'nominal_fc'	=> $nominal,
 					]);
 	
 					JournalDetail::create([
@@ -2087,7 +2091,7 @@ class CustomHelper {
 						'warehouse_id'	=> $rowdetail->itemStock->warehouse_id,
 						'type'			=> '2',
 						'nominal'		=> $nominal,
-						'nominal_fc'	=> 0,
+						'nominal_fc'	=> $nominal,
 					]);
 				}
 			}
@@ -2154,7 +2158,7 @@ class CustomHelper {
 						'warehouse_id'	=> $iti->inventoryTransferOut->warehouse_to,
 						'type'			=> '1',
 						'nominal'		=> $rowdetail->total,
-						'nominal_fc'	=> 0,
+						'nominal_fc'	=> $rowdetail->total,
 					]);
 	
 					JournalDetail::create([
@@ -2165,7 +2169,7 @@ class CustomHelper {
 						'warehouse_id'	=> $iti->inventoryTransferOut->warehouse_from,
 						'type'			=> '2',
 						'nominal'		=> $rowdetail->total,
-						'nominal_fc'	=> 0,
+						'nominal_fc'	=> $rowdetail->total,
 					]);
 				}
 			}
@@ -2219,7 +2223,7 @@ class CustomHelper {
 					'place_id'		=> $row->asset->place_id,
 					'type'			=> '1',
 					'nominal'		=> $row->nominal,
-					'nominal_fc'	=> 0,
+					'nominal_fc'	=> $row->nominal,
 				]);
 
 				JournalDetail::create([
@@ -2228,7 +2232,7 @@ class CustomHelper {
 					'place_id'		=> $row->asset->place_id,
 					'type'			=> '2',
 					'nominal'		=> $row->nominal,
-					'nominal_fc'	=> 0,
+					'nominal_fc'	=> $row->nominal,
 				]);
 				
 				self::updateBalanceAsset($row->asset_id,$row->nominal,'OUT');
@@ -2291,7 +2295,7 @@ class CustomHelper {
 							'project_id'	=> $row->lookable->project_id ? $row->lookable->project_id : NULL,
 							'type'			=> '1',
 							'nominal'		=> $wtax,
-							'nominal_fc'	=> $type == '1' || $type == '' ? 0 : $row->wtax,
+							'nominal_fc'	=> $type == '1' || $type == '' ? $wtax : $row->wtax,
 							'note'			=> $pm->return_tax_no,
 							'note2'			=> date('d/m/Y',strtotime($pm->return_date))
 						]);
@@ -2321,7 +2325,7 @@ class CustomHelper {
 							'account_id'	=> $coahutangusaha->bp_journal ? $row->lookable->purchaseInvoice->account_id : NULL,
 							'type'			=> '1',
 							'nominal'		=> $grandtotal,
-							'nominal_fc'	=> $type == '1' || $type == '' ? 0 : $row->grandtotal,
+							'nominal_fc'	=> $type == '1' || $type == '' ? $grandtotal : $row->grandtotal,
 						]);
 					}
 					
@@ -2353,7 +2357,7 @@ class CustomHelper {
 								'project_id'	=> $row->lookable->lookable->purchaseOrderDetail->project_id ? $row->lookable->lookable->purchaseOrderDetail->project_id : NULL,
 								'type'			=> '2',
 								'nominal'		=> $total,
-								'nominal_fc'	=> $type == '1' || $type == '' ? 0 : $row->total,
+								'nominal_fc'	=> $type == '1' || $type == '' ? $total : $row->total,
 							]);
 
 							self::sendCogs('purchase_memos',
@@ -2405,7 +2409,7 @@ class CustomHelper {
 							'project_id'	=> $row->lookable->project_id ? $row->lookable->project_id : NULL,
 							'type'			=> '2',
 							'nominal'		=> $tax,
-							'nominal_fc'	=> $type == '1' || $type == '' ? 0 : $row->tax,
+							'nominal_fc'	=> $type == '1' || $type == '' ? $tax : $row->tax,
 							'note'			=> $pm->return_tax_no,
 							'note2'			=> date('d/m/Y',strtotime($pm->return_date))
 						]);
@@ -2425,7 +2429,7 @@ class CustomHelper {
 							'account_id'	=> $row->wTaxMaster->coaPurchase->bp_journal ? $row->lookable->account_id : NULL,
 							'type'			=> '1',
 							'nominal'		=> $row->wtax * $row->lookable->currency_rate,
-							'nominal_fc'	=> $row->lookable->currency->type == '1' ? 0 : $row->wtax,
+							'nominal_fc'	=> $row->lookable->currency->type == '1' ? $row->wtax * $row->lookable->currency_rate : $row->wtax,
 							'note'			=> $pm->return_tax_no,
 							'note2'			=> date('d/m/Y',strtotime($pm->return_date))
 						]);
@@ -2438,7 +2442,7 @@ class CustomHelper {
 							'account_id'	=> $coahutangusaha->bp_journal ? $row->lookable->account_id : NULL,
 							'type'			=> '1',
 							'nominal'		=> $row->grandtotal * $row->lookable->currency_rate,
-							'nominal_fc'	=> $row->lookable->currency->type == '1' ? 0 : $row->grandtotal,
+							'nominal_fc'	=> $row->lookable->currency->type == '1' ? $row->grandtotal * $row->lookable->currency_rate : $row->grandtotal,
 						]);
 					}
 
@@ -2449,7 +2453,7 @@ class CustomHelper {
 							'account_id'	=> $coamodel->bp_journal ? $row->lookable->account_id : NULL,
 							'type'			=> '2',
 							'nominal'		=> $row->total * $row->lookable->currency_rate,
-							'nominal_fc'	=> $row->lookable->currency->type == '1' ? 0 : $row->total,
+							'nominal_fc'	=> $row->lookable->currency->type == '1' ? $row->total * $row->lookable->currency_rate : $row->total,
 						]);
 					}
 
@@ -2460,7 +2464,7 @@ class CustomHelper {
 							'account_id'	=> $row->taxMaster->coaPurchase->bp_journal ? $row->lookable->account_id : NULL,
 							'type'			=> '2',
 							'nominal'		=> $row->tax * $row->lookable->currency_rate,
-							'nominal_fc'	=> $row->lookable->currency->type == '1' ? 0 : $row->tax,
+							'nominal_fc'	=> $row->lookable->currency->type == '1' ? $row->tax * $row->lookable->currency_rate : $row->tax,
 							'note'			=> $pm->return_tax_no,
 							'note2'			=> date('d/m/Y',strtotime($pm->return_date))
 						]);
@@ -2475,7 +2479,7 @@ class CustomHelper {
 					'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
 					'type'			=> '1',
 					'nominal'		=> $pm->rounding > 0 ? $pm->rounding * $currency_rate : $pm->rounding * $currency_rate,
-					'nominal_fc'	=> $type == '1' || $type == '' ? 0 : $pm->rounding,
+					'nominal_fc'	=> $type == '1' || $type == '' ? ($pm->rounding > 0 ? $pm->rounding * $currency_rate : $pm->rounding * $currency_rate) : $pm->rounding,
 				]);
 
 				JournalDetail::create([
@@ -2484,7 +2488,7 @@ class CustomHelper {
 					'account_id'	=> $coarounding->bp_journal ? $account_id : NULL,
 					'type'			=> '2',
 					'nominal'		=> $pm->rounding > 0 ? $pm->rounding : $pm->rounding,
-					'nominal_fc'	=> $type == '1' || $type == '' ? 0 : $pm->rounding,
+					'nominal_fc'	=> $type == '1' || $type == '' ? ($pm->rounding > 0 ? $pm->rounding : $pm->rounding) : $pm->rounding,
 				]);
 			}
 
@@ -2835,7 +2839,7 @@ class CustomHelper {
 						'project_id'	=> $row->project_id ? $row->project_id : NULL,
 						'type'			=> '1',
 						'nominal'		=> $row->total,
-						'nominal_fc'	=> 0,
+						'nominal_fc'	=> $row->total,
 					]);
 
 					$grandtotal += $row->grandtotal;
@@ -2855,7 +2859,7 @@ class CustomHelper {
 							'project_id'	=> $row->project_id ? $row->project_id : NULL,
 							'type'			=> '1',
 							'nominal'		=> $row->tax,
-							'nominal_fc'	=> 0,
+							'nominal_fc'	=> $row->tax,
 							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
 							'note2'			=> 'Tgl. FP/BP '.date('d/m/Y',strtotime($row->purchaseInvoice->cut_date))
 						]);
@@ -2874,7 +2878,7 @@ class CustomHelper {
 							'project_id'	=> $row->project_id ? $row->project_id : NULL,
 							'type'			=> '2',
 							'nominal'		=> $row->wtax,
-							'nominal_fc'	=> 0,
+							'nominal_fc'	=> $row->wtax,
 							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
 							'note2'			=> 'Tgl. FP/BP '.date('d/m/Y',strtotime($row->purchaseInvoice->cut_date))
 						]);
@@ -2892,7 +2896,7 @@ class CustomHelper {
 						'project_id'	=> $row->project_id ? $row->project_id : NULL,
 						'type'			=> '2',
 						'nominal'		=> $row->grandtotal,
-						'nominal_fc'	=> 0,
+						'nominal_fc'	=> $row->grandtotal,
 					]);
 
 				}elseif($row->lookable_type == 'purchase_order_details'){
@@ -2912,7 +2916,7 @@ class CustomHelper {
 						'project_id'	=> $row->project_id ? $row->project_id : NULL,
 						'type'			=> '1',
 						'nominal'		=> $pod->getArrayTotal()['total'] * $pod->purchaseOrder->currency_rate,
-						'nominal_fc'	=> $type == '1' || $type == '' ? 0 : $pod->getArrayTotal()['total'],
+						'nominal_fc'	=> $type == '1' || $type == '' ? $pod->getArrayTotal()['total'] * $pod->purchaseOrder->currency_rate : $pod->getArrayTotal()['total'],
 					]);
 
 					$grandtotal += $row->grandtotal * $pod->purchaseOrder->currency_rate;
@@ -2933,7 +2937,7 @@ class CustomHelper {
 							'project_id'	=> $row->project_id ? $row->project_id : NULL,
 							'type'			=> '1',
 							'nominal'		=> $row->tax * $pod->purchaseOrder->currency_rate,
-							'nominal_fc'	=> $pod->purchaseOrder->currency->type == '1' ? 0 : $row->tax,
+							'nominal_fc'	=> $pod->purchaseOrder->currency->type == '1' ? $row->tax * $pod->purchaseOrder->currency_rate : $row->tax,
 							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
 							'note2'			=> 'Tgl. FP/BP '.date('d/m/Y',strtotime($row->purchaseInvoice->cut_date))
 						]);
@@ -2952,7 +2956,7 @@ class CustomHelper {
 							'project_id'	=> $row->project_id ? $row->project_id : NULL,
 							'type'			=> '2',
 							'nominal'		=> $row->wtax * $pod->purchaseOrder->currency_rate,
-							'nominal_fc'	=> $pod->purchaseOrder->currency->type == '1' ? 0 : $row->wtax,
+							'nominal_fc'	=> $pod->purchaseOrder->currency->type == '1' ? $row->wtax * $pod->purchaseOrder->currency_rate : $row->wtax,
 							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
 							'note2'			=> 'Tgl. FP/BP '.date('d/m/Y',strtotime($row->purchaseInvoice->cut_date))
 						]);
@@ -2970,7 +2974,7 @@ class CustomHelper {
 						'project_id'	=> $row->project_id ? $row->project_id : NULL,
 						'type'			=> '2',
 						'nominal'		=> $row->grandtotal * $pod->purchaseOrder->currency_rate,
-						'nominal_fc'	=> $pod->purchaseOrder->currency->type == '1' ? 0 : $row->grandtotal,
+						'nominal_fc'	=> $pod->purchaseOrder->currency->type == '1' ? $row->grandtotal * $pod->purchaseOrder->currency_rate : $row->grandtotal,
 					]);
 
 					if(self::checkArrayRaw($arrNote,$pod->purchaseOrder->code) < 0){
@@ -2985,7 +2989,7 @@ class CustomHelper {
 						'account_id'	=> $row->lookable->landedCostFee->coa->bp_journal ? $row->lookable->landedCost->account_id : NULL,
 						'type'			=> '1',
 						'nominal'		=> $row->lookable->total * $row->lookable->landedCost->currency_rate,
-						'nominal_fc'	=> $row->lookable->landedCost->currency->type == '1' ? 0 : $row->lookable->total,
+						'nominal_fc'	=> $row->lookable->landedCost->currency->type == '1' ? $row->lookable->total * $row->lookable->landedCost->currency_rate : $row->lookable->total,
 						'note'			=> $row->lookable->landedCostFee->name,
 					]);
 
@@ -3001,7 +3005,7 @@ class CustomHelper {
 							'account_id'	=> $row->taxMaster->coaPurchase->bp_journal ? $account_id : NULL,
 							'type'			=> '1',
 							'nominal'		=> $row->tax * $row->lookable->landedCost->currency_rate,
-							'nominal_fc'	=> $row->lookable->landedCost->currency->type == '1' ? 0 : $row->tax,
+							'nominal_fc'	=> $row->lookable->landedCost->currency->type == '1' ? $row->tax * $row->lookable->landedCost->currency_rate : $row->tax,
 							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
 							'note2'			=> 'Tgl. FP/BP '.date('d/m/Y',strtotime($row->purchaseInvoice->cut_date))
 						]);
@@ -3014,7 +3018,7 @@ class CustomHelper {
 							'account_id'	=> $row->wTaxMaster->coaPurchase->bp_journal ? $account_id : NULL,
 							'type'			=> '2',
 							'nominal'		=> $row->wtax * $row->lookable->landedCost->currency_rate,
-							'nominal_fc'	=> $row->lookable->landedCost->currency->type == '1' ? 0 : $row->wtax,
+							'nominal_fc'	=> $row->lookable->landedCost->currency->type == '1' ? $row->wtax * $row->lookable->landedCost->currency_rate : $row->wtax,
 							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
 							'note2'			=> 'Tgl. FP/BP '.date('d/m/Y',strtotime($row->purchaseInvoice->cut_date))
 						]);
@@ -3026,7 +3030,7 @@ class CustomHelper {
 						'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
 						'type'			=> '2',
 						'nominal'		=> $row->grandtotal * $row->lookable->landedCost->currency_rate,
-						'nominal_fc'	=> $row->lookable->landedCost->currency->type == '1' ? 0 : $row->grandtotal,
+						'nominal_fc'	=> $row->lookable->landedCost->currency->type == '1' ? $row->grandtotal * $row->lookable->landedCost->currency_rate : $row->grandtotal,
 					]);
 
 					if(self::checkArrayRaw($arrNote,$row->lookable->landedCost->code) < 0){
@@ -3046,7 +3050,7 @@ class CustomHelper {
 						'project_id'	=> $row->lookable->purchaseOrderDetail->project_id ? $row->lookable->purchaseOrderDetail->project_id : NULL,
 						'type'			=> '1',
 						'nominal'		=> $row->total * $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate,
-						'nominal_fc'	=> $row->lookable->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? 0 : $row->total,
+						'nominal_fc'	=> $row->lookable->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? $row->total * $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate : $row->total,
 					]);
 
 					$grandtotal += $row->grandtotal * $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
@@ -3067,7 +3071,7 @@ class CustomHelper {
 							'project_id'	=> $row->lookable->purchaseOrderDetail->project_id ? $row->lookable->purchaseOrderDetail->project_id : NULL,
 							'type'			=> '1',
 							'nominal'		=> $row->tax * $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate,
-							'nominal_fc'	=> $row->lookable->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? 0 : $row->tax,
+							'nominal_fc'	=> $row->lookable->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? $row->tax * $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate : $row->tax,
 							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
 							'note2'			=> 'Tgl. FP/BP '.date('d/m/Y',strtotime($row->purchaseInvoice->cut_date))
 						]);
@@ -3086,7 +3090,7 @@ class CustomHelper {
 							'project_id'	=> $row->lookable->purchaseOrderDetail->project_id ? $row->lookable->purchaseOrderDetail->project_id : NULL,
 							'type'			=> '2',
 							'nominal'		=> $row->wtax * $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate,
-							'nominal_fc'	=> $row->lookable->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? 0 : $row->wtax,
+							'nominal_fc'	=> $row->lookable->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? $row->wtax * $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate : $row->wtax,
 							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
 							'note2'			=> 'Tgl. FP/BP '.date('d/m/Y',strtotime($row->purchaseInvoice->cut_date))
 						]);
@@ -3104,7 +3108,7 @@ class CustomHelper {
 						'project_id'	=> $row->lookable->purchaseOrderDetail->project_id ? $row->lookable->purchaseOrderDetail->project_id : NULL,
 						'type'			=> '2',
 						'nominal'		=> $row->grandtotal * $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate,
-						'nominal_fc'	=> $row->lookable->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? 0 : $row->grandtotal,
+						'nominal_fc'	=> $row->lookable->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? $row->grandtotal * $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate : $row->grandtotal,
 					]);
 
 					if(self::checkArrayRaw($arrNote,$row->lookable->goodReceipt->code) < 0){
@@ -3121,7 +3125,7 @@ class CustomHelper {
 					'account_id'	=> $coarounding->bp_journal ? $account_id : NULL,
 					'type'			=> $pi->rounding > 0 ? '1' : '2',
 					'nominal'		=> abs($pi->rounding * $currency_rate),
-					'nominal_fc'	=> $type == '1' || $type == '' ? 0 : abs($pi->rounding),
+					'nominal_fc'	=> $type == '1' || $type == '' ? abs($pi->rounding * $currency_rate) : abs($pi->rounding),
 				]);
 
 				JournalDetail::create([
@@ -3130,7 +3134,7 @@ class CustomHelper {
 					'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
 					'type'			=> $pi->rounding > 0 ? '2' : '1',
 					'nominal'		=> abs($pi->rounding * $currency_rate),
-					'nominal_fc'	=> $type == '1' || $type == '' ? 0 : abs($pi->rounding),
+					'nominal_fc'	=> $type == '1' || $type == '' ? abs($pi->rounding * $currency_rate) : abs($pi->rounding),
 				]);
 			}
 
@@ -3146,7 +3150,7 @@ class CustomHelper {
 						'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
 						'type'			=> '1',
 						'nominal'		=> $row->nominal * $row->purchaseDownPayment->currency_rate,
-						'nominal_fc'	=> $row->purchaseDownPayment->currency->type == '1' ? 0 : $row->nominal,
+						'nominal_fc'	=> $row->purchaseDownPayment->currency->type == '1' ? $row->nominal * $row->purchaseDownPayment->currency_rate : $row->nominal,
 					]);
 	
 					JournalDetail::create([
@@ -3155,7 +3159,7 @@ class CustomHelper {
 						'account_id'	=> $coauangmukapembelian->bp_journal ? $account_id : NULL,
 						'type'			=> '2',
 						'nominal'		=> $row->nominal * $row->purchaseDownPayment->currency_rate,
-						'nominal_fc'	=> $row->purchaseDownPayment->currency->type == '1' ? 0 : $row->nominal,
+						'nominal_fc'	=> $row->purchaseDownPayment->currency->type == '1' ? $row->nominal * $row->purchaseDownPayment->currency_rate : $row->nominal,
 					]);
 				}
 			}
@@ -3238,8 +3242,8 @@ class CustomHelper {
 				'coa_id'		=> $coauangmuka->id,
 				'account_id'	=> $coauangmuka->bp_journal ? $account_id : NULL,
 				'type'			=> '1',
-				'nominal'		=> $pdp->grandtotal,
-				'nominal_fc'	=> $pdp->currency->type == '1' ? 0 : $pdp->grandtotal,
+				'nominal'		=> $pdp->grandtotal * $pdp->currency_rate,
+				'nominal_fc'	=> $pdp->currency->type == '1' ? $pdp->grandtotal * $pdp->currency_rate : $pdp->grandtotal,
 			]);
 
 			JournalDetail::create([
@@ -3247,8 +3251,8 @@ class CustomHelper {
 				'coa_id'		=> $coahutangusaha->id,
 				'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
 				'type'			=> '2',
-				'nominal'		=> $pdp->grandtotal,
-				'nominal_fc'	=> $pdp->currency->type == '1' ? 0 : $pdp->grandtotal,
+				'nominal'		=> $pdp->grandtotal * $pdp->currency_rate,
+				'nominal_fc'	=> $pdp->currency->type == '1' ? $pdp->grandtotal * $pdp->currency_rate : $pdp->grandtotal,
 			]);
 
 		}elseif($table_name == 'employee_transfers'){
@@ -3393,7 +3397,7 @@ class CustomHelper {
 						'coa_id'		=> $row->coa_id,
 						'type'			=> $row->type,
 						'nominal'		=> abs($row->nominal),
-						'nominal_fc'	=> 0,
+						'nominal_fc'	=> abs($row->nominal),
 					]);
 				}
 

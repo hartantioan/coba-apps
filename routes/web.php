@@ -2333,6 +2333,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('print',[JournalController::class, 'print']);
                     Route::get('export',[JournalController::class, 'export']);
                     Route::post('print_by_range',[JournalController::class, 'printByRange']);
+                    Route::get('get_import_excel',[JournalController::class, 'getImportExcel']);
                     Route::get('print_individual/{id}',[JournalController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('create',[JournalController::class, 'create'])->middleware('operation.access:journal,update');
                     Route::post('create_multi',[JournalController::class, 'createMulti'])->middleware('operation.access:journal,update');

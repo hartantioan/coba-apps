@@ -28,6 +28,7 @@ use App\Exports\ExportTemplateJournalCopy;
 use Illuminate\Database\Eloquent\Builder;
 use App\Helpers\CustomHelper;
 use App\Models\Menu;
+use App\Models\Project;
 
 class JournalController extends Controller
 {
@@ -504,12 +505,22 @@ class JournalController extends Controller
             
             $totalDebit = 0; 
             $totalCredit = 0;
+            $totalDebitFC = 0; 
+            $totalCreditFC = 0;
             foreach($request->arr_multi_debit as $key => $row){
                 $totalDebit += floatval($row);
             }
 
+            foreach($request->arr_multi_debit_fc as $key => $row){
+                $totalDebitFC += floatval($row);
+            }
+
             foreach($request->arr_multi_kredit as $key => $row){
                 $totalCredit += floatval($row);
+            }
+
+            foreach($request->arr_multi_kredit_fc as $key => $row){
+                $totalCreditFC += floatval($row);
             }
 
             $cekCoa = true;
@@ -518,7 +529,7 @@ class JournalController extends Controller
 
             foreach($request->arr_multi_coa as $key => $row){
                 $coaAda = null;
-                $coaAda = Coa::where('code',$row)->where('status','1')->first();
+                $coaAda = Coa::where('code',explode('|',$row)[0])->where('status','1')->first();
                 if(!$coaAda){
                     $cekCoa = false;
                     $coaNotAvailable[] = $row;
@@ -541,6 +552,13 @@ class JournalController extends Controller
                 ]);
             }
 
+            if($totalDebitFC - $totalCreditFC > 0 || $totalDebitFC - $totalCreditFC < 0){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Total debit mata uang asli dan kredit mata uang asli terdapat selisih '.(number_format($totalDebitFC - $totalCreditFC,2,',','.'))
+                ]);
+            }
+
             $cekSameCode = Journal::whereIn('code',$request->arr_multi_code)->count();
 
             if($cekSameCode > 0){
@@ -557,14 +575,16 @@ class JournalController extends Controller
                 foreach($request->arr_multi_code as $key => $row){
 
                     if($temp !== $row){
+                        $currency = Currency::where('code',explode('|',$request->arr_multi_currency[$key])[0])->first();
+                        $company = Company::where('code',explode('|',$request->arr_multi_company[$key])[0])->first();
+
                         $query = Journal::create([
                             'code'			            => $row,
                             'user_id'		            => session('bo_id'),
-                            'currency_id'               => $request->arr_multi_currency[$key] ? $request->arr_multi_currency[$key] : NULL,
-                            'company_id'                => $request->arr_multi_company[$key] ? $request->arr_multi_company[$key] : NULL,
+                            'currency_id'               => $currency->id,
+                            'company_id'                => $company->id,
                             'currency_rate'             => $request->arr_multi_conversion[$key] ? $request->arr_multi_conversion[$key] : NULL,
                             'post_date'                 => $request->arr_multi_post_date[$key] ? date('Y-m-d',strtotime($request->arr_multi_post_date[$key])) : NULL,
-                            'due_date'                  => $request->arr_multi_due_date[$key] ? date('Y-m-d',strtotime($request->arr_multi_due_date[$key])) : NULL,
                             'note'                      => $request->arr_multi_note[$key] ? $request->arr_multi_note[$key] : NULL,
                             'status'                    => '1'
                         ]);
@@ -580,19 +600,28 @@ class JournalController extends Controller
                     }
 
                     if($query) {
-                
+                        $account = User::where('employee_no',explode('|',$request->arr_multi_bp[$key])[0])->first();
+                        $place = Place::where('code',explode('|',$request->arr_multi_place[$key])[0])->first();
+                        $line = Line::where('code',explode('|',$request->arr_multi_line[$key])[0])->first();
+                        $machine = Machine::where('code',explode('|',$request->arr_multi_machine[$key])[0])->first();
+                        $project = Project::where('code',explode('|',$request->arr_multi_project[$key])[0])->first();
+                        $department = Department::where('code',explode('|',$request->arr_multi_department[$key])[0])->first();
+
                         if(floatval($request->arr_multi_debit[$key]) > 0){
                             JournalDetail::create([
                                 'journal_id'        => $query->id,
                                 'coa_id'            => $coaAvailable[$key],
-                                'account_id'        => $request->arr_multi_bp[$key] ? $request->arr_multi_bp[$key] : NULL,
-                                'place_id'          => $request->arr_multi_place[$key] ? $request->arr_multi_place[$key] : NULL,
-                                'line_id'           => $request->arr_multi_line[$key] ? $request->arr_multi_line[$key] : NULL,
-                                'machine_id'        => $request->arr_multi_machine[$key] ? $request->arr_multi_machine[$key] : NULL,
-                                'department_id'     => $request->arr_multi_department[$key] ? $request->arr_multi_department[$key] : NULL,
+                                'account_id'        => $account ? $account->id : NULL,
+                                'place_id'          => $place ? $place->id : NULL,
+                                'line_id'           => $line ? $line->id : NULL,
+                                'machine_id'        => $machine ? $machine->id : NULL,
+                                'project_id'        => $project ? $project->id : NULL,
+                                'department_id'     => $department ? $department->id : NULL,
                                 'type'              => '1',
                                 'nominal'           => floatval($request->arr_multi_debit[$key]),
+                                'nominal_fc'        => floatval($request->arr_multi_debit_fc[$key]),
                                 'note'              => $request->arr_multi_note_detail[$key],
+                                'note2'             => $request->arr_multi_note_detail2[$key],
                             ]);
                         }
 
@@ -600,14 +629,17 @@ class JournalController extends Controller
                             JournalDetail::create([
                                 'journal_id'        => $query->id,
                                 'coa_id'            => $coaAvailable[$key],
-                                'account_id'        => $request->arr_multi_bp[$key] ? $request->arr_multi_bp[$key] : NULL,
-                                'place_id'          => $request->arr_multi_place[$key] ? $request->arr_multi_place[$key] : NULL,
-                                'line_id'           => $request->arr_multi_line[$key] ? $request->arr_multi_line[$key] : NULL,
-                                'machine_id'        => $request->arr_multi_machine[$key] ? $request->arr_multi_machine[$key] : NULL,
-                                'department_id'     => $request->arr_multi_department[$key] ? $request->arr_multi_department[$key] : NULL,
+                                'account_id'        => $account ? $account->id : NULL,
+                                'place_id'          => $place ? $place->id : NULL,
+                                'line_id'           => $line ? $line->id : NULL,
+                                'machine_id'        => $machine ? $machine->id : NULL,
+                                'project_id'        => $project ? $project->id : NULL,
+                                'department_id'     => $department ? $department->id : NULL,
                                 'type'              => '2',
                                 'nominal'           => floatval($request->arr_multi_kredit[$key]),
+                                'nominal_fc'        => floatval($request->arr_multi_kredit_fc[$key]),
                                 'note'              => $request->arr_multi_note_detail[$key],
+                                'note2'             => $request->arr_multi_note_detail2[$key],
                             ]);
                         }
                     }

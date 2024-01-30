@@ -441,7 +441,8 @@
                             <th class="center-align" rowspan="2">Department</th>
                             <th class="center-align" rowspan="2">Gudang</th>
                             <th class="center-align" rowspan="2">Proyek</th>
-                            <th class="center-align" rowspan="2">Keterangan</th>
+                            <th class="center-align" rowspan="2">Ket.1</th>
+                            <th class="center-align" rowspan="2">Ket.2</th>
                             <th class="center-align" colspan="2">Mata Uang Asli</th>
                             <th class="center-align" colspan="2">Mata Uang Konversi</th>
                         </tr>

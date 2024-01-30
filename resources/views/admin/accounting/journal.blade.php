@@ -220,7 +220,7 @@
                                         <h5>Detail Coa</h5>
                                         <p class="mt-2 mb-2">
                                             <table class="bordered" style="min-width:2800px;" id="table-detail">
-                                                <thead>
+                                                <thead style="position:sticky;top: 50px !important;background-color:rgb(176, 212, 212) !important;">
                                                     <tr>
                                                         <th class="center" rowspan="2">BP</th>
                                                         <th class="center" rowspan="2">Coa</th>
@@ -276,9 +276,9 @@
                                 </div>
                                 <div class="col s12">
                                     <div class="col s12" style="overflow:auto;width:100% !important;">
-                                        <h6>Anda bisa menggunakan fitur copy paste dari format excel yang telah disediakan. Silahkan klik <a href="{{ asset(Storage::url('format_imports/format_copas_journal.xlsx')) }}" target="_blank">disini</a> untuk mengunduh. Jangan menyalin kolom paling atas (bagian header), dan tempel pada isian paling kiri di tabel di bawah ini.</h6>
+                                        <h6>Anda bisa menggunakan fitur copy paste dari format excel yang telah disediakan. Silahkan klik <a href="{{-- {{ asset(Storage::url('format_imports/format_copas_journal.xlsx')) }} --}}{{ Request::url() }}/get_import_excel" target="_blank">disini</a> untuk mengunduh. Jangan menyalin kolom paling atas (bagian header), dan tempel pada isian paling kiri di tabel di bawah ini.</h6>
                                         <p class="mt-2 mb-2">
-                                            <table class="bordered" style="min-width:2800px;zoom:0.7;" id="table-detail1">
+                                            <table class="bordered" style="min-width:3500px;zoom:0.7;" id="table-detail1">
                                                 <thead>
                                                     <tr>
                                                         <th class="center" rowspan="2">Kode Jurnal</th>
@@ -296,7 +296,8 @@
                                                         <th class="center" style="width:75px;" rowspan="2">Departemen</th>
                                                         <th class="center" colspan="2">Mata Uang Asli</th>
                                                         <th class="center" colspan="2">Mata Uang Konversi</th>
-                                                        <th class="center" rowspan="2">Keterangan Detail</th>
+                                                        <th class="center" rowspan="2">Keterangan Detail 1</th>
+                                                        <th class="center" rowspan="2">Keterangan Detail 2</th>
                                                         <th class="center" rowspan="2">Hapus</th>
                                                     </tr>
                                                     <tr>
@@ -308,7 +309,7 @@
                                                 </thead>
                                                 <tbody id="body-coa-multi">
                                                     <tr id="last-row-coa-multi">
-                                                        <td colspan="19" class="center">
+                                                        <td colspan="20" class="center">
                                                             <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addLine()" href="javascript:void(0);">
                                                                 <i class="material-icons left">add</i> Tambah 1 Baris
                                                             </a>
@@ -697,10 +698,10 @@
                             <input name="arr_note[]" type="text" placeholder="Keterangan...">
                         </td>
                         <td>
-                            ` + (type == '1' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="` + formatRupiahIni(roundTwoDecimal(nominal).toString().replace('.',',')) + `" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
+                            ` + (type == '1' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="` + formatRupiahIni(roundTwoDecimal(nominal).toString().replace('.',',')) + `" style="width:175px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
                         </td>
                         <td>
-                            ` + (type == '2' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="` + formatRupiahIni(roundTwoDecimal(nominal).toString().replace('.',',')) + `" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
+                            ` + (type == '2' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="` + formatRupiahIni(roundTwoDecimal(nominal).toString().replace('.',',')) + `" style="width:175px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
                         </td>
                         <td class="center">
                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" href="javascript:void(0);">
@@ -787,16 +788,16 @@
                     <input name="arr_note2[]" type="text" placeholder="Keterangan 2...">
                 </td>
                 <td>
-                    ` + (type == '1' ? `<input name="arr_nominal_fc[]" onfocus="emptyThis(this);" type="text" value="0" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">` : `-`) + `
+                    ` + (type == '1' ? `<input name="arr_nominal_fc[]" onfocus="emptyThis(this);" type="text" value="0" style="width:175px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">` : `-`) + `
                 </td>
                 <td>
-                    ` + (type == '2' ? `<input name="arr_nominal_fc[]" onfocus="emptyThis(this);" type="text" value="0" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">` : `-`) + `
+                    ` + (type == '2' ? `<input name="arr_nominal_fc[]" onfocus="emptyThis(this);" type="text" value="0" style="width:175px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">` : `-`) + `
                 </td>
                 <td>
-                    ` + (type == '1' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="0" style="width:150px !important;" onkeyup="formatRupiah(this);" readonly>` : `-`) + `
+                    ` + (type == '1' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="0" style="width:175px !important;" onkeyup="formatRupiah(this);" readonly>` : `-`) + `
                 </td>
                 <td>
-                    ` + (type == '2' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="0" style="width:150px !important;" onkeyup="formatRupiah(this);" readonly>` : `-`) + `
+                    ` + (type == '2' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="0" style="width:175px !important;" onkeyup="formatRupiah(this);" readonly>` : `-`) + `
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" href="javascript:void(0);">
@@ -877,52 +878,61 @@
         $('#last-row-coa-multi').before(`
             <tr class="row_coa_multi">
                 <td>
-                    <input type="text" name="arr_multi_code[]" placeholder="Kode Jurnal">
+                    <input type="text" name="arr_multi_code[]" placeholder="Kode Jurnal" style="width:175px;">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_company[]" placeholder="ID Perusahaan">
+                    <input type="text" name="arr_multi_company[]" placeholder="ID Perusahaan" style="width:175px;">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_note[]" placeholder="Keterangan">
+                    <input type="text" name="arr_multi_note[]" placeholder="Keterangan" style="width:175px;">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_post_date[]" placeholder="Tgl.Post format d/m/Y ex:15/12/23">
+                    <input type="text" name="arr_multi_post_date[]" placeholder="Tgl.Post format d/m/Y ex:15/12/23" style="width:175px;">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_due_date[]" placeholder="Tgl.Tenggat format d/m/Y ex:15/12/23">
+                    <input type="text" name="arr_multi_currency[]" placeholder="ID Mata Uang" style="width:175px;">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_currency[]" placeholder="ID Mata Uang">
+                    <input type="text" name="arr_multi_conversion[]" placeholder="Konversi" style="width:175px;">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_conversion[]" placeholder="Konversi">
+                    <input type="text" name="arr_multi_bp[]" placeholder="ID Partner Bisnis" style="width:175px;">    
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_bp[]" placeholder="ID Partner Bisnis">    
+                    <input type="text" name="arr_multi_coa[]" placeholder="ID Coa" style="width:175px;">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_coa[]" placeholder="ID Coa">
+                    <input type="text" name="arr_multi_place[]" placeholder="ID Plant" style="width:175px;">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_place[]" placeholder="ID Plant">
+                    <input type="text" name="arr_multi_line[]" placeholder="ID Line" style="width:175px;">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_line[]" placeholder="ID Line">
+                    <input type="text" name="arr_multi_machine[]" placeholder="ID Mesin" style="width:175px;">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_machine[]" placeholder="ID Mesin">
+                    <input type="text" name="arr_multi_project[]" placeholder="ID Project" style="width:175px;">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_department[]" placeholder="ID Departemen">
+                    <input type="text" name="arr_multi_department[]" placeholder="ID Departemen" style="width:175px;">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_debit[]" placeholder="Nominal Debit" value="0" onkeyup="countAllMulti()">
+                    <input type="text" name="arr_multi_debit_fc[]" placeholder="Nominal Debit" value="0" onkeyup="countAllMulti()" style="width:175px;">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_kredit[]" placeholder="Nominal Kredit" value="0" onkeyup="countAllMulti()">
+                    <input type="text" name="arr_multi_kredit_fc[]" placeholder="Nominal Kredit" value="0" onkeyup="countAllMulti()" style="width:175px;">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_note_detail[]" placeholder="Keterangan" value="">
+                    <input type="text" name="arr_multi_debit[]" placeholder="Nominal Debit" value="0" onkeyup="countAllMulti()" style="width:175px;">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_kredit[]" placeholder="Nominal Kredit" value="0" onkeyup="countAllMulti()" style="width:175px;">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_note_detail[]" placeholder="Keterangan" value="" style="width:175px;">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_note_detail2[]" placeholder="Keterangan" value="" style="width:175px;">
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa-multi" href="javascript:void(0);">
@@ -997,52 +1007,61 @@
                         $('#last-row-coa-multi').before(`
                             <tr class="row_coa_multi">
                                 <td>
-                                    <input type="text" name="arr_multi_code[]" placeholder="Kode Jurnal">
+                                    <input type="text" name="arr_multi_code[]" placeholder="Kode Jurnal" style="width:175px;">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_company[]" placeholder="ID Perusahaan">
+                                    <input type="text" name="arr_multi_company[]" placeholder="ID Perusahaan" style="width:175px;">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_note[]" placeholder="Keterangan">
+                                    <input type="text" name="arr_multi_note[]" placeholder="Keterangan" style="width:175px;">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_post_date[]" placeholder="Tgl.Post format d/m/Y ex:15/12/23">
+                                    <input type="text" name="arr_multi_post_date[]" placeholder="Tgl.Post format d/m/Y ex:15/12/23" style="width:175px;">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_due_date[]" placeholder="Tgl.Tenggat format d/m/Y ex:15/12/23">
+                                    <input type="text" name="arr_multi_currency[]" placeholder="ID Mata Uang" style="width:175px;">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_currency[]" placeholder="ID Mata Uang">
+                                    <input type="text" name="arr_multi_conversion[]" placeholder="Konversi" style="width:175px;">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_conversion[]" placeholder="Konversi">
+                                    <input type="text" name="arr_multi_bp[]" placeholder="ID Partner Bisnis" style="width:175px;">    
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_bp[]" placeholder="ID Partner Bisnis">    
+                                    <input type="text" name="arr_multi_coa[]" placeholder="ID Coa" style="width:175px;">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_coa[]" placeholder="ID Coa">
+                                    <input type="text" name="arr_multi_place[]" placeholder="ID Plant" style="width:175px;">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_place[]" placeholder="ID Plant">
+                                    <input type="text" name="arr_multi_line[]" placeholder="ID Line" style="width:175px;">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_line[]" placeholder="ID Line">
+                                    <input type="text" name="arr_multi_machine[]" placeholder="ID Mesin" style="width:175px;">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_machine[]" placeholder="ID Line">
+                                    <input type="text" name="arr_multi_project[]" placeholder="ID Project" style="width:175px;">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_department[]" placeholder="ID Departemen">
+                                    <input type="text" name="arr_multi_department[]" placeholder="ID Departemen" style="width:175px;">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_debit[]" placeholder="Nominal Debit" value="0" onkeyup="countAllMulti()">
+                                    <input type="text" name="arr_multi_debit_fc[]" placeholder="Nominal Debit" value="0" onkeyup="countAllMulti()" style="width:175px;">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_kredit[]" placeholder="Nominal Kredit" value="0" onkeyup="countAllMulti()">
+                                    <input type="text" name="arr_multi_kredit_fc[]" placeholder="Nominal Kredit" value="0" onkeyup="countAllMulti()" style="width:175px;">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_note_detail[]" placeholder="Keterangan" value="">
+                                    <input type="text" name="arr_multi_debit[]" placeholder="Nominal Debit" value="0" onkeyup="countAllMulti()" style="width:175px;">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_kredit[]" placeholder="Nominal Kredit" value="0" onkeyup="countAllMulti()" style="width:175px;">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_note_detail[]" placeholder="Keterangan" value="" style="width:175px;">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_note_detail2[]" placeholder="Keterangan" value="" style="width:175px;">
                                 </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa-multi" href="javascript:void(0);">
@@ -1389,32 +1408,37 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                var formData = new FormData($('#form_data')[0]);
+                var formData = new FormData($('#form_data')[0]), passed = true;
 
                 formData.delete("arr_multi_code[]");
                 formData.delete("arr_multi_company[]");
                 formData.delete("arr_multi_note[]");
                 formData.delete("arr_multi_post_date[]");
-                formData.delete("arr_multi_due_date[]");
                 formData.delete("arr_multi_currency[]");
                 formData.delete("arr_multi_conversion[]");
+                formData.delete("arr_multi_bp[]");
                 formData.delete("arr_multi_coa[]");
                 formData.delete("arr_multi_place[]");
-                formData.delete("arr_multi_bp[]");
                 formData.delete("arr_multi_line[]");
                 formData.delete("arr_multi_machine[]");
+                formData.delete("arr_multi_project[]");
                 formData.delete("arr_multi_department[]");
+                formData.delete("arr_multi_debit_fc[]");
+                formData.delete("arr_multi_kredit_fc[]");
                 formData.delete("arr_multi_debit[]");
                 formData.delete("arr_multi_kredit[]");
                 formData.delete("arr_multi_note_detail[]");
+                formData.delete("arr_multi_note_detail2[]");
 
                 $('input[name^="arr_multi_code"]').each(function(index){
                     if($(this).val()){
+                        if(!$('input[name^="arr_multi_company"]').eq(index).val() || !$('input[name^="arr_multi_post_date"]').eq(index).val() || !$('input[name^="arr_multi_currency"]').eq(index).val() || !$('input[name^="arr_multi_conversion"]').eq(index).val() || !$('input[name^="arr_multi_coa"]').eq(index).val() || !$('input[name^="arr_multi_debit_fc[]"]').eq(index).val() || !$('input[name^="arr_multi_kredit_fc[]"]').eq(index).val() || !$('input[name^="arr_multi_debit[]"]').eq(index).val() || !$('input[name^="arr_multi_kredit[]"]').eq(index).val()){
+                            passed = false;
+                        }
                         formData.append('arr_multi_code[]',$(this).val());
                         formData.append('arr_multi_company[]',($('input[name^="arr_multi_company"]').eq(index).val() ? $('input[name^="arr_multi_company"]').eq(index).val() : ''));
-                        formData.append('arr_multi_note[]',($('input[name^="arr_multi_note"]').eq(index).val() ? $('input[name^="arr_multi_note"]').eq(index).val() : ''));
+                        formData.append('arr_multi_note[]',($('input[name^="arr_multi_note[]"]').eq(index).val() ? $('input[name^="arr_multi_note[]"]').eq(index).val() : ''));
                         formData.append('arr_multi_post_date[]',($('input[name^="arr_multi_post_date"]').eq(index).val() ? $('input[name^="arr_multi_post_date"]').eq(index).val() : ''));
-                        formData.append('arr_multi_due_date[]',($('input[name^="arr_multi_due_date"]').eq(index).val() ? $('input[name^="arr_multi_due_date"]').eq(index).val() : ''));
                         formData.append('arr_multi_currency[]',($('input[name^="arr_multi_currency"]').eq(index).val() ? $('input[name^="arr_multi_currency"]').eq(index).val() : ''));
                         formData.append('arr_multi_conversion[]',($('input[name^="arr_multi_conversion"]').eq(index).val() ? $('input[name^="arr_multi_conversion"]').eq(index).val() : ''));
                         formData.append('arr_multi_coa[]',($('input[name^="arr_multi_coa"]').eq(index).val() ? $('input[name^="arr_multi_coa"]').eq(index).val() : ''));
@@ -1422,76 +1446,88 @@
                         formData.append('arr_multi_bp[]',($('input[name^="arr_multi_bp"]').eq(index).val() ? $('input[name^="arr_multi_bp"]').eq(index).val() : ''));
                         formData.append('arr_multi_line[]',($('input[name^="arr_multi_line"]').eq(index).val() ? $('input[name^="arr_multi_line"]').eq(index).val() : ''));
                         formData.append('arr_multi_machine[]',($('input[name^="arr_multi_machine"]').eq(index).val() ? $('input[name^="arr_multi_machine"]').eq(index).val() : ''));
+                        formData.append('arr_multi_project[]',($('input[name^="arr_multi_project"]').eq(index).val() ? $('input[name^="arr_multi_project"]').eq(index).val() : ''));
                         formData.append('arr_multi_department[]',($('input[name^="arr_multi_department"]').eq(index).val() ? $('input[name^="arr_multi_department"]').eq(index).val() : ''));
-                        formData.append('arr_multi_debit[]',($('input[name^="arr_multi_debit"]').eq(index).val() ? $('input[name^="arr_multi_debit"]').eq(index).val() : '0'));
-                        formData.append('arr_multi_kredit[]',($('input[name^="arr_multi_kredit"]').eq(index).val() ? $('input[name^="arr_multi_kredit"]').eq(index).val() : '0'));
-                        formData.append('arr_multi_note_detail[]',($('input[name^="arr_multi_note_detail"]').eq(index).val() ? $('input[name^="arr_multi_note_detail"]').eq(index).val() : '-'));
+                        formData.append('arr_multi_debit_fc[]',($('input[name^="arr_multi_debit_fc[]"]').eq(index).val() ? $('input[name^="arr_multi_debit_fc[]"]').eq(index).val() : '0'));
+                        formData.append('arr_multi_kredit_fc[]',($('input[name^="arr_multi_kredit_fc[]"]').eq(index).val() ? $('input[name^="arr_multi_kredit_fc[]"]').eq(index).val() : '0'));
+                        formData.append('arr_multi_debit[]',($('input[name^="arr_multi_debit[]"]').eq(index).val() ? $('input[name^="arr_multi_debit[]"]').eq(index).val() : '0'));
+                        formData.append('arr_multi_kredit[]',($('input[name^="arr_multi_kredit[]"]').eq(index).val() ? $('input[name^="arr_multi_kredit[]"]').eq(index).val() : '0'));
+                        formData.append('arr_multi_note_detail[]',($('input[name^="arr_multi_note_detail[]"]').eq(index).val() ? $('input[name^="arr_multi_note_detail"]').eq(index).val() : '-'));
+                        formData.append('arr_multi_note_detail2[]',($('input[name^="arr_multi_note_detail2[]"]').eq(index).val() ? $('input[name^="arr_multi_note_detail2"]').eq(index).val() : '-'));
                     }
                 });
 
-                $.ajax({
-                    url: '{{ Request::url() }}/create_multi',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    cache: true,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        $('#validation_alert_multi').hide();
-                        $('#validation_alert_multi').html('');
-                        loadingOpen('.modal-content');
-                    },
-                    success: function(response) {
-                        loadingClose('.modal-content');
-                        if(response.status == 200) {
-                            success();
-                            M.toast({
-                                html: response.message
-                            });
-                        } else if(response.status == 422) {
-                            $('#validation_alert_multi').show();
-                            $('.modal-content').scrollTop(0);
-                            
-                            swal({
-                                title: 'Ups! Validation',
-                                text: 'Check your form.',
-                                icon: 'warning'
-                            });
-
-                            $.each(response.error, function(i, val) {
-                                $.each(val, function(i, val) {
-                                    $('#validation_alert_multi').append(`
-                                        <div class="card-alert card red">
-                                            <div class="card-content white-text">
-                                                <p>` + val + `</p>
-                                            </div>
-                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                <span aria-hidden="true">×</span>
-                                            </button>
-                                        </div>
-                                    `);
+                if(passed){
+                    $.ajax({
+                        url: '{{ Request::url() }}/create_multi',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        cache: true,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            $('#validation_alert_multi').hide();
+                            $('#validation_alert_multi').html('');
+                            loadingOpen('.modal-content');
+                        },
+                        success: function(response) {
+                            loadingClose('.modal-content');
+                            if(response.status == 200) {
+                                success();
+                                M.toast({
+                                    html: response.message
                                 });
-                            });
-                        } else {
-                            M.toast({
-                                html: response.message
+                            } else if(response.status == 422) {
+                                $('#validation_alert_multi').show();
+                                $('.modal-content').scrollTop(0);
+                                
+                                swal({
+                                    title: 'Ups! Validation',
+                                    text: 'Check your form.',
+                                    icon: 'warning'
+                                });
+
+                                $.each(response.error, function(i, val) {
+                                    $.each(val, function(i, val) {
+                                        $('#validation_alert_multi').append(`
+                                            <div class="card-alert card red">
+                                                <div class="card-content white-text">
+                                                    <p>` + val + `</p>
+                                                </div>
+                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                        `);
+                                    });
+                                });
+                            } else {
+                                M.toast({
+                                    html: response.message
+                                });
+                            }
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('.modal-content');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
                             });
                         }
-                    },
-                    error: function() {
-                        $('.modal-content').scrollTop(0);
-                        loadingClose('.modal-content');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
-                        });
-                    }
-                });
+                    });
+                }else{
+                    swal({
+                        title: 'Ups!',
+                        text: 'Perusahaan, tanggal posting, mata uang, konversi, coa, nominal mata uang asing, nominal konversi tidak boleh kosong.',
+                        icon: 'error'
+                    });
+                }
             }
         });
     }
@@ -1606,16 +1642,16 @@
                                 <input name="arr_note2[]" type="text" placeholder="Keterangan 2..." value="` + val.note2 + `">
                             </td>
                             <td>
-                                ` + (val.type == '1' ? `<input name="arr_nominal_fc[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal_fc + `" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">` : `-`) + `
+                                ` + (val.type == '1' ? `<input name="arr_nominal_fc[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal_fc + `" style="width:175px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">` : `-`) + `
                             </td>
                             <td>
-                                ` + (val.type == '2' ? `<input name="arr_nominal_fc[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal_fc + `" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">` : `-`) + `
+                                ` + (val.type == '2' ? `<input name="arr_nominal_fc[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal_fc + `" style="width:175px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">` : `-`) + `
                             </td>
                             <td>
-                                ` + (val.type == '1' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal + `" style="width:150px !important;" onkeyup="formatRupiah(this);" readonly>` : `-`) + `
+                                ` + (val.type == '1' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal + `" style="width:175px !important;" onkeyup="formatRupiah(this);" readonly>` : `-`) + `
                             </td>
                             <td>
-                                ` + (val.type == '2' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal + `" style="width:150px !important;" onkeyup="formatRupiah(this);" readonly>` : `-`) + `
+                                ` + (val.type == '2' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal + `" style="width:175px !important;" onkeyup="formatRupiah(this);" readonly>` : `-`) + `
                             </td>
                             <td class="center">
                                 <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" href="javascript:void(0);">

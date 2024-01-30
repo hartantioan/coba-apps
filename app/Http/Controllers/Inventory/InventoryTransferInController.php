@@ -541,6 +541,7 @@ class InventoryTransferInController extends Controller
                     <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
                     <td class="center-align">'.($row->project_id ? $row->project->name : '-').'</td>
                     <td class="center-align">'.($row->note ? $row->note : '').'</td>
+                    <td class="center-align">'.($row->note2 ? $row->note2 : '').'</td>
                     <td class="right-align">'.($row->type == '1' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
                     <td class="right-align">'.($row->type == '2' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
                     <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>

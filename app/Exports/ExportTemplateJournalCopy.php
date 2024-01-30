@@ -31,7 +31,7 @@ class ExportTemplateJournalCopy implements WithEvents
         $company = Company::where('status','1')->get();
         $currency = Currency::where('status','1')->get();
         $user = User::where('status','1')->get();
-        $coa = Coa::where('status','1')->get();
+        $coa = Coa::where('status','1')->where('level','5')->get();
         $place = Place::where('status','1')->get();
         $line = Line::where('status','1')->get();
         $machine = Machine::where('status','1')->get();
@@ -46,9 +46,58 @@ class ExportTemplateJournalCopy implements WithEvents
         }
 
         $startRow = 2;
-        foreach($unit as $row){
+        foreach($currency as $row){
             $event->getWriter()->getSheetByIndex(2)->setCellValue('A'.$startRow,$row->code);
             $event->getWriter()->getSheetByIndex(2)->setCellValue('B'.$startRow,$row->name);
+            $startRow++;
+        }
+
+        $startRow = 2;
+        foreach($user as $row){
+            $event->getWriter()->getSheetByIndex(3)->setCellValue('A'.$startRow,$row->employee_no);
+            $event->getWriter()->getSheetByIndex(3)->setCellValue('B'.$startRow,$row->name);
+            $startRow++;
+        }
+
+        $startRow = 2;
+        foreach($coa as $row){
+            $event->getWriter()->getSheetByIndex(4)->setCellValue('A'.$startRow,$row->code);
+            $event->getWriter()->getSheetByIndex(4)->setCellValue('B'.$startRow,$row->name);
+            $startRow++;
+        }
+
+        $startRow = 2;
+        foreach($place as $row){
+            $event->getWriter()->getSheetByIndex(5)->setCellValue('A'.$startRow,$row->code);
+            $event->getWriter()->getSheetByIndex(5)->setCellValue('B'.$startRow,$row->name);
+            $startRow++;
+        }
+
+        $startRow = 2;
+        foreach($line as $row){
+            $event->getWriter()->getSheetByIndex(6)->setCellValue('A'.$startRow,$row->code);
+            $event->getWriter()->getSheetByIndex(6)->setCellValue('B'.$startRow,$row->name);
+            $startRow++;
+        }
+
+        $startRow = 2;
+        foreach($machine as $row){
+            $event->getWriter()->getSheetByIndex(7)->setCellValue('A'.$startRow,$row->code);
+            $event->getWriter()->getSheetByIndex(7)->setCellValue('B'.$startRow,$row->name);
+            $startRow++;
+        }
+
+        $startRow = 2;
+        foreach($department as $row){
+            $event->getWriter()->getSheetByIndex(8)->setCellValue('A'.$startRow,$row->code);
+            $event->getWriter()->getSheetByIndex(8)->setCellValue('B'.$startRow,$row->name);
+            $startRow++;
+        }
+
+        $startRow = 2;
+        foreach($project as $row){
+            $event->getWriter()->getSheetByIndex(9)->setCellValue('A'.$startRow,$row->code);
+            $event->getWriter()->getSheetByIndex(9)->setCellValue('B'.$startRow,$row->name);
             $startRow++;
         }
 

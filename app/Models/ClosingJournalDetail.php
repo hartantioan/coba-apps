@@ -19,6 +19,7 @@ class ClosingJournalDetail extends Model
         'coa_id',
         'type',
         'nominal',
+        'nominal_fc'
     ];
 
     public function closingJournal()

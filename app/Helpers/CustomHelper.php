@@ -2304,12 +2304,22 @@ class CustomHelper {
 					if($row->grandtotal > 0){
 						$grandtotal = 0;
 						$realgrandtotal = 0;
+						$place_id = NULL;
+						$line = NULL;
+						$machine = NULL;
+						$department = NULL;
+						$project_id = NULL;
 						if($row->lookable->lookable_type == 'coas'){
 							$grandtotal = $row->grandtotal;
 						}elseif($row->lookable->lookable_type == 'purchase_order_details'){
 							$grandtotal = $row->grandtotal * $row->lookable->lookable->purchaseOrder->currency_rate;
 							$currency_rate = $row->lookable->lookable->purchaseOrder->currency_rate;
 							$type = $row->lookable->lookable->purchaseOrder->currency->type;
+							$place_id = $row->lookable->place_id;
+							$line = $row->lookable->line_id;
+							$machine = $row->lookable->machine_id;
+							$department = $row->lookable->department_id;
+							$project_id = $row->lookable->project_id;
 						}elseif($row->lookable->lookable_type == 'landed_cost_fee_details'){
 							$grandtotal = $row->grandtotal * $row->lookable->lookable->landedCost->currency_rate;
 							$currency_rate = $row->lookable->lookable->landedCost->currency_rate;
@@ -2324,6 +2334,11 @@ class CustomHelper {
 							'coa_id'		=> $coahutangusaha->id,
 							'account_id'	=> $coahutangusaha->bp_journal ? $row->lookable->purchaseInvoice->account_id : NULL,
 							'type'			=> '1',
+							'place_id'		=> $place_id,
+							'line_id'		=> $line,
+							'machine_id'	=> $machine,
+							'department_id'	=> $department,
+							'project_id'	=> $project_id,
 							'nominal'		=> $grandtotal,
 							'nominal_fc'	=> $type == '1' || $type == '' ? $grandtotal : $row->grandtotal,
 						]);
@@ -2337,6 +2352,20 @@ class CustomHelper {
 							$total = $row->total * $row->lookable->lookable->purchaseOrder->currency_rate;
 							$currency_rate = $row->lookable->lookable->purchaseOrder->currency_rate;
 							$type = $row->lookable->lookable->purchaseOrder->currency->type;
+
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $row->lookable->lookable->coa_id,
+								'place_id'		=> $row->lookable->lookable->place_id ? $row->lookable->lookable->place_id : NULL,
+								'line_id'		=> $row->lookable->lookable->line_id ? $row->lookable->lookable->line_id : NULL,
+								'machine_id'	=> $row->lookable->lookable->machine_id ? $row->lookable->lookable->machine_id : NULL,
+								'department_id'	=> $row->lookable->lookable->department_id ? $row->lookable->lookable->department_id : NULL,
+								'warehouse_id'	=> $row->lookable->lookable->warehouse_id ? $row->lookable->lookable->warehouse_id : NULL,
+								'project_id'	=> $row->lookable->lookable->project_id ? $row->lookable->lookable->project_id : NULL,
+								'type'			=> '2',
+								'nominal'		=> $total,
+								'nominal_fc'	=> $type == '1' || $type == '' ? $total : $row->total,
+							]);
 						}elseif($row->lookable->lookable_type == 'landed_cost_fee_details'){
 							$total = $row->total * $row->lookable->lookable->landedCost->currency_rate;
 							$currency_rate = $row->lookable->lookable->landedCost->currency_rate;
@@ -2391,7 +2420,7 @@ class CustomHelper {
 						if($row->lookable->lookable_type == 'coas'){
 							$tax = $row->tax;
 						}elseif($row->lookable->lookable_type == 'purchase_order_details'){
-							$tax = $row->tax * $row->lookable->purchaseOrder->currency_rate;
+							$tax = $row->tax * $row->lookable->lookable->purchaseOrder->currency_rate;
 						}elseif($row->lookable->lookable_type == 'landed_cost_fee_details'){
 							$tax = $row->tax * $row->lookable->lookable->landedCost->currency_rate;
 						}else{

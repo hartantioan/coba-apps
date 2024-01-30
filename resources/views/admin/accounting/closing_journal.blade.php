@@ -486,7 +486,7 @@
             </div>
         </div>
         <div class="row mt-2">
-            <table class="bordered Highlight striped">
+            <table class="bordered Highlight striped" style="zoom:0.7;">
                 <thead>
                         <tr>
                             <th class="center-align" rowspan="2">No</th>
@@ -729,6 +729,7 @@
                         $('#empty-detail').remove();
 
                         if(response.result.length > 0){
+                            let totalDebit = 0, totalCredit = 0;
                             $.each(response.result, function(i, val) {
                                 var count = makeid(10);
                                 $('#body-detail').append(`
@@ -742,14 +743,23 @@
                                             ` + val.coa_code + ` - ` + val.coa_name + `
                                         </td>
                                         <td class="right-align">
-                                            ` + (parseFloat(val.nominal) >= 0 ? val.nominal : '0,00' ) + `
+                                            ` + (parseFloat(val.nominal) >= 0 ? formatRupiahIni(val.nominal.toFixed(2).toString().replace('.',',')) : '0,00' ) + `
                                         </td>
                                         <td class="right-align">
-                                            ` + (parseFloat(val.nominal) < 0 ? -1 * val.nominal : '0,00' ) + `
+                                            ` + (parseFloat(val.nominal) < 0 ? formatRupiahIni((-1 * val.nominal).toFixed(2).toString().replace('.',',')) : '0,00' ) + `
                                         </td>
                                     </tr>
                                 `);
+                                totalDebit += parseFloat(val.nominal) >= 0 ? parseFloat(val.nominal) : 0;
+                                totalCredit += parseFloat(val.nominal) < 0 ? parseFloat(val.nominal) : 0;
                             });
+                            $('#body-detail').append(`
+                                <tr>
+                                    <th class="right-align" colspan="2">TOTAL</th>
+                                    <th class="right-align">` + formatRupiahIni(totalDebit.toFixed(2).toString().replace('.',',')) + `</th>
+                                    <th class="right-align">` + formatRupiahIni(totalCredit.toFixed(2).toString().replace('.',',')) + `</th>
+                                </tr>
+                            `);
                         }else{
                             resetDetailForm();
                         }

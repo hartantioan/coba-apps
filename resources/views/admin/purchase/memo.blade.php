@@ -495,7 +495,7 @@
             </div>
         </div>
         <div class="row mt-2">
-            <table class="bordered Highlight striped">
+            <table class="bordered Highlight striped" style="zoom:0.7;">
                 <thead>
                         <tr>
                             <th class="center-align" rowspan="2">No</th>
@@ -1048,7 +1048,7 @@
         if($('input[name^="arr_code"]').length > 0){
             $('input[name^="arr_code"]').each(function(){
                 let element = $(this);
-                var rowgrandtotal = 0, rowtotal = 0, rowtax = 0, rowwtax = 0, percent_tax = parseFloat($('input[name^="arr_percent_tax"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), percent_wtax = parseFloat($('input[name^="arr_percent_wtax"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), rowlimit = parseFloat($('input[name^="arr_limit"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
+                var rowgrandtotal = 0, rowtotal = 0, rowtax = 0, rowwtax = 0, percent_tax = parseFloat($('input[name^="arr_percent_tax"][data-id="' + element.data('id') + '"]').val()), percent_wtax = parseFloat($('input[name^="arr_percent_wtax"][data-id="' + element.data('id') + '"]').val()), rowlimit = parseFloat($('input[name^="arr_limit"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
                 rowtotal = parseFloat($('input[name^="arr_nominal"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
                 if(percent_tax > 0 && $('input[name^="arr_is_include_tax"][data-id="' + element.data('id') + '"]').val() == '1'){
                     rowtotal = rowtotal / (1 + (percent_tax / 100));

@@ -196,27 +196,27 @@
                                     <h4>Detail Produk</h4>
                                     Coa debit mengikuti coa pada masing-masing grup item.
                                     <div style="overflow:auto;">
-                                        <table class="bordered" style="min-width:3000px !important;" id="table-detail">
+                                        <table class="bordered" style="min-width:3800px !important;" id="table-detail">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Item</th>
-                                                    <th class="center">Stok Skrg</th>
-                                                    <th class="center">Tujuan</th>
+                                                    <th class="center" width="150px">Stok Skrg</th>
+                                                    <th class="center" width="150px">Tujuan</th>
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan Stock</th>
-                                                    <th class="center">Nomor Serial (Jika ada)</th>
+                                                    <th class="center" width="250px">Nomor Serial (Jika ada)</th>
                                                     <th class="center">Harga</th>
-                                                    <th class="center">Total</th>
-                                                    <th class="center">Keterangan</th>
+                                                    <th class="center" width="150px">Total</th>
+                                                    <th class="center" width="150px">Keterangan</th>
                                                     <th class="center">Tipe Penerimaan</th>
                                                     <th class="center">Coa</th>
                                                     <th class="center">Dist.Biaya</th>
-                                                    <th class="center">Plant</th>
-                                                    <th class="center">Line</th>
-                                                    <th class="center">Mesin</th>
-                                                    <th class="center">Departemen</th>
-                                                    <th class="center">Area</th>
-                                                    <th class="center">Shading</th>
+                                                    <th class="center" width="150px">Plant</th>
+                                                    <th class="center" width="150px">Line</th>
+                                                    <th class="center" width="150px">Mesin</th>
+                                                    <th class="center" width="150px">Departemen</th>
+                                                    <th class="center" width="150px">Area</th>
+                                                    <th class="center" width="150px">Shading</th>
                                                     <th class="center">Proyek</th>
                                                     <th class="center">Hapus</th>
                                                 </tr>
@@ -400,7 +400,7 @@
             </div>
         </div>
         <div class="row mt-2">
-            <table class="bordered Highlight striped">
+            <table class="bordered Highlight striped" style="zoom:0.7;">
                 <thead>
                         <tr>
                             <th class="center-align" rowspan="2">No</th>

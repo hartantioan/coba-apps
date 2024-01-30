@@ -709,7 +709,7 @@
             </div>
         </div>
         <div class="row mt-2">
-            <table class="bordered Highlight striped">
+            <table class="bordered Highlight striped" style="zoom:0.7;">
                 <thead>
                         <tr>
                             <th class="center-align" rowspan="2">No</th>
@@ -721,7 +721,8 @@
                             <th class="center-align" rowspan="2">Department</th>
                             <th class="center-align" rowspan="2">Gudang</th>
                             <th class="center-align" rowspan="2">Proyek</th>
-                            <th class="center-align" rowspan="2">Keterangan</th>
+                            <th class="center-align" rowspan="2">Ket.1</th>
+                            <th class="center-align" rowspan="2">Ket.2</th>
                             <th class="center-align" colspan="2">Mata Uang Asli</th>
                             <th class="center-align" colspan="2">Mata Uang Konversi</th>
                         </tr>
@@ -1943,7 +1944,6 @@
 
                                 if(!$('#received_date').val()){
                                     addDays();
-                                    /* parseFloat($(element).val().replaceAll(".", "").replaceAll(",",".")) */
                                 }
                                 
                                 $('.modal-content').scrollTop(0);
@@ -3463,9 +3463,11 @@
 
     function addDays(){
         if($('#top').val()){
-            var result = new Date($('#received_date').val());
-            result.setDate(result.getDate() + parseInt($('#top').val()));
-            $('#due_date').val(result.toISOString().split('T')[0]);
+            if($('#received_date').val()){
+                var result = new Date($('#received_date').val());
+                result.setDate(result.getDate() + parseInt($('#top').val()));
+                $('#due_date').val(result.toISOString().split('T')[0]);
+            }
         }else{
             $('#due_date').val(null);
         }

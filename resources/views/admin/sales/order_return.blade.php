@@ -433,7 +433,7 @@
             </div>
         </div>
         <div class="row mt-2">
-            <table class="bordered Highlight striped">
+            <table class="bordered Highlight striped" style="zoom:0.7;">
                 <thead>
                         <tr>
                             <th class="center-align" rowspan="2">No</th>

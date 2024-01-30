@@ -14,6 +14,8 @@ class ExportCoa implements FromCollection, WithTitle, WithHeadings, WithCustomSt
     * @return \Illuminate\Support\Collection
     */
 
+    protected $search, $status, $company, $type;
+
     public function __construct(string $search, string $status, int $company, string $type)
     {
         $this->search = $search ? $search : '';
@@ -72,7 +74,7 @@ class ExportCoa implements FromCollection, WithTitle, WithHeadings, WithCustomSt
                     }
                 });
             }
-        })->get();
+        })->orderBy('code')->get();
 
         $arr = [];
 

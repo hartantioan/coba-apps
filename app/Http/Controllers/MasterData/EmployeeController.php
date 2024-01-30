@@ -15,6 +15,7 @@ use App\Models\Position;
 use App\Models\Shift;
 use App\Models\User;
 use App\Models\UserEducation;
+use App\Models\AttendancePeriod;
 use App\Models\UserFamily;
 use App\Models\UserWorkExperience;
 use App\Models\Warehouse;
@@ -741,47 +742,70 @@ class EmployeeController extends Controller
     }
 
     public function copySchedule(Request $request){
-        $currentDate = Carbon::now()->format('Y-m-d');
-        $query_schedule = EmployeeSchedule::where('user_id', $request->user_id)
-            ->whereDate('date', '>', $currentDate)
-            ->get();
-        if($query_schedule){
-            foreach($request->arr_employee as $employee_id){
-                foreach($query_schedule as $schedule){
-                    DB::beginTransaction();
-                    try {
-                        
-                        $query = EmployeeSchedule::create([
-                            'shift_id'          => $schedule->shift_id,
-                            'date'	            => $schedule->date,
-                            'user_id'           => $employee_id,
-                        ]);
+        
+        $validation = Validator::make($request->all(), [
+            'period_id'            => 'required',
+            'arr_employee'         => 'required',
+        ], [
+            'period_id.required'         => 'Harap pilih periode.',
+            'arr_employee.required'     => 'Harap pilih pegawai.',
 
-                        DB::commit();
-                    }catch(\Exception $e){
-                        DB::rollback();
-                    }
-                    
-                }
-            }
-            if($query) {               
-
-                $response = [
-                    'status'    => 200,
-                    'message'   => 'Data successfully saved.',
-                ];
-            } else {
-                $response = [
-                    'status'  => 500,
-                    'message' => 'Data failed to save.'
-                ];
-            }
-        }else{
-            $kambing["kambing"][]="User ini belum memiliki jadwal yang lebih dari tanggal hari ini.";
+        ]);
+        if($validation->fails()) {
             $response = [
                 'status' => 422,
-                'error'  => $kambing
-            ]; 
+                'error'  => $validation->errors()
+            ];
+        } else {
+            $period = AttendancePeriod::find($request->period_id);
+            $start_date = Carbon::parse($period->start_date)->format('Y-m-d');
+            $end_date = Carbon::parse($period->end_date)->format('Y-m-d');
+            
+            $query_schedule = EmployeeSchedule::where('user_id', $request->user_id)
+            ->whereDate('date', '>=', $start_date)
+            ->whereDate('date', '<=', $end_date)
+            ->get();
+            info($query_schedule);
+            if($query_schedule){
+                foreach($request->arr_employee as $employee_id){
+                   
+                    foreach($query_schedule as $schedule){
+                        DB::beginTransaction();
+                        try {
+                            
+                            $query = EmployeeSchedule::create([
+                                'shift_id'          => $schedule->shift_id,
+                                'date'	            => $schedule->date,
+                                'user_id'           => $employee_id,
+                                'status'            => 1,
+                            ]);
+
+                            DB::commit();
+                        }catch(\Exception $e){
+                            DB::rollback();
+                        }
+                        
+                    }
+                }
+                if($query) {               
+
+                    $response = [
+                        'status'    => 200,
+                        'message'   => 'Data successfully saved.',
+                    ];
+                } else {
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data failed to save.'
+                    ];
+                }
+            }else{
+                $kambing["kambing"][]="User ini belum memiliki jadwal yang lebih dari tanggal hari ini.";
+                $response = [
+                    'status' => 422,
+                    'error'  => $kambing
+                ]; 
+            }
         }
         return response()->json($response);
     }

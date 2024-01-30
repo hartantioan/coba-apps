@@ -46,32 +46,39 @@ class ImportEmployeeSchedule implements ToCollection
             $dataFormatted[] = $data;
         }
         $arrayDate = $dataFormatted[0]["E-Z"];
+        
         $dates = [];
         foreach ($arrayDate as $timestamp) {
             $dateTime = DateTime::createFromFormat('U', ($timestamp - 25569) * 86400);
             $dateFormatted = $dateTime->format('d/m/Y');
             $dates[] = $dateFormatted;
         }
+       
         $data_shift_schedule = [];
-        foreach($dataFormatted as $key =>$data_employee){
-            if ($key === 0) {
-                continue;
-            }
-            foreach($dates as $index=>$datee){
-                $kambing = [
-                    "user_code" => $data_employee["B"],
-                    "shift_code" => $data_employee["E-Z"][$index],
-                    "date" => $datee,
-                ];
-               
-                $data_shift_schedule[]=$kambing;
+        foreach($dataFormatted as $keyd =>$data_employee){
+            
+            // if ($key === 0) {
+            //     info($key);
+            //     break;
+            // }
+            if($keyd > 0){
+                foreach($dates as $index=>$datee){
+                   
+                    $data_shift_schedule[]=[
+                        "user_code" => $data_employee["B"],
+                        "shift_code" => $data_employee["E-Z"][$index],
+                        "date" => $datee,
+                    ];
+                   
+                }
             }
             
-        };
+            
+        }
         foreach($data_shift_schedule as $data_masuk){
             $query_employee=User::where('employee_no',$data_masuk["user_code"])->first();
-            $query_shift=Shift::where('code',$data_masuk["shift_code"])->first();
-            
+            $query_shift=Shift::where('code','like',$data_masuk["shift_code"])->first();
+           
             if($query_employee){
                 if($query_shift){
                     try {
@@ -82,7 +89,7 @@ class ImportEmployeeSchedule implements ToCollection
                         $query = EmployeeSchedule::create([
                             'shift_id'          => $query_shift->id,
                             'date'	            => $formattedDate,
-                            'user_id'           => $query_employee->id,
+                            'user_id'           => $data_masuk["user_code"],
                             'status'            => '1'
                             
                         ]);

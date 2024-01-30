@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('item_units', function (Blueprint $table) {
-            // $table->char('is_default',1)->nullable()->after('is_buy_unit');
+        Schema::table('shift', function (Blueprint $table) {
+            //
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('item_units', function (Blueprint $table) {
-            $table->dropColumn('is_default');
+        Schema::table('shift', function (Blueprint $table) {
+            //
         });
     }
 };

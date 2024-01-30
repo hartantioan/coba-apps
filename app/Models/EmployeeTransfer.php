@@ -111,8 +111,8 @@ class EmployeeTransfer extends Model
     public function typeRaw(){
         $type = match ($this->type) {
             '1' => 'Promotion',
-            '2' => 'Mutation',
-            '3' => 'Demotion',
+            '2' => 'Demotion',
+            '3' => 'Mutation',
             '4' => 'Resign',
             default => 'Invalid',
         };

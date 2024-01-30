@@ -25,11 +25,11 @@ class EmployeeScheduleController extends Controller
             'title'         => 'Jadwal Pegawai',
             'content'       => 'admin.master_data.employee_schedule',
             'user'          => User::where('type','1')->where('status','1')->whereHas('position',function($query){
-                                    $query->whereHas('division',function ($query){
-                                        $query->where('department_id',1);
-                                    });
+                                    // $query->whereHas('division',function ($query){
+                                    //     $query->where('department_id',1);
+                                    // });
                                 })->get(),
-            'shift'         => Shift::where('status',1)->where('department_id',1)->get(),
+            'shift'         => Shift::where('status',1)->get(),
             'department'    => Department::where('status',1)->get(),
         ];
 
@@ -363,9 +363,9 @@ class EmployeeScheduleController extends Controller
             
             $query_user_depart = User::with(['position.division.department'])
                 ->whereHas('position', function ($query) use ($request) {
-                    $query->whereHas('division', function ($query) use ($request) {
-                        $query->where('department_id', $request->id);
-                    });
+                    // $query->whereHas('division', function ($query) use ($request) {
+                    //     $query->where('department_id', $request->id);
+                    // });
                 })
             ->get();
            
@@ -403,19 +403,20 @@ class EmployeeScheduleController extends Controller
 
         $total_data = User::count();
         $query_data = User::where(function($query) use ($search, $request) {
-                if($request->department_id){
-                    $query->whereHas('position', function ($query) use ($request) {
-                        $query->whereHas('division', function ($query) use ($request) {
-                            $query->where('department_id', $request->department_id);
-                        });
-                    });
-                }else{
-                    $query->whereHas('position', function ($query) use ($request) {
-                        $query->whereHas('division', function ($query) use ($request) {
-                            $query->where('department_id', 1);
-                        });
-                    });
-                }
+                $query->where('type',1);
+                // if($request->department_id){
+                //     $query->whereHas('position', function ($query) use ($request) {
+                //         $query->whereHas('division', function ($query) use ($request) {
+                //             $query->where('department_id', $request->department_id);
+                //         });
+                //     });
+                // }else{
+                //     $query->whereHas('position', function ($query) use ($request) {
+                //         $query->whereHas('division', function ($query) use ($request) {
+                //             $query->where('department_id', 1);
+                //         });
+                //     });
+                // }
                 
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -431,19 +432,20 @@ class EmployeeScheduleController extends Controller
             ->get();
 
         $total_filtered = User::where(function($query) use ($search, $request) {
-            if($request->department_id){
-                $query->whereHas('position', function ($query) use ($request) {
-                    $query->whereHas('division', function ($query) use ($request) {
-                        $query->where('department_id', $request->department_id);
-                    });
-                });
-            }else{
-                $query->whereHas('position', function ($query) use ($request) {
-                    $query->whereHas('division', function ($query) use ($request) {
-                        $query->where('department_id', 1);
-                    });
-                });
-            }
+            $query->where('type',1);
+            // if($request->department_id){
+            //     $query->whereHas('position', function ($query) use ($request) {
+            //         $query->whereHas('division', function ($query) use ($request) {
+            //             $query->where('department_id', $request->department_id);
+            //         });
+            //     });
+            // }else{
+            //     $query->whereHas('position', function ($query) use ($request) {
+            //         $query->whereHas('division', function ($query) use ($request) {
+            //             $query->where('department_id', 1);
+            //         });
+            //     });
+            // }
             
             if($search) {
                 $query->where(function($query) use ($search, $request) {
@@ -469,8 +471,8 @@ class EmployeeScheduleController extends Controller
                     $nomor,
                     $val->employee_no ,
                     $val->name ,
-                    $val->position->division->department->name,
-                    $val->position->name,
+                    $val->position->division->department->name ?? '-',
+                    $val->position->name ?? '-',
                    
                 ];
 

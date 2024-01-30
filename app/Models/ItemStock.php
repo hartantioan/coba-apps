@@ -18,6 +18,7 @@ class ItemStock extends Model
         'area_id',
         'item_id',
         'item_shading_id',
+        'location',
         'qty'
     ];
 

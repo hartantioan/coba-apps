@@ -19,7 +19,6 @@ class Shift extends Model
         'user_id',
         'edit_id',
         'place_id',
-        'department_id',
         'name',
         'tolerant',
         'time_in',
@@ -41,9 +40,6 @@ class Shift extends Model
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
     }
     
-    public function department(){
-        return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
-    }
 
     public function status(){
         switch($this->status) {

@@ -23,6 +23,7 @@ use App\Http\Controllers\Inventory\StockInRupiahController;
 use App\Http\Controllers\Inventory\StockInQtyController;
 use App\Http\Controllers\Inventory\MinimumStockController;
 use App\Http\Controllers\MasterData\AttendanceMachineController;
+use App\Http\Controllers\MasterData\ItemStockLocationController;
 use App\Http\Controllers\MasterData\AttendancePeriodController;
 use App\Http\Controllers\MasterData\DivisionController;
 use App\Http\Controllers\MasterData\EmployeeController;
@@ -550,6 +551,16 @@ Route::prefix('admin')->group(function () {
                         Route::post('destroy', [UnitController::class, 'destroy'])->middleware('operation.access:unit,delete');
                     });
 
+                    Route::prefix('item_stock_location')->middleware('operation.access:item_stock_location,view')->group(function () {
+                        Route::get('/',[ItemStockLocationController::class, 'index']);
+                        Route::post('filter',[ItemStockLocationController::class, 'filter']);
+                        Route::post('save1', [ItemStockLocationController::class, 'save1']);
+                        Route::post('saveAll',[ItemStockLocationController::class, 'saveAll']);
+                        Route::get('export', [ItemStockLocationController::class, 'export']);
+                        Route::post('create',[ItemStockLocationController::class, 'create'])->middleware('operation.access:item_stock_location,update');
+                        Route::post('destroy', [ItemStockLocationController::class, 'destroy'])->middleware('operation.access:item_stock_location,delete');
+                    });
+
                     Route::prefix('type')->middleware('operation.access:type,view')->group(function () {
                         Route::get('/',[TypeController::class, 'index']);
                         Route::get('datatable',[TypeController::class, 'datatable']);
@@ -1033,6 +1044,8 @@ Route::prefix('admin')->group(function () {
                         Route::post('create',[UserDateController::class, 'create'])->middleware('operation.access:user_date,update');
                         Route::post('destroy', [UserDateController::class, 'destroy'])->middleware('operation.access:user_date,delete');
                     });
+
+                    
 
                     Route::prefix('attendance_machine')->middleware('operation.access:attendance_machine,view')->group(function () {
                         Route::get('/',[AttendanceMachineController::class, 'index']);

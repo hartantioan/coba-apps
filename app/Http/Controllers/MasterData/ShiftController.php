@@ -41,7 +41,7 @@ class ShiftController extends Controller
             'id',
             'code',
             'place_id',
-            'department_id',
+            // 'department_id',
             'name',
         ];
 
@@ -60,9 +60,10 @@ class ShiftController extends Controller
                             ->orWhere('name', 'like', "%$search%")
                             ->orWhereHas('place',function($query) use($search,$request){
                                 $query->where('name','like',"%$search%");
-                            })->orWhereHas('department',function($query) use($search,$request){
-                                $query->where('name','like',"%$search%");
                             });
+                            // ->orWhereHas('department',function($query) use($search,$request){
+                            //     $query->where('name','like',"%$search%");
+                            // });
                     });
                 }
 
@@ -83,9 +84,10 @@ class ShiftController extends Controller
                             ->orWhere('name', 'like', "%$search%")
                             ->orWhereHas('place',function($query) use($search,$request){
                                 $query->where('name','like',"%$search%");
-                            })->orWhereHas('department',function($query) use($search,$request){
-                                $query->where('name','like',"%$search%");
                             });
+                            // ->orWhereHas('department',function($query) use($search,$request){
+                            //     $query->where('name','like',"%$search%");
+                            // });
                     });
                 }
 
@@ -105,7 +107,7 @@ class ShiftController extends Controller
                     $nomor,
                     $val->code,
                     $val->place->name,
-                    $val->department->name,
+                  /*   $val->department->name, */
                     $val->name,
                     $val->time_in,
                     $val->time_out,
@@ -139,11 +141,11 @@ class ShiftController extends Controller
         $time_in = strtotime($request->time_in);
     
        
-        $query_department= Department::find($request->department_id);
+        /* $query_department= Department::find($request->department_id); */
         $query_place= Place::find($request->place_id);
         $stime_in = date('H:i', strtotime($request->time_in));
         $stime_out = date('H:i', strtotime($request->time_out));
-        $code = $query_place->id.'||'.$query_department->code.$stime_in . ' - ' . $stime_out;
+        $code = $query_place->id.'||'.$stime_in . ' - ' . $stime_out;
 
         $request->merge(['code' => $code]);
 
@@ -151,11 +153,11 @@ class ShiftController extends Controller
             'code'           => $request->temp ? ['required', Rule::unique('shifts', 'code')->ignore($request->temp)] : 'required|unique:shifts,code',
             'name'           => 'required',
             'place_id'       => 'required',
-            'department_id'  => 'required',
+            /* 'department_id'  => 'required', */
             'time_in'        => 'required',
             'time_out'       => 'required',
             'tolerant'          => 'required',
-            'total_shift'   => 'required',
+            // 'total_shift'   => 'required',
             
             
         ], [
@@ -163,12 +165,12 @@ class ShiftController extends Controller
             'code.unique'            => 'Kode telah terpakai.',
             'name.required'          => 'Nama Shift tidak boleh kosong.',
             'place_id.required'      => 'Plant tidak boleh kosong.',
-            'department_id.required' => 'Departemen tidak boleh kosong',
-          
+            /* 'department_id.required' => 'Departemen tidak boleh kosong',
+           */
             'time_in.required'       => 'Jam masuk tidak boleh kosong',
             'time_out.required'      => 'Jam pulang tidak boleh kosong',
             'tolerant.required'      => 'toleransi keterlambatan tidak boleh kosong',
-            'total_shift'            => 'Total Shift perlu diisi minimal 1' 
+            // 'total_shift'            => 'Total Shift perlu diisi minimal 1' 
         ]);
         
 
@@ -186,12 +188,12 @@ class ShiftController extends Controller
                 ]);
             } */
 
-            if($request->total_shift < 0){
-                return response()->json([
-                    'status'    => 500,
-                    'message'   => 'Total Shift kurang dari 1',
-                ]);
-            }
+            // if($request->total_shift < 0){
+            //     return response()->json([
+            //         'status'    => 500,
+            //         'message'   => 'Total Shift kurang dari 1',
+            //     ]);
+            // }
 
 			if($request->temp){
                 DB::beginTransaction();
@@ -200,10 +202,10 @@ class ShiftController extends Controller
                     $query->name                = $request->name;
                     $query->edit_id             = session('bo_id');
                     $query->place_id            = $request->place_id;
-                    $query->department_id       = $request->department_id;
+                  /*   $query->department_id       = $request->department_id; */
                     $query->name                = $request->name;
                     $query->is_next_day         = $request->is_next_day;
-                    $query->total_shift         = $request->total_shift;
+                    // $query->total_shift         = $request->total_shift;
                     $query->time_in             = $request->time_in;
                     $query->time_out            = $request->time_out;
                     $query->tolerant            = $request->tolerant;
@@ -219,16 +221,16 @@ class ShiftController extends Controller
                 try {
                     $time_in = date('H:i', strtotime($request->time_in));
                     $time_out = date('H:i', strtotime($request->time_out));
-                    $query_department= Department::find($request->department_id);
+                 /*    $query_department= Department::find($request->department_id); */
                     $query_place= Place::find($request->place_id);
-                    $code = $query_place->id.'||'.$query_department->code.$time_in . '-' . $time_out;
+                    $code = $query_place->id.'||'.$time_in . '-' . $time_out;
                     $query = Shift::create([
                         'code'              => $code,
                         'name'			    => $request->name,
                         'user_id'           => session('bo_id'),
                         'place_id'          => $request->place_id,
-                        'department_id'     => $request->department_id,
-                        'total_shift'       => $request->total_shift,
+                        /* 'department_id'     => $request->department_id, */
+                        // 'total_shift'       => $request->total_shift,
                         'time_in'           => $request->time_in,
                         'time_out'          => $request->time_out,
                         'is_next_day'       => $request->is_next_day ?? 0,

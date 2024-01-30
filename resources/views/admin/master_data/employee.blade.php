@@ -120,8 +120,13 @@
 <div id="modal2" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
+           
             <div class="col s12">
                 <form class="row" id="form_data" onsubmit="return false;">
+                    <div class="input-field col m12 s12">
+                        <select class="browser-default" id="period_id" name="period_id"></select>
+                        <label class="active" for="period_id">Periode :</label>
+                    </div>
                     <input type="hidden" id="temp_copy" name="temp_copy">
                     <table class="bordered centered">
                         <thead>
@@ -146,7 +151,7 @@
                                 <td>{{ $row->position->name??'' }}</td>
                                 <td class="input-field">
                                     <label>
-                                        <input type="checkbox" name="arr_employee[]" id="checkbox{{ $row->id }}" value="{{ $row->id }}"/>
+                                        <input type="checkbox" name="arr_employee[]" id="checkbox{{ $row->id }}" value="{{ $row->employee_no }}"/>
                                         <span>Pilih</span>
                                     </label>
                                 </td>
@@ -231,6 +236,7 @@
             dropdownAutoWidth: true,
             width: '100%',
         });
+       
 
         var Calendar = FullCalendar.Calendar;
         var Draggable = FullCalendarInteraction.Draggable;
@@ -245,6 +251,15 @@
             editable: false,
             plugins: ["dayGrid", "timeGrid", "interaction"],
             droppable: false,
+            eventClick: function (info) {
+                function removeEvent() {
+                    info.event.remove();
+                }
+
+                if (confirm("Are you sure you want to delete this event?")) {
+                    removeEvent();
+                }
+            },
         });
 
         loadDataTable();
@@ -263,16 +278,18 @@
             }
         });
         $('#modal2').modal({
+            dismissible:false,
             onOpenStart: function(modal,trigger) {
-                
+               
             },
             onOpenEnd: function(modal, trigger) { 
+                
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
             }
         });
-
+        select2ServerSide('#period_id', '{{ url("admin/select2/period") }}');
         $('#modal_salary_component').modal({
             onOpenStart: function(modal,trigger) {
                 
@@ -455,7 +472,9 @@
     function copySchedule() {
         var formData = new FormData($('#form_data')[0]);
         var id = $('#temp_copy').val();
+        var period_id = $('#period_id').val();
         formData.append('user_id',id);
+        formData.append('period_id',period_id);
         $.ajax({
             url: '{{ Request::url() }}/copy_schedule',
             type: 'POST',
@@ -691,159 +710,7 @@
         $('#modal1').modal('close');
     }
 
-    function show(id){
-        $.ajax({
-            url: '{{ Request::url() }}/show',
-            type: 'POST',
-            dataType: 'JSON',
-            data: {
-                id: id
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                loadingOpen('#main');
-            },
-            success: function(response) {
-                loadingClose('#main');
-                $('#modal1').modal('open');
-                
-                $('#temp').val(id);
-                $('#name').val(response.name);
-                $('#username').val(response.username);
-                $('#phone').val(response.phone);
-                $('#email').val(response.email);
-                $("#address").val(response.address);
-                $('#type').val(response.type).trigger('change').formSelect();
-
-                refreshGroup();
-                
-                $('#province_id,#city_id,#country_id').empty();
-
-                $('#province_id').append(`
-                    <option value="` + response.province_id + `">` + response.province_name + `</option>
-                `);
-                $('#city_id').append(`
-                    <option value="` + response.city_id + `">` + response.city_name + `</option>
-                `);
-
-                $('#subdistrict_id').empty();
-                $.each(response.subdistrict_list, function(i, value) {
-                    $('#subdistrict_id').append(`
-                        <option value="` + value.id + `">` + value.code + ` ` + value.name + `</option>
-                    `);
-                });
-
-                $('#subdistrict_id').val(response.subdistrict_id).trigger('change');
-
-                $('#country_id').append(`
-                    <option value="` + response.country_id + `">` + response.country_name + `</option>
-                `);
-
-                $('#tax_id').val(response.tax_id);
-                $('#tax_name').val(response.tax_name);
-                $('#tax_address').val(response.tax_address);
-                $('#id_card').val(response.id_card);
-                $('#id_card_address').val(response.id_card_address);
-                $('#gender').val(response.gender).formSelect();
-                $('#group_id').val(response.group_id).formSelect();
-
-                if(response.type == '1'){
-                    $('#company_id').val(response.company_id).formSelect();
-                    $('#place_id').val(response.place_id).formSelect();
-                    $('#department_id').val(response.department_id).formSelect();
-                    $('#position_id').val(response.position_id).formSelect();
-                    $('#married_status').val(response.married_status).formSelect();
-                    $('#married_date').val(response.married_date);
-                    $('#children').val(response.children);
-                }else{
-                    $('#pic').val(response.pic);
-                    $('#pic_no').val(response.pic_no);
-                    $('#office_no').val(response.office_no);
-                    $('#limit_credit').val(response.limit_credit);
-                    $('#top').val(response.top);
-                    $('#top_internal').val(response.top_internal);
-                }
-
-                $('.row_bank').remove();
-
-                if(response.banks.length > 0){
-                    $.each(response.banks, function(i, val) {
-                        $('#last-row-bank').before(`
-                            <tr class="row_bank">
-                                <td>
-                                    <select class="browser-default bank-array" id="arr_bank` + i + `" name="arr_bank[]"></select>
-                                </td>
-                                <td>
-                                    <input name="arr_name[]" type="text" placeholder="Atas nama" value="` + val.name + `">
-                                </td>
-                                <td class="center">
-                                    <input name="arr_no[]" type="text" placeholder="No rekening" value="` + val.no + `">
-                                </td>
-                                <td>
-                                    <input name="arr_branch[]" type="text" placeholder="Cabang" value="` + val.branch + `">
-                                </td>
-                                <td class="center">
-                                    <label>
-                                        <input class="with-gap" name="check" type="radio" value="` + i + `" ` + (val.is_default == '1' ? 'checked' : '') + `>
-                                        <span>Pilih</span>
-                                    </label>
-                                </td>
-                                <td class="center">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-bank" href="javascript:void(0);">
-                                        <i class="material-icons">delete</i>
-                                    </a>
-                                </td>
-                            </tr>
-                        `);
-                        select2ServerSide('#arr_bank' + i, '{{ url("admin/select2/bank") }}');
-                        $('#arr_bank' + i).append(`
-                            <option value="` + val.bank_id + `">` + val.bank_name + `</option>
-                        `);
-                    });
-                }
-
-                if(response.datas.length > 0){
-                    $.each(response.datas, function(i, val) {
-                        $('#last-row-info').before(`
-                            <tr class="row_info">
-                                <td>
-                                    <input name="arr_title[]" type="text" placeholder="Judul informasi tambahan" value="` + val.title + `">
-                                </td>
-                                <td class="center">
-                                    <input name="arr_content[]" type="text" placeholder="Isi informasi tambahan" value="` + val.content + `">
-                                </td>
-                                <td class="center">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-info" href="javascript:void(0);">
-                                        <i class="material-icons">delete</i>
-                                    </a>
-                                </td>
-                            </tr>
-                        `);
-                    });
-                }
-
-                if(response.status == '1'){
-                    $('#status').prop( "checked", true);
-                }else{
-                    $('#status').prop( "checked", false);
-                }
-                $('.modal-content').scrollTop(0);
-                $('#name').focus();
-                
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('#main');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
-        });
-    }
+    
 
     function destroy(id){
         swal({

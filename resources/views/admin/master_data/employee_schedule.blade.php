@@ -253,14 +253,7 @@
                                     <div class="card">
                                         <div class="card-content">
                                         <div class="row">
-                                            <div class="input-field col s3">
-                                                <select class="select2 browser-default" id="department_id" name="department_id" onchange="changeDepartmentToSchedule()">
-                                                    @foreach ($department as $departmente )
-                                                        <option value={{$departmente->id}}>{{$departmente->name}}</option>
-                                                    @endforeach
-                                                </select>
-                                                <label class="active" for="department_id">Select Shift</label>
-                                            </div>
+                                           
                                         </div>
                                         <div class="row">
                                             <div class="col m3 s12">
@@ -723,7 +716,7 @@
         
     });
 
-    function changeDepartmentToSchedule(){
+   /*  function changeDepartmentToSchedule(){
         calendar.removeAllEvents();
         table_schedule.rows().deselect();
         $('.fc-events-container').empty();
@@ -745,11 +738,11 @@
                 $('#table_user').empty();
                 loadingClose('#main');
                 if(response.status == 200) {
-                    $.each(response.shift, function(i, val) {
-                        $('#event_container').append(`
-                            <div class='fc-event' data-id=`+val['id']+` >`+val['name']+`||`+val['code']+`</div>
-                        `);
-                    });
+                    // $.each(response.shift, function(i, val) {
+                    //     $('#event_container').append(`
+                    //         <div class='fc-event' data-id=`+val['id']+` >`+val['name']+`||`+val['code']+`</div>
+                    //     `);
+                    // });
     
                 }
                 
@@ -766,7 +759,7 @@
             }
         });
         
-    }
+    } */
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
@@ -860,7 +853,7 @@
                 url: '{{ Request::url() }}/datatable_user_schedule',
                 type: 'GET',
                 data: {
-                    department_id : $('#department_id').val(),
+                    /* department_id : $('#department_id').val(), */
                 },
                 beforeSend: function() {
                     loadingOpen('#datatable_schedule');

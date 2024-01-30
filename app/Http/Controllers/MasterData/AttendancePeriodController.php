@@ -166,10 +166,10 @@ class AttendancePeriodController extends Controller
         
         $user_data = User::where(function($query) use ( $request) {
             $query->where('type','1');
-            $query->whereIn('employee_no',['323004','E000006','E000008','E000007','E000005','E000010']);
-            // $query->whereIn('employee_no',['E000010']);    
+            $query->whereIn('employee_no',['323003','323005','323007','323009','323011','323016','323017','323020','323021','323022','323024','323026','323027','323029','323031','323033','323034']);
+            // $query->whereIn('employee_no',['323033']);    
             })->get();
-
+        
         $query_salary_report = SalaryReport::create([
             'code'                                  => SalaryReport::generateCode('SrPo'),
             'period_id'                             => $request->id,
@@ -281,7 +281,7 @@ class AttendancePeriodController extends Controller
                     }
                 } 
                 while ($date->lte($end_date)) {
-
+                    
                     $query_data = EmployeeSchedule::join('shifts', 'employee_schedules.shift_id', '=', 'shifts.id')
                         ->whereDate('employee_schedules.date', $date->toDateString())
                         ->where('employee_schedules.user_id', $row_user->employee_no)
@@ -513,7 +513,7 @@ class AttendancePeriodController extends Controller
                                 //perhitungan masuk tepat atau tidak dan pulang tepat atau tidak
                                 if ($dateAttd >= $real_min_time_in && $dateAttd <= $real_time_in) {
                                     $exact_in[$key]= 1 ;
-                                    info('masuk1');
+                                  
                                     if(!$login[$key]){
                                         
                                         if($masuk_awal==null){
@@ -529,7 +529,7 @@ class AttendancePeriodController extends Controller
                                     
                                 }if($dateAttd > $real_time_in && $dateAttd < $real_time_out){// tataru sini bisa haruse utk yang tidak ada ituuu
                                     $diffHoursTimePartMinIn = Carbon::parse($timePart)->diffInHours($time_in);
-                                    info('masuk2');
+                                   
                                     if($row_schedule_filter->status == 5 && $query_lembur && $lembur_awal_shift == 0){////perhitungan untuk time in dimana lembur tidak masuk tapi ada jadwal lembur yang bergabung dengan jam
                                         $lembur = 0;
                                        
@@ -603,14 +603,23 @@ class AttendancePeriodController extends Controller
                                 }
                                 //perhitungan pulang
                                 if($dateAttd >= $real_time_out && $dateAttd <= $real_max_time_out){
+                                   
+                                        
+                                    
                                     
                                     $exact_out [$key]= 1 ;
-                                    if(!$muleh){
+                                    
+                                   
+                                    if(!$logout){
+                                        $logout = $timePart;
                                         $muleh=$timePart;
                                         $array_keluar[$key]=$timePart;
                                         $different_keluar[$key]='';
                                     }
-                                    if($muleh<$timePart){
+                                    if($logout<$timePart){
+                                       
+                                        
+                                        $logout = $timePart;
                                         $muleh=$timePart;
                                         $array_keluar[$key]=$timePart;
                                         $different_keluar[$key]='';
@@ -624,32 +633,38 @@ class AttendancePeriodController extends Controller
                                 //     }
                                 // }
                                 if ($dateAttd <= $real_time_out && $dateAttd <= $real_max_time_out && $date->toDateString() == $dateAttd->toDateString()&&count($query_data)==1) {
-                                    if(count($query_data)>1 || $date->toDateString() == $dateAttd->toDateString()){
-                                        $exact_out [$key]= 1 ;
-                                      
-                                    }
+                                    
                                     if($muleh==null && $date->toDateString() == $dateAttd->toDateString()){
                                         if($masuk_awal == null){
                                             $masuk_awal = $timePart;
                                         }else{
-                                            $muleh=$timePart;
+                                            
+                                            if($masuk_awal != $timePart){
+                                                $muleh=$timePart;
+                                            }
                                         }
                                         
                                     }elseif($muleh < $timePart){
                                         $muleh=$timePart;
                                         $array_keluar[$key]=$timePart;
+                                        
                                     }
                                     if(!$logout&& $date->toDateString() == $dateAttd->toDateString()){
                                         
-                                        $logout = $timePart;
-                                        if($login && $login != $timePart){
-                                
+                                        if($timePart != $masuk_awal || $dateAttd > $real_max_time_out || $dateAttd > $real_time_in){
+                                           
+                                            $logout = $timePart;
+                                        }
+                                       
+                                        if($login && $timePart != $masuk_awal){
+                                        
                                             $array_keluar[$key]=$timePart;
                                         }
                                         $different_keluar[$key]='';
                                         
                                     }  
                                 }
+                                
                             }
                             
                             $latestRecord = $query_attendance->last();
@@ -779,12 +794,20 @@ class AttendancePeriodController extends Controller
                                     }
                                     
                                     if($logout != null ){
+                                        
                                         $exact_out[$key]=1;
+                                        $logout_real =$date->format('Y-m-d') . ' ' . $logout;
+
+                                        if($logout_real<$real_time_out){
+                                            $exact_out[$key]=0;
+                                        }
                                     }else{
+                                       
                                         $exact_out[$key]= 0 ;
                                     }
                                     
                                 }
+                              
                                 
                             }
                             if($key == 1 &&  count($query_data) == 2){//mengecek saat schedule yang di tengah dan jumlahnya dua dan mengecek kalau dia itu tidak check saat masuk dan check saat pulang
@@ -2230,7 +2253,7 @@ class AttendancePeriodController extends Controller
                 'message'  =>'sep',
             ];
             $query_close = AttendancePeriod::find(CustomHelper::decrypt($request->id));
-            info($query_close);
+           
             $date = Carbon::parse($query_close->start_date)->copy();
             while($date->lte($query_close->end_date)){
                 $query_data = EmployeeSchedule::whereDate('date', $date->toDateString())->get();
@@ -2378,7 +2401,7 @@ class AttendancePeriodController extends Controller
                         $time_out = $row_daily->shift->time_out;
                         $max_time_out = Carbon::parse($time_out)->addHours($row_daily->shift->tolerant)->toTimeString();
                     }else{
-                        info($row_daily['date']);
+                       
                         $overtime_request_perday = OvertimeRequest::where('date',Carbon::createFromFormat('d/m/Y', $row_daily['date'])->format('Y-m-d'))
                             ->where('account_id',$row_daily->user_id)
                             ->where('schedule_id',null)

@@ -70,7 +70,7 @@
                                                         <th>#</th>
                                                         <th>Kode</th>
                                                         <th>Plant</th>
-                                                        <th>Departemen</th>
+                                                    
                                                         <th>Nama</th>
                                                        
                                                         <th>Time In</th>
@@ -123,10 +123,10 @@
                             <input id="tolerant" name="tolerant" type="text" placeholder="Toleransi Waktu(jam)">
                             <label class="active" for="tolerant">Toleransi</label>
                         </div>
-                        <div class="input-field col s4">
+                        {{-- <div class="input-field col s4">
                             <input id="total_shift" name="total_shift" type="number" placeholder="Total Shift">
                             <label class="active" for="total_shift">Total Shift</label>
-                        </div>
+                        </div> --}}
                         <div class="input-field col s4">
                             <select class="form-control" id="place_id" name="place_id">
                                 @foreach($place as $b)
@@ -135,14 +135,14 @@
                             </select>
                             <label class="" for="place_id">Plant</label>
                         </div>
-                        <div class="input-field col s4">
+                        {{-- <div class="input-field col s4">
                             <select class="form-control" id="department_id" name="department_id">
                                 @foreach($department as $b)
                                     <option value="{{ $b->id }}">{{ $b->name }}</option>
                                 @endforeach
                             </select>
                             <label class="" for="department_id">Departemen</label>
-                        </div>
+                        </div> --}}
                         <div class="input-field col s4">
                             <div class="switch mb-1">
                                 <label for="is_next_day">Next Day</label>
@@ -308,7 +308,7 @@
                 { name: 'id', searchable: false, className: 'center-align' },
                 { name: 'code', className: 'center-align' },
                 { name: 'place', className: 'center-align' },
-                { name: 'department', className: 'center-align' },
+               /*  { name: 'department', className: 'center-align' }, */
                 { name: 'name', className: 'center-align' },
                
                 { name: 'time_in', className: 'center-align' },
@@ -446,7 +446,7 @@
                 $('#temp').val(id);
                 $('#name').val(response.name);
                 $('#place_id').val(response.place_id).formSelect();
-                $('#department_id').val(response.department_id).formSelect();
+                /* $('#department_id').val(response.department_id).formSelect(); */
                 $('#tolerant').val(response.tolerant);
                 $('#time_in').val(response.time_in);
                 $('#time_out').val(response.time_out);

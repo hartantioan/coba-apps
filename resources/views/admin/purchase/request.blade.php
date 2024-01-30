@@ -1863,7 +1863,7 @@
 
                         $.each(datakuy.details, function(i, val) {
                             var count = makeid(10);
-                            $('#last-row-item').before(`
+                            $('#body-item').append(`
                                 <tr class="row_item" data-id="` + $('#material_request_id').val() + `">
                                     <input type="hidden" name="arr_lookable_type[]" value="` + val.type + `">
                                     <input type="hidden" name="arr_lookable_id[]" value="` + val.id + `">

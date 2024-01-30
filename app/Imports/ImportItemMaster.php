@@ -24,7 +24,7 @@ class ImportItemMaster implements ToCollection
                 $unit = Unit::where('code',trim($row[2]))->first();
                 $group = ItemGroup::where('name',trim($row[3]))->first();
                 $item = Item::where('code',$row[0])->first();
-
+                info($key);
                 if($item){
                     $item->update([
                         'note'  => $item->note.','.$row[5],

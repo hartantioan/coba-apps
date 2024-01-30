@@ -14,6 +14,10 @@
     .browser-default {
         height: 2rem !important;
     }
+    
+    .detail-table-fixed{
+        margin: 0 auto;width: 100%;height:50vh;overflow-x:scroll;overflow-y:scroll;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -216,11 +220,11 @@
                                             </a>
                                         </div>
                                     </div>
-                                    <div class="col s12 mt-2" style="overflow:auto;width:100% !important;">
+                                    <div class="col s12 mt-2">
                                         <h5>Detail Coa</h5>
-                                        <p class="mt-2 mb-2">
-                                            <table class="bordered" style="min-width:2800px;" id="table-detail">
-                                                <thead style="position:sticky;top: 50px !important;background-color:rgb(176, 212, 212) !important;">
+                                        <div class="detail-table-fixed">
+                                            <table class="bordered" style="min-width:2800px;position: relative;" id="table-detail">
+                                                <thead style="position:sticky;top: 0px !important;background-color:rgb(176, 212, 212) !important;z-index:10;position: -webkit-sticky;">
                                                     <tr>
                                                         <th class="center" rowspan="2">BP</th>
                                                         <th class="center" rowspan="2">Coa</th>
@@ -245,17 +249,20 @@
                                                 <tbody id="body-coa">
                                                     <tr id="last-row-coa">
                                                         <td colspan="14">
-                                                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addCoa('1')" href="javascript:void(0);">
-                                                                <i class="material-icons left">add</i> Tambah Debit
-                                                            </a>
-                                                            <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addCoa('2')" href="javascript:void(0);">
-                                                                <i class="material-icons left">add</i> Tambah Kredit
-                                                            </a>
+                                                            
                                                         </td>
                                                     </tr>
                                                 </tbody>
                                             </table>
-                                        </p>
+                                        </div>
+                                    </div>
+                                    <div class="col s12 mt-1 right">
+                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addCoa('1')" href="javascript:void(0);">
+                                            <i class="material-icons left">add</i> Tambah Debit
+                                        </a>
+                                        <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addCoa('2')" href="javascript:void(0);">
+                                            <i class="material-icons left">add</i> Tambah Kredit
+                                        </a>
                                     </div>
                                     <div class="col s6 mt-1 center"><h5>Total Debit : <b id="totalDebit">0,000</b></h5></div>
                                     <div class="col s6 mt-1 center"><h5>Total Credit : <b id="totalCredit">0,000</b></h5></div>
@@ -277,9 +284,9 @@
                                 <div class="col s12">
                                     <div class="col s12" style="overflow:auto;width:100% !important;">
                                         <h6>Anda bisa menggunakan fitur copy paste dari format excel yang telah disediakan. Silahkan klik <a href="{{-- {{ asset(Storage::url('format_imports/format_copas_journal.xlsx')) }} --}}{{ Request::url() }}/get_import_excel" target="_blank">disini</a> untuk mengunduh. Jangan menyalin kolom paling atas (bagian header), dan tempel pada isian paling kiri di tabel di bawah ini.</h6>
-                                        <p class="mt-2 mb-2">
+                                        <div class="detail-table-fixed">
                                             <table class="bordered" style="min-width:3500px;zoom:0.7;" id="table-detail1">
-                                                <thead>
+                                                <thead style="position:sticky;top: 0px !important;background-color:rgb(176, 212, 212) !important;z-index:10;position: -webkit-sticky;">
                                                     <tr>
                                                         <th class="center" rowspan="2">Kode Jurnal</th>
                                                         <th class="center" style="width:75px;" rowspan="2">Perusahaan</th>
@@ -310,17 +317,20 @@
                                                 <tbody id="body-coa-multi">
                                                     <tr id="last-row-coa-multi">
                                                         <td colspan="20" class="center">
-                                                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addLine()" href="javascript:void(0);">
-                                                                <i class="material-icons left">add</i> Tambah 1 Baris
-                                                            </a>
-                                                            <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addMulti()" href="javascript:void(0);">
-                                                                <i class="material-icons left">add</i> Tambah Multi Baris
-                                                            </a>
+                                                            
                                                         </td>
                                                     </tr>
                                                 </tbody>
                                             </table>
-                                        </p>
+                                        </div>
+                                    </div>
+                                    <div class="col s12 mt-1 right">
+                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addLine()" href="javascript:void(0);">
+                                            <i class="material-icons left">add</i> Tambah 1 Baris
+                                        </a>
+                                        <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addMulti()" href="javascript:void(0);">
+                                            <i class="material-icons left">add</i> Tambah Multi Baris
+                                        </a>
                                     </div>
                                     <div class="col s6 mt-1 center"><h6>Total Debit Konversi: <b id="totalDebitMulti">0,000</b></h6></div>
                                     <div class="col s6 mt-1 center"><h6>Total Credit Konversi: <b id="totalCreditMulti">0,000</b></h6></div>

@@ -87,14 +87,14 @@ class MaterialRequestDetail extends Model
     public function purchaseRequestDetail()
     {
         return $this->hasMany('App\Models\PurchaseRequestDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('purchaseRequest',function($query){
-            $query->whereIn('status',['2','3']);
+            $query->whereIn('status',['1','2','3']);
         });
     }
 
     public function goodIssueDetail()
     {
         return $this->hasMany('App\Models\GoodIssueDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('goodIssue',function($query){
-            $query->whereIn('status',['2','3']);
+            $query->whereIn('status',['1','2','3']);
         });
     }
 

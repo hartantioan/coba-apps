@@ -509,7 +509,7 @@
                             <div id="accessform" class="col s12 active">
                                 <p class="mt-2 mb-2">
                                     <table class="bordered" id="table-menu-access">
-                                        <thead style="position:sticky;top: -25px !important;background-color:rgb(176, 212, 212) !important;">
+                                        <thead style="position:sticky;top: 40px !important;background-color:rgb(176, 212, 212) !important;">
                                             <tr>
                                                 <th width="20%" class="center" rowspan="3">Menu</th>
                                                 <th width="80%" class="center" colspan="5">Akses</th>

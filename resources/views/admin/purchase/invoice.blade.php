@@ -721,8 +721,7 @@
                             <th class="center-align" rowspan="2">Department</th>
                             <th class="center-align" rowspan="2">Gudang</th>
                             <th class="center-align" rowspan="2">Proyek</th>
-                            <th class="center-align" rowspan="2">Ket.1</th>
-                            <th class="center-align" rowspan="2">Ket.2</th>
+                            <th class="center-align" rowspan="2">Keterangan</th>
                             <th class="center-align" colspan="2">Mata Uang Asli</th>
                             <th class="center-align" colspan="2">Mata Uang Konversi</th>
                         </tr>
@@ -1942,8 +1941,9 @@
                                     $('#downpayment').val('0,00');
                                 }
 
-                                if(!$('#due_date').val()){
+                                if(!$('#received_date').val()){
                                     addDays();
+                                    /* parseFloat($(element).val().replaceAll(".", "").replaceAll(",",".")) */
                                 }
                                 
                                 $('.modal-content').scrollTop(0);

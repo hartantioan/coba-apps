@@ -202,9 +202,11 @@ class ClosingJournalController extends Controller
                         'coa_code'  => $row->coa->code,
                         'coa_name'  => $row->coa->name,
                         'nominal'   => $row->type == '1' ? $row->nominal : -1 * $row->nominal,
+                        'nominal_fc'=> $row->type == '1' ? $row->nominal_fc : -1 * $row->nominal_fc,
                     ];
                 }else{
                     $arr[$cekIndex]['nominal'] += $row->type == '1' ? $row->nominal : -1 * $row->nominal;
+                    $arr[$cekIndex]['nominal_fc'] += $row->type == '1' ? $row->nominal_fc : -1 * $row->nominal_fc;
                 }
             }
 
@@ -223,7 +225,8 @@ class ClosingJournalController extends Controller
             $coalabarugi = Coa::where('code','300.03.02.01.01')->where('company_id',$request->company_id)->first();
 
             foreach($result as $key => $row){
-                $result[$key]['nominal'] = -1 * round($result[$key]['nominal'],2);
+                $result[$key]['nominal'] = -1 * round(floatval($result[$key]['nominal']),2);
+                $result[$key]['nominal_fc'] = -1 * round(floatval($result[$key]['nominal_fc']),2);
             }
 
             $result[] = [
@@ -272,6 +275,7 @@ class ClosingJournalController extends Controller
                 'month'		            => 'required',
                 'arr_coa_id'            => 'required|array',
                 'arr_nominal'           => 'required|array',
+                'arr_nominal_fc'        => 'required|array',
             ], [
                 'code.required' 				    => 'Kode/No tidak boleh kosong.',
              /*    'code.string'                       => 'Kode harus dalam bentuk string.',
@@ -285,6 +289,8 @@ class ClosingJournalController extends Controller
                 'arr_coa_id.array'                  => 'Coa harus dalam bentuk array.',
                 'arr_nominal.required'              => 'Nominal tidak boleh kosong',
                 'arr_nominal.array'                 => 'Nominal harus dalam bentuk array.',
+                'arr_nominal_fc.required'           => 'Nominal mata uang asli tidak boleh kosong',
+                'arr_nominal_fc.array'              => 'Nominal mata uang asli harus dalam bentuk array.',
             ]);
 
             if($validation->fails()) {
@@ -390,6 +396,7 @@ class ClosingJournalController extends Controller
                             'coa_id'                => $row,
                             'type'                  => $request->arr_nominal[$key] >= 0 ? '1' : '2',
                             'nominal'               => abs($request->arr_nominal[$key]),
+                            'nominal_fc'            => abs($request->arr_nominal_fc[$key]),
                         ]);
                     }
 

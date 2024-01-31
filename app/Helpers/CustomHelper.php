@@ -3426,7 +3426,7 @@ class CustomHelper {
 						'coa_id'		=> $row->coa_id,
 						'type'			=> $row->type,
 						'nominal'		=> abs($row->nominal),
-						'nominal_fc'	=> abs($row->nominal),
+						'nominal_fc'	=> abs($row->nominal_fc),
 					]);
 				}
 

@@ -209,7 +209,7 @@
 								<th>Level</th>
 								<th>Status</th>
 								<th>Akun Kas</th>
-								<th>Akun Kontrol</th>
+								<th>Muncul di Jurnal</th>
 								<th>Wajib BP di Jurnal</th>
 							</tr>
                         </thead>

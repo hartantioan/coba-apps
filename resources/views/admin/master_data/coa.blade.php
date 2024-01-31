@@ -75,7 +75,7 @@
                                                 <div class="input-field">
                                                     <select multiple="multiple" id="filter_type" name="filter_type" onchange="loadDataTable()">
                                                         <option value="" selected>Semua</option>
-                                                        <option value="2">Akun Kontrol</option>
+                                                        <option value="2">Akun Jurnal</option>
                                                         <option value="3">Akun Kas</option>
                                                     </select>
                                                 </div>
@@ -107,7 +107,7 @@
                                                         <th>Level</th>
                                                         <th>Akun Kas</th>
                                                         <th>Block</th>
-                                                        <th>Akun Kontrol</th>
+                                                        <th>Muncul di Jurnal</th>
                                                         <th>Wajib BP di Jurnal</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
@@ -180,7 +180,7 @@
                         </div>
                         <div class="input-field col s6">
                             <div class="switch mb-1">
-                                <label for="show_journal">Akun Kontrol</label>
+                                <label for="show_journal">Muncul di Jurnal</label>
                                 <label class="right">
                                     Tidak
                                     <input type="checkbox" id="show_journal" name="show_journal" value="1">
@@ -435,8 +435,8 @@
                 $('#parent_id').empty();
                 $("select2").val($("select2 option:first").val()).trigger('change');
                 M.updateTextFields();
-                $('#is_confidential').prop( "checked", false);
-                $('#is_control_account').prop( "checked", false);
+                $('#show_journal').prop( "checked", false);
+                $('#is_hidden').prop( "checked", false);
                 $('#is_cash_account').prop( "checked", false);
             }
         });

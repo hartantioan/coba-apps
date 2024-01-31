@@ -63,7 +63,7 @@ class ExportPurchaseMemo implements FromCollection, WithTitle, WithHeadings, Sho
                 ->where('post_date', '<=', $this->end_date);
             })->get();
         }elseif($this->mode == '2'){
-            $data = PurchaseMemo::withTrashed()->whereHas('purchaseMemo',function($query){
+            $data = PurchaseMemoDetail::withTrashed()->whereHas('purchaseMemo',function($query){
                 $query->where('post_date', '>=',$this->start_date)
                 ->where('post_date', '<=', $this->end_date);
             })->get();

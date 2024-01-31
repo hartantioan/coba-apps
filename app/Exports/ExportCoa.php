@@ -33,7 +33,7 @@ class ExportCoa implements FromCollection, WithTitle, WithHeadings, WithCustomSt
         'LEVEL',
         'AKUN KAS',
         'BLOCK',
-        'AKUN KONTROL',
+        'MUNCUL DI JURNAL',
         'WAJIB BP JURNAL',
         'STATUS',
     ];

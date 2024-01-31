@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Accounting;
 
+use App\Exports\ExportSubsidiaryLedger;
 use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Coa;
@@ -9,6 +10,7 @@ use App\Models\Company;
 use App\Models\JournalDetail;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SubsidiaryLedgerController extends Controller
 {
@@ -127,5 +129,14 @@ class SubsidiaryLedgerController extends Controller
             'status'            => 200,
             'html'              => $html,
         ]);
+    }
+
+    public function export(Request $request){
+        $datestart = $request->datestart? $request->datestart : '';
+        $dateend = $request->dateend ? $request->dateend : '';
+        $coastart = $request->coastart ? $request->coastart : '';
+        $coaend = $request->coaend ? $request->coaend : '';
+
+		return Excel::download(new ExportSubsidiaryLedger($datestart,$dateend,$coastart,$coaend), 'subsidiary_ledger_'.uniqid().'.xlsx');
     }
 }

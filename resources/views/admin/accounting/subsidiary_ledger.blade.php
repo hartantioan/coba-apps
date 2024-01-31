@@ -80,6 +80,9 @@
                                                 <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="reset();">
                                                     <i class="material-icons center">loop</i>
                                                 </a>
+                                                <div id="export_button">
+                                                    <button class="btn waves-effect waves-light right submit mt-2" onclick="exportExcel();">Excel<i class="material-icons right">view_list</i></button>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -159,9 +162,7 @@
     function reset(){
         $('#company').val($("#company option:first").val()).formSelect();
         $('#date_start,#date_end').val('{{ date("Y-m-d") }}');
-        $('#result').html('
-            Silahkan pilih bulan, coa dan tekan tombol hijau.
-        ');
+        $('#result').html('Silahkan pilih bulan, coa dan tekan tombol hijau.');
         $('#coa_start,#coa_end').empty();
     }
 
@@ -204,5 +205,14 @@
                 });
             }
         });
+    }
+
+    function exportExcel(){
+        var datestart = $('#date_start').val();
+        var dateend = $('#date_end').val();
+        var coastart = $('#coa_start').val();
+        var coaend = $('#coa_end').val();
+
+        window.location = "{{ Request::url() }}/export?datestart=" + datestart + "&dateend=" + dateend+ "&coastart=" + coastart+ "&coaend=" + coaend
     }
 </script>

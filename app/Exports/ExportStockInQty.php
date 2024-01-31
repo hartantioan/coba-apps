@@ -42,7 +42,7 @@ class ExportStockInQty implements FromView,ShouldAutoSize
         })->get();
         
         $array_filter = [];
-        $array_filter=[];
+       
         foreach($query_data as $row){
             $data_tempura = [
                 'item' => $row->item->code.'-'.$row->item->name,

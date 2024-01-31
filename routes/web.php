@@ -2397,6 +2397,7 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('subsidiary_ledger')->middleware('operation.access:subsidiary_ledger,view')->group(function () {
                         Route::get('/',[SubsidiaryLedgerController::class, 'index']);
                         Route::post('process', [SubsidiaryLedgerController::class, 'process']);
+                        Route::get('export', [SubsidiaryLedgerController::class, 'export']);
                     });
                     Route::prefix('ledger')->middleware('operation.access:ledger,view')->group(function () {
                         Route::get('/',[LedgerController::class, 'index']);

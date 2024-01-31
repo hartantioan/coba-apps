@@ -205,11 +205,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <ul class="tabs">
-                    <li class="tab col m6"><a class="active" href="#inputOne">Input Satu Data</a></li>
-                    {{-- <li class="tab col m6"><a href="#inputMulti">Input Multi Data</a></li> --}}
-                </ul>
-                <div id="inputOne" class="col s12 active">
+                
                     <h4 class="mt-2">Tambah/Edit {{ $title }}</h4>
                     <i>Silahkan pilih supplier / vendor untuk mengambil data dokumen GRPO, PO Jasa, LC, atau PO DP.</i>
                     <form class="row" id="form_data" onsubmit="return false;">
@@ -308,103 +304,117 @@
                                 </div>
                                 <div class="input-field col m3 s12">
                                     <input id="scan_barcode" name="scan_barcode" type="text" placeholder="Ketik nomor dokumen dan tekan Enter...">
-                                    <label class="active" for="invoice_no">Tambah Dokumen dari Scan Barcode</label>
+                                    <label class="active" for="scan_barcode">Scan Barcode (Single Input)</label>
                                 </div>
                                 <div class="col m12 s12 step17">
-                                    <div id="detailOne" class="col s12">
-                                        <p class="mt-2 mb-2">
-                                            <h6>Detail Goods Receipt PO / Landed Cost / Purchase Order Jasa / Coa</h6>
-                                            <div style="overflow:auto;">
-                                                <table class="bordered" style="width:3500px !important;" id="table-detail">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="center">GR/LC/PO/Coa No.</th>
-                                                            <th class="center">NO.PO/GRPO</th>
-                                                            <th class="center">No.SJ</th>
-                                                            <th class="center">Item / Coa Jasa</th>
-                                                            <th class="center">Satuan</th>
-                                                            <th class="center">Qty Diterima</th>
-                                                            <th class="center">Qty Kembali</th>
-                                                            <th class="center">Qty Sisa</th>
-                                                            <th class="center">Qty Stok</th>
-                                                            <th class="center">Satuan Stok</th>
-                                                            <th class="center">Harga@</th>
-                                                            <th class="center">Tgl.Post</th>
-                                                            <th class="center">Tgl.Tenggat</th>
-                                                            <th class="center">Total</th>
-                                                            <th class="center">PPN (%)</th>
-                                                            <th class="center">Termasuk PPN</th>
-                                                            <th class="center">PPN (Rp)</th>
-                                                            <th class="center">PPh (%)</th>
-                                                            <th class="center">PPh (Rp)</th>
-                                                            <th class="center">Grandtotal</th>
-                                                            <th class="center">Keterangan 1</th>
-                                                            <th class="center">Keterangan 2</th>
-                                                            <th class="center">Plant</th>
-                                                            <th class="center">Line</th>
-                                                            <th class="center">Mesin</th>
-                                                            <th class="center">Departemen</th>
-                                                            <th class="center">Gudang</th>
-                                                            <th class="center">Proyek</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="body-detail">
-                                                        <tr id="last-row-detail">
-                                                            <td colspan="28">
-                                                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
-                                                                    <i class="material-icons left">add</i> Pembulatan Manual
-                                                                </a>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
+                                    <ul class="collapsible">
+                                        <li class="active step18" id="detailOne" onclick="resetTable();">
+                                            <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">assignment</i>Single Input</div>
+                                            <div class="collapsible-body" style="display:block;">
+                                                <div class="row">
+                                                    <div class="col m12" style="overflow:auto;width:100% !important;">
+                                                        <p class="mt-2 mb-2">
+                                                            <h6>Detail Goods Receipt PO / Landed Cost / Purchase Order Jasa / Coa</h6>
+                                                            <div style="overflow:auto;">
+                                                                <table class="bordered" style="width:3500px !important;" id="table-detail">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th class="center">GR/LC/PO/Coa No.</th>
+                                                                            <th class="center">NO.PO/GRPO</th>
+                                                                            <th class="center">No.SJ</th>
+                                                                            <th class="center">Item / Coa Jasa</th>
+                                                                            <th class="center">Satuan</th>
+                                                                            <th class="center">Qty Diterima</th>
+                                                                            <th class="center">Qty Kembali</th>
+                                                                            <th class="center">Qty Sisa</th>
+                                                                            <th class="center">Qty Stok</th>
+                                                                            <th class="center">Satuan Stok</th>
+                                                                            <th class="center">Harga@</th>
+                                                                            <th class="center">Tgl.Post</th>
+                                                                            <th class="center">Tgl.Tenggat</th>
+                                                                            <th class="center">Total</th>
+                                                                            <th class="center">PPN (%)</th>
+                                                                            <th class="center">Termasuk PPN</th>
+                                                                            <th class="center">PPN (Rp)</th>
+                                                                            <th class="center">PPh (%)</th>
+                                                                            <th class="center">PPh (Rp)</th>
+                                                                            <th class="center">Grandtotal</th>
+                                                                            <th class="center">Keterangan 1</th>
+                                                                            <th class="center">Keterangan 2</th>
+                                                                            <th class="center">Plant</th>
+                                                                            <th class="center">Line</th>
+                                                                            <th class="center">Mesin</th>
+                                                                            <th class="center">Departemen</th>
+                                                                            <th class="center">Gudang</th>
+                                                                            <th class="center">Proyek</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody id="body-detail">
+                                                                        <tr id="last-row-detail">
+                                                                            <td colspan="28">
+                                                                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
+                                                                                    <i class="material-icons left">add</i> Pembulatan Manual
+                                                                                </a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </p>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </p>
-                                    </div>
-                                    <div id="detailMulti" class="col s12" style="display:none;">
-                                        <div class="col s12" style="overflow:auto;width:100% !important;">
-                                            <h6>Anda bisa menggunakan fitur copy paste dari format excel yang telah disediakan. Silahkan klik <a href="{{-- {{ asset(Storage::url('format_imports/format_copas_ap_invoice_2.xlsx')) }} --}}{{ Request::url() }}/get_import_excel" target="_blank">disini</a> untuk mengunduh. Jangan menyalin kolom paling atas (bagian header), dan tempel pada isian paling kiri di tabel di bawah ini.</h6>
-                                            <h6>Fitur ini hanya untuk transaksi yang langsung menjadi biaya pada hutang usaha.</h6>
-                                            <p class="mt-2 mb-2">
-                                                <table class="bordered" style="min-width:2700px;zoom:0.7;">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="center">Coa</th>
-                                                            <th class="center">Qty</th>
-                                                            <th class="center">Harga Satuan</th>
-                                                            <th class="center">Total</th>
-                                                            <th class="center">ID PPN</th>
-                                                            <th class="center">PPN</th>
-                                                            <th class="center">ID PPh</th>
-                                                            <th class="center">PPh</th>
-                                                            <th class="center">Grandtotal</th>
-                                                            <th class="center">Ket.1</th>
-                                                            <th class="center">Ket.2</th>
-                                                            <th class="center">Plant</th>
-                                                            <th class="center">Line</th>
-                                                            <th class="center">Mesin</th>
-                                                            <th class="center">Departemen</th>
-                                                            <th class="center">Gudang</th>
-                                                            <th class="center">Proyek</th>
-                                                            <th class="center">Hapus</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="body-multi">
-                                                        <tr id="last-row-multi">
-                                                            <td colspan="18">
-                                                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 step_2_1 " onclick="addLine()" href="javascript:void(0);">
-                                                                    <i class="material-icons left">add</i> Tambah 1 Baris
-                                                                </a>
-                                                                <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addMulti()" href="javascript:void(0);">
-                                                                    <i class="material-icons left">add</i> Tambah Multi Baris
-                                                                </a>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </p>
-                                        </div>
-                                    </div>
+                                        </li>
+                                        <li id="detailMulti" class="step19" onclick="resetTable();">
+                                            <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">library_books</i>Multi Input</div>
+                                            <div class="collapsible-body">
+                                                <div class="row">
+                                                    <div class="col m12" style="overflow:auto;width:100% !important;">
+                                                        <h6>Anda bisa menggunakan fitur copy paste dari format excel yang telah disediakan. Silahkan klik <a href="{{-- {{ asset(Storage::url('format_imports/format_copas_ap_invoice_2.xlsx')) }} --}}{{ Request::url() }}/get_import_excel" target="_blank">disini</a> untuk mengunduh. Jangan menyalin kolom paling atas (bagian header), dan tempel pada isian paling kiri di tabel di bawah ini.</h6>
+                                                        <h6>Fitur ini hanya untuk transaksi yang langsung menjadi biaya pada hutang usaha.</h6>
+                                                        <p class="mt-2 mb-2">
+                                                            <table class="bordered" style="min-width:2700px;zoom:0.7;">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="center">Coa</th>
+                                                                        <th class="center">Qty</th>
+                                                                        <th class="center">Harga Satuan</th>
+                                                                        <th class="center">Total</th>
+                                                                        <th class="center">ID PPN</th>
+                                                                        <th class="center">PPN</th>
+                                                                        <th class="center">ID PPh</th>
+                                                                        <th class="center">PPh</th>
+                                                                        <th class="center">Grandtotal</th>
+                                                                        <th class="center">Ket.1</th>
+                                                                        <th class="center">Ket.2</th>
+                                                                        <th class="center">Plant</th>
+                                                                        <th class="center">Line</th>
+                                                                        <th class="center">Mesin</th>
+                                                                        <th class="center">Departemen</th>
+                                                                        <th class="center">Gudang</th>
+                                                                        <th class="center">Proyek</th>
+                                                                        <th class="center">Hapus</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody id="body-multi">
+                                                                    <tr id="last-row-multi">
+                                                                        <td colspan="18">
+                                                                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 step_2_1 " onclick="addLine()" href="javascript:void(0);">
+                                                                                <i class="material-icons left">add</i> Tambah 1 Baris
+                                                                            </a>
+                                                                            <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addMulti()" href="javascript:void(0);">
+                                                                                <i class="material-icons left">add</i> Tambah Multi Baris
+                                                                            </a>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
                                 </div>
                                 <div class="col m12 s12 step18">
                                     <p class="mt-2 mb-2">
@@ -481,7 +491,6 @@
                             </div>
                         </div>
                     </form>
-                </div>
             </div>
         </div>
     </div>
@@ -1050,7 +1059,13 @@
                                                     ` + val.qty_returned + `
                                                 </td>
                                                 <td class="center">
-                                                    <input class="browser-default" type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                                                    <input class="browser-default" type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();countStock(this);" data-conversion="` + val.qty_conversion + `">
+                                                </td>
+                                                <td class="center" id="qty_stock` + count + `">
+                                                    ` + val.qty_stock + `
+                                                </td>
+                                                <td class="center" id="unit_stock` + count + `">
+                                                    ` + val.unit_stock + `
                                                 </td>
                                                 <td class="right-align">
                                                     ` + val.price + `
@@ -1128,13 +1143,24 @@
 
                                         $('#top').val(val.top);
 
+                                        $('#received_date').val(val.received_date);
+                                        $('#due_date').val(val.due_date);
+                                        $('#document_date').val(val.document_date);
+                                        $('#tax_no').val(val.tax_no);
+                                        $('#tax_cut_no').val(val.tax_cut_no);
+                                        $('#cut_date').val(val.cut_date);
+                                        $('#spk_no').val(val.spk_no);
+                                        $('#invoice_no').val(val.invoice_no);
+
                                     });                        
                                 }else{
                                     $('.row_detail').remove();
                                     $('#total,#tax,#balance').text('0,00');
                                 }
 
-                                addDays();
+                                if(!$('#received_date').val()){
+                                    addDays();
+                                }
                                 
                                 $('.modal-content').scrollTop(400);
                                 M.updateTextFields();
@@ -1171,14 +1197,29 @@
         return this.substring(0, index) + replacement + this.substring(index + replacement.length);
     };
 
+    function resetTable(){
+        setTimeout(function() {
+            if($('#detailOne').hasClass('active')){
+                $('#type_detail').val('1').formSelect();
+            }
+            if($('#detailMulti').hasClass('active')){
+                $('#type_detail').val('2').formSelect();
+            }
+        }, 500);
+    }
+
     function viewDetail(){
         $('.row_detail,.row_detail_dp,.row_multi').remove();
         if($('#type_detail').val() == '1'){
-            $('#detailOne').show();
-            $('#detailMulti').hide();
+            $('#detailOne .collapsible-body').show();
+            $('#detailOne').addClass('active');
+            $('#detailMulti .collapsible-body').hide();
+            $('#detailMulti').removeClass('active');
         }else if($('#type_detail').val() == '2'){
-            $('#detailOne').hide();
-            $('#detailMulti').show();
+            $('#detailOne .collapsible-body').hide();
+            $('#detailOne').removeClass('active');
+            $('#detailMulti .collapsible-body').show();
+            $('#detailMulti').addClass('active');
         }
         countAll();
     }
@@ -1316,6 +1357,7 @@
                     });
                 }
             });
+            countAll();
             return false;
         });
     }
@@ -2125,6 +2167,12 @@
                 <input type="hidden" name="arr_temp_qty[]" value="1" data-id="` + count + `">
                 <td class="center">
                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                </td>
+                <td class="center">
+                    -
+                </td>
+                <td class="center">
+                    -
                 </td>
                 <td class="center">
                     -

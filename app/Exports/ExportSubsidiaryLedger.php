@@ -12,6 +12,8 @@ class ExportSubsidiaryLedger implements  FromView,ShouldAutoSize
     /**
     * @return \Illuminate\Support\Collection
     */
+    protected $dateend, $datestart, $coaend, $coastart;
+
     public function __construct(string $datestart, string $dateend,string $coastart,string $coaend)
     {
         $this->datestart = $datestart ? $datestart : '';
@@ -39,13 +41,6 @@ class ExportSubsidiaryLedger implements  FromView,ShouldAutoSize
                 'name'=>  $row->name,
                 'balance'=>number_format($balance,2,',','.'),
             ];
-            // $html .=    '<tr style="font-weight:800;">
-            //                 <td width="200px">'.$row->code.'</td>
-            //                 <td width="200px">'.$row->name.'</td>
-            //                 <td colspan="5"></td>
-            //                 <td class="right-align">'.number_format($balance,2,',','.').'</td>
-            //                 <td colspan="9"></td>
-            //             </tr>';
             if(count($rowdata) > 0){
                 foreach($rowdata as $key => $detail){
                     $balance += ($detail->type == '1' ? $detail->nominal : -1 * $detail->nominal);
@@ -68,57 +63,11 @@ class ExportSubsidiaryLedger implements  FromView,ShouldAutoSize
                     $data_tempura['j_machine'][]=($detail->machine()->exists() ? $detail->machine->code : '-');
                     $data_tempura['j_department'][]=($detail->department()->exists() ? $detail->department->code : '-');
                     $data_tempura['j_project'][]=($detail->project()->exists() ? $detail->project->code : '-');
-                    
-                    // $html .= '<tr>
-                    //             <td>'.$detail->coa->code.'</td>
-                    //             <td>'.$detail->coa->name.'</td>
-                    //             <td>'.date('d/m/Y',strtotime($detail->journal->post_date)).'</td>
-                    //             <td>'.$detail->journal->code.'</td>
-                    //             <td>'.($detail->journal->lookable_id ? $detail->journal->lookable->code : '-').'</td>
-                    //             <td class="right-align">'.($detail->type == '1' ? number_format($detail->nominal,2,',','.') : '-').'</td>
-                    //             <td class="right-align">'.($detail->type == '2' ? number_format($detail->nominal,2,',','.') : '-').'</td>
-                    //             <td class="right-align">'.number_format($balance,2,',','.').'</td>
-                    //             <td>'.$detail->journal->note.'</td>
-                    //             <td>'.$detail->note.'</td>
-                    //             <td>'.$detail->note2.'</td>
-                    //             <td>'.($detail->place()->exists() ? $detail->place->code : '-').'</td>
-                    //             <td>'.($detail->warehouse()->exists() ? $detail->warehouse->name : '-').'</td>
-                    //             <td>'.($detail->line()->exists() ? $detail->line->code : '-').'</td>
-                    //             <td>'.($detail->machine()->exists() ? $detail->machine->code : '-').'</td>
-                    //             <td>'.($detail->department()->exists() ? $detail->department->code : '-').'</td>
-                    //             <td>'.($detail->project()->exists() ? $detail->project->code : '-').'</td>
-                    //         </tr>';
                 }
             }
             $array_filter[]=$data_tempura;
         }
-
-        // $query_data = ItemStock::where(function($query) {
-        //     if($this->plant){
-        //         $query->where('place_id',$this->plant);
-        //     }
-        //     if($this->warehouse){
-        //         $query->where('warehouse_id',$this->warehouse);
-        //     }
-        // })->get();
         
-        // info($query_data);
-        // $array_filter = [];
-        // foreach($query_data as $row){
-        //     $data_tempura = [
-        //         'item' => $row->item->code.'-'.$row->item->name,
-        //         'stock'=>number_format($row->qty),
-        //         'plant'=>$row->place->code,
-        //         'gudang'=>$row->warehouse->code . ' - ' . $row->warehouse->name,
-        //         'area' => $row->area->name??'-',
-        //         'shading' => $row->itemShading->code??'-',
-        //         // 'final'=>number_format($qty,3,',','.'),
-        //         'satuan'=>$row->item->uomUnit->code,
-        //         'location'=>$row->location ?? '',
-        //     ];
-        //     $array_filter[]=$data_tempura;
-        // }
-      
         return view('admin.exports.subsidiary_ledger', [
             'data' => $array_filter,
         ]);

@@ -1620,6 +1620,9 @@
     }
     
     function getAccountData(){
+        if($('.data-used').length > 0){
+            $('.data-used').trigger('click');
+        }
         let val = $('#supplier_id').val();
         $.ajax({
             url: '{{ Request::url() }}/get_account_data',

@@ -75,7 +75,6 @@
                                                 <div class="input-field">
                                                     <select multiple="multiple" id="filter_type" name="filter_type" onchange="loadDataTable()">
                                                         <option value="" selected>Semua</option>
-                                                        <option value="1">Akun Rahasia</option>
                                                         <option value="2">Akun Kontrol</option>
                                                         <option value="3">Akun Kas</option>
                                                     </select>
@@ -106,11 +105,9 @@
                                                         <th>Perusahaan</th>
                                                         <th>Parent</th>
                                                         <th>Level</th>
-                                                        <th>Akun Rahasia</th>
-                                                        <th>Akun Kontrol</th>
                                                         <th>Akun Kas</th>
                                                         <th>Block</th>
-                                                        <th>Tampil di Jurnal</th>
+                                                        <th>Akun Kontrol</th>
                                                         <th>Wajib BP di Jurnal</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
@@ -172,24 +169,6 @@
                         </div>
                         <div class="input-field col s6">
                             <div class="switch mb-1">
-                                <label for="is_confidential">Akun Rahasia</label>
-                                <label class="right">
-                                    Tidak
-                                    <input type="checkbox" id="is_confidential" name="is_confidential" value="1">
-                                    <span class="lever"></span>
-                                    Ya
-                                </label>
-                            </div>
-                            <div class="switch mb-1">
-                                <label for="is_control_account">Akun Control</label>
-                                <label class="right">
-                                    Tidak
-                                    <input type="checkbox" id="is_control_account" name="is_control_account" value="1">
-                                    <span class="lever"></span>
-                                    Ya
-                                </label>
-                            </div>
-                            <div class="switch mb-1">
                                 <label for="is_cash_account">Akun Kas</label>
                                 <label class="right">
                                     Tidak
@@ -201,7 +180,7 @@
                         </div>
                         <div class="input-field col s6">
                             <div class="switch mb-1">
-                                <label for="show_journal">Tampilkan di Form Jurnal</label>
+                                <label for="show_journal">Akun Kontrol</label>
                                 <label class="right">
                                     Tidak
                                     <input type="checkbox" id="show_journal" name="show_journal" value="1">
@@ -533,11 +512,9 @@
                 { name: 'company_id', className: 'center-align' },
                 { name: 'parent_id', className: '' },
                 { name: 'level', className: 'center-align' },
-                { name: 'confidential', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'control', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'cash', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'hidden', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'show_journal', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'control', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'bp_journal', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
@@ -693,18 +670,6 @@
                     `);
                 }
                 
-                if(response.is_confidential == '1'){
-                    $('#is_confidential').prop( "checked", true);
-                }else{
-                    $('#is_confidential').prop( "checked", false);
-                }
-
-                if(response.is_control_account == '1'){
-                    $('#is_control_account').prop( "checked", true);
-                }else{
-                    $('#is_control_account').prop( "checked", false);
-                }
-
                 if(response.is_cash_account == '1'){
                     $('#is_cash_account').prop( "checked", true);
                 }else{

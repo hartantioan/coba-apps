@@ -1867,7 +1867,7 @@
                                 <tr class="row_item" data-id="` + $('#material_request_id').val() + `">
                                     <input type="hidden" name="arr_lookable_type[]" value="` + val.type + `">
                                     <input type="hidden" name="arr_lookable_id[]" value="` + val.id + `">
-                                    <td>
+                                    <td style="pointer-events: none;">
                                         <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                                     </td>
                                     <td>

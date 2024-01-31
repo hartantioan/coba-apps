@@ -70,6 +70,7 @@ class User extends Authenticatable
         'registration_id',
         'reset_code',
         'type_payment',
+        'user_old_id',
     ];
 
     protected $hidden = [

@@ -1393,7 +1393,7 @@
                                         <tr class="row_item" data-id="` + response.id + `">
                                             <input type="hidden" name="arr_data[]" value="` + val.reference_id + `">
                                             <input type="hidden" name="arr_type[]" value="` + type + `">
-                                            <td>
+                                            <td style="pointer-events: none;">
                                                 <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                                             </td>
                                             <td>
@@ -1504,7 +1504,7 @@
                                         <tr class="row_item" data-id="` + response.id + `">
                                             <input type="hidden" name="arr_data[]" value="` + val.reference_id + `">
                                             <input type="hidden" name="arr_type[]" value="` + type + `">
-                                            <td>
+                                            <td style="pointer-events: none;">
                                                 <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                                             </td>
                                             <td>

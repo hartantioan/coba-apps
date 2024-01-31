@@ -208,10 +208,8 @@
 								<th>Parent</th>
 								<th>Level</th>
 								<th>Status</th>
-								<th>Akun Rahasia</th>
-								<th>Akun Control</th>
 								<th>Akun Kas</th>
-								<th>Tampil Jurnal</th>
+								<th>Akun Kontrol</th>
 								<th>Wajib BP di Jurnal</th>
 							</tr>
                         </thead>
@@ -225,8 +223,6 @@
 									<td>{{ $row->parentSub()->exists() ? $row->parentSub->name : 'is Parent' }}</td>
 									<td align="center">{{ $row->level }}</td>
 									<td align="center">{!! $row->status() !!}</td>
-									<td align="center">{{$row->is_confidential ? 'v' : 'x'}}</td>
-									<td align="center">{{$row->is_control_account ? 'v' : 'x'}}</td>
 									<td align="center">{{$row->is_cash_account ? 'v' : 'x'}}</td>
 									<td align="center">{{$row->show_journal ? 'v' : 'x'}}</td>
 									<td align="center">{{$row->bp_journal ? 'v' : 'x'}}</td>

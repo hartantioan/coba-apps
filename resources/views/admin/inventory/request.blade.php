@@ -491,6 +491,7 @@
         window.table.search('{{ $code }}').draw();
 
         $('#modal2').modal({
+            dismissible: false,
             onOpenStart: function(modal,trigger) {
                 
             },
@@ -502,6 +503,7 @@
             }
         });
         $('#modal3').modal({
+            dismissible: false,
             onOpenStart: function(modal,trigger) {
                 
             },
@@ -517,6 +519,7 @@
         });
 
         $('#modal4').modal({
+            dismissible: false,
             onOpenStart: function(modal,trigger) {
                 
             },
@@ -528,6 +531,7 @@
         });
 
         $('#modal7').modal({
+            dismissible: false,
             onOpenStart: function(modal,trigger) {
                 
             },

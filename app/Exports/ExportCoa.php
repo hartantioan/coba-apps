@@ -31,9 +31,10 @@ class ExportCoa implements FromCollection, WithTitle, WithHeadings, WithCustomSt
         'PERUSAHAAN',
         'PARENT',
         'LEVEL',
-        'AKUN RAHASIA',
-        'AKUN KONTROL',
         'AKUN KAS',
+        'BLOCK',
+        'AKUN KONTROL',
+        'WAJIB BP JURNAL',
         'STATUS',
     ];
 
@@ -62,11 +63,8 @@ class ExportCoa implements FromCollection, WithTitle, WithHeadings, WithCustomSt
             if($this->type){
                 $query->where(function($query){
                     foreach(explode(',',$this->type) as $row){
-                        if($row == '1'){
-                            $query->OrWhereNotNull('is_confidential');
-                        }
                         if($row == '2'){
-                            $query->OrWhereNotNull('is_control_account');
+                            $query->OrWhereNotNull('show_journal');
                         }
                         if($row == '3'){
                             $query->OrWhereNotNull('is_cash_account');
@@ -86,9 +84,10 @@ class ExportCoa implements FromCollection, WithTitle, WithHeadings, WithCustomSt
                 'perusahaan'    => $row->company->name,
                 'parent'        => $row->parentSub()->exists() ? $row->parentSub->name : 'is Parent',
                 'level'         => $row->level,
-                'rahasia'       => $row->is_confidential ? 'Ya' : 'Tidak',
-                'kontrol'       => $row->is_control_account ? 'Ya' : 'Tidak',
                 'kas'           => $row->is_cash_account ? 'Ya' : 'Tidak',
+                'block'         => $row->is_hidden ? 'Ya' : 'Tidak',
+                'show_journal'  => $row->show_journal ? 'Ya' : 'Tidak',
+                'must_bp'       => $row->bp_journal ? 'Ya' : 'Tidak',
                 'status'        => $row->status == '1' ? 'Aktif' : 'Non-Aktif',
             ];
         }

@@ -2,10 +2,10 @@
     <thead class="sidebar-sticky" >
         <tr>
             <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Kode Coa</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px" width="500px">Nama Coa</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px" width="100px">Tanggal</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px" width="200px">No.JE</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px" width="200px">Dok.Ref.</th>
+            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="500px">Nama Coa</th>
+            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="100px">Tanggal</th>
+            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="200px">No.JE</th>
+            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="200px">Dok.Ref.</th>
             <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Debit</th>
             <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Kredit</th>
             <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Total</th>
@@ -26,7 +26,7 @@
             <td width="200px">{{$row['code']}}</td>
             <td width="200px">{{$row['name']}}</td>
             <td colspan="5"></td>
-            <td class="right-align">'.{{$row['balance']}}.'</td>
+            <td class="right-align">{{$row['balance']}}</td>
             <td colspan="9"></td>
         </tr>
         @if (isset($row['coa_code']) && is_array($row['coa_code']))

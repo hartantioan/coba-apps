@@ -452,8 +452,8 @@ class Select2Controller extends Controller {
                     ->orWhere('prefix', 'like', "%$search%");
                  })->where('level',5)
                 ->where('status','1')
+                ->whereNotNull('is_cash_account')
                 ->whereIn('company_id',$arrCompany)
-                ->where('code','like',"100.01.01%")
                 ->get();
 
         foreach($data as $d) {

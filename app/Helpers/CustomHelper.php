@@ -3262,7 +3262,7 @@ class CustomHelper {
 				'currency_id'	=> isset($pdp->currency_id) ? $pdp->currency_id : NULL,
 				'currency_rate'	=> isset($pdp->currency_rate) ? $pdp->currency_rate : NULL,
 				'post_date'		=> $pdp->post_date,
-				'note'			=> $pdp->code,
+				'note'			=> $pdp->note,
 				'status'		=> '3'
 			]);
 

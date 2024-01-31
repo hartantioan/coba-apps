@@ -73,16 +73,16 @@
                                                 <label for="date_end" style="font-size:1rem;">Tanggal Akhir :</label>
                                                 <input type="date" max="{{ date('9999'.'-12-31') }}" id="date_end" name="date_end" value="{{ date('Y-m-d') }}">
                                             </div>
-                                            <div class="col m2 s6 pt-2">
-                                                <a class="btn btn-small green waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="process();">
+                                            <div class="col m4 s6 pt-2">
+                                                <a class="btn btn-small green waves-effect waves-light breadcrumbs-btn mr-3 tooltipped" href="javascript:void(0);" onclick="process();" data-position="top" data-tooltip="Proses">
                                                     <i class="material-icons center">check</i>
                                                 </a>
-                                                <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="reset();">
+                                                <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3 tooltipped" href="javascript:void(0);" onclick="reset();" data-position="top" data-tooltip="Reset">
                                                     <i class="material-icons center">loop</i>
                                                 </a>
-                                                <div id="export_button">
-                                                    <button class="btn waves-effect waves-light right submit mt-2" onclick="exportExcel();">Excel<i class="material-icons right">view_list</i></button>
-                                                </div>
+                                                <a class="btn btn-small blue waves-effect waves-light breadcrumbs-btn mr-3 tooltipped" href="javascript:void(0);" onclick="exportExcel();" data-position="top" data-tooltip="Export Excel">
+                                                    <i class="material-icons center">view_list</i>
+                                                </a>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -120,6 +120,7 @@
 
 <script>
     $(function(){
+        $('.tooltipped').tooltip();
         $('#coa_start,#coa_end').select2({
             placeholder: '-- Kosong --',
             minimumInputLength: 1,

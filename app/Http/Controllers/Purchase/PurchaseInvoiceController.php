@@ -157,6 +157,16 @@ class PurchaseInvoiceController extends Controller
                                 'department_name' => $rowdetail->department_id ? $rowdetail->department->name : '-',
                                 'warehouse_name'=> $rowdetail->warehouse_id ? $rowdetail->warehouse->name : '-',
                                 'project_name'  => $rowdetail->purchaseOrderDetail->project_id ? $rowdetail->purchaseOrderDetail->project->name : '-',
+                                'qty_stock'     => number_format(($rowdetail->qty - $rowdetail->qtyReturn()) * $rowdetail->qty_conversion,3,',','.'),
+                                'unit_stock'    => $rowdetail->item->uomUnit->code,
+                                'qty_conversion'=> $rowdetail->qty_conversion,
+                                'received_date' => '',
+                                'document_date' => '',
+                                'tax_no'        => '',
+                                'tax_cut_no'    => '',
+                                'cut_date'      => '',
+                                'spk_no'        => '',
+                                'invoice_no'    => '',
                             ];
                         }
                     }
@@ -203,6 +213,16 @@ class PurchaseInvoiceController extends Controller
                                 'department_name' => '-',
                                 'warehouse_name'=> '-',
                                 'project_name'  => '-',
+                                'qty_stock'     => 1,
+                                'unit_stock'    => '-',
+                                'qty_conversion'=> 1,
+                                'received_date' => '',
+                                'document_date' => '',
+                                'tax_no'        => '',
+                                'tax_cut_no'    => '',
+                                'cut_date'      => '',
+                                'spk_no'        => '',
+                                'invoice_no'    => '',
                             ];
                         }
                     }
@@ -250,6 +270,16 @@ class PurchaseInvoiceController extends Controller
                                 'department_name' => $rowdetail->department_id ? $rowdetail->department->name : '-',
                                 'warehouse_name'=> $rowdetail->warehouse_id ? $rowdetail->warehouse->name : '-',
                                 'project_name'  => $rowdetail->project_id ? $rowdetail->project->name : '-',
+                                'qty_stock'     => number_format($rowdetail->qty,3,',','.'),
+                                'unit_stock'    => '-',
+                                'qty_conversion'=> 1,
+                                'received_date' => $datapo->received_date ?? '',
+                                'document_date' => $datapo->document_date ?? '',
+                                'tax_no'        => $datapo->tax_no ?? '',
+                                'tax_cut_no'    => $datapo->tax_cut_no ?? '',
+                                'cut_date'      => $datapo->cut_date ?? '',
+                                'spk_no'        => $datapo->spk_no ?? '',
+                                'invoice_no'    => $datapo->invoice_no ?? '',
                             ];
                         }
                     }

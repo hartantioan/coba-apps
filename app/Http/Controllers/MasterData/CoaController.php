@@ -82,11 +82,8 @@ class CoaController extends Controller
                 if($request->type){
                     $query->where(function($query) use ($request){
                         foreach($request->type as $row){
-                            if($row == '1'){
-                                $query->OrWhereNotNull('is_confidential');
-                            }
                             if($row == '2'){
-                                $query->OrWhereNotNull('is_control_account');
+                                $query->OrWhereNotNull('show_journal');
                             }
                             if($row == '3'){
                                 $query->OrWhereNotNull('is_cash_account');
@@ -124,11 +121,8 @@ class CoaController extends Controller
                 if($request->type){
                     $query->where(function($query) use ($request){
                         foreach($request->type as $row){
-                            if($row == '1'){
-                                $query->OrWhereNotNull('is_confidential');
-                            }
                             if($row == '2'){
-                                $query->OrWhereNotNull('is_control_account');
+                                $query->OrWhereNotNull('show_journal');
                             }
                             if($row == '3'){
                                 $query->OrWhereNotNull('is_cash_account');
@@ -159,8 +153,6 @@ class CoaController extends Controller
                     $val->company->name,
                     $val->parentSub()->exists() ? $val->parentSub->name : 'is Parent',
                     $val->level,
-                    $val->is_confidential ? '&#10003;' : '&#10005;',
-                    $val->is_control_account ? '&#10003;' : '&#10005;',
                     $val->is_cash_account ? '&#10003;' : '&#10005;',
                     $val->is_hidden ? '&#10003;' : '&#10005;',
                     $val->show_journal ? '&#10003;' : '&#10005;',
@@ -227,8 +219,6 @@ class CoaController extends Controller
                     $query->parent_id = $request->parent_id ? $request->parent_id : NULL;
                     $query->level = $request->level;
                     $query->status = $request->status ? $request->status : '2';
-                    $query->is_confidential = $request->is_confidential ? $request->is_confidential : NULL;
-                    $query->is_control_account = $request->is_control_account ? $request->is_control_account : NULL;
                     $query->is_cash_account = $request->is_cash_account ? $request->is_cash_account : NULL;
                     $query->is_hidden = $request->is_hidden ? $request->is_hidden : NULL;
                     $query->show_journal = $request->show_journal ? $request->show_journal : NULL;
@@ -248,8 +238,6 @@ class CoaController extends Controller
                         'company_id'            => $request->company_id,
                         'parent_id'	            => $request->parent_id ? $request->parent_id : NULL,
                         'level'                 => $request->level,
-                        'is_confidential'       => $request->is_confidential ? $request->is_confidential : NULL,
-                        'is_control_account'    => $request->is_control_account ? $request->is_control_account : NULL,
                         'is_cash_account'       => $request->is_cash_account ? $request->is_cash_account : NULL,
                         'is_hidden'             => $request->is_hidden ? $request->is_hidden : NULL,
                         'show_journal'          => $request->show_journal ? $request->show_journal : NULL,

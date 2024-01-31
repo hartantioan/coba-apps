@@ -415,6 +415,13 @@ class PurchaseDownPaymentController extends Controller
 
             $grandtotal = $total + $tax - $wtax;
 
+            if($grandtotal <= 0){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Grandtotal tidak boleh kurang dari sama dengan 0.'
+                ]);
+            }
+
 			if($request->temp){
                 DB::beginTransaction();
                 try {

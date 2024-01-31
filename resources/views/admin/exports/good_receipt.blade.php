@@ -1,33 +1,38 @@
 <table border="1" cellpadding="2" cellspacing="0" style="width:100%; font-size:13px;border-collapse: collapse;">
     <thead>
         <tr align="center">
-            <th rowspan="2">No</th>
-            <th rowspan="2">GR NO.</th>
-            <th rowspan="2">Pengguna</th>
-            <th rowspan="2">Partner Bisnis</th>
-            <th colspan="2">Tanggal</th>
-            <th rowspan="2">Penerima</th>
-            <th rowspan="2">Perusahaan</th>
-            <th rowspan="2">Dokumen</th>
-            <th rowspan="2">Catatan</th>
-            <th rowspan="2">Status</th>
-            <th rowspan="2">Deleter</th>
-            <th rowspan="2">Tgl.Delete</th>
-            <th rowspan="2">Ket.Delete</th>
-            <th rowspan="2">Voider</th>
-            <th rowspan="2">Tgl.Void</th>
-            <th rowspan="2">Ket.Void</th>
-            <th rowspan="2">Item</th>
-            <th rowspan="2">Jum.</th>
-            <th rowspan="2">Sat.</th>
-            <th rowspan="2">Catatan</th>
-            <th rowspan="2">Plant</th>
-            <th rowspan="2">Departemen</th>
-            <th rowspan="2">Gudang</th>
-        </tr>
-        <tr align="center">
-            <th>Pengajuan</th>
+            <th>No.</th>
+            <th>No. Dokumen</th>
+            <th>Status</th>
+            <th>Deleter</th>
+            <th>Tgl. Delete</th>
+            <th>Ket. Delete</th>
+            <th>Voider</th>
+            <th>Tgl. Void</th>
+            <th>Ket. Void</th>
+            <th>Pengguna</th>
+            <th>Nama Supplier</th>
+            <th>Tgl. Terima</th>
+            <th>Tgl. SJ</th>
+            <th>No. SJ</th>
+            <th>Penerima</th>
+            <th>Keterangan</th>
             <th>Dokumen</th>
+            <th>Kode Item</th>
+            <th>Nama Item</th>
+            <th>Plant</th>
+            <th>Ket. 1</th>
+            <th>Ket. 2</th>
+            <th>Qty.</th>
+            <th>Satuan</th>
+            <th>Qty. Konversi</th>
+            <th>Satuan</th>
+            <th>Total</th>
+            <th>Line</th>
+            <th>Mesin</th>
+            <th>Departemen</th>
+            <th>Gudang</th>
+            <th>Based On</th>
         </tr>
     </thead>
     <tbody>
@@ -39,14 +44,6 @@
             <tr align="center" style="background-color:#d9d9d9;">
                 <td>{{ $no }}</td>
                 <td>{{ $row->code }}</td>
-                <td>{{ $row->user->name }}</td>
-                <td>{{ $row->account->name }}</td>
-                <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
-                <td>{{ date('d/m/Y',strtotime($row->document_date)) }}</td>
-                <td>{{ $row->receiver_name }}</td>
-                <td>{{ $row->company->name }}</td>
-                <td><a href="{{ $row->attachment() }}" target="_blank">File</a></td>
-                <td>{{ $row->note }}</td>
                 <td>{!! $row->statusRaw() !!}</td>
                 <td>{{ $row->deleteUser()->exists() ? $row->deleteUser->name : '' }}</td>
                 <td>{{ $row->deleteUser()->exists() ? date('d/m/Y',strtotime($row->deleted_at)) : '' }}</td>
@@ -54,14 +51,30 @@
                 <td>{{ $row->voidUser()->exists() ? $row->voidUser->name : '' }}</td>
                 <td>{{ $row->voidUser()->exists() ? date('d/m/Y',strtotime($row->void_date)) : '' }}</td>
                 <td>{{ $row->voidUser()->exists() ? $row->void_note : '' }}</td>
-                <td align="center">{{ ($keydetail + 1) }}</td>
-                <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name }}</td>
+                <td>{{ $row->user->name }}</td>
+                <td>{{ $row->account->name }}</td>
+                <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
+                <td>{{ date('d/m/Y',strtotime($row->document_date)) }}</td>
+                <td>{{ $row->document }}</td>
+                <td>{{ $row->receiver_name }}</td>
+                <td>{{ $row->note }}</td>
+                {{-- <td>{{ $row->company->name }}</td> --}}
+                <td><a href="{{ $row->attachment() }}" target="_blank">File</a></td>
+                <td>{{ $rowdetail->item->code }}</td>
+                <td>{{ $rowdetail->item->name }}</td>
+                <td align="center">{{ $rowdetail->place->code.' - '.$rowdetail->place->company->name }}</td>
+                <td>{{ $rowdetail->note }}</td>
+                <td>{{ $rowdetail->note2 }}</td>
                 <td align="center">{{ $rowdetail->qty }}</td>
                 <td align="center">{{ $rowdetail->itemUnit->unit->code }}</td>
-                <td>{{ $rowdetail->note }}</td>
-                <td align="center">{{ $rowdetail->place->code.' - '.$rowdetail->place->company->name }}</td>
+                <td align="center">{{ $rowdetail->qty * $rowdetail->qty_conversion }}</td>
+                <td align="center">{{ $rowdetail->item->uomUnit->code }}</td>
+                <td align="center">{{ $rowdetail->total }}</td>
+                <td align="center">{{ $rowdetail->line->name ?? ''  }}</td>
+                <td align="center">{{ $rowdetail->machine->name ?? ''  }}</td>
                 <td align="center">{{ $rowdetail->department->name ?? ''  }}</td>
                 <td align="center">{{ $rowdetail->warehouse->name }}</td>
+                <td align="center">{{ $rowdetail->purchaseOrderDetail->purchaseOrder->code }}</td>
             </tr>
             @php
                 $no++;

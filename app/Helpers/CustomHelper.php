@@ -2049,7 +2049,7 @@ class CustomHelper {
 			
 			$ito = InventoryTransferOut::find($table_id);
 
-			if($ito->place_from !== $ito->place_to){
+			/* if(($ito->place_from !== $ito->place_to) || ($ito->place_from == $ito->place_to && $ito->warehouse_from !== $ito->warehouse_to)){ */
 				$query = Journal::create([
 					'user_id'		=> session('bo_id'),
 					'company_id'	=> $ito->company_id,
@@ -2094,7 +2094,7 @@ class CustomHelper {
 						'nominal_fc'	=> $nominal,
 					]);
 				}
-			}
+			/* } */
 
 			foreach($ito->inventoryTransferOutDetail as $rowdetail){
 				$priceout = $rowdetail->item->priceNow($rowdetail->itemStock->place_id,$ito->post_date);
@@ -2134,7 +2134,7 @@ class CustomHelper {
 
 			$iti = InventoryTransferIn::find($table_id);
 
-			if($iti->inventoryTransferOut->place_from !== $iti->InventoryTransferOut->place_to){
+			/* if(($iti->inventoryTransferOut->place_from !== $iti->InventoryTransferOut->place_to) || ($iti->inventoryTransferOut->place_from == $iti->inventoryTransferOut->place_to && $iti->inventoryTransferOut->warehouse_from !== $iti->inventoryTransferOut->warehouse_to)){ */
 				$query = Journal::create([
 					'user_id'		=> session('bo_id'),
 					'company_id'	=> $iti->company_id,
@@ -2172,7 +2172,7 @@ class CustomHelper {
 						'nominal_fc'	=> $rowdetail->total,
 					]);
 				}
-			}
+			/* } */
 
 			foreach($iti->inventoryTransferOut->inventoryTransferOutDetail as $rowdetail){
 				self::sendCogs('inventory_transfer_ins',

@@ -18,6 +18,7 @@ use App\Exports\ExportCoa;
 use Maatwebsite\Excel\Concerns\ToModel;
 
 use App\Imports\ImportCoa;
+use App\Imports\ImportCoaMaster;
 
 class CoaController extends Controller
 {
@@ -445,5 +446,15 @@ class CoaController extends Controller
             ];
             return response()->json($response);
         }
+    }
+
+    public function importMaster(Request $request)
+    {
+        Excel::import(new ImportCoaMaster,$request->file('file'));
+
+        return response()->json([
+            'status'    => 200,
+            'message'   => 'Import sukses!'
+        ]);
     }
 }

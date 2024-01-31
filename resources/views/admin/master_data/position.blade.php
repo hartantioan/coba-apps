@@ -418,8 +418,8 @@
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
-                $('#division_id').val(response.division_id).formselect();
-                $('#level_id').val(response.division_id).formselect();
+                $('#division_id').val(response.division_id).formSelect();
+                $('#level_id').val(response.level_id).formSelect();
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{

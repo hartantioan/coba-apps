@@ -948,6 +948,7 @@ Route::prefix('admin')->group(function () {
                         Route::post('print',[CoaController::class, 'print']);
                         Route::get('export',[CoaController::class, 'export']);
                         Route::post('import',[CoaController::class, 'import'])->middleware('operation.access:coa,update');
+                        Route::post('import_master',[CoaController::class, 'importMaster'])->middleware('operation.access:coa,update');
                         Route::post('create',[CoaController::class, 'create'])->middleware('operation.access:coa,update');
                         Route::post('destroy', [CoaController::class, 'destroy'])->middleware('operation.access:coa,delete');
                     });

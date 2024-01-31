@@ -201,7 +201,7 @@ class User extends Authenticatable
             }elseif($type == '3'){
                 $prefix = 'S';
             }elseif($type == '4'){
-                $prefix = 'V';
+                $prefix = 'E';
             }
     
             $query = User::selectRaw('type, RIGHT(employee_no, 6) as code')

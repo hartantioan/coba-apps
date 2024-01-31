@@ -972,7 +972,7 @@ class InventoryRevaluationController extends Controller
                 'reference' => $query->code,
                 'company'   => $query->company()->exists() ? $query->company->name : '-',
                 'code'      => $query->journal->code,
-                'note'      => $query->note,
+                'note'      => $query->journal->note,
                 'post_date' => date('d/m/Y',strtotime($query->post_date)),
             ];
             $string='';

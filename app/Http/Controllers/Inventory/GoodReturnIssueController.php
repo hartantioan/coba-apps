@@ -943,7 +943,9 @@ class GoodReturnIssueController extends Controller
                 'message'   => $query->journal,
                 'user'      => $query->user->name,
                 'reference' => $query->code,
+                'note'      => $query->journal->note,
                 'company'   => $query->company()->exists() ? $query->company->name : '-',
+                'post_date' => date('d/m/Y',strtotime($query->post_date)),
             ];
             $string='';
             foreach($query->journal->journalDetail()->where(function($query){

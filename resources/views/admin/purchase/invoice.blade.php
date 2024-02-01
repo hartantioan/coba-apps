@@ -306,9 +306,9 @@
                                     <input id="scan_barcode" name="scan_barcode" type="text" placeholder="Ketik nomor dokumen dan tekan Enter...">
                                     <label class="active" for="scan_barcode">Scan Barcode (Single Input)</label>
                                 </div>
-                                <div class="col m12 s12 step19">
+                                <div class="col m12 s12">
                                     <ul class="collapsible">
-                                        <li class="active step20" id="detailOne" onclick="resetTable();">
+                                        <li class="active step19" id="detailOne" onclick="resetTable();">
                                             <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">assignment</i>Single Input</div>
                                             <div class="collapsible-body" style="display:block;">
                                                 <div class="row">
@@ -365,7 +365,7 @@
                                                 </div>
                                             </div>
                                         </li>
-                                        <li id="detailMulti" class="step21" onclick="resetTable();">
+                                        <li id="detailMulti" class="step20" onclick="resetTable();">
                                             <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">library_books</i>Multi Input</div>
                                             <div class="collapsible-body">
                                                 <div class="row">
@@ -416,7 +416,7 @@
                                         </li>
                                     </ul>
                                 </div>
-                                <div class="col m12 s12 step22">
+                                <div class="col m12 s12 step21">
                                     <p class="mt-2 mb-2">
                                         <h5>Detail Down Payment Partner Bisnis</h5>
                                         <div style="overflow:auto;">
@@ -441,14 +441,14 @@
                                         </div>
                                     </p>
                                 </div>
-                                <div class="input-field col m4 s12 step23">
+                                <div class="input-field col m4 s12 step22">
                                     <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                     <label class="active" for="note">Keterangan</label>
                                 </div>
                                 <div class="input-field col m4 s12">
 
                                 </div>
-                                <div class="input-field col m4 s12 step24">
+                                <div class="input-field col m4 s12 step23">
                                     <table width="100%" class="bordered">
                                         <thead>
                                             <tr>
@@ -484,10 +484,6 @@
                                         </thead>
                                     </table>
                                 </div>
-                                <div class="col s12 mt-3 ">
-                                    <button class="btn waves-effect waves-light purple" onclick="startIntro1();">Panduan <i class="material-icons right">help_outline</i></button>
-                                    <button class="btn waves-effect waves-light right step25 submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
-                                </div>
                             </div>
                         </div>
                     </form>
@@ -495,6 +491,8 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button class="btn waves-effect waves-light purple mr-1" onclick="startIntro1();">Panduan <i class="material-icons right">help_outline</i></button>
+        <button class="btn waves-effect waves-light step15 mr-1 step24" onclick="save();">Simpan <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -3656,33 +3654,28 @@
                     intro : 'Penambahan GRPO terotomisasi melalui pemilihan supplier/vendor yang nantinya akan masuk kesini .Penambahan GRPO LC PO jasa dan COA terkait secara manual dapat dilakukan disini' 
                 },
                 {
-                    title : 'Detail Purchase Order',
-                    element : document.querySelector('.step20'),
-                    intro : 'Tidak wajib dicentang dan diisikan. Tabel ini berisi informasi Purchase Order yang ingin di linkkan dengan Purchase Down Payment, silahkan isikan keterangan, dan uang muka yang dipakai pada kolom yang disediakan.' 
-                },
-                {
                     title : 'Detail Multi',
-                    element : document.querySelector('.step21'),
+                    element : document.querySelector('.step20'),
                     intro : 'Disini merupakan tempat untuk melakukan copy paste dari excel guna mempermudah penginputan.' 
                 },
                 {
                     title : 'Detail Down Payment Partner Bisnis',
-                    element : document.querySelector('.step22'),
+                    element : document.querySelector('.step21'),
                     intro : 'Detail Purchase DP dari partner bisnis yang dipilih akan ditampilan disini.' 
                 },
                 {
                     title : 'Keterangan',
-                    element : document.querySelector('.step23'),
+                    element : document.querySelector('.step22'),
                     intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
                 },
                 {
                     title : 'Uang Muka dan Pembulatan',
-                    element : document.querySelector('.step24'),
+                    element : document.querySelector('.step23'),
                     intro : 'Pada inputan Uang muka tidak dapat di edit hanya pada pembulatan yang bisa di edit untuk melakukan pembulatan ke atas / ke bawah.' 
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step25'),
+                    element : document.querySelector('.step24'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

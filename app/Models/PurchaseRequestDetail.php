@@ -139,4 +139,12 @@ class PurchaseRequestDetail extends Model
             $query->whereIn('status',['2','3']);
         });
     }
+
+    public function getListPo(){
+        $list = [];
+        foreach($this->purchaseOrderDetail as $row){
+            $list[] = $row->purchaseOrder->code;
+        }
+        return implode(',',$list);
+    }
 }

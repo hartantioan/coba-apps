@@ -382,7 +382,7 @@ class PaymentRequestController extends Controller
             foreach($data->fundRequest as $row){
                 if(!$row->used()->exists() && $row->balancePaymentRequest() > 0 && $row->document_status !== '1'){
                     $memo = 0;
-                    $final = $row->grandtotal - $memo;
+                    $final = $row->balancePaymentRequest() - $memo;
                     $details[] = [
                         'id'            => $row->id,
                         'type'          => 'fund_requests',
@@ -397,7 +397,7 @@ class PaymentRequestController extends Controller
                         'grandtotal'    => number_format($row->grandtotal,2,',','.'),
                         'downpayment'   => number_format(0,2,',','.'),
                         'rounding'      => number_format(0,2,',','.'),
-                        'balance'       => number_format($row->grandtotal,2,',','.'),
+                        'balance'       => number_format($row->balancePaymentRequest(),2,',','.'),
                         'memo'          => number_format($memo,2,',','.'),
                         'final'         => $row->currency->symbol.' '.number_format($final,2,',','.'),
                         'note'          => $row->note ? $row->note : '',

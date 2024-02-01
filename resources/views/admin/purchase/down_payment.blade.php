@@ -397,7 +397,7 @@
     </div>
     <div class="modal-footer">
         <button class="btn waves-effect waves-light purple mr-1" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
-        <button class="btn waves-effect waves-light step15 mr-1" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+        <button class="btn waves-effect waves-light step15 mr-1 step18" onclick="save();">Simpan <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -1888,13 +1888,18 @@
                     intro : 'Keterangan tambahan yang hanya muncul pada saat dokumen dicetak.' 
                 },
                 {
-                    title : 'Subtotal & Diskon',
+                    title : 'Checklist lampiran',
                     element : document.querySelector('.step16'),
+                    intro : 'Silahkan pilih dokumen yang dilampirkan dan akan muncul ketika dokumen dicetak.' 
+                },
+                {
+                    title : 'Subtotal & Diskon',
+                    element : document.querySelector('.step17'),
                     intro : 'Silahkan isikan nominal Subtotal langsung jika anda tidak menggunakan Purchase Order link, dan jika ada diskon anda bisa menambahkannya di inputan Discount.' 
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step17'),
+                    element : document.querySelector('.step18'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

@@ -2,35 +2,32 @@
     <thead>
         <tr align="center">
             <th>No</th>
-            <th>Code</th>
+            <th>No.Dokumen</th>
             <th>Status</th>
             <th>Voider</th>
-            <th>Tgl.Void</th>
-            <th>Ket.Void</th>
+            <th>Tgl. Void</th>
+            <th>Ket. Void</th>
             <th>Deleter</th>
-            <th>Tgl.Delete</th>
-            <th>Ket.Delete</th>
+            <th>Tgl. Delete</th>
+            <th>Ket. Delete</th>
             <th>Pengguna</th>
-            <th>Perusahaan</th>
-            <th>Tanggal</th>
+            <th>Tgl. Posting</th>
             <th>Keterangan</th>
             <th>Dokumen</th>
-            <th>Item</th>
-            <th>Dari Plant</th>
-            <th>Keterangan Detail</th>
+            <th>Kode Item</th>
+            <th>Nama Item</th>
+            <th>Plant</th>
+            <th>Ket. Detail</th>
             <th>Tipe Pengeluaran</th>
-            <th>Coa</th>
-            <th>Dist.Biaya</th>
+            <th>COA</th>
+            <th>Distribusi Biaya</th>
             <th>Qty</th>
             <th>Satuan</th>
             <th>Line</th>
             <th>Mesin</th>
             <th>Departemen</th>
-            <th>Dari Gudang</th>
+            <th>Gudang</th>
             <th>Proyek</th>
-            <th>Area</th>
-            <th>Shading</th>     
-            <th>Plant</th>
             <th>Requester</th>
             <th>Qty Kembali</th>
             <th>Total</th>
@@ -54,11 +51,11 @@
                 <td>{{ $row->deleteUser()->exists() ? date('d/m/Y',strtotime($row->deleted_at)) : '' }}</td>
                 <td>{{ $row->deleteUser()->exists() ? $row->delete_note : '' }}</td>
                 <td>{{ $row->user->name }}</td>
-                <td>{{ $row->company->name }}</td>
                 <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                 <td>{{ $row->note }}</td>
                 <td><a href="{{ $row->attachment() }}">File</a></td>
-                <td>{{ $rowdetail->itemStock->item->code.' - '.$rowdetail->itemStock->item->name }}</td>
+                <td>{{ $rowdetail->itemStock->item->code }}</td>
+                <td>{{ $rowdetail->itemStock->item->name }}</td>
                 <td>{{ $rowdetail->place()->exists() ? $rowdetail->place->code : '-' }}</td>
                 <td>{{ $rowdetail->note }}</td>
                 <td>{{ $rowdetail->inventoryCoa()->exists() ? $rowdetail->inventoryCoa->name : '-' }}</td>
@@ -71,21 +68,10 @@
                 <td>{{ $rowdetail->department()->exists() ? $rowdetail->department->name : '-' }}</td>
                 <td>{{ $rowdetail->itemStock->warehouse->name }}</td>
                 <td>{{ $rowdetail->project()->exists() ? $rowdetail->project->name : '-' }}</td>
-               
-                
-                <td>{{ $rowdetail->itemStock->area()->exists() ? $rowdetail->itemStock->area->name : '-' }}</td>
-                <td>{{ $rowdetail->itemShading()->exists() ? $rowdetail->itemShading->code : '-' }}</td>
-                
-                <td>{{ $rowdetail->itemStock->place->code }}</td>
                 <td>{{ $rowdetail->requester }}</td>
                 <td>{{ number_format($rowdetail->qty_return,3,',','.') }}</td>
                 <td>{{ $rowdetail->total }}</td>
-                <td>{{ $rowdetail->materialRequestDetail()  ? $rowdetail->lookable->code : '-'}}</td>
-                
-                
-                
-                
-                
+                <td>{{ $rowdetail->materialRequestDetail()  ? $rowdetail->lookable->code : '-'}}</td>                
             </tr>
             @php
                 $no++;

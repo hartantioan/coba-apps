@@ -332,7 +332,7 @@
                             <div class="col m4 s12">
 
                             </div>
-                            <div class="col m4 s12 mt-1" id="last-row-item step14">
+                            <div class="col m4 s12 mt-1 step14" id="last-row-item">
                                 <a class="waves-effect waves-light green btn-small mb-1 mr-1 right" onclick="addItemFromStock()" href="javascript:void(0);">
                                     <i class="material-icons left">add</i> Tambah Dari Stok
                                 </a>
@@ -990,16 +990,17 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             beforeSend: function() {
-                loadingOpen('.modal-content');
+                loadingOpen('#main');
             },
             success: function(response) {
-                loadingClose('.modal-content');
+                loadingClose('#main');
             
                 makeTreeOrg(response.message,response.link);
                 
                 $('#modal3').modal('open');
             },
             error: function() {
+                loadingClose('#main');
                 swal({
                     title: 'Ups!',
                     text: 'Check your internet connection.',

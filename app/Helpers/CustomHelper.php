@@ -746,6 +746,7 @@ class CustomHelper {
 				$query_schedule_update->save();
 			}
 			
+		}elseif($table_name == 'material_requests'){
 			
 		}elseif($table_name == 'leave_requests'){
 			$lr = LeaveRequest::find($table_id);

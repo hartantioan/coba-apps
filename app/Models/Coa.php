@@ -56,6 +56,10 @@ class Coa extends Model
         return $status;
     }
 
+    public function balancePaymentRequest(){
+        return 0;
+    }
+
     public function journalDebit(){
         return $this->hasMany('App\Models\JournalDetail','coa_id','id')->where('type','1')->whereHas('journal',function($query){
             $query->whereIn('status',['2','3']);

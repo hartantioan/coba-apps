@@ -136,7 +136,7 @@ class PurchaseOrderController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = PurchaseOrder::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
+        $total_data = PurchaseOrder::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */count();
         
         $query_data = PurchaseOrder::where(function($query) use ($search, $request) {
                 if($search) {
@@ -212,7 +212,7 @@ class PurchaseOrderController extends Controller
                 }
 
             })
-            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+            /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -290,7 +290,7 @@ class PurchaseOrderController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
             })
-            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+            /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
             ->count();
 
         $response['data'] = [];

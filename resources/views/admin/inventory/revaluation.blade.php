@@ -169,7 +169,7 @@
                             <div class="col m12 s12 step5">
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Produk</h4>
-                                    <div style="overflow:auto;">
+                                    <div style="overflow:auto;width:100% !important;">
                                         <table class="bordered" style="min-width:1800px !important;" id="table-detail">
                                             <thead>
                                                 <tr>

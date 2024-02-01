@@ -1178,16 +1178,17 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             beforeSend: function() {
-                loadingOpen('.modal-content');
+                loadingOpen('#main');
             },
             success: function(response) {
-                loadingClose('.modal-content');
+                loadingClose('#main');
 
                 makeTreeOrg(response.message,response.link);
                 
                 $('#modal3').modal('open');
             },
             error: function() {
+                loadingClose('#main');
                 swal({
                     title: 'Ups!',
                     text: 'Check your internet connection.',
@@ -3124,9 +3125,9 @@
                     intro : 'Keterangan tambahan yang hanya muncul pada saat dokumen dicetak.' 
                 },
                 {
-                    title : 'Diskon',
+                    title : 'Tabel Informasi Total Transaksi',
                     element : document.querySelector('.step25'),
-                    intro : 'Nominal diskon, untuk diskon yang ingin dimunculkan di dalam dokumen ketika dicetak. Diskon ini mengurangi subtotal.' 
+                    intro : 'Nominal diskon, untuk diskon yang ingin dimunculkan di dalam dokumen ketika dicetak. Diskon ini mengurangi subtotal. Nominal PPh bisa disesuaikan dengan kebutuhan.' 
                 },
                 {
                     title : 'Tombol Simpan',

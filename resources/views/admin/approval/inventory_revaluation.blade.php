@@ -198,7 +198,7 @@
                     <th class="center-align">Shading</th>
                     <th class="center-align">Line</th>
                     <th class="center-align">Mesin</th>
-                    <th class="center-align">Departemen</th>
+                    <th class="center-align">Divisi</th>
                     <th class="center-align">Proyek</th>
                     <th class="center-align">Qty</th>
                     <th class="center-align">Sat.</th>

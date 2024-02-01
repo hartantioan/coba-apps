@@ -44,6 +44,7 @@ use App\Models\Department;
 use App\Models\GoodReceiptDetail;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportGoodReceipt;
+use App\Models\Division;
 use App\Models\ItemSerial;
 use App\Models\Menu;
 
@@ -67,7 +68,7 @@ class GoodReceiptPOController extends Controller
             'content'   => 'admin.inventory.good_receipt',
             'company'   => Company::where('status','1')->get(),
             'place'     => Place::whereIn('id',$this->dataplaces)->where('status','1')->get(),
-            'department'=> Department::where('status','1')->get(),
+            'department'=> Division::where('status','1')->get(),
             'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
@@ -653,7 +654,7 @@ class GoodReceiptPOController extends Controller
                                         <th class="center-align">Plant</th>
                                         <th class="center-align">Line</th>
                                         <th class="center-align">Mesin</th>
-                                        <th class="center-align">Departemen</th>
+                                        <th class="center-align">Divisi</th>
                                         <th class="center-align">Gudang</th>
                                         <th class="center-align">Timbangan</th>
                                     </tr>

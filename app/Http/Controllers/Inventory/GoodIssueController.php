@@ -29,6 +29,7 @@ use App\Models\Company;
 use App\Models\Department;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportGoodIssue;
+use App\Models\Division;
 use App\Models\GoodReceiptDetailSerial;
 use App\Models\InventoryCoa;
 use App\Models\ItemSerial;
@@ -57,7 +58,7 @@ class GoodIssueController extends Controller
             'content'   => 'admin.inventory.good_issue',
             'company'   => Company::where('status','1')->get(),
             'place'     => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
-            'department'=> Department::where('status','1')->get(),
+            'department'=> Division::where('status','1')->get(),
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
             'newcode'   => $menu->document_code.date('y'),
@@ -500,7 +501,7 @@ class GoodIssueController extends Controller
                                 <th class="center-align">Shading</th>
                                 <th class="center-align">Line</th>
                                 <th class="center-align">Mesin</th>
-                                <th class="center-align">Departemen</th>
+                                <th class="center-align">Divisi</th>
                                 <th class="center-align">Proyek</th>
                                 <th class="center-align">Requester</th>
                                 <th class="center-align">Qty Kembali</th>

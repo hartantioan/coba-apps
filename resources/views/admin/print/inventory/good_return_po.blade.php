@@ -164,7 +164,7 @@
 											<th>Catatan 1</th>
 											<th>Catatan 2</th>
 											<th>Plant</th>
-											<th>Departemen</th>
+											<th>Divisi</th>
 											<th>Gudang</th>
 										</tr>
 									</thead>

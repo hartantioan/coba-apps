@@ -30,7 +30,7 @@
             <th>Total</th>
             <th>Line</th>
             <th>Mesin</th>
-            <th>Departemen</th>
+            <th>Divisi</th>
             <th>Gudang</th>
             <th>Based On</th>
         </tr>

@@ -213,7 +213,7 @@ td {
                     <th class="center">Ket. 1</th>
                     <th class="center">Ket. 2</th>
                     <th class="center">Plant</th>
-                    <th class="center">Departemen</th>
+                    <th class="center">Divisi</th>
                     <th class="center">Gudang</th>
                 </tr>
             </thead>

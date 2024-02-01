@@ -25,7 +25,7 @@
             <th>Satuan</th>
             <th>Line</th>
             <th>Mesin</th>
-            <th>Departemen</th>
+            <th>Divisi</th>
             <th>Gudang</th>
             <th>Area</th>
             <th>Shading</th>

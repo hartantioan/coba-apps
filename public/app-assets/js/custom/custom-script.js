@@ -258,6 +258,14 @@ function checkPageMaintenance(root){
 	});
 }
 
+$(document).keydown(function(e) {
+	if (e.ctrlKey && e.keyCode == 13) {
+		if($('#modal1').length > 0){
+			$('#modal1').modal('open');
+		}
+	}
+});
+
 $(document).on('focus', '.select2.select2-container', function (e) {
 	if (e.originalEvent && $(this).find(".select2-selection--single").length > 0) {
 		$(this).siblings('select').select2('open');

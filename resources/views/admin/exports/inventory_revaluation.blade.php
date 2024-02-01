@@ -23,7 +23,7 @@
             <th>Coa</th>
             <th>Line</th>
             <th>Mesin</th>
-            <th>Department</th>
+            <th>Divisi</th>
             <th>Proyek</th>
         </tr>
     </thead>

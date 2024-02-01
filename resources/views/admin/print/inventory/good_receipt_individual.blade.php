@@ -236,7 +236,7 @@
                                     <th class="center">Keterangan 2</th>
                                     <th class="center">Remark</th>
                                     <th class="center">Plant</th>
-                                    <th class="center">Departemen</th>
+                                    <th class="center">Divisi</th>
                                     <th class="center">Gudang</th>
                                 </tr>
                             </thead>

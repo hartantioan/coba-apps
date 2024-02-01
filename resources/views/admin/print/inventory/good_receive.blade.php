@@ -168,7 +168,7 @@
                                             <th>Keterangan</th>
                                             <th>Coa</th>
 											<th>Plant</th>
-											<th>Depertemen</th>
+											<th>Divisi</th>
                                             <th>Gudang</th>
                                         </tr>
                                     </thead>

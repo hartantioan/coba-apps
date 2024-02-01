@@ -27,6 +27,7 @@ use App\Models\Company;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportInventoryTransferOut;
 use App\Models\Department;
+use App\Models\Division;
 use App\Models\Line;
 use App\Models\Machine;
 use App\Models\Menu;
@@ -59,7 +60,7 @@ class InventoryRevaluationController extends Controller
             'menucode'  => $menu->document_code,
             'line'      => Line::where('status','1')->get(),
             'machine'   => Machine::where('status','1')->get(),
-            'department'=> Department::where('status','1')->get(),
+            'department'=> Division::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -405,7 +406,7 @@ class InventoryRevaluationController extends Controller
                                 <th class="center-align">Shading</th>
                                 <th class="center-align">Line</th>
                                 <th class="center-align">Mesin</th>
-                                <th class="center-align">Departemen</th>
+                                <th class="center-align">Divisi</th>
                                 <th class="center-align">Proyek</th>
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>

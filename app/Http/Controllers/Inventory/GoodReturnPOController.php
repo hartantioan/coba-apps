@@ -529,7 +529,7 @@ class GoodReturnPOController extends Controller
                                         <th class="center-align">Keterangan 1</th>
                                         <th class="center-align">Keterangan 2</th>
                                         <th class="center-align">Plant</th>
-                                        <th class="center-align">Departemen</th>
+                                        <th class="center-align">Divisi</th>
                                         <th class="center-align">Gudang</th>
                                         <th class="center-align">Referensi</th>
                                     </tr>

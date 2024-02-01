@@ -130,7 +130,7 @@
 </div>
 
 <div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
-    <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
+    <div class="modal-content" style="overflow: hidden;max-width: 100%;">
         <div class="row">
             <div class="col s12">
                 <h4>Tambah/Edit {{ $title }}</h4>
@@ -166,54 +166,43 @@
                                 <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. post" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                 <label class="active" for="post_date">Tgl. Post</label>
                             </div>
-                            <div class="col m12 s12 step5" style="overflow:auto;width:100% !important;">
+                            <div class="col m12 s12 step5">
                                 <p class="mt-2 mb-2">
-                                    <h4>Detail Produk</h4>
-                                    <table class="bordered" style="min-width:1800px !important;" id="table-detail">
-                                        <thead>
-                                            <tr>
-                                                <th class="center">Item</th>
-                                                <th class="center">Ambil Dari</th>
-                                                <th class="center">Nominal</th>
-                                                <th class="center">Coa</th>
-                                                <th class="center">Line</th>
-                                                <th class="center">Mesin</th>
-                                                <th class="center">Departemen</th>
-                                                <th class="center">Proyek</th>
-                                                <th class="center">Hapus</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="body-item">
-                                            <tr id="last-row-item">
-                                                <td colspan="9" class="center">
-                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
-                                                        <i class="material-icons left">add</i> Tambah Item
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                        <tfoot>
-                                            <tr>
-                                                <td colspan="2" class="right-align">
-                                                    TOTAL
-                                                </td>
-                                                <td class="right-align">
-                                                    <h6 id="total">0,00</h6>
-                                                </td>
-                                                <td colspan="6">
-                                                    
-                                                </td>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
+                                    <h5>Detail Produk</h5>
+                                    <div style="overflow:auto;width:100% !important;height:40vh;">
+                                        <table class="bordered" style="min-width:1800px !important;" id="table-detail">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center">Item</th>
+                                                    <th class="center">Ambil Dari</th>
+                                                    <th class="center">Nominal</th>
+                                                    <th class="center">Coa</th>
+                                                    <th class="center">Line</th>
+                                                    <th class="center">Mesin</th>
+                                                    <th class="center">Divisi</th>
+                                                    <th class="center">Proyek</th>
+                                                    <th class="center">Hapus</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="body-item">
+                                                <tr id="last-row-item">
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </p>
                             </div>
                             <div class="input-field col m4 s12 step6">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
-                            <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step7" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                            <div class="input-field col m4 s12 right-align">
+                                TOTAL : <b id="total">0,00</b>
+                            </div>
+                            <div class="input-field col m4 s12">
+                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 right" onclick="addItem()" href="javascript:void(0);">
+                                    <i class="material-icons left">add</i> Tambah Item
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -222,8 +211,9 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn waves-effect waves-light purple step10" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <button class="btn waves-effect waves-light purple step10 mr-1" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+        <button class="btn waves-effect waves-light submit step7 mr-1" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat">Close</a>
     </div>
 </div>
 
@@ -382,7 +372,7 @@
                             <th class="center-align" rowspan="2">Plant</th>
                             <th class="center-align" rowspan="2">Line</th>
                             <th class="center-align" rowspan="2">Mesin</th>
-                            <th class="center-align" rowspan="2">Department</th>
+                            <th class="center-align" rowspan="2">Divisi</th>
                             <th class="center-align" rowspan="2">Gudang</th>
                             <th class="center-align" rowspan="2">Proyek</th>
                             <th class="center-align" rowspan="2">Ket.1</th>
@@ -568,10 +558,7 @@
         
         $('#arr_item_stock' + count).append(`
             <option value="">--Silahkan pilih item--</option>
-        `).select2({
-            dropdownAutoWidth: true,
-            width: '100%',
-        });
+        `);
     }
 
     function changeLine(element){
@@ -594,9 +581,9 @@
 
     function getPlaceWarehouse(val){
         if($("#arr_item_stock" + val).val()){
-            $('#arr_place' + val).val($("#arr_item_stock" + val).select2().find(":selected").data("place"));
-            $('#arr_warehouse' + val).val($("#arr_item_stock" + val).select2().find(":selected").data("warehouse"));
-            $('#arr_qty' + val).val($("#arr_item_stock" + val).select2().find(":selected").data("qty"));
+            $('#arr_place' + val).val($("#arr_item_stock" + val).find(":selected").data("place"));
+            $('#arr_warehouse' + val).val($("#arr_item_stock" + val).find(":selected").data("warehouse"));
+            $('#arr_qty' + val).val($("#arr_item_stock" + val).find(":selected").data("qty"));
         }else{
             $('#arr_place' + val).val('');
             $('#arr_warehouse' + val).val('');
@@ -1096,10 +1083,7 @@
                         
                         $('#arr_item_stock' + count).append(`
                             <option value="">--Silahkan pilih item--</option>
-                        `).select2({
-                            dropdownAutoWidth: true,
-                            width: '100%',
-                        });
+                        `);
 
                         if(val.stock_list.length){
                             $('#arr_item_stock' + count).empty().append(`

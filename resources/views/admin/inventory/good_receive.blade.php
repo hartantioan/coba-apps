@@ -214,7 +214,7 @@
                                                     <th class="center" width="150px">Plant</th>
                                                     <th class="center" width="150px">Line</th>
                                                     <th class="center" width="150px">Mesin</th>
-                                                    <th class="center" width="150px">Departemen</th>
+                                                    <th class="center" width="150px">Divisi</th>
                                                     <th class="center" width="150px">Area</th>
                                                     <th class="center" width="150px">Shading</th>
                                                     <th class="center">Proyek</th>
@@ -409,7 +409,7 @@
                             <th class="center-align" rowspan="2">Plant</th>
                             <th class="center-align" rowspan="2">Line</th>
                             <th class="center-align" rowspan="2">Mesin</th>
-                            <th class="center-align" rowspan="2">Department</th>
+                            <th class="center-align" rowspan="2">Divisi</th>
                             <th class="center-align" rowspan="2">Gudang</th>
                             <th class="center-align" rowspan="2">Proyek</th>
                             <th class="center-align" rowspan="2">Ket.1</th>

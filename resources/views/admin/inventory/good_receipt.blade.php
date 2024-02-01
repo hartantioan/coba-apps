@@ -229,7 +229,7 @@
                                                     <th class="center">Plant</th>
                                                     <th class="center">Line</th>
                                                     <th class="center">Mesin</th>
-                                                    <th class="center">Departemen</th>
+                                                    <th class="center">Divisi</th>
                                                     <th class="center">Gudang</th>
                                                     <th class="center">Timbangan</th>
                                                     <th class="center">Hapus</th>
@@ -453,7 +453,7 @@
                             <th class="center-align" rowspan="2">Plant</th>
                             <th class="center-align" rowspan="2">Line</th>
                             <th class="center-align" rowspan="2">Mesin</th>
-                            <th class="center-align" rowspan="2">Department</th>
+                            <th class="center-align" rowspan="2">Divisi</th>
                             <th class="center-align" rowspan="2">Gudang</th>
                             <th class="center-align" rowspan="2">Proyek</th>
                             <th class="center-align" rowspan="2">Ket.1</th>

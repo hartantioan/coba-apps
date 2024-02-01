@@ -208,7 +208,7 @@
                     <th class="center">Plant</th>
                     <th class="center">Line</th>
                     <th class="center">Mesin</th>
-                    <th class="center">Departemen</th>
+                    <th class="center">Divisi</th>
                     <th class="center">Area</th>
                     <th class="center">Shading</th>
                     <th class="center">Proyek</th>

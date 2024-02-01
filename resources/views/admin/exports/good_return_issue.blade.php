@@ -2,7 +2,7 @@
     <thead>
         <tr align="center">
             <th>No</th>
-            <th>Code</th>
+            <th>No. Dokumen</th>
             <th>Status</th>
             <th>Voider</th>
             <th>Tgl.Void</th>
@@ -11,7 +11,7 @@
             <th>Tgl.Delete</th>
             <th>Ket.Delete</th>
             <th>Pengguna</th>
-            <th>Tanggal</th>
+            <th>Tgl. Posting </th>
             <th>Keterangan</th>
             <th>Dokumen</th>
             

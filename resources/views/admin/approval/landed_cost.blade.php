@@ -226,7 +226,7 @@
                     <tr>
                         <th class="center">No</th>
                         <th class="center">Plant</th>
-                        <th class="center">Departemen</th>
+                        <th class="center">Divisi</th>
                         <th class="center">Gudang</th>
                         <th class="center">Item</th>
                         <th class="center">Qty</th>

@@ -265,9 +265,9 @@
                                                         <th class="center">Referensi</th>
                                                         <th class="center">Tgl.Post</th>
                                                         <th class="center">Tgl.Jatuh Tempo</th>
-                                                        <th class="center">Total</th>
-                                                        <th class="center">Pembulatan</th>
                                                         <th class="center">Subtotal</th>
+                                                        <th class="center">Pembulatan</th>
+                                                        <th class="center">Total</th>
                                                         <th class="center">Dist.Biaya</th>
                                                         <th class="center">Keterangan</th>
                                                         <th class="center">Hapus</th>

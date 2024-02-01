@@ -42,6 +42,7 @@ use App\Models\User;
 use App\Models\Place;
 use App\Helpers\CustomHelper;
 use App\Models\Department;
+use App\Models\Division;
 use App\Models\ItemUnit;
 use App\Models\Menu;
 
@@ -65,7 +66,7 @@ class MaterialRequestController extends Controller
             'content'   => 'admin.inventory.request',
             'company'   => Company::where('status','1')->get(),
             'place'     => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
-            'department'=> Department::where('status','1')->get(),
+            'department'=> Division::where('status','1')->get(),
             'line'      => Line::where('status','1')->get(),
             'machine'   => Machine::where('status','1')->get(),
             'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
@@ -232,7 +233,7 @@ class MaterialRequestController extends Controller
                                 <th class="center-align">Gudang</th>
                                 <th class="center-align">Line</th>
                                 <th class="center-align">Mesin</th>
-                                <th class="center-align">Departemen</th>
+                                <th class="center-align">Divisi</th>
                                 <th class="center-align">Proyek</th>
                                 <th class="center-align">Requester</th>
                                 <th class="center-align">Status</th>

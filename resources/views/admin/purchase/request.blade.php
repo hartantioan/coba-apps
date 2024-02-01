@@ -233,7 +233,7 @@
                                                     <th class="center">Line</th>
                                                     <th class="center">Mesin</th>
                                                     <th class="center">Gudang Tujuan</th>
-                                                    <th class="center">Departemen</th>
+                                                    <th class="center">Divisi</th>
                                                     <th class="center">Requester</th>
                                                     <th class="center">Proyek</th>
                                                     <th class="center">Hapus</th>

@@ -177,7 +177,7 @@
                                         <tr align="center">
 											<th>Plant</th>
 											<th>Line</th>
-											<th>Departemen</th>
+											<th>Divisi</th>
 											<th>Gudang</th>
                                             <th>Item</th>
                                             <th>Qty</th>

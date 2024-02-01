@@ -64,7 +64,7 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Sh
         'Satuan',
         'Line',
         'Mesin',
-        'Departemen',
+        'Divisi',
         'Gudang',
         'Requester',
         'Proyek',

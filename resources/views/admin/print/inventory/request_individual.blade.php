@@ -251,7 +251,7 @@
                                 <th align="center">Gudang</th>
                                 <th align="center">Line</th>
                                 <th align="center">Machine</th>
-                                <th align="center">Departemen</th>
+                                <th align="center">Divisi</th>
                                 <th align="center">Proyek</th>
                                 <th align="center-">Requester</th>
                             </tr>

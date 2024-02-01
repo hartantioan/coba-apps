@@ -423,7 +423,7 @@
                                                     <th class="center">Plant</th>
                                                     <th class="center">Line</th>
                                                     <th class="center">Mesin</th>
-                                                    <th class="center">Departemen</th>
+                                                    <th class="center">Divisi</th>
                                                     <th class="center">Gudang</th>
                                                     <th class="center">Proyek</th>
                                                     <th class="center">Qty x Harga</th>

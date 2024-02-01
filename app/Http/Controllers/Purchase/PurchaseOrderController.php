@@ -46,6 +46,7 @@ use App\Exports\ExportPurchaseOrder;
 use App\Models\User;
 use App\Models\Tax;
 use App\Models\Coa;
+use App\Models\Division;
 use App\Models\ItemUnit;
 use Milon\Barcode\DNS2D;
 use Milon\Barcode\Facades\DNS2DFacade;
@@ -72,7 +73,7 @@ class PurchaseOrderController extends Controller
             'currency'      => Currency::where('status','1')->get(),
             'company'       => Company::where('status','1')->get(),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
-            'department'    => Department::where('status','1')->get(),
+            'department'    => Division::where('status','1')->get(),
             'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
             'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
@@ -632,7 +633,7 @@ class PurchaseOrderController extends Controller
                 if(!$passedProfitLoss){
                     return response()->json([
                         'status'  => 500,
-                        'message' => 'Untuk Coa terpilih harus memiliki Departemen. Silahkan pilih departemen.'
+                        'message' => 'Untuk Coa terpilih harus memiliki Divisi. Silahkan pilih divisi.'
                     ]);
                 }
             }
@@ -954,7 +955,7 @@ class PurchaseOrderController extends Controller
                                 <th class="center-align">Plant</th>
                                 <th class="center-align">Line</th>
                                 <th class="center-align">Mesin</th>
-                                <th class="center-align">Departemen</th>
+                                <th class="center-align">Divisi</th>
                                 <th class="center-align">Gudang</th>
                                 <th class="center-align">Referensi</th>
                                 <th class="center-align">Requester</th>

@@ -40,6 +40,7 @@ use App\Helpers\CustomHelper;
 use App\Models\User;
 use App\Models\PurchaseMemoDetail;
 use App\Exports\ExportPurchaseMemo;
+use App\Models\Division;
 use App\Models\PurchaseInvoiceDetail;
 
 class PurchaseMemoController extends Controller
@@ -62,7 +63,7 @@ class PurchaseMemoController extends Controller
             'content'       => 'admin.purchase.memo',
             'company'       => Company::where('status','1')->get(),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
-            'department'    => Department::where('status','1')->get(),
+            'department'    => Division::where('status','1')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),

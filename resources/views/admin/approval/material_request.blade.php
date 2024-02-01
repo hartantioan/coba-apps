@@ -200,7 +200,7 @@
                         <th class="center-align">Gudang</th>
                         <th class="center-align">Line</th>
                         <th class="center-align">Machine</th>
-                        <th class="center-align">Departemen</th>
+                        <th class="center-align">Divisi</th>
                         <th class="center-align">Proyek</th>
                         <th class="center-align">Requester</th>
                     </tr>

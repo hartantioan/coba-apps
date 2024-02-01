@@ -24,7 +24,7 @@
             <th>Gudang</th>
             <th>Line</th>
             <th>Mesin</th>
-            <th>Departemen</th>
+            <th>Divisi</th>
             <th>Proyek</th>
             <th>Requester</th>
             <th>Status Item Approval</th>

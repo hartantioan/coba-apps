@@ -61,7 +61,7 @@ class MaterialRequestDetail extends Model
 
     public function department()
     {
-        return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\Division', 'department_id', 'id')->withTrashed();
     }
 
     public function itemUnit()

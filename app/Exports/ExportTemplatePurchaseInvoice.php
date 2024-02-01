@@ -8,6 +8,7 @@ use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\RegistersEventListeners;
 use App\Models\Coa;
 use App\Models\Department;
+use App\Models\Division;
 use App\Models\Line;
 use App\Models\Machine;
 use App\Models\Place;
@@ -41,7 +42,7 @@ class ExportTemplatePurchaseInvoice implements WithEvents
         $wtax = Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get();
         $plant = Place::where('status','1')->get();
         $warehouse = Warehouse::where('status','1')->get();
-        $department = Department::where('status','1')->get();
+        $department = Division::where('status','1')->get();
         $line = Line::where('status','1')->get();
         $machine = Machine::where('status','1')->get();
         $project = Project::where('status','1')->get();

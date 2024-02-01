@@ -251,7 +251,7 @@
                                 <th class="center">Tgl.Dipakai</th>
                                 <th class="center">Plant</th>
                                 <th class="center">Gudang</th>
-                                <th class="center">Departemen</th>
+                                <th class="center">Divisi</th>
                             </tr>
                         </thead>
                         <tbody>

@@ -460,7 +460,7 @@
                                                 <th>Plant</th>
                                                 <th>Line</th>
                                                 <th>Mesin</th>
-                                                <th>Departemen</th>
+                                                <th>Divisi</th>
                                                 <th>Gudang</th>
                                                 <th>Requester</th>
                                                 <th>Proyek</th>

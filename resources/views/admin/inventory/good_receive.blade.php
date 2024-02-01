@@ -182,7 +182,7 @@
                                 <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                                 <label class="active" for="currency_rate">Konversi</label>
                             </div>
-                            <div class="file-field input-field col m3 s12">
+                            <div class="file-field input-field col m3 s12 step7">
                                 <div class="btn">
                                     <span>Lampiran Bukti</span>
                                     <input type="file" name="document" id="document">
@@ -191,7 +191,7 @@
                                     <input class="file-path validate" type="text">
                                 </div>
                             </div>
-                            <div class="col m12 s12 step7">
+                            <div class="col m12 s12 step8">
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Produk</h4>
                                     Coa debit mengikuti coa pada masing-masing grup item.
@@ -230,12 +230,12 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <button class="waves-effect waves-light cyan btn-small mb-1 mr-1 mt-1 right" onclick="addItem()" href="javascript:void(0);">
+                                    <button class="waves-effect waves-light cyan btn-small mb-1 mr-1 mt-1 right step9" onclick="addItem()" href="javascript:void(0);">
                                         <i class="material-icons left">add</i> Tambah Item
                                     </button>
                                 </p>
                             </div>
-                            <div class="input-field col m4 s12 step8">
+                            <div class="input-field col m4 s12 step10">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
@@ -249,8 +249,8 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn waves-effect waves-light purple step10 mr-1" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
-        <button class="btn waves-effect waves-light submit step9 mr-1" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+        <button class="btn waves-effect waves-light purple mr-1" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+        <button class="btn waves-effect waves-light submit step10 mr-1" onclick="save();">Simpan <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -1644,13 +1644,23 @@
                     intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
                 },
                 {
-                    title : 'Keterangan',
+                    title : 'Detail Produk',
                     element : document.querySelector('.step8'),
-                    intro : 'Berfungsi untuk menambahkan GRPO yang masih belum menjadi PO Invoice' 
+                    intro : 'Menampilkan produk yang nantinya akan diinputkan pada good receive ini sebagai detail' 
+                },
+                {
+                    title : 'Tambah Item',
+                    element : document.querySelector('.step9'),
+                    intro : 'Berfungsi untuk menambahkan item yang akan dimasukkan ke good receive ' 
+                },
+                {
+                    title : 'Keterangan',
+                    element : document.querySelector('.step10'),
+                    intro : 'Memberi keterangan pada data good receive' 
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step9'),
+                    element : document.querySelector('.step11'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

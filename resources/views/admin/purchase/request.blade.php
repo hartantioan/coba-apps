@@ -332,7 +332,7 @@
                             <div class="col m4 s12">
 
                             </div>
-                            <div class="col m4 s12 mt-1" id="last-row-item">
+                            <div class="col m4 s12 mt-1" id="last-row-item step14">
                                 <a class="waves-effect waves-light green btn-small mb-1 mr-1 right" onclick="addItemFromStock()" href="javascript:void(0);">
                                     <i class="material-icons left">add</i> Tambah Dari Stok
                                 </a>
@@ -341,7 +341,7 @@
                                 </a>
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step14" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step15" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -2565,11 +2565,7 @@
                     element : document.querySelector('.step7'),
                     intro : 'Perusahaan dimana dokumen ini dibuat.' 
                 },
-                {
-                    title : 'Link Proyek',
-                    element : document.querySelector('.step8'),
-                    intro : 'Jika Purchase Request memiliki hubungan dengan proyek, maka silahkan tentukan disini.' 
-                },
+               
                 {
                     title : 'Daftar Material Request',
                     element : document.querySelector('.step9'),
@@ -2596,8 +2592,13 @@
                     intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
                 },
                 {
-                    title : 'Tombol Simpan',
+                    title : 'Tombol Tambah Stock',
                     element : document.querySelector('.step14'),
+                    intro : 'Terdapat 2 tombol yaitu tambah dari stock dan tambah stock apabila memilih tambah dari stock maka akan terjadi penambahan pada row di tabel atas yang berisikan item dari itemstock. Untuk tambah 1 maka akan menambahkan row untuk memilih item yang tidak harus berasal dari stock pada tabel tersebut.' 
+                },
+                {
+                    title : 'Tombol Simpan',
+                    element : document.querySelector('.step15'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

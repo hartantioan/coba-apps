@@ -195,7 +195,7 @@
                                 </div>
                             </div>
                         </fieldset>
-                        <fieldset>
+                        <fieldset class="step6">
                             <legend>2. Good Issue / Barang Keluar</legend>
                             <div class="row">
                                 <div class="input-field col m5 step9">
@@ -217,7 +217,7 @@
                         <fieldset style="min-width: 100%;overflow:auto;">
                             <legend>3. Detail Produk</legend>
                             <div class="row">
-                                <div class="col m12 s12 step6">
+                                <div class="col m12 s12 step7">
                                     <p class="mt-2 mb-2">
                                         <h5>Detail Produk</h5>
                                         <div>
@@ -253,12 +253,12 @@
                             </div>
                         </fieldset>
                         <div class="row">
-                            <div class="input-field col m4 s12 step7">
+                            <div class="input-field col m4 s12 step8">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step8" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step9" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -1455,18 +1455,23 @@
                     intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
                 },
                 {
-                    title : 'Detail Produk',
+                    title : ' Good Issue / Barang Keluar',
                     element : document.querySelector('.step6'),
+                    intro : ' Guna mengambil data yang terdapat pada good issue terkait dan akan menambahkan ke list detail produk yang akan digunakan untuk good return issue' 
+                },
+                {
+                    title : 'Detail Produk',
+                    element : document.querySelector('.step7'),
                     intro : 'List Produk yang terkait' 
                 },
                 {
                     title : 'Keterangan',
-                    element : document.querySelector('.step7'),
+                    element : document.querySelector('.step8'),
                     intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.'
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step8'),
+                    element : document.querySelector('.step9'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

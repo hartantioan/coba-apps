@@ -3027,11 +3027,7 @@
                     element : document.querySelector('.step4'),
                     intro : 'Tipe Pembelian berisi barang atau jasa, silahkan pilih barang jika pembelian adalah untuk barang yang ada wujudnya, dan pilih jasa, jika tipe pembelian adalah jasa. Hati-hati karena tipe pembelian barang maka, detail produk di tabel akan otomatis mengambil data dari master data item, sedangkan tipe pembelian jasa akan otomatis ke biaya / COA.' 
                 },
-                {
-                    title : 'Kategori PO',
-                    element : document.querySelector('.step5'),
-                    intro : 'Standar PO adalah yang paling umum digunakan. Dalam PO standar merupakan dokumen pemesanan reguler atau standart yang berisikan informasi, barang yang dipesan, jumlah setiap item yang mereka beli, lokasi pengiriman dan tanggal, dan syarat pembayaran. Planned PO, merupakan PO yang diterbitkan untuk mengantisipasi kebutuhan masa depan akan suatu barang. Blanked PO, adalah komitmen dari customer untuk membeli produk atau layanan dari supplier secara berkelanjutan hingga nilai pesanan tertentu tercapai. Contract PO, baik pembeli dan supplier menandatangani kontrak yang menentukan persyaratan pembelian sebelum pesanan pembelian terkait dengan kontrak dikeluarkan. Sementara ada denda untuk melanggar pesanan pembelian kontrak bervariasi, baik supplier dan pembeli memiliki kemampuan untuk mengambil tindakan hukum jika pihak lain tidak memenuhi akhir kontrak mereka.'
-                },
+              
                 {
                     title : 'Tipe Pengiriman',
                     element : document.querySelector('.step6'),

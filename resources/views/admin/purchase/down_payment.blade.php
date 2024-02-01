@@ -242,7 +242,7 @@
                                 <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);loadCurrency();">
                                 <label class="active" for="post_date">Tgl. Posting</label>
                             </div>
-                            <div class="input-field col m3 s12 step10">
+                            <div class="input-field col m3 s12 step7">
                                 <input id="top" name="top" type="number" value="0" onchange="addDays();">
                                 <label class="active" for="top">TOP</label>
                             </div>
@@ -283,7 +283,7 @@
                                 </select>
                                 <label class="" for="is_include_tax">Termasuk PPN</label>
                             </div>
-                            <div class="input-field col m3 s12 step11">
+                            <div class="input-field col m3 s12 step12">
                                 <select id="wtax_id" name="wtax_id" onchange="countAll();">
                                     <option value="0" data-id="0">-- Pilih ini jika non-PPh --</option>
                                     @foreach ($wtax as $row)
@@ -292,7 +292,7 @@
                                 </select>
                                 <label class="" for="wtax_id">PPh</label>
                             </div>
-                            <div class="col m12 s12 step11">
+                            <div class="col m12 s12 step13">
                                 <p class="mt-2 mb-2">
                                     <h6>Detail Purchase Order (Centang jika ada)</h6>
                                     <div style="overflow:auto;">
@@ -326,15 +326,15 @@
                                 </p>
                             </div>
                             <div class="col m8 s12 row">
-                                <div class="input-field col m6 s12 step12">
+                                <div class="input-field col m6 s12 step14">
                                     <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                     <label class="active" for="note">Keterangan</label>
                                 </div>
-                                <div class="input-field col m6 s12 step13">
+                                <div class="input-field col m6 s12 step15">
                                     <textarea class="materialize-textarea preserveLines" id="note_external" name="note_external" placeholder="Keterangan Tambahan" rows="3"></textarea>
                                     <label class="active" for="note_external">Keterangan Tambahan (muncul pada printout)</label>
                                 </div>
-                                <div class="col m12 s12 step11">
+                                <div class="col m12 s12 step16">
                                     <p class="mt-2 mb-2">
                                         <h6>Checklist Lampiran</h6>
                                         @foreach ($menu->checklistDocument as $row)
@@ -352,7 +352,7 @@
                                     </p>
                                 </div>
                             </div>
-                            <div class="input-field col m4 s12 step14">
+                            <div class="input-field col m4 s12 step17">
                                 <table width="100%" class="bordered">
                                     <thead>
                                         <tr>
@@ -1842,7 +1842,7 @@
                     intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
                 },
                 {
-                    title : 'Tgl. Jatuh Tempo',
+                    title : 'TOP',
                     element : document.querySelector('.step7'),
                     intro : 'Tanggal berlaku hingga, dari dokumen ini.' 
                 },
@@ -1851,6 +1851,7 @@
                     element : document.querySelector('.step8'),
                     intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
                 },
+               
                 {
                     title : 'Mata Uang',
                     element : document.querySelector('.step9'),
@@ -1862,28 +1863,38 @@
                     intro : 'Nilai konversi rupiah pada saat dokumen dibuat. Nilai konversi secara otomatis diisi ketika form tambah baru dibuka pertama kali dan data diambil dari situs exchangerate.host. Pastikan kode mata uang benar di master data agar nilai konversi tidak error.'
                 },
                 {
-                    title : 'Detail Purchase Order',
+                    title : 'PPN',
                     element : document.querySelector('.step11'),
+                    intro : 'Disini pengguna dapat memilih berapa ppn yang akan dikenakan pada down payment disini dan dapat memilih tidak terdapat ppn jika memang tidak ada ppn.'
+                },
+                {
+                    title : 'Termasuk PPN',
+                    element : document.querySelector('.step12'),
+                    intro : 'Disini user dapat memilih apakah down payment ini sudah / belum termasuk dalam hitungan ppn.'
+                },
+                {
+                    title : 'Detail Purchase Order',
+                    element : document.querySelector('.step13'),
                     intro : 'Tidak wajib dicentang dan diisikan. Tabel ini berisi informasi Purchase Order yang ingin di linkkan dengan Purchase Down Payment, silahkan isikan keterangan, dan uang muka yang dipakai pada kolom yang disediakan.' 
                 },
                 {
                     title : 'Keterangan',
-                    element : document.querySelector('.step12'),
+                    element : document.querySelector('.step14'),
                     intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
                 },
                 {
                     title : 'Keterangan Eksternal',
-                    element : document.querySelector('.step13'),
+                    element : document.querySelector('.step15'),
                     intro : 'Keterangan tambahan yang hanya muncul pada saat dokumen dicetak.' 
                 },
                 {
                     title : 'Subtotal & Diskon',
-                    element : document.querySelector('.step14'),
+                    element : document.querySelector('.step16'),
                     intro : 'Silahkan isikan nominal Subtotal langsung jika anda tidak menggunakan Purchase Order link, dan jika ada diskon anda bisa menambahkannya di inputan Discount.' 
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step15'),
+                    element : document.querySelector('.step17'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

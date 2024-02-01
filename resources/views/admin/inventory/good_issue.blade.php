@@ -195,7 +195,7 @@
                                 </div>
                             </div>
                         </fieldset>
-                        <fieldset>
+                        <fieldset class="step6">
                             <legend>2. Material Request (Jika Ada)</legend>
                             <div class="mt-1 mb-1">
                                 <b>Tarik data dari Material Request - qty yang muncul diambil dari selisih jumlah qty Material Request dikurangi stok saat ini. Jika selisih > 0, maka qty yang digunakan adalah qty stok. Jika selisih kurang <= 0, maka qty yang digunakan adalah qty Material Request. Hanya item yang telah disetujui akan masuk disini.</b>
@@ -220,7 +220,7 @@
                         <fieldset style="min-width: 100%;overflow:auto;">
                             <legend>3. Detail Produk</legend>
                             <div class="row">
-                                <div class="col m12 s12 step6">
+                                <div class="col m12 s12 step7">
                                     <p class="mt-2 mb-2">
                                         <h5>Detail Produk</h5>
                                         Coa debit mengikuti coa pada masing-masing grup item.
@@ -264,7 +264,7 @@
                             <i class="material-icons left">add</i> Tambah Item
                         </button>
                         <div class="row">
-                            <div class="input-field col m4 s12 step7">
+                            <div class="input-field col m4 s12 step8">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
@@ -279,7 +279,7 @@
     </div>
     <div class="modal-footer">
         <button class="btn waves-effect waves-light purple mr-1" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
-        <button class="btn waves-effect waves-light submit mr-1 step8" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+        <button class="btn waves-effect waves-light submit mr-1 step9" onclick="save();">Simpan <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -1954,18 +1954,23 @@
                     intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
                 },
                 {
-                    title : 'Detail Produk',
+                    title : ' Material Request (Jika Ada)',
                     element : document.querySelector('.step6'),
+                    intro : 'Digunakan apabila ada material request terkain yang nantinya item dari material request akan diinput ke dalam list detail produk.' 
+                },
+                {
+                    title : 'Detail Produk',
+                    element : document.querySelector('.step7'),
                     intro : 'List Produk yang terkait' 
                 },
                 {
                     title : 'Keterangan',
-                    element : document.querySelector('.step7'),
+                    element : document.querySelector('.step8'),
                     intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.'
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step8'),
+                    element : document.querySelector('.step9'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

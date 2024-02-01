@@ -255,9 +255,9 @@
                             <div class="col m12 s12 step12">
                                 <h6><b>GRPO / Inv.Transfer / Landed Cost (Masuk) Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                             </div>
-                            <div class="col m12 s12 step13">
+                            <div class="col m12 s12 ">
                                 <p class="mt-2 mb-2">
-                                    <h5>Rincian Biaya</h5>
+                                    <h5 class="step13">Rincian Biaya</h5>
                                     <div style="overflow:auto;">
                                         <table class="bordered" id="table-detail">
                                             <thead>

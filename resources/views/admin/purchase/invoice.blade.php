@@ -226,26 +226,26 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m3 s12 step3">
                                     <select class="form-control" id="type_detail" name="type_detail" onchange="viewDetail();">
                                         <option value="1">Normal</option>
                                         <option value="2">Multi dari Excel</option>
                                     </select>
                                     <label class="" for="type_detail">Tipe Detail</label>
                                 </div>
-                                <div class="input-field col m3 s12 step3">
+                                <div class="input-field col m3 s12 step4">
                                     <input type="hidden" id="temp" name="temp">
                                     <select class="browser-default" id="account_id" name="account_id" onchange="getAccountData(this.value);"></select>
                                     <label class="active" for="account_id">Supplier / Vendor</label>
                                 </div>
-                                <div class="input-field col m3 s12 step4">
+                                <div class="input-field col m3 s12 step5">
                                     <select class="form-control" id="type" name="type">
                                         <option value="1">Cash</option>
                                         <option value="2">Credit</option>
                                     </select>
                                     <label class="" for="type">Tipe</label>
                                 </div>
-                                <div class="input-field col m3 s12 step5">
+                                <div class="input-field col m3 s12 step6">
                                     <select class="form-control" id="company_id" name="company_id">
                                         @foreach ($company as $rowcompany)
                                             <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
@@ -253,47 +253,47 @@
                                     </select>
                                     <label class="" for="company_id">Perusahaan</label>
                                 </div>
-                                <div class="input-field col m3 s12 step6">
+                                <div class="input-field col m3 s12 step7">
                                     <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                     <label class="active" for="post_date">Tgl. Posting</label>
                                 </div>
-                                <div class="input-field col m3 s12 step7">
+                                <div class="input-field col m3 s12 step8">
                                     <input id="received_date" name="received_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Terima" value="{{ date('Y-m-d') }}" onchange="addDays();">
                                     <label class="active" for="received_date">Tgl. Terima</label>
                                 </div>
-                                <div class="input-field col m3 s12 step8">
+                                <div class="input-field col m3 s12 step9">
                                     <input id="top" name="top" min="0" type="number" value="0" onchange="addDays();">
                                     <label class="active" for="top">TOP (hari) Autofill dari GRPO</label>
                                 </div>
-                                <div class="input-field col m3 s12 step9">
+                                <div class="input-field col m3 s12 step10">
                                     <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Jatuh Tempo">
                                     <label class="active" for="due_date">Tgl. Jatuh Tempo</label>
                                 </div>
-                                <div class="input-field col m3 s12 step10">
+                                <div class="input-field col m3 s12 step11">
                                     <input id="document_date" name="document_date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. dokumen">
                                     <label class="active" for="document_date">Tgl. Dokumen</label>
                                 </div>
-                                <div class="input-field col m3 s12 step11">
+                                <div class="input-field col m3 s12 step12">
                                     <input id="tax_no" name="tax_no" type="text" placeholder="Nomor faktur pajak...">
                                     <label class="active" for="tax_no">No. Faktur Pajak</label>
                                 </div>
-                                <div class="input-field col m3 s12 step12">
+                                <div class="input-field col m3 s12 step13">
                                     <input id="tax_cut_no" name="tax_cut_no" type="text" placeholder="Nomor bukti potong...">
                                     <label class="active" for="tax_cut_no">No. Bukti Potong</label>
                                 </div>
-                                <div class="input-field col m3 s12 step13">
+                                <div class="input-field col m3 s12 step14">
                                     <input id="cut_date" name="cut_date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Bukti potong">
                                     <label class="active" for="cut_date">Tgl. Bukti Potong</label>
                                 </div>
-                                <div class="input-field col m3 s12 step14">
+                                <div class="input-field col m3 s12 step15">
                                     <input id="spk_no" name="spk_no" type="text" placeholder="Nomor SPK...">
                                     <label class="active" for="spk_no">No. SPK</label>
                                 </div>
-                                <div class="input-field col m3 s12 step15">
+                                <div class="input-field col m3 s12 step16">
                                     <input id="invoice_no" name="invoice_no" type="text" placeholder="Nomor Invoice dari Suppplier/Vendor">
                                     <label class="active" for="invoice_no">No. Invoice</label>
                                 </div>
-                                <div class="file-field input-field col m3 s12 step16">
+                                <div class="file-field input-field col m3 s12 step17">
                                     <div class="btn">
                                         <span>Lampiran</span>
                                         <input type="file" name="document" id="document">
@@ -302,13 +302,13 @@
                                         <input class="file-path validate" type="text">
                                     </div>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m3 s12 step18">
                                     <input id="scan_barcode" name="scan_barcode" type="text" placeholder="Ketik nomor dokumen dan tekan Enter...">
                                     <label class="active" for="scan_barcode">Scan Barcode (Single Input)</label>
                                 </div>
-                                <div class="col m12 s12 step17">
+                                <div class="col m12 s12 step19">
                                     <ul class="collapsible">
-                                        <li class="active step18" id="detailOne" onclick="resetTable();">
+                                        <li class="active step20" id="detailOne" onclick="resetTable();">
                                             <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">assignment</i>Single Input</div>
                                             <div class="collapsible-body" style="display:block;">
                                                 <div class="row">
@@ -365,7 +365,7 @@
                                                 </div>
                                             </div>
                                         </li>
-                                        <li id="detailMulti" class="step19" onclick="resetTable();">
+                                        <li id="detailMulti" class="step21" onclick="resetTable();">
                                             <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">library_books</i>Multi Input</div>
                                             <div class="collapsible-body">
                                                 <div class="row">
@@ -416,7 +416,7 @@
                                         </li>
                                     </ul>
                                 </div>
-                                <div class="col m12 s12 step18">
+                                <div class="col m12 s12 step22">
                                     <p class="mt-2 mb-2">
                                         <h5>Detail Down Payment Partner Bisnis</h5>
                                         <div style="overflow:auto;">
@@ -441,14 +441,14 @@
                                         </div>
                                     </p>
                                 </div>
-                                <div class="input-field col m4 s12 step19">
+                                <div class="input-field col m4 s12 step23">
                                     <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                     <label class="active" for="note">Keterangan</label>
                                 </div>
                                 <div class="input-field col m4 s12">
 
                                 </div>
-                                <div class="input-field col m4 s12 step20">
+                                <div class="input-field col m4 s12 step24">
                                     <table width="100%" class="bordered">
                                         <thead>
                                             <tr>
@@ -486,7 +486,7 @@
                                 </div>
                                 <div class="col s12 mt-3 ">
                                     <button class="btn waves-effect waves-light purple" onclick="startIntro1();">Panduan <i class="material-icons right">help_outline</i></button>
-                                    <button class="btn waves-effect waves-light right step21 submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                    <button class="btn waves-effect waves-light right step25 submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                                 </div>
                             </div>
                         </div>
@@ -3571,98 +3571,118 @@
                     intro : 'Pilih kode plant untuk nomor dokumen bisa secara otomatis ter-generate.'
                 },
                 {
-                    title : 'Supplier',
+                    title : 'Tipe Detail',
                     element : document.querySelector('.step3'),
+                    intro : 'Tipe Detail dari invoice yang nantinya akan menentukan inputan dari invoice ini.' 
+                },
+                {
+                    title : 'Supplier',
+                    element : document.querySelector('.step4'),
                     intro : 'Supplier adalah Partner Bisnis tipe penyedia barang / jasa. Jika ingin menambahkan data baru, silahkan ke form Master Data - Organisasi - Partner Bisnis. Pada inputan disini akan menambahkan ke detail grpo po lc yang ada dibawah begitu juga pada tabel detail down payment yang berkaitan dengan supplier dan tipenya.' 
                 },
                 {
                     title : 'Tipe',
-                    element : document.querySelector('.step4'),
+                    element : document.querySelector('.step5'),
                     intro : 'Tipe Pembayaran menggunakan cash / transfer / giro / check dari perusahaan.' 
                 },
                 {
                     title : 'Perusahaan',
-                    element : document.querySelector('.step5'),
+                    element : document.querySelector('.step6'),
                     intro : 'Perusahaan dimana dokumen ini dibuat.' 
                 },
                 {
                     title : 'Tgl. Posting',
-                    element : document.querySelector('.step6'),
+                    element : document.querySelector('.step7'),
                     intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
                 },
                 {
                     title : 'Tgl. Terima',
-                    element : document.querySelector('.step7'),
+                    element : document.querySelector('.step8'),
                     intro : 'Tanggal Terima dari Invoice ini.' 
                 },
                 {
                     title : 'TOP',
-                    element : document.querySelector('.step8'),
+                    element : document.querySelector('.step9'),
                     intro : 'Tenggat waktu pembayaran dalam hari yang juga dapat terisi secara otomatis melalui GRPO .' 
                 },
                 {
                     title : 'Tgl. Jatuh Tempo',
-                    element : document.querySelector('.step9'),
+                    element : document.querySelector('.step10'),
                     intro : 'Tanggal berlaku  dari dokumen ini.' 
                 },
                 {
                     title : 'Tgl. Dokumen',
-                    element : document.querySelector('.step10'),
+                    element : document.querySelector('.step11'),
                     intro : 'Tanggal yang nantinya digunakan saat dokumen dicetak.' 
                 },
                 {
                     title : 'No Fakur Pajak',
-                    element : document.querySelector('.step11'),
+                    element : document.querySelector('.step12'),
                     intro : ' No faktur pajak yang digunakan / terkait dalam invoice.' 
                 },
                 {
                     title : 'No Bukti Potong',
-                    element : document.querySelector('.step12'),
+                    element : document.querySelector('.step13'),
                     intro : ' No bukti potong yang digunakan dalam invoice.' 
                 },
                 {
                     title : 'Tgl. Bukti Potong',
-                    element : document.querySelector('.step13'),
+                    element : document.querySelector('.step14'),
                     intro : ' Tanggal yang ada dalam bukti potong' 
                 },
                 {
                     title : 'No SPK',
-                    element : document.querySelector('.step14'),
+                    element : document.querySelector('.step15'),
                     intro : ' Merupakan nomor perintah kerja dari dokumen (jika ada)' 
                 },
                 {
                     title : 'No Invoice',
-                    element : document.querySelector('.step15'),
+                    element : document.querySelector('.step16'),
                     intro : ' Nomor Invoice terkait yang berasal dari vendor atau supplier(harap diisi jika ada)' 
                 },
                 {
                     title : 'File Lampiran',
-                    element : document.querySelector('.step16'),
+                    element : document.querySelector('.step17'),
                     intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
                 },
                 {
+                    title : 'Scan Barcode',
+                    element : document.querySelector('.step18'),
+                    intro : 'Digunakan untuk memasukan inputan detail ke form dengan menggunakan alat scanner barcode' 
+                },
+                {
                     title : 'Detail Goods Receipt PO / Landed Cost / Purchase Order Jasa / Coa',
-                    element : document.querySelector('.step17'),
+                    element : document.querySelector('.step19'),
                     intro : 'Penambahan GRPO terotomisasi melalui pemilihan supplier/vendor yang nantinya akan masuk kesini .Penambahan GRPO LC PO jasa dan COA terkait secara manual dapat dilakukan disini' 
                 },
                 {
                     title : 'Detail Purchase Order',
-                    element : document.querySelector('.step18'),
+                    element : document.querySelector('.step20'),
                     intro : 'Tidak wajib dicentang dan diisikan. Tabel ini berisi informasi Purchase Order yang ingin di linkkan dengan Purchase Down Payment, silahkan isikan keterangan, dan uang muka yang dipakai pada kolom yang disediakan.' 
                 },
                 {
+                    title : 'Detail Multi',
+                    element : document.querySelector('.step21'),
+                    intro : 'Disini merupakan tempat untuk melakukan copy paste dari excel guna mempermudah penginputan.' 
+                },
+                {
+                    title : 'Detail Down Payment Partner Bisnis',
+                    element : document.querySelector('.step22'),
+                    intro : 'Detail Purchase DP dari partner bisnis yang dipilih akan ditampilan disini.' 
+                },
+                {
                     title : 'Keterangan',
-                    element : document.querySelector('.step19'),
+                    element : document.querySelector('.step23'),
                     intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
                 },
                 {
                     title : 'Uang Muka dan Pembulatan',
-                    element : document.querySelector('.step20'),
+                    element : document.querySelector('.step24'),
                     intro : 'Pada inputan Uang muka tidak dapat di edit hanya pada pembulatan yang bisa di edit untuk melakukan pembulatan ke atas / ke bawah.' 
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step21'),
+                    element : document.querySelector('.step25'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

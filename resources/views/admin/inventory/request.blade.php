@@ -158,10 +158,10 @@
                                 </div>
                             </div>
                         </fieldset>
-                        <fieldset style="min-width: 100%;overflow:auto;">
+                        <fieldset style="min-width: 100%;overflow:auto;" class="step5">
                             <legend>2. Detail Produk</legend>
                             <div class="row">
-                                <div class="col m12 s12 step5" style="width:2800px;">
+                                <div class="col m12 s12 " style="width:2800px;">
                                     <p class="mt-2 mb-2">
                                         <h4>Detail Produk</h4>
                                         <table class="bordered" id="table-detail">

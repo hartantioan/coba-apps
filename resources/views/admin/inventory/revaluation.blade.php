@@ -166,48 +166,46 @@
                                 <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. post" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                 <label class="active" for="post_date">Tgl. Post</label>
                             </div>
-                            <div class="col m12 s12 step5">
+                            <div class="col m12 s12 step5" style="overflow:auto;width:100% !important;">
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Produk</h4>
-                                    <div style="overflow:auto;width:100% !important;">
-                                        <table class="bordered" style="min-width:1800px !important;" id="table-detail">
-                                            <thead>
-                                                <tr>
-                                                    <th class="center">Item</th>
-                                                    <th class="center">Ambil Dari</th>
-                                                    <th class="center">Nominal</th>
-                                                    <th class="center">Coa</th>
-                                                    <th class="center">Line</th>
-                                                    <th class="center">Mesin</th>
-                                                    <th class="center">Departemen</th>
-                                                    <th class="center">Proyek</th>
-                                                    <th class="center">Hapus</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="body-item">
-                                                <tr id="last-row-item">
-                                                    <td colspan="9" class="center">
-                                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
-                                                            <i class="material-icons left">add</i> Tambah Item
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                            <tfoot>
-                                                <tr>
-                                                    <td colspan="2" class="right-align">
-                                                        TOTAL
-                                                    </td>
-                                                    <td class="right-align">
-                                                        <h6 id="total">0,00</h6>
-                                                    </td>
-                                                    <td colspan="6">
-                                                        
-                                                    </td>
-                                                </tr>
-                                            </tfoot>
-                                        </table>
-                                    </div>
+                                    <table class="bordered" style="min-width:1800px !important;" id="table-detail">
+                                        <thead>
+                                            <tr>
+                                                <th class="center">Item</th>
+                                                <th class="center">Ambil Dari</th>
+                                                <th class="center">Nominal</th>
+                                                <th class="center">Coa</th>
+                                                <th class="center">Line</th>
+                                                <th class="center">Mesin</th>
+                                                <th class="center">Departemen</th>
+                                                <th class="center">Proyek</th>
+                                                <th class="center">Hapus</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="body-item">
+                                            <tr id="last-row-item">
+                                                <td colspan="9" class="center">
+                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
+                                                        <i class="material-icons left">add</i> Tambah Item
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="2" class="right-align">
+                                                    TOTAL
+                                                </td>
+                                                <td class="right-align">
+                                                    <h6 id="total">0,00</h6>
+                                                </td>
+                                                <td colspan="6">
+                                                    
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
                                 </p>
                             </div>
                             <div class="input-field col m4 s12 step6">

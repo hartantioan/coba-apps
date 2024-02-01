@@ -264,7 +264,7 @@
                                                     <tr>
                                                         <th class="center">Referensi</th>
                                                         <th class="center">Tgl.Post</th>
-                                                        <th class="center">Tgl.Tenggat</th>
+                                                        <th class="center">Tgl.Jatuh Tempo</th>
                                                         <th class="center">Total</th>
                                                         <th class="center">Pembulatan</th>
                                                         <th class="center">Subtotal</th>

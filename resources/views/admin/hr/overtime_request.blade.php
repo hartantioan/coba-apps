@@ -120,11 +120,11 @@
                     <div class="col s12">
                         <input type="hidden" id="temp" name="temp">
                         <input type="hidden" id="temp_schedule" name="temp_schedule">
-                        <div class="input-field col m2 s12">
+                        <div class="input-field col m2 s12 step1">
                             <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                             <label class="active" for="code">No. Dokumen</label>
                         </div>
-                        <div class="input-field col m1 s12">
+                        <div class="input-field col m1 s12 step2">
                             <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
                                 <option value="">--Pilih--</option>
                                 @foreach ($place as $rowplace)
@@ -132,22 +132,22 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s6 step3">
                             <select class="select2 browser-default" id="account_id" name="account_id" >
                                 <option value="">--Pilih ya--</option>
                             </select>
                             <label class="active" for="account_id">Select Employee</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s6 step4">
                             <input id="date" name="date"  type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tanggal" onchange="resetSchedule()">
                             <label class="active" for="date">Tanggal</label>
                         </div>
                         
-                        <div class="input-field col s6" id="jadwal_space">
+                        <div class="input-field col s6 step5" id="jadwal_space">
                             <select class="browser-default item-array" id="schedule_id" name="schedule_id"></select>
                             <label class="active" for="schedule_id">Pilih Jadwal(exceptional)</label>
                         </div>
-                        <div class="input-field col s6" id="place_select">
+                        <div class="input-field col s6 step6" id="place_select">
                             <select id="company_id" name="company_id">
                                 <option value=""></option>
                                 @foreach($company as $row)
@@ -157,26 +157,27 @@
                             <label for="company_id">Perusahaan</label>
                         </div>
                         
-                        <div class="input-field col s6">
+                        <div class="input-field col s6 step7">
                             <input id="time_in" name="time_in"   type="time" placeholder="Jam Mulai" >
                             <label class="active" for="time_in">Jam Awal</label>
                         </div>
-                        <div class="input-field col s6" >
+                        <div class="input-field col s6 step8" >
                             <input id="time_out" name="time_out"  type="time" placeholder="Jam Akhir">
                             <label class="active" for="time_out">Jam Akhir</label>
                         </div>
                         
-                        <div class="file-field input-field col m3 s12 step16">
+                        <div class="file-field input-field col m3 s12 step9">
                             <input id="post_date" name="post_date"   type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tanggal Post">
                             <label class="active" for="post_date">Tanggal Post</label>
                         </div>
                         
-                        <div class="input-field col s6">
+                        <div class="input-field col s6 step10">
                             <input id="note" name="note" type="text" placeholder="">
                             <label class="active" for="note">Keterangan</label>
                         </div>
                     
-                        <div class="col s12 mt-3">
+                        <div class="col s12 mt-3 step11">
+                            
                             <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                         </div>
                     </div>
@@ -185,6 +186,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button class="btn waves-effect waves-light purple " onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -806,22 +808,19 @@
     }
 
     function destroy(id){
+        var msg = '';
         swal({
-            title: "Apakah anda yakin?",
-            text: "Anda tidak bisa mengembalikan data yang terhapus!",
-            icon: 'warning',
-            dangerMode: true,
-            buttons: {
-            cancel: 'Tidak, jangan!',
-            delete: 'Ya, lanjutkan!'
-            }
+            title: "Alasan mengapa anda menghapus!",
+            text: "Anda tidak bisa mengembalikan data yang telah dihapus.",
+            buttons: true,
+            content: "input",
         }).then(function (willDelete) {
             if (willDelete) {
                 $.ajax({
                     url: '{{ Request::url() }}/destroy',
                     type: 'POST',
                     dataType: 'JSON',
-                    data: { id : id },
+                    data: { id : id, msg : message },
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
@@ -1024,6 +1023,77 @@
             }
         });
         
+    }
+
+    function startIntro(){
+        introJs().setOptions({
+            exitOnOverlayClick : false,
+            steps: [
+                {
+                    title : 'Form Lembur ',
+                    intro : 'Form ini digunakan untuk melakukan ijin lembur.'
+                },
+                {
+                    title : 'Nomor Dokumen',
+                    element : document.querySelector('.step1'),
+                    intro : 'Nomor dokumen wajib diisikan, dengan kombinasi 4 huruf kode dokumen, tahun pembuatan dokumen, kode plant, serta nomor urut. Nomor ini bersifat unik, tidak akan sama, dan nomor urut paling belakang akan ter-reset secara otomatis berdasarkan tahun tanggal post.'
+                },
+                {
+                    title : 'Kode Plant',
+                    element : document.querySelector('.step2'),
+                    intro : 'Pilih kode plant untuk nomor dokumen bisa secara otomatis ter-generate.'
+                },
+                {
+                    title : 'Select Employee',
+                    element : document.querySelector('.step3'),
+                    intro : 'Memilih employee yang bersangkutan dengan form lembur.' 
+                },
+                {
+                    title : 'Tanggal',
+                    element : document.querySelector('.step4'),
+                    intro : 'Merupakan tanggal yang dimana lembur itu berlangsung.' 
+                },
+              
+                {
+                    title : 'Pilih jadwal',
+                    element : document.querySelector('.step5'),
+                    intro : 'Memilih jadwal yang berkaitan dengan lembur apa bila tidak memilih jadwal maka lembur akan berjalan sendiri tanpa berkaitan dengan jadwal.' 
+                },
+                {
+                    title : 'Perusahaan',
+                    element : document.querySelector('.step6'),
+                    intro : 'Digunakan untuk memilih perusahaan yang berkaitan dengan form lembur ini.' 
+                },
+                {
+                    title : 'Jam Awal',
+                    element : document.querySelector('.step7'),
+                    intro : 'Inputan untuk jam awal lembur dimulai.' 
+                },
+                {
+                    title : 'Jam Akhir',
+                    element : document.querySelector('.step8'),
+                    intro : 'Inputan untuk jam akhir lembur tersebut.' 
+                },
+                {
+                    title : 'Tanggal Post',
+                    element : document.querySelector('.step9'),
+                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
+                },
+                {
+                    title : 'Keterangan',
+                    element : document.querySelector('.step10'),
+                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
+                },
+                {
+                    title : 'Simpan',
+                    element : document.querySelector('.step11'),
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                },
+                
+            ]
+        })/* .onbeforechange(function(targetElement){
+            alert(this._currentStep);
+        }) */.start();
     }
     
 </script>

@@ -291,4 +291,31 @@ class AssetUsageController extends Controller
        
         return response()->json($response);
     }
+
+    public function destroy(Request $request){
+        $query = AssetUsage::find($request->id);
+       
+        if($query->delete()) {
+           
+            
+            
+
+            activity()
+            ->performedOn(new AssetUsage())
+            ->causedBy(session('bo_id'))
+            ->withProperties($query)
+            ->log('Delete the Asset Usage data');
+            $response = [
+                'status'  => 200,
+                'message' => 'Data deleted successfully.'
+            ];
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }
 }

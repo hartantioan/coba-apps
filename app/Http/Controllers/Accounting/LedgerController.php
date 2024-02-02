@@ -146,7 +146,7 @@ class LedgerController extends Controller
                                 <th class="center-align">Plant</th>
                                 <th class="center-align">Line</th>
                                 <th class="center-align">Mesin</th>
-                                <th class="center-align">Departemen</th>
+                                <th class="center-align">Divisi</th>
                                 <th class="center-align">Gudang</th>
                                 <th class="center-align">Debit</th>
                                 <th class="center-align">Kredit</th>

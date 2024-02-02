@@ -16,7 +16,7 @@
             <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Gudang</th>
             <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Line</th>
             <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Mesin</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Departemen</th>
+            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Divisi </th>
             <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Proyek</th>
         </tr>
     </thead>

@@ -125,13 +125,13 @@
                     </div>
                     <div class="col s12">
                         <input type="hidden" id="temp" name="temp">
-                        <div class="input-field col s6">
+                        <div class="input-field col s6 step1">
                             <select class="select2 browser-default" id="employee_id" name="employee_id" onchange="userDetail()">
                                 <option value="">--Pilih ya--</option>
                             </select>
                             <label class="active" for="employee_id">Select Employee</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s6 step2">
                             <select id="type" name="type" onchange="hideShow()">
                                 <option value="1">Promotion</option>
                                 <option value="2">Demotion</option>
@@ -140,7 +140,7 @@
                             </select>
                             <label for="type">Tipe</label>
                         </div>
-                        <div class="input-field col s6 employee_inputs" id="place_select">
+                        <div class="input-field col s6 employee_inputs step3" id="place_select">
                             <select id="place_id" name="place_id">
                                 <option value="">--Pilih--</option>
                                 @foreach($place as $row)
@@ -149,33 +149,33 @@
                             </select>
                             <label for="place_id">Penempatan</label>
                         </div>
-                        <div class="input-field col s6 employee_inputs" id="position_select">
+                        <div class="input-field col s6 employee_inputs step4" id="position_select">
                             <select  class="select2 browser-default" id="position_id" name="position_id">
                                 <option value=""></option>
                                 
                             </select>
                             <label class="active" for="position_id">Posisi/Level</label>
                         </div>
-                        <div class="input-field col s6" id="manager_select">
+                        <div class="input-field col s6 step5" id="manager_select">
                             <select class="select2 browser-default" id="manager_id" name="manager_id">
                                 <option value="">--Pilih ya--</option>
                             </select>
                             <label class="active" for="manager_id">Select Manager</label>
                         </div>
                         
-                        <div class="input-field col s6" >
+                        <div class="input-field col s6 step6" >
                             <input id="post_date" name="post_date"  min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tanggal Post">
                             <label class="active" for="post_date">Tanggal Post</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s6 step7">
                             <input id="valid_date" name="valid_date"  min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tanggal Efektif">
                             <label class="active" for="valid_date">Tanggal Efektif</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s6 step8">
                             <input id="note" name="note" type="text" placeholder="">
                             <label class="active" for="note">Keterangan Transfer</label>
                         </div>
-                        <div class="col s12 mt-3">
+                        <div class="col s12 mt-3 step9">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                         </div>
                     </div>
@@ -184,6 +184,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button class="btn waves-effect waves-light purple " onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -785,22 +786,19 @@
     }
 
     function destroy(id){
+        var msg = '';
         swal({
-            title: "Apakah anda yakin?",
-            text: "Anda tidak bisa mengembalikan data yang terhapus!",
-            icon: 'warning',
-            dangerMode: true,
-            buttons: {
-            cancel: 'Tidak, jangan!',
-            delete: 'Ya, lanjutkan!'
-            }
+            title: "Alasan mengapa anda menghapus!",
+            text: "Anda tidak bisa mengembalikan data yang telah dihapus.",
+            buttons: true,
+            content: "input",
         }).then(function (willDelete) {
             if (willDelete) {
                 $.ajax({
                     url: '{{ Request::url() }}/destroy',
                     type: 'POST',
                     dataType: 'JSON',
-                    data: { id : id },
+                    data: { id : id, msg : message },
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
@@ -1003,6 +1001,67 @@
             }
         });
         
+    }
+
+    function startIntro(){
+        introJs().setOptions({
+            exitOnOverlayClick : false,
+            steps: [
+                {
+                    title : 'Form Reward & Punishment ',
+                    intro : 'Form ini digunakan untuk mendata reward maupun punishment yang nantinya akan digunakan pada periode yang telah dipilih.'
+                },
+                {
+                    title : 'Select Employee',
+                    element : document.querySelector('.step1'),
+                    intro : 'Memilih employee yang akan di update.'
+                },
+                {
+                    title : 'Tipe Transfer',
+                    element : document.querySelector('.step2'),
+                    intro : 'Digunakan untuk memilih tipe dari transfer yang ingin dilakukan.'
+                },
+                {
+                    title : 'Penempatan',
+                    element : document.querySelector('.step3'),
+                    intro : 'Menentukan tempat pergantian dari employee yang ingin di update.' 
+                },
+                {
+                    title : 'Posisi/Level',
+                    element : document.querySelector('.step4'),
+                    intro : 'Posisi/Level digunakan untuk memilih update dari employee.' 
+                },
+              
+                {
+                    title : 'Select Manager',
+                    element : document.querySelector('.step5'),
+                    intro : 'Memilih penanggung jawab dari user yang berkaitan.' 
+                },
+                {
+                    title : 'Tanggal Post',
+                    element : document.querySelector('.step6'),
+                    intro : 'Tanggal yang digunakan untuk kapan form ini dibuat .' 
+                },
+                {
+                    title : 'Tanggal Efektif',
+                    element : document.querySelector('.step7'),
+                    intro : 'Tanggal aktif user tersebut terupdate.' 
+                },
+                {
+                    title : 'Keterangan',
+                    element : document.querySelector('.step8'),
+                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
+                },
+                {
+                    title : 'Simpan',
+                    element : document.querySelector('.step9'),
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                },
+                
+            ]
+        })/* .onbeforechange(function(targetElement){
+            alert(this._currentStep);
+        }) */.start();
     }
     
 </script>

@@ -203,7 +203,7 @@
                         <th class="center-align">Gudang</th>
                         <th class="center-align">Line</th>
                         <th class="center-align">Mesin</th>
-                        <th class="center-align">Departemen</th>
+                        <th class="center-align">Divisi</th>
                         <th class="center-align">Proyek</th>
                         <th class="center-align">Dist.Biaya</th>
                         <th class="center">Harga</th>

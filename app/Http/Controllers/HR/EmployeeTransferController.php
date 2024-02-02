@@ -381,7 +381,10 @@ class EmployeeTransferController extends Controller
             ]);
         }
         if($query->delete()) {
-
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
             $response = [
                 'status'  => 200,
                 'message' => 'Data deleted successfully.'

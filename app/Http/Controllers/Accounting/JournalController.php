@@ -6,6 +6,7 @@ use App\Models\Coa;
 use App\Models\Company;
 use App\Models\Currency;
 use App\Models\Department;
+use App\Models\Division;
 use App\Models\Line;
 use App\Models\Machine;
 use App\Models\Place;
@@ -50,7 +51,7 @@ class JournalController extends Controller
             'company'   => Company::where('status','1')->get(),
             'currency'  => Currency::where('status','1')->get(),
             'place'     => Place::whereIn('id',$this->dataplaces)->where('status','1')->get(),
-            'department'=> Department::where('status','1')->get(),
+            'department'=> Division::where('status','1')->get(),
             'line'      => Line::where('status','1')->get(),
             'machine'   => Machine::where('status','1')->get(),
             'minDate'   => $request->get('minDate'),
@@ -213,7 +214,7 @@ class JournalController extends Controller
                                 <th class="center-align" rowspan="2">Plant</th>
                                 <th class="center-align" rowspan="2">Line</th>
                                 <th class="center-align" rowspan="2">Mesin</th>
-                                <th class="center-align" rowspan="2">Departemen</th>
+                                <th class="center-align" rowspan="2">Divisi</th>
                                 <th class="center-align" rowspan="2">Proyek</th>
                                 <th class="center-align" rowspan="2">Keterangan 1</th>
                                 <th class="center-align" rowspan="2">Keterangan 2</th>

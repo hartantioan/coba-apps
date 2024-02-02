@@ -79,7 +79,14 @@ class AuthController extends Controller
 				'message'	=> 'Account not found'
 			];
 		}
-
+        
+        // session([
+        //     'bo_id'             => '1',
+        // ]);
+        // $response = [
+        //     'status' 	=> 200,
+        //     'message'	=> 'Successfull logged in. Please wait!'
+        // ];
         return response()->json($response);
     }
 

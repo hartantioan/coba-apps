@@ -171,7 +171,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="input-field col m3 s12 step2">
+                            <div class="input-field col m3 s12 step3">
                                  <select class="form-control" id="type" name="type">
                                    
                                     <option value="1">Reward</option>
@@ -179,15 +179,15 @@
                                 </select>
                                 <label class="" for="type">Tipe Form</label>
                             </div>
-                            <div class="input-field col m12 s12">
+                            <div class="input-field col m12 s12 step4">
                                 <select class="browser-default" id="period_id" name="period_id"></select>
                                 <label class="active" for="period_id">Periode Mulai</label>
                             </div>
-                            <div class="input-field col m3 s12 step4">
+                            <div class="input-field col m3 s12 step5">
                                 <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                 <label class="active" for="post_date">Tgl. Posting</label>
                             </div>
-                            <div class="col m12 s12">
+                            <div class="col m12 s12 step6">
                                 <div style="overflow:auto;">
                                     <table class="bordered">
                                         <thead>
@@ -236,12 +236,12 @@
                                 </div>
                             </div>
                             
-                            <div class="input-field col m3 s12 step12">
+                            <div class="input-field col m3 s12 step7">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
                             
-                            <div class="col s12 mt-3 step13">
+                            <div class="col s12 mt-3 step8">
                                 <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
@@ -265,6 +265,7 @@
         </div>
     </div>
     <div class="modal-footer">
+       
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -377,6 +378,62 @@
         select2ServerSide('#arr_uid' + count, '{{ url("admin/select2/employee") }}');
     }
 
+    function startIntro(){
+        introJs().setOptions({
+            exitOnOverlayClick : false,
+            steps: [
+                {
+                    title : 'Form Reward & Punishment ',
+                    intro : 'Form ini digunakan untuk mendata reward maupun punishment yang nantinya akan digunakan pada periode yang telah dipilih.'
+                },
+                {
+                    title : 'Nomor Dokumen',
+                    element : document.querySelector('.step1'),
+                    intro : 'Nomor dokumen wajib diisikan, dengan kombinasi 4 huruf kode dokumen, tahun pembuatan dokumen, kode plant, serta nomor urut. Nomor ini bersifat unik, tidak akan sama, dan nomor urut paling belakang akan ter-reset secara otomatis berdasarkan tahun tanggal post.'
+                },
+                {
+                    title : 'Kode Plant',
+                    element : document.querySelector('.step2'),
+                    intro : 'Pilih kode plant untuk nomor dokumen bisa secara otomatis ter-generate.'
+                },
+                {
+                    title : 'Tipe Form',
+                    element : document.querySelector('.step3'),
+                    intro : 'Menentukan Tipe dari Form ini merupakan Reward / Punishment.' 
+                },
+                {
+                    title : 'Periode Mulai',
+                    element : document.querySelector('.step4'),
+                    intro : 'Menentukan Periode mulai berjalannya reward atau punishment.' 
+                },
+              
+                {
+                    title : 'Tanggal Post',
+                    element : document.querySelector('.step5'),
+                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
+                },
+                {
+                    title : 'Tabel Data Reward / Punishment',
+                    element : document.querySelector('.step6'),
+                    intro : 'Menampilkan List data yang nantinya akan digunakan dalam memberi reward / punish .' 
+                },
+                {
+                    title : 'Keterangan',
+                    element : document.querySelector('.step7'),
+                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
+                },
+                {
+                    title : 'Simpan',
+                    element : document.querySelector('.step8'),
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                },
+                
+            ]
+        })/* .onbeforechange(function(targetElement){
+            alert(this._currentStep);
+        }) */.start();
+    }
+
     function voidStatus(id){
         var msg = '';
         swal({
@@ -419,22 +476,19 @@
     }
 
     function destroy(id){
+        var msg = '';
         swal({
-            title: "Apakah anda yakin?",
-            text: "Anda tidak bisa mengembalikan data yang terhapus!",
-            icon: 'warning',
-            dangerMode: true,
-            buttons: {
-            cancel: 'Tidak, jangan!',
-            delete: 'Ya, lanjutkan!'
-            }
+            title: "Alasan mengapa anda menghapus!",
+            text: "Anda tidak bisa mengembalikan data yang telah dihapus.",
+            buttons: true,
+            content: "input",
         }).then(function (willDelete) {
             if (willDelete) {
                 $.ajax({
                     url: '{{ Request::url() }}/destroy',
                     type: 'POST',
                     dataType: 'JSON',
-                    data: { id : id },
+                    data: { id : id, msg : message },
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },

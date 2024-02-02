@@ -20,6 +20,8 @@ class ReturnHardwareItemsUsage extends Model
         'date',
         'info',
         'status',
+        'delete_id',
+        'delete_note', 
     ];
 
     public function status(){

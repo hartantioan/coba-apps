@@ -120,11 +120,11 @@
                     <div class="col s12">
                         <input type="hidden" id="temp" name="temp">
                         <input type="hidden" id="temp_schedule" name="temp_schedule">
-                        <div class="input-field col m2 s12">
+                        <div class="input-field col m2 s12 step1">
                             <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                             <label class="active" for="code">No. Dokumen</label>
                         </div>
-                        <div class="input-field col m1 s12">
+                        <div class="input-field col m1 s12 step2">
                             <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
                                 <option value="">--Pilih--</option>
                                 @foreach ($place as $rowplace)
@@ -132,23 +132,23 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s6 step3">
                             <select class="select2 browser-default" id="account_id" name="account_id" onchange="getQuotas()">
                                 <option value="">--Pilih ya--</option>
                             </select>
                             <label class="active" for="account_id">Select Employee</label>
                         </div>
-                        <div class="input-field col m3 s6">
+                        <div class="input-field col m3 s6 step4">
                             <div id="total_cuti_sementara"></div>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s6 step5">
                             <select  class="select2 browser-default" id="leave_type_id" name="leave_type_id" onchange="changeIjin()">
                                 <option value=""></option>
                                 
                             </select>
                             <label  class="active" for="type">Tipe</label>
                         </div>
-                        <div class="input-field col s6 employee_inputs" id="place_select">
+                        <div class="input-field col s6 employee_inputs step6" id="place_select">
                             <select id="company_id" name="company_id">
                                 <option value=""></option>
                                 @foreach($company as $row)
@@ -157,28 +157,28 @@
                             </select>
                             <label for="company_id">Perusahaan</label>
                         </div>
-                        <div class="input-field col s6" >
+                        <div class="input-field col s6 step7" >
                             <input id="start_date" name="start_date"  type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tanggal Mulai" onchange="resetSchedule()">
                             <label class="active" for="start_date">Tanggal Awal</label>
                         </div>
-                        <div class="input-field col s6" id="end_date_field">
+                        <div class="input-field col s6 step8" id="end_date_field">
                             <input id="end_date" name="end_date"   type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tanggal Akhir">
                             <label class="active" for="end_date">Tanggal Akhir</label>
                         </div>
-                        <div class="input-field col s6" id="start_time_div" hidden>
+                        <div class="input-field col s6 step9" id="start_time_div" hidden>
                             <input id="start_time" name="start_time"   type="time" placeholder="Jam Mulai" >
                             <label class="active" for="start_time">Jam Awal</label>
                         </div>
-                        <div class="input-field col s6" id="end_time_div" hidden>
+                        <div class="input-field col s6 step10" id="end_time_div" hidden>
                             <input id="end_time" name="end_time"  type="time" placeholder="Jam Akhir">
                             <label class="active" for="end_time">Jam Akhir</label>
                         </div>
                         
-                        <div class="file-field input-field col m3 s12 step16">
+                        <div class="file-field input-field col m3 s12 step11">
                             <input id="post_date" name="post_date"   type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tanggal Post">
                             <label class="active" for="post_date">Tanggal Post</label>
                         </div>
-                        <div class="col m12 s12 step9" style="overflow:auto;width:100% !important;" id="table_schedule" hidden>
+                        <div class="col m12 s12 step12" style="overflow:auto;width:100% !important;" id="table_schedule" hidden>
                             <p class="mt-2 mb-2">
                                 <h4>Detail Jadwal Yang ingin diganti</h4>
                                 <table class="bordered" style="width:1800px;" >
@@ -213,11 +213,11 @@
                                 </table>
                             </p>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s6 step13">
                             <input id="note" name="note" type="text" placeholder="">
                             <label class="active" for="note">Keterangan</label>
                         </div>
-                        <div class="file-field input-field col m3 s12 step16">
+                        <div class="file-field input-field col m3 s12 step14">
                             <div class="btn">
                                 <span>Lampiran</span>
                                 <input type="file" name="document" id="document">
@@ -226,7 +226,7 @@
                                 <input class="file-path validate" type="text">
                             </div>
                         </div>
-                        <div class="col s12 mt-3">
+                        <div class="col s12 mt-3 step15">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                         </div>
                     </div>
@@ -1175,22 +1175,19 @@
     }
 
     function destroy(id){
+        var msg = '';
         swal({
-            title: "Apakah anda yakin?",
-            text: "Anda tidak bisa mengembalikan data yang terhapus!",
-            icon: 'warning',
-            dangerMode: true,
-            buttons: {
-            cancel: 'Tidak, jangan!',
-            delete: 'Ya, lanjutkan!'
-            }
+            title: "Alasan mengapa anda menghapus!",
+            text: "Anda tidak bisa mengembalikan data yang telah dihapus.",
+            buttons: true,
+            content: "input",
         }).then(function (willDelete) {
             if (willDelete) {
                 $.ajax({
                     url: '{{ Request::url() }}/destroy',
                     type: 'POST',
                     dataType: 'JSON',
-                    data: { id : id },
+                    data: { id : id, msg : message },
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
@@ -1215,6 +1212,86 @@
                 });
             }
         });
+    }
+
+    function startIntro(){
+        introJs().setOptions({
+            exitOnOverlayClick : false,
+            steps: [
+                {
+                    title : 'Form Reward & Punishment ',
+                    intro : 'Form ini digunakan untuk mendata reward maupun punishment yang nantinya akan digunakan pada periode yang telah dipilih.'
+                },
+                {
+                    title : 'Nomor Dokumen',
+                    element : document.querySelector('.step1'),
+                    intro : 'Nomor dokumen wajib diisikan, dengan kombinasi 4 huruf kode dokumen, tahun pembuatan dokumen, kode plant, serta nomor urut. Nomor ini bersifat unik, tidak akan sama, dan nomor urut paling belakang akan ter-reset secara otomatis berdasarkan tahun tanggal post.'
+                },
+                {
+                    title : 'Kode Plant',
+                    element : document.querySelector('.step2'),
+                    intro : 'Pilih kode plant untuk nomor dokumen bisa secara otomatis ter-generate.'
+                },
+                {
+                    title : 'Select Employee',
+                    element : document.querySelector('.step3'),
+                    intro : 'Memilih Employee yang akan digunakan dalam form ini.' 
+                },
+                {
+                    title : 'Jumlah Cuti',
+                    element : document.querySelector('.step4'),
+                    intro : 'Data yang ditampilkan merupakan kuota cuti dari masing masing employee setiap pilihan employee berubah.' 
+                },
+                {
+                    title : 'Tipe Cuti',
+                    element : document.querySelector('.step4'),
+                    intro : 'Memilih Tipe cuti yang nantinya akan digunakan pada form ini.' 
+                },
+                {
+                    title : 'Perusahaan',
+                    element : document.querySelector('.step6'),
+                    intro : 'Digunakan untuk memilih perusahaan yang berkaitan dengan form.' 
+                },
+                {
+                    title : 'Tanggal Awal',
+                    element : document.querySelector('.step7'),
+                    intro : 'Merupakan tanggal awal yang digunakan untuk memulai tanggal dimana user akan melakukan cuti.' 
+                },
+                {
+                    title : 'Tanggal Akhir',
+                    element : document.querySelector('.step8'),
+                    intro : 'Merupakan tanggal awal yang digunakan untuk mengakhiri tanggal dimana user akan melakukan cuti.' 
+                },
+                {
+                    title : 'Tanggal Post',
+                    element : document.querySelector('.step11'),
+                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
+                },
+                {
+                    title : 'Detail Jadwal yang diganti',
+                    element : document.querySelector('.step12'),
+                    intro : 'Merupakan List dari schedule yang nantinya akan berkaitan dengan ijin pada form ini.' 
+                },
+                {
+                    title : 'Keterangan',
+                    element : document.querySelector('.step13'),
+                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
+                },
+                {
+                    title : 'Lampiran',
+                    element : document.querySelector('.step14'),
+                    intro : 'Merupakan bukti dokumen dari form bersangkutan.' 
+                },
+                {
+                    title : 'Simpan',
+                    element : document.querySelector('.step15'),
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                },
+                
+            ]
+        })/* .onbeforechange(function(targetElement){
+            alert(this._currentStep);
+        }) */.start();
     }
 
     var printService = new WebSocketPrinter({

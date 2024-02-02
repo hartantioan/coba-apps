@@ -113,11 +113,11 @@
                     
                     <div class="col s12">
                         <input type="hidden" id="temp" name="temp">
-                        <div class="input-field col m2 s12">
+                        <div class="input-field col m2 s12 step1">
                             <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                             <label class="active" for="code">No. Dokumen</label>
                         </div>
-                        <div class="input-field col m1 s12">
+                        <div class="input-field col m1 s12 step2">
                             <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
                                 <option value="">--Pilih--</option>
                                 @foreach ($place as $rowplace)
@@ -125,13 +125,13 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s6 step3">
                             <select class="select2 browser-default" id="account_id" name="account_id" >
                                 <option value="">--Pilih ya--</option>
                             </select>
                             <label class="active" for="account_id">Select Employee</label>
                         </div>
-                        <div class="input-field col s6 employee_inputs" id="place_select">
+                        <div class="input-field col s6 employee_inputs step4" id="place_select">
                             <select id="company_id" name="company_id">
                                 <option value=""></option>
                                 @foreach($company as $row)
@@ -140,7 +140,7 @@
                             </select>
                             <label for="company_id">Perusahaan</label>
                         </div>
-                        <div class="col m12 s12 step9" style="overflow:auto;width:100% !important;">
+                        <div class="col m12 s12 step5" style="overflow:auto;width:100% !important;">
                             <p class="mt-2 mb-2">
                                 <h4>Detail Jadwal Yang ingin diganti</h4>
                                 <table class="bordered" style="width:1800px;">
@@ -182,12 +182,12 @@
                             </p>
                         </div>
                     
-                        <div class="file-field input-field col m3 s12 step16">
+                        <div class="file-field input-field col m3 s12 step6">
                             <input id="post_date" name="post_date"   type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tanggal Post">
                             <label class="active" for="post_date">Tanggal Post</label>
                         </div>
                         
-                        <div class="col s12 mt-3">
+                        <div class="col s12 mt-3 step6">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                         </div>
                     </div>
@@ -196,6 +196,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button class="btn waves-effect waves-light purple " onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -438,6 +439,56 @@
         select2ServerSide('#leave_type_id', '{{ url("admin/select2/leave_type") }}');
         
     });
+
+    function startIntro(){
+        introJs().setOptions({
+            exitOnOverlayClick : false,
+            steps: [
+                {
+                    title : 'Form Pergantian Shift ',
+                    intro : 'Form ini digunakan untuk melakukan pergantian shift antara user berkaitan.'
+                },
+                {
+                    title : 'Nomor Dokumen',
+                    element : document.querySelector('.step1'),
+                    intro : 'Nomor dokumen wajib diisikan, dengan kombinasi 4 huruf kode dokumen, tahun pembuatan dokumen, kode plant, serta nomor urut. Nomor ini bersifat unik, tidak akan sama, dan nomor urut paling belakang akan ter-reset secara otomatis berdasarkan tahun tanggal post.'
+                },
+                {
+                    title : 'Kode Plant',
+                    element : document.querySelector('.step2'),
+                    intro : 'Pilih kode plant untuk nomor dokumen bisa secara otomatis ter-generate.'
+                },
+                {
+                    title : 'Select Employee',
+                    element : document.querySelector('.step4'),
+                    intro : 'Memilih Employee yang akan digunakan dalam form ini.' 
+                },
+                {
+                    title : 'Perusahaan',
+                    element : document.querySelector('.step4'),
+                    intro : 'Digunakan untuk memilih perusahaan yang berkaitan dengan form ini.' 
+                },
+                {
+                    title : 'Detail Jadwal Yang ingin diganti',
+                    element : document.querySelector('.step5'),
+                    intro : 'Menampilkan list jadwal yang ingin diganti.' 
+                },
+                {
+                    title : 'Tanggal Post',
+                    element : document.querySelector('.step6'),
+                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
+                },
+                {
+                    title : 'Simpan',
+                    element : document.querySelector('.step7'),
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                },
+                
+            ]
+        })/* .onbeforechange(function(targetElement){
+            alert(this._currentStep);
+        }) */.start();
+    }
 
     function addItem(){
         var count = makeid(10);
@@ -828,22 +879,19 @@
     }
 
     function destroy(id){
+        var msg = '';
         swal({
-            title: "Apakah anda yakin?",
-            text: "Anda tidak bisa mengembalikan data yang terhapus!",
-            icon: 'warning',
-            dangerMode: true,
-            buttons: {
-            cancel: 'Tidak, jangan!',
-            delete: 'Ya, lanjutkan!'
-            }
+            title: "Alasan mengapa anda menghapus!",
+            text: "Anda tidak bisa mengembalikan data yang telah dihapus.",
+            buttons: true,
+            content: "input",
         }).then(function (willDelete) {
             if (willDelete) {
                 $.ajax({
                     url: '{{ Request::url() }}/destroy',
                     type: 'POST',
                     dataType: 'JSON',
-                    data: { id : id },
+                    data: { id : id, msg : message },
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },

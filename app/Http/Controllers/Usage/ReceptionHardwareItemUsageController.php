@@ -324,6 +324,36 @@ class ReceptionHardwareItemUsageController extends Controller
 		return response()->json($response);
     }
 
+    public function destroy(Request $request){
+        $query = ReceptionHardwareItemsUsage::find($request->id);
+    
+        if($query->delete()) {
+            
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
+            
+
+            activity()
+            ->performedOn(new ReceptionHardwareItemsUsage())
+            ->causedBy(session('bo_id'))
+            ->withProperties($query)
+            ->log('Delete the reception hardwareitemusage data');
+            $response = [
+                'status'  => 200,
+                'message' => 'Data deleted successfully.'
+            ];
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
     public function print( Request $request){
 
         $RH = ReceptionHardwareItemsUsage::find($request->id);

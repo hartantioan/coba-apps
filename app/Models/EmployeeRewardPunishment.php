@@ -21,6 +21,8 @@ class EmployeeRewardPunishment extends Model
         'period_id',
         'note',
         'status',
+        'delete_id',
+        'delete_note', 
     ];
     public function user(){
         return $this->belongsTo('App\Models\User','user_id','id')->withTrashed();

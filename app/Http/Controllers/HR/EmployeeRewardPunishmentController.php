@@ -406,6 +406,10 @@ class EmployeeRewardPunishmentController extends Controller
         }
         
         if($query->delete()) {
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
 
             $query->employeeRewardPunishmentDetail()->delete();
 

@@ -543,8 +543,11 @@ class LeaveRequestController extends Controller
         }
         if($query->delete()) {
             CustomHelper::removeApproval('leave_requests',$query->id);
-
-            $query->purchaseMemoDetail()->delete();
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
+            $query->leaveRequestShift()->delete();
 
             activity()
             ->performedOn(new LeaveRequest())

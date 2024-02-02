@@ -401,4 +401,54 @@ class RequestRepairHardwareItemUsageController extends Controller
             abort(404);
         }
     }
+
+    public function destroy(Request $request){
+        $query = RequestRepairHardwareItemsUsage::find($request->id);
+       
+		if($query->approval()){
+            foreach ($query->approval() as $detail){
+                foreach($detail->approvalMatrix as $row){
+                    if($row->approved){
+                        $approved = true;
+                    }
+
+                    if($row->revised){
+                        $revised = true;
+                    }
+                }
+            }
+        }
+
+        if($approved && !$revised){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'leave_requests telah diapprove, anda tidak bisa melakukan perubahan.'
+            ]);
+        }
+        if($query->delete()) {
+            CustomHelper::removeApproval('request_repair_hardware_items_usages',$query->id);
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
+            $query->leaveRequestShift()->delete();
+
+            activity()
+            ->performedOn(new RequestRepairHardwareItemsUsage())
+            ->causedBy(session('bo_id'))
+            ->withProperties($query)
+            ->log('Delete the Request Repaire Hardware Item data');
+            $response = [
+                'status'  => 200,
+                'message' => 'Data deleted successfully.'
+            ];
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }
 }

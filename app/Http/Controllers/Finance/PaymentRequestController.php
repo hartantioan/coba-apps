@@ -48,6 +48,7 @@ use App\Exports\ExportPaymentRequest;
 use App\Models\Place;
 use App\Models\User;
 use App\Models\Department;
+use App\Models\Division;
 use App\Models\Menu;
 use App\Models\MarketingOrderMemo;
 use App\Models\OutgoingPayment;
@@ -84,7 +85,7 @@ class PaymentRequestController extends Controller
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'line'          => Line::where('status','1')->get(),
             'machine'       => Machine::where('status','1')->get(),
-            'department'    => Department::where('status','1')->get(),
+            'department'    => Division::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -1051,7 +1052,7 @@ class PaymentRequestController extends Controller
                                 <th class="center-align">Plant</th>
                                 <th class="center-align">Line</th>
                                 <th class="center-align">Mesin</th>
-                                <th class="center-align">Departemen</th>
+                                <th class="center-align">Divisi</th>
                                 <th class="center-align">Proyek</th>
                                 <th class="center-align">Bayar</th>
                             </tr>

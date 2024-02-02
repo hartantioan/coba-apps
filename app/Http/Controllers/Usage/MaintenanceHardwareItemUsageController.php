@@ -433,6 +433,7 @@ class MaintenanceHardwareItemUsageController extends Controller
         $deleted = Storage::delete($path);
         if ($deleted) {
             if($query->delete()) {
+                
                 $response = [
                     'status'  => 200,
                     'message' => 'Data deleted successfully.'

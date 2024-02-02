@@ -27,6 +27,8 @@ class MaintenanceHardwareItemsUsage extends Model
         'void_id',
         'void_note',
         'void_date',
+        'delete_id',
+        'delete_note', 
     ];
 
     public function status(){

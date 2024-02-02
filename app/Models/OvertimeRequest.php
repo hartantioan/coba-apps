@@ -29,6 +29,8 @@ class OvertimeRequest extends Model
         'grandtotal',
         'nominal_adjust',
         'status',
+        'delete_id',
+        'delete_note',
         'void_id',
         'void_note',
         'void_date',

@@ -138,7 +138,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="input-field col m3 s12 step7">
+                        <div class="input-field col m3 s12 step4">
                             <select class="form-control" id="company_id" name="company_id" onchange="getCompanyAddress();">
                                 @foreach ($company as $rowcompany)
                                     <option value="{{ $rowcompany->id }}" data-address="{{ $rowcompany->address }}">{{ $rowcompany->name }}</option>
@@ -146,16 +146,16 @@
                             </select>
                             <label class="" for="company_id">Perusahaan</label>
                         </div>
-                        <div class="input-field col m12 s12">
+                        <div class="input-field col m12 s12 step5">
                             <select class="browser-default" id="period_id" name="period_id"></select>
                             <label class="active" for="period_id">Periode Mulai</label>
                         </div>
-                        <div class="input-field col m3 s12 step4">
+                        <div class="input-field col m3 s12 step6">
                             <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                             <label class="active" for="post_date">Tgl. Posting</label>
                         </div>
                         
-                        <div class="col m12 s12">
+                        <div class="col m12 s12 step7">
                             <div style="overflow:auto;">
                                 <table class="bordered">
                                     <thead>
@@ -196,12 +196,13 @@
                             </div>
                         </div>
                         
-                        <div class="input-field col m3 s12 step12">
+                        <div class="input-field col m3 s12 step8">
                             <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                             <label class="active" for="note">Keterangan</label>
                         </div>
                         <div class="col s12 mt-3">
-                            <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                           
+                            <button class="btn waves-effect waves-light right submit step9" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                         </div>
                     </div>
                 </form>
@@ -209,6 +210,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button class="btn waves-effect waves-light purple " onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -760,22 +762,19 @@
     }
 
     function destroy(id){
+        var msg = '';
         swal({
-            title: "Apakah anda yakin?",
-            text: "Anda tidak bisa mengembalikan data yang terhapus!",
-            icon: 'warning',
-            dangerMode: true,
-            buttons: {
-            cancel: 'Tidak, jangan!',
-            delete: 'Ya, lanjutkan!'
-            }
+            title: "Alasan mengapa anda menghapus!",
+            text: "Anda tidak bisa mengembalikan data yang telah dihapus.",
+            buttons: true,
+            content: "input",
         }).then(function (willDelete) {
             if (willDelete) {
                 $.ajax({
                     url: '{{ Request::url() }}/destroy',
                     type: 'POST',
                     dataType: 'JSON',
-                    data: { id : id },
+                    data: { id : id, msg : message },
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
@@ -978,6 +977,61 @@
             }
         });
         
+    }
+
+    function startIntro(){
+        introJs().setOptions({
+            exitOnOverlayClick : false,
+            steps: [
+                {
+                    title : 'Form Revisi HRD ',
+                    intro : 'Digunakan untuk menambahkan data jam masuk ke user guna mengkoreksi hasil akhir dari close period.'
+                },
+                {
+                    title : 'Nomor Dokumen',
+                    element : document.querySelector('.step1'),
+                    intro : 'Nomor dokumen wajib diisikan, dengan kombinasi 4 huruf kode dokumen, tahun pembuatan dokumen, kode plant, serta nomor urut. Nomor ini bersifat unik, tidak akan sama, dan nomor urut paling belakang akan ter-reset secara otomatis berdasarkan tahun tanggal post.'
+                },
+                {
+                    title : 'Kode Plant',
+                    element : document.querySelector('.step2'),
+                    intro : 'Pilih kode plant untuk nomor dokumen bisa secara otomatis ter-generate.'
+                },
+                {
+                    title : 'Perusahaan',
+                    element : document.querySelector('.step4'),
+                    intro : 'Digunakan untuk memilih perusahaan yang berkaitan dengan form reivsi ini.' 
+                },
+                {
+                    title : 'Periode Mulai',
+                    element : document.querySelector('.step5'),
+                    intro : 'Menentukan Periode mulai berjalannya pengkoreksian ini.' 
+                },
+                {
+                    title : 'Tanggal Post',
+                    element : document.querySelector('.step6'),
+                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
+                },
+                {
+                    title : 'List Koreksi',
+                    element : document.querySelector('.step6'),
+                    intro : 'Menampilkan List data yang akan dikoreksi.' 
+                },
+                {
+                    title : 'Keterangan',
+                    element : document.querySelector('.step8'),
+                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
+                },
+                {
+                    title : 'Simpan',
+                    element : document.querySelector('.step9'),
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                },
+                
+            ]
+        })/* .onbeforechange(function(targetElement){
+            alert(this._currentStep);
+        }) */.start();
     }
     
 </script>

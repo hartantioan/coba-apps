@@ -347,7 +347,10 @@ class ShiftRequestController extends Controller
         }
         if($query->delete()) {
             CustomHelper::removeApproval('shift_requests',$query->id);
-
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
        
             activity()
             ->performedOn(new ShiftRequest())

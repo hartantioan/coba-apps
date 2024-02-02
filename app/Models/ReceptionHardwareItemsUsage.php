@@ -21,7 +21,9 @@ class ReceptionHardwareItemsUsage extends Model
         'info',
         'date',
         'status',
-        'location'
+        'location',
+        'delete_id',
+        'delete_note', 
     ];
 
     public function status(){

@@ -66,9 +66,9 @@
                 <td>{{ $rowdetail->costDistribution()->exists() ? $rowdetail->costDistribution->name : '-' }}</td>
                 <td>{{ number_format($rowdetail->qty,3,',','.') }}</td>
                 <td>{{ $rowdetail->item->uomUnit->code }}</td>
-                <td>{{ $rowdetail->getLine() }}</td>
-                <td>{{ $rowdetail->getMachine() }}</td>
-                <td>{{ $rowdetail->getDepartment() }}</td>
+                <td>{{ $rowdetail->line->code }}</td>
+                <td>{{ $rowdetail->machine->code }}</td>
+                <td>{{ $rowdetail->department->name }}</td>
                 <td>{{ $rowdetail->place->code.' - '.$rowdetail->warehouse->name }}</td>
                 <td>{{ $rowdetail->area()->exists() ? $rowdetail->area->name : '-' }}</td>
                 <td>{{ $rowdetail->itemShading()->exists() ? $rowdetail->itemShading->code : '-' }}</td>

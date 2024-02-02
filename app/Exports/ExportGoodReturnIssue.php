@@ -6,8 +6,9 @@ use App\Models\GoodReturnIssue;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class ExportGoodReturnIssue implements FromView
+class ExportGoodReturnIssue implements FromView,ShouldAutoSize
 {
     /**
     * @return \Illuminate\Support\Collection

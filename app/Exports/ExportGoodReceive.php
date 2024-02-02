@@ -6,8 +6,9 @@ use App\Models\GoodReceive;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class ExportGoodReceive implements FromView
+class ExportGoodReceive implements FromView,ShouldAutoSize
 {
     /**
     * @return \Illuminate\Support\Collection

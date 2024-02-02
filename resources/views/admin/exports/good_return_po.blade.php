@@ -22,7 +22,9 @@
             <th>Ket. 2</th>
             <th>Qty. Diterima</th>
             <th>Qty. Kembali</th>
+            <th>Qty. Kembali</th>
             <th>Satuan</th>
+            <th>List Serial</th>
             <th>Line</th>
             <th>Mesin</th>
             <th>Divisi</th>
@@ -52,9 +54,7 @@
                 <td>{{ $row->account->name }}</td>
                 <td>{{ $row->note }}</td>
                 <td><a href="{{ $row->attachment() }}" target="_blank">File</a></td>
-                <td>{{ $rowdetail->item->name }}</td>
-                
-
+                <td>{{ $rowdetail->item->code }}</td>
                 <td>{{ $rowdetail->item->name }}</td>
                 <td>{{ $rowdetail->goodReceiptDetail->place->name }}</td>
                 <td>{{ $rowdetail->note }}</td>
@@ -63,7 +63,6 @@
                 <td align="center">{{ $rowdetail->qty }}</td>
                 <td align="center">{{ $rowdetail->itemUnit->unit->code }}</td>
                 <td>{{ $rowdetail->listSerial() }}</td>
-                <td>{{ $row->voidUser()->exists() ? $row->voidUser->name : '' }}</td>
                 <td align="center">{{ $rowdetail->goodReceiptDetail->line()->exists() ?$rowdetail->goodReceiptDetail->line->name : ' - '}}</td>
                 <td align="center">{{ $rowdetail->goodReceiptDetail->machine()->exists() ? $rowdetail->goodReceiptDetail->machine->name :'-'}}</td>
                 <td align="center">{{ $rowdetail->goodReceiptDetail->department()->exists() ? $rowdetail->goodReceiptDetail->department->name : ' - '  }}</td>

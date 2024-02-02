@@ -6,8 +6,9 @@ use App\Models\InventoryRevaluation;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class ExportInventoryRevaluation implements FromView
+class ExportInventoryRevaluation implements FromView,ShouldAutoSize
 {
     /**
     * @return \Illuminate\Support\Collection

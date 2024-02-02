@@ -6,8 +6,9 @@ use App\Models\GoodReceipt;
 use App\Models\GoodReturnPO;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class ExportGoodReturnPO implements FromView
+class ExportGoodReturnPO implements FromView,ShouldAutoSize
 {
     /**
     * @return \Illuminate\Support\Collection

@@ -5,8 +5,9 @@ namespace App\Exports;
 use App\Models\GoodReceipt;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class ExportGoodReceipt implements FromView
+class ExportGoodReceipt implements FromView,ShouldAutoSize
 {
     /**
     * @return \Illuminate\Support\Collection

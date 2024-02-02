@@ -6,8 +6,9 @@ use App\Models\GoodScale;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class ExportGoodScale implements FromView
+class ExportGoodScale implements FromView,ShouldAutoSize
 {
     /**
     * @return \Illuminate\Support\Collection

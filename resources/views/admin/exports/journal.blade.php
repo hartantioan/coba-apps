@@ -22,7 +22,7 @@
             <th>Plant</th>
             <th>Partner Bisnis</th>
             <th>Item</th>
-            <th>Departemen</th>
+            <th>Divisi</th>
             <th>Gudang</th>
             <th>Debit Real</th>
             <th>Kredit Real</th>

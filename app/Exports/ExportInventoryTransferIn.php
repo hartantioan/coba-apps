@@ -6,8 +6,9 @@ use App\Models\InventoryTransferIn;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class ExportInventoryTransferIn implements FromView
+class ExportInventoryTransferIn implements FromView,ShouldAutoSize
 {
     /**
     * @return \Illuminate\Support\Collection

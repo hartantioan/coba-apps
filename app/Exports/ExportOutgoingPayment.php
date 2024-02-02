@@ -27,19 +27,24 @@ class ExportOutgoingPayment implements FromCollection, WithTitle, WithHeadings, 
     }
 
     private $headings = [
-        'NO',
-        'TGL.POST',
-        'ACCOUNT CODE',
-        'ACCOUNT NAME',
-        'KETERANGAN',
-        'GRANDTOTAL',
-        'STATUS',
-        'VOIDER',
-        'TGL.VOID',
-        'KET.VOID',
-        'DELETER',
-        'TGL.DELETE',
-        'KET.DELETE',
+        'No',
+        'No. Dokumen',
+        'Status',
+        'Voider',
+        'Tgl. Void',
+        'Ket. Void',
+        'Deleter',
+        'Tgl. Delete',
+        'Ket. Delete',
+        'Partner Bisnis',
+        'Tgl. Posting',
+        'No. Rekening',
+        'Rekening Penerima',
+        'Bank Tujuan',
+        'Kas / Bank',
+        'Keterangan',
+        'Total',
+        'Based On'
     ];
 
     public function collection()
@@ -64,18 +69,25 @@ class ExportOutgoingPayment implements FromCollection, WithTitle, WithHeadings, 
 
             $arr[] = [
                 '1'                 => ($key + 1),
-                '2'                 => $row->post_date,
-                '3'                 => $row->account->employee_no??'',
-                '4'                 => $row->account->name??'',
-                '6'                 => $row->note,
-                '8'                 => $row->grandtotal,
-                '14'                => $row->statusRaw(),
+                'code'              => $row->code,
+                'status'            => $row->statusRaw(),
                 'voider'            => $row->voidUser()->exists() ? $row->voidUser->name : '',
                 'void_date'         => $row->voidUser()->exists() ? $row->void_date : '',
                 'void_note'         => $row->voidUser()->exists() ? $row->void_note : '',
                 'deleter'           => $row->deleteUser()->exists() ? $row->deleteUser->name : '',
                 'delete_date'       => $row->deleteUser()->exists() ? $row->deleted_at : '',
                 'delete_note'       => $row->deleteUser()->exists() ? $row->delete_note : '',
+                '4'                 => $row->account->name??'',
+                '3'                 => $row->post_date,
+                'no_rekening'       => $row->paymentRequest->account_no,
+                'rekening_penerima'       => $row->paymentRequest->account_name,
+                'bank_tujuan'       => $row->paymentRequest->account_bank,
+                'kas/bank'       => $row->coaSource->name,
+                '6'                 => $row->note,
+                '8'                 => $row->grandtotal,
+                'basedon'           => $row->paymentRequest->code
+               
+                
             ];
             
         }

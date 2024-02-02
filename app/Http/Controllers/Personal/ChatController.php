@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Personal;
 use App\Http\Controllers\Controller;
 use App\Models\Chat;
+use App\Models\ChatRequest;
 use App\Models\Chats;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
@@ -18,12 +19,6 @@ class ChatController extends Controller
     public function index()
     {
         $userCode = session('bo_id');
-        // $chats = Chat::where(function ($query) use ($userCode) {
-        //             $query->where('id_user1', $userCode)
-        //                 ->orWhere('id_user2', $userCode);
-        //         })
-        //         ->get();
-
 
         $data = [
             'title'         => 'Obrolan - Pengguna',
@@ -34,9 +29,18 @@ class ChatController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-    public function new_chat()
+    public function sync()
     {
-        
+        $listAllRoom = ChatRequest::where('status','Approved')
+                        ->where(function($query){
+                            $query->where('from_user_id',session('bo_id'))->orWhere('to_user_id',session('bo_id'));
+                        })->get();
+
+        $response = [
+            'status'    => 200,
+            'message'   => 'Data successfully saved.',
+        ];
+        return response()->json($response);
     }
 
 }

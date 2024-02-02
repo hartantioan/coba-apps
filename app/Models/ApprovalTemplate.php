@@ -20,6 +20,7 @@ class ApprovalTemplate extends Model
         'name',
         'is_check_nominal',
         'is_check_benchmark',
+        'is_coa_detail',
         'nominal_type',
         'sign',
         'nominal',

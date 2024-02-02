@@ -838,7 +838,7 @@ class FundRequestController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light blue accent-2 white-text" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light orange accent-2 white-text" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light red accent-2 white-text" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
-                        '.($val->document_status == '3' && $totalReceivableBalance == 0 && $val->status == '2' ? '<button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light purple accent-2 white-text" data-popup="tooltip" title="Finish" onclick="finish(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">offline_pin</i></button>' : '').'
+                        '.($totalReceivableBalance == 0 && $val->status == '2' ? '<button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light purple accent-2 white-text" data-popup="tooltip" title="Finish" onclick="finish(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">offline_pin</i></button>' : '').'
 					'
                 ];
 
@@ -1108,7 +1108,7 @@ class FundRequestController extends Controller
         try {
             $query = FundRequest::where('code',CustomHelper::decrypt($request->code))->first();
             if($query->status == '2'){
-                if($query->document_status == '3'){
+                /* if($query->document_status == '3'){ */
                     $query->status = '3';
                     $query->save();
     
@@ -1120,12 +1120,12 @@ class FundRequestController extends Controller
                     CustomHelper::sendNotification('fund_requests',$query->id,'Status Permohonan Dana No. '.$query->code.' dinyatakan SELESAI','Status dokumen anda telah dinyatakan selesai.',session('bo_id'));
     
                     DB::commit();
-                }else{
+                /* }else{
                     return response()->json([
                         'status'  => 500,
                         'message' => 'Status dokumen harus TIDAK LENGKAP, anda tidak bisa melakukan perubahan.'
                     ]);
-                }
+                } */
             }else{
                 return response()->json([
                     'status'  => 500,

@@ -1465,7 +1465,13 @@ class Select2Controller extends Controller {
         $response = [];
         $search   = $request->search;
         $data = ApprovalStage::where(function($query) use($search){
-                    $query->where('code', 'like', "%$search%");
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhereHas('approvalStageDetail',function($query)use($search){
+                            $query->whereHas('user',function($query)use($search){
+                                $query->where('employee_no', 'like', "%$search%")
+                                    ->orWhere('name','like',"%$search%");
+                            });
+                        });
                 })
                 ->where('status','1')->get();
 

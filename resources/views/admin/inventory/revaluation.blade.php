@@ -133,7 +133,7 @@
     <div class="modal-content" style="overflow: hidden;max-width: 100%;">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit {{ $title }}</h4>
+                <h5>Tambah/Edit {{ $title }}</h5>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -167,9 +167,9 @@
                                 <label class="active" for="post_date">Tgl. Post</label>
                             </div>
                             <div class="col m12 s12 step5">
-                                <p class="mt-2 mb-2">
+                                <p>
                                     <h5>Detail Produk</h5>
-                                    <div style="overflow:auto;width:100% !important;height:40vh;">
+                                    <div style="overflow:auto;width:100% !important;height:35vh;">
                                         <table class="bordered" style="min-width:1800px !important;" id="table-detail">
                                             <thead>
                                                 <tr>

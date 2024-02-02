@@ -377,6 +377,20 @@ class CustomHelper {
 						}else{
 							$passed = false;
 						}
+					}elseif($row->is_coa_detail){
+						$passedGroupCoa = false;
+						foreach($source->lookable->details as $rowdetail){
+							if($rowdetail->coa()->exists()){
+								$passedGroupCoa = true;
+							}
+						}
+						if($passedGroupCoa){
+							if(!self::compare($data->grandtotal * $currency_rate,$row->sign,$row->nominal)){
+								$passed = false;
+							}
+						}else{
+							$passed = false;
+						}
 					}else{
 						#checknominal dan bukanrange
 						if(!self::compare($data->grandtotal * $currency_rate,$row->sign,$row->nominal)){
@@ -403,6 +417,20 @@ class CustomHelper {
 						}
 
 						if($passedGroupItem){
+							if(!self::compareRange($data->grandtotal * $currency_rate,$row->nominal,$row->nominal_final)){
+								$passed = false;
+							}
+						}else{
+							$passed = false;
+						}
+					}elseif($row->is_coa_detail){
+						$passedGroupCoa = false;
+						foreach($source->lookable->details as $rowdetail){
+							if($rowdetail->coa()->exists()){
+								$passedGroupCoa = true;
+							}
+						}
+						if($passedGroupCoa){
 							if(!self::compareRange($data->grandtotal * $currency_rate,$row->nominal,$row->nominal_final)){
 								$passed = false;
 							}

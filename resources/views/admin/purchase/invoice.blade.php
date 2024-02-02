@@ -1319,7 +1319,7 @@
                     <input type="text" name="arr_multi_machine[]" placeholder="ID Mesin">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_department[]" placeholder="ID Departemen">
+                    <input type="text" name="arr_multi_department[]" placeholder="ID Divisi">
                 </td>
                 <td>
                     <input type="text" name="arr_multi_warehouse[]" placeholder="ID Gudang">
@@ -1432,7 +1432,7 @@
                                     <input type="text" name="arr_multi_machine[]" placeholder="ID Mesin">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_department[]" placeholder="ID Departemen">
+                                    <input type="text" name="arr_multi_department[]" placeholder="ID Divisi">
                                 </td>
                                 <td>
                                     <input type="text" name="arr_multi_warehouse[]" placeholder="ID Gudang">

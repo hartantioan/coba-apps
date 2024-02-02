@@ -42,6 +42,7 @@ class ApprovalTemplateController extends Controller
             'user_id',
             'name',
             'nominal_type',
+            'is_coa_detail',
             'is_check_nominal',
             'is_check_benchmark',
             'sign',
@@ -100,6 +101,7 @@ class ApprovalTemplateController extends Controller
                     $val->user->name,
                     $val->name,
                     $val->nominalType(),
+                    $val->is_coa_detail ? 'Ya' : 'Tidak',
                     $val->is_check_nominal ? 'Ya' : 'Tidak',
                     $val->is_check_benchmark ? 'Ya' : 'Tidak',
                     $val->sign.' ('.$val->sign().')',
@@ -213,6 +215,7 @@ class ApprovalTemplateController extends Controller
                     $query->code = $request->code;
                     $query->user_id = session('bo_id');
                     $query->name = $request->name;
+                    $query->is_coa_detail = $request->is_coa_detail ? $request->is_coa_detail : NULL;
                     $query->is_check_benchmark = $request->is_check_benchmark ? $request->is_check_benchmark : NULL;
                     $query->is_check_nominal = $request->is_check_nominal ? $request->is_check_nominal : NULL;
                     $query->nominal_type = $request->nominal_type ? $request->nominal_type : NULL;
@@ -241,6 +244,7 @@ class ApprovalTemplateController extends Controller
                         'code'			        => $request->code,
                         'user_id'			    => session('bo_id'),
                         'name'                  => $request->name,
+                        'is_coa_detail'         => $request->is_coa_detail ? $request->is_coa_detail : NULL,
                         'is_check_nominal'      => $request->is_check_nominal ? $request->is_check_nominal : NULL,
                         'is_check_benchmark'    => $request->is_check_benchmark ? $request->is_check_benchmark : NULL,
                         'nominal_type'          => $request->nominal_type ? $request->nominal_type : NULL,

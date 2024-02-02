@@ -63,6 +63,7 @@
                                                         <th>Pengguna</th>
                                                         <th>Nama</th>
                                                         <th>Tipe</th>
+                                                        <th>Cek Coa/Biaya?</th>
                                                         <th>Cek Nominal?</th>
                                                         <th>Cek Benchmark?</th>
                                                         <th>Tanda</th>
@@ -125,7 +126,20 @@
                             <label class="active" for="item_group">Grup Item (Kosongi untuk tipe semua grup item)</label>
                         </div>
                         <div class="col s12 row">
-                            <div class="col s6 row">
+                            <div class="col s4 row">
+                                <h6 class="center-align">Apakah ada pengecekan Detail Coa/Biaya?</h6>
+                                <div class="input-field col s12 center-align">
+                                    <div class="switch mb-1">
+                                        <label class="center">
+                                            Tidak
+                                            <input type="checkbox" id="is_coa_detail" name="is_coa_detail" value="1" onclick="">
+                                            <span class="lever"></span>
+                                            Ya
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col s4 row">
                                 <h6 class="center-align">Apakah ada syarat nominal?</h6>
                                 <div class="input-field col s12 center-align">
                                     <div class="switch mb-1">
@@ -138,7 +152,7 @@
                                     </div>
                                 </div>
                             </div>  
-                            <div class="col s6 row">
+                            <div class="col s4 row">
                                 <h6 class="center-align">Apakah ada syarat benchmark?</h6>
                                 <div class="input-field col s12 center-align">
                                     <div class="switch mb-1">
@@ -554,6 +568,7 @@
                 { name: 'user_id', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
                 { name: 'nominal_type', className: 'center-align' },
+                { name: 'is_coa_detail', className: 'center-align' },
                 { name: 'is_check_nominal', className: 'center-align' },
                 { name: 'is_check_benchmark', className: 'center-align' },
                 { name: 'sign', className: 'center-align' },
@@ -812,6 +827,10 @@
                     $('#nominal_final').val(response.nominal_final);
                 }else{
                     $('#final-border').hide();
+                }
+
+                if(response.is_coa_detail == '1'){
+                    $('#is_coa_detail').prop( "checked", true);
                 }
 
                 if(response.is_check_benchmark == '1'){

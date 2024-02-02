@@ -381,7 +381,7 @@ class PaymentRequestController extends Controller
             }
 
             foreach($data->fundRequest as $row){
-                if(!$row->used()->exists() && $row->balancePaymentRequest() > 0 && $row->document_status !== '1'){
+                if(!$row->used()->exists() && $row->balancePaymentRequest() > 0 && $row->document_status !== '1' && $row->status == '2'){
                     $memo = 0;
                     $final = $row->balancePaymentRequest() - $memo;
                     $details[] = [

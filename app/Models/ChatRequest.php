@@ -13,7 +13,7 @@ class ChatRequest extends Model
 
     protected $primaryKey = 'id';
 
-    protected $fillable = ['from_user_id', 'to_user_id', 'status'];
+    protected $fillable = ['code', 'from_user_id', 'to_user_id', 'status'];
 
     public function fromUser()
     {
@@ -34,5 +34,10 @@ class ChatRequest extends Model
         };
 
         return $status;
+    }
+
+    public function chat()
+    {
+        return $this->hasMany('App\Models\Chat');
     }
 }

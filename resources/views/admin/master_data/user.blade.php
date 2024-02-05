@@ -1855,49 +1855,55 @@
                 
                 $('#province_id,#country_id').empty();
 
-                $('#province_id').append(`
-                    <option value="` + response.province_id + `">` + response.province_name + `</option>
-                `);
+                if(response.province_id){
+                    $('#province_id').append(`
+                        <option value="` + response.province_id + `">` + response.province_name + `</option>
+                    `);
+                }
                 
                 $('#subdistrict_id,#district_id,#city_id').empty().append(`
                     <option value="">--Pilih ya--</option>
                 `);
 
-                $.each(response.cities, function(i, val) {
-                    $('#city_id').append(`
-                        <option value="` + val.id + `" ` + (val.id == response.city_id ? 'selected' : '') + `>` + val.code + ` - ` + val.name + `</option>
-                    `);
-                });
-
-                let index = -1;
-
-                $.each(response.cities, function(i, val) {
-                    if(val.id == response.city_id){
-                        index = i;
-                    }
-                });
-
-                if(index >= 0){
-                    $.each(response.cities[index].district, function(i, value) {
-                        let selected = '';
-                        $('#district_id').append(`
-                            <option value="` + value.id + `" ` + (value.id == response.district_id ? 'selected' : '') + ` data-subdistrict='` + JSON.stringify(value.subdistrict) + `'>` + value.code + ` - ` + value.name + `</option>
+                if(response.cities){
+                    $.each(response.cities, function(i, val) {
+                        $('#city_id').append(`
+                            <option value="` + val.id + `" ` + (val.id == response.city_id ? 'selected' : '') + `>` + val.code + ` - ` + val.name + `</option>
                         `);
-                        if(value.id == response.district_id){
-                            subdistrict = value.subdistrict;
+                    });
+
+                    let index = -1;
+
+                    $.each(response.cities, function(i, val) {
+                        if(val.id == response.city_id){
+                            index = i;
                         }
                     });
 
-                    $.each(subdistrict, function(i, value) {
-                        $('#subdistrict_id').append(`
-                            <option value="` + value.id + `" ` + (value.id == response.subdistrict_id ? 'selected' : '') + `>` + value.code + ` - ` + value.name + `</option>
-                        `);
-                    });
+                    if(index >= 0){
+                        $.each(response.cities[index].district, function(i, value) {
+                            let selected = '';
+                            $('#district_id').append(`
+                                <option value="` + value.id + `" ` + (value.id == response.district_id ? 'selected' : '') + ` data-subdistrict='` + JSON.stringify(value.subdistrict) + `'>` + value.code + ` - ` + value.name + `</option>
+                            `);
+                            if(value.id == response.district_id){
+                                subdistrict = value.subdistrict;
+                            }
+                        });
+
+                        $.each(subdistrict, function(i, value) {
+                            $('#subdistrict_id').append(`
+                                <option value="` + value.id + `" ` + (value.id == response.subdistrict_id ? 'selected' : '') + `>` + value.code + ` - ` + value.name + `</option>
+                            `);
+                        });
+                    }
                 }
 
-                $('#country_id').append(`
-                    <option value="` + response.country_id + `">` + response.country_name + `</option>
-                `);
+                if(response.country_id){
+                    $('#country_id').append(`
+                        <option value="` + response.country_id + `">` + response.country_name + `</option>
+                    `);
+                }
 
                 $('#tax_id').val(response.tax_id);
                 $('#tax_name').val(response.tax_name);

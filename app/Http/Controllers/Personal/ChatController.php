@@ -88,10 +88,11 @@ class ChatController extends Controller
 
         foreach($data as $row){
             $listChat[] = [
+                'id'        => $row->id,
                 'photo'     => $row->fromUser->photo(),
                 'message'   => $row->chat_message,
                 'status'    => $row->message_status,
-                'time'      => $row->updated_at,
+                'time'      => date('Y-m-d') == date('Y-m-d',strtotime($row->updated_at)) ? date('H:i A',strtotime($row->updated_at)) : date('d/m/y H:i',strtotime($row->updated_at)) ,
                 'is_me'     => $row->from_user_id == session('bo_id') ? '1' : '',
             ];
         }
@@ -101,6 +102,33 @@ class ChatController extends Controller
             'message'       => 'Data successfully loaded.',
             'data'          => $listChat,
         ];
+        return response()->json($response);
+    }
+
+    public function send(Request $request)
+    {
+        $data = ChatRequest::where('code',CustomHelper::decrypt($request->code))->first();
+
+        if($data){
+
+            $chat = Chat::create([
+                'chat_request_id'   => $data->id,
+                'from_user_id'      => session('bo_id'),
+                'to_user_id'        => $data->from_user_id == session('bo_id') ? $data->to_user_id : $data->from_user_id,
+                'chat_message'      => $request->message,
+                'message_status'    => 'Sent',
+            ]);
+
+            $response = [
+                'status'        => 200,
+                'message'       => 'Data successfully loaded.',
+            ];
+        }else{
+            $response = [
+                'status'        => 500,
+                'message'       => 'Data not found.',
+            ];
+        }
         return response()->json($response);
     }
 }

@@ -6,6 +6,22 @@
   .chat-application .app-chat .chat-content .chat-content-area .chat-area .chats .chat {
     margin: 0.3rem 0.5rem;
   }
+
+  .chat-information-right {
+    position:relative;
+    bottom:-10px;
+    color: grey;
+    right: 10px;
+    font-size:0.9rem;
+  }
+
+  .chat-information-left {
+    position:relative;
+    bottom:-10px;
+    color: grey;
+    left:10px;
+    font-size:0.9rem;
+  }
 </style>
 <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/app-chat.css') }}">
 <div id="main">
@@ -120,11 +136,11 @@
 
                         <!-- Chat footer <-->
                         <div class="chat-footer">
-                          <form onsubmit="enter_chat();" action="javascript:void(0);" class="chat-input">
+                          <form onsubmit="enterChat();" action="javascript:void(0);" class="chat-input">
                             <i class="material-icons mr-2">face</i>
                             <i class="material-icons mr-2">attachment</i>
-                            <input type="text" placeholder="Type message here.." class="message mb-0">
-                            <a class="btn waves-effect waves-light send" onclick="enter_chat();">Send</a>
+                            <input type="text" placeholder="Type message here.." class="message mb-0" id="main-text">
+                            <a class="btn waves-effect waves-light send" onclick="enterChat();">Send</a>
                           </form>
                         </div>
                         <!--/ Chat footer -->
@@ -173,7 +189,7 @@
         $('#chatTarget').empty();
         $.each(response.data, function(i, val) {
           $('#chatTarget').append(`
-            <div class="chat ` + (val.is_me ? 'chat-right' : '') + `">
+            <div class="chat ` + (val.is_me ? 'chat-right' : '') + `" data-id="` + val.id + `">
               <div class="chat-avatar">
                 <a class="avatar">
                   <img src="` + val.photo + `" class="circle" alt="avatar" />
@@ -182,7 +198,7 @@
               <div class="chat-body">
                 <div class="chat-text">
                   <p>` + val.message + `</p>
-                  &nbsp;<div style="position:relative;bottom:-10px;">addasd</div>
+                  <div class="` + (val.is_me ? 'chat-information-right' : 'chat-information-left') + `">` + val.time + `</div>
                 </div>
               </div>
             </div>
@@ -191,7 +207,6 @@
         $(".chat-area").scrollTop($(".chat-area > .chats").height());
       },
       error: function() {
-          $('.modal-content').scrollTop(0);
           loadingClose('.chat-content');
           swal({
               title: 'Ups!',
@@ -200,6 +215,94 @@
           });
       }
     });
+  }
+
+  function refreshChat(){
+    if($('.chat-user.active').length > 0){
+      let code = $('.chat-user.active').data('code');
+      $.ajax({
+        url: '{{ Request::url() }}/get_message',
+        type: 'POST',
+        dataType: 'JSON',
+        data: {
+          code : code,
+        },
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        beforeSend: function() {
+          loadingOpen('.chat-content');
+        },
+        success: function(response) {
+          loadingClose('.chat-content');
+          $.each(response.data, function(i, val) {
+            $('#chatTarget').append(`
+              <div class="chat ` + (val.is_me ? 'chat-right' : '') + `" data-id="` + val.id + `">
+                <div class="chat-avatar">
+                  <a class="avatar">
+                    <img src="` + val.photo + `" class="circle" alt="avatar" />
+                  </a>
+                </div>
+                <div class="chat-body">
+                  <div class="chat-text">
+                    <p>` + val.message + `</p>
+                    <div class="` + (val.is_me ? 'chat-information-right' : 'chat-information-left') + `">` + val.time + `</div>
+                  </div>
+                </div>
+              </div>
+            `);
+          });
+        },
+        error: function() {
+            loadingClose('.chat-content');
+            swal({
+                title: 'Ups!',
+                text: 'Check your internet connection.',
+                icon: 'error'
+            });
+        }
+      });
+    }
+  }
+
+  function enterChat() {
+    if($('.chat-user.active').length > 0){
+      var message = $(".message").val();
+      if (message != "") {
+          let code = $('.chat-user.active').data('code');
+          $.ajax({
+            url: '{{ Request::url() }}/send',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+              code : code,
+              message : message,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+              loadingOpen('.chat-area');
+            },
+            success: function(response) {
+              loadingClose('.chat-area');
+              
+              $('#main-text').val('');
+              /* loadMessage(code); */
+
+              $(".chat-area").scrollTop($(".chat-area > .chats").height());
+            },
+          error: function() {
+              loadingClose('.chat-area');
+              swal({
+                  title: 'Ups!',
+                  text: 'Check your internet connection.',
+                  icon: 'error'
+              });
+          }
+        });
+      }
+    }
   }
 
   function sync(){
@@ -257,7 +360,6 @@
         }
       },
       error: function() {
-          $('.modal-content').scrollTop(0);
           loadingClose('#main');
           swal({
               title: 'Ups!',

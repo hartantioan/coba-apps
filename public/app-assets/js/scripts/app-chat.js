@@ -91,18 +91,6 @@ $(document).ready(function () {
    }
 });
 
-
-// Add message to chat
-function enter_chat(source) {
-   var message = $(".message").val();
-   if (message != "") {
-      var html = '<div class="chat-text">' + "<p>" + message + "</p>" + "</div>";
-      $(".chat:last-child .chat-body").append(html);
-      $(".message").val("");
-      $(".chat-area").scrollTop($(".chat-area > .chats").height());
-   }
-}
-
 $(window).on("resize", function () {
    if ($(window).width() > 899) {
       $("#chat-sidenav").removeClass("sidenav");

@@ -88,11 +88,11 @@ class ChatController extends Controller
 
         foreach($data as $row){
             $listChat[] = [
-                'photo'     => $row->toUser->photo(),
+                'photo'     => $row->fromUser->photo(),
                 'message'   => $row->chat_message,
                 'status'    => $row->message_status,
                 'time'      => $row->updated_at,
-                'is_me'     => $row->to_user_id == session('bo_id') ? '1' : '',
+                'is_me'     => $row->from_user_id == session('bo_id') ? '1' : '',
             ];
         }
 

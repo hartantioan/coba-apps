@@ -40,7 +40,7 @@ class ExportPaymentRequest implements FromCollection, WithTitle, WithHeadings, S
         'Tgl. Posting',
         'Tgl. Bayar',
         'Tipe Pembayaran',
-        'TOP',
+        
         'Kas / Bank',
         'Reimburse',
         'No. Rekening',
@@ -92,15 +92,14 @@ class ExportPaymentRequest implements FromCollection, WithTitle, WithHeadings, S
                     'partner_bisnis'=> $row->account->name ?? '',
                     'tgl_post'      => $row->post_date,
                     'required_date' => $row->pay_date,
-                    'type'          => $row->payment_type,
-                    'TOP'           => $row->payment_type,
+                    'type'          => $row->paymentType(),
                     'kas/bank'            => $row->coaSource->name ?? '-',
                     'reimburse'             => $row->is_reimburse ? 'ya' : 'tidak' ,
                     'no rekening'   => $row->account_no,
                     'rekening penerima'            => $row->account_name,
                     'bank tujuan'            => $row->account_bank,
                     'keterangan'            => $row->note,
-                    'coa'                   => $row_detail->coa->code,
+                    'coa'                   => $row_detail->coa->name,
                     'distribusi_biaya'      => $row_detail->costDistribution()->exists() ? $row_detail->costDistribution->name : '',
                     'ket_detail'            => $row_detail->note,
                     'nominal'               => $row_detail->nominal,
@@ -109,7 +108,7 @@ class ExportPaymentRequest implements FromCollection, WithTitle, WithHeadings, S
                     'mesin'                 => $row_detail->machine()->exists() ? $row_detail->machine->name : '',
                     'Departmen'             => $row_detail->department()->exists() ? $row_detail->department->name : '',
                     'proyek'                => $row_detail->project()->exists() ? $row_detail->project->name : '',
-                    'basedon'               => $row_detail->lookable()->exists() ? $row_detail->lookable->code : '',
+                    'basedon'               => $row_detail->lookable->code.' - '.$row_detail->paymentRequest->getPaymentCrossCode(),
                 ];
             }
             

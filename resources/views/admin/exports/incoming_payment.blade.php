@@ -28,15 +28,17 @@
                     <td>{{ $key+1 }}</td>
                     <td>{{ $row->code }}</td>
                     <td>{!! $row->status() !!}</td>
-                    <td>{{ $row->deleteUser()->exists() ? $row->deleteUser->name : '' }}</td>
-                    <td>{{ $row->deleteUser()->exists() ? date('d/m/Y',strtotime($row->deleted_at)) : '' }}</td>
-                    <td>{{ $row->deleteUser()->exists() ? $row->delete_note : '' }}</td>
                     <td>{{ $row->voidUser()->exists() ? $row->voidUser->name : '' }}</td>
                     <td>{{ $row->voidUser()->exists() ? date('d/m/Y',strtotime($row->void_date)) : '' }}</td>
                     <td>{{ $row->voidUser()->exists() ? $row->void_note : '' }}</td>
+                    <td>{{ $row->deleteUser()->exists() ? $row->deleteUser->name : '' }}</td>
+                    <td>{{ $row->deleteUser()->exists() ? date('d/m/Y',strtotime($row->deleted_at)) : '' }}</td>
+                    <td>{{ $row->deleteUser()->exists() ? $row->delete_note : '' }}</td>
+
                     <td>{{ $row->account->name }}</td>
                     <td>{{ $row->post_date }}</td>
                     <td>{{ $row->coa->name }}</td>
+                    <td>{{ $row->note }}</td>
                     <td>{{ $rowDetail->subtotal }}</td>
                     <td>{{ $rowDetail->rounding }}</td>
                     <td>{{ $rowDetail->total }}</td>

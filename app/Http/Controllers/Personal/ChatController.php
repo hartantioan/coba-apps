@@ -31,10 +31,14 @@ class ChatController extends Controller
 
     public function sync()
     {
-        $listAllRoom = ChatRequest::where('status','Approved')
+        $data = ChatRequest::where('status','Approved')
                         ->where(function($query){
                             $query->where('from_user_id',session('bo_id'))->orWhere('to_user_id',session('bo_id'));
                         })->get();
+
+        $listAllRoom = [];
+        
+        /* foreach($data as $) */
 
         $response = [
             'status'    => 200,

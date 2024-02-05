@@ -105,7 +105,7 @@ class PaymentRequest extends Model
         $arr = [];
 
         foreach($this->paymentRequestCross as $row){
-            $arr[] = $row->code;
+            $arr[] = $row->lookable->code;
         }
 
         return implode(',',$arr);

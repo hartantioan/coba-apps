@@ -188,6 +188,7 @@
             </div>
           `);
         });
+        $(".chat-area").scrollTop($(".chat-area > .chats").height());
       },
       error: function() {
           $('.modal-content').scrollTop(0);

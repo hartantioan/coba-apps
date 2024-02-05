@@ -1058,11 +1058,11 @@ class UserController extends Controller
 
     public function show(Request $request){
         $user = User::find($request->id);
-        $user['province_name'] = $user->province->code.' - '.$user->province->name;
-        $user['city_name'] = $user->city->code.' - '.$user->city->name;
-        $user['country_name'] = $user->country->name;
+        $user['province_name'] = $user->province()->exists() ? $user->province->code.' - '.$user->province->name : '';
+        $user['city_name'] = $user->city()->exists() ? $user->city->code.' - '.$user->city->name : '';
+        $user['country_name'] = $user->country()->exists() ? $user->country->name : '';
         $user['limit_credit'] = $user->limit_credit ? number_format($user->limit_credit, 0, ',', '.') : '';
-        $user['cities'] = $user->province->getCity();
+        $user['cities'] = $user->province()->exists() ? $user->province->getCity() : '';
 
         $banks = [];
 		
@@ -1089,14 +1089,14 @@ class UserController extends Controller
                 'content'           => $row->content,
                 'npwp'              => $row->npwp,
                 'address'           => $row->address,
-                'country_id'        => $row->country_id,
+                'country_id'        => $row->country_id ? $row->country_id : '',
                 'country_name'      => $row->country()->exists() ? $row->country->code.' - '.$row->country->name : '',
-                'province_id'       => $row->province_id,
-                'city_id'           => $row->city_id,
+                'province_id'       => $row->province_id ? $row->province_id : '',
+                'city_id'           => $row->city_id ? $row->city_id : '',
                 'city_name'         => $row->city()->exists() ? $row->city->code.' - '.$row->city->name : '',
-                'district_id'       => $row->district_id,
+                'district_id'       => $row->district_id ? $row->district_id : '',
                 'district_name'     => $row->district()->exists() ? $row->district->code.' - '.$row->district->name : '',
-                'subdistrict_id'    => $row->subdistrict_id,
+                'subdistrict_id'    => $row->subdistrict_id ? $row->subdistrict_id : '',
                 'subdistrict_name'  => $row->subdistrict()->exists() ? $row->subdistrict->code.' - '.$row->subdistrict->name : '',
             ];
 		}

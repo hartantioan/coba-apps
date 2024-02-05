@@ -182,7 +182,7 @@
               <div class="chat-body">
                 <div class="chat-text">
                   <p>` + val.message + `</p>
-                  <div style="position:absolute;bottom:-10px;">addasd</div>
+                  &nbsp;<div style="position:relative;bottom:-10px;">addasd</div>
                 </div>
               </div>
             </div>

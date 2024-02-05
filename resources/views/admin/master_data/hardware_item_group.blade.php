@@ -64,7 +64,7 @@
                                                         <th>#</th>
                                                         <th>Code</th>
                                                         <th>Nama</th>
-                                                        <th>Department</th>
+                                                        <th>Divisi</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -104,7 +104,12 @@
                             <label class="active" for="name">Nama</label>
                         </div>
                         <div class="input-field col s6">
-                            <select class="browser-default" id="department_id" name="department_id">&nbsp;</select>
+                            <select class="browser-default" id="department_id" name="department_id">&nbsp;
+                                <option value="">--Kosong--</option>
+                                @foreach ($department as $rowdept)
+                                    <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                                @endforeach
+                            </select>
                             <label class="active" for="department_id">Pilih Departemen</label>
                         </div>
                         <div class="input-field col s6">
@@ -141,7 +146,7 @@
 <script>
     $(function() {
         loadDataTable();
-        select2ServerSide('#department_id', '{{ url("admin/select2/department") }}');
+      
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {

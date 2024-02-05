@@ -107,29 +107,29 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s6 step1">
                             <input id="name" name="name" type="text" placeholder="Nama" value="{{session('bo_name')}}" readonly>
                             <label class="active" for="name">Nama</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s6 step2">
                             <input type="hidden" id="temp" name="temp"> 
                             <input type="hidden" id="temp_request" name="temp_request"> 
                             <input id="item_name" name="item_name" type="text" placeholder="" readonly>
                             <label class="active" for="item_name">Nama Item</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s6 step3">
                             <input id="start_date" name="start_date" min="{{ $minDate }}" max="{{ $maxDate}}" type="date" placeholder="Tgl. mulai" value="{{ date('Y-m-d') }}">
                             <label class="active" for="start_date">Tgl. Mulai</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s6 step4">
                             <input id="end_date" name="end_date" min="{{ $minDate }}" type="date" value="{{ date('Y-m-d') }}">
                             <label class="active" for="end_date">Perkiraan Selesai</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s6 step5">
                             <input id="solution" name="solution" type="text" placeholder="Keterangan">
                             <label class="active" for="solution">Solusi</label>
                         </div>
-                        <div class="input-field col s12">
+                        <div class="input-field col s12 step6">
                             <div class="row">
                                 <div class="file-field input-field col m8 s12">
                                     <div class="btn col m3 s12">
@@ -171,7 +171,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col s12 mt-3">
+                        <div class="col s12 mt-3 step7">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                         </div>
                     </div>
@@ -180,6 +180,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button class="btn waves-effect waves-light purple" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -703,22 +704,19 @@
     }
 
     function destroy(id){
+        var msg = '';
         swal({
-            title: "Apakah anda yakin?",
-            text: "Anda tidak bisa mengembalikan data yang terhapus!",
-            icon: 'warning',
-            dangerMode: true,
-            buttons: {
-            cancel: 'Tidak, jangan!',
-            delete: 'Ya, lanjutkan!'
-            }
-        }).then(function (willDelete) {
-            if (willDelete) {
+            title: "Alasan mengapa anda menghapus!",
+            text: "Anda tidak bisa mengembalikan data yang telah dihapus.",
+            buttons: true,
+            content: "input",
+        }).then(message => {
+            if (message != "" && message != null) {
                 $.ajax({
                     url: '{{ Request::url() }}/destroy',
                     type: 'POST',
                     dataType: 'JSON',
-                    data: { id : id },
+                    data: { id : id, msg : message },
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
@@ -743,5 +741,57 @@
                 });
             }
         });
+    }
+
+    function startIntro(){
+        introJs().setOptions({
+            exitOnOverlayClick : false,
+            steps: [
+                {
+                    title : 'Maintenance Hardware',
+                    intro : 'Form ini digunakan untuk mencatat perbaikan suatu hardware berdasarkan pembuatnya atau user yang login saat ini.'
+                },
+                {
+                    title : 'Nama',
+                    element : document.querySelector('.step1'),
+                    intro : 'Merupakan nama dari user yang login saat ini.'
+                },
+                {
+                    title : 'Nama Item',
+                    element : document.querySelector('.step2'),
+                    intro : 'Merupakan nama dari item yang diperbaiki.'
+                },
+                {
+                    title : 'Tanggal Mulai',
+                    element : document.querySelector('.step3'),
+                    intro : 'Merupakan tanggal mulai dari perbaikan hardware ini.' 
+                },
+                {
+                    title : 'Perkiraan Selesai',
+                    element : document.querySelector('.step4'),
+                    intro : 'Merupakan perkiraan tanggal akhir dari perbaikan hardware ini.' 
+                },
+              
+                {
+                    title : 'Solusi',
+                    element : document.querySelector('.step5'),
+                    intro : 'Merupakan penjelasan bagaimana penyelasaian masalah dari barang tersebut.' 
+                },
+                {
+                    title : 'File Lampiran',
+                    element : document.querySelector('.step6'),
+                    intro : 'Silahkan unggah file lampiran.' 
+                },
+                {
+                    title : 'Tombol Simpan',
+                    element : document.querySelector('.step7'),
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                },
+                
+                
+            ]
+        })/* .onbeforechange(function(targetElement){
+            alert(this._currentStep);
+        }) */.start();
     }
 </script>

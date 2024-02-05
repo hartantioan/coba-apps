@@ -469,4 +469,34 @@ class MaintenanceHardwareItemUsageController extends Controller
         }
     }
 
+    public function destroy(Request $request){
+        $query = MaintenanceHardwareItemsUsage::find($request->id);
+       
+        if($query->delete()) {
+           
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
+            
+
+            activity()
+            ->performedOn(new MaintenanceHardwareItemsUsage())
+            ->causedBy(session('bo_id'))
+            ->withProperties($query)
+            ->log('Delete the Asset Usage data');
+            $response = [
+                'status'  => 200,
+                'message' => 'Data deleted successfully.'
+            ];
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\MasterData;
 
 use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
+use App\Models\Division;
 use App\Models\HardwareItemGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +17,8 @@ class HardwareItemGroupController extends Controller
     {
         $data = [
             'title' => 'Item Hardware Group',
-            'content' => 'admin.master_data.hardware_item_group'
+            'content' => 'admin.master_data.hardware_item_group',
+            'department'    => Division::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -81,7 +83,7 @@ class HardwareItemGroupController extends Controller
                     $val->id,
                     $val->code,
                     $val->name,
-                    $val->department->code.'-'.$val->department->name,
+                    $val->department->code ?? ''.'-'.$val->department->name ?? '',
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>

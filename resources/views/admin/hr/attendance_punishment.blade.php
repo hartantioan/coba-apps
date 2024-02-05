@@ -1021,7 +1021,76 @@
         
     }
 
-    
+    function startIntro(){
+        introJs().setOptions({
+            exitOnOverlayClick : false,
+            steps: [
+                {
+                    title : 'Form Punishment ',
+                    intro : 'Form ini digunakan untuk melakukan ijin lembur.'
+                },
+                {
+                    title : 'Nomor Dokumen',
+                    element : document.querySelector('.step1'),
+                    intro : 'Nomor dokumen wajib diisikan, dengan kombinasi 4 huruf kode dokumen, tahun pembuatan dokumen, kode plant, serta nomor urut. Nomor ini bersifat unik, tidak akan sama, dan nomor urut paling belakang akan ter-reset secara otomatis berdasarkan tahun tanggal post.'
+                },
+                {
+                    title : 'Kode Plant',
+                    element : document.querySelector('.step2'),
+                    intro : 'Pilih kode plant untuk nomor dokumen bisa secara otomatis ter-generate.'
+                },
+                {
+                    title : 'Select Employee',
+                    element : document.querySelector('.step3'),
+                    intro : 'Memilih employee yang bersangkutan dengan form lembur.' 
+                },
+                {
+                    title : 'Tanggal',
+                    element : document.querySelector('.step4'),
+                    intro : 'Merupakan tanggal yang dimana lembur itu berlangsung.' 
+                },
+              
+                {
+                    title : 'Pilih jadwal',
+                    element : document.querySelector('.step5'),
+                    intro : 'Memilih jadwal yang berkaitan dengan lembur apa bila tidak memilih jadwal maka lembur akan berjalan sendiri tanpa berkaitan dengan jadwal.' 
+                },
+                {
+                    title : 'Perusahaan',
+                    element : document.querySelector('.step6'),
+                    intro : 'Digunakan untuk memilih perusahaan yang berkaitan dengan form lembur ini.' 
+                },
+                {
+                    title : 'Jam Awal',
+                    element : document.querySelector('.step7'),
+                    intro : 'Inputan untuk jam awal lembur dimulai.' 
+                },
+                {
+                    title : 'Jam Akhir',
+                    element : document.querySelector('.step8'),
+                    intro : 'Inputan untuk jam akhir lembur tersebut.' 
+                },
+                {
+                    title : 'Tanggal Post',
+                    element : document.querySelector('.step9'),
+                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
+                },
+                {
+                    title : 'Keterangan',
+                    element : document.querySelector('.step10'),
+                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
+                },
+                {
+                    title : 'Simpan',
+                    element : document.querySelector('.step11'),
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                },
+                
+            ]
+        })/* .onbeforechange(function(targetElement){
+            alert(this._currentStep);
+        }) */.start();
+    }
   
 
 </script>

@@ -104,27 +104,27 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s6 step1">
                             <select class="browser-default" id="hardware_item_id" name="hardware_item_id">&nbsp;</select>
                             <label class="active" for="hardware_item_id">Pilih Item dari inventory</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s6 step2">
                             <select class="browser-default" id="user_id" name="user_id">&nbsp;</select>
                             <label class="active" for="user_id">Pilih User(jika ada)</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s6 step3">
                             <input id="location" name="location" type="text" placeholder="Keterangan">
                             <label class="active" for="location">Lokasi</label>
                         </div>
-                        <div class="input-field col s6"> 
+                        <div class="input-field col s6 step4"> 
                             <input type="date" id="date" name="date" min="{{ $minDate }}">
                             <label class="active" for="date">Date(tanggal)</label>
                         </div>
-                        <div class="input-field col s12">
+                        <div class="input-field col s12 step5">
                             <input id="info" name="info" type="text" placeholder="Info">
                             <label class="active" for="info">Info</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s6 step6">
                             <div class="switch mb-1">
                                 <label for="order">Status</label>
                                 <label>
@@ -135,7 +135,7 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="col s12 mt-3">
+                        <div class="col s12 mt-3 step7">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                         </div>
                     </div>
@@ -144,6 +144,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button class="btn waves-effect waves-light purple" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -725,25 +726,73 @@
             }
         });
     }
+
+    function startIntro(){
+        introJs().setOptions({
+            exitOnOverlayClick : false,
+            steps: [
+                {
+                    title : 'Form Penyerahan Barang',
+                    intro : 'Form ini digunakan untuk mencatat penyerahan barang kepada user siapa yang nantinya akan menggunakan inventaris di form ini.'
+                },
+                {
+                    title : 'Pilih User',
+                    element : document.querySelector('.step1'),
+                    intro : 'Memilih user yang berkaitan dengan penyerahan item'
+                },
+                {
+                    title : 'Kode Plant',
+                    element : document.querySelector('.step2'),
+                    intro : 'Pilih kode plant untuk nomor dokumen bisa secara otomatis ter-generate.'
+                },
+                {
+                    title : 'Lokasi',
+                    element : document.querySelector('.step3'),
+                    intro : 'Keterangan Lokasi barang nantinya akan berada dimana.' 
+                },
+                {
+                    title : 'Date(tanggal)',
+                    element : document.querySelector('.step4'),
+                    intro : 'Merupakan tanggal dimana penyerahan pada form ini akan dilakukan.' 
+                },
+              
+                {
+                    title : 'Info',
+                    element : document.querySelector('.step5'),
+                    intro : 'Keterangan tambahan yang akan dicantumkan pada form ini.' 
+                },
+                {
+                    title : 'Status',
+                    element : document.querySelector('.step6'),
+                    intro : 'Merupakan status aktif atau tidaknya penyerahan ini.' 
+                },
+                {
+                    title : 'Tombol Simpan',
+                    element : document.querySelector('.step7'),
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar' 
+                },
+                
+            ]
+        })/* .onbeforechange(function(targetElement){
+            alert(this._currentStep);
+        }) */.start();
+    }
     
 
     function destroy(id){
+        var msg = '';
         swal({
-            title: "Apakah anda yakin?",
-            text: "Anda tidak bisa mengembalikan data yang terhapus!",
-            icon: 'warning',
-            dangerMode: true,
-            buttons: {
-            cancel: 'Tidak, jangan!',
-            delete: 'Ya, lanjutkan!'
-            }
-        }).then(function (willDelete) {
-            if (willDelete) {
+            title: "Alasan mengapa anda menghapus!",
+            text: "Anda tidak bisa mengembalikan data yang telah dihapus.",
+            buttons: true,
+            content: "input",
+        }).then(message => {
+            if (message != "" && message != null) {
                 $.ajax({
                     url: '{{ Request::url() }}/destroy',
                     type: 'POST',
                     dataType: 'JSON',
-                    data: { id : id },
+                    data: { id : id, msg : message },
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },

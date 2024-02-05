@@ -53,23 +53,23 @@
                                                     <div id="validation_alert" style="display:none;"></div>
                                                 </div>
                                                 <div class="col s12">
-                                                    <div class="input-field col s6">
+                                                    <div class="input-field col s6 step1">
                                                         <input id="name" name="name" type="text" placeholder="Nama" value="{{session('bo_name')}}" readonly>
                                                         <label class="active" for="name">Nama</label>
                                                     </div>
-                                                    <div class="input-field col s6">
+                                                    <div class="input-field col s6 step2">
                                                         <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                                         <label class="active" for="post_date">Tgl. Posting</label>
                                                     </div>
-                                                    <div class="input-field col s6">
+                                                    <div class="input-field col s6 step3">
                                                         <select class="browser-default" id="hardware_item_id" name="hardware_item_id">&nbsp;</select>
                                                         <label class="active" for="hardware_item_id">Pilih Item dari inventory</label>
                                                     </div>
-                                                    <div class="input-field col s12">
+                                                    <div class="input-field col s12 step4">
                                                         <input id="complaint" name="complaint" type="text" placeholder="Mati saat ....">
                                                         <label class="active" for="complaint">Keluhan</label>
                                                     </div>
-                                                    <div class="input-field col s12">
+                                                    <div class="input-field col s12 step5">
                                                         <div class="row">
                                                             <div class="file-field input-field col m8 s12">
                                                                 <div class="btn col m3 s12">
@@ -112,7 +112,8 @@
                                                         </div>
                                                     </div>
                                                     <div class="col s12 mt-3">
-                                                        <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                                        <button class="btn waves-effect waves-light purple" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+                                                        <button class="btn waves-effect waves-light right submit step6" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                                                     </div>
                                                 </div>
                                             </form> 
@@ -533,6 +534,51 @@
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
 
+    function startIntro(){
+        introJs().setOptions({
+            exitOnOverlayClick : false,
+            steps: [
+                {
+                    title : 'Form Permintaan Perbaikan Barang',
+                    intro : 'Form ini digunakan membuat permohonan untuk perbaikan barang.'
+                },
+                {
+                    title : 'Nama',
+                    element : document.querySelector('.step2'),
+                    intro : 'Merupakan nama requester yang login saat ini'
+                },
+                {
+                    title : 'Tgl Posting',
+                    element : document.querySelector('.step2'),
+                    intro : 'Tanggal post form ini'
+                },
+                {
+                    title : 'Pilih item dari inventory',
+                    element : document.querySelector('.step3'),
+                    intro : 'Digunakan untuk memilih item dari inventaris yang akan diminta untuk diperbaiki.'
+                },
+                {
+                    title : 'Keluhan',
+                    element : document.querySelector('.step4'),
+                    intro : 'Keterangan yang perlu diisi untuk mengetahui kerusakan apa yang ada pada barang tersebut.' 
+                },
+                {
+                    title : 'Lampiran',
+                    element : document.querySelector('.step5'),
+                    intro : 'Merupakan lampiran yang perlu dicantumkan saat memberikan request.' 
+                },
+                {
+                    title : 'Tombol Simpan',
+                    element : document.querySelector('.step6'),
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar' 
+                },
+                
+            ]
+        })/* .onbeforechange(function(targetElement){
+            alert(this._currentStep);
+        }) */.start();
+    }
+
     function save(){
 			
         var formData = new FormData($('#form_data')[0]);
@@ -768,22 +814,19 @@
     }
 
     function destroy(id){
+        var msg = '';
         swal({
-            title: "Apakah anda yakin?",
-            text: "Anda tidak bisa mengembalikan data yang terhapus!",
-            icon: 'warning',
-            dangerMode: true,
-            buttons: {
-            cancel: 'Tidak, jangan!',
-            delete: 'Ya, lanjutkan!'
-            }
-        }).then(function (willDelete) {
-            if (willDelete) {
-                /* $.ajax({
+            title: "Alasan mengapa anda menghapus!",
+            text: "Anda tidak bisa mengembalikan data yang telah dihapus.",
+            buttons: true,
+            content: "input",
+        }).then(message => {
+            if (message != "" && message != null) {
+                $.ajax({
                     url: '{{ Request::url() }}/destroy',
                     type: 'POST',
                     dataType: 'JSON',
-                    data: { id : id },
+                    data: { id : id, msg : message },
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
@@ -805,8 +848,7 @@
                             icon: 'error'
                         });
                     }
-                }); */
-                alert('coming soon');
+                });
             }
         });
     }

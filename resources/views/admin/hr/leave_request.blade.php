@@ -235,6 +235,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button class="btn waves-effect waves-light purple " onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -1219,8 +1220,8 @@
             exitOnOverlayClick : false,
             steps: [
                 {
-                    title : 'Form Reward & Punishment ',
-                    intro : 'Form ini digunakan untuk mendata reward maupun punishment yang nantinya akan digunakan pada periode yang telah dipilih.'
+                    title : 'Form Ijin Keluar',
+                    intro : 'Form ini digunakan untuk mendata Ijin  nantinya akan digunakan pada periode yang telah dipilih.'
                 },
                 {
                     title : 'Nomor Dokumen',

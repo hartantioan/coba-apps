@@ -100,6 +100,17 @@ class PaymentRequest extends Model
         return $this->hasMany('App\Models\PaymentRequestCross');
     }
 
+    public function getPaymentCrossCode()
+    {
+        $arr = [];
+
+        foreach($this->paymentRequestCross as $row){
+            $arr[] = $row->code;
+        }
+
+        return implode(',',$arr);
+    }
+
     public function outgoingPayment()
     {
         return $this->hasOne('App\Models\OutgoingPayment', 'payment_request_id', 'id')->whereIn('status',['2','3']);

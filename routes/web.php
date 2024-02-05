@@ -366,6 +366,7 @@ Route::prefix('admin')->group(function () {
                 Route::prefix('chat')->group(function () {
                     Route::get('/',[ChatController::class, 'index']);
                     Route::post('sync', [ChatController::class, 'sync']);
+                    Route::post('get_message', [ChatController::class, 'getMessage']);
                 });
 
                 Route::prefix('task')->group(function () {

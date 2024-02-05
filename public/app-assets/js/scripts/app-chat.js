@@ -71,6 +71,7 @@ $(document).ready(function () {
       else {
          // if search filter box is empty
          $(".sidebar-chat .chat-list .chat-user").show();
+         $(".no-data-found").removeClass('show');
       }
    });
 

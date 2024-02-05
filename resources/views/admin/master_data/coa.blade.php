@@ -160,12 +160,12 @@
                             <label class="" for="company_id">Perusahaan</label>
                         </div>
                         <div class="input-field col s6">
-                            <select class="browser-default" id="parent_id" name="parent_id"></select>
-                            <label class="active" for="parent_id">Parent Coa</label>
-                        </div>
-                        <div class="input-field col s6">
                             <input id="level" name="level" type="number" placeholder="Level" step="1" value="1" min="1">
                             <label class="active" for="level">Level</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <select class="browser-default" id="parent_id" name="parent_id"></select>
+                            <label class="active" for="parent_id">Parent Coa</label>
                         </div>
                         <div class="input-field col s6">
                             <div class="switch mb-1">
@@ -197,7 +197,7 @@
                                     Ya
                                 </label>
                             </div>
-                            <div class="switch mb-1">
+                            {{-- <div class="switch mb-1">
                                 <label for="is_hidden">Sembunyikan dari Transaksi</label>
                                 <label class="right">
                                     Tidak
@@ -205,7 +205,7 @@
                                     <span class="lever"></span>
                                     Ya
                                 </label>
-                            </div>
+                            </div> --}}
                         </div>
                         <div class="input-field col s6">
                             <div class="switch mb-1">
@@ -441,7 +441,30 @@
             }
         });
 
-        select2ServerSide('#parent_id', '{{ url("admin/select2/raw_coa") }}');
+        $('#parent_id').select2({
+            placeholder: '-- Silahkan pilih --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/raw_coa") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        level: $('#level').val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
     });
 
     function rowDetail(data) {

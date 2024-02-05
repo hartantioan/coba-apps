@@ -377,7 +377,7 @@ class Select2Controller extends Controller {
                  })->where('level',5)
                 ->where('status','1')
                 ->whereIn('company_id',$arrCompany)
-                ->whereNull('is_hidden')
+                ->whereNotNull('show_journal')
                 ->get();
 
         foreach($data as $d) {
@@ -470,11 +470,15 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
+        $level = $request->level > 1 ? $request->level - 1 : 1;
         $data = Coa::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
                     ->orWhere('name', 'like', "%$search%")
                     ->orWhere('prefix', 'like', "%$search%");
-                })->where('status','1')->get();
+                })
+                ->where('status','1')
+                ->where('level',$level)
+                ->get();
 
         foreach($data as $d) {
             $pre_text = str_repeat(" - ", $d->level);

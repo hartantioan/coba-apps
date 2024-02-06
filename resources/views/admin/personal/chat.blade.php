@@ -164,7 +164,7 @@
     sync();
     setInterval(function () {
       sync();
-    },2000);
+    },10000);
   });
 
   function loadMessage(code){

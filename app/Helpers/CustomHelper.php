@@ -681,15 +681,9 @@ class CustomHelper {
 				'status'		=> '3'
 			]);
 
-			$arrCoa = [];
-
 			$coa_credit = Coa::where('code','200.01.03.01.02')->where('company_id',$gr->company_id)->first();
 
 			foreach($gr->goodReceiptDetail as $rowdetail){
-
-				if(self::checkArrayRaw($arrNote,$rowdetail->purchaseOrderDetail->purchaseOrder->code) < 0){
-					$arrNote[] = $rowdetail->purchaseOrderDetail->purchaseOrder->code;
-				}
 
 				$rowtotal = $rowdetail->getRowTotal() * $rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate;
 
@@ -749,10 +743,6 @@ class CustomHelper {
 					NULL,
 				);
 			}
-
-			$journal = Journal::find($query->id);
-			$journal->note = $journal->note.' - '.implode(', ',$arrNote);
-			$journal->save();
 
 			$gr->updateRootDocumentStatusDone();
 		}elseif($table_name == 'shift_requests'){
@@ -2468,7 +2458,7 @@ class CustomHelper {
 							'type'			=> '2',
 							'nominal'		=> $tax,
 							'nominal_fc'	=> $type == '1' || $type == '' ? $tax : $row->tax,
-							'note'			=> 'No. FPB : '.$pm->return_tax_no,
+							'note'			=> $pm->return_tax_no,
 							'note2'			=> date('d/m/Y',strtotime($pm->return_date))
 						]);
 					}
@@ -2488,7 +2478,7 @@ class CustomHelper {
 							'type'			=> '1',
 							'nominal'		=> $row->wtax * $row->lookable->currency_rate,
 							'nominal_fc'	=> $row->lookable->currency->type == '1' ? $row->wtax * $row->lookable->currency_rate : $row->wtax,
-							'note'			=> 'No. FPB : '.$pm->return_tax_no,
+							'note'			=> $pm->return_tax_no,
 							'note2'			=> date('d/m/Y',strtotime($pm->return_date))
 						]);
 					}
@@ -2523,7 +2513,7 @@ class CustomHelper {
 							'type'			=> '2',
 							'nominal'		=> $row->tax * $row->lookable->currency_rate,
 							'nominal_fc'	=> $row->lookable->currency->type == '1' ? $row->tax * $row->lookable->currency_rate : $row->tax,
-							'note'			=> 'No. FPB : '.$pm->return_tax_no,
+							'note'			=> $pm->return_tax_no,
 							'note2'			=> date('d/m/Y',strtotime($pm->return_date))
 						]);
 					}

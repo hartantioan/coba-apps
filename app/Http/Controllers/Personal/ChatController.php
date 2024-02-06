@@ -50,7 +50,7 @@ class ChatController extends Controller
                     'code'          => CustomHelper::encrypt($row->code),
                     'name'          => $row->toUser->name,
                     'photo'         => $row->toUser->photo(),
-                    'last_message'  => $lastMessage ? $lastMessage : '',
+                    'last_message'  => $lastMessage ? $lastMessage : 'Tidak ada histori percakapan.',
                     'last_time'     => $lastTime ? $lastTime : '',
                     'real_last_time'=> $realLastTime,
                 ];
@@ -61,7 +61,7 @@ class ChatController extends Controller
                     'code'          => CustomHelper::encrypt($row->code),
                     'name'          => $row->fromUser->name,
                     'photo'         => $row->fromUser->photo(),
-                    'last_message'  => $lastMessage ? $lastMessage : '',
+                    'last_message'  => $lastMessage ? $lastMessage : 'Tidak ada histori percakapan.',
                     'last_time'     => $lastTime ? $lastTime : '',
                     'real_last_time'=> $realLastTime,
                 ];
@@ -96,6 +96,35 @@ class ChatController extends Controller
                 'is_me'     => $row->from_user_id == session('bo_id') ? '1' : '',
             ];
         }
+
+        $response = [
+            'status'        => 200,
+            'message'       => 'Data successfully loaded.',
+            'data'          => $listChat,
+        ];
+        return response()->json($response);
+    }
+
+    public function refresh(Request $request)
+    {
+        $data = Chat::whereHas('chatRequest',function($query)use($request){
+            $query->where('code',CustomHelper::decrypt($request->code));
+        })->latest()->take(10)->get();
+
+        $listChat = [];
+
+        foreach($data as $row){
+            $listChat[] = [
+                'id'        => $row->id,
+                'photo'     => $row->fromUser->photo(),
+                'message'   => $row->chat_message,
+                'status'    => $row->message_status,
+                'time'      => date('Y-m-d') == date('Y-m-d',strtotime($row->updated_at)) ? date('H:i A',strtotime($row->updated_at)) : date('d/m/y H:i',strtotime($row->updated_at)) ,
+                'is_me'     => $row->from_user_id == session('bo_id') ? '1' : '',
+            ];
+        }
+
+        $listChat = collect($listChat)->sortBy('id');
 
         $response = [
             'status'        => 200,

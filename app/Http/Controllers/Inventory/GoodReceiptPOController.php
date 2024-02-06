@@ -105,7 +105,7 @@ class GoodReceiptPOController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = GoodReceipt::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
+        $total_data = GoodReceipt::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */count();
         
         $query_data = GoodReceipt::where(function($query) use ($search, $request) {
                 if($search) {
@@ -140,7 +140,7 @@ class GoodReceiptPOController extends Controller
                     $query->whereIn('status', $request->status);
                 }
             })
-            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+            /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -179,7 +179,7 @@ class GoodReceiptPOController extends Controller
                     $query->whereIn('status', $request->status);
                 }
             })
-            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+            /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
             ->count();
 
         $response['data'] = [];

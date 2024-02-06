@@ -162,6 +162,9 @@
 <script>
   $(function() {
     sync();
+    setInterval(function () {
+      sync();
+    },2000);
   });
 
   function loadMessage(code){
@@ -221,7 +224,7 @@
     if($('.chat-user.active').length > 0){
       let code = $('.chat-user.active').data('code');
       $.ajax({
-        url: '{{ Request::url() }}/get_message',
+        url: '{{ Request::url() }}/refresh',
         type: 'POST',
         dataType: 'JSON',
         data: {
@@ -231,30 +234,36 @@
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         beforeSend: function() {
-          loadingOpen('.chat-content');
         },
         success: function(response) {
-          loadingClose('.chat-content');
           $.each(response.data, function(i, val) {
-            $('#chatTarget').append(`
-              <div class="chat ` + (val.is_me ? 'chat-right' : '') + `" data-id="` + val.id + `">
-                <div class="chat-avatar">
-                  <a class="avatar">
-                    <img src="` + val.photo + `" class="circle" alt="avatar" />
-                  </a>
-                </div>
-                <div class="chat-body">
-                  <div class="chat-text">
-                    <p>` + val.message + `</p>
-                    <div class="` + (val.is_me ? 'chat-information-right' : 'chat-information-left') + `">` + val.time + `</div>
+            let there = false;
+
+            if($('.chat[data-id="' + val.id + '"]').length > 0){
+              there = true;
+            }
+
+            if(!there){
+              $('#chatTarget').append(`
+                <div class="chat ` + (val.is_me ? 'chat-right' : '') + `" data-id="` + val.id + `">
+                  <div class="chat-avatar">
+                    <a class="avatar">
+                      <img src="` + val.photo + `" class="circle" alt="avatar" />
+                    </a>
+                  </div>
+                  <div class="chat-body">
+                    <div class="chat-text">
+                      <p>` + val.message + `</p>
+                      <div class="` + (val.is_me ? 'chat-information-right' : 'chat-information-left') + `">` + val.time + `</div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            `);
+              `);
+            }
+            $(".chat-area").scrollTop($(".chat-area > .chats").height());
           });
         },
         error: function() {
-            loadingClose('.chat-content');
             swal({
                 title: 'Ups!',
                 text: 'Check your internet connection.',
@@ -263,6 +272,7 @@
         }
       });
     }
+    sync();
   }
 
   function enterChat() {
@@ -288,9 +298,7 @@
               loadingClose('.chat-area');
               
               $('#main-text').val('');
-              /* loadMessage(code); */
-
-              $(".chat-area").scrollTop($(".chat-area > .chats").height());
+              refreshChat();
             },
           error: function() {
               loadingClose('.chat-area');
@@ -306,6 +314,10 @@
   }
 
   function sync(){
+    let code = '';
+    if($('.chat-user.active').length > 0){
+      code = $('.chat-user.active').data('code');
+    }
     $.ajax({
       url: '{{ Request::url() }}/sync',
       type: 'POST',
@@ -317,17 +329,17 @@
           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
       },
       beforeSend: function() {
-          loadingOpen('#main');
+        
       },
       success: function(response) {
-        loadingClose('#main');
 
         $('.chat-list').empty();
         $(".no-data-found").removeClass('show');
         if(response.data.length > 0){
+
           $.each(response.data, function(i, val) {
             $('.chat-list').append(`
-              <div class="chat-user" id="chatUser` + val.code + `" data-code="` + val.code + `">
+              <div class="chat-user ` + (code == val.code ? 'active' : '') + `" id="chatUser` + val.code + `" data-code="` + val.code + `">
                 <div class="user-section">
                   <div class="row valign-wrapper">
                     <div class="col s2 media-image online pr-0">
@@ -349,6 +361,10 @@
                 </div>
               </div>
             `);
+
+            if(code){
+              refreshChat();
+            }
           });
           $(".chat-user").on("click", function () {
             loadMessage($(this).data('code'));
@@ -360,7 +376,6 @@
         }
       },
       error: function() {
-          loadingClose('#main');
           swal({
               title: 'Ups!',
               text: 'Check your internet connection.',

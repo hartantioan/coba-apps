@@ -211,11 +211,6 @@
       },
       error: function() {
           loadingClose('.chat-content');
-          swal({
-              title: 'Ups!',
-              text: 'Check your internet connection.',
-              icon: 'error'
-          });
       }
     });
   }
@@ -264,11 +259,7 @@
           });
         },
         error: function() {
-            swal({
-                title: 'Ups!',
-                text: 'Check your internet connection.',
-                icon: 'error'
-            });
+
         }
       });
     }
@@ -302,11 +293,6 @@
             },
           error: function() {
               loadingClose('.chat-area');
-              swal({
-                  title: 'Ups!',
-                  text: 'Check your internet connection.',
-                  icon: 'error'
-              });
           }
         });
       }
@@ -376,11 +362,7 @@
         }
       },
       error: function() {
-          swal({
-              title: 'Ups!',
-              text: 'Check your internet connection.',
-              icon: 'error'
-          });
+        
       }
     });
   }

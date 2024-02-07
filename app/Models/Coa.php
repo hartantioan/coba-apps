@@ -27,6 +27,7 @@ class Coa extends Model
         'is_hidden',
         'show_journal',
         'bp_journal',
+        'kode_program_lama',
     ];
 
     public function company(){

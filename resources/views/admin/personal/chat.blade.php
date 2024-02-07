@@ -56,11 +56,11 @@
                                 <div class="sidebar-header">
                                   <div class="row valign-wrapper">
                                     <div class="col s2 media-image pr-0">
-                                      <img src="../../../app-assets/images/user/12.jpg" alt=""
+                                      <img src="{{ $data_user->photo() }}" alt=""
                                         class="circle z-depth-2 responsive-img">
                                     </div>
                                     <div class="col s10">
-                                      <p class="m-0 blue-grey-text text-darken-4 font-weight-700">Lawrence Collins</p>
+                                      <p class="m-0 blue-grey-text text-darken-4 font-weight-700">{{ $data_user->name }}</p>
                                       <p class="m-0 info-text">Apple pie bonbon cheesecake tiramisu</p>
                                     </div>
                                   </div>
@@ -77,7 +77,7 @@
                                     <input type="text" placeholder="Search Chat" class="app-filter" id="chat_filter">
                                   </div>
                                   <div class="add-user">
-                                    <a href="#">
+                                    <a href="javascript:void(0);">
                                       <i class="material-icons mr-2 add-user-icon">person_add</i>
                                     </a>
                                   </div>
@@ -128,7 +128,9 @@
                         <div class="chat-area">
                           <div class="chats">
                             <div class="chats" id="chatTarget">
-
+                              <a class="btn-floating waves-effect waves-light amber darken-4 hide" style="position:fixed;z-index:100;bottom:100px;right:25px;" href="javascript:void(0);" id="scrollToBottom" onclick="scrollToBottom();">
+                                <i class="material-icons">arrow_downward</i>
+                              </a>
                             </div>
                           </div>
                         </div>
@@ -164,7 +166,13 @@
     sync();
     setInterval(function () {
       sync();
-    },10000);
+    },5000);
+
+    /* $(".chat-area").scrollTop($(".chat-area > .chats").height()); */
+    $('.chat-area').scroll(function(){
+      $('#scrollToBottom').removeClass('hide', ($(".chat-area > .chats").height() - $(this).scrollTop()) > 100);
+      /* $('#scrollToBottom').addClass('hide', $(".chat-area > .chats").height() - 74); */
+    });
   });
 
   function loadMessage(code){
@@ -189,9 +197,9 @@
         $('#imageTarget').attr('src',$('#imageSource' + code).attr('src'));
         $('#nameTarget').text($('#nameSource' + code).text());
         $('.chat-content-area').removeClass('hide');
-        $('#chatTarget').empty();
+        $('.chat').empty();
         $.each(response.data, function(i, val) {
-          $('#chatTarget').append(`
+          $('#scrollToBottom').before(`
             <div class="chat ` + (val.is_me ? 'chat-right' : '') + `" data-id="` + val.id + `">
               <div class="chat-avatar">
                 <a class="avatar">
@@ -255,7 +263,7 @@
                 </div>
               `);
             }
-            $(".chat-area").scrollTop($(".chat-area > .chats").height());
+            /* $(".chat-area").scrollTop($(".chat-area > .chats").height()); */
           });
         },
         error: function() {
@@ -263,7 +271,6 @@
         }
       });
     }
-    sync();
   }
 
   function enterChat() {
@@ -350,6 +357,9 @@
 
             if(code){
               refreshChat();
+            }
+            if($("#chat_filter").val()){
+              $("#chat_filter").trigger('keyup');
             }
           });
           $(".chat-user").on("click", function () {

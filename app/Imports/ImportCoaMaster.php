@@ -13,7 +13,11 @@ class ImportCoaMaster implements ToCollection
     {
         foreach ($rows as $key => $row) {
             $coa = Coa::where('code',$row[1])->first();
-            info($coa ? $coa->code.' '.$coa->status : '-');
+            if($coa){
+                $coa->update([
+                    'kode_program_lama' => trim($row[0]),
+                ]);
+            }
         }
     }
 }

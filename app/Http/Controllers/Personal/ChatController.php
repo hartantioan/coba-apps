@@ -95,6 +95,11 @@ class ChatController extends Controller
                 'time'      => date('Y-m-d') == date('Y-m-d',strtotime($row->updated_at)) ? date('H:i A',strtotime($row->updated_at)) : date('d/m/y H:i',strtotime($row->updated_at)) ,
                 'is_me'     => $row->from_user_id == session('bo_id') ? '1' : '',
             ];
+            if($row->to_user_id == session('bo_id')){
+                $row->update([
+                    'message_status'    => 'Read',
+                ]);
+            }
         }
 
         $response = [
@@ -122,6 +127,12 @@ class ChatController extends Controller
                 'time'      => date('Y-m-d') == date('Y-m-d',strtotime($row->updated_at)) ? date('H:i A',strtotime($row->updated_at)) : date('d/m/y H:i',strtotime($row->updated_at)) ,
                 'is_me'     => $row->from_user_id == session('bo_id') ? '1' : '',
             ];
+
+            if($row->to_user_id == session('bo_id')){
+                $row->update([
+                    'message_status'    => 'Read',
+                ]);
+            }
         }
 
         $listChat = collect($listChat)->sortBy('id');

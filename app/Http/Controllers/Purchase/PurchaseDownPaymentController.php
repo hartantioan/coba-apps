@@ -580,8 +580,7 @@ class PurchaseDownPaymentController extends Controller
                 }
 
                 CustomHelper::sendApproval('purchase_down_payments',$query->id,$query->note);
-                CustomHelper::sendNotification('purchase_down_payments',$query->id,'Pengajuan AP Down Payment No. '.$query->code,$query->note,session('bo_id'));
-                CustomHelper::addDeposit($query->account_id,$total);
+                CustomHelper::sendNotification('purchase_down_payments',$query->id,'Pengajuan AP Down Payment No. '.$query->code,$query->note,session('bo_id'));                
 
                 activity()
                     ->performedOn(new PurchaseDownPayment())

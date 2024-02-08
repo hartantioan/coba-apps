@@ -1,18 +1,18 @@
 <?php
 
 namespace App\Http\Controllers\Dashboard;
-use App\Models\Attendances;
-use App\Models\EmployeeSchedule;
+
+use App\Helpers\CustomHelper;
 use App\Models\ItemCogs;
 use App\Models\ItemStock;
-use App\Models\PurchaseOrder;
-use App\Models\PurchaseRequest;
-use App\Models\Task;
-use Carbon\Carbon;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Foundation\Validation\ValidatesRequests;
 use App\Http\Controllers\Controller;
+use App\Models\GoodIssue;
+use App\Models\GoodIssueDetail;
+use App\Models\GoodReceipt;
+use App\Models\GoodReceiptDetail;
+use App\Models\GoodReceive;
+use App\Models\GoodReceiveDetail;
+use App\Models\PurchaseDownPayment;
 use App\Models\User;
 
 class DashboardController extends Controller
@@ -29,118 +29,91 @@ class DashboardController extends Controller
         $data = [
             'title'         => 'Dashboard',
             'content'       => 'admin.dashboard.main',
-            'itemcogs'      => ItemCogs::orderByDesc('date')->orderByDesc('id')->get(),
-            'itemstocks'    => ItemStock::all(),
+            /* 'itemcogs'      => ItemCogs::orderByDesc('date')->orderByDesc('id')->get(), */
+            'itemstocks'    => ItemStock::where('qty','>',0)->get(),
             'user'          => $this->user,
-            /* 'pr'        => PurchaseRequest::all(),
-            'pr1'       => PurchaseRequest::find(5),
-            'po'        => PurchaseOrder::find(1), */
         ];
-        $currentMonth = Carbon::now()->month;
-        $currentYear = Carbon::now()->year;
-        if(session('bo_reminder')){
-            $query_reminder = Task::whereIn('id',session('bo_reminder'))->get();
-            if($query_reminder){
-                $data['reminder'] = $query_reminder;
-            }
-        }
-        // Calculate the start and end dates
-        $startDate = Carbon::create($currentYear, $currentMonth - 1, 21);
-        $endDate = Carbon::create($currentYear, $currentMonth, 20);
-        
-        // Retrieve employee schedules and attendances within the date range
-        $schedule = EmployeeSchedule::where('user_id', 1)
-            ->whereBetween('date', [$startDate, $endDate])
-            ->get();
-        
-        $attendance = Attendances::where('employee_no', '123017')
-            ->whereBetween('date', [$startDate, $endDate])
-            ->get();
-
-   
-        $date = $startDate->copy();
-        $attendance_detail=[];
-        $total_telat_masuk=0;
-        $total_telat_keluar=0;
-        $total_absen=0;
-        while ($date->lte($endDate)) {
-            $schedule_otd = null;
-            $attendance_otd=[];
-            foreach($schedule as $row_schedule){
-               
-                if ($date->eq(Carbon::parse($row_schedule->date))) {
-                    
-                    $schedule_otd = $row_schedule;
-                }
-            }
-            foreach($attendance as $row_attendance){
-               
-                if ($date->toDateString() === Carbon::parse($row_attendance->date)->toDateString()) {
-            
-                    $attendance_otd[] = $row_attendance;
-                }
-            }
-            if($schedule_otd){
-     
-                if($attendance_otd){
-                    $exact_in  = 0;
-                    $exact_out = 0;
-                    foreach($attendance_otd as $row_attendance_filter){
-                        
-                        $dateAttd = Carbon::parse($row_attendance_filter->date);
-                        $timePart = $dateAttd->format('H:i:s');
-                        $min_time_in = $schedule_otd->shift->min_time_in;
-                        $time_in = $schedule_otd->shift->time_in;
-                        $max_time_out = $schedule_otd->shift->max_time_out;
-                        $time_out = $schedule_otd->shift->time_out;
-                        if ($timePart >= $min_time_in && $timePart <= $time_in) {
-                            $exact_in = 1 ;  
-                        }
-                    
-                        if ($timePart >= $time_out && $timePart <= $max_time_out) {
-                          
-                            $exact_out = 1 ;
-                              
-                        }
-                    }
-                    $attendance_detail []=[
-                        'date' => Carbon::parse($schedule_otd->date)->format('d/m/Y'),
-                        'in'   => $exact_in,
-                        'out'  => $exact_out,
-                    ];
-                    if($exact_in!=1){
-                        $total_telat_masuk++;
-                    }
-                    if($exact_out!=1){
-                        $total_telat_keluar++;
-                    }
-                    if($exact_in!=1&&$exact_out!=1){
-                        $total_absen++;
-                    }
-                    // hardarti if(t1-t4 tapi exact_in is 1 then it will not be any t1-t4)
-                    //hardarti if(1 hari ada lebih dari 1 shift shift di loop di ambil min time in shift terpertama dan mengambil max timeout shift terakhir)
-                    // jadi apabila ada shift yang berganti hari alangkah baiknya sy mengambil attendance dari database yang memiliki tanggal yang sama
-                }
-            }
-            
-            
-            
-            $date->addDay();
-        }
-        usort($attendance_detail, function ($a, $b) {
-            $dateA = Carbon::createFromFormat('d/m/Y', $a['date'])->timestamp;
-            $dateB = Carbon::createFromFormat('d/m/Y', $b['date'])->timestamp;
-            return $dateB - $dateA;
-        });
-        
-        $data['attendance'] = $attendance_detail;
-        $data['total_absen'] = $total_absen;
-        $data['attendance_count'] = count($attendance_detail)-$total_absen;
-        $data['start_date']= $startDate->format('d/m/Y');
-        $data['end_date']=  $endDate->format('d/m/Y');
-        $data['total_telat_keluar']=$total_telat_keluar;
-        $data['total_telat_masuk']=$total_telat_masuk;
-
+    
         return view('admin.layouts.index', ['data' => $data]);
+
+        /* $gr = GoodReceiptDetail::all();
+        $gi = GoodIssueDetail::all();
+        $grcv = GoodReceiveDetail::all(); */
+
+        /* foreach($gr as $row){
+            $data = ItemStock::where('place_id',$row->place_id)->where('warehouse_id',$row->warehouse_id)->where('item_id',$row->item_id)->first();
+            if($data){
+                $data->update([
+                    'qty' => $data->qty + $row->qty,
+                ]);
+            }else{
+                ItemStock::create([
+                    'place_id'      => $row->place_id,
+                    'warehouse_id'  => $row->warehouse_id,
+                    'item_id'       => $row->item_id,
+                    'qty'           => $row->qty,
+                ]);
+            }
+        } */
+
+        /* foreach($gi as $row){
+            $dataupdate = ItemStock::find($row->item_stock_id);
+            $dataupdate->update([
+                'qty'   => $dataupdate->qty - $row->qty,
+            ]);
+        }
+        
+        foreach($grcv as $row){
+            $dataupdate = ItemStock::where('place_id',$row->place_id)->where('warehouse_id',$row->warehouse_id)->where('item_id',$row->item_id)->first();
+            $dataupdate->update([
+                'qty'   => $dataupdate->qty + $row->qty,
+            ]);
+        } */
+
+        /* $gr = GoodReceipt::all();
+        $gi = GoodIssue::all();
+        $grcv = GoodReceive::all();
+
+        $data = [];
+
+        foreach($gr as $row){
+            $data[] = [
+                'type'          => 'IN',
+                'date'          => $row->post_date,
+                'lookable_type' => $row->getTable(),
+                'lookable_id'   => $row->id,
+            ];
+        }
+
+        foreach($gi as $row){
+            $data[] = [
+                'type'          => 'OUT',
+                'date'          => $row->post_date,
+                'lookable_type' => $row->getTable(),
+                'lookable_id'   => $row->id,
+            ];
+        }
+
+        foreach($grcv as $row){
+            $data[] = [
+                'type'          => 'IN',
+                'date'          => $row->post_date,
+                'lookable_type' => $row->getTable(),
+                'lookable_id'   => $row->id,
+            ];
+        }
+
+        $collection = collect($data)->sortBy(function($item) {
+                        return [$item['date'], $item['type']];
+                    })->values();
+
+        foreach($collection as $row){
+            CustomHelper::sendJournal($row['lookable_type'],$row['lookable_id']);
+        } */
+
+        /* $podp = PurchaseDownPayment::all();
+        foreach($podp as $row){
+            CustomHelper::sendJournal($row->getTable(),$row->id,$row->account_id);
+        } */
     }
 }

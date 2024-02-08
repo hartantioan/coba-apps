@@ -3314,6 +3314,8 @@ class CustomHelper {
 				'nominal_fc'	=> $pdp->currency->type == '1' ? $pdp->grandtotal * $pdp->currency_rate : $pdp->grandtotal,
 			]);
 
+			CustomHelper::addDeposit($account_id,$pdp->total);
+
 		}elseif($table_name == 'employee_transfers'){
 			$transfer = EmployeeTransfer::find($table_id);
 

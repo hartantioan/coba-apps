@@ -3,6 +3,10 @@
     width:50px !important;
   }
   
+  .modal {
+    top:0px !important;
+  }
+
   .chat-application .app-chat .chat-content .chat-content-area .chat-area .chats .chat {
     margin: 0.3rem 0.5rem;
   }
@@ -21,6 +25,23 @@
     color: grey;
     left:10px;
     font-size:0.9rem;
+  }
+
+  .text-bold {
+    font-weight: 800;
+  }
+
+  span.badge.new:after {
+    content: '';
+  }
+
+  #pending-request {
+    min-width: 0%;
+    position:absolute;
+    top:0px;
+    z-index:10;
+    border-radius:5px;
+    right:10px;
   }
 </style>
 <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/app-chat.css') }}">
@@ -77,9 +98,10 @@
                                     <input type="text" placeholder="Search Chat" class="app-filter" id="chat_filter">
                                   </div>
                                   <div class="add-user">
-                                    <a href="javascript:void(0);">
+                                    <a class="modal-trigger" href="#modal1">
                                       <i class="material-icons mr-2 add-user-icon">person_add</i>
                                     </a>
+                                    <span class="new badge green darken-1" id="pending-request">0</span>
                                   </div>
                                 </div>
                                 <!--/ Sidebar Search -->
@@ -128,7 +150,7 @@
                         <div class="chat-area">
                           <div class="chats">
                             <div class="chats" id="chatTarget">
-                              <a class="btn-floating waves-effect waves-light amber darken-4 hide" style="position:fixed;z-index:100;bottom:100px;right:25px;" href="javascript:void(0);" id="scrollToBottom" onclick="scrollToBottom();">
+                              <a class="btn-floating waves-effect waves-light amber darken-4" style="position:fixed;z-index:100;bottom:100px;right:25px;display:none;" href="javascript:void(0);" id="scrollToBottom" onclick="scrollToBottom();">
                                 <i class="material-icons">arrow_downward</i>
                               </a>
                             </div>
@@ -159,6 +181,23 @@
     </div>
   </div>
 </div>
+
+<div id="modal1" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;max-width:100%;min-width:90%;">
+  <div class="modal-content">
+      <div class="row">
+          <div class="col s12">
+              <h5>Tambah Obrolan</h5>
+              <div class="row" id="available-user-list">
+                
+              </div>
+          </div>
+      </div>
+  </div>
+  <div class="modal-footer">
+      <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+  </div>
+</div>
+
 <!-- END: Page Main-->
 <script src="{{ url('app-assets/js/scripts/app-chat.js') }}"></script>
 <script>
@@ -168,12 +207,99 @@
       sync();
     },5000);
 
-    /* $(".chat-area").scrollTop($(".chat-area > .chats").height()); */
     $('.chat-area').scroll(function(){
-      $('#scrollToBottom').removeClass('hide', ($(".chat-area > .chats").height() - $(this).scrollTop()) > 100);
-      /* $('#scrollToBottom').addClass('hide', $(".chat-area > .chats").height() - 74); */
+      if(($(".chat-area > .chats").height() - $(this).scrollTop()) > 540){
+        $('#scrollToBottom').fadeIn();
+      }else{
+        $('#scrollToBottom').fadeOut();
+      }
+    });
+
+    $('#modal1').modal({
+        dismissible: false,
+        onOpenStart: function(modal,trigger) {
+          getListAvailableUser();
+        },
+        onOpenEnd: function(modal, trigger) { 
+            
+        },
+        onCloseEnd: function(modal, trigger){
+          $('#available-user-list').empty();
+        }
     });
   });
+
+  function scrollToBottom(){
+    $(".chat-area").scrollTop($(".chat-area > .chats").height());
+  }
+
+  function action(code,method){
+    $.ajax({
+      url: '{{ Request::url() }}/action',
+      type: 'POST',
+      dataType: 'JSON',
+      data: {
+        code : code,
+        method : method,
+      },
+      headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      },
+      beforeSend: function() {
+        loadingOpen('#modal1');
+      },
+      success: function(response) {
+        loadingClose('#modal1');
+        getListAvailableUser();
+      },
+      error: function() {
+        loadingClose('#modal1');
+      }
+    });
+  }
+
+  function getListAvailableUser(){
+    $.ajax({
+      url: '{{ Request::url() }}/get_available_user',
+      type: 'POST',
+      dataType: 'JSON',
+      data: {
+        
+      },
+      headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      },
+      beforeSend: function() {
+        loadingOpen('#modal1');
+      },
+      success: function(response) {
+        loadingClose('#modal1');
+        $('#available-user-list').empty();
+        $.each(response.data, function(i, val) {
+          let btnConnect = `<a class="waves-effect waves-light btn gradient-45deg-green-teal border-round mt-7 z-depth-4" href="javascript:void(0);" onclick="action('` + val.code + `','connect');">Hubungkan</a>`;
+          let btnDisconnect = `<a class="waves-effect waves-light btn red darken-3 border-round mt-7 z-depth-4" href="javascript:void(0);" onclick="action('` + val.code + `','disconnect');">Putuskan</a>`;
+          let btnApprove = `<a class="waves-effect waves-light btn indigo darken-3 border-round mt-7 z-depth-4" href="javascript:void(0);" onclick="action('` + val.code + `','approve');">Terima</a> <a class="waves-effect waves-light btn orange darken-3 border-round mt-7 z-depth-4 ml-2" href="javascript:void(0);" onclick="action('` + val.code + `','reject');">Tolak</a>`;
+          let btnCancel = `<a class="waves-effect waves-light btn orange darken-3 border-round mt-7 z-depth-4 ml-2" href="javascript:void(0);" onclick="action('` + val.code + `','cancel');">Batalkan</a>`;
+          $('#available-user-list').append(`
+            <div class="col s12 m4 l3 card-width">
+              <div class="card card-border center-align gradient-45deg-purple-deep-orange">
+                <div class="card-content white-text">
+                  <div class="col s12"></div>
+                  <img class="responsive-img circle z-depth-4" width="100" src="` + val.photo + `" alt="" style="height: 50px !important;"/>
+                  <h6 class="white-text mb-1">` + val.name + `</h6>
+                  <p class="m-0">` + val.position + `</p>
+                  ` + (val.status ? (val.status == 'Approved' ? btnDisconnect : (val.is_approval ? btnApprove : btnCancel)) : btnConnect) + `
+                </div>
+              </div>
+            </div>
+          `);
+        });
+      },
+      error: function() {
+        loadingClose('#modal1');
+      }
+    });
+  }
 
   function loadMessage(code){
     $.ajax({
@@ -191,6 +317,9 @@
       },
       success: function(response) {
         loadingClose('.chat-content');
+        $('.chat-user').each(function () {
+          $(this).removeClass('active');
+        });
         if(!$('#chatUser' + code).hasClass('active')){
           $('#chatUser' + code).addClass('active');
         }
@@ -256,14 +385,16 @@
                   </div>
                   <div class="chat-body">
                     <div class="chat-text">
-                      <p>` + val.message + `</p>
-                      <div class="` + (val.is_me ? 'chat-information-right' : 'chat-information-left') + `">` + val.time + `</div>
+                      <p class="` + (!val.is_me ? (val.status == 'Sent' ? 'text-bold' : '') : '') + `">` + val.message + `</p>
+                      <div class="` + (val.is_me ? 'chat-information-right' : 'chat-information-left ') + `">` + val.time + `</div>
                     </div>
                   </div>
                 </div>
               `);
             }
-            /* $(".chat-area").scrollTop($(".chat-area > .chats").height()); */
+            if(($(".chat-area > .chats").height() - $('.chat-area').scrollTop()) <= 540){
+              scrollToBottom();
+            }
           });
         },
         error: function() {
@@ -294,8 +425,10 @@
             },
             success: function(response) {
               loadingClose('.chat-area');
-              
               $('#main-text').val('');
+              if(($(".chat-area > .chats").height() - $('.chat-area').scrollTop()) > 540){
+                scrollToBottom();
+              }
               refreshChat();
             },
           error: function() {
@@ -328,6 +461,7 @@
 
         $('.chat-list').empty();
         $(".no-data-found").removeClass('show');
+        $('#pending-request').text(response.total_pending);
         if(response.data.length > 0){
 
           $.each(response.data, function(i, val) {
@@ -341,7 +475,7 @@
                     </div>
                     <div class="col s10">
                       <p class="m-0 blue-grey-text text-darken-4 font-weight-700" id="nameSource` + val.code + `">` + val.name + `</p>
-                      <p class="m-0 info-text">` + val.last_message + `</p>
+                      <p class="m-0 info-text ` + (val.status == 'Sent' ? 'text-bold' : '') + `">` + val.last_message + `</p>
                     </div>
                   </div>
                 </div>
@@ -369,6 +503,8 @@
           if (!$(".no-data-found").hasClass('show')) {
               $(".no-data-found").addClass('show');
           }
+          $('.chat-content-area').addClass('hide');
+          $('.chat').empty();
         }
       },
       error: function() {

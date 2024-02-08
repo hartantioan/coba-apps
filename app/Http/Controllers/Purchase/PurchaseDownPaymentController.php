@@ -153,7 +153,7 @@ class PurchaseDownPaymentController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = PurchaseDownPayment::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
+        $total_data = PurchaseDownPayment::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */count();
         
         $query_data = PurchaseDownPayment::where(function($query) use ($search, $request) {
                 if($search) {
@@ -219,7 +219,7 @@ class PurchaseDownPaymentController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
             })
-            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+            /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -289,7 +289,7 @@ class PurchaseDownPaymentController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
             })
-            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+            /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
             ->count();
 
         $response['data'] = [];

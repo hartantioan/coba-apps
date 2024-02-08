@@ -37,12 +37,16 @@ class ChatController extends Controller
                         ->where(function($query){
                             $query->where('from_user_id',session('bo_id'))->orWhere('to_user_id',session('bo_id'));
                         })->get();
+        $countPendingRequest = ChatRequest::where('status','Pending')
+                        ->where('to_user_id',session('bo_id'))
+                        ->count();
 
         $listAllRoom = [];
         
         foreach($data as $row){
             $lm = $row->chat()->orderByDesc('id')->first();
             $lastMessage = $lm ? $lm->chat_message : '';
+            $lastStatus = $lm ? $lm->message_status : '';
             $lastTime = $lm ? $lm->getTimeAgo() : '';
             $realLastTime = $lm ? $lm->updated_at : '';
             if($row->from_user_id == session('bo_id')){
@@ -53,6 +57,7 @@ class ChatController extends Controller
                     'last_message'  => $lastMessage ? $lastMessage : 'Tidak ada histori percakapan.',
                     'last_time'     => $lastTime ? $lastTime : '',
                     'real_last_time'=> $realLastTime,
+                    'status'        => $lastStatus,
                 ];
             }
 
@@ -64,15 +69,17 @@ class ChatController extends Controller
                     'last_message'  => $lastMessage ? $lastMessage : 'Tidak ada histori percakapan.',
                     'last_time'     => $lastTime ? $lastTime : '',
                     'real_last_time'=> $realLastTime,
+                    'status'        => $lastStatus,
                 ];
             }
         }
 
-        $collect = collect($listAllRoom)->sortByDesc('real_last_time');
+        $collect = collect($listAllRoom)->sortByDesc('real_last_time')->values();
 
         $response = [
             'status'        => 200,
             'message'       => 'Data successfully loaded.',
+            'total_pending' => $countPendingRequest,
             'data'          => $collect,
         ];
         return response()->json($response);
@@ -106,6 +113,39 @@ class ChatController extends Controller
             'status'        => 200,
             'message'       => 'Data successfully loaded.',
             'data'          => $listChat,
+        ];
+        return response()->json($response);
+    }
+
+    public function getAvailableUser(Request $request)
+    {
+        $data = User::where('status','1')->where('type','1')->where('id','!=',session('bo_id'))->get();
+
+        $list = [];
+
+        foreach($data as $row){
+            $datarequest = ChatRequest::where(function($query)use($row){
+                $query->where('from_user_id',$row->id)->where('to_user_id',session('bo_id'));
+            })
+            ->orWhere(function($query)use($row){
+                $query->where('from_user_id',session('bo_id'))->where('to_user_id',$row->id);
+            })->first();
+
+            $list[] = [
+                'id'            => $row->id,
+                'photo'         => $row->photo(),
+                'position'      => $row->position()->exists() ? (strlen($row->position->name) > 15 ? substr($row->position->name,0,15)."..." : $row->position->name) : '--Kosong--',
+                'name'          => strlen($row->name) > 15 ? substr($row->name,0,15)."..." : $row->name,
+                'code'          => CustomHelper::encrypt($row->employee_no),
+                'status'        => $datarequest ? $datarequest->status : '',
+                'is_approval'   => $datarequest ? ($datarequest->to_user_id == session('bo_id') ? '1' : '' ) : '',
+            ];
+        }
+
+        $response = [
+            'status'        => 200,
+            'message'       => 'Data successfully loaded.',
+            'data'          => $list,
         ];
         return response()->json($response);
     }
@@ -169,6 +209,75 @@ class ChatController extends Controller
                 'message'       => 'Data not found.',
             ];
         }
+        return response()->json($response);
+    }
+
+    public function action(Request $request)
+    {
+
+        if($request->method == 'approve' || $request->method == 'reject'){
+            $data = ChatRequest::where('to_user_id',session('bo_id'))->whereHas('fromUser',function($query)use($request){
+                $query->where('employee_no',CustomHelper::decrypt($request->code));
+            })->first();
+
+            if($data){
+                if($request->method == 'approve'){
+                    $data->update([
+                        'status'    => 'Approved'
+                    ]);
+                }
+                if($request->method == 'reject'){
+                    $data->delete();
+                }
+            }
+        }
+
+        if($request->method == 'cancel'){
+            $data = ChatRequest::where('from_user_id',session('bo_id'))->whereHas('toUser',function($query)use($request){
+                $query->where('employee_no',CustomHelper::decrypt($request->code));
+            })->where('status','Pending')->first();
+
+            if($data){
+                $data->delete();
+            }
+        }
+
+        if($request->method == 'disconnect'){
+            $user = User::where('employee_no',CustomHelper::decrypt($request->code))->first();
+            $data = ChatRequest::where(function($query)use($user){
+                $query->where('from_user_id',session('bo_id'))->where('to_user_id',$user->id);
+            })->orWhere(function($query)use($user){
+                $query->where('from_user_id',$user->id)->where('to_user_id',session('bo_id'));
+            })->first();
+
+            if($data){
+                $data->chat()->delete();
+                $data->delete();
+            }
+        }
+
+        if($request->method == 'connect'){
+            $user = User::where('employee_no',CustomHelper::decrypt($request->code))->first();
+            $data = ChatRequest::where(function($query)use($user){
+                $query->where('from_user_id',session('bo_id'))->where('to_user_id',$user->id);
+            })->orWhere(function($query)use($user){
+                $query->where('from_user_id',$user->id)->where('to_user_id',session('bo_id'));
+            })->first();
+
+            if(!$data){
+                ChatRequest::create([
+                    'code'          => strtoupper(Str::random(25)),
+                    'from_user_id'  => session('bo_id'),
+                    'to_user_id'    => $user->id,
+                    'status'        => 'Pending',
+                ]);
+            }
+        }
+
+        $response = [
+            'status'        => 200,
+            'message'       => 'Data successfully loaded.',
+        ];
         return response()->json($response);
     }
 }

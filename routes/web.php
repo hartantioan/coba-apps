@@ -366,9 +366,11 @@ Route::prefix('admin')->group(function () {
                 Route::prefix('chat')->group(function () {
                     Route::get('/',[ChatController::class, 'index']);
                     Route::post('sync', [ChatController::class, 'sync']);
+                    Route::post('action', [ChatController::class, 'action']);
                     Route::post('send', [ChatController::class, 'send']);
                     Route::post('refresh', [ChatController::class, 'refresh']);
                     Route::post('get_message', [ChatController::class, 'getMessage']);
+                    Route::post('get_available_user', [ChatController::class, 'getAvailableUser']);
                 });
 
                 Route::prefix('task')->group(function () {

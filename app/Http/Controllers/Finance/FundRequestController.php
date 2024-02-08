@@ -107,7 +107,7 @@ class FundRequestController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = FundRequest::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
+        $total_data = FundRequest::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */count();
         
         $query_data = FundRequest::where(function($query) use ($search, $request) {
                 if($search) {
@@ -135,7 +135,7 @@ class FundRequestController extends Controller
                     $query->where('document_status', $request->document);
                 }
             })
-            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+            /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -167,7 +167,7 @@ class FundRequestController extends Controller
                     $query->where('document_status', $request->document);
                 }
             })
-            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+            /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
             ->count();
 
         $response['data'] = [];
@@ -182,7 +182,7 @@ class FundRequestController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->place->code,
-                    $val->department->name,
+                    $val->department()->exists() ? $val->department->name : '',
                     $val->account->name,
                     $val->type(),
                     date('d/m/Y',strtotime($val->post_date)),
@@ -810,7 +810,7 @@ class FundRequestController extends Controller
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->place->code,
-                    $val->department->name,
+                    $val->department()->exists() ? $val->department->name : '',
                     $val->account->name,
                     $val->type(),
                     date('d/m/Y',strtotime($val->post_date)),

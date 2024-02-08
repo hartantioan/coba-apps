@@ -58,6 +58,7 @@ use App\Models\LandedCost;
 use App\Models\ItemCogs;
 use App\Models\ItemShading;
 use App\Models\ItemStock;
+use App\Models\MaterialRequest;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseRequest;
 use App\Models\UsedData;
@@ -542,6 +543,14 @@ class CustomHelper {
 				'status'	=> '2'
 			]);
 
+			#lek misal g ada approval
+			if($table_name == 'material_requests'){
+				$mr = MaterialRequest::find($table_id);
+				$mr->materialRequestDetail()->update([
+					'status'	=> '1'
+				]);
+			}
+
 			if(isset($data->account_id)){
 				self::sendJournal($table_name,$table_id,$data->account_id);
 			}else{
@@ -765,6 +774,8 @@ class CustomHelper {
 			}
 			
 		}elseif($table_name == 'material_requests'){
+
+
 			
 		}elseif($table_name == 'leave_requests'){
 			$lr = LeaveRequest::find($table_id);

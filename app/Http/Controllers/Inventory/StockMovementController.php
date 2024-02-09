@@ -106,6 +106,6 @@ class StockMovementController extends Controller
         $start_date = $request->start_date ? $request->start_date:'';
         $finish_date = $request->finish_date ? $request->finish_date:'';
 
-		return Excel::download(new ExportStockMovement($plant,$item,$start_date,$finish_date), 'stock_in_rupiah'.uniqid().'.xlsx');
+		return Excel::download(new ExportStockMovement($plant,$item,$start_date,$finish_date), 'stock_movement'.uniqid().'.xlsx');
     }
 }

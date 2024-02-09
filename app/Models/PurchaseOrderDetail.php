@@ -159,7 +159,7 @@ class PurchaseOrderDetail extends Model
     }
 
     public function discountHeader(){
-        $bobot = $this->subtotal / $this->purchaseOrder->subtotal;
+        $bobot = $this->purchaseOrder->subtotal > 0 ? $this->subtotal / $this->purchaseOrder->subtotal : 0;
         return $bobot * $this->purchaseOrder->discount;
     }
 

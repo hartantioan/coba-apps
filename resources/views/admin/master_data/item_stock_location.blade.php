@@ -49,7 +49,7 @@
                                             <select class="browser-default" id="warehouse_id" name="warehouse_id">
                                                 <option value="">--Pilih--</option>
                                                 @foreach ($warehouse as $rowwarehouse)
-                                                    <option value="{{ $rowwarehouse->id }}">{{ $rowwarehouse->code }}</option>
+                                                    <option value="{{ $rowwarehouse->id }}">{{ $rowwarehouse->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -192,7 +192,7 @@
                                 <tr>
                                     <td class="center-align">`+(i+1)+`</td>
                                     <td >`+val.item+`</td>
-                                    <td >`+val.stock+`</td>
+                                    <td class="right-align">`+val.stock+`</td>
                                     <td >`+val.plant+`</td>
                                     <td >`+val.gudang+`</td>
                                     <td >`+val.area+`</td>

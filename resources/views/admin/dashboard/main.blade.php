@@ -53,8 +53,8 @@
                                                         <td class="center-align">{{ $row->area()->exists() ? $row->area->name : '-' }}</td>
                                                         <td class="center-align">{{ $row->itemShading()->exists() ? $row->itemShading->code : '-' }}</td>
                                                         <td class="center-align">{{ number_format($row->qty,3,',','.').' '.$row->item->uomUnit->code }}</td>
-                                                        <td class="center-align">{{ number_format($row->totalUndeliveredItem(),3,',','.').' '.$row->item->uomUnit->code }}</td>
-                                                        <td class="right-align">{{ number_format($row->valueNow(),3,',','.') }}</td>
+                                                        <td class="center-align">{{ number_format($row->totalUndeliveredItem(),2,',','.').' '.$row->item->uomUnit->code }}</td>
+                                                        <td class="right-align">{{ number_format($row->valueNow(),2,',','.') }}</td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>

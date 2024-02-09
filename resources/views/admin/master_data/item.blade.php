@@ -706,6 +706,7 @@
                     </tr>
                 `);
                 $('.unit-inputs').css('pointer-events','auto');
+                $("#item_group_id").val($("#item_group_id option:first").val()).trigger('change');
             }
         });
 

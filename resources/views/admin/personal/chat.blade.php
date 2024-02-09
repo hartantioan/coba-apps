@@ -82,7 +82,7 @@
                                     </div>
                                     <div class="col s10">
                                       <p class="m-0 blue-grey-text text-darken-4 font-weight-700">{{ $data_user->name }}</p>
-                                      <p class="m-0 info-text">Apple pie bonbon cheesecake tiramisu</p>
+                                      <p class="m-0 info-text">-</p>
                                     </div>
                                   </div>
                                   <span class="option-icon">

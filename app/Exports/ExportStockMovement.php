@@ -36,29 +36,51 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                     $query->where('id',$this->item);
                 });
             }
-            if($this->plant){
+            if($this->plant != 'all'){
                 $query->whereHas('place',function($query){
                     $query->where('id',$this->plant);
                 });
             }
             
         })
-        ->orderBy('date','ASC')
-        ->orderBy('id','ASC')
+        ->orderBy('item_id')
+        ->orderBy('date')
+        ->orderBy('type')
         ->get();
         
-        $array_filter = [];
+        $previousId = null; // Initialize the previous ID variable
+        $cum_qty = 0;
+        $cum_val = 0 ;
         $firstDate = null;
         $array_filter=[];
         $uom_unit = null;
 
         foreach($query_data as $row){
+            if ($previousId !== null && $row->item_id !== $previousId) {
+                $cum_qty = 0; // Reset the count when the ID changes
+                $cum_val = 0;
+            }
+            if($row->type=='IN'){
+                $cum_qty+=$row->qty_final;
+                $cum_val+=$row->total_final;
+            }else{
+                $cum_qty-=$row->qty_final;
+                $cum_val-=$row->total_final;
+            }
+            
             $data_tempura = [
-                'keterangan' => $row->lookable->code.'-'.$row->lookable->note,
+                'plant' => $row->place->code,
+                'warehouse' => $row->warehouse->code,
+                'item' => $row->item->name,
+                'satuan' => $row->item->uomUnit->code,
+                'kode' => $row->item->code,
+                'final'=>number_format($row->price_final,2,',','.'),
+                'total'=>number_format($cum_val,2,',','.'),
+                'qty'=>number_format($cum_qty,3,',','.'),
                 'date' =>  date('d/m/Y',strtotime($row->date)),
-                'masuk'=> number_format($row->qty_in,3,',','.') ?? '-',
-                'keluar'=>number_format($row->qty_out,3,',','.') ?? '-',
-                'final'=>number_format($row->qty_final,3,',','.'),
+                'document' => $row->lookable->code,
+                'cum_qty' => number_format($row->qty_final,3,',','.'),
+                'cum_val' => number_format($row->total_final,2,',','.'),
             ];
             $array_filter[]=$data_tempura;
             if ($firstDate === null) {
@@ -73,7 +95,7 @@ class ExportStockMovement implements FromView,ShouldAutoSize
             $query_first = ItemCogs::where('date', '<', $firstDate)
             ->where('item_id',$this->item)
             ->where('place_id',$this->plant)
-            ->orderBy('date', 'desc')
+            
             ->first();
             if($query_first){
                 $last_nominal=number_format($query_first->qty_final,3,',','.');

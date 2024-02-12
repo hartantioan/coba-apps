@@ -22,7 +22,8 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Item;
 use App\Models\Unit;
 use App\Models\ItemGroup;
-
+use App\Models\ItemStock;
+use App\Models\Place;
 use App\Models\Warehouse;
 use Illuminate\Support\Facades\DB;
 use App\Imports\ImportItem;
@@ -31,9 +32,18 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportItem;
 use App\Imports\ImportItemMaster;
 use App\Models\ItemUnit;
+use App\Models\User;
 
 class ItemController extends Controller
 {
+    protected $dataplaces,$dataplacecode, $datawarehouses;
+    public function __construct(){
+        $user = User::find(session('bo_id'));
+
+        $this->dataplaces = $user ? $user->userPlaceArray() : [];
+        $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
+        $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
+    }
     public function index()
     {
         
@@ -62,9 +72,12 @@ class ItemController extends Controller
         $data = [
             'title'     => 'Item',
             'content'   => 'admin.master_data.item',
-            'group'     => ItemGroup::where('status','1')->get(),
+            'group'     =>  ItemGroup::whereHas('itemGroupWarehouse',function($query){
+                                $query->whereIn('warehouse_id',$this->datawarehouses);
+                            })->get(),
             'unit'      => Unit::where('status','1')->get(),
-            'warehouse' => Warehouse::where('status','1')->get(),
+            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+            'warehouse'     => Warehouse::where('status','1')->whereIn('id',$this->datawarehouses)->get(),
             'pallet'    => Pallet::where('status','1')->get(),
             'itemex'    => $result,
             'itemsh'    => $result1,
@@ -87,7 +100,7 @@ class ItemController extends Controller
         $order  = $column[$request->input('order.0.column')];
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
-
+      
         $total_data = Item::count();
         
         $query_data = Item::where(function($query) use ($search, $request) {
@@ -129,6 +142,12 @@ class ItemController extends Controller
                         }
                     });
                 }
+
+                if($request->group){
+                    $query->where(function($query) use ($request){
+                        $query->whereIn('item_group_id', $request->group);
+                    });
+                }
             })
             ->offset($start)
             ->limit($length)
@@ -163,6 +182,11 @@ class ItemController extends Controller
                                 $query->OrWhereNotNull('is_service');
                             }
                         }
+                    });
+                }
+                if($request->group){
+                    $query->where(function($query) use ($request){
+                        $query->whereIn('item_group_id', $request->group);
                     });
                 }
             })
@@ -319,6 +343,20 @@ class ItemController extends Controller
 			}
 			
 			if($query) {
+
+                $place = Place::where('status','1')->get();
+                
+
+                foreach($place as $row_place){
+                    foreach($query->itemGroup->itemGroupWarehouse as $rowwarehouse){
+                        ItemStock::create([
+                            'place_id'      => $row_place->id,
+                            'warehouse_id'  => $rowwarehouse->warehouse_id,
+                            'item_id'       => $query->id,
+                            'qty'           => 0
+                        ]);
+                    }
+                }
 
                 if($request->arr_unit){
                     foreach($request->arr_unit as $key => $row){
@@ -600,8 +638,9 @@ class ItemController extends Controller
 
     public function destroy(Request $request){
         $query = Item::find($request->id);
-		
+
         if($query->delete()) {
+            $query->itemStock()->delete();
             activity()
                 ->performedOn(new Item())
                 ->causedBy(session('bo_id'))
@@ -783,8 +822,9 @@ class ItemController extends Controller
         $search = $request->search ? $request->search : '';
         $status = $request->status ? $request->status : '';
         $type = $request->type ? $request->type : '';
+        $group = $request->group ? $request->group : '';
 		
-		return Excel::download(new ExportItem($search,$status,$type), 'item_'.uniqid().'.xlsx');
+		return Excel::download(new ExportItem($search,$status,$type,$group), 'item_'.uniqid().'.xlsx');
     }
 
     public function import(Request $request)

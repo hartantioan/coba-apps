@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('reception_hardware_items_usages', function (Blueprint $table) {
-            //
+            $table->bigInteger('delete_id')->nullable()->after('void_date');
+            $table->string('delete_note')->nullable()->after('delete_id');
         });
     }
 

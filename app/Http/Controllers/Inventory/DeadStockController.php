@@ -33,9 +33,12 @@ class DeadStockController extends Controller
             $query->selectRaw('MAX(id)')
                 ->from('item_cogs')
                 ->where('date', '<=', $request->date)
-                ->where('place_id',$request->plant)
                 ->where('warehouse_id',$request->warehouse)
                 ->groupBy('item_id');
+
+            if($request->plant != 'all'){
+                $query->where('plant_id',$request->plant);
+            }
         })
         ->get();
         $array_filter=[];
@@ -45,14 +48,17 @@ class DeadStockController extends Controller
             $date = Carbon::parse($row->date);
             $dateDifference = $date->diffInDays($request->date);
                
-                if ($dateDifference >= $request->hari) {
+                // if ($dateDifference >= $request->hari) {
                     $array_filter[]=[
+                        'plant'=>$row->plant->code,
+                        'gudang'=>$row->warehouse->code,
+                        'kode'=>$row->item->code,
                         'item'=>$row->item->name,
                         'keterangan'=>$row->lookable->code.'-'.$row->lookable->name,
                         'date'=>$row->date,
                         'lamahari'=>$dateDifference,
                     ];
-                }
+                // }
                       
         }
         $end_time = microtime(true);

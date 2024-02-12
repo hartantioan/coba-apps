@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('request_repair_hardware_items_usage_id', function (Blueprint $table) {
-            //
+            $table->bigInteger('delete_id')->nullable()->after('void_date');
+            $table->string('delete_note')->nullable()->after('delete_id');
         });
     }
 

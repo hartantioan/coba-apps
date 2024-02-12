@@ -34,6 +34,7 @@
                                     <div class="row">
                                         <div class="input-field col m3 s12">
                                             <select class="form-control" id="plant" name="plant">
+                                                <option value="all">Semua</option>
                                                 @foreach ($place as $row)
                                                     <option value="{{ $row->id }}">{{ $row->code }}</option>
                                                 @endforeach
@@ -49,8 +50,7 @@
                                             <label class="" for="warehouse">WareHouse</label>
                                         </div>
                                         <div class="input-field col m3 s12">
-                                            <input id="hari" name="hari" type="number">
-                                            <label class="active" for="hari">Jumlah Hari</label>
+                                           
                                         </div>
                                         <div class="input-field col m3 s12">
                                             <input id="date" name="date"  type="date" max="{{ date('9999'.'-12-31') }}" placeholder="" value="{{ date('Y-m-d') }}">
@@ -72,7 +72,10 @@
                         <thead>
                             <tr>
                                 <th class="center-align">No.</th>
-                                <th class="center-align">Item</th>
+                                <th class="center-align">Plant</th>
+                                <th class="center-align">Gudang</th>
+                                <th class="center-align">Kode Item</th>
+                                <th class="center-align">Nama Item</th>
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Tgl Terakhir</th>
                                 <th class="center-align">Lama Hari</th>
@@ -119,6 +122,9 @@
                             $('#table_body').append(`
                                 <tr>
                                     <td class="center-align">`+(i+1)+`</td>
+                                    <td >`+val.plant+`</td>
+                                    <td >`+val.gudang+`</td>
+                                    <td >`+val.kode+`</td>
                                     <td >`+val.item+`</td>
                                     <td >`+val.keterangan+`</td>
                                     <td >`+val.date+`</td>

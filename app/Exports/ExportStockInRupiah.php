@@ -49,19 +49,45 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                     $query->where('id',$this->warehouse);
                 });
             }
-        })->get();
+        })
+        ->orderBy('item_id')
+        ->orderBy('date')
+        ->orderBy('type')
+        ->get();
         
-        $array_filter = [];
+        $previousId = null; // Initialize the previous ID variable
+        $cum_qty = 0;
+        $cum_val = 0 ;
         $array_filter=[];
         foreach($query_data as $row){
+            if ($previousId !== null && $row->item_id !== $previousId) {
+                $cum_qty = 0; // Reset the count when the ID changes
+                $cum_val = 0;
+            }
+            if($row->type=='IN'){
+                $cum_qty+=$row->qty_final;
+                $cum_val+=$row->total_final;
+            }else{
+                $cum_qty-=$row->qty_final;
+                $cum_val-=$row->total_final;
+            }
+            
             $data_tempura = [
-                'item' => $row->item->code.'-'.$row->item->name,
+                'plant' => $row->place->code,
+                'warehouse' => $row->warehouse->code,
+                'item' => $row->item->name,
+                'satuan' => $row->item->uomUnit->code,
+                'kode' => $row->item->code,
                 'final'=>number_format($row->price_final,2,',','.'),
                 'totalfinal'=>number_format($row->total_final,2,',','.'),
                 'qtyfinal'=>number_format($row->qty_final,3,',','.'),
                 'date' =>  date('d/m/Y',strtotime($row->date)),
+                'document' => $row->lookable->code,
+                'cum_qty' => number_format($cum_qty,3,',','.'),
+                'cum_val' => number_format($cum_val,2,',','.'),
             ];
             $array_filter[]=$data_tempura;
+            $previousId = $row->item_id;
         }
         return view('admin.exports.stock_in_rupiah', [
             'data' => $array_filter,

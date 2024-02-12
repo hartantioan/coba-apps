@@ -194,7 +194,7 @@
                         <th class="center" rowspan="2">Plant</th>
                         <th class="center" rowspan="2">Line</th>
                         <th class="center" rowspan="2">Mesin</th>
-                        <th class="center" rowspan="2">Departemen</th>
+                        <th class="center" rowspan="2">Divisi</th>
                         <th class="center" rowspan="2">Proyek</th>
                         <th class="center" rowspan="2">Keterangan 1</th>
                         <th class="center" rowspan="2">Keterangan 2</th>

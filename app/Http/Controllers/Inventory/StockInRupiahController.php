@@ -53,18 +53,41 @@ class StockInRupiahController extends Controller
                     $query->where('id',$request->warehouse);
                 });
             }
-        })->get();
-        
+        })
+        ->orderBy('item_id')
+        ->orderBy('date')
+        ->orderBy('type')
+        ->get();
+      
+        $cum_qty = 0;
+        $cum_val = 0 ;
         $array_filter=[];
         foreach($query_data as $row){
+           
+            if($row->type=='IN'){
+                $cum_qty=$row->qty_in;
+                $cum_val=$row->total_in;
+            }else{
+                $cum_qty=$row->qty_out;
+                $cum_val=$row->total_out;
+            }
+            
             $data_tempura = [
-                'item' => $row->item->code.'-'.$row->item->name,
+                'plant' => $row->place->code,
+                'warehouse' => $row->warehouse->code,
+                'item' => $row->item->name,
+                'satuan' => $row->item->uomUnit->code,
+                'kode' => $row->item->code,
                 'final'=>number_format($row->price_final,2,',','.'),
-                'totalfinal'=>number_format($row->total_final,2,',','.'),
-                'qtyfinal'=>number_format($row->qty_final,3,',','.'),
+                'total'=>number_format($cum_val,2,',','.'),
+                'qty'=>number_format($cum_qty,3,',','.'),
                 'date' =>  date('d/m/Y',strtotime($row->date)),
+                'document' => $row->lookable->code,
+                'cum_qty' => number_format($row->qty_final,3,',','.'),
+                'cum_val' => number_format($row->total_final,2,',','.'),
             ];
             $array_filter[]=$data_tempura;
+            $previousId = $row->item_id;
         }
         $end_time = microtime(true);
   

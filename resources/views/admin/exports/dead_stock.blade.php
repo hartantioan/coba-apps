@@ -2,7 +2,10 @@
     <thead>
         <tr align="center">
             <th class="center-align">No.</th>
-            <th class="center-align">Item</th>
+            <th class="center-align">Plant</th>
+            <th class="center-align">Gudang</th>
+            <th class="center-align">Kode Item</th>
+            <th class="center-align">Nama Item</th>
             <th class="center-align">Keterangan</th>
             <th class="center-align">Tgl Terakhir</th>
             <th class="center-align">Lama Hari</th> 
@@ -12,6 +15,9 @@
         @foreach($data as $key => $row)
         <tr>
             <td align="center">{{$key+1}}</td>
+            <td align="center">{{$row['plant']}}</td>
+            <td align="center">{{$row['gudang']}}</td>
+            <td align="center">{{$row['kode']}}</td>
             <td align="center">{{$row['item']}}</td>
             <td align="center">{{$row['keterangan']}}</td>
             <td align="center">{{$row['date']}}</td>

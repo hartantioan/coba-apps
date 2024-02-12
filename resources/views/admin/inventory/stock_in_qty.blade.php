@@ -76,7 +76,10 @@
                         <thead>
                             <tr>
                                 <th class="center-align">No.</th>
-                                <th class="center-align">Item</th>
+                                <th class="center-align">Plant.</th>
+                                <th class="center-align">Gudang</th>
+                                <th class="center-align">Kode Item</th>
+                                <th class="center-align">Nama Item</th>
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
                             </tr>
@@ -131,6 +134,9 @@
                             $('#table_body').append(`
                                 <tr>
                                     <td class="center-align">`+(i+1)+`</td>
+                                    <td >`+val.plant+`</td>
+                                    <td >`+val.gudang+`</td>
+                                    <td >`+val.kode+`</td>
                                     <td >`+val.item+`</td>
                                     <td >`+val.final+`</td>
                                     <td >`+val.satuan+`</td>

@@ -13,6 +13,7 @@ class ExportDeadStock implements FromView,ShouldAutoSize
     /**
     * @return \Illuminate\Support\Collection
     */
+    protected $plant,$warehouse,$hari,$date;
     public function __construct(string $plant, string $warehouse,string $hari,string $date)
     {
         $this->plant = $plant ? $plant : '';
@@ -39,6 +40,9 @@ class ExportDeadStock implements FromView,ShouldAutoSize
                
                 if ($dateDifference >= intval($this->hari)) {
                     $array_filter[]=[
+                        'plant'=>$row->plant->code,
+                        'gudang'=>$row->warehouse->code,
+                        'kode'=>$row->item->code,
                         'item'=>$row->item->name,
                         'keterangan'=>$row->lookable->code.'-'.$row->lookable->name,
                         'date'=>date('d/m/Y',strtotime($row->date)),

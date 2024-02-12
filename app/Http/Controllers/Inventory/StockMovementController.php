@@ -38,34 +38,50 @@ class StockMovementController extends Controller
             } else if($request->finish_date) {
                 $query->whereDate('date','<=', $request->finish_date);
             }
-            if($request->item) {
+            if($request->item_id) {
                 $query->whereHas('item',function($query) use($request){
-                    $query->where('id',$request->item);
+                    $query->where('id',$request->item_id);
                 });
             }
-            if($request->plant){
+            if($request->plant != 'all'){
                 $query->whereHas('place',function($query) use($request){
                     $query->where('id',$request->plant);
                 });
             }
-            
         })
-        ->orderBy('date','ASC')
-        ->orderBy('id','ASC')
+        ->orderBy('item_id')
+        
         ->get();
-        
-        
+       // Initialize the previous ID variable
+        $cum_qty = 0;
+        $cum_val = 0 ;
         $firstDate = null;
         $array_filter=[];
         $uom_unit = null;
 
         foreach($query_data as $row){
+            
+            if($row->type=='IN'){
+                $cum_qty=$row->qty_in;
+                $cum_val=$row->total_in;
+            }else{
+                $cum_qty=$row->qty_out;
+                $cum_val=$row->total_out;
+            }
+            
             $data_tempura = [
-                'keterangan' => $row->lookable->code.'-'.$row->lookable->note,
+                'plant' => $row->place->code,
+                'warehouse' => $row->warehouse->code,
+                'item' => $row->item->name,
+                'satuan' => $row->item->uomUnit->code,
+                'kode' => $row->item->code,
+                'final'=>number_format($row->price_final,2,',','.'),
+                'total'=>number_format($cum_val,2,',','.'),
+                'qty'=>number_format($cum_qty,3,',','.'),
                 'date' =>  date('d/m/Y',strtotime($row->date)),
-                'masuk'=> number_format($row->qty_in,3,',','.') ?? '-',
-                'keluar'=>number_format($row->qty_out,3,',','.') ?? '-',
-                'final'=>number_format($row->qty_final,3,',','.'),
+                'document' => $row->lookable->code,
+                'cum_qty' => number_format($row->qty_final,3,',','.'),
+                'cum_val' => number_format($row->total_final,2,',','.'),
             ];
             $array_filter[]=$data_tempura;
             if ($firstDate === null) {
@@ -80,7 +96,7 @@ class StockMovementController extends Controller
             $query_first = ItemCogs::where('date', '<', $firstDate)
             ->where('item_id',$request->item)
             ->where('place_id',$request->plant)
-            ->orderBy('date', 'desc')
+         
             ->first();
             if($query_first){
                 $last_nominal=number_format($query_first->qty_final,3,',','.');
@@ -88,7 +104,6 @@ class StockMovementController extends Controller
             
         }
         $end_time = microtime(true);
-  
         $execution_time = ($end_time - $start_time);
         $response =[
             'status'=>200,

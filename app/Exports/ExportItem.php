@@ -14,13 +14,14 @@ class ExportItem implements FromCollection, WithTitle, WithHeadings, WithCustomS
     * @return \Illuminate\Support\Collection
     */
 
-    protected $search, $status, $type;
+    protected $search, $status, $type , $group;
 
-    public function __construct(string $search, string $status, string $type)
+    public function __construct(string $search, string $status, string $type, string $group)
     {
         $this->search = $search ? $search : '';
 		$this->status = $status ? $status : '';
         $this->type = $type ? $type : '';
+        $this->group = $group ? $group : '';
     }
 
     private $headings = [
@@ -75,6 +76,13 @@ class ExportItem implements FromCollection, WithTitle, WithHeadings, WithCustomS
                             $query->OrWhereNotNull('is_service');
                         }
                     }
+                });
+            }
+            if($this->group){
+                $groupIds = explode(',', $this->group);
+
+                $query->where(function ($query) use ($groupIds) {
+                    $query->whereIn('item_group_id', $groupIds);
                 });
             }
         })->get();

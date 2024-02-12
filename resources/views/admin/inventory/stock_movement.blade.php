@@ -74,11 +74,15 @@
                         <thead>
                             <tr>
                                 <th class="center-align">No.</th>
-                                <th class="center-align">Keterangan</th>
-                                <th class="center-align">Tanggal</th>
-                                <th class="center-align">Masuk <div class="uomunit"></div></th>
-                                <th class="center-align">Keluar <div class="uomunit"></div></th>
-                                <th class="center-align">Saldo <div class="uomunit"></div></th>
+                                <th class="center-align">Tanggal.</th>
+                                <th class="center-align">Plant.</th>
+                                <th class="center-align">Gudang.</th>
+                                <th class="center-align">Kode Item</th>
+                                <th class="center-align">Nama Item</th>
+                                <th class="center-align">Satuan</th>
+                                <th class="center-align">No Dokumen</th>
+                                <th class="center-align">Mutasi</th>
+                                <th class="center-align">Balance</th>
                             </tr>
                         </thead>
                         <tbody id="movement_body">
@@ -146,11 +150,15 @@
                             $('#movement_body').append(`
                                 <tr>
                                     <td class="center-align">`+(i+1)+`</td>
-                                    <td >`+val.keterangan+`</td>
                                     <td >`+val.date+`</td>
-                                    <td class="right-align">`+val.masuk+`</td>
-                                    <td class="right-align">`+val.keluar+`</td>
-                                    <td class="right-align">`+val.final+`</td>
+                                    <td >`+val.plant+`</td>
+                                    <td >`+val.warehouse+`</td>
+                                    <td >`+val.kode+`</td>
+                                    <td >`+val.item+`</td>
+                                    <td >`+val.satuan+`</td>
+                                    <td class="right-align">`+val.document+`</td>
+                                    <td class="right-align">`+val.qty+`</td>
+                                    <td class="right-align">`+val.cum_qty+`</td>
                                 </tr>
                             `);
                         });

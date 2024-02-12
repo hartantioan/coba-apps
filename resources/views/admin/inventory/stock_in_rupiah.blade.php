@@ -84,11 +84,18 @@
                         <thead>
                             <tr>
                                 <th class="center-align">No.</th>
-                                <th class="center-align">Item</th>
-                                <th class="center-align">date</th>
-                                <th class="center-align">Harga Pokok Penjualan</th>
-                                <th class="center-align">Qty Final</th>
-                                <th class="center-align">Total Harga Final</th>
+                                <th class="center-align">Tanggal</th>
+                                <th class="center-align">Plant</th>
+                                <th class="center-align">Gudang</th>
+                                <th class="center-align">Kode</th>
+                                <th class="center-align">Nama Item</th>
+                                <th class="center-align">Satuan</th>
+                                <th class="center-align">No. Dokumen</th>
+                                <th class="center-align">Qty</th>
+                                <th class="center-align">Harga </th>
+                                <th class="center-align">Total</th>
+                                <th class="center-align">Cumulative Qty.</th>
+                                <th class="center-align">Cumulative Value</th>
                             </tr>
                         </thead>
                         <tbody id="table_body">
@@ -139,11 +146,18 @@
                             $('#table_body').append(`
                                 <tr>
                                     <td class="center-align">`+(i+1)+`</td>
-                                    <td >`+val.item+`</td>
                                     <td >`+val.date+`</td>
+                                    <td >`+val.plant+`</td>
+                                    <td >`+val.warehouse+`</td>
+                                    <td >`+val.kode+`</td>
+                                    <td >`+val.item+`</td>
+                                    <td >`+val.satuan+`</td>
+                                    <td >`+val.document+`</td>
+                                    <td class="right-align">`+val.qty+`</td>
                                     <td class="right-align">`+val.final+`</td>
-                                    <td class="right-align">`+val.qtyfinal+`</td>
-                                    <td class="right-align">`+val.totalfinal+`</td>
+                                    <td class="right-align">`+val.total+`</td>
+                                    <td class="right-align">`+val.cum_qty+`</td>
+                                    <td class="right-align">`+val.cum_val+`</td>
                                 </tr>
                             `);
                         });

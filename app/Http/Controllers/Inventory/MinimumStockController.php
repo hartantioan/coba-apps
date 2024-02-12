@@ -12,17 +12,31 @@ use Maatwebsite\Excel\Facades\Excel;
 
 use App\Exports\ExportMinimumStock;
 use App\Models\Item;
+use App\Models\ItemGroup;
+use App\Models\User;
 
 class MinimumStockController extends Controller
 {
+
+    protected $dataplaces,$dataplacecode, $datawarehouses;
+    public function __construct(){
+        $user = User::find(session('bo_id'));
+
+        $this->dataplaces = $user ? $user->userPlaceArray() : [];
+        $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
+        $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
+    }
     public function index(Request $request)
     {
         
         $data = [
             'title'     => 'Stok item Yang Minim',
             'content'   => 'admin.inventory.minimum_stock',
-            'place'     =>  Place::where('status','1')->get(),
-            'warehouse' =>  Warehouse::where('status',1)->get()
+            'group'     =>  ItemGroup::whereHas('itemGroupWarehouse',function($query){
+                $query->whereIn('warehouse_id',$this->datawarehouses);
+            })->get(),
+            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+            'warehouse'     => Warehouse::where('status','1')->whereIn('id',$this->datawarehouses)->get(),
         ];
         
         return view('admin.layouts.index', ['data' => $data]);
@@ -31,37 +45,53 @@ class MinimumStockController extends Controller
 
     public function filter(Request $request){
         $start_time = microtime(true);
-        info($request);
-        $query_data = Item::where(function($querys) use ( $request) {
-            if($request->item_id){
-                $querys->where('id',$request->item_id);
-            }
+        
+        // $query_data = Item::where(function($querys) use ( $request) {
+        //     if($request->item_id){
+        //         $querys->where('id',$request->item_id);
+        //     }
     
+        // })
+        // ->get();
+       
+        $query_data = ItemStock::where(function($querys) use ( $request) {
+            if($request->item_group_id[0]){
+                
+                $querys->whereHas('item', function ($query) use ($request) {
+                    $query->whereIn('item_group_id', $request->item_group_id);
+                });
+            }
+            if($request->item_id != 'null'){
+           
+                $querys->where('item_id',$request->item_id);
+            }
+            if($request->warehouse != 'all'){
+                $querys->where('warehouse_id',$request->warehouse);
+            }
+            if($request->plant != 'all'){
+                $querys->where('place_id',$request->plant);
+            }
         })
         ->get();
-        
+        info($query_data);
         $array_filter=[];
         
         foreach($query_data as $row){
-            if($row->itemStock()->exists()){
-                $perlu = 1;
-                $qty = $row->getStockAll();
-            }
-            else{
-                $qty = 0;
-                $perlu = 0;
-            }
+            info($row->warehouse);
             $data_tempura = [
-                'item_id' => CustomHelper::encrypt($row->code),
-                'item' => $row->code.'-'.$row->name,
-                'minimum'=>number_format($row->min_stock),
-                'needed'=>number_format($row->min_stock-$qty),
-                'maximum'=>number_format($row->max_stock),
-                'final'=>number_format($qty,3,',','.'),
-                'satuan'=>$row->uomUnit->code,
-                'perlu' =>$perlu,
+                'item_id' => CustomHelper::encrypt($row->item->code),
+                'plant' => $row->place->code,
+                'gudang' => $row->warehouse->name ?? '',
+                'kode' => $row->item->code,
+                'item' => $row->item->name,
+                'minimum'=>number_format($row->item->min_stock),
+                'needed'=>number_format($row->item->min_stock-$row->qty),
+                'maximum'=>number_format($row->item->max_stock),
+                'final'=>number_format($row->qty,3,',','.'),
+                'satuan'=>$row->item->uomUnit->code,
+                'perlu' =>1,
             ];
-            if($qty < $row->min_stock){
+            if($row->qty < $row->item->min_stock){
                 $array_filter[]=$data_tempura;
             }
             
@@ -78,9 +108,11 @@ class MinimumStockController extends Controller
     }
     public function export(Request $request){
 		$item_id = $request->item_id ? $request->item_id:'';
-       
+        $plant = $request->plant ? $request->plant:'';
+        $warehouse = $request->warehouse ? $request->warehouse:'';
+        $item_group_id = $request->item_group_id ? $request->item_group_id:'';
       
-		return Excel::download(new ExportMinimumStock($item_id), 'minimum_stock'.uniqid().'.xlsx');
+		return Excel::download(new ExportMinimumStock($item_id,$warehouse,$plant,$item_group_id), 'minimum_stock'.uniqid().'.xlsx');
     }
 
     public function showDetail(Request $request){

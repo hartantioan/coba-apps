@@ -3,6 +3,7 @@
 <!-- BEGIN: Head-->
 
 <head>
+    
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
@@ -25,6 +26,7 @@
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/chartist-js/chartist.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/chartist-js/chartist-plugin-tooltip.css') }}">
 	<link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/flag-icon/css/flag-icon.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/app-todo.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/data-tables/css/jquery.dataTables.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/data-tables/extensions/responsive/css/responsive.dataTables.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/data-tables/css/select.dataTables.min.css') }}">

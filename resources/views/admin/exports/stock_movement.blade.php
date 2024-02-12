@@ -2,26 +2,34 @@
     <thead>
         <tr align="center">
             <th class="center-align">No.</th>
-            <th class="center-align">Keterangan</th>
-            <th class="center-align">Tanggal</th>
-            <th class="center-align">Masuk {{$uomunit}}</th>
-            <th class="center-align">Keluar {{$uomunit}}</th>
-            <th class="center-align">Saldo {{$uomunit}}</th>
+            <th class="center-align">Tanggal.</th>
+            <th class="center-align">Plant.</th>
+            <th class="center-align">Gudang.</th>
+            <th class="center-align">Kode Item</th>
+            <th class="center-align">Nama Item</th>
+            <th class="center-align">Satuan</th>
+            <th class="center-align">No Dokumen</th>
+            <th class="center-align">Mutasi</th>
+            <th class="center-align">Balance</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td colspan="5">Saldo Sebelumnya:</td>
+            <td colspan="10">Saldo Sebelumnya:</td>
             <td align="center"> {{$latest}}</td>
         </tr>
         @foreach($data as $key => $row)
         <tr>
             <td align="center">{{$key+1}}</td>
-            <td align="center">{{$row['keterangan']}}</td>
             <td align="center">{{$row['date']}}</td>
-            <td align="center">{{$row['masuk']}}</td>
-            <td align="center">{{$row['keluar']}}</td>
-            <td align="center">{{$row['final']}}</td>
+            <td align="center">{{$row['plant']}}</td>
+            <td align="center">{{$row['warehouse']}}</td>
+            <td align="center">{{$row['kode']}}</td>
+            <td align="center">{{$row['item']}}</td>
+            <td align="center">{{$row['satuan']}}</td>
+            <td align="center">{{$row['document']}}</td>
+            <td align="center">{{$row['qty']}}</td>
+            <td align="center">{{$row['cum_qty']}}</td>
         </tr>
         @endforeach
         @if(count($data) == 0)

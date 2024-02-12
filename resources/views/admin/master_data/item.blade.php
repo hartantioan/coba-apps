@@ -109,6 +109,50 @@
                                                     </select>
                                                 </div>
                                             </div>
+                                            <div class="col m4 s6 ">
+                                                <label for="filter_group" style="font-size:1rem;">Filter Group :</label>
+                                                <div class="input-field col s12">
+                                                    <select class="select2 browser-default" multiple="multiple" id="filter_group" name="filter_group" onchange="loadDataTable()">
+                                                        @foreach($group->whereNull('parent_id') as $c)
+                                                            @if(!$c->childSub()->exists())
+                                                                <option value="{{ $c->id }}"> - {{ $c->name }}</option>
+                                                            @else
+                                                                <optgroup label=" - {{ $c->code.' - '.$c->name }}">
+                                                                @foreach($c->childSub as $bc)
+                                                                    @if(!$bc->childSub()->exists())
+                                                                        <option value="{{ $bc->id }}"> -  - {{ $bc->name }}</option>
+                                                                    @else
+                                                                        <optgroup label=" -  - {{ $bc->code.' - '.$bc->name }}">
+                                                                            @foreach($bc->childSub as $bcc)
+                                                                                @if(!$bcc->childSub()->exists())
+                                                                                    <option value="{{ $bcc->id }}"> -  -  - {{ $bcc->name }}</option>
+                                                                                @else
+                                                                                    <optgroup label=" -  -  - {{ $bcc->code.' - '.$bcc->name }}">
+                                                                                        @foreach($bcc->childSub as $bccc)
+                                                                                            @if(!$bccc->childSub()->exists())
+                                                                                                <option value="{{ $bccc->id }}"> -  -  -  - {{ $bccc->name }}</option>
+                                                                                            @else
+                                                                                                <optgroup label=" -  -  -  - {{ $bccc->code.' - '.$bccc->name }}">
+                                                                                                    @foreach($bccc->childSub as $bcccc)
+                                                                                                        @if(!$bcccc->childSub()->exists())
+                                                                                                            <option value="{{ $bcccc->id }}"> -  -  -  -  - {{ $bcccc->name }}</option>
+                                                                                                        @endif
+                                                                                                    @endforeach
+                                                                                                </optgroup>
+                                                                                            @endif
+                                                                                        @endforeach
+                                                                                    </optgroup>
+                                                                                @endif
+                                                                            @endforeach
+                                                                        </optgroup>
+                                                                    @endif
+                                                                @endforeach
+                                                                </optgroup>
+                                                            @endif
+                                                    @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </li>
@@ -996,7 +1040,8 @@
                     adaUnit : $('#adaUnit').val(),
                     adaShading : $('#adaSh').val(),
                     status : $('#filter_status').val(),
-                    'type[]' : $('#filter_type').val()
+                    'type[]' : $('#filter_type').val(),
+                    'group[]' : $('#filter_group').val()
                 },
                 beforeSend: function() {
                     loadingOpen('#datatable_serverside');
@@ -1670,8 +1715,8 @@
         var search = window.table.search();
         var status = $('#filter_status').val();
         var type = $('#filter_type').val();
-        
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type;
+        var group = $('#filter_group').val();
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type+ "&group=" + group;
     }
 
 </script>

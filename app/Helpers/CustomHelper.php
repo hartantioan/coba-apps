@@ -3448,7 +3448,7 @@ class CustomHelper {
 					'lookable_type'	=> $table_name,
 					'lookable_id'	=> $table_id,
 					'post_date'		=> $data->post_date,
-					'note'			=> $data->code,
+					'note'			=> $cj->note,
 					'status'		=> '3'
 				]);
 				
@@ -3466,7 +3466,7 @@ class CustomHelper {
 					'status'	=> '3'
 				]);
 
-				self::sendTrialBalance($cj->company_id, $cj->month, $cj);
+				/* self::sendTrialBalance($cj->company_id, $cj->month, $cj); */
 			}
 		}elseif($table_name == 'purchase_orders'){
 			$po = PurchaseOrder::find($table_id);
@@ -3565,7 +3565,7 @@ class CustomHelper {
 				'lookable_type'	=> $closingJournal->getTable(),
 				'lookable_id'	=> $closingJournal->id,
 				'post_date'		=> $nextmonth.'-01',
-				'note'			=> $closingJournal->code,
+				'note'			=> $closingJournal->note,
 				'status'		=> '3'
 			]);
 

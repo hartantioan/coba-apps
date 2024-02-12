@@ -69,7 +69,6 @@ class LockPeriodController extends Controller
             'status_closing',
             'user_id',
             'company_id',
-            'post_date',
             'month',
             'note',
         ];
@@ -150,15 +149,14 @@ class LockPeriodController extends Controller
                     ',
                     $val->user()->exists() ? $val->user->name : 'Oleh Sistem',
                     $val->company()->exists() ? $val->company->name : '-',
-                    date('d/m/Y',strtotime($val->post_date)),
                     date('F Y',strtotime($val->month)),
                     $val->note,
                     $val->status(),
-                    '
+                    /* '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
-					'
+					' */
                 ];
 
                 $nomor++;

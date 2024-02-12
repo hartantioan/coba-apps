@@ -151,11 +151,11 @@ class WarehouseController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = Warehouse::create([
-                        'code'              => Warehouse::generateCode(),
-                        'name'			    => $request->name,
-                        'note'			    => $request->note,
-                        'is_transit_warehouse' => $request->is_transit_warehouse ? $request->is_transit_warehouse : NULL,
-                        'status'            => $request->status ? $request->status : '2',
+                        'code'                  => Warehouse::generateCode(),
+                        'name'			        => $request->name,
+                        'note'			        => $request->note,
+                        'is_transit_warehouse'  => $request->is_transit_warehouse ? $request->is_transit_warehouse : NULL,
+                        'status'                => $request->status ? $request->status : '2',
                     ]);
                     DB::commit();
                 }catch(\Exception $e){

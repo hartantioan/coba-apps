@@ -261,7 +261,7 @@ class PaymentRequestController extends Controller
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->user->name,
-                    $val->account->name,
+                    $val->account()->exists() ? $val->account->name : '',
                     $val->company->name,
                     $val->coa_source_id ? $val->coaSource->name : '-',
                     $val->paymentType(),
@@ -1166,7 +1166,7 @@ class PaymentRequestController extends Controller
 
     public function show(Request $request){
         $pr = PaymentRequest::where('code',CustomHelper::decrypt($request->id))->first();
-        $pr['account_name'] = $pr->account->name;
+        $pr['account_name'] = $pr->account()->exists() ? $pr->account->name : '';
         $pr['code_place_id'] = substr($pr->code,7,2);
         $pr['coa_source_name'] = $pr->coaSource()->exists() ? $pr->coaSource->code.' - '.$pr->coaSource->name.' - '.$pr->coaSource->company->name : '';
         $pr['currency_rate'] = number_format($pr->currency_rate,3,',','.');
@@ -1177,7 +1177,7 @@ class PaymentRequestController extends Controller
         $pr['grandtotal'] = number_format($pr->grandtotal,2,',','.');
         $pr['payment'] = number_format($pr->payment,2,',','.');
         $pr['balance'] = number_format($pr->balance,2,',','.');
-        $pr['top'] = $pr->account->top;
+        $pr['top'] = $pr->account()->exists() ? $pr->account->top : 0;
 
         $arr = [];
         $banks = [];
@@ -1185,13 +1185,15 @@ class PaymentRequestController extends Controller
 
         $is_cost = 0;
 
-        foreach($pr->account->userBank()->orderByDesc('is_default')->get() as $row){
-            $banks[] = [
-                'bank_id'   => $row->bank_id,
-                'name'      => $row->name,
-                'bank_name' => $row->bank->name,
-                'no'        => $row->no,
-            ];
+        if($pr->account()->exists()){
+            foreach($pr->account->userBank()->orderByDesc('is_default')->get() as $row){
+                $banks[] = [
+                    'bank_id'   => $row->bank_id,
+                    'name'      => $row->name,
+                    'bank_name' => $row->bank->name,
+                    'no'        => $row->no,
+                ];
+            }
         }
 
         foreach($pr->paymentRequestDetail as $row){

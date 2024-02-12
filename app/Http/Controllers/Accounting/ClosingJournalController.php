@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportClosingJournal;
 use App\Helpers\CustomHelper;
+use App\Models\LockPeriod;
 use App\Models\Menu;
 class ClosingJournalController extends Controller
 {
@@ -274,6 +275,7 @@ class ClosingJournalController extends Controller
                 'post_date'			    => 'required',
                 'company_id'		    => 'required',
                 'month'		            => 'required',
+                'note'                  => 'required',
                 'arr_coa_id'            => 'required|array',
                 'arr_nominal'           => 'required|array',
                 'arr_nominal_fc'        => 'required|array',
@@ -286,6 +288,7 @@ class ClosingJournalController extends Controller
                 'post_date.required' 			    => 'Tanggal post tidak boleh kosong.',
                 'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
                 'month.required' 			        => 'Periode bulan tidak boleh kosong.',
+                'note.required' 			        => 'Keterangan / catatan tidak boleh kosong.',
                 'arr_coa_id.required'               => 'Coa tidak boleh kosong',
                 'arr_coa_id.array'                  => 'Coa harus dalam bentuk array.',
                 'arr_nominal.required'              => 'Nominal tidak boleh kosong',
@@ -307,6 +310,21 @@ class ClosingJournalController extends Controller
                     return response()->json([
                         'status'  => 500,
                         'message' => 'Data tidak bisa disimpan karena nilai laba/rugi adalah 0.',
+                    ]);
+                }
+
+                $passedClosingLockPeriod = false;
+
+                $datalockperiod = LockPeriod::where('month',$request->month)->where('status_closing','2')->whereIn('status',['2','3'])->first();
+
+                if($datalockperiod){
+                    $passedClosingLockPeriod = true;
+                }
+
+                if(!$passedClosingLockPeriod){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Kunci / Lock Periode tidak ditemukan, silakan rubah status menjadi tutup.',
                     ]);
                 }
 
@@ -390,6 +408,10 @@ class ClosingJournalController extends Controller
                 }
                 
                 if($query) {
+
+                    $updateLockPeriod = LockPeriod::where('month',$request->month)->update([
+                        'status_closing'    => '3'
+                    ]);
                     
                     foreach($request->arr_coa_id as $key => $row){
                         ClosingJournalDetail::create([
@@ -545,6 +567,10 @@ class ClosingJournalController extends Controller
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
                 ];
             }else{
+                LockPeriod::where('month',$query->month)->update([
+                    'status_closing'    => '2'
+                ]);
+
                 $query->update([
                     'status'    => '5',
                     'void_id'   => session('bo_id'),
@@ -582,7 +608,7 @@ class ClosingJournalController extends Controller
     public function destroy(Request $request){
         $query = ClosingJournal::where('code',CustomHelper::decrypt($request->id))->first();
 
-        $approved = false;
+        /* $approved = false;
         $revised = false;
 
         if($query->approval()){
@@ -611,9 +637,17 @@ class ClosingJournalController extends Controller
                 'status'  => 500,
                 'message' => 'Closing Journal sudah dalam progres, anda tidak bisa melakukan perubahan.'
             ]);
-        }
+        } */
         
         if($query->delete()) {
+
+            if(in_array($query->status,['2','3'])){
+                CustomHelper::removeJournal($query->getTable(),$query->id);
+            }
+
+            LockPeriod::where('month',$query->month)->update([
+                'status_closing'    => '2'
+            ]);
 
             $query->update([
                 'delete_id'     => session('bo_id'),
@@ -1073,7 +1107,7 @@ class ClosingJournalController extends Controller
 
         $arr = [];
         $passed = 1;
-        foreach($coas as $key => $row){
+        /* foreach($coas as $key => $row){
             $arrError = [];
             $data = $row->journalDetail()->whereHas('journal',function($query)use($month){
                 $query->where('post_date','like',"$month%");
@@ -1101,20 +1135,20 @@ class ClosingJournalController extends Controller
                 'errors'    => $arrError,
                 'passed'    => $passed,
             ];
-        }
+        } */
 
         if($passed == 1){
             $response = [
                 'status'    => 200,
                 'message'   => ''
             ];
-        }else{
+        }/* else{
             $response = [
                 'status'    => 422,
                 'message'   => '',
                 'data'      => $arr
             ];
-        }
+        } */
 
         return response()->json($response);
     }

@@ -25,6 +25,7 @@ class Warehouse extends Model
     public static function generateCode()
     {
         $query = Warehouse::selectRaw('RIGHT(code, 3) as code')
+            ->withTrashed()
             ->orderByDesc('id')
             ->limit(1)
             ->get();

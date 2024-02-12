@@ -143,6 +143,6 @@ class SubsidiaryLedgerController extends Controller
         $coastart = $request->coastart ? $request->coastart : '';
         $coaend = $request->coaend ? $request->coaend : '';
 
-		return Excel::download(new ExportSubsidiaryLedger($datestart,$dateend,$coastart,$coaend), 'subsidiary_ledger_'.uniqid().'.csv',\Maatwebsite\Excel\Excel::CSV);
+		return Excel::download(new ExportSubsidiaryLedger($datestart,$dateend,$coastart,$coaend), 'subsidiary_ledger_'.uniqid().'.xlsx');
     }
 }

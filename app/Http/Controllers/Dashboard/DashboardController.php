@@ -13,6 +13,8 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use App\Http\Controllers\Controller;
+use App\Models\Attendances;
+use App\Models\EmployeeSchedule;
 use App\Models\User;
 
 class DashboardController extends Controller
@@ -1182,8 +1184,6 @@ class DashboardController extends Controller
             $counter_ps++;
             $date_leave_req->addDay();
         }
-
-     
         
         $data['attendance'] = $attendance_detail;
         $data['attendance_perday'] = $attendance_per_day;

@@ -162,6 +162,16 @@ class GoodReceiptDetail extends Model
         });
     }
 
+    public function balanceQtyInvoice(){
+        $qty = $this->qty;
+
+        foreach($this->purchaseInvoiceDetail as $row){
+            $qty -= $row->qty;
+        }
+
+        return $qty;
+    }
+
     public function balanceInvoice(){
         $total = round($this->grandtotal,2);
 

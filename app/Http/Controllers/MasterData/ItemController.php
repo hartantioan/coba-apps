@@ -69,12 +69,16 @@ class ItemController extends Controller
             $result1 = 0;
         }
 
+        $itemGroup = ItemGroup::whereHas('childSub',function($query){
+            $query->whereHas('itemGroupWarehouse',function($query){
+                $query->whereIn('warehouse_id',$this->datawarehouses);
+            });
+        })->get();
+
         $data = [
             'title'     => 'Item',
             'content'   => 'admin.master_data.item',
-            'group'     =>  ItemGroup::whereHas('itemGroupWarehouse',function($query){
-                                $query->whereIn('warehouse_id',$this->datawarehouses);
-                            })->get(),
+            'group'     =>  $itemGroup,
             'unit'      => Unit::where('status','1')->get(),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'warehouse'     => Warehouse::where('status','1')->whereIn('id',$this->datawarehouses)->get(),

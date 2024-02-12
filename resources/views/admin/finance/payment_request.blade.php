@@ -2802,8 +2802,10 @@
                 $('#note').focus();
                 M.updateTextFields();
                 setTimeout(function() {
-                    /* countAll(); */
-                    $('#payment_type').val(response.payment_type).trigger('change').formSelect();
+                    $('#payment_type').val(response.payment_type).formSelect();
+                    if(!response.is_cost == '1'){
+                        $('#payment_type').trigger('change');
+                    }
                 }, 700);
             },
             error: function() {

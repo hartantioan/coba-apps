@@ -261,6 +261,20 @@ class GoodReceipt extends Model
         }
     }
 
+    public function balanceQtyInvoice(){
+        $qty = 0;
+
+        foreach($this->goodReceiptDetail as $row){
+            $qty += $row->balanceQtyInvoice();
+        }
+
+        if($qty > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public function journal(){
         return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
     }

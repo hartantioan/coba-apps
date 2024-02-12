@@ -3170,14 +3170,6 @@
                                         </select>
                                     </td>
                                     <td class="center">
-                                        <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                                            <option value="">--Kosong--</option>
-                                            @foreach ($warehouse as $row)
-                                                <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td class="center">
                                         <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
                                     </td>
                                 </tr>

@@ -62,7 +62,7 @@
                 <td><a href="{{ $row->attachment() }}" target="_blank">File</a></td>
                 <td>{{ $rowdetail->item->code }}</td>
                 <td>{{ $rowdetail->item->name }}</td>
-                <td align="center">{{ $rowdetail->place->code.' - '.$rowdetail->place->company->name }}</td>
+                <td align="center">{{ $rowdetail->place->code }}</td>
                 <td>{{ $rowdetail->note }}</td>
                 <td>{{ $rowdetail->note2 }}</td>
                 <td align="center">{{ $rowdetail->qty }}</td>

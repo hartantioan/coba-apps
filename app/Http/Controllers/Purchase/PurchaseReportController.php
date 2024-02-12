@@ -18,7 +18,7 @@ class PurchaseReportController extends Controller
         $parentSegment = request()->segment(2);
         $menu = Menu::where('url', $parentSegment)->first();
         $data = [
-            'title'     => 'Laporan Purchase Request',
+            'title'     => 'Laporan Purchase',
             'content'   => 'admin.purchase.report',
             'menus'     => Menu::where('parent_id',$menu->id)
                             ->whereHas('menuUser', function ($query) {

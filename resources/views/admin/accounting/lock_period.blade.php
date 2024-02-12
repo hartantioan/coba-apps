@@ -103,11 +103,9 @@
                                                         <th>Status Closing</th>
                                                         <th>Pengguna</th>
                                                         <th>Perusahaan</th>
-                                                        <th>Tgl.Post</th>
                                                         <th>Periode</th>
                                                         <th>Keterangan</th>
                                                         <th>Status Dokumen</th>
-                                                        <th>Action</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -434,11 +432,9 @@
                 { name: 'status_closing', className: 'center-align' },
                 { name: 'user_id', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
-                { name: 'post_date', className: 'center-align' },
                 { name: 'period', className: 'center-align' },
                 { name: 'note', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',
             buttons: [

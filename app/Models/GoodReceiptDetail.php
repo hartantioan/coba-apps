@@ -172,6 +172,12 @@ class GoodReceiptDetail extends Model
         return $qty;
     }
 
+    public function qtyInvoice(){
+        $qty = $this->purchaseInvoiceDetail()->sum('qty');
+
+        return $qty;
+    }
+
     public function balanceInvoice(){
         $total = round($this->grandtotal,2);
 

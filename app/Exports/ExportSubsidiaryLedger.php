@@ -35,34 +35,42 @@ class ExportSubsidiaryLedger implements  FromView,ShouldAutoSize
             $rowdata = $row->journalDetail()->whereHas('journal',function($query)use($date_start,$date_end){
                 $query->whereRaw("post_date BETWEEN '$date_start' AND '$date_end'");
             })->where('nominal','!=',0)->get();
+            $arrData = [];
+            foreach($rowdata as $rowdetail){
+                $arrData[] = [
+                    'post_date' => $rowdetail->journal->post_date,
+                    'data'      => $rowdetail,
+                ];
+            }
+            $collect = collect($arrData)->sortBy('post_date');
             $balance = $row->getBalanceFromDate($date_start);
             $data_tempura = [
                 'code' => $row->code,
                 'name'=>  $row->name,
                 'balance'=>number_format($balance,2,',','.'),
             ];
-            if(count($rowdata) > 0){
-                foreach($rowdata as $key => $detail){
-                    $balance += ($detail->type == '1' ? $detail->nominal : -1 * $detail->nominal);
+            if(count($collect) > 0){
+                foreach($collect as $key => $detail){
+                    $balance += ($detail['data']->type == '1' ? $detail['data']->nominal : -1 * $detail['data']->nominal);
 
-                    $data_tempura['coa_code'][]=$detail->coa->code;
-                    $data_tempura['coa_name'][]=$detail->coa->name;
-                    $data_tempura['j_postdate'][]=date('d/m/Y',strtotime($detail->journal->post_date));
-                    $data_tempura['j_code'][]=$detail->journal->code;
-                    $data_tempura['j_lookable'][]=($detail->journal->lookable_id ? $detail->journal->lookable->code : '-');
-                    $data_tempura['j_detail1'][]=($detail->type == '1' ? number_format($detail->nominal,2,',','.') : '-');
-                    $data_tempura['j_detail2'][]=($detail->type == '2' ? number_format($detail->nominal,2,',','.') : '-');
+                    $data_tempura['coa_code'][]=$detail['data']->coa->code;
+                    $data_tempura['coa_name'][]=$detail['data']->coa->name;
+                    $data_tempura['j_postdate'][]=date('Y-m-d',strtotime($detail['data']->journal->post_date));
+                    $data_tempura['j_code'][]=$detail['data']->journal->code;
+                    $data_tempura['j_lookable'][]=($detail['data']->journal->lookable_id ? $detail['data']->journal->lookable->code : '-');
+                    $data_tempura['j_detail1'][]=($detail['data']->type == '1' ? number_format($detail['data']->nominal,2,',','.') : '-');
+                    $data_tempura['j_detail2'][]=($detail['data']->type == '2' ? number_format($detail['data']->nominal,2,',','.') : '-');
                    
                     $data_tempura['j_balance'][]=number_format($balance,2,',','.');
-                    $data_tempura['j_note'][]=$detail->journal->note;
-                    $data_tempura['j_note1'][]=$detail->note;
-                    $data_tempura['j_note2'][]=$detail->note2;
-                    $data_tempura['j_place'][]=($detail->place()->exists() ? $detail->place->code : '-');
-                    $data_tempura['j_warehouse'][]=($detail->warehouse()->exists() ? $detail->warehouse->name : '-');
-                    $data_tempura['j_line'][]=($detail->line()->exists() ? $detail->line->code : '-');
-                    $data_tempura['j_machine'][]=($detail->machine()->exists() ? $detail->machine->code : '-');
-                    $data_tempura['j_department'][]=($detail->department()->exists() ? $detail->department->code : '-');
-                    $data_tempura['j_project'][]=($detail->project()->exists() ? $detail->project->code : '-');
+                    $data_tempura['j_note'][]=$detail['data']->journal->note;
+                    $data_tempura['j_note1'][]=$detail['data']->note;
+                    $data_tempura['j_note2'][]=$detail['data']->note2;
+                    $data_tempura['j_place'][]=($detail['data']->place()->exists() ? $detail['data']->place->code : '-');
+                    $data_tempura['j_warehouse'][]=($detail['data']->warehouse()->exists() ? $detail['data']->warehouse->name : '-');
+                    $data_tempura['j_line'][]=($detail['data']->line()->exists() ? $detail['data']->line->code : '-');
+                    $data_tempura['j_machine'][]=($detail['data']->machine()->exists() ? $detail['data']->machine->code : '-');
+                    $data_tempura['j_department'][]=($detail['data']->department()->exists() ? $detail['data']->department->code : '-');
+                    $data_tempura['j_project'][]=($detail['data']->project()->exists() ? $detail['data']->project->code : '-');
                 }
             }
             $array_filter[]=$data_tempura;

@@ -1220,6 +1220,7 @@
                         <tr class="row_detail ` + (i == (response.details.length - 1) ? 'teal lighten-4' : '') + `">
                             <input type="hidden" name="arr_coa_id[]" value="` + val.coa_id + `">
                             <input type="hidden" name="arr_nominal[]" value="` + val.nominal + `">
+                            <input type="hidden" name="arr_nominal_fc[]" value="` + val.nominal_fc + `">
                             <td class="center">
                                 ` + (i + 1) + `
                             </td>

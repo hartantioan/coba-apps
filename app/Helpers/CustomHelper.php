@@ -3462,6 +3462,10 @@ class CustomHelper {
 					]);
 				}
 
+				$cj->update([
+					'status'	=> '3'
+				]);
+
 				self::sendTrialBalance($cj->company_id, $cj->month, $cj);
 			}
 		}elseif($table_name == 'purchase_orders'){

@@ -47,8 +47,6 @@ class SubsidiaryLedgerController extends Controller
         }
 
         $start_time = microtime(true);
-
-        #logic here LANJUTKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANNNNNNNNNNNNN
         
         $html = '<table class="bordered" id="table-result" style="min-width:2500px !important;zoom:0.6;">
                     <thead class="sidebar-sticky" style="background-color:white;">
@@ -79,6 +77,14 @@ class SubsidiaryLedgerController extends Controller
             $rowdata = $row->journalDetail()->whereHas('journal',function($query)use($date_start,$date_end){
                 $query->whereRaw("post_date BETWEEN '$date_start' AND '$date_end'");
             })->where('nominal','!=',0)->get();
+            $arrData = [];
+            foreach($rowdata as $rowdetail){
+                $arrData[] = [
+                    'post_date' => $rowdetail->journal->post_date,
+                    'data'      => $rowdetail,
+                ];
+            }
+            $collect = collect($arrData)->sortBy('post_date');
             $balance = $row->getBalanceFromDate($date_start);
             $html .= '<tr style="font-weight:800;">
                             <td width="200px">'.$row->code.'</td>
@@ -87,27 +93,27 @@ class SubsidiaryLedgerController extends Controller
                             <td class="right-align">'.number_format($balance,2,',','.').'</td>
                             <td colspan="9"></td>
                         </tr>';
-            if(count($rowdata) > 0){
-                foreach($rowdata as $key => $detail){
-                    $balance += ($detail->type == '1' ? $detail->nominal : -1 * $detail->nominal);
+            if(count($collect) > 0){
+                foreach($collect as $key => $detail){
+                    $balance += ($detail['data']->type == '1' ? $detail['data']->nominal : -1 * $detail['data']->nominal);
                     $html .= '<tr>
-                                <td>'.$detail->coa->code.'</td>
-                                <td>'.$detail->coa->name.'</td>
-                                <td>'.date('d/m/Y',strtotime($detail->journal->post_date)).'</td>
-                                <td>'.$detail->journal->code.'</td>
-                                <td>'.($detail->journal->lookable_id ? $detail->journal->lookable->code : '-').'</td>
-                                <td class="right-align">'.($detail->type == '1' ? number_format($detail->nominal,2,',','.') : '-').'</td>
-                                <td class="right-align">'.($detail->type == '2' ? number_format($detail->nominal,2,',','.') : '-').'</td>
+                                <td>'.$detail['data']->coa->code.'</td>
+                                <td>'.$detail['data']->coa->name.'</td>
+                                <td>'.date('d/m/Y',strtotime($detail['data']->journal->post_date)).'</td>
+                                <td>'.$detail['data']->journal->code.'</td>
+                                <td>'.($detail['data']->journal->lookable_id ? $detail['data']->journal->lookable->code : '-').'</td>
+                                <td class="right-align">'.($detail['data']->type == '1' ? number_format($detail['data']->nominal,2,',','.') : '-').'</td>
+                                <td class="right-align">'.($detail['data']->type == '2' ? number_format($detail['data']->nominal,2,',','.') : '-').'</td>
                                 <td class="right-align">'.number_format($balance,2,',','.').'</td>
-                                <td>'.$detail->journal->note.'</td>
-                                <td>'.$detail->note.'</td>
-                                <td>'.$detail->note2.'</td>
-                                <td>'.($detail->place()->exists() ? $detail->place->code : '-').'</td>
-                                <td>'.($detail->warehouse()->exists() ? $detail->warehouse->name : '-').'</td>
-                                <td>'.($detail->line()->exists() ? $detail->line->code : '-').'</td>
-                                <td>'.($detail->machine()->exists() ? $detail->machine->code : '-').'</td>
-                                <td>'.($detail->department()->exists() ? $detail->department->code : '-').'</td>
-                                <td>'.($detail->project()->exists() ? $detail->project->code : '-').'</td>
+                                <td>'.$detail['data']->journal->note.'</td>
+                                <td>'.$detail['data']->note.'</td>
+                                <td>'.$detail['data']->note2.'</td>
+                                <td>'.($detail['data']->place()->exists() ? $detail['data']->place->code : '-').'</td>
+                                <td>'.($detail['data']->warehouse()->exists() ? $detail['data']->warehouse->name : '-').'</td>
+                                <td>'.($detail['data']->line()->exists() ? $detail['data']->line->code : '-').'</td>
+                                <td>'.($detail['data']->machine()->exists() ? $detail['data']->machine->code : '-').'</td>
+                                <td>'.($detail['data']->department()->exists() ? $detail['data']->department->code : '-').'</td>
+                                <td>'.($detail['data']->project()->exists() ? $detail['data']->project->code : '-').'</td>
                             </tr>';
                 }
             }
@@ -137,6 +143,6 @@ class SubsidiaryLedgerController extends Controller
         $coastart = $request->coastart ? $request->coastart : '';
         $coaend = $request->coaend ? $request->coaend : '';
 
-		return Excel::download(new ExportSubsidiaryLedger($datestart,$dateend,$coastart,$coaend), 'subsidiary_ledger_'.uniqid().'.xlsx');
+		return Excel::download(new ExportSubsidiaryLedger($datestart,$dateend,$coastart,$coaend), 'subsidiary_ledger_'.uniqid().'.csv',\Maatwebsite\Excel\Excel::CSV);
     }
 }

@@ -89,7 +89,7 @@ class OutgoingPaymentController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = OutgoingPayment::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
+        $total_data = OutgoingPayment::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */count();
         
         $query_data = OutgoingPayment::where(function($query) use ($search, $request) {
                 if($search) {
@@ -136,7 +136,7 @@ class OutgoingPaymentController extends Controller
                     $query->where('company_id',$request->company_id);
                 }
             })
-            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+            /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -187,7 +187,7 @@ class OutgoingPaymentController extends Controller
                     $query->where('company_id',$request->company_id);
                 }
             })
-            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+            /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
             ->count();
 
         $response['data'] = [];

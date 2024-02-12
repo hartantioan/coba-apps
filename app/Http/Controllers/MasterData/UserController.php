@@ -432,6 +432,10 @@ class UserController extends Controller
                                 <th>Auto Generate AR Invoice (dari SJ)</th>
                                 <th>'.$data->arInvoice().'</th>
                             </tr>
+                            <tr>
+                                <th>Pengguna Spesial (Kunci Periode)</th>
+                                <th>'.$data->isSpecial().'</th>
+                            </tr>
                         </thead>
                     </table>';
 		
@@ -584,6 +588,7 @@ class UserController extends Controller
                     $query->employee_type   = $request->type == '1' ? $request->employee_type : NULL;
                     $query->is_ar_invoice   = $request->type == '2' ? ($request->is_ar_invoice ? $request->is_ar_invoice : NULL) : NULL;
                     $query->last_change_password =  $request->password ? date('Y-m-d H:i:s') : $query->last_change_password;
+                    $query->is_special_lock_user = $request->is_special_lock_user ?? NULL;
                     $query->save();
 
                     DB::commit();
@@ -631,14 +636,15 @@ class UserController extends Controller
                         'user_status'           => 'Offline',
                         'employee_type'         => $request->type == '1' ? $request->employee_type : NULL,
                         // 'is_ar_invoice'         => $request->type == '2' ? ($request->is_ar_invoice ? $request->is_ar_invoice : NULL) : NULL,
-                        // 'last_change_password'  => date('Y-m-d H:i:s')
+                        // 'last_change_password'  => date('Y-m-d H:i:s'),
+                        'is_special_lock_user'  => $request->is_special_lock_user ?? NULL,
                     ]);
                     if($request->type == 1){
                         $query_salary_component = SalaryComponent::where('status',1)->get();
                         foreach($query_salary_component as $row_salary_component){
                             $query_save = EmployeeSalaryComponent::create([
-                                'user_id'			        => $query->id,
-                                'salary_component_id'           => $row_salary_component->id,
+                                'user_id'			    => $query->id,
+                                'salary_component_id'   => $row_salary_component->id,
                                 'nominal'	            => 0
                             ]);
                         }

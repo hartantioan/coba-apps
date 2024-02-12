@@ -223,11 +223,11 @@
     </div>
 </div>
 
-<div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
+{{-- <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
     </a>
-</div>
+</div> --}}
 
 <!-- END: Page Main-->
 <script>
@@ -651,7 +651,7 @@
         var status = $(element).val();
         swal({
             title: "Apakah anda yakin ingin update status?",
-            text: "Untuk status BUKA dan TUTUP, maka jurnal Closing Jurnal akan dihapus sehingga laba rugi periode berjalan juga akan hilang! Untuk status KUNCI, maka jurnal closing harus dibuat pada form Closing Jurnal sesuai periode terpilih.",
+            text: "Seluruh dokumen transaksi yang berhubungan dengan jurnal pada periode terpilih tidak akan bisa dirubah.",
             icon: 'warning',
             dangerMode: true,
             buttons: {

@@ -71,6 +71,7 @@ class User extends Authenticatable
         'reset_code',
         'type_payment',
         'id_program_lama',
+        'is_special_lock_user',
     ];
 
     protected $hidden = [
@@ -96,6 +97,14 @@ class User extends Authenticatable
           default => '',
         };
 
+        return $type;
+    }
+
+    public function isSpecial(){
+        $type = match ($this->is_special_lock_user) {
+          '1' => 'Ya',
+          default => 'Tidak',
+        };
         return $type;
     }
 

@@ -148,8 +148,8 @@ class LockPeriodController extends Controller
                             <option value="3" '.($val->status_closing == '3' ? 'selected' : '').'>Kunci</option>
                         </select>
                     ',
-                    $val->user->name,
-                    $val->company->name,
+                    $val->user()->exists() ? $val->user->name : 'Oleh Sistem',
+                    $val->company()->exists() ? $val->company->name : '-',
                     date('d/m/Y',strtotime($val->post_date)),
                     date('F Y',strtotime($val->month)),
                     $val->note,
@@ -551,7 +551,7 @@ class LockPeriodController extends Controller
         $data = LockPeriod::where('code',CustomHelper::decrypt($request->code))->first();
         if($data){
 
-            if($request->status == '3'){
+            /* if($request->status == '3'){
                 $totalClosing = ClosingJournal::where('month',$data->month)->whereIn('status',['2','3'])->count();
 
                 if($totalClosing == 0){
@@ -560,13 +560,13 @@ class LockPeriodController extends Controller
                         'message' => 'Closing Jurnal / Tutup Periode pada periode '.date('F Y',strtotime($data->month)).' tidak ditemukan atau belum di approve. Silahkan buat pada form Akunting - Tutup Periode.',
                     ]);
                 }
-            }
+            } */
 
             $data->update([
                 'status_closing'   => $request->status ? $request->status : NULL,
             ]);
 
-            if($request->status == '1' || $request->status == '2'){
+            /* if($request->status == '1' || $request->status == '2'){
                 $dataClosingJournal = ClosingJournal::where('month',$data->month)->whereIn('status',['1','2','3'])->get();
                 if($dataClosingJournal){
                     foreach($dataClosingJournal as $row){
@@ -581,7 +581,7 @@ class LockPeriodController extends Controller
                         }
                     }
                 }
-            }
+            } */
 
             CustomHelper::sendNotification($data->getTable(),$data->id,'Status Kunci Periode No. '.$data->code.' telah diupdate','Status kunci periode dokumen '.$data->code.' telah di-'.$data->statusClosing().'.',session('bo_id'));
 

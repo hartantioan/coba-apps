@@ -296,26 +296,39 @@
                             </select>
                             <label class="" for="place_id">Plant (Untuk nomor pegawai)</label>
                         </div>
-                        <div class="input-field col s3 customer_inputs" style="display:none;">
-                            <div class="switch mb-1">
-                                <label for="is_ar_invoice">Auto Generate SJ -> AR Invoice</label>
-                                <label>
-                                    Tidak
-                                    <input checked type="checkbox" id="is_ar_invoice" name="is_ar_invoice" value="1">
-                                    <span class="lever"></span>
-                                    Ya
-                                </label>
+                        <div class="col s12 mt-1">
+                            <div class="input-field col s3 customer_inputs" style="display:none;">
+                                <div class="switch mb-1">
+                                    <label for="is_ar_invoice">Auto Generate SJ -> AR Invoice</label>
+                                    <label>
+                                        Tidak
+                                        <input checked type="checkbox" id="is_ar_invoice" name="is_ar_invoice" value="1">
+                                        <span class="lever"></span>
+                                        Ya
+                                    </label>
+                                </div>
                             </div>
-                        </div>
-                        <div class="input-field col s3">
-                            <div class="switch mb-1">
-                                <label for="status">Status</label>
-                                <label>
-                                    Non-Active
-                                    <input checked type="checkbox" id="status" name="status" value="1">
-                                    <span class="lever"></span>
-                                    Active
-                                </label>
+                            <div class="input-field col s3 employee_inputs">
+                                <div class="switch mb-1">
+                                    <label for="is_special_lock_user">Spesial (Kunci Periode)</label>
+                                    <label>
+                                        Tidak
+                                        <input checked type="checkbox" id="is_special_lock_user" name="is_special_lock_user" value="1">
+                                        <span class="lever"></span>
+                                        Ya
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="input-field col s3">
+                                <div class="switch mb-1">
+                                    <label for="status">Status</label>
+                                    <label>
+                                        Non-Active
+                                        <input checked type="checkbox" id="status" name="status" value="1">
+                                        <span class="lever"></span>
+                                        Active
+                                    </label>
+                                </div>
                             </div>
                         </div>
                         <div class="col s12 mt-3">
@@ -2162,6 +2175,12 @@
                     $('#status').prop( "checked", true);
                 }else{
                     $('#status').prop( "checked", false);
+                }
+
+                if(response.is_special_lock_user == '1'){
+                    $('#is_special_lock_user').prop( "checked", true);
+                }else{
+                    $('#is_special_lock_user').prop( "checked", false);
                 }
 
                 if(response.is_ar_invoice == '1'){

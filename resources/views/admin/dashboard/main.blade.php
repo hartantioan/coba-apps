@@ -24,7 +24,7 @@
                     <div class="row">
                         <div class="col s12 m12 l12">
                             <div class="card padding-4 animate fadeLeft">
-                                <div class="row">
+                                {{-- <div class="row">
                                     <div class="col s12 m12">
                                         <h5>HPP & STOK REALTIME</h5>
                                         <table class="bordered" style="font-size:10px;zoom:0.8;">
@@ -59,7 +59,7 @@
                                                 @endforeach
                                             </tbody>
                                         </table>
-                                        {{-- <h5>HPP REALTIME</h5>
+                                        <h5>HPP REALTIME</h5>
                                         <table class="bordered" style="font-size:10px;">
                                             <thead>
                                                 <tr>
@@ -89,9 +89,9 @@
                                                     </tr>
                                                 @endforeach
                                             </tbody>
-                                        </table> --}}
+                                        </table>
                                     </div>
-                                </div>
+                                </div> --}}
                             </div>
                         </div>
                     </div>

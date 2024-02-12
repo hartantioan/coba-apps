@@ -26,8 +26,10 @@ use App\Models\GoodReceipt;
 use App\Models\GoodReceiptDetail;
 use App\Models\GoodReceive;
 use App\Models\GoodReceiveDetail;
+use App\Models\Item;
 use App\Models\ItemStock;
 use App\Models\MenuUser;
+use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
 
 class MenuController extends Controller
@@ -127,6 +129,21 @@ class MenuController extends Controller
         /* $podp = PurchaseDownPayment::all();
         foreach($podp as $row){
             CustomHelper::sendJournal($row->getTable(),$row->id,$row->account_id);
+        } */
+
+        /* $item = Item::where('status','1')->get();
+        foreach($item as $row){
+            foreach($row->itemGroup->itemGroupWarehouse as $rowdetail){
+                $itemStock = ItemStock::where('item_id',$row->id)->where('warehouse_id',$rowdetail->warehouse_id)->where('place_id',1)->first();
+                if(!$itemStock){
+                    ItemStock::create([
+                        'item_id'       => $row->id,
+                        'place_id'      => 1,
+                        'warehouse_id'  => $rowdetail->warehouse_id,
+                        'qty'           => 0,
+                    ]);
+                }
+            }
         } */
     }
 

@@ -3131,6 +3131,7 @@ class Select2Controller extends Controller {
                     ->orWhere('prefix', 'like', "%$search%");
                  })
                 ->where('status','1')
+                ->where('level',5)
                 ->where('company_id',$request->company_id)
                 ->orderBy('code')
                 ->get();

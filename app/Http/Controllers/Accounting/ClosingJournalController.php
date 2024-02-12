@@ -234,6 +234,7 @@ class ClosingJournalController extends Controller
                 'coa_code'  => $coalabarugi->code,
                 'coa_name'  => $coalabarugi->name,
                 'nominal'   => $profitLoss,
+                'nominal_fc'=> $profitLoss,
             ];
 
             $response = [
@@ -394,9 +395,9 @@ class ClosingJournalController extends Controller
                         ClosingJournalDetail::create([
                             'closing_journal_id'    => $query->id,
                             'coa_id'                => $row,
-                            'type'                  => $request->arr_nominal[$key] >= 0 ? '1' : '2',
-                            'nominal'               => abs($request->arr_nominal[$key]),
-                            'nominal_fc'            => abs($request->arr_nominal_fc[$key]),
+                            'type'                  => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])) >= 0 ? '1' : '2',
+                            'nominal'               => abs(str_replace(',','.',str_replace('.','',$request->arr_nominal[$key]))),
+                            'nominal_fc'            => abs(str_replace(',','.',str_replace('.','',$request->arr_nominal_fc[$key]))),
                         ]);
                     }
 
@@ -517,6 +518,7 @@ class ClosingJournalController extends Controller
                 'coa_code'  => $row->coa->code,
                 'coa_name'  => $row->coa->name,
                 'nominal'   => $row->type == '1' ? $row->nominal : -1 * $row->nominal,
+                'nominal_fc'=> $row->type == '1' ? $row->nominal_fc : -1 * $row->nominal_fc,
             ];
         }
 

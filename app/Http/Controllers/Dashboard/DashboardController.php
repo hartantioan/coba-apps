@@ -21,7 +21,7 @@ class DashboardController extends Controller
             'title'         => 'Dashboard',
             'content'       => 'admin.dashboard.main',
             /* 'itemcogs'      => ItemCogs::orderByDesc('date')->orderByDesc('id')->get(), */
-            'itemstocks'    => ItemStock::where('qty','>',0)->get(),
+            /* 'itemstocks'    => ItemStock::where('qty','>',0)->get(), */
             'user'          => $this->user,
         ];
     

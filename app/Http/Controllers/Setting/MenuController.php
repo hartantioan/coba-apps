@@ -76,9 +76,9 @@ class MenuController extends Controller
             $dataupdate->update([
                 'qty'   => $dataupdate->qty - $row->qty,
             ]);
-        }
+        } */
 
-        $grcv = GoodReceiveDetail::all();
+        /* $grcv = GoodReceiveDetail::all();
 
         foreach($grcv as $row){
             $dataupdate = ItemStock::where('place_id',$row->place_id)->where('warehouse_id',$row->warehouse_id)->where('item_id',$row->item_id)->first();

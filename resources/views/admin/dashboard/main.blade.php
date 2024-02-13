@@ -428,50 +428,49 @@
 <script>
    $(function(){
       select2ServerSide('#period_id', '{{ url("admin/select2/period") }}');
-   })
+   });
    var originalHtml = $('.todo-collection').html();
    function periodChange(){
       
       $('.todo-collection').empty();
-      console.log($('#period_id').val());
       if($('#period_id').val() != null){
          $.ajax({
             url: '{{ Request::url() }}/change_period',
             type: 'POST',
             dataType: 'JSON',
             data: {
-                  id: $('#period_id').val(),
+               id: $('#period_id').val(),
             },
             headers: {
-                  'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             beforeSend: function() {
                   loadingOpen('.modal-content');
             },
             success: function(response) {
-                  loadingClose('.modal-content');  
-                  $('#attendance_count').text(response.message['attendance_count']);
-                  $('#tepatkeluar').text(response.message['tepatkeluar']);
-                  $('#tepatmasuk').text(response.message['tepatmasuk']);
-                  $('#terlambat').text(response.message['terlambat']);
-                  $('#total_absen').text(response.message['total_absen']);
-                  $('#total_tidak_datang').text(response.message['total_tidak_datang']);
-                  $('#total_tidak_pulang').text(response.message['total_tidak_pulang']);
-                  $('#counter_cuti').text(response.message['counter_cuti']);
-                  $('#counter_sakit').text(response.message['counter_sakit']);
-                  $('#counter_ijin').text(response.message['counter_ijin']);
-                  $('#counter_dinas_luar').text(response.message['counter_dinas_luar']);
-                  $('#counter_cuti_kusus').text(response.message['counter_cuti_kusus']);
+               loadingClose('.modal-content');  
+               $('#attendance_count').text(response.message['attendance_count']);
+               $('#tepatkeluar').text(response.message['tepatkeluar']);
+               $('#tepatmasuk').text(response.message['tepatmasuk']);
+               $('#terlambat').text(response.message['terlambat']);
+               $('#total_absen').text(response.message['total_absen']);
+               $('#total_tidak_datang').text(response.message['total_tidak_datang']);
+               $('#total_tidak_pulang').text(response.message['total_tidak_pulang']);
+               $('#counter_cuti').text(response.message['counter_cuti']);
+               $('#counter_sakit').text(response.message['counter_sakit']);
+               $('#counter_ijin').text(response.message['counter_ijin']);
+               $('#counter_dinas_luar').text(response.message['counter_dinas_luar']);
+               $('#counter_cuti_kusus').text(response.message['counter_cuti_kusus']);
 
-                  $('#counter_dispen').text(response.message['counter_dispen']);
-                  $('#counter_wfh').text(response.message['counter_wfh']);
-                  $('.modal-content').scrollTop(0);
+               $('#counter_dispen').text(response.message['counter_dispen']);
+               $('#counter_wfh').text(response.message['counter_wfh']);
+               $('.modal-content').scrollTop(0);
 
-                
-                  var attendancePerDay = response.message['attendance_perday'];
-                  
-                  if (attendancePerDay.length > 0) {
-                  
+               
+               var attendancePerDay = response.message['attendance_perday'];
+               
+               if (attendancePerDay.length > 0) {
+               
                   $.each(attendancePerDay, function(index, rowDate) {
                      var listItem = '<li class="collection-item todo-items">' +
                            '<div class="list-content pl-2">' +
@@ -519,7 +518,5 @@
          $('#counter_dispen').text('{{ $counter_dispen }}');
          $('#counter_wfh').text('{{ $counter_wfh }}');
       }
-      
-     
    }
 </script>

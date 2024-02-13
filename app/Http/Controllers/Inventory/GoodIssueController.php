@@ -102,9 +102,11 @@ class GoodIssueController extends Controller
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('goodIssueDetail', function($query) use($search, $request){
-                                $query->whereHas('item',function($query) use($search, $request){
-                                    $query->where('code', 'like', "%$search%")
-                                        ->orWhere('name','like',"%$search%");
+                                $query->whereHas('itemStock',function($query) use($search, $request){
+                                    $query->whereHas('item',function($query) use($search, $request){
+                                        $query->where('code', 'like', "%$search%")
+                                            ->orWhere('name','like',"%$search%");
+                                    });
                                 });
                             })
                             ->orWhereHas('user',function($query) use($search, $request){
@@ -139,9 +141,11 @@ class GoodIssueController extends Controller
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('goodIssueDetail', function($query) use($search, $request){
-                                $query->whereHas('item',function($query) use($search, $request){
-                                    $query->where('code', 'like', "%$search%")
-                                        ->orWhere('name','like',"%$search%");
+                                $query->whereHas('itemStock',function($query) use($search, $request){
+                                    $query->whereHas('item',function($query) use($search, $request){
+                                        $query->where('code', 'like', "%$search%")
+                                            ->orWhere('name','like',"%$search%");
+                                    });
                                 });
                             })
                             ->orWhereHas('user',function($query) use($search, $request){

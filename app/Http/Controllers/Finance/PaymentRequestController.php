@@ -1282,6 +1282,11 @@ class PaymentRequestController extends Controller
                     'message' => 'Data telah digunakan pada Outgoing Payment / Kas Bank Keluar.'
                 ];
             }else{
+
+                if($query->journal()->exists()){
+                    CustomHelper::removeJournal($query->getTable(),$query->id);
+                }
+
                 $query->update([
                     'status'    => '5',
                     'void_id'   => session('bo_id'),

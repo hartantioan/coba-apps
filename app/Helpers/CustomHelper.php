@@ -248,7 +248,7 @@ class CustomHelper {
 			}
 		}
 
-		ResetCogs::dispatch($date,$place_id,$item_id);
+		/* ResetCogs::dispatch($date,$place_id,$item_id); */
 	}
 
 	public static function sendStock($place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $type = null, $area_id = null, $shading = null){

@@ -17,7 +17,6 @@ class ExportOutstandingPurchaseRequest implements FromView,ShouldAutoSize
         $data = PurchaseRequestDetail::whereHas('purchaseRequest',function($query){
             $query->whereIn('status',['2','3']);
         })->whereNull('status')->get();
-        info($data);
         $array=[];
         foreach($data as $row){
             $entry = [];

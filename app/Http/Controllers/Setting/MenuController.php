@@ -31,6 +31,8 @@ use App\Models\ItemStock;
 use App\Models\MenuUser;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
+use App\Models\PurchaseOrder;
+use App\Models\PurchaseRequest;
 
 class MenuController extends Controller
 {
@@ -74,9 +76,9 @@ class MenuController extends Controller
             $dataupdate->update([
                 'qty'   => $dataupdate->qty - $row->qty,
             ]);
-        } */
+        }
 
-        /* $grcv = GoodReceiveDetail::all();
+        $grcv = GoodReceiveDetail::all();
 
         foreach($grcv as $row){
             $dataupdate = ItemStock::where('place_id',$row->place_id)->where('warehouse_id',$row->warehouse_id)->where('item_id',$row->item_id)->first();
@@ -143,6 +145,20 @@ class MenuController extends Controller
                         'qty'           => 0,
                     ]);
                 }
+            }
+        } */
+
+        /* $data = PurchaseOrder::all();
+
+        foreach($data as $row){
+            if($row->hasBalance()){
+                $row->update([
+                    'status'    => '2'
+                ]);
+            }else{
+                $row->update([
+                    'status'    => '3'
+                ]);
             }
         } */
     }

@@ -38,9 +38,9 @@ class StockMovementController extends Controller
             } else if($request->finish_date) {
                 $query->whereDate('date','<=', $request->finish_date);
             }
-            if($request->item_id) {
+            if($request->item) {
                 $query->whereHas('item',function($query) use($request){
-                    $query->where('id',$request->item_id);
+                    $query->where('id',$request->item);
                 });
             }
             if($request->plant != 'all'){

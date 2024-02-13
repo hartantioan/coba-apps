@@ -202,7 +202,7 @@
                                         </td>
                                         <td width="1%">:</td>
                                         <td width="60%">
-                                            {{ $data->account->name }}
+                                            {{ $data->account()->exists() ? $data->account->name : '' }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -211,7 +211,7 @@
                                         </td>
                                         <td width="1%">:</td>
                                         <td width="60%">
-                                            {{ $data->account->address }}
+                                            {{ $data->account()->exists() ? $data->account->address : '' }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -220,7 +220,7 @@
                                         </td>
                                         <td width="1%">:</td>
                                         <td width="60%">
-                                            {{ $data->account->phone.' / '.$data->account->office_no }}
+                                            {{ $data->account()->exists() ? $data->account->phone.' / '.$data->account->office_no : '' }}
                                         </td>
                                     </tr>
                                     <tr>

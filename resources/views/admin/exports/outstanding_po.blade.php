@@ -7,13 +7,14 @@
             <th class="center-align">No</th>
             <th class="center-align">Dokumen</th>
             <th class="center-align">Tgl.Post</th>
+            <th class="center-align">Nama Vendor</th>
             <th class="center-align">Keterangan</th>
             <th class="center-align">Status</th>
             <th class="center-align">Kode Item</th>
             <th class="center-align">Nama Item</th>
             <th class="center-align">Satuan</th>
-            <th class="center-align">Qty Req.</th>
-            <th class="center-align">Qty PO</th>
+            <th class="center-align">Qty PO.</th>
+            <th class="center-align">Qty GR</th>
             <th class="center-align">Tunggakan</th>
         </tr>
     </thead>
@@ -24,6 +25,7 @@
                 <td>{{ $key + 1 }}.</td>
                 <td>{{ $row['code'] }}</td>
                 <td>{{ $row['post_date'] }}</td>
+                <td>{{ $row['nama_supp'] }}</td>
                 <td>{{ $row['note'] }}</td>
                 <td>{{ $row['status'] }}</td>
                 <td>{{ $row['item_code'] }}</td>

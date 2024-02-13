@@ -675,6 +675,9 @@ class DashboardController extends Controller
                     $date_arrived_forget[]=Carbon::parse($date)->format('d/m/Y');
                     
                 }
+                if($row_arrive == 0 && $exact_out[$key] == 0){
+                    $total_absen++;
+                }
             }
             
            
@@ -689,6 +692,7 @@ class DashboardController extends Controller
                         $date_out_forget[]=Carbon::parse($date)->format('d/m/Y');
                         break;
                     }
+                    
                 }
             }
             
@@ -1250,7 +1254,7 @@ class DashboardController extends Controller
             $data['tepatkeluar'] = $attendance_monthly_user->out_on_time;
             $data['tepatmasuk'] = $attendance_monthly_user->arrived_on_time;
             $data['terlambat'] = $attendance_monthly_user->late;
-            $data['total_absen'] = $attendance_monthly_user->absent;
+            $data['total_absen'] = $attendance_monthly_user->alpha;
             $data['total_tidak_datang'] = $attendance_monthly_user->arrived_forget;
             $data['total_tidak_pulang'] =$attendance_monthly_user->out_log_forget;
             $data['attendance_count'] = $attendance_monthly_user->effective_day;
@@ -1259,10 +1263,10 @@ class DashboardController extends Controller
             $data['total_telat_masuk']=$attendance_monthly_user->late;
             $data['counter_cuti'] = $attendance_monthly_user->furlough;
             $data['counter_sakit'] = $attendance_monthly_user->sick;
-            $data['counter_ijin'] = $attendance_monthly_user->absent;
-            $data['counter_dinas_luar'] = $attendance_monthly_user->absent;
+            $data['counter_ijin'] = $attendance_monthly_user->permit;
+            $data['counter_dinas_luar'] = $attendance_monthly_user->outstation;
             $data['counter_cuti_kusus'] = $attendance_monthly_user->special_occassion;
-            $data['counter_lain_lain'] = $attendance_monthly_user->absent;
+            $data['counter_lain_lain'] = $attendance_monthly_user->special_occasion;
             $data['counter_dispen'] = $attendance_monthly_user->dispen;
             $data['counter_wfh'] = $attendance_monthly_user->wfh;
         }else{

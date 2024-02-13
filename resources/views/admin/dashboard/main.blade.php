@@ -42,7 +42,7 @@
                                        
                                        <div class="row">
                                           <div class="col s12 m6 l4">
-                                             <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                                             <div class="card gradient-45deg-deep-orange-orange gradient-shadow min-height-100 white-text animate fadeLeft">
                                                 <div class="padding-4">
                                                    <div class="row" style="">
                                                       <div class="col s7 m7">
@@ -60,7 +60,7 @@
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
-                                             <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                                             <div class="card gradient-45deg-purple-deep-orange gradient-shadow min-height-100 white-text animate fadeLeft">
                                                 <div class="padding-4">
                                                    <div class="row">
                                                       <div class="col s7 m7">
@@ -78,7 +78,7 @@
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
-                                             <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                                             <div class="card gradient-45deg-purple-amber gradient-shadow min-height-100 white-text animate fadeLeft">
                                                 <div class="padding-4">
                                                    <div class="row">
                                                       <div class="col s7 m7">
@@ -96,16 +96,16 @@
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
-                                             <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                                             <div class="card gradient-45deg-blue-indigo gradient-shadow min-height-100 white-text animate fadeLeft">
                                                 <div class="padding-4">
                                                    <div class="row">
                                                       <div class="col s7 m7">
                                                          <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                         <p>Terlambat &nbsp; &nbsp; &nbsp; &nbsp;</p>
+                                                         <p>Alpha &nbsp; &nbsp; &nbsp; &nbsp;</p>
                                                       </div>
                                                       <div class="col s5 m5 right-align">
                                                          <p class="no-margin">Total</p>
-                                                         <h5 class="mb-0 white-text" id="terlambat">{{$terlambat}}</h5>
+                                                         <h5 class="mb-0 white-text" id="total_absen">{{$total_absen}}</h5>
                                                          
                                                          <p></p>
                                                       </div>
@@ -114,7 +114,7 @@
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
-                                             <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                                             <div class="card gradient-45deg-indigo-blue gradient-shadow min-height-100 white-text animate fadeLeft">
                                                 <div class="padding-4">
                                                    <div class="row">
                                                       <div class="col s7 m7">
@@ -132,7 +132,7 @@
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
-                                             <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                                             <div class="card gradient-45deg-indigo-purple gradient-shadow min-height-100 white-text animate fadeLeft">
                                                 <div class="padding-4">
                                                    <div class="row">
                                                       <div class="col s7 m7">
@@ -204,7 +204,7 @@
                                        
                                        <div class="row">
                                           <div class="col s12 m6 l4">
-                                             <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                                             <div class="card  deep-purple gradient-shadow min-height-100 white-text animate fadeLeft">
                                                 <div class="padding-4">
                                                    <div class="row" style="">
                                                       <div class="col s7 m7">
@@ -222,7 +222,7 @@
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
-                                             <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                                             <div class="card deep-purple darken-1 gradient-shadow min-height-100 white-text animate fadeLeft">
                                                 <div class="padding-4">
                                                    <div class="row">
                                                       <div class="col s7 m7">
@@ -240,7 +240,7 @@
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
-                                             <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                                             <div class="card deep-purple darken-2 gradient-shadow min-height-100 white-text animate fadeLeft">
                                                 <div class="padding-4">
                                                    <div class="row">
                                                       <div class="col s7 m7">
@@ -258,7 +258,7 @@
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
-                                             <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                                             <div class="card indigo gradient-shadow min-height-100 white-text animate fadeLeft">
                                                 <div class="padding-4">
                                                    <div class="row">
                                                       <div class="col s7 m7">
@@ -276,7 +276,7 @@
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
-                                             <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                                             <div class="card indigo darken-1 gradient-shadow min-height-100 white-text animate fadeLeft">
                                                 <div class="padding-4">
                                                    <div class="row">
                                                       <div class="col s7 m7">
@@ -294,7 +294,7 @@
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
-                                             <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                                             <div class="card  indigo darken-2 gradient-shadow min-height-100 white-text animate fadeLeft">
                                                 <div class="padding-4">
                                                    <div class="row">
                                                       <div class="col s7 m7">
@@ -312,7 +312,7 @@
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
-                                             <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                                             <div class="card  blue darken-1 gradient-shadow min-height-100 white-text animate fadeLeft">
                                                 <div class="padding-4">
                                                    <div class="row">
                                                       <div class="col s7 m7">
@@ -429,39 +429,97 @@
    $(function(){
       select2ServerSide('#period_id', '{{ url("admin/select2/period") }}');
    })
-
+   var originalHtml = $('.todo-collection').html();
    function periodChange(){
-      $.ajax({
-         url: '{{ Request::url() }}/change_period',
-         type: 'POST',
-         dataType: 'JSON',
-         data: {
-               id: $('#period_id').val(),
-         },
-         headers: {
-               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-         },
-         beforeSend: function() {
-               loadingOpen('.modal-content');
-         },
-         success: function(response) {
-               loadingClose('.modal-content');
-               $('#attendance_count').text(response.message['attendance_count']);
-               $('#tepatkeluar').text(response.message['tepatkeluar']);
-               
-               $('.modal-content').scrollTop(0);
-             
-         },
-         error: function() {
-               $('.modal-content').scrollTop(0);
-               loadingClose('.modal-content');
-               swal({
-                  title: 'Ups!',
-                  text: 'Check your internet connection.',
-                  icon: 'error'
-               });
-         }
-      });
+      
+      $('.todo-collection').empty();
+      console.log($('#period_id').val());
+      if($('#period_id').val() != null){
+         $.ajax({
+            url: '{{ Request::url() }}/change_period',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                  id: $('#period_id').val(),
+            },
+            headers: {
+                  'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                  loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                  loadingClose('.modal-content');  
+                  $('#attendance_count').text(response.message['attendance_count']);
+                  $('#tepatkeluar').text(response.message['tepatkeluar']);
+                  $('#tepatmasuk').text(response.message['tepatmasuk']);
+                  $('#terlambat').text(response.message['terlambat']);
+                  $('#total_absen').text(response.message['total_absen']);
+                  $('#total_tidak_datang').text(response.message['total_tidak_datang']);
+                  $('#total_tidak_pulang').text(response.message['total_tidak_pulang']);
+                  $('#counter_cuti').text(response.message['counter_cuti']);
+                  $('#counter_sakit').text(response.message['counter_sakit']);
+                  $('#counter_ijin').text(response.message['counter_ijin']);
+                  $('#counter_dinas_luar').text(response.message['counter_dinas_luar']);
+                  $('#counter_cuti_kusus').text(response.message['counter_cuti_kusus']);
+
+                  $('#counter_dispen').text(response.message['counter_dispen']);
+                  $('#counter_wfh').text(response.message['counter_wfh']);
+                  $('.modal-content').scrollTop(0);
+
+                
+                  var attendancePerDay = response.message['attendance_perday'];
+                  
+                  if (attendancePerDay.length > 0) {
+                  
+                  $.each(attendancePerDay, function(index, rowDate) {
+                     var listItem = '<li class="collection-item todo-items">' +
+                           '<div class="list-content pl-2">' +
+                           '<div class="list-title-area">' +
+                           '<div class="list-title">' + rowDate.schedulefirst + ' - ' + rowDate.schedulelast + '</div>' +
+                           '</div>' +
+                           '<div class="list-desc">' + rowDate.time + '</div>' +
+                           '</div>' +
+                           '<div class="list-right">' +
+                           '<div class="list-date">' + rowDate.date + '</div>' +
+                           '</div>' +
+                           '</li>';
+
+                     $('.todo-collection').append(listItem);
+                  });
+               } 
+            },
+            error: function() {
+                  $('.modal-content').scrollTop(0);
+                  loadingClose('.modal-content');
+                  swal({
+                     title: 'Ups!',
+                     text: 'Check your internet connection.',
+                     icon: 'error'
+                  });
+            }
+         });
+        
+      }else{
+         $('.todo-collection').html(originalHtml);
+         $('#attendance_count').text('{{ $attendance_count }}');
+         $('#tepatkeluar').text('{{ $tepatkeluar }}');
+         $('#tepatmasuk').text('{{ $tepatmasuk }}');
+         $('#tepatkeluar').text('{{ $tepatkeluar }}');
+         $('#terlambat').text('{{ $terlambat }}');
+         $('#total_absen').text('{{ $total_absen }}');
+         $('#total_tidak_datang').text('{{ $total_tidak_datang }}');
+         $('#total_tidak_pulang').text('{{ $total_tidak_pulang }}');
+         $('#counter_cuti').text('{{ $counter_cuti }}');
+         $('#counter_sakit').text('{{ $counter_sakit }}');
+         $('#counter_ijin').text('{{ $counter_ijin }}');
+         $('#counter_dinas_luar').text('{{ $counter_dinas_luar }}');
+         $('#counter_cuti_kusus').text('{{ $counter_cuti_kusus }}');
+        
+         $('#counter_dispen').text('{{ $counter_dispen }}');
+         $('#counter_wfh').text('{{ $counter_wfh }}');
+      }
+      
      
    }
 </script>

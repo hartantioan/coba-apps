@@ -3,18 +3,20 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Models\ItemStock;
+use App\Models\Attendances;
 use App\Models\UserSpecial;
+use App\Models\EmployeeSchedule;
 use App\Models\Punishment;
 use App\Models\OvertimeRequest;
 use App\Models\LeaveRequest;
+use App\Models\AttendanceMonthlyReport;
 use App\Models\Task;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use App\Http\Controllers\Controller;
-use App\Models\Attendances;
-use App\Models\EmployeeSchedule;
+use Illuminate\Http\Request;
 use App\Models\User;
 
 class DashboardController extends Controller
@@ -1207,5 +1209,89 @@ class DashboardController extends Controller
         $data['counter_wfh'] = $counter_wfh;
 
         return view('admin.layouts.index', ['data' => $data]);
+    }
+
+    public function changePeriod(Request $request){
+        $attendance_monthly_user = AttendanceMonthlyReport::where('period_id',$request->id)
+        ->where('user_id',session('bo_id'))->first();
+     
+        if($attendance_monthly_user){
+            $attendance = Attendances::where('employee_no', $this->user->employee_no)
+            ->whereBetween('date', [$attendance_monthly_user->period->start_date, $attendance_monthly_user->period->end_date])
+            ->orderBy('date', 'desc') // Order by 'date' column in descending order
+            ->limit(20) // Limit the result to 20 records
+            ->get();
+            $schedule = EmployeeSchedule::join('shifts', 'employee_schedules.shift_id', '=', 'shifts.id')
+            ->where('employee_schedules.user_id', $this->user->employee_no)
+            ->whereBetween('employee_schedules.date', [$attendance_monthly_user->period->start_date, $attendance_monthly_user->period->end_date])
+            ->orderBy('shifts.time_in')
+            ->select('employee_schedules.*') 
+            ->get();
+            foreach ($attendance as $row_att) {
+                $carbonDate = Carbon::parse($row_att->date);
+                $matchingScheduleFirst = $schedule->where('date', $carbonDate->format('Y-m-d'))->first();
+                $matchingScheduleLast = $schedule->where('date', $carbonDate->format('Y-m-d'))->last();
+                if( $matchingScheduleFirst){
+                    $shift_in   = $matchingScheduleFirst->shift->time_in;
+                    $shift_out  = $matchingScheduleLast->shift->time_out;
+                }else{
+                    $shift_in   = '';
+                    $shift_out  = '';
+                }
+                $attendance_per_day[] = [
+                    'date' => $carbonDate->format('d-m-Y'), // Format date as dd-mm-yyyy
+                    'time' => $carbonDate->format('h:i A'), // Format time as hh:mm AM/PM
+                    'schedulefirst' => $shift_in,
+                    'schedulelast'  => $shift_out,
+                ];
+            }
+            $data['attendance'] = $attendance;
+            $data['attendance_perday'] = $attendance_per_day;
+            $data['tepatkeluar'] = $attendance_monthly_user->out_on_time;
+            $data['tepatmasuk'] = $attendance_monthly_user->arrived_on_time;
+            $data['terlambat'] = $attendance_monthly_user->late;
+            $data['total_absen'] = $attendance_monthly_user->absent;
+            $data['total_tidak_datang'] = $attendance_monthly_user->arrived_forget;
+            $data['total_tidak_pulang'] =$attendance_monthly_user->out_log_forget;
+            $data['attendance_count'] = $attendance_monthly_user->effective_day;
+            $data['start_date']= Carbon::parse($attendance_monthly_user->period->start_date)->format('d/m/Y');
+            $data['end_date']=  Carbon::parse($attendance_monthly_user->period->end_date)->format('d/m/Y');
+            $data['total_telat_masuk']=$attendance_monthly_user->late;
+            $data['counter_cuti'] = $attendance_monthly_user->furlough;
+            $data['counter_sakit'] = $attendance_monthly_user->sick;
+            $data['counter_ijin'] = $attendance_monthly_user->absent;
+            $data['counter_dinas_luar'] = $attendance_monthly_user->absent;
+            $data['counter_cuti_kusus'] = $attendance_monthly_user->special_occassion;
+            $data['counter_lain_lain'] = $attendance_monthly_user->absent;
+            $data['counter_dispen'] = $attendance_monthly_user->dispen;
+            $data['counter_wfh'] = $attendance_monthly_user->wfh;
+        }else{
+            $data['attendance'] = null;
+            $data['attendance_perday'] = null;
+            $data['tepatkeluar'] =  0;
+            $data['tepatmasuk'] =  0;
+            $data['terlambat'] =  0;
+            $data['total_absen'] =  0;
+            $data['total_tidak_datang'] =  0;
+            $data['total_tidak_pulang'] =  0;
+            $data['attendance_count'] =  0;
+            $data['start_date'] =  null;
+            $data['end_date'] =  null;
+            $data['total_telat_masuk'] = 0;
+            $data['counter_cuti'] = 0;
+            $data['counter_sakit'] = 0;
+            $data['counter_ijin'] = 0;
+            $data['counter_dinas_luar'] = 0;
+            $data['counter_cuti_kusus'] = 0;
+            $data['counter_lain_lain'] = 0;
+            $data['counter_dispen'] = 0;
+            $data['counter_wfh'] = 0;
+        }
+
+        $response = [
+            'status'    => 200,
+            'message'   => $data,
+        ];
+        return response()->json($response);
     }
 }

@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Exports\ExportDownPayment;
+use App\Exports\ExportOutstandingDP;
 use App\Models\Tax;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -125,5 +126,9 @@ class DownPaymentController extends Controller
 
     public function export(Request $request){
 		return Excel::download(new ExportDownPayment($request->date), 'down_payment_'.uniqid().'.xlsx');
+    }
+
+    public function getOutstanding(Request $request){
+		return Excel::download(new ExportOutstandingDP(), 'outstanding_purchase_down_payment'.uniqid().'.xlsx');
     }
 }

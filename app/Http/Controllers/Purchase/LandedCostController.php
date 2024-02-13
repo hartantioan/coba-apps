@@ -26,7 +26,7 @@ use App\Models\PurchaseOrderDetail;
 
 use App\Models\InventoryTransferIn;
 use App\Models\LandedCostFee;
-
+use App\Exports\ExportOutstandingLC;
 use App\Models\Place;
 ;
 use App\Models\Tax;
@@ -2951,6 +2951,10 @@ class LandedCostController extends Controller
             ]; 
         }
         return response()->json($response);
+    }
+
+    public function getOutstanding(Request $request){
+		return Excel::download(new ExportOutstandingLC(), 'outstanding_landed_cost'.uniqid().'.xlsx');
     }
 
 }

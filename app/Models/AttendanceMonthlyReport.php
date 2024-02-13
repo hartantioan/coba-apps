@@ -39,6 +39,10 @@ class AttendanceMonthlyReport extends Model
     public function user(){
         return $this->belongsTo('App\Models\User','user_id','id')->withTrashed();
     }
+
+    public function period(){
+        return $this->belongsTo('App\Models\AttendancePeriod','period_id','id');
+    }
     
 
     public function status(){

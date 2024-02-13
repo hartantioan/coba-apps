@@ -1,0 +1,47 @@
+<?php
+
+namespace App\Exports;
+
+use App\Models\GoodReceiptDetail;
+use Maatwebsite\Excel\Concerns\FromView;
+use Illuminate\View\View;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+
+class ExportOutstandingGRPO implements FromView,ShouldAutoSize
+{
+    /**
+    * @return \Illuminate\Support\Collection
+    */
+    public function view(): View
+    {
+        $data = GoodReceiptDetail::whereHas('goodReceipt',function($query){
+            $query->whereIn('status',['2','3']);
+        })->get();
+        info($data);
+        $array=[];
+        foreach($data as $row){
+            $entry = [];
+            $entry["code"]=$row->goodReceipt->code;
+            $entry["post_date"] = date('d/m/Y',strtotime($row->goodReceipt->post_date));
+            $entry["note"] = $row->goodReceipt->note;
+            $entry["status"] = $row->goodReceipt->statusRaw();
+            $entry["item_code"] = $row->item->code;
+            $entry["item_name"] = $row->item->name;
+            $entry["satuan"] =$row->itemUnit->unit->code;
+            $entry["qty"] = number_format($row->qty,3,',','.');
+            $entry["qty_gr"] = number_format($row->qtyInvoice(),3,',','.');
+            $entry["qty_balance"] = number_format($row->balanceQtyInvoice(),3,',','.');
+            if($row->balanceQtyInvoice()> 0){
+                $array[] = $entry;
+            }
+            
+            
+        }
+        
+        
+        return view('admin.exports.outstanding_po', [
+            'data' => $array,
+            
+        ]);
+    }
+}

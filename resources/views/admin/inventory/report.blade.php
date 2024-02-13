@@ -45,6 +45,7 @@
                                             <label class="active" for="end_date">Tanggal Akhir</label>
                                         </div>
                                         <div class="col s12 mt-3">
+                                            <button class="btn waves-effect waves-light right cyan submit mr-2" onclick="getOutstanding();" id="btn_out">Lihat Tunggakan <i class="material-icons right">list</i></button>
                                             <button class="btn waves-effect waves-light right submit" onclick="exportExcel();">Get Rekap <i class="material-icons right">file_download</i></button>
                                         </div>
                                     </div>
@@ -61,13 +62,29 @@
 
 <!-- END: Page Main-->
 <script>
-     
+     $('#btn_out').hide();
+    $(document).ready(function() {
+        $('#type').change(function() {
+            var selectedValue = $(this).val();
+           
+            if (selectedValue === 'inventory/good_receipt_po') {
+                $('#btn_out').show();
+            } else {
+                $('#btn_out').hide();
+            }
+        });
+    });
     function exportExcel(){
         var tipe = $('#type').val();
         var search = $('#start_date').val();
         var status = $('#end_date').val();
         var mode = $('#mode').val();
         window.location = "{{ URL::to('/') }}/admin/"+tipe+"/export?start_date=" + search + "&end_date=" + status + "&mode=" + mode;
+    }
+
+    function getOutstanding(){
+        var tipe = $('#type').val();
+        window.location = "{{ URL::to('/') }}/admin/"+tipe+"/get_outstanding?";
     }
 
     function printPreview(code,aslicode){

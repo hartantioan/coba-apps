@@ -11,6 +11,7 @@ use App\Models\GoodScale;
 use App\Models\InventoryTransferOut;
 use App\Models\Item;
 use App\Models\Line;
+use App\Exports\ExportOutstandingDP;
 use App\Models\LandedCost;
 use App\Models\Machine;
 use App\Models\MaterialRequest;
@@ -2830,5 +2831,7 @@ class PurchaseDownPaymentController extends Controller
         return response()->json($response);
     }
 
-
+    public function getOutstanding(Request $request){
+		return Excel::download(new ExportOutstandingDP(), 'outstanding_purchase_down_payment'.uniqid().'.xlsx');
+    }
 }

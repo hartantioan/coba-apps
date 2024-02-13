@@ -165,17 +165,22 @@
                 { name: 'out_log_forget', className: 'center-align' },
                 { name: 'arrived_forget', className: 'center-align' },
             ];
-            var punish_code = @json($punishment_code);
+                @if(isset($punishment_code))
+                    var punish_code = @json($punishment_code);
+                @endif
                 var string =`
                     <tr>
                     <th>#</th>
                     <th>Nama</th>
                     <th>Jumlah Shift</th>
                 `;
-                $.each(punish_code,function(i,val){
-                    string+=`<th>`+val+`</th>`;
-                    column_data_table.push({ name: val, className: 'center-align' });
-                });
+                @if(isset($punishment_code))
+                    $.each(punish_code,function(i,val){
+                        string+=`<th>`+val+`</th>`;
+                        column_data_table.push({ name: val, className: 'center-align' });
+                    });
+                @endif
+                
                 string+=`<th>Tepat waktu</th>
                         <th>Ijin Kusus</th>
                         <th>Sakit</th>

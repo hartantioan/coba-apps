@@ -105,6 +105,11 @@
     }
 
     function getOutstanding(){
+        var tipe = $('#type').val();
+        window.location = "{{ URL::to('/') }}/admin/"+tipe+"/get_outstanding?";
+    }
+
+    /* function getOutstanding(){
         $('#show-result').hide();
         $('#content-result').html('');
         var tipekuy = $('#type').val();
@@ -156,7 +161,7 @@
                 }
             }
         });
-    }
+    } */
 
     function printPreview(code,aslicode){
         swal({

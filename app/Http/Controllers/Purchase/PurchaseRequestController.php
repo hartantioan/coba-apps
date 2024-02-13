@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Purchase;
+
+use App\Exports\ExportOutstandingPurchaseRequest;
 use App\Exports\ReportPurchaseRequest;
 use App\Http\Controllers\Controller;
 use App\Models\ApprovalMatrix;
@@ -2583,64 +2585,64 @@ class PurchaseRequestController extends Controller
 		return response()->json($response);
     }
 
-    public function getOutstanding(Request $request)
-    {
-        $start_date = $request->startDate;
-        $end_date = $request->endDate;
-
-        $data = PurchaseRequestDetail::whereHas('purchaseRequest',function($query)use($start_date,$end_date){
-                    $query->where(function($query) use ($start_date, $end_date) {
-                        $query->whereDate('post_date', '>=', $start_date)
-                            ->whereDate('post_date', '<=', $end_date);
-                    })->whereIn('status',['2','3']);
-                })->whereNull('status')->get();
-        
-        $string = '<div class="row pt-1 pb-1"><div class="col s12"><table style="min-width:100%;max-width:100%;">
-                        <thead>
-                            <tr>
-                                <th class="center-align" colspan="10">Daftar Item Request Pembelian</th>
-                            </tr>
-                            <tr>
-                                <th class="center-align">No</th>
-                                <th class="center-align">Dokumen</th>
-                                <th class="center-align">Tgl.Post</th>
-                                <th class="center-align">Keterangan</th>
-                                <th class="center-align">Status</th>
-                                <th class="center-align">Item</th>
-                                <th class="center-align">Satuan</th>
-                                <th class="center-align">Qty Req.</th>
-                                <th class="center-align">Qty PO</th>
-                                <th class="center-align">Tunggakan</th>
-                            </tr>
-                        </thead><tbody>';
-        
-        foreach($data as $key => $row){
-            if($row->qtyBalance() > 0){
-                $string .= '<tr>
-                    <td class="center-align">'.($key + 1).'</td>
-                    <td class="center-align">'.$row->purchaseRequest->code.'</td>
-                    <td class="center-align">'.date('d/m/Y',strtotime($row->purchaseRequest->post_date)).'</td>
-                    <td class="">'.$row->purchaseRequest->note.'</td>
-                    <td class="center-align">'.$row->purchaseRequest->status().'</td>
-                    <td class="">'.$row->item->code.' - '.$row->item->name.'</td>
-                    <td class="center-align">'.$row->itemUnit->unit->code.'</td>
-                    <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
-                    <td class="right-align">'.number_format($row->qtyPO(),3,',','.').'</td>
-                    <td class="right-align">'.number_format($row->qtyBalance(),3,',','.').'</td>
-                </tr>';
-            }
-        }
-        
-        $string .= '</tbody></table></div></div>';
-
-        $response = [
-            'status'    => 200,
-            'content'   => $string,
-            'message'   => 'Data tidak ditemukan.',
-        ];
+    public function getOutstanding(Request $request){
+       
 		
-        return response()->json($response);
+		return Excel::download(new ExportOutstandingPurchaseRequest(), 'outstanding_purchase_request_'.uniqid().'.xlsx');
     }
+    // public function getOutstanding(Request $request)
+    // {
+
+    //     $data = PurchaseRequestDetail::whereHas('purchaseRequest',function($query){
+    //                 $query->whereIn('status',['2','3']);
+    //             })->whereNull('status')->get();
+        
+    //     $string = '<div class="row pt-1 pb-1"><div class="col s12"><table style="min-width:100%;max-width:100%;">
+    //                     <thead>
+    //                         <tr>
+    //                             <th class="center-align" colspan="10">Daftar Item Request Pembelian</th>
+    //                         </tr>
+    //                         <tr>
+    //                             <th class="center-align">No</th>
+    //                             <th class="center-align">Dokumen</th>
+    //                             <th class="center-align">Tgl.Post</th>
+    //                             <th class="center-align">Keterangan</th>
+    //                             <th class="center-align">Status</th>
+    //                             <th class="center-align">Item</th>
+    //                             <th class="center-align">Satuan</th>
+    //                             <th class="center-align">Qty Req.</th>
+    //                             <th class="center-align">Qty PO</th>
+    //                             <th class="center-align">Tunggakan</th>
+    //                         </tr>
+    //                     </thead><tbody>';
+        
+    //     foreach($data as $key => $row){
+    //         if($row->qtyBalance() > 0){
+    //             $string .= '<tr>
+    //                 <td class="center-align">'.($key + 1).'</td>
+    //                 <td class="center-align">'.$row->purchaseRequest->code.'</td>
+    //                 <td class="center-align">'.date('d/m/Y',strtotime($row->purchaseRequest->post_date)).'</td>
+    //                 <td class="">'.$row->purchaseRequest->note.'</td>
+    //                 <td class="center-align">'.$row->purchaseRequest->status().'</td>
+    //                 <td class="">'.$row->item->code.' - '.$row->item->name.'</td>
+    //                 <td class="center-align">'.$row->itemUnit->unit->code.'</td>
+    //                 <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
+    //                 <td class="right-align">'.number_format($row->qtyPO(),3,',','.').'</td>
+    //                 <td class="right-align">'.number_format($row->qtyBalance(),3,',','.').'</td>
+    //             </tr>';
+    //         }
+    //     }
+        
+    //     $string .= '</tbody></table></div></div>';
+
+    //     $response = [
+    //         'status'    => 200,
+    //         'content'   => $string,
+    //         'message'   => 'Data tidak ditemukan.',
+    //     ];
+		
+    //     return response()->json($response);
+    // }
 
     public function getItemFromStock(Request $request){
         

@@ -11,6 +11,7 @@ use App\Models\GoodScale;
 use App\Models\InventoryTransferOut;
 use App\Models\Item;
 use App\Models\Line;
+use App\Exports\ExportOutstandingGRPO;
 use App\Models\LandedCost;
 use App\Models\Machine;
 use App\Models\MaterialRequest;
@@ -2751,5 +2752,11 @@ class GoodReceiptPOController extends Controller
             ]; 
         }
         return response()->json($response);
+    }
+
+    public function getOutstanding(Request $request){
+       
+		
+		return Excel::download(new ExportOutstandingGRPO(), 'outstanding_grpo_'.uniqid().'.xlsx');
     }
 }

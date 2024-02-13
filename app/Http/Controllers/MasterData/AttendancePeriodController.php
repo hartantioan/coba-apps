@@ -166,7 +166,7 @@ class AttendancePeriodController extends Controller
         
         $user_data = User::where(function($query) use ( $request) {
             $query->where('type','1');
-            $query->whereIn('employee_no',['323003','323005','323007','323009','323011','323016','323017','323020','323021','323022','323024','323026','323027','323029','323031','323033','323034']);
+            $query->whereIn('employee_no',['323004','323003','323005','323007','323009','323011','323016','323017','323020','323021','323022','323024','323026','323027','323029','323031','323033','323034']);
             // $query->whereIn('employee_no',['323033']);    
             })->get();
         
@@ -178,7 +178,6 @@ class AttendancePeriodController extends Controller
         
         $query_salary_component= SalaryComponent::where('status',1)->get();
         $punishment_get = Punishment::where('status',1)->get();
-        
         foreach($query_salary_component as $row_component){
             $report_salary_template = SalaryReportTemplate::create([
                 'lookable_type'                             => 'salary_components',
@@ -193,11 +192,14 @@ class AttendancePeriodController extends Controller
                 'lookable_id'                               => $row_punishment->id,
             ]);
         }
-        $report_salary_template = SalaryReportTemplate::create([
-            'lookable_type'                             => 'overtime_requests',
-            'salary_report_id'                          => $query_salary_report->id,
-            'lookable_id'                               => $row_punishment->id,
-        ]);
+        if($punishment_get){
+            $report_salary_template = SalaryReportTemplate::create([
+                'lookable_type'                             => 'overtime_requests',
+                'salary_report_id'                          => $query_salary_report->id,
+                'lookable_id'                               => -1,
+            ]);
+        }
+        
 
         $attendance_detail = [];
         $user_counter_effective_day = [];

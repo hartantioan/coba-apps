@@ -14,7 +14,7 @@ use App\Models\GoodReceipt;
 use App\Models\GoodScale;
 use App\Models\InventoryTransferOut;
 use App\Models\Item;
-
+use App\Exports\ExportOutstandingInvoice;
 use App\Models\LandedCost;
 
 use App\Models\MaterialRequest;
@@ -3657,5 +3657,9 @@ class PurchaseInvoiceController extends Controller
     
     public function getImportExcel(){
         return Excel::download(new ExportTemplatePurchaseInvoice(), 'format_copas_multi_ap_invoice'.uniqid().'.xlsx');
+    }
+
+    public function getOutstanding(Request $request){
+		return Excel::download(new ExportOutstandingInvoice(), 'outstanding_purchase_invoice_'.uniqid().'.xlsx');
     }
 }

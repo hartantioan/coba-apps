@@ -26,395 +26,319 @@
                         <div class="col s12 m6 l12">
                             
                             <div class="card padding-2 animate fadeLeft row">
-                                <h6 class="pl-2 pt-1">Absensi</h6>
-                                <div class="col s8 m6 l8">
+                                 <div class="col s4 m6 l4">
+                                    <h6 class="pl-2 pt-1">Absensi</h6>
+                                 </div>
+                                 <div class="col s4 m6 l4">
+                                 </div>
+                                 <div class="col s4 m6 l4">
+                                    <label class="" for="period_id">Period</label>
+                                    <select class="browser-default" id="period_id" name="period_id" onchange="periodChange()"></select>
                                     
-                                    <div class="row">
-                                        <div class="col s12 m6 l4">
-                                            <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
-                                               <div class="padding-4">
-                                                  <div class="row" style="">
-                                                     <div class="col s7 m7">
-                                                        <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                        <p>Hari Efektif &nbsp; &nbsp; </p>
-                                                     </div>
-                                                     <div class="col s5 m5 right-align">
-                                                        <p class="no-margin">Total</p>
-                                                        <h5 class="mb-0 white-text">{{$attendance_count}}</h5>
-                                                        
-                                                        <p></p>
-                                                     </div>
-                                                  </div>
-                                               </div>
-                                            </div>
-                                         </div>
-                                         <div class="col s12 m6 l4">
-                                            <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
-                                               <div class="padding-4">
-                                                  <div class="row">
-                                                     <div class="col s7 m7">
-                                                        <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                        <p>Tepat Keluar &nbsp;</p>
-                                                     </div>
-                                                     <div class="col s5 m5 right-align">
-                                                        <p class="no-margin">Total</p>
-                                                        <h5 class="mb-0 white-text">{{$tepatkeluar}}</h5>
-                                                        
-                                                        <p></p>
-                                                     </div>
-                                                  </div>
-                                               </div>
-                                            </div>
-                                         </div>
-                                         <div class="col s12 m6 l4">
-                                            <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
-                                               <div class="padding-4">
-                                                  <div class="row">
-                                                     <div class="col s7 m7">
-                                                        <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                        <p>Tepat Masuk &nbsp;</p>
-                                                     </div>
-                                                     <div class="col s5 m5 right-align">
-                                                        <p class="no-margin">Total</p>
-                                                        <h5 class="mb-0 white-text">{{$tepatmasuk}}</h5>
-                                                        
-                                                        <p></p>
-                                                     </div>
-                                                  </div>
-                                               </div>
-                                            </div>
-                                         </div>
-                                         <div class="col s12 m6 l4">
-                                            <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
-                                               <div class="padding-4">
-                                                  <div class="row">
-                                                     <div class="col s7 m7">
-                                                        <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                        <p>Terlambat &nbsp; &nbsp; &nbsp; &nbsp;</p>
-                                                     </div>
-                                                     <div class="col s5 m5 right-align">
-                                                        <p class="no-margin">Total</p>
-                                                        <h5 class="mb-0 white-text">{{$terlambat}}</h5>
-                                                        
-                                                        <p></p>
-                                                     </div>
-                                                  </div>
-                                               </div>
-                                            </div>
-                                         </div>
-                                         <div class="col s12 m6 l4">
-                                            <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
-                                               <div class="padding-4">
-                                                  <div class="row">
-                                                     <div class="col s7 m7">
-                                                        <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                        <p>Tidak Absen Datang</p>
-                                                     </div>
-                                                     <div class="col s5 m5 right-align">
-                                                        <p class="no-margin">Total</p>
-                                                        <h5 class="mb-0 white-text">{{$total_tidak_datang}}</h5>
-                                                        
-                                                        <p></p>
-                                                     </div>
-                                                  </div>
-                                               </div>
-                                            </div>
-                                         </div>
-                                         <div class="col s12 m6 l4">
-                                            <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
-                                               <div class="padding-4">
-                                                  <div class="row">
-                                                     <div class="col s7 m7">
-                                                        <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                        <p>Tidak Absen Pulang</p>
-                                                     </div>
-                                                     <div class="col s5 m5 right-align">
-                                                        <p class="no-margin">Total</p>
-                                                        <h5 class="mb-0 white-text">{{$total_tidak_pulang}}</h5>
-                                                        
-                                                        <p></p>
-                                                     </div>
-                                                  </div>
-                                               </div>
-                                            </div>
-                                         </div>
-                                    </div>
-                                </div>
-                                <div class="col s4 m6 l4 ">
-                                    <div class="app-todo">
-                                        <div class="content-area" style="margin-top:0%; width:100%">
-                                          <div class="app-wrapper">
-                                            
-                                            <div class="card card card-default scrollspy border-radius-6 fixed-width" >
-                                              <div class="card-content p-0 pb-1" >
-                                                <div class="todo-header">
-                                                  <div class="header-checkbox">
-                                                   
-                                                  </div>
-                                                  <div class="list-content"></div>
-                                                  <div class="todo-action">
-                                                   
-                                                   
-                                                  </div>
+                                 </div>
+                                 
+                                 
+                                 <div class="col s8 m6 l8">
+                                       
+                                       <div class="row">
+                                          <div class="col s12 m6 l4">
+                                             <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                                                <div class="padding-4">
+                                                   <div class="row" style="">
+                                                      <div class="col s7 m7">
+                                                         <i class="material-icons background-round mt-5">add_shopping_cart</i>
+                                                         <p>Hari Efektif &nbsp; &nbsp; </p>
+                                                      </div>
+                                                      <div class="col s5 m5 right-align">
+                                                         <p class="no-margin">Total</p>
+                                                         <h5 class="mb-0 white-text" id="attendance_count">{{$attendance_count}}</h5>
+                                                         
+                                                         <p></p>
+                                                      </div>
+                                                   </div>
                                                 </div>
-                                                <ul class="collection todo-collection" style="max-height: 18rem; overflow-y: auto; overflow-x: hidden;">
-                                                    @foreach ($attendance_perday as $row_date )
-                                                    <li class="collection-item todo-items">
-                                                        <div class="list-content pl-2">
-                                                        <div class="list-title-area">
-                                                            <div class="list-title">{{$row_date['schedulefirst']}} - {{$row_date['schedulelast']}}</div>
-                                                            
-                                                        </div>
-                                                        <div class="list-desc"> {{$row_date['time']}}</div>
-                                                        </div>
-                                                        <div class="list-right">
-                                                        <div class="list-date"> {{$row_date['date']}} </div>
-                                                        
-                                                        </div>
-                                                    </li>
-                                                        
-                                                    @endforeach
-                                                    
-                                                  
-                                                  
-                                                    <li class="collection-item no-data-found">
-                                                        <h6 class="center-align font-weight-500">No Results Found</h6>
-                                                    </li>
-                                                    <div class="ps__rail-x" style="left: 0px; bottom: 0px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__rail-y" style="top: 0px; right: 0px;"><div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 0px;"></div></div>
-                                                </ul>
-                                              </div>
-                                            </div>
+                                             </div>
                                           </div>
-                                        </div>
-                                      </div>
-                                    
-                                </div>
-                                <div class="col s12 m12 l12">
-                                    
-                                    <div class="row">
-                                        <div class="col s12 m6 l4">
-                                            <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
-                                               <div class="padding-4">
-                                                  <div class="row" style="">
-                                                     <div class="col s7 m7">
-                                                        <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                        <p>Total Cuti &nbsp; &nbsp; </p>
-                                                     </div>
-                                                     <div class="col s5 m5 right-align">
-                                                        <p class="no-margin">Total</p>
-                                                        <h5 class="mb-0 white-text">{{$counter_cuti}}</h5>
-                                                        
-                                                        <p></p>
-                                                     </div>
-                                                  </div>
-                                               </div>
-                                            </div>
-                                         </div>
-                                         <div class="col s12 m6 l4">
-                                            <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
-                                               <div class="padding-4">
-                                                  <div class="row">
-                                                     <div class="col s7 m7">
-                                                        <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                        <p>Sakit &nbsp;</p>
-                                                     </div>
-                                                     <div class="col s5 m5 right-align">
-                                                        <p class="no-margin">Total</p>
-                                                        <h5 class="mb-0 white-text">{{$counter_sakit}}</h5>
-                                                        
-                                                        <p></p>
-                                                     </div>
-                                                  </div>
-                                               </div>
-                                            </div>
-                                         </div>
-                                         <div class="col s12 m6 l4">
-                                            <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
-                                               <div class="padding-4">
-                                                  <div class="row">
-                                                     <div class="col s7 m7">
-                                                        <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                        <p> Ijin &nbsp;</p>
-                                                     </div>
-                                                     <div class="col s5 m5 right-align">
-                                                        <p class="no-margin">Total</p>
-                                                        <h5 class="mb-0 white-text">{{$counter_ijin}}</h5>
-                                                        
-                                                        <p></p>
-                                                     </div>
-                                                  </div>
-                                               </div>
-                                            </div>
-                                         </div>
-                                         <div class="col s12 m6 l4">
-                                            <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
-                                               <div class="padding-4">
-                                                  <div class="row">
-                                                     <div class="col s7 m7">
-                                                        <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                        <p>Dinas Luar &nbsp; &nbsp; &nbsp; &nbsp;</p>
-                                                     </div>
-                                                     <div class="col s5 m5 right-align">
-                                                        <p class="no-margin">Total</p>
-                                                        <h5 class="mb-0 white-text">{{$counter_dinas_luar}}</h5>
-                                                        
-                                                        <p></p>
-                                                     </div>
-                                                  </div>
-                                               </div>
-                                            </div>
-                                         </div>
-                                         <div class="col s12 m6 l4">
-                                            <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
-                                               <div class="padding-4">
-                                                  <div class="row">
-                                                     <div class="col s7 m7">
-                                                        <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                        <p>Cuti Khsusus</p>
-                                                     </div>
-                                                     <div class="col s5 m5 right-align">
-                                                        <p class="no-margin">Total</p>
-                                                        <h5 class="mb-0 white-text">{{$counter_cuti_kusus}}</h5>
-                                                        
-                                                        <p></p>
-                                                     </div>
-                                                  </div>
-                                               </div>
-                                            </div>
-                                         </div>
-                                         <div class="col s12 m6 l4">
-                                            <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
-                                               <div class="padding-4">
-                                                  <div class="row">
-                                                     <div class="col s7 m7">
-                                                        <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                        <p>Dispen</p>
-                                                     </div>
-                                                     <div class="col s5 m5 right-align">
-                                                        <p class="no-margin">Total</p>
-                                                        <h5 class="mb-0 white-text">{{$counter_dispen}}</h5>
-                                                        
-                                                        <p></p>
-                                                     </div>
-                                                  </div>
-                                               </div>
-                                            </div>
-                                         </div>
-                                         <div class="col s12 m6 l4">
-                                            <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
-                                               <div class="padding-4">
-                                                  <div class="row">
-                                                     <div class="col s7 m7">
-                                                        <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                        <p>WFH</p>
-                                                     </div>
-                                                     <div class="col s5 m5 right-align">
-                                                        <p class="no-margin">Total</p>
-                                                        <h5 class="mb-0 white-text">{{$counter_wfh}}</h5>
-                                                        
-                                                        <p></p>
-                                                     </div>
-                                                  </div>
-                                               </div>
-                                            </div>
-                                         </div>
-                                    </div>
-                                </div>
+                                          <div class="col s12 m6 l4">
+                                             <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                                                <div class="padding-4">
+                                                   <div class="row">
+                                                      <div class="col s7 m7">
+                                                         <i class="material-icons background-round mt-5">add_shopping_cart</i>
+                                                         <p>Tepat Keluar &nbsp;</p>
+                                                      </div>
+                                                      <div class="col s5 m5 right-align">
+                                                         <p class="no-margin">Total</p>
+                                                         <h5 class="mb-0 white-text" id="tepatkeluar">{{$tepatkeluar}}</h5>
+                                                         
+                                                         <p></p>
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                             </div>
+                                          </div>
+                                          <div class="col s12 m6 l4">
+                                             <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                                                <div class="padding-4">
+                                                   <div class="row">
+                                                      <div class="col s7 m7">
+                                                         <i class="material-icons background-round mt-5">add_shopping_cart</i>
+                                                         <p>Tepat Masuk &nbsp;</p>
+                                                      </div>
+                                                      <div class="col s5 m5 right-align">
+                                                         <p class="no-margin">Total</p>
+                                                         <h5 class="mb-0 white-text" id="tepatmasuk">{{$tepatmasuk}}</h5>
+                                                         
+                                                         <p></p>
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                             </div>
+                                          </div>
+                                          <div class="col s12 m6 l4">
+                                             <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                                                <div class="padding-4">
+                                                   <div class="row">
+                                                      <div class="col s7 m7">
+                                                         <i class="material-icons background-round mt-5">add_shopping_cart</i>
+                                                         <p>Terlambat &nbsp; &nbsp; &nbsp; &nbsp;</p>
+                                                      </div>
+                                                      <div class="col s5 m5 right-align">
+                                                         <p class="no-margin">Total</p>
+                                                         <h5 class="mb-0 white-text" id="terlambat">{{$terlambat}}</h5>
+                                                         
+                                                         <p></p>
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                             </div>
+                                          </div>
+                                          <div class="col s12 m6 l4">
+                                             <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                                                <div class="padding-4">
+                                                   <div class="row">
+                                                      <div class="col s7 m7">
+                                                         <i class="material-icons background-round mt-5">add_shopping_cart</i>
+                                                         <p>Tidak Absen Datang</p>
+                                                      </div>
+                                                      <div class="col s5 m5 right-align">
+                                                         <p class="no-margin">Total</p>
+                                                         <h5 class="mb-0 white-text" id="total_tidak_datang">{{$total_tidak_datang}}</h5>
+                                                         
+                                                         <p></p>
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                             </div>
+                                          </div>
+                                          <div class="col s12 m6 l4">
+                                             <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                                                <div class="padding-4">
+                                                   <div class="row">
+                                                      <div class="col s7 m7">
+                                                         <i class="material-icons background-round mt-5">add_shopping_cart</i>
+                                                         <p>Tidak Absen Pulang</p>
+                                                      </div>
+                                                      <div class="col s5 m5 right-align">
+                                                         <p class="no-margin">Total</p>
+                                                         <h5 class="mb-0 white-text" id="total_tidak_pulang">{{$total_tidak_pulang}}</h5>
+                                                         
+                                                         <p></p>
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                             </div>
+                                          </div>
+                                       </div>
+                                 </div>
+                                 <div class="col s4 m6 l4 ">
+                                       <div class="app-todo">
+                                          <div class="content-area" style="margin-top:0%; width:100%">
+                                             <div class="app-wrapper">
+                                             
+                                             <div class="card card card-default scrollspy border-radius-6 fixed-width" >
+                                                <div class="card-content p-0 pb-1" >
+                                                   <div class="todo-header">
+                                                   <div class="header-checkbox">
+                                                      
+                                                   </div>
+                                                   <div class="list-content"></div>
+                                                   <div class="todo-action">
+                                                      
+                                                      
+                                                   </div>
+                                                   </div>
+                                                   <ul class="collection todo-collection" style="max-height: 18rem; overflow-y: auto; overflow-x: hidden;">
+                                                      @foreach ($attendance_perday as $row_date )
+                                                      <li class="collection-item todo-items">
+                                                         <div class="list-content pl-2">
+                                                         <div class="list-title-area">
+                                                               <div class="list-title">{{$row_date['schedulefirst']}} - {{$row_date['schedulelast']}}</div>
+                                                               
+                                                         </div>
+                                                         <div class="list-desc"> {{$row_date['time']}}</div>
+                                                         </div>
+                                                         <div class="list-right">
+                                                         <div class="list-date"> {{$row_date['date']}} </div>
+                                                         
+                                                         </div>
+                                                      </li>
+                                                         
+                                                      @endforeach
+                                                      
+                                                   
+                                                   
+                                                      <li class="collection-item no-data-found">
+                                                         <h6 class="center-align font-weight-500">No Results Found</h6>
+                                                      </li>
+                                                      <div class="ps__rail-x" style="left: 0px; bottom: 0px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__rail-y" style="top: 0px; right: 0px;"><div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 0px;"></div></div>
+                                                   </ul>
+                                                </div>
+                                             </div>
+                                             </div>
+                                          </div>
+                                       </div>
+                                       
+                                 </div>
+                                 <div class="col s12 m12 l12">
+                                       
+                                       <div class="row">
+                                          <div class="col s12 m6 l4">
+                                             <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                                                <div class="padding-4">
+                                                   <div class="row" style="">
+                                                      <div class="col s7 m7">
+                                                         <i class="material-icons background-round mt-5">add_shopping_cart</i>
+                                                         <p>Total Cuti &nbsp; &nbsp; </p>
+                                                      </div>
+                                                      <div class="col s5 m5 right-align">
+                                                         <p class="no-margin">Total</p>
+                                                         <h5 class="mb-0 white-text" id="counter_cuti">{{$counter_cuti}}</h5>
+                                                         
+                                                         <p></p>
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                             </div>
+                                          </div>
+                                          <div class="col s12 m6 l4">
+                                             <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                                                <div class="padding-4">
+                                                   <div class="row">
+                                                      <div class="col s7 m7">
+                                                         <i class="material-icons background-round mt-5">add_shopping_cart</i>
+                                                         <p>Sakit &nbsp;</p>
+                                                      </div>
+                                                      <div class="col s5 m5 right-align">
+                                                         <p class="no-margin">Total</p>
+                                                         <h5 class="mb-0 white-text" id="counter_sakit">{{$counter_sakit}}</h5>
+                                                         
+                                                         <p></p>
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                             </div>
+                                          </div>
+                                          <div class="col s12 m6 l4">
+                                             <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                                                <div class="padding-4">
+                                                   <div class="row">
+                                                      <div class="col s7 m7">
+                                                         <i class="material-icons background-round mt-5">add_shopping_cart</i>
+                                                         <p> Ijin &nbsp;</p>
+                                                      </div>
+                                                      <div class="col s5 m5 right-align">
+                                                         <p class="no-margin">Total</p>
+                                                         <h5 class="mb-0 white-text" id="counter_ijin">{{$counter_ijin}}</h5>
+                                                         
+                                                         <p></p>
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                             </div>
+                                          </div>
+                                          <div class="col s12 m6 l4">
+                                             <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                                                <div class="padding-4">
+                                                   <div class="row">
+                                                      <div class="col s7 m7">
+                                                         <i class="material-icons background-round mt-5">add_shopping_cart</i>
+                                                         <p>Dinas Luar &nbsp; &nbsp; &nbsp; &nbsp;</p>
+                                                      </div>
+                                                      <div class="col s5 m5 right-align">
+                                                         <p class="no-margin">Total</p>
+                                                         <h5 class="mb-0 white-text" id="counter_dinas_luar">{{$counter_dinas_luar}}</h5>
+                                                         
+                                                         <p></p>
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                             </div>
+                                          </div>
+                                          <div class="col s12 m6 l4">
+                                             <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                                                <div class="padding-4">
+                                                   <div class="row">
+                                                      <div class="col s7 m7">
+                                                         <i class="material-icons background-round mt-5">add_shopping_cart</i>
+                                                         <p>Cuti Khsusus</p>
+                                                      </div>
+                                                      <div class="col s5 m5 right-align">
+                                                         <p class="no-margin">Total</p>
+                                                         <h5 class="mb-0 white-text" id="counter_cuti_kusus">{{$counter_cuti_kusus}}</h5>
+                                                         
+                                                         <p></p>
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                             </div>
+                                          </div>
+                                          <div class="col s12 m6 l4">
+                                             <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                                                <div class="padding-4">
+                                                   <div class="row">
+                                                      <div class="col s7 m7">
+                                                         <i class="material-icons background-round mt-5">add_shopping_cart</i>
+                                                         <p>Dispen</p>
+                                                      </div>
+                                                      <div class="col s5 m5 right-align">
+                                                         <p class="no-margin">Total</p>
+                                                         <h5 class="mb-0 white-text" id="counter_dispen">{{$counter_dispen}}</h5>
+                                                         
+                                                         <p></p>
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                             </div>
+                                          </div>
+                                          <div class="col s12 m6 l4">
+                                             <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text animate fadeLeft">
+                                                <div class="padding-4">
+                                                   <div class="row">
+                                                      <div class="col s7 m7">
+                                                         <i class="material-icons background-round mt-5">add_shopping_cart</i>
+                                                         <p>WFH</p>
+                                                      </div>
+                                                      <div class="col s5 m5 right-align">
+                                                         <p class="no-margin">Total</p>
+                                                         <h5 class="mb-0 white-text" id="counter_wfh">{{$counter_wfh}}</h5>
+                                                         
+                                                         <p></p>
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                             </div>
+                                          </div>
+                                       </div>
+                                 </div>
                             </div>
 
                         </div>
                         
-                        <div class="col s12 m6 l4">
+                        
+                        {{-- <div class="col s12 m12 l12">
                             <div class="card padding-4 animate fadeLeft">
                                 <div class="row">
-                                    <div class="col s5 m5">
-                                        <h5 class="mb-0">{{$total_telat_masuk}}</h5>
-                                        <p style="font-size: x-small" class>Tidak Check Log Masuk</p>
-                                    </div>
-                                    <div class="col s7 m7 right-align" style="font-size: 0.67rem;color: dimgrey;font-weight: bold;">
-                                        <i class="material-icons background-round mt-5 mb-5 gradient-45deg-purple-amber gradient-shadow white-text">fullscreen</i>
-                                        <p class="mb-0">periode {{$start_date}} - {{$end_date}}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col s12 m6 l4">
-                            <div class="card padding-4 animate fadeLeft">
-                                <div class="row">
-                                    <div class="col s5 m5">
-                                        <h5 class="mb-0">0</h5>
-                                        <p style="font-size: x-small" class>Tidak Check Log Keluar</p>
-                                    </div>
-                                    <div class="col s7 m7 right-align" style="font-size: 0.67rem;color: dimgrey;font-weight: bold;">
-                                        <i class="material-icons background-round mt-5 mb-5 gradient-45deg-purple-amber gradient-shadow white-text">fullscreen_exit</i>
-                                        <p class="mb-0">periode {{$start_date}} - {{$end_date}}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col s12 m6 l4">
-                            <div class="card padding-4 animate fadeLeft">
-                                <div class="row">
-                                    <div class="col s5 m5">
-                                        <h5 class="mb-0">{{$total_absen}}</h5>
-                                        <p style="font-size: x-small" class>Absen</p>
-                                    </div>
-                                    <div class="col s7 m7 right-align" style="font-size: 0.67rem;color: dimgrey;font-weight: bold;">
-                                        <i class="material-icons background-round mt-5 mb-5 gradient-45deg-purple-amber gradient-shadow white-text">fullscreen_exit</i>
-                                        <p class="mb-0">periode {{$start_date}} - {{$end_date}}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col s12 m6 l4">
-                            <div class="card padding-4 animate fadeLeft">
-                                <div class="row">
-                                    <div class="col s5 m5">
-                                        <h5 class="mb-0">{{$attendance_count}}</h5>
-                                        <p style="font-size: x-small" class>Total Masuk</p>
-                                    </div>
-                                    <div class="col s7 m7 right-align" style="font-size: 0.67rem;color: dimgrey;font-weight: bold;">
-                                        <i class="material-icons background-round mt-5 mb-5 gradient-45deg-purple-amber gradient-shadow white-text">fullscreen_exit</i>
-                                        <p class="mb-0">periode {{$start_date}} - {{$end_date}}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col s12 m6 l8">
-                            <div class="card padding-3 animate fadeLeft">
-                                <ul class="collapsible collapsible-accordion">
-                                    <li>
-                                        <div class="collapsible-header"><i class="material-icons">filter_list</i> Detail Masuk</div>
-                                        <div class="collapsible-body">
-                                            <div class="row" style="max-height: 8rem;overflow-y: scroll;">
-                                                @foreach ($attendance as $row_attendance )
-                                                    <div class="card card-border z-depth-2">
-                            
-                                                        <div class="card-content">
-                                                            <h6 class="font-weight-900 text-uppercase"><a href="#">{{$row_attendance['date']}}</a></h6>
-                                                            @if ($row_attendance["in"] == 1 && $row_attendance["out"] == 1)
-                                                                <p>Tepat Waktu</p>
-                                                            @elseif ($row_attendance["in"] == 0 && $row_attendance["out"] == 1)
-                                                                <p>Tidak Check Log Masuk</p>
-                                                            @elseif ($row_attendance["in"] == 1 && $row_attendance["out"] == 0)
-                                                                <p>Tidak Check Log Keluar</p>
-                                                            @else
-                                                                <p>Tidak Masuk</p>
-                                                            @endif
-                                                        </div>
-                                                    </div>
-                                                @endforeach
-                                                
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                            
-                        </div>
-                        <div class="col s12 m12 l12">
-                            <div class="card padding-4 animate fadeLeft">
-                                {{-- <div class="row">
                                     <div class="col s12 m12">
                                         <h5>HPP & STOK REALTIME</h5>
                                         <table class="bordered" style="font-size:10px;zoom:0.8;">
@@ -481,9 +405,9 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                </div> --}}
+                                </div>
                             </div>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
 
@@ -500,3 +424,44 @@
         </div>
     </div>
 </div>
+
+<script>
+   $(function(){
+      select2ServerSide('#period_id', '{{ url("admin/select2/period") }}');
+   })
+
+   function periodChange(){
+      $.ajax({
+         url: '{{ Request::url() }}/change_period',
+         type: 'POST',
+         dataType: 'JSON',
+         data: {
+               id: $('#period_id').val(),
+         },
+         headers: {
+               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+         },
+         beforeSend: function() {
+               loadingOpen('.modal-content');
+         },
+         success: function(response) {
+               loadingClose('.modal-content');
+               $('#attendance_count').text(response.message['attendance_count']);
+               $('#tepatkeluar').text(response.message['tepatkeluar']);
+               
+               $('.modal-content').scrollTop(0);
+             
+         },
+         error: function() {
+               $('.modal-content').scrollTop(0);
+               loadingClose('.modal-content');
+               swal({
+                  title: 'Ups!',
+                  text: 'Check your internet connection.',
+                  icon: 'error'
+               });
+         }
+      });
+     
+   }
+</script>

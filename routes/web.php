@@ -351,6 +351,10 @@ Route::prefix('admin')->group(function () {
                 Route::get('item_serial_return_po', [Select2Controller::class, 'itemSerialReturnPo']);
             });
 
+            Route::prefix('dashboard')->group(function () {
+                Route::post('change_period',[DashboardController::class, 'changePeriod']);
+            });
+
             Route::prefix('menu')->group(function () {
                 Route::get('/',[MenuIndexController::class, 'index']);
             });
@@ -1278,7 +1282,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [PurchaseRequestController::class, 'show']);
                     Route::post('get_items', [PurchaseRequestController::class, 'getItems']);
                     Route::post('get_code', [PurchaseRequestController::class, 'getCode']);
-                    Route::post('get_outstanding', [PurchaseRequestController::class, 'getOutstanding']);
+                    Route::get('get_outstanding', [PurchaseRequestController::class, 'getOutstanding']);
                     Route::post('get_items_from_stock', [PurchaseRequestController::class, 'getItemFromStock']);
                     Route::post('print',[PurchaseRequestController::class, 'print']);
                     Route::get('export',[PurchaseRequestController::class, 'export']);
@@ -1348,7 +1352,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [PurchaseOrderController::class, 'show']);
                     Route::post('get_items', [PurchaseOrderController::class, 'getItems']);
                     Route::post('get_code', [PurchaseOrderController::class, 'getCode']);
-                    Route::post('get_outstanding', [PurchaseOrderController::class, 'getOutstanding']);
+                    Route::get('get_outstanding', [PurchaseOrderController::class, 'getOutstanding']);
                     Route::post('print',[PurchaseOrderController::class, 'print']);
                     Route::post('print_by_range',[PurchaseOrderController::class, 'printByRange']);
                     Route::get('export',[PurchaseOrderController::class, 'export']);
@@ -1376,6 +1380,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('viewstructuretree',[PurchaseDownPaymentController::class, 'viewStructureTree']);
                     Route::get('view_journal/{id}',[PurchaseDownPaymentController::class, 'viewJournal'])->middleware('operation.access:purchase_down_payment,journal');
                     Route::get('export',[PurchaseDownPaymentController::class, 'export']);
+                    Route::get('get_outstanding', [PurchaseDownPaymentController::class, 'getOutstanding']);
                     Route::post('create',[PurchaseDownPaymentController::class, 'create'])->middleware('operation.access:purchase_down_payment,update');
                     Route::post('void_status', [PurchaseDownPaymentController::class, 'voidStatus'])->middleware('operation.access:purchase_down_payment,void');
                     Route::get('approval/{id}',[PurchaseDownPaymentController::class, 'approval'])->withoutMiddleware('direct.access');
@@ -1384,6 +1389,7 @@ Route::prefix('admin')->group(function () {
 
                 Route::prefix('landed_cost')->middleware(['operation.access:landed_cost,view','lockacc'])->group(function () {
                     Route::get('/',[LandedCostController::class, 'index']);
+                    Route::get('get_outstanding', [LandedCostController::class, 'getOutstanding']);
                     Route::post('get_good_receipt', [LandedCostController::class, 'getGoodReceipt']);
                     Route::post('get_account_data', [LandedCostController::class, 'getAccountData']);
                     Route::post('get_delivery_cost', [LandedCostController::class, 'getDeliveryCost']);
@@ -1407,6 +1413,7 @@ Route::prefix('admin')->group(function () {
 
                 Route::prefix('purchase_invoice')->middleware(['operation.access:purchase_invoice,view','lockacc'])->group(function () {
                     Route::get('/',[PurchaseInvoiceController::class, 'index']);
+                    Route::get('get_outstanding', [PurchaseInvoiceController::class, 'getOutstanding']);
                     Route::post('get_gr_lc', [PurchaseInvoiceController::class, 'getGoodReceiptLandedCost']);
                     Route::post('get_account_data', [PurchaseInvoiceController::class, 'getAccountData']);
                     Route::get('datatable',[PurchaseInvoiceController::class, 'datatable']);
@@ -1637,6 +1644,7 @@ Route::prefix('admin')->group(function () {
 
                 Route::prefix('good_receipt_po')->middleware(['operation.access:good_receipt_po,view','lockacc'])->group(function () {
                     Route::get('/',[GoodReceiptPOController::class, 'index']);
+                    Route::get('get_outstanding', [GoodReceiptPOController::class, 'getOutstanding']);
                     Route::get('datatable',[GoodReceiptPOController::class, 'datatable']);
                     Route::get('row_detail',[GoodReceiptPOController::class, 'rowDetail']);
                     Route::post('show', [GoodReceiptPOController::class, 'show']);

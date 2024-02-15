@@ -14,10 +14,12 @@
         </tr>
     </thead>
     <tbody>
-        <tr>
-            <td colspan="10">Saldo Sebelumnya:</td>
-            <td align="center"> {{$latest}}</td>
-        </tr>
+        @if($perlu = 1)
+            <tr>
+                <td colspan="10">Saldo Sebelumnya:</td>
+                <td align="center"> {{$latest}}</td>
+            </tr>
+        @endif
         @foreach($data as $key => $row)
         <tr>
             <td align="center">{{$key+1}}</td>

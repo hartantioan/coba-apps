@@ -7,7 +7,7 @@ use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Item;
 use App\Models\ItemStock;
-
+use App\Models\ItemGroup;
 use App\Models\User;
 use App\Models\Place;
 use App\Models\Warehouse;
@@ -27,9 +27,14 @@ class StockInQtyController extends Controller
     }
     public function index(Request $request)
     {
-        
+        $itemGroup = ItemGroup::whereHas('childSub',function($query){
+            $query->whereHas('itemGroupWarehouse',function($query){
+                $query->whereIn('warehouse_id',$this->datawarehouses);
+            });
+        })->get();
         $data = [
             'title'     => 'Stok Dalam Qty',
+            'group'     =>  $itemGroup,
             'content'   => 'admin.inventory.stock_in_qty',
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'warehouse'     => Warehouse::where('status','1')->whereIn('id',$this->datawarehouses)->get(),

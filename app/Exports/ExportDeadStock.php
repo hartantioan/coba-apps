@@ -13,12 +13,12 @@ class ExportDeadStock implements FromView,ShouldAutoSize
     /**
     * @return \Illuminate\Support\Collection
     */
-    protected $plant,$warehouse,$hari,$date;
-    public function __construct(string $plant, string $warehouse,string $hari,string $date)
+    protected $plant,$warehouse,$group,$date;
+    public function __construct(string $plant, string $warehouse,string $date,string $group)
     {
         $this->plant = $plant ? $plant : '';
 		$this->warehouse = $warehouse ? $warehouse : '';
-        $this->hari = $hari ? $hari : '';
+        $this->group = $group ? $group : '';
         $this->date = $date ? $date : '';
     }
     public function view(): View
@@ -27,9 +27,20 @@ class ExportDeadStock implements FromView,ShouldAutoSize
             $query->selectRaw('MAX(id)')
                 ->from('item_cogs')
                 ->where('date', '<=', $this->date)
-                ->where('place_id',$this->plant)
-                ->where('warehouse_id',$this->warehouse)
                 ->groupBy('item_id');
+            
+            if($this->plant != 'all'){
+                $query->where('plant_id',$this->plant);
+            }
+            if($this->warehouse != 'all'){
+                $query->where('warehouse_id',$this->warehouse);
+            }
+            if($this->group[0] != null){
+                $groupIds = explode(',', $this->group);
+                $query->whereHas('item',function($query) use($groupIds){
+                    $query->whereIn('item_group_id', $groupIds);
+                });
+            }
         })
         ->get();
         $array_filter = [];
@@ -38,17 +49,17 @@ class ExportDeadStock implements FromView,ShouldAutoSize
             $date = Carbon::parse($row->date);
             $dateDifference = $date->diffInDays($this->date);
                
-                if ($dateDifference >= intval($this->hari)) {
-                    $array_filter[]=[
-                        'plant'=>$row->place->code,
-                        'gudang'=>$row->warehouse->code,
-                        'kode'=>$row->item->code,
-                        'item'=>$row->item->name,
-                        'keterangan'=>$row->lookable->code.'-'.$row->lookable->name,
-                        'date'=>date('d/m/Y',strtotime($row->date)),
-                        'lamahari'=>$dateDifference,
-                    ];
-                }
+            
+                $array_filter[]=[
+                    'plant'=>$row->place->code,
+                    'gudang'=>$row->warehouse->name,
+                    'kode'=>$row->item->code,
+                    'item'=>$row->item->name,
+                    'keterangan'=>$row->lookable->code.'-'.$row->lookable->name,
+                    'date'=>date('d/m/Y',strtotime($row->date)),
+                    'lamahari'=>$dateDifference,
+                ];
+                
                       
         }
       

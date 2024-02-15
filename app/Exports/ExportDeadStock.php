@@ -27,9 +27,14 @@ class ExportDeadStock implements FromView,ShouldAutoSize
             $query->selectRaw('MAX(id)')
                 ->from('item_cogs')
                 ->where('date', '<=', $this->date)
-                ->where('place_id',$this->plant)
-                ->where('warehouse_id',$this->warehouse)
                 ->groupBy('item_id');
+            
+            if($this->plant != 'all'){
+                $query->where('plant_id',$this->plant);
+            }
+            if($this->warehouse != 'all'){
+                $query->where('warehouse_id',$this->warehouse);
+            }
         })
         ->get();
         $array_filter = [];

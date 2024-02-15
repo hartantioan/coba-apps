@@ -43,6 +43,7 @@
                                         </div>
                                         <div class="input-field col m3 s12">
                                             <select class="form-control" id="warehouse" name="warehouse">
+                                                <option value="all">Semua</option>
                                                 @foreach ($warehouse as $row)
                                                     <option value="{{ $row->id }}">{{ $row->name }}</option>
                                                 @endforeach

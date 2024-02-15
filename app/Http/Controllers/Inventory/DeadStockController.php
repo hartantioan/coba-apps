@@ -33,16 +33,18 @@ class DeadStockController extends Controller
             $query->selectRaw('MAX(id)')
                 ->from('item_cogs')
                 ->where('date', '<=', $request->date)
-                ->where('warehouse_id',$request->warehouse)
                 ->groupBy('item_id');
 
             if($request->plant != 'all'){
                 $query->where('place_id',$request->plant);
             }
+            if($request->warehouse != 'all'){
+                $query->where('warehouse_id',$request->warehouse);
+            }
         })
         ->get();
         $array_filter=[];
-        
+       
         foreach($query_data as $row){
            
             $date = Carbon::parse($row->date);

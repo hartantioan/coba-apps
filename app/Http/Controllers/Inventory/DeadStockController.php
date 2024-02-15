@@ -44,20 +44,20 @@ class DeadStockController extends Controller
 
     public function filter(Request $request){
         $start_time = microtime(true);
-        info($request);
-        $query_data = ItemCogs::whereIn('id', function ($query) use ($request) {
+        $query_data = ItemCogs::whereIn('id', function ($query) use ($request) {            
             $query->selectRaw('MAX(id)')
                 ->from('item_cogs')
                 ->where('date', '<=', $request->date)
                 ->groupBy('item_id');
-
+        })
+        ->where(function($query)use($request){
             if($request->plant != 'all'){
                 $query->where('place_id',$request->plant);
             }
             if($request->warehouse != 'all'){
                 $query->where('warehouse_id',$request->warehouse);
             }
-            if($request->group[0] != null){
+            if($request->group){
                 $query->whereHas('item',function($query) use($request){
                     $query->whereIn('item_group_id', $request->group);
                 });

@@ -66,7 +66,7 @@ class TrialBalanceController extends Controller
                 <th style="min-width:150px !important;" class="center-align">Saldo Awal</th>
                 <th style="min-width:150px !important;" class="center-align">Debit</th>
                 <th style="min-width:150px !important;" class="center-align">Kredit</th>
-                <th style="min-width:150px !important;" class="center-align">Saldo</th>';
+                <th style="min-width:150px !important;" class="center-align">Saldo Akhir</th>';
         }
 
         $html .= '</tr></thead><tbody>';

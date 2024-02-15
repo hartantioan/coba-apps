@@ -316,7 +316,7 @@ class MarketingOrderPlanController extends Controller
                 DB::beginTransaction();
                 $lastSegment = $request->lastsegment;
                 $menu = Menu::where('url', $lastSegment)->first();
-                $newCode=MarketingOrderPlan::generateCode($menu->document_code.date('y').$request->code_place_id);
+                $newCode=MarketingOrderPlan::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                     
                 try {
                     $query = MarketingOrderPlan::create([

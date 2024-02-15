@@ -324,7 +324,7 @@ class MarketingHandoverInvoiceController extends Controller
                 }else{
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode=MarketingOrderHandoverInvoice::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    $newCode=MarketingOrderHandoverInvoice::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                     
                     $query = MarketingOrderHandoverInvoice::create([
                         'code'			            => $newCode,

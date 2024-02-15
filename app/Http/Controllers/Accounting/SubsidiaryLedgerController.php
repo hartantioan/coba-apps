@@ -31,6 +31,7 @@ class SubsidiaryLedgerController extends Controller
         $date_end = $request->date_end;
         $coa_start = $request->coa_start;
         $coa_end = $request->coa_end;
+        $is_closing_journal = $request->is_closing_journal;
 
         if($coa_start > $coa_end || $date_start > $date_end){
             return response()->json([
@@ -79,10 +80,19 @@ class SubsidiaryLedgerController extends Controller
             })->where('nominal','!=',0)->get();
             $arrData = [];
             foreach($rowdata as $rowdetail){
-                $arrData[] = [
-                    'post_date' => $rowdetail->journal->post_date,
-                    'data'      => $rowdetail,
-                ];
+                if($is_closing_journal){
+                    if($rowdetail->journal->lookable_type !== 'closing_journals'){
+                        $arrData[] = [
+                            'post_date' => $rowdetail->journal->post_date,
+                            'data'      => $rowdetail,
+                        ];
+                    }
+                }else{
+                    $arrData[] = [
+                        'post_date' => $rowdetail->journal->post_date,
+                        'data'      => $rowdetail,
+                    ];
+                }
             }
             $collect = collect($arrData)->sortBy('post_date');
             $balance = $row->getBalanceFromDate($date_start);
@@ -142,7 +152,8 @@ class SubsidiaryLedgerController extends Controller
         $dateend = $request->dateend ? $request->dateend : '';
         $coastart = $request->coastart ? $request->coastart : '';
         $coaend = $request->coaend ? $request->coaend : '';
+        $closing_journal = $request->closing_journal;
 
-		return Excel::download(new ExportSubsidiaryLedger($datestart,$dateend,$coastart,$coaend), 'subsidiary_ledger_'.uniqid().'.xlsx');
+		return Excel::download(new ExportSubsidiaryLedger($datestart,$dateend,$coastart,$coaend,$closing_journal), 'subsidiary_ledger_'.uniqid().'.xlsx');
     }
 }

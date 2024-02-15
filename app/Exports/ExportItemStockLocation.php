@@ -31,7 +31,6 @@ class ExportItemStockLocation implements FromView,ShouldAutoSize
             }
         })->get();
         
-        info($query_data);
         $array_filter = [];
         foreach($query_data as $row){
             $data_tempura = [

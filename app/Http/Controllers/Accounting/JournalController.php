@@ -422,7 +422,7 @@ class JournalController extends Controller
                 }else{
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode=Journal::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    $newCode=Journal::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                     $query = Journal::create([
                         'code'			            => $newCode,
                         'lookable_type'             => $request->journal_id ? 'journals' : NULL,

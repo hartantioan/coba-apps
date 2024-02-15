@@ -538,7 +538,7 @@ class GoodReceiptPOController extends Controller
                 try {
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode=GoodReceipt::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    $newCode=GoodReceipt::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                    
                     $query = GoodReceipt::create([
                         'code'			        => $newCode,

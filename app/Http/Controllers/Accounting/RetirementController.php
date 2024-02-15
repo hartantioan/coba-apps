@@ -276,7 +276,7 @@ class RetirementController extends Controller
 			}else{
                 $lastSegment = $request->lastsegment;
                 $menu = Menu::where('url', $lastSegment)->first();
-                $newCode=Retirement::generateCode($menu->document_code.date('y').$request->code_place_id);
+                $newCode=Retirement::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                 $query = Retirement::create([
                     'code'			=> $newCode,
                     'user_id'		=> session('bo_id'),

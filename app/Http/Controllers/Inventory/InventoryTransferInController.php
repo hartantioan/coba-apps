@@ -345,7 +345,7 @@ class InventoryTransferInController extends Controller
                 }else{
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode=InventoryTransferIn::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    $newCode=InventoryTransferIn::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                     
                     $query = InventoryTransferIn::create([
                         'code'			            => $newCode,

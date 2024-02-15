@@ -14,7 +14,6 @@ class ExportOutstandingDP implements FromView,ShouldAutoSize
     public function view(): View
     {
         $data = PurchaseDownPayment::whereIn('status',['2','3'])->whereNull('status')->get();
-        info($data);
         $array=[];
         foreach($data as $row){
             $entry = [];

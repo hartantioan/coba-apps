@@ -1018,7 +1018,7 @@ class FundRequestController extends Controller
                 try {
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode=FundRequest::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    $newCode=FundRequest::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                     
                     $query = FundRequest::create([
                         'code'			=> $newCode,

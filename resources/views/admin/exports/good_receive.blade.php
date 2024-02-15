@@ -54,21 +54,19 @@
                 <td>{{ $row->user->name }}</td>
                 <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                 <td>{{ $row->note }}</td>
-
                 <td><a href="{{ $row->attachment() }}">File</a></td>
                 <td>{{ $rowdetail->item->code }}</td>
- 
                 <td>{{$rowdetail->item->name }}</td>
                 <td>{{ $rowdetail->getPlace() }}</td>
                 <td>{{ $rowdetail->note }}</td>
                 <td>{{ $rowdetail->inventoryCoa()->exists() ? $rowdetail->inventoryCoa->name.' - '.$rowdetail->inventoryCoa->code : '-' }}</td>
-                <td>{{ $rowdetail->coa()->exists() ? $row->coa->code.' - '.$rowdetail->coa->name : '-' }}</td>
+                <td>{{ $rowdetail->coa()->exists() ? $rowdetail->coa->code.' - '.$rowdetail->coa->name : '-' }}</td>
                 <td>{{ $rowdetail->costDistribution()->exists() ? $rowdetail->costDistribution->name : '-' }}</td>
                 <td>{{ number_format($rowdetail->qty,3,',','.') }}</td>
                 <td>{{ $rowdetail->item->uomUnit->code }}</td>
-                <td>{{ $rowdetail->line->code }}</td>
-                <td>{{ $rowdetail->machine->code }}</td>
-                <td>{{ $rowdetail->department->name }}</td>
+                <td>{{ $rowdetail->line()->exists() ? $rowdetail->line->code : '-' }}</td>
+                <td>{{ $rowdetail->machine()->exists() ? $rowdetail->machine->code : '-' }}</td>
+                <td>{{ $rowdetail->department()->exists() ? $rowdetail->department->name : '-' }}</td>
                 <td>{{ $rowdetail->place->code.' - '.$rowdetail->warehouse->name }}</td>
                 <td>{{ $rowdetail->area()->exists() ? $rowdetail->area->name : '-' }}</td>
                 <td>{{ $rowdetail->itemShading()->exists() ? $rowdetail->itemShading->code : '-' }}</td>

@@ -339,7 +339,7 @@ class PurchaseInvoiceController extends Controller
         
         foreach($datagr as $row){
             $invoice = $row->totalInvoice();
-            if(($row->grandtotal - $invoice) > 0){
+            if(round($row->grandtotal - $invoice,2) > 0){
                 $details[] = [
                     'type'          => 'good_receipts',
                     'id'            => $row->id,
@@ -993,7 +993,7 @@ class PurchaseInvoiceController extends Controller
                 try {
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode=PurchaseInvoice::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    $newCode=PurchaseInvoice::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                     
                     $query = PurchaseInvoice::create([
                         'code'			            => $newCode,

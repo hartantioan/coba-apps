@@ -75,24 +75,21 @@ class SubsidiaryLedgerController extends Controller
 
         foreach($coas as $key => $row){
             $rowdata = null;
-            $rowdata = $row->journalDetail()->whereHas('journal',function($query)use($date_start,$date_end){
-                $query->whereRaw("post_date BETWEEN '$date_start' AND '$date_end'");
+            $rowdata = $row->journalDetail()->whereHas('journal',function($query)use($date_start,$date_end,$is_closing_journal){
+                $query->whereRaw("post_date BETWEEN '$date_start' AND '$date_end'")
+                    ->where(function($query)use($is_closing_journal){
+                        if($is_closing_journal){
+                            $query->where('lookable_type','!=','closing_journals')
+                                ->orWhereNull('lookable_type');
+                        }
+                    });
             })->where('nominal','!=',0)->get();
             $arrData = [];
             foreach($rowdata as $rowdetail){
-                if($is_closing_journal){
-                    if($rowdetail->journal->lookable_type !== 'closing_journals'){
-                        $arrData[] = [
-                            'post_date' => $rowdetail->journal->post_date,
-                            'data'      => $rowdetail,
-                        ];
-                    }
-                }else{
-                    $arrData[] = [
-                        'post_date' => $rowdetail->journal->post_date,
-                        'data'      => $rowdetail,
-                    ];
-                }
+                $arrData[] = [
+                    'post_date' => $rowdetail->journal->post_date,
+                    'data'      => $rowdetail,
+                ];
             }
             $collect = collect($arrData)->sortBy('post_date');
             $balance = $row->getBalanceFromDate($date_start);

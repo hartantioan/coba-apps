@@ -138,9 +138,29 @@ class Coa extends Model
             $child = $this->getFifthChildFromFifth();
         }
 
+        $totalBalanceBeforeDebit = 0;
+        $totalBalanceBeforeCredit = 0;
         $totalDebit = 0;
         $totalCredit = 0;
         foreach($child as $row){
+            $totalBalanceBeforeDebit += $row->journalDebit()->whereHas('journal',function($query)use($month){
+                $query->whereIn('status',['2','3'])
+                    ->whereRaw("post_date < '$month-01'")
+                    ->where(function($query){
+                        $query->where('lookable_type','!=','closing_journals')
+                            ->orWhereNull('lookable_type');
+                    });
+            })->sum('nominal');
+
+            $totalBalanceBeforeCredit += $row->journalCredit()->whereHas('journal',function($query)use($month){
+                $query->whereIn('status',['2','3'])
+                    ->whereRaw("post_date < '$month-01'")
+                    ->where(function($query){
+                        $query->where('lookable_type','!=','closing_journals')
+                            ->orWhereNull('lookable_type');
+                    });
+            })->sum('nominal');
+
             $totalDebit += $row->journalDebit()->whereHas('journal',function($query)use($month){
                 $query->whereIn('status',['2','3'])
                     ->whereRaw("post_date LIKE '$month%'")
@@ -161,9 +181,10 @@ class Coa extends Model
         }
 
         $arr = [
-            'totalDebit'    => $totalDebit,
-            'totalCredit'   => $totalCredit,
-            'totalBalance'  => $totalDebit - $totalCredit,
+            'totalBalanceBefore'    => $totalBalanceBeforeDebit - $totalBalanceBeforeCredit,
+            'totalDebit'            => $totalDebit,
+            'totalCredit'           => $totalCredit,
+            'totalBalance'          => $totalDebit - $totalCredit,
         ];
 
         return $arr;

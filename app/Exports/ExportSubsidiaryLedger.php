@@ -34,23 +34,20 @@ class ExportSubsidiaryLedger implements  FromView,ShouldAutoSize
         foreach($coas as $key => $row){
             $rowdata = null;
             $rowdata = $row->journalDetail()->whereHas('journal',function($query)use($date_start,$date_end){
-                $query->whereRaw("post_date BETWEEN '$date_start' AND '$date_end'");
+                $query->whereRaw("post_date BETWEEN '$date_start' AND '$date_end'")
+                    ->where(function($query){
+                        if($this->closing_journal){
+                            $query->where('lookable_type','!=','closing_journals')
+                                ->orWhereNull('lookable_type');
+                        }
+                    });
             })->where('nominal','!=',0)->get();
             $arrData = [];
             foreach($rowdata as $rowdetail){
-                if($this->closing_journal){
-                    if($rowdetail->journal->lookable_type !== 'closing_journals'){
-                        $arrData[] = [
-                            'post_date' => $rowdetail->journal->post_date,
-                            'data'      => $rowdetail,
-                        ];
-                    }
-                }else{
-                    $arrData[] = [
-                        'post_date' => $rowdetail->journal->post_date,
-                        'data'      => $rowdetail,
-                    ];
-                }
+                $arrData[] = [
+                    'post_date' => $rowdetail->journal->post_date,
+                    'data'      => $rowdetail,
+                ];
             }
             $collect = collect($arrData)->sortBy('post_date');
             $balance = $row->getBalanceFromDate($date_start);

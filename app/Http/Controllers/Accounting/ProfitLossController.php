@@ -36,14 +36,16 @@ class ProfitLossController extends Controller
         $arrMonth = [];
         while (strtotime($month_start) <= strtotime($month_end)) {
             $arrMonth[] = [
-                'month'         => date("F'y", strtotime($month_start)),
-                'raw_month'     => date("Y-m", strtotime($month_start)),
-                'totalDebit'    => 0,
-                'totalCredit'   => 0,
-                'totalBalance'  => 0,
-                'tempDebit'     => 0,
-                'tempCredit'    => 0,
-                'tempBalance'   => 0,
+                'month'                 => date("F'y", strtotime($month_start)),
+                'raw_month'             => date("Y-m", strtotime($month_start)),
+                'totalBalanceBefore'    => 0,
+                'totalDebit'            => 0,
+                'totalCredit'           => 0,
+                'totalBalance'          => 0,
+                'tempBalanceBefore'     => 0,
+                'tempDebit'             => 0,
+                'tempCredit'            => 0,
+                'tempBalance'           => 0,
             ];
             $month_start = date("Y-m", strtotime("+1 month", strtotime($month_start)));
         }
@@ -54,16 +56,17 @@ class ProfitLossController extends Controller
                             <th rowspan="2" style="min-width:350px !important;left: 0px;position: sticky;background-color:white;">Nama Coa</th>';
 
         foreach($arrMonth as $key => $row) {
-            $html .= '<th style="min-width:450px !important;" class="center-align" colspan="3">'.$row['month'].'</th>';
+            $html .= '<th style="min-width:450px !important;" class="center-align" colspan="4">'.$row['month'].'</th>';
         }
 
         $html .= '</tr><tr>';
 
         foreach($arrMonth as $key => $row) {
             $html .= '
+                <th style="min-width:150px !important;" class="center-align">Saldo Awal</th>
                 <th style="min-width:150px !important;" class="center-align">Debit</th>
                 <th style="min-width:150px !important;" class="center-align">Kredit</th>
-                <th style="min-width:150px !important;" class="center-align">Saldo</th>';
+                <th style="min-width:150px !important;" class="center-align">Saldo Akhir</th>';
         }
 
         $html .= '</tr></thead><tbody>';
@@ -78,12 +81,14 @@ class ProfitLossController extends Controller
                 foreach($arrMonth as $key => $rowMonth) {
                     $val = $row->getTotalMonthFromParentExceptClosing($rowMonth['raw_month'],$level);
                     $html .= '
+                        <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalanceBefore'],2,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalDebit'],2,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalCredit'],2,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalance'],2,',','.').'</td>';
+                    $arrMonth[$key]['totalBalanceBefore'] += $val['totalBalanceBefore'];
                     $arrMonth[$key]['totalDebit'] += $val['totalDebit'];
                     $arrMonth[$key]['totalCredit'] += $val['totalCredit'];
-                    $arrMonth[$key]['totalBalance'] += $val['totalDebit'] - $val['totalCredit'];
+                    $arrMonth[$key]['totalBalance'] += $val['totalBalanceBefore'] + $val['totalDebit'] - $val['totalCredit'];
                 }
 
                 $html .= '</tr>';
@@ -94,9 +99,10 @@ class ProfitLossController extends Controller
                 if($tempParent !== $row->parent_id){
                     $html .= '<tr>
                         <td style="left: 0px;position: sticky;background-color:white;"><b>'.$row->parentSub->name.'</b></td>
-                        <td colspan="'.(count($arrMonth) * 3).'"></td>
+                        <td colspan="'.(count($arrMonth) * 4).'"></td>
                     </tr>';
                     foreach($arrMonth as $key => $rowMonth) {
+                        $arrMonth[$key]['tempBalanceBefore'] = 0;
                         $arrMonth[$key]['tempDebit'] = 0;
                         $arrMonth[$key]['tempCredit'] = 0;
                         $arrMonth[$key]['tempBalance'] = 0;
@@ -108,15 +114,18 @@ class ProfitLossController extends Controller
                 foreach($arrMonth as $key => $rowMonth) {
                     $val = $row->getTotalMonthFromParentExceptClosing($rowMonth['raw_month'],$level);
                     $html .= '
+                        <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalanceBefore'],2,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalDebit'],2,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalCredit'],2,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalance'],2,',','.').'</td>';
                     $arrMonth[$key]['totalDebit'] += $val['totalDebit'];
                     $arrMonth[$key]['totalCredit'] += $val['totalCredit'];
-                    $arrMonth[$key]['totalBalance'] += $val['totalDebit'] - $val['totalCredit'];
+                    $arrMonth[$key]['totalBalance'] += $val['totalBalanceBefore'] + $val['totalDebit'] - $val['totalCredit'];
                     $arrMonth[$key]['tempDebit'] += $val['totalDebit'];
                     $arrMonth[$key]['tempCredit'] += $val['totalCredit'];
-                    $arrMonth[$key]['tempBalance'] += $val['totalDebit'] - $val['totalCredit'];
+                    $arrMonth[$key]['tempBalance'] += $val['totalBalanceBefore'] + $val['totalDebit'] - $val['totalCredit'];
+                    $arrMonth[$key]['tempBalanceBefore'] += $val['totalBalanceBefore'];
+                    $arrMonth[$key]['totalBalanceBefore'] += $val['totalBalanceBefore'];
                 }
 
                 $html .= '</tr>';
@@ -127,7 +136,9 @@ class ProfitLossController extends Controller
                             <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->name.'</b></td>';
                         
                         foreach($arrMonth as $key => $rowMonth) {
-                            $html .= '<td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempDebit'],2,',','.').'</b></td>
+                            $html .= '
+                            <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalanceBefore'],2,',','.').'</b></td>
+                            <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempDebit'],2,',','.').'</b></td>
                             <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempCredit'],2,',','.').'</b></td>
                             <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalance'],2,',','.').'</b></td>';
                         }
@@ -139,7 +150,9 @@ class ProfitLossController extends Controller
                         <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->name.'</b></td>';
 
                     foreach($arrMonth as $key => $rowMonth) {
-                        $html .= '<td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempDebit'],2,',','.').'</b></td>
+                        $html .= '
+                        <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalanceBefore'],2,',','.').'</b></td>
+                        <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempDebit'],2,',','.').'</b></td>
                         <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempCredit'],2,',','.').'</b></td>
                         <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalance'],2,',','.').'</b></td>';
                     }
@@ -156,9 +169,10 @@ class ProfitLossController extends Controller
                 if($tempParent2 !== $row->parentSub->parent_id){
                     $html .= '<tr>
                         <td style="left: 0px;position: sticky;background-color:white;"><b>'.$row->parentSub->parentSub->name.'</b></td>
-                        <td colspan="'.(count($arrMonth) * 3).'"></td>
+                        <td colspan="'.(count($arrMonth) * 4).'"></td>
                     </tr>';
                     foreach($arrMonth as $key => $rowMonth) {
+                        $arrMonth[$key]['tempBalanceBefore'] = 0;
                         $arrMonth[$key]['tempDebit'] = 0;
                         $arrMonth[$key]['tempCredit'] = 0;
                         $arrMonth[$key]['tempBalance'] = 0;
@@ -167,7 +181,7 @@ class ProfitLossController extends Controller
                 if($tempParent1 !== $row->parent_id){
                     $html .= '<tr>
                         <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;'.$row->parentSub->name.'</td>
-                        <td colspan="'.(count($arrMonth) * 3).'"></td>
+                        <td colspan="'.(count($arrMonth) * 4).'"></td>
                     </tr>';
                 }
                 $html .= '<tr>
@@ -176,15 +190,18 @@ class ProfitLossController extends Controller
                 foreach($arrMonth as $key => $rowMonth) {
                     $val = $row->getTotalMonthFromParentExceptClosing($rowMonth['raw_month'],$level);
                     $html .= '
+                        <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalanceBefore'],2,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalDebit'],2,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalCredit'],2,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalance'],2,',','.').'</td>';
                     $arrMonth[$key]['totalDebit'] += $val['totalDebit'];
                     $arrMonth[$key]['totalCredit'] += $val['totalCredit'];
-                    $arrMonth[$key]['totalBalance'] += $val['totalDebit'] - $val['totalCredit'];
+                    $arrMonth[$key]['totalBalance'] += $val['totalBalanceBefore'] + $val['totalDebit'] - $val['totalCredit'];
                     $arrMonth[$key]['tempDebit'] += $val['totalDebit'];
                     $arrMonth[$key]['tempCredit'] += $val['totalCredit'];
-                    $arrMonth[$key]['tempBalance'] += $val['totalDebit'] - $val['totalCredit'];
+                    $arrMonth[$key]['tempBalance'] += $val['totalBalanceBefore'] + $val['totalDebit'] - $val['totalCredit'];
+                    $arrMonth[$key]['tempBalanceBefore'] += $val['totalBalanceBefore'];
+                    $arrMonth[$key]['totalBalanceBefore'] += $val['totalBalanceBefore'];
                 }
 
                 $html .= '</tr>';
@@ -195,7 +212,9 @@ class ProfitLossController extends Controller
                             <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->parentSub->name.'</b></td>';
                         
                         foreach($arrMonth as $key => $rowMonth) {
-                            $html .= '<td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempDebit'],2,',','.').'</b></td>
+                            $html .= '
+                            <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalanceBefore'],2,',','.').'</b></td>
+                            <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempDebit'],2,',','.').'</b></td>
                             <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempCredit'],2,',','.').'</b></td>
                             <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalance'],2,',','.').'</b></td>';
                         }
@@ -226,9 +245,10 @@ class ProfitLossController extends Controller
                 if($tempParent3 !== $row->parentSub->parentSub->parent_id){
                     $html .= '<tr>
                         <td style="left: 0px;position: sticky;background-color:white;"><b>'.$row->parentSub->parentSub->parentSub->name.'</b></td>
-                        <td colspan="'.(count($arrMonth) * 3).'"></td>
+                        <td colspan="'.(count($arrMonth) * 4).'"></td>
                     </tr>';
                     foreach($arrMonth as $key => $rowMonth) {
+                        $arrMonth[$key]['tempBalanceBefore'] = 0;
                         $arrMonth[$key]['tempDebit'] = 0;
                         $arrMonth[$key]['tempCredit'] = 0;
                         $arrMonth[$key]['tempBalance'] = 0;
@@ -237,13 +257,13 @@ class ProfitLossController extends Controller
                 if($tempParent2 !== $row->parentSub->parent_id){
                     $html .= '<tr>
                         <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;<b>'.$row->parentSub->parentSub->name.'</b></td>
-                        <td colspan="'.(count($arrMonth) * 3).'"></td>
+                        <td colspan="'.(count($arrMonth) * 4).'"></td>
                     </tr>';
                 }
                 if($tempParent1 !== $row->parent_id){
                     $html .= '<tr>
                         <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$row->parentSub->name.'</td>
-                        <td colspan="'.(count($arrMonth) * 3).'"></td>
+                        <td colspan="'.(count($arrMonth) * 4).'"></td>
                     </tr>';
                 }
                 $html .= '<tr>
@@ -252,15 +272,18 @@ class ProfitLossController extends Controller
                 foreach($arrMonth as $key => $rowMonth) {
                     $val = $row->getTotalMonthFromParentExceptClosing($rowMonth['raw_month'],$level);
                     $html .= '
+                        <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalanceBefore'],2,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalDebit'],2,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalCredit'],2,',','.').'</td>
-                        <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalance'],2,',','.').'</td>';
+                        <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalanceBefore'] + $val['totalBalance'],2,',','.').'</td>';
                     $arrMonth[$key]['totalDebit'] += $val['totalDebit'];
                     $arrMonth[$key]['totalCredit'] += $val['totalCredit'];
-                    $arrMonth[$key]['totalBalance'] += $val['totalDebit'] - $val['totalCredit'];
+                    $arrMonth[$key]['totalBalance'] += $val['totalBalanceBefore'] + $val['totalDebit'] - $val['totalCredit'];
                     $arrMonth[$key]['tempDebit'] += $val['totalDebit'];
                     $arrMonth[$key]['tempCredit'] += $val['totalCredit'];
-                    $arrMonth[$key]['tempBalance'] += $val['totalDebit'] - $val['totalCredit'];
+                    $arrMonth[$key]['tempBalance'] += $val['totalBalanceBefore'] + $val['totalDebit'] - $val['totalCredit'];
+                    $arrMonth[$key]['tempBalanceBefore'] += $val['totalBalanceBefore'];
+                    $arrMonth[$key]['totalBalanceBefore'] += $val['totalBalanceBefore'];
                 }
 
                 $html .= '</tr>';
@@ -271,7 +294,8 @@ class ProfitLossController extends Controller
                             <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->parentSub->parentSub->name.'</b></td>';
                         
                         foreach($arrMonth as $key => $rowMonth) {
-                            $html .= '<td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempDebit'],2,',','.').'</b></td>
+                            $html .= '<td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalanceBefore'],2,',','.').'</b></td>
+                            <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempDebit'],2,',','.').'</b></td>
                             <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempCredit'],2,',','.').'</b></td>
                             <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalance'],2,',','.').'</b></td>';
                         }
@@ -283,7 +307,8 @@ class ProfitLossController extends Controller
                         <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->parentSub->parentSub->name.'</b></td>';
 
                     foreach($arrMonth as $key => $rowMonth) {
-                        $html .= '<td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempDebit'],2,',','.').'</b></td>
+                        $html .= '<td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalanceBefore'],2,',','.').'</b></td>
+                        <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempDebit'],2,',','.').'</b></td>
                         <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempCredit'],2,',','.').'</b></td>
                         <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalance'],2,',','.').'</b></td>';
                     }
@@ -304,9 +329,10 @@ class ProfitLossController extends Controller
                 if($tempParent4 !== $row->parentSub->parentSub->parentSub->parent_id){
                     $html .= '<tr>
                         <td style="left: 0px;position: sticky;background-color:white;"><b>'.$row->parentSub->parentSub->parentSub->parentSub->name.'</b></td>
-                        <td colspan="'.(count($arrMonth) * 3).'"></td>
+                        <td colspan="'.(count($arrMonth) * 4).'"></td>
                     </tr>';
                     foreach($arrMonth as $key => $rowMonth) {
+                        $arrMonth[$key]['tempBalanceBefore'] = 0;
                         $arrMonth[$key]['tempDebit'] = 0;
                         $arrMonth[$key]['tempCredit'] = 0;
                         $arrMonth[$key]['tempBalance'] = 0;
@@ -315,19 +341,19 @@ class ProfitLossController extends Controller
                 if($tempParent3 !== $row->parentSub->parentSub->parent_id){
                     $html .= '<tr>
                         <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;<b>'.$row->parentSub->parentSub->parentSub->name.'</b></td>
-                        <td colspan="'.(count($arrMonth) * 3).'"></td>
+                        <td colspan="'.(count($arrMonth) * 4).'"></td>
                     </tr>';
                 }
                 if($tempParent2 !== $row->parentSub->parent_id){
                     $html .= '<tr>
                         <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>'.$row->parentSub->parentSub->name.'</b></td>
-                        <td colspan="'.(count($arrMonth) * 3).'"></td>
+                        <td colspan="'.(count($arrMonth) * 4).'"></td>
                     </tr>';
                 }
                 if($tempParent1 !== $row->parent_id){
                     $html .= '<tr>
                         <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$row->parentSub->name.'</td>
-                        <td colspan="'.(count($arrMonth) * 3).'"></td>
+                        <td colspan="'.(count($arrMonth) * 4).'"></td>
                     </tr>';
                 }
                 $html .= '<tr>
@@ -336,15 +362,18 @@ class ProfitLossController extends Controller
                 foreach($arrMonth as $key => $rowMonth) {
                     $val = $row->getTotalMonthFromParentExceptClosing($rowMonth['raw_month'],$level);
                     $html .= '
+                        <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalanceBefore'],2,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalDebit'],2,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalCredit'],2,',','.').'</td>
-                        <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalance'],2,',','.').'</td>';
+                        <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalanceBefore'] + $val['totalBalance'],2,',','.').'</td>';
                     $arrMonth[$key]['totalDebit'] += $val['totalDebit'];
                     $arrMonth[$key]['totalCredit'] += $val['totalCredit'];
-                    $arrMonth[$key]['totalBalance'] += $val['totalDebit'] - $val['totalCredit'];
+                    $arrMonth[$key]['totalBalance'] += $val['totalBalanceBefore'] + $val['totalDebit'] - $val['totalCredit'];
                     $arrMonth[$key]['tempDebit'] += $val['totalDebit'];
                     $arrMonth[$key]['tempCredit'] += $val['totalCredit'];
-                    $arrMonth[$key]['tempBalance'] += $val['totalDebit'] - $val['totalCredit'];
+                    $arrMonth[$key]['tempBalance'] += $val['totalBalanceBefore'] + $val['totalDebit'] - $val['totalCredit'];
+                    $arrMonth[$key]['tempBalanceBefore'] += $val['totalBalanceBefore'];
+                    $arrMonth[$key]['totalBalanceBefore'] += $val['totalBalanceBefore'];
                 }
 
                 $html .= '</tr>';
@@ -355,7 +384,8 @@ class ProfitLossController extends Controller
                             <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->parentSub->parentSub->parentSub->name.'</b></td>';
                         
                         foreach($arrMonth as $key => $rowMonth) {
-                            $html .= '<td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempDebit'],2,',','.').'</b></td>
+                            $html .= '<td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalanceBefore'],2,',','.').'</b></td>
+                            <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempDebit'],2,',','.').'</b></td>
                             <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempCredit'],2,',','.').'</b></td>
                             <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalance'],2,',','.').'</b></td>';
                         }
@@ -367,7 +397,8 @@ class ProfitLossController extends Controller
                         <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->parentSub->parentSub->parentSub->name.'</b></td>';
 
                     foreach($arrMonth as $key => $rowMonth) {
-                        $html .= '<td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempDebit'],2,',','.').'</b></td>
+                        $html .= '<td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalanceBefore'],2,',','.').'</b></td>
+                        <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempDebit'],2,',','.').'</b></td>
                         <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempCredit'],2,',','.').'</b></td>
                         <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalance'],2,',','.').'</b></td>';
                     }
@@ -386,6 +417,7 @@ class ProfitLossController extends Controller
 
         foreach($arrMonth as $key => $row) {
             $html .= '
+                <th style="min-width:150px !important;" class="right-align">'.number_format($row['totalBalanceBefore'],2,',','.').'</th>
                 <th style="min-width:150px !important;" class="right-align">'.number_format($row['totalDebit'],2,',','.').'</th>
                 <th style="min-width:150px !important;" class="right-align">'.number_format($row['totalCredit'],2,',','.').'</th>
                 <th style="min-width:150px !important;" class="right-align">

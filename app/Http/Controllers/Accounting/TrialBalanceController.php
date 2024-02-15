@@ -125,6 +125,7 @@ class TrialBalanceController extends Controller
                     $arrMonth[$key]['tempCredit'] += $val['totalCredit'];
                     $arrMonth[$key]['tempBalance'] += $val['totalBalanceBefore'] + $val['totalDebit'] - $val['totalCredit'];
                     $arrMonth[$key]['tempBalanceBefore'] += $val['totalBalanceBefore'];
+                    $arrMonth[$key]['totalBalanceBefore'] += $val['totalBalanceBefore'];
                 }
 
                 $html .= '</tr>';
@@ -200,6 +201,7 @@ class TrialBalanceController extends Controller
                     $arrMonth[$key]['tempCredit'] += $val['totalCredit'];
                     $arrMonth[$key]['tempBalance'] += $val['totalBalanceBefore'] + $val['totalDebit'] - $val['totalCredit'];
                     $arrMonth[$key]['tempBalanceBefore'] += $val['totalBalanceBefore'];
+                    $arrMonth[$key]['totalBalanceBefore'] += $val['totalBalanceBefore'];
                 }
 
                 $html .= '</tr>';
@@ -282,6 +284,7 @@ class TrialBalanceController extends Controller
                     $arrMonth[$key]['tempCredit'] += $val['totalCredit'];
                     $arrMonth[$key]['tempBalance'] += $val['totalBalanceBefore'] + $val['totalDebit'] - $val['totalCredit'];
                     $arrMonth[$key]['tempBalanceBefore'] += $val['totalBalanceBefore'];
+                    $arrMonth[$key]['totalBalanceBefore'] += $val['totalBalanceBefore'];
                 }
 
                 $html .= '</tr>';
@@ -371,6 +374,7 @@ class TrialBalanceController extends Controller
                     $arrMonth[$key]['tempCredit'] += $val['totalCredit'];
                     $arrMonth[$key]['tempBalance'] += $val['totalBalanceBefore'] + $val['totalDebit'] - $val['totalCredit'];
                     $arrMonth[$key]['tempBalanceBefore'] += $val['totalBalanceBefore'];
+                    $arrMonth[$key]['totalBalanceBefore'] += $val['totalBalanceBefore'];
                 }
 
                 $html .= '</tr>';

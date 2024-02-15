@@ -37,7 +37,7 @@ class DeadStockController extends Controller
                 ->groupBy('item_id');
 
             if($request->plant != 'all'){
-                $query->where('plant_id',$request->plant);
+                $query->where('place_id',$request->plant);
             }
         })
         ->get();
@@ -50,7 +50,7 @@ class DeadStockController extends Controller
                
                 // if ($dateDifference >= $request->hari) {
                     $array_filter[]=[
-                        'plant'=>$row->plant->code,
+                        'plant'=>$row->place->code,
                         'gudang'=>$row->warehouse->code,
                         'kode'=>$row->item->code,
                         'item'=>$row->item->name,

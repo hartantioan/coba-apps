@@ -40,7 +40,7 @@ class ExportDeadStock implements FromView,ShouldAutoSize
                
                 if ($dateDifference >= intval($this->hari)) {
                     $array_filter[]=[
-                        'plant'=>$row->plant->code,
+                        'plant'=>$row->place->code,
                         'gudang'=>$row->warehouse->code,
                         'kode'=>$row->item->code,
                         'item'=>$row->item->name,

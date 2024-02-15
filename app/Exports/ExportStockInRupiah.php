@@ -13,6 +13,9 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
     /**
     * @return \Illuminate\Support\Collection
     */
+
+    protected $plant, $item, $warehouse, $start_date, $finish_date;
+
     public function __construct(string $plant, string $item,string $warehouse, string $start_date, string $finish_date)
     {
         $this->plant = $plant ? $plant : '';
@@ -65,11 +68,11 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                 $cum_val = 0;
             }
             if($row->type=='IN'){
-                $cum_qty+=$row->qty_final;
-                $cum_val+=$row->total_final;
+                $cum_qty+=$row->qty_in;
+                $cum_val+=$row->total_out;
             }else{
-                $cum_qty-=$row->qty_final;
-                $cum_val-=$row->total_final;
+                $cum_qty-=$row->qty_out;
+                $cum_val-=$row->total_out;
             }
             
             $data_tempura = [
@@ -78,13 +81,13 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                 'item' => $row->item->name,
                 'satuan' => $row->item->uomUnit->code,
                 'kode' => $row->item->code,
-                'final'=>number_format($row->price_final,2,',','.'),
-                'totalfinal'=>number_format($row->total_final,2,',','.'),
-                'qtyfinal'=>number_format($row->qty_final,3,',','.'),
+                'final'=>number_format(($row->type=='IN' ? $row->price_in : $row->price_out),2,',','.'),
+                'totalfinal'=>number_format(($row->type=='IN' ? $row->total_in : $row->total_out),2,',','.'),
+                'qtyfinal'=>number_format(($row->type=='IN' ? $row->qty_in : $row->qty_out),3,',','.'),
                 'date' =>  date('d/m/Y',strtotime($row->date)),
                 'document' => $row->lookable->code,
-                'cum_qty' => number_format($cum_qty,3,',','.'),
-                'cum_val' => number_format($cum_val,2,',','.'),
+                'cum_qty' => number_format($row->qty_final,3,',','.'),
+                'cum_val' => number_format($row->total_final,2,',','.'),
             ];
             $array_filter[]=$data_tempura;
             $previousId = $row->item_id;

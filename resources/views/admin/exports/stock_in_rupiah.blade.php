@@ -27,9 +27,9 @@
             <td align="center">{{$row['item']}}</td>
             <td align="center">{{$row['satuan']}}</td>
             <td align="center">{{$row['document']}}</td>
-            <td align="center">{{$row['qty']}}</td>
+            <td align="center">{{$row['qtyfinal']}}</td>
             <td align="center">{{$row['final']}}</td>
-            <td align="center">{{$row['total']}}</td>
+            <td align="center">{{$row['totalfinal']}}</td>
             <td align="center">{{$row['cum_qty']}}</td>
             <td align="center">{{$row['cum_val']}}</td>
         </tr>

@@ -94,6 +94,19 @@
                                                 <label for="coa_end" style="font-size:1rem;">Sampai Coa</label>
                                                 <select class="browser-default" id="coa_end" name="coa_end"></select>
                                             </div>
+                                            <div class="col m4 s6 ">
+                                                <label for="is_closing_journal" style="font-size:1rem;">Jurnal Closing</label>
+                                                <div class="input-field">
+                                                    <div class="switch mb-1">
+                                                        <label>
+                                                            Tampilkan
+                                                            <input type="checkbox" id="is_closing_journal" name="is_closing_journal" value="1">
+                                                            <span class="lever"></span>
+                                                            Sembunyikan
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </li>
@@ -165,6 +178,7 @@
         $('#date_start,#date_end').val('{{ date("Y-m-d") }}');
         $('#result').html('Silahkan pilih bulan, coa dan tekan tombol hijau.');
         $('#coa_start,#coa_end').empty();
+        $('#is_closing_journal').prop('checked', false);
     }
 
     function process(){
@@ -177,6 +191,7 @@
                 date_end : $('#date_end').val(),
                 coa_start : $('#coa_start').val(),
                 coa_end : $('#coa_end').val(),
+                is_closing_journal : ($('#is_closing_journal').is(':checked') ? $('#is_closing_journal').val() : ''),
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -213,7 +228,8 @@
         var dateend = $('#date_end').val();
         var coastart = $('#coa_start').val();
         var coaend = $('#coa_end').val();
+        var is_closing_journal = ($('#is_closing_journal').is(':checked') ? $('#is_closing_journal').val() : '');
 
-        window.location = "{{ Request::url() }}/export?datestart=" + datestart + "&dateend=" + dateend+ "&coastart=" + coastart+ "&coaend=" + coaend
+        window.location = "{{ Request::url() }}/export?datestart=" + datestart + "&dateend=" + dateend+ "&coastart=" + coastart+ "&coaend=" + coaend + "&closing_journal=" + is_closing_journal;
     }
 </script>

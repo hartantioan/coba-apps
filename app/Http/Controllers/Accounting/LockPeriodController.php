@@ -274,7 +274,7 @@ class LockPeriodController extends Controller
                 }else{
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode=LockPeriod::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    $newCode=LockPeriod::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                     $query = LockPeriod::create([
                         'code'			=> $newCode,
                         'user_id'		=> session('bo_id'),

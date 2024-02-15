@@ -12,14 +12,15 @@ class ExportSubsidiaryLedger implements  FromView,ShouldAutoSize
     /**
     * @return \Illuminate\Support\Collection
     */
-    protected $dateend, $datestart, $coaend, $coastart;
+    protected $dateend, $datestart, $coaend, $coastart, $closing_journal;
 
-    public function __construct(string $datestart, string $dateend,string $coastart,string $coaend)
+    public function __construct(string $datestart, string $dateend,string $coastart,string $coaend,string $closing_journal)
     {
         $this->datestart = $datestart ? $datestart : '';
 		$this->dateend = $dateend ? $dateend : '';
         $this->coastart = $coastart ? $coastart : '';
         $this->coaend = $coaend ? $coaend : '';
+        $this->closing_journal = $closing_journal ? $closing_journal : '';
     }
     public function view(): View
     {
@@ -37,10 +38,19 @@ class ExportSubsidiaryLedger implements  FromView,ShouldAutoSize
             })->where('nominal','!=',0)->get();
             $arrData = [];
             foreach($rowdata as $rowdetail){
-                $arrData[] = [
-                    'post_date' => $rowdetail->journal->post_date,
-                    'data'      => $rowdetail,
-                ];
+                if($this->closing_journal){
+                    if($rowdetail->journal->lookable_type !== 'closing_journals'){
+                        $arrData[] = [
+                            'post_date' => $rowdetail->journal->post_date,
+                            'data'      => $rowdetail,
+                        ];
+                    }
+                }else{
+                    $arrData[] = [
+                        'post_date' => $rowdetail->journal->post_date,
+                        'data'      => $rowdetail,
+                    ];
+                }
             }
             $collect = collect($arrData)->sortBy('post_date');
             $balance = $row->getBalanceFromDate($date_start);

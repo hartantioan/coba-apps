@@ -28,13 +28,17 @@ class MinimumStockController extends Controller
     }
     public function index(Request $request)
     {
+
+        $itemGroup = ItemGroup::whereHas('childSub',function($query){
+            $query->whereHas('itemGroupWarehouse',function($query){
+                $query->whereIn('warehouse_id',$this->datawarehouses);
+            });
+        })->get();
         
         $data = [
             'title'     => 'Stok item Yang Minim',
             'content'   => 'admin.inventory.minimum_stock',
-            'group'     =>  ItemGroup::whereHas('itemGroupWarehouse',function($query){
-                $query->whereIn('warehouse_id',$this->datawarehouses);
-            })->get(),
+            'group'     =>  $itemGroup,
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'warehouse'     => Warehouse::where('status','1')->whereIn('id',$this->datawarehouses)->get(),
         ];

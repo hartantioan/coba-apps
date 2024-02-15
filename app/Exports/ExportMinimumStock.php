@@ -28,7 +28,6 @@ class ExportMinimumStock implements FromView,ShouldAutoSize
 
     public function view(): View
     {
-        info($this->warehouse);
         $query_data = ItemStock::where(function($querys){
             if($this->item_id != 'null'){
 
@@ -50,7 +49,6 @@ class ExportMinimumStock implements FromView,ShouldAutoSize
     
         })
         ->get();
-        info($query_data);
         $array_filter = [];
        
         foreach($query_data as $row){

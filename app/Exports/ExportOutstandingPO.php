@@ -17,7 +17,6 @@ class ExportOutstandingPO implements FromView,ShouldAutoSize
         $data = PurchaseOrderDetail::whereHas('purchaseOrder',function($query){
             $query->whereIn('status',['2','3']);
         })->whereNull('status')->get();
-        info($data);
         $array=[];
         foreach($data as $row){
             $entry = [];

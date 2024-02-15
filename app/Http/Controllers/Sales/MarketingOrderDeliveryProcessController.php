@@ -498,7 +498,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 try {
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode=MarketingOrderDeliveryProcess::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    $newCode=MarketingOrderDeliveryProcess::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                     
                     $query = MarketingOrderDeliveryProcess::create([
                         'code'			                => $newCode,

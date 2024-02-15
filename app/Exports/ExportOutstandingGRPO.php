@@ -17,7 +17,6 @@ class ExportOutstandingGRPO implements FromView,ShouldAutoSize
         $data = GoodReceiptDetail::whereHas('goodReceipt',function($query){
             $query->whereIn('status',['2','3']);
         })->get();
-        info($data);
         $array=[];
         foreach($data as $row){
             $entry = [];

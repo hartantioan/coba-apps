@@ -336,7 +336,7 @@ class ProductionScheduleController extends Controller
                 try {
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode=ProductionSchedule::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    $newCode=ProductionSchedule::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                     
                     $query = ProductionSchedule::create([
                         'code'			            => $newCode,

@@ -322,15 +322,15 @@ class UserController extends Controller
                             </tr>
                             <tr>
                                 <th>Kota/Kabupaten</th>
-                                <th>'.$data->city->name.'</th>
+                                <th>'.($data->city()->exists() ? $data->city->name : '-').'</th>
                             </tr>
                             <tr>
                                 <th>Provinsi</th>
-                                <th>'.$data->province->name.'</th>
+                                <th>'.($data->province()->exists() ? $data->province->name : '-').'</th>
                             </tr>
                             <tr>
                                 <th>Kota/Kabupaten</th>
-                                <th>'.$data->country->name.'</th>
+                                <th>'.($data->country()->exists() ? $data->country->name : '-').'</th>
                             </tr>
                             <tr>
                                 <th>Cabang</th>

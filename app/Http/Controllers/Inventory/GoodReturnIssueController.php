@@ -312,7 +312,7 @@ class GoodReturnIssueController extends Controller
                 }else{
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode=GoodReturnIssue::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    $newCode=GoodReturnIssue::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                     
                     $query = GoodReturnIssue::create([
                         'code'			        => $newCode,

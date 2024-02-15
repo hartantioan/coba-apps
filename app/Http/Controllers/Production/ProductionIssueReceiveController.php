@@ -326,7 +326,7 @@ class ProductionIssueReceiveController extends Controller
                 try {
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode=ProductionIssueReceive::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    $newCode=ProductionIssueReceive::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                     
                     $query = ProductionIssueReceive::create([
                         'code'			            => $newCode,

@@ -327,7 +327,7 @@ class InventoryRevaluationController extends Controller
                 }else{
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode=InventoryRevaluation::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    $newCode=InventoryRevaluation::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                     
                     $query = InventoryRevaluation::create([
                         'code'			        => $newCode,

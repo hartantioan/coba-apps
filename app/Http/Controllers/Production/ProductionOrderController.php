@@ -360,7 +360,7 @@ class ProductionOrderController extends Controller
                 try {
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode=ProductionOrder::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    $newCode=ProductionOrder::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                     
                     $query = ProductionOrder::create([
                         'code'			                => $newCode,

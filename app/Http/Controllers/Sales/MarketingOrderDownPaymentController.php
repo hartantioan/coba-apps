@@ -421,7 +421,7 @@ class MarketingOrderDownPaymentController extends Controller
                 try {
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode=MarketingOrderDownPayment::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    $newCode=MarketingOrderDownPayment::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                     
                     $query = MarketingOrderDownPayment::create([
                         'code'			            => $newCode,

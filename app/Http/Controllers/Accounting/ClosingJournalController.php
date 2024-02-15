@@ -393,7 +393,7 @@ class ClosingJournalController extends Controller
                 }else{
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode=ClosingJournal::generateCode($menu->document_code.date('y').$request->code_place_id);
+                    $newCode=ClosingJournal::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                     $query = ClosingJournal::create([
                         'code'			=> $newCode,
                         'user_id'		=> session('bo_id'),
@@ -417,9 +417,9 @@ class ClosingJournalController extends Controller
                         ClosingJournalDetail::create([
                             'closing_journal_id'    => $query->id,
                             'coa_id'                => $row,
-                            'type'                  => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])) >= 0 ? '1' : '2',
-                            'nominal'               => abs(str_replace(',','.',str_replace('.','',$request->arr_nominal[$key]))),
-                            'nominal_fc'            => abs(str_replace(',','.',str_replace('.','',$request->arr_nominal_fc[$key]))),
+                            'type'                  => $request->arr_nominal[$key] >= 0 ? '1' : '2',
+                            'nominal'               => abs($request->arr_nominal[$key]),
+                            'nominal_fc'            => abs($request->arr_nominal_fc[$key]),
                         ]);
                     }
 
@@ -570,6 +570,8 @@ class ClosingJournalController extends Controller
                 LockPeriod::where('month',$query->month)->update([
                     'status_closing'    => '2'
                 ]);
+
+                CustomHelper::removeJournal($query->getTable(),$query->id);
 
                 $query->update([
                     'status'    => '5',
@@ -1053,7 +1055,7 @@ class ClosingJournalController extends Controller
 
         $arr = [];
         $passed = 1;
-        foreach($coas as $key => $row){
+        /* foreach($coas as $key => $row){
             $arrError = [];
             $data = $row->journalDetail()->whereHas('journal',function($query)use($month){
                 $query->where('post_date','like',"$month%");
@@ -1081,20 +1083,20 @@ class ClosingJournalController extends Controller
                 'errors'    => $arrError,
                 'passed'    => $passed,
             ];
-        }
+        } */
 
         if($passed == 1){
             $response = [
                 'status'    => 200,
                 'message'   => ''
             ];
-        }else{
+        }/* else{
             $response = [
                 'status'    => 422,
                 'message'   => '',
                 'data'      => $arr
             ];
-        }
+        } */
         
         return response()->json($response);
     }

@@ -61,6 +61,50 @@
                                             </select>
                                             <label class="active" for="item_id">ITEM</label>
                                         </div>
+                                        <div class="input-field col m6 s12 mt-2">
+                                            <label for="filter_group" class="active" style="font-size:1rem;">Filter Group :</label>
+                                           
+                                            <select class="select2 browser-default" multiple="multiple" id="filter_group" name="filter_group" onchange="loadDataTable()">
+                                                @foreach($group->whereNull('parent_id') as $c)
+                                                    @if(!$c->childSub()->exists())
+                                                        <option value="{{ $c->id }}"> - {{ $c->name }}</option>
+                                                    @else
+                                                        <optgroup label=" - {{ $c->code.' - '.$c->name }}">
+                                                        @foreach($c->childSub as $bc)
+                                                            @if(!$bc->childSub()->exists())
+                                                                <option value="{{ $bc->id }}"> -  - {{ $bc->name }}</option>
+                                                            @else
+                                                                <optgroup label=" -  - {{ $bc->code.' - '.$bc->name }}">
+                                                                    @foreach($bc->childSub as $bcc)
+                                                                        @if(!$bcc->childSub()->exists())
+                                                                            <option value="{{ $bcc->id }}"> -  -  - {{ $bcc->name }}</option>
+                                                                        @else
+                                                                            <optgroup label=" -  -  - {{ $bcc->code.' - '.$bcc->name }}">
+                                                                                @foreach($bcc->childSub as $bccc)
+                                                                                    @if(!$bccc->childSub()->exists())
+                                                                                        <option value="{{ $bccc->id }}"> -  -  -  - {{ $bccc->name }}</option>
+                                                                                    @else
+                                                                                        <optgroup label=" -  -  -  - {{ $bccc->code.' - '.$bccc->name }}">
+                                                                                            @foreach($bccc->childSub as $bcccc)
+                                                                                                @if(!$bcccc->childSub()->exists())
+                                                                                                    <option value="{{ $bcccc->id }}"> -  -  -  -  - {{ $bcccc->name }}</option>
+                                                                                                @endif
+                                                                                            @endforeach
+                                                                                        </optgroup>
+                                                                                    @endif
+                                                                                @endforeach
+                                                                            </optgroup>
+                                                                        @endif
+                                                                    @endforeach
+                                                                </optgroup>
+                                                            @endif
+                                                        @endforeach
+                                                        </optgroup>
+                                                    @endif
+                                            @endforeach
+                                            </select>
+                                           
+                                        </div>
                                         <div class="col m3 mt-2">
                                             <button class="btn waves-effect waves-light submit" onclick="filter();">Cari <i class="material-icons right">file_download</i></button>
                                         </div>

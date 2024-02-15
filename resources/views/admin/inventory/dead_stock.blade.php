@@ -32,6 +32,49 @@
                                 </div>
                                 <div class="col s12">
                                     <div class="row">
+                                        <div class="input-field col m6 s12">
+                                            <label for="filter_group" class="active" style="font-size:1rem;">Filter Group :</label>
+                                        
+                                            <select class="select2 browser-default" multiple="multiple" id="filter_group" name="filter_group" onchange="loadDataTable()">
+                                                @foreach($group->whereNull('parent_id') as $c)
+                                                    @if(!$c->childSub()->exists())
+                                                        <option value="{{ $c->id }}"> - {{ $c->name }}</option>
+                                                    @else
+                                                        <optgroup label=" - {{ $c->code.' - '.$c->name }}">
+                                                        @foreach($c->childSub as $bc)
+                                                            @if(!$bc->childSub()->exists())
+                                                                <option value="{{ $bc->id }}"> -  - {{ $bc->name }}</option>
+                                                            @else
+                                                                <optgroup label=" -  - {{ $bc->code.' - '.$bc->name }}">
+                                                                    @foreach($bc->childSub as $bcc)
+                                                                        @if(!$bcc->childSub()->exists())
+                                                                            <option value="{{ $bcc->id }}"> -  -  - {{ $bcc->name }}</option>
+                                                                        @else
+                                                                            <optgroup label=" -  -  - {{ $bcc->code.' - '.$bcc->name }}">
+                                                                                @foreach($bcc->childSub as $bccc)
+                                                                                    @if(!$bccc->childSub()->exists())
+                                                                                        <option value="{{ $bccc->id }}"> -  -  -  - {{ $bccc->name }}</option>
+                                                                                    @else
+                                                                                        <optgroup label=" -  -  -  - {{ $bccc->code.' - '.$bccc->name }}">
+                                                                                            @foreach($bccc->childSub as $bcccc)
+                                                                                                @if(!$bcccc->childSub()->exists())
+                                                                                                    <option value="{{ $bcccc->id }}"> -  -  -  -  - {{ $bcccc->name }}</option>
+                                                                                                @endif
+                                                                                            @endforeach
+                                                                                        </optgroup>
+                                                                                    @endif
+                                                                                @endforeach
+                                                                            </optgroup>
+                                                                        @endif
+                                                                    @endforeach
+                                                                </optgroup>
+                                                            @endif
+                                                        @endforeach
+                                                        </optgroup>
+                                                    @endif
+                                            @endforeach
+                                            </select>
+                                        </div>
                                         <div class="input-field col m3 s12">
                                             <select class="form-control" id="plant" name="plant">
                                                 <option value="all">Semua</option>
@@ -50,16 +93,20 @@
                                             </select>
                                             <label class="" for="warehouse">WareHouse</label>
                                         </div>
-                                        <div class="input-field col m3 s12">
-                                           
-                                        </div>
+                                        
                                         <div class="input-field col m3 s12">
                                             <input id="date" name="date"  type="date" max="{{ date('9999'.'-12-31') }}" placeholder="" value="{{ date('Y-m-d') }}">
                                             <label class="active" for="date">Masukkan Tanggal</label>
                                         </div>
-                                        <div class="col s12 mt-3">
+                                        
+                                        
+                                        <div class="col m3 mt-3">
                                             
                                             <button class="btn waves-effect waves-light right submit" onclick="filter();">Cari <i class="material-icons right">file_download</i></button>
+                                        </div>
+                                        
+                                        <div  class="col m3" id="export_button">
+                                            <button class="btn waves-effect waves-light right submit mt-2" onclick="exportExcel();">Excel<i class="material-icons right">view_list</i></button>
                                         </div>
                                     </div>
                                 </div>
@@ -85,9 +132,7 @@
                         <tbody id="table_body">
                         </tbody>
                     </table>
-                    <div id="export_button">
-                        <button class="btn waves-effect waves-light right submit mt-2" onclick="exportExcel();">Excel<i class="material-icons right">view_list</i></button>
-                    </div>
+                  
                 </div>
             </div>
         </div>
@@ -98,6 +143,7 @@
     $('#export_button').hide();
     function filter(){
         var formData = new FormData($('#form_data')[0]);
+        formData.append('group[]',$('#filter_group').val());
         $.ajax({
             url: '{{ Request::url() }}/filter',
             type: 'POST',
@@ -190,11 +236,19 @@
             
         });
     }
+    $(function() {
+        $(".select2").select2({
+            dropdownAutoWidth: true,
+            width: '100%',
+        });
+       
+    });
     function exportExcel(){
-        var jumlahhari = $('#hari').val();
+        
         var plant = $('#plant').val();
+        var group = $('#filter_group').val() ? $('#filter_group').val():'';
         var warehouse = $('#warehouse').val();
         var date = $('#date').val();
-        window.location = "{{ Request::url() }}/export?plant=" + plant + "&warehouse=" + warehouse+"&date=" + date+"&hari="+jumlahhari;
+        window.location = "{{ Request::url() }}/export?plant=" + plant + "&warehouse=" + warehouse+"&date=" + date+ "&group=" + group;
     }
 </script>

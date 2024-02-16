@@ -180,7 +180,7 @@ class LandedCostController extends Controller
             foreach($request->arr_gr_id as $row){
                 $data = GoodReceipt::find(intval($row));
                 $data['lookable_type'] = $data->getTable();
-                $data['from_address'] = $data->account->city->name.' - '.$data->account->subdistrict->name;
+                $data['from_address'] = $data->account->city()->exists() ? $data->account->city->name.' - '.$data->account->subdistrict->name : '';
                 $data['subdistrict_from_id'] = $data->account->subdistrict_id;
                 $data['code'] = $data->code.' - SJ : '.$data->delivery_no;
             

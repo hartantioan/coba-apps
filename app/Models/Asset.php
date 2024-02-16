@@ -25,7 +25,9 @@ class Asset extends Model
         'method',
         'note',
         'status',
+        'accumulation_total',
         'book_balance',
+        'count_balance',
     ];
 
     public function status(){
@@ -91,11 +93,7 @@ class Asset extends Model
     }
 
     public function balanceBookRaw(){
-        $total = $this->nominal;
-
-        foreach($this->depreciationDetail as $row){
-            $total -= $row->nominal;
-        }
+        $total = $this->book_balance;
 
         return $total;
     }
@@ -103,8 +101,12 @@ class Asset extends Model
     public function qtyBalance(){
         $total = 0;
 
-        foreach($this->capitalizationDetail as $row){
+        /* foreach($this->capitalizationDetail as $row){
             $total += $row->qty;
+        } */
+
+        if($this->count_balance){
+            $total = 1;
         }
 
         foreach($this->retirementDetail as $row){
@@ -153,18 +155,8 @@ class Asset extends Model
     }
 
     public function getCountDepreciation(){
-        $count = $this->depreciationDetail()->count();
+        $count = $this->assetGroup->depreciation_period - $this->count_balance;
 
         return $count;
-    }
-
-    public function totalDepreciation(){
-        $total = 0;
-
-        foreach($this->depreciationDetail as $row){
-            $total += $row->nominal;
-        }
-
-        return $total;
     }
 }

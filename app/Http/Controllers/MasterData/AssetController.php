@@ -139,7 +139,7 @@ class AssetController extends Controller
                     $val->assetGroup->name.' - '.$val->assetGroup->coa->name,
                     $val->date ? date('d/m/Y',strtotime($val->date)) : '<span class=""><div class="chip red white-text z-depth-4">Belum dikapitalisasi.</div></span>',
                     $val->nominal > 0 ? number_format($val->nominal,2,',','.') : '<span class=""><div class="chip red white-text z-depth-4">Belum dikapitalisasi.</div></span>',
-                    $val->nominal > 0 ? number_format($val->totalDepreciation(),2,',','.') : '<span class=""><div class="chip red white-text z-depth-4">Belum dikapitalisasi.</div></span>',
+                    $val->nominal > 0 ? number_format($val->accumulation_total,2,',','.') : '<span class=""><div class="chip red white-text z-depth-4">Belum dikapitalisasi.</div></span>',
                     number_format($val->book_balance,2,',','.'),
                     $val->method(),
                     $val->note,

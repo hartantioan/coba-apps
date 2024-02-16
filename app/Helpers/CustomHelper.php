@@ -2073,6 +2073,17 @@ class CustomHelper {
 							'nominal_fc'	=> $cp->currency->type == '1' ? $row->total * $cp->currency_rate : $row->total,
 						]);
 					}
+
+					$asset = $row->asset;
+                    if($asset){
+                        $asset->update([
+                            'date'                  => $cp->post_date,
+                            'nominal'               => $row->total * $cp->currency_rate,
+                            'accumulation_total'    => 0,
+                            'book_balance'          => $row->total * $cp->currency_rate,
+                            'count_balance'         => $asset->assetGroup->depreciation_period,
+                        ]);
+                    }
 				}
 			}
 		}elseif($table_name == 'inventory_transfer_outs'){
@@ -3675,7 +3686,9 @@ class CustomHelper {
 		
 		if($asset){
 			$asset->update([
-				'book_balance' => $type == 'OUT' ? round($asset->book_balance - $nominal,3) : round($asset->book_balance + $nominal,3),
+				'accumulation_total'	=> $type == 'OUT' ? round($asset->accumulation_total + $nominal,3) : round($asset->accumulation_total - $nominal,3),
+				'book_balance' 			=> $type == 'OUT' ? round($asset->book_balance - $nominal,3) : round($asset->book_balance + $nominal,3),
+				'count_balance'			=> $type == 'OUT' ? $asset->count_balance - 1 : $asset->count_balance + 1,
 			]);
 		}
 	}

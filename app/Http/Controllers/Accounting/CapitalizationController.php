@@ -323,11 +323,6 @@ class CapitalizationController extends Controller
                         'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
                         'note'                  => $request->arr_note[$key]
                     ]);
-                    Asset::find(intval($row))->update([
-                        'date'          => $query->post_date,
-                        'nominal'       => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
-                        'book_balance'  => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
-                    ]);
                 }
 
                 CustomHelper::sendApproval('capitalizations',$query->id,$query->note);

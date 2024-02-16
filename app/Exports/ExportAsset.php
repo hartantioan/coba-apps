@@ -73,7 +73,7 @@ class ExportAsset implements FromCollection, WithTitle, WithHeadings, WithCustom
                 'group'         => $row->assetGroup->name,
                 'date_cap'      => date('d/m/Y',strtotime($row->date)),
                 'nominal'       => number_format($row->nominal,2,',','.'),
-                'depreciation'  => number_format($row->totalDepreciation(),2,',','.'),
+                'depreciation'  => number_format($row->accumulation_total,2,',','.'),
                 'balance'       => number_format($row->book_balance,2,',','.'),
                 'method'        => $row->method(),
                 'note'          => $row->note,

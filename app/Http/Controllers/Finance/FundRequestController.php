@@ -40,6 +40,7 @@ use App\Models\Place;
 use App\Models\Department;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportFundRequest;
+use App\Exports\ExportOutstandingFundRequest;
 
 class FundRequestController extends Controller
 {
@@ -2844,5 +2845,11 @@ class FundRequestController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function getOutstanding(Request $request){
+       
+		
+		return Excel::download(new ExportOutstandingFundRequest(), 'outstanding_fund_request_'.uniqid().'.xlsx');
     }
 }

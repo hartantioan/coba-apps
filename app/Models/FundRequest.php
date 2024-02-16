@@ -191,6 +191,18 @@ class FundRequest extends Model
         return $total;
     }
 
+    public function totalPaymentRequest(){
+        $total = 0;
+
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest', function($query){
+            $query->whereIn('status',['2','3']);
+        })->get() as $row){
+            $total += $row->nominal;
+        }
+
+        return $total;
+    }
+
     public function balanceCloseBill(){
         $total = floatval($this->grandtotal);
 

@@ -2179,6 +2179,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[FundRequestController::class, 'rowDetail']);
                     Route::post('show', [FundRequestController::class, 'show']);
                     Route::post('print',[FundRequestController::class, 'print']);
+                    Route::get('get_outstanding', [FundRequestController::class, 'getOutstanding']);
                     Route::post('print_by_range',[FundRequestController::class, 'printByRange']);
                     Route::get('print_individual/{id}',[FundRequestController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('viewstructuretree',[FundRequestController::class, 'viewStructureTree']);

@@ -98,14 +98,11 @@
                                             <input id="date" name="date"  type="date" max="{{ date('9999'.'-12-31') }}" placeholder="" value="{{ date('Y-m-d') }}">
                                             <label class="active" for="date">Masukkan Tanggal</label>
                                         </div>
-                                        
-                                        
-                                        <div class="col m3 mt-3">
-                                            
-                                            <button class="btn waves-effect waves-light right submit" onclick="filter();">Cari <i class="material-icons right">file_download</i></button>
+                                        <div class="input-field col m1 mt-1">
+                                            <button class="btn waves-effect waves-light submit" onclick="filter();">Cari <i class="material-icons right">file_download</i></button>
                                         </div>
                                         
-                                        <div  class="col m3" id="export_button">
+                                        <div  class="input-field col m1 mt-1" id="export_button">
                                             <button class="btn waves-effect waves-light right submit mt-2" onclick="exportExcel();">Excel<i class="material-icons right">view_list</i></button>
                                         </div>
                                     </div>

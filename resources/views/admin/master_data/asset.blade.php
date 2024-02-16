@@ -95,6 +95,7 @@
                                                         <th>Nominal</th>
                                                         <th>Akum.Depresiasi</th>
                                                         <th>Saldo Buku</th>
+                                                        <th>Sisa Depresiasi</th>
                                                         <th>Metode</th>
                                                         <th>Keterangan</th>
                                                         <th>Status</th>
@@ -469,6 +470,7 @@
                 { name: 'nominal', className: 'center-align' },
                 { name: 'depreciation', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'book_balance', className: 'center-align' },
+                { name: 'count_balance', className: 'center-align' },
                 { name: 'method', className: 'center-align' },
                 { name: 'note', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },

@@ -45,7 +45,7 @@ class ClosingJournalController extends Controller
             'company'       => Company::where('status','1')->get(),
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-            
+            'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'newcode'       => $menu->document_code.date('y'),
             'menucode'      => $menu->document_code,
             'place'         => Place::whereIn('id',$this->dataplaces)->where('status','1')->get(),

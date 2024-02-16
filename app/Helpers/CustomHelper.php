@@ -894,7 +894,7 @@ class CustomHelper {
 					'nominal_fc'	=> $ret->currency->type == '1' ? $row->asset->nominal * $ret->currency_rate : $row->asset->nominal,
 				]);
 
-				self::updateBalanceAsset($row->asset_id,$row->asset->book_balance,'OUT');
+				self::updateBalanceAsset($row->asset_id,$row->asset->book_balance,'OUT',$table_name);
 			}
 		
 		}elseif($table_name == 'incoming_payments'){
@@ -2276,7 +2276,7 @@ class CustomHelper {
 					'nominal_fc'	=> $row->nominal,
 				]);
 				
-				self::updateBalanceAsset($row->asset_id,$row->nominal,'OUT');
+				self::updateBalanceAsset($row->asset_id,$row->nominal,'OUT',$table_name);
 			}
 
 		}elseif($table_name == 'work_orders'){
@@ -3681,14 +3681,14 @@ class CustomHelper {
 		}
 	}
 
-	public static function updateBalanceAsset($asset_id = null, $nominal = null, $type = null){
+	public static function updateBalanceAsset($asset_id = null, $nominal = null, $type = null, $table = null){
 		$asset = Asset::find($asset_id);
 		
 		if($asset){
 			$asset->update([
 				'accumulation_total'	=> $type == 'OUT' ? round($asset->accumulation_total + $nominal,3) : round($asset->accumulation_total - $nominal,3),
 				'book_balance' 			=> $type == 'OUT' ? round($asset->book_balance - $nominal,3) : round($asset->book_balance + $nominal,3),
-				'count_balance'			=> $type == 'OUT' ? $asset->count_balance - 1 : $asset->count_balance + 1,
+				'count_balance'			=> $type == 'OUT' ? ($table == 'retirements' ? 0 : ($asset->count_balance - 1)) : $asset->count_balance + 1,
 			]);
 		}
 	}

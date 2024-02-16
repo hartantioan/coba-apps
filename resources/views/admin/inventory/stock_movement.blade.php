@@ -39,8 +39,8 @@
                                     <div class="row">
                                         <div class="input-field col m3 s12">
                                             <select class="form-control" id="type" name="type">
-                                                <option value="all">SEMUA</option>
-                                                <option value="final">Final</option>
+                                                <option value="all">DENGAN MUTASI</option>
+                                                <option value="final">TANPA MUTASI (FINAL)</option>
                                             </select>
                                             <label class="" for="type">Tipe</label>
                                         </div>
@@ -70,7 +70,7 @@
                                             <label class="" for="warehouse">WareHouse</label>
                                         </div>
                                         <div class="input-field col m3 s12">
-                                            <select class="select2 browser-default" id="item" name="item">
+                                            <select class="select2 browser-default" id="item_id" name="item_id">
                                                 
                                             </select>
                                             <label class="active" for="item">ITEM</label>
@@ -119,10 +119,10 @@
                                                 </select>
                                             
                                         </div>
-                                        <div class="col m3">
+                                        <div class="col m1">
                                             <button class="btn waves-effect waves-light submit" onclick="filter();">Cari <i class="material-icons right">file_download</i></button>
                                         </div>
-                                        <div  class="col m3" id="export_button">
+                                        <div  class="col m1" id="export_button">
                                             <button class="btn waves-effect waves-light right submit mt-2" onclick="exportExcel();">Excel<i class="material-icons right">view_list</i></button>
                                         </div>
                                     </div>
@@ -164,10 +164,8 @@
             var selectedType = $(this).val();
             
             if (selectedType === 'final') {
-                // If type is final, disable start_date input and remove its value
                 $('#start_date').prop('disabled', true).val('');
             } else {
-                // If type is not final, enable start_date input
                 $('#start_date').prop('disabled', false);
             }
         });
@@ -177,7 +175,7 @@
             width: '100%',
         });
 
-        select2ServerSide('#item', '{{ url("admin/select2/item") }}');
+        select2ServerSide('#item_id', '{{ url("admin/select2/item") }}');
     });
     $('#export_button').hide();
     function filter(){

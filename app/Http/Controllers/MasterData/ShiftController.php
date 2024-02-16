@@ -106,7 +106,7 @@ class ShiftController extends Controller
                 $response['data'][] = [
                     $nomor,
                     $val->code,
-                    $val->place->name,
+                    $val->place->code,
                   /*   $val->department->name, */
                     $val->name,
                     $val->time_in,

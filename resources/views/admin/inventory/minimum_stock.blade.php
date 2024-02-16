@@ -123,14 +123,14 @@
                         <thead>
                             <tr>
                                 <th rowspan="2" class="center-align">No.</th>
-                                <th rowspan="2"class="center-align">Plant</th>
-                                <th rowspan="2"class="center-align">Gudang</th>
-                                <th rowspan="2"class="center-align">Kode Item</th>
-                                <th rowspan="2"class="center-align">Nama Item</th>
+                                <th rowspan="2" class="center-align">Plant</th>
+                                <th rowspan="2" class="center-align">Gudang</th>
+                                <th rowspan="2" class="center-align">Kode Item</th>
+                                <th rowspan="2" class="center-align">Nama Item</th>
                                 <th colspan="3" class="center-align">Stock</th>
-                                <th rowspan="2"class="center-align">Required</th>
-                                <th rowspan="2"class="center-align">Satuan</th>
-                                <th rowspan="2"class="center-align">Detail</th>
+                                <th rowspan="2" class="center-align">Required</th>
+                                <th rowspan="2" class="center-align">Satuan</th>
+                                <th rowspan="2" class="center-align">Detail</th>
                             </tr>
                             <tr>
                                 <th class="center-align">Minimum</th>

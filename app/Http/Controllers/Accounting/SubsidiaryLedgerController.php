@@ -149,7 +149,7 @@ class SubsidiaryLedgerController extends Controller
         $dateend = $request->dateend ? $request->dateend : '';
         $coastart = $request->coastart ? $request->coastart : '';
         $coaend = $request->coaend ? $request->coaend : '';
-        $closing_journal = $request->closing_journal;
+        $closing_journal = $request->closing_journal ? $request->closing_journal : '';
 
 		return Excel::download(new ExportSubsidiaryLedger($datestart,$dateend,$coastart,$coaend,$closing_journal), 'subsidiary_ledger_'.uniqid().'.xlsx');
     }

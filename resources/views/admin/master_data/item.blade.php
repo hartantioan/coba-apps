@@ -395,7 +395,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col s6 row">
+                        <div class="col s8 row">
                             <div class="col s12">
                                 <div class="input-field col s12 unit-inputs">
                                     <select class="select2 browser-default" id="uom_unit" name="uom_unit" onchange="getUnitStock();">
@@ -442,7 +442,7 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s4">
                             <div class="switch mb-1">
                                 <label for="is_inventory_item">Item untuk Inventori</label>
                                 <label class="right">
@@ -751,6 +751,7 @@
                 `);
                 $('.unit-inputs').css('pointer-events','auto');
                 $("#item_group_id").val($("#item_group_id option:first").val()).trigger('change');
+                $('#temp').val('');
             }
         });
 

@@ -93,7 +93,11 @@ class Asset extends Model
     }
 
     public function balanceBookRaw(){
-        $total = $this->book_balance;
+        $total = $this->nominal;
+
+        foreach($this->depreciationDetail as $row){
+            $total -= $row->nominal;
+        }
 
         return $total;
     }

@@ -440,6 +440,11 @@ class RetirementController extends Controller
 
     public function voidStatus(Request $request){
         $query = Retirement::where('code',CustomHelper::decrypt($request->id))->first();
+
+        return response()->json([
+            'status'  => 500,
+            'message' => 'Sementara fitur tidak dapat digunakan.'
+        ]);
         
         if($query) {
 

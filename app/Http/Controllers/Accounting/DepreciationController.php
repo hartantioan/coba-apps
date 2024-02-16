@@ -429,6 +429,11 @@ class DepreciationController extends Controller
     public function voidStatus(Request $request){
         $query = Depreciation::where('code',CustomHelper::decrypt($request->id))->first();
         
+        /* return response()->json([
+            'status'  => 500,
+            'message' => 'Sementara fitur tidak dapat digunakan.'
+        ]); */
+
         if($query) {
 
             if(!CustomHelper::checkLockAcc($query->post_date)){
@@ -452,8 +457,9 @@ class DepreciationController extends Controller
                 ]);
 
                 if(in_array($query->status,['2','3'])){
+                    CustomHelper::removeJournal($query->getTable(),$query->id);
                     foreach($query->depreciationDetail as $row){
-                        CustomHelper::updateBalanceAsset($row->asset_id,$row->nominal,'IN');
+                        CustomHelper::updateBalanceAsset($row->asset_id,$row->nominal,'IN',$query->getTable());
                     }
                 }
     

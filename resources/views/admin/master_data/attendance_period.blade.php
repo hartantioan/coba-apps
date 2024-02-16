@@ -756,7 +756,7 @@
                     var string2='';
                     $.each(response.title, function(i, val) {
                         string += '<h4> Report Salary for '+val
-                            +'</h4> <table> '
+                            +'</h4> <table> ';
                  
                         string+=response.message[i];
                        
@@ -764,7 +764,7 @@
                     });
                     $.each(response.title, function(i, val) {
                         string2 += '<h4> Report Salary for '+val
-                            +'</h4> <table> '
+                            +'</h4> <table> ';
                  
                         string2+=response.perday[i];
                        

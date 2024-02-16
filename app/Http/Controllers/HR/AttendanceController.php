@@ -29,6 +29,7 @@ class AttendanceController extends Controller
             'content'       => 'admin.hr.attendance',
             'machine'       => AttendanceMachine::where('status','1')->get(),
         ];
+        
         $total_count = 0;
         foreach($data['machine'] as $row){
             $total_count+=$row->log_counts;

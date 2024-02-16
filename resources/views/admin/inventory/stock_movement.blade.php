@@ -78,7 +78,7 @@
                                         <div class="input-field col m6 s12 ">
                                             <label for="filter_group" class="active" style="font-size:1rem;">Filter Group :</label>
                                             
-                                                <select class="select2 browser-default" multiple="multiple" id="filter_group" name="filter_group" onchange="loadDataTable()">
+                                                <select class="select2 browser-default" multiple="multiple" id="filter_group" name="filter_group[]" onchange="loadDataTable()">
                                                     @foreach($group->whereNull('parent_id') as $c)
                                                         @if(!$c->childSub()->exists())
                                                             <option value="{{ $c->id }}"> - {{ $c->name }}</option>
@@ -196,11 +196,11 @@
             },
             beforeSend: function() {
                 $('#validation_alert_multi').html('');
-                loadingOpen('.modal-content');
+                loadingOpen('#main');
             },
             success: function(response) {
                 $('#export_button').show();
-                loadingClose('.modal-content');
+                loadingClose('#main');
                 if(response.status == 200) {
                     $('#movement_body').empty();
                     $('.uomunit').empty();

@@ -61,54 +61,55 @@
                                         </div>
                                         <div class="input-field col m3 s12">
                                             <select class="browser-default" id="item_id" name="item_id"></select>
-                                           
+                                            <label for="item_id" class="active" style="font-size:1rem;">Item :</label>
                                         </div>
-                                        <div class="col m4 s6 ">
-                                            <label for="filter_group" style="font-size:1rem;">Filter Group :</label>
-                                            <div class="input-field col s12">
-                                                <select class="select2 browser-default" multiple="multiple" id="filter_group" name="filter_group">
-                                                    @foreach($group->whereNull('parent_id') as $c)
-                                                        @if(!$c->childSub()->exists())
-                                                            <option value="{{ $c->id }}"> - {{ $c->name }}</option>
-                                                        @else
-                                                            <optgroup label=" - {{ $c->code.' - '.$c->name }}">
-                                                            @foreach($c->childSub as $bc)
-                                                                @if(!$bc->childSub()->exists())
-                                                                    <option value="{{ $bc->id }}"> -  - {{ $bc->name }}</option>
-                                                                @else
-                                                                    <optgroup label=" -  - {{ $bc->code.' - '.$bc->name }}">
-                                                                        @foreach($bc->childSub as $bcc)
-                                                                            @if(!$bcc->childSub()->exists())
-                                                                                <option value="{{ $bcc->id }}"> -  -  - {{ $bcc->name }}</option>
-                                                                            @else
-                                                                                <optgroup label=" -  -  - {{ $bcc->code.' - '.$bcc->name }}">
-                                                                                    @foreach($bcc->childSub as $bccc)
-                                                                                        @if(!$bccc->childSub()->exists())
-                                                                                            <option value="{{ $bccc->id }}"> -  -  -  - {{ $bccc->name }}</option>
-                                                                                        @else
-                                                                                            <optgroup label=" -  -  -  - {{ $bccc->code.' - '.$bccc->name }}">
-                                                                                                @foreach($bccc->childSub as $bcccc)
-                                                                                                    @if(!$bcccc->childSub()->exists())
-                                                                                                        <option value="{{ $bcccc->id }}"> -  -  -  -  - {{ $bcccc->name }}</option>
-                                                                                                    @endif
-                                                                                                @endforeach
-                                                                                            </optgroup>
-                                                                                        @endif
-                                                                                    @endforeach
-                                                                                </optgroup>
-                                                                            @endif
-                                                                        @endforeach
-                                                                    </optgroup>
-                                                                @endif
-                                                            @endforeach
-                                                            </optgroup>
-                                                        @endif
-                                                @endforeach
-                                                </select>
-                                            </div>
+                                        <div class="input-field col m4 s6 ">
+                                            <label for="filter_group" class="active" style="font-size:1rem;">Filter Group :</label>
+                                            <select class="select2 browser-default" multiple="multiple" id="filter_group" name="filter_group[]">
+                                                @foreach($group->whereNull('parent_id') as $c)
+                                                    @if(!$c->childSub()->exists())
+                                                        <option value="{{ $c->id }}"> - {{ $c->name }}</option>
+                                                    @else
+                                                        <optgroup label=" - {{ $c->code.' - '.$c->name }}">
+                                                        @foreach($c->childSub as $bc)
+                                                            @if(!$bc->childSub()->exists())
+                                                                <option value="{{ $bc->id }}"> -  - {{ $bc->name }}</option>
+                                                            @else
+                                                                <optgroup label=" -  - {{ $bc->code.' - '.$bc->name }}">
+                                                                    @foreach($bc->childSub as $bcc)
+                                                                        @if(!$bcc->childSub()->exists())
+                                                                            <option value="{{ $bcc->id }}"> -  -  - {{ $bcc->name }}</option>
+                                                                        @else
+                                                                            <optgroup label=" -  -  - {{ $bcc->code.' - '.$bcc->name }}">
+                                                                                @foreach($bcc->childSub as $bccc)
+                                                                                    @if(!$bccc->childSub()->exists())
+                                                                                        <option value="{{ $bccc->id }}"> -  -  -  - {{ $bccc->name }}</option>
+                                                                                    @else
+                                                                                        <optgroup label=" -  -  -  - {{ $bccc->code.' - '.$bccc->name }}">
+                                                                                            @foreach($bccc->childSub as $bcccc)
+                                                                                                @if(!$bcccc->childSub()->exists())
+                                                                                                    <option value="{{ $bcccc->id }}"> -  -  -  -  - {{ $bcccc->name }}</option>
+                                                                                                @endif
+                                                                                            @endforeach
+                                                                                        </optgroup>
+                                                                                    @endif
+                                                                                @endforeach
+                                                                            </optgroup>
+                                                                        @endif
+                                                                    @endforeach
+                                                                </optgroup>
+                                                            @endif
+                                                        @endforeach
+                                                        </optgroup>
+                                                    @endif
+                                            @endforeach
+                                            </select>
                                         </div>
                                         <div class="col m3 mt-2">
                                             <button class="btn waves-effect waves-light submit" onclick="filter();">Cari <i class="material-icons right">file_download</i></button>
+                                        </div>
+                                        <div class="col m3 mt-2" id="export_button">
+                                            <button class="btn waves-effect waves-light right submit mt-2" onclick="exportExcel();">Excel<i class="material-icons right">view_list</i></button>
                                         </div>
                                     </div>
                                 </div>
@@ -140,9 +141,7 @@
                         <tbody id="table_body">
                         </tbody>
                     </table>
-                    <div id="export_button">
-                        <button class="btn waves-effect waves-light right submit mt-2" onclick="exportExcel();">Excel<i class="material-icons right">view_list</i></button>
-                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -216,11 +215,11 @@
             },
             beforeSend: function() {
                 $('#validation_alert_multi').html('');
-                loadingOpen('.modal-content');
+                loadingOpen('#main');
             },
             success: function(response) {
                 $('#export_button').show();
-                loadingClose('.modal-content');
+                loadingClose('#main');
                 if(response.status == 200) {
                     $('#table_body').empty();            
                     if (response.message.length > 0) {

@@ -59,10 +59,11 @@ class MinimumStockController extends Controller
         // ->get();
        
         $query_data = ItemStock::where(function($querys) use ( $request) {
-            if($request->item_group_id[0]){
+           
+            if($request->filter_group){
                 
                 $querys->whereHas('item', function ($query) use ($request) {
-                    $query->whereIn('item_group_id', $request->item_group_id);
+                    $query->whereIn('item_group_id', $request->filter_group);
                 });
             }
             if($request->item_id != 'null'){
@@ -77,11 +78,11 @@ class MinimumStockController extends Controller
             }
         })
         ->get();
-        info($query_data);
+      
         $array_filter=[];
         
         foreach($query_data as $row){
-            info($row->warehouse);
+          
             $data_tempura = [
                 'item_id' => CustomHelper::encrypt($row->item->code),
                 'plant' => $row->place->code,
@@ -95,11 +96,14 @@ class MinimumStockController extends Controller
                 'satuan'=>$row->item->uomUnit->code,
                 'perlu' =>1,
             ];
+            
             if($row->qty < $row->item->min_stock){
+                
                 $array_filter[]=$data_tempura;
             }
             
         }
+    
         $end_time = microtime(true);
   
         $execution_time = ($end_time - $start_time);

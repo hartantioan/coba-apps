@@ -75,7 +75,11 @@ class StockInQtyController extends Controller
             if ($request->plant != 'all') {
                 $query->where('item_stocks.place_id', $request->plant);
             }
+            if($request->filter_group){
+                $query->whereIn('items.item_group_id', $request->filter_group);
+            }
         })
+        
         ->orderBy('items.code') // Assuming 'code' is the attribute you want to use for sorting
         ->get();
 
@@ -118,8 +122,8 @@ class StockInQtyController extends Controller
 		$plant = $request->plant ? $request->plant:'';
         $warehouse = $request->warehouse?$request->warehouse:'';
         $item = $request->item ? $request->item:'';
-      
-		return Excel::download(new ExportStockInQty($plant,$item,$warehouse), 'stock_in_qty'.uniqid().'.xlsx');
+        $group = $request->group ? $request->group:'';
+		return Excel::download(new ExportStockInQty($plant,$item,$warehouse,$group), 'stock_in_qty'.uniqid().'.xlsx');
     }
 
     //

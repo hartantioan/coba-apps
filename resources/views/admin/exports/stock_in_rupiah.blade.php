@@ -17,7 +17,7 @@
         </tr>
     </thead>
     <tbody>
-        @if($perlu = 1)
+        @if($perlu == 1)
             <tr>
                 <td colspan="5">Saldo Sebelumnya:</td>
                 <td align="center"> {{$latest}}</td>

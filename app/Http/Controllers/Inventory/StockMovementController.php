@@ -75,9 +75,9 @@ class StockMovementController extends Controller
                     });
                 }
     
-                if($request->group[0] != null){
+                if($request->filter_group){
                     $query->whereHas('item',function($query) use($request){
-                        $query->whereIn('item_group_id', $request->group);
+                        $query->whereIn('item_group_id', $request->filter_group);
                     });
                 }
             })
@@ -116,9 +116,9 @@ class StockMovementController extends Controller
                     });
                 }
     
-                if($request->group[0] != null){
+                if($request->filter_group){
                     $query->whereHas('item',function($query) use($request){
-                        $query->whereIn('item_group_id', $request->group);
+                        $query->whereIn('item_group_id', $request->filter_group);
                     });
                 }
             })

@@ -57,9 +57,9 @@ class DeadStockController extends Controller
             if($request->warehouse != 'all'){
                 $query->where('warehouse_id',$request->warehouse);
             }
-            if($request->group){
+            if($request->filter_group){
                 $query->whereHas('item',function($query) use($request){
-                    $query->whereIn('item_group_id', $request->group);
+                    $query->whereIn('item_group_id', $request->filter_group);
                 });
             }
         })
@@ -101,6 +101,6 @@ class DeadStockController extends Controller
         $date = $request->date ? $request->date:'';
         $hari= $request->hari ? $request->hari:'';
         $group = $request->group ? $request->group:'';
-		return Excel::download(new ExportDeadStock($plant,$warehouse,$hari,$date), 'dead_stock'.uniqid().'.xlsx');
+		return Excel::download(new ExportDeadStock($plant,$warehouse,$date,$group), 'dead_stock'.uniqid().'.xlsx');
     }
 }

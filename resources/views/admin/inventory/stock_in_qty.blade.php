@@ -61,10 +61,10 @@
                                             </select>
                                             <label class="active" for="item_id">ITEM</label>
                                         </div>
-                                        <div class="input-field col m6 s12 mt-2">
+                                        <div class="input-field col m6 s12">
                                             <label for="filter_group" class="active" style="font-size:1rem;">Filter Group :</label>
                                            
-                                            <select class="select2 browser-default" multiple="multiple" id="filter_group" name="filter_group" onchange="loadDataTable()">
+                                            <select class="select2 browser-default" multiple="multiple" id="filter_group" name="filter_group[]" onchange="loadDataTable()">
                                                 @foreach($group->whereNull('parent_id') as $c)
                                                     @if(!$c->childSub()->exists())
                                                         <option value="{{ $c->id }}"> - {{ $c->name }}</option>
@@ -108,6 +108,9 @@
                                         <div class="col m3 mt-2">
                                             <button class="btn waves-effect waves-light submit" onclick="filter();">Cari <i class="material-icons right">file_download</i></button>
                                         </div>
+                                        <div class="col m3 mt-2" id="export_button">
+                                            <button class="btn waves-effect waves-light right submit mt-2" onclick="exportExcel();">Excel<i class="material-icons right">view_list</i></button>
+                                        </div>
                                     </div>
                                 </div>
                             </form>
@@ -131,9 +134,7 @@
                         <tbody id="table_body">
                         </tbody>
                     </table>
-                    <div id="export_button">
-                        <button class="btn waves-effect waves-light right submit mt-2" onclick="exportExcel();">Excel<i class="material-icons right">view_list</i></button>
-                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -166,11 +167,11 @@
             },
             beforeSend: function() {
                 $('#validation_alert_multi').html('');
-                loadingOpen('.modal-content');
+                loadingOpen('#main');
             },
             success: function(response) {
                 $('#export_button').show();
-                loadingClose('.modal-content');
+                loadingClose('#main');
                 if(response.status == 200) {
                     $('#table_body').empty();            
                     if (response.message.length > 0) {
@@ -249,7 +250,7 @@
         var plant = $('#plant').val();
         var warehouse = $('#warehouse').val();
         var item = $('#item_id').val() ? $('#item_id').val():'';
-
-        window.location = "{{ Request::url() }}/export?plant=" + plant + "&warehouse=" + warehouse+"&item=" + item
+        var group = $('#filter_group').val() ? $('#filter_group').val():'';
+        window.location = "{{ Request::url() }}/export?plant=" + plant + "&warehouse=" + warehouse+"&item=" + item +"&group=" + group;
     }
 </script>

@@ -23,19 +23,21 @@ class ExportDeadStock implements FromView,ShouldAutoSize
     }
     public function view(): View
     {
-        $query_data = ItemCogs::whereIn('id', function ($query){
+        info($this->date);
+        $query_data = ItemCogs::whereIn('id', function ($query) {            
             $query->selectRaw('MAX(id)')
                 ->from('item_cogs')
                 ->where('date', '<=', $this->date)
                 ->groupBy('item_id');
-            
+        })
+        ->where(function($query){
             if($this->plant != 'all'){
-                $query->where('plant_id',$this->plant);
+                $query->where('place_id',$this->plant);
             }
             if($this->warehouse != 'all'){
                 $query->where('warehouse_id',$this->warehouse);
             }
-            if($this->group[0] != null){
+            if($this->group){
                 $groupIds = explode(',', $this->group);
                 $query->whereHas('item',function($query) use($groupIds){
                     $query->whereIn('item_group_id', $groupIds);
@@ -43,6 +45,7 @@ class ExportDeadStock implements FromView,ShouldAutoSize
             }
         })
         ->get();
+        info($query_data);
         $array_filter = [];
         foreach($query_data as $row){
            

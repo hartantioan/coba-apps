@@ -11,14 +11,13 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
 class ExportStockInQty implements FromView,ShouldAutoSize
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
-    public function __construct(string $plant, string $item,string $warehouse)
+    protected $plant, $item, $warehouse,$group;
+    public function __construct(string $plant, string $item,string $warehouse,string $group)
     {
         $this->plant = $plant ? $plant : '';
 		$this->item = $item ? $item : '';
         $this->warehouse = $warehouse ? $warehouse : '';
+        $this->group = $group ? $group : '';
 
     }
     public function view(): View
@@ -34,6 +33,12 @@ class ExportStockInQty implements FromView,ShouldAutoSize
             if ($this->plant != 'all') {
                 $query->where('item_stocks.place_id', $this->plant);
             }
+        })
+        ->when($this->group, function ($query) {
+            $groupIds = explode(',', $this->group);
+            $query->whereHas('item', function ($itemQuery) use($groupIds) {
+                $itemQuery->whereIn('item_group_id', $groupIds);
+            });
         })
         ->orderBy('items.code')->get();
 

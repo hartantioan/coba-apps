@@ -19,7 +19,7 @@ class FundRequest extends Model
         'code',
         'user_id',
         'place_id',
-        'department_id',
+        'division_id',
         'account_id',
         'type',
         'post_date',
@@ -75,9 +75,9 @@ class FundRequest extends Model
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
     }
 
-    public function department()
+    public function division()
     {
-        return $this->belongsTo('App\Models\Division', 'department_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\Division', 'division_id', 'id')->withTrashed();
     }
 
     public function fundRequestDetail()

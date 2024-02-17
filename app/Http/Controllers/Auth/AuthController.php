@@ -54,6 +54,7 @@ class AuthController extends Controller
                     'bo_company_id'     => $user->company_id,
                     'bo_place_id'       => $user->place_id,
                     'bo_department_id'  => $user->department_id,
+                    'bo_division_id'    => $user->position()->exists() ? $user->position->division_id : '',
                     'bo_position_id'    => $user->position_id,
                     'bo_is_lock'        => 0,
                     'bo_reminder'       => $array_id_task,

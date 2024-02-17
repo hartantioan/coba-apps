@@ -86,7 +86,7 @@
                                                         <th rowspan="2">#</th>
                                                         <th rowspan="2">Code</th>
                                                         <th rowspan="2">Plant</th>
-                                                        <th rowspan="2">Departemen</th>
+                                                        <th rowspan="2">Divisi</th>
                                                         <th rowspan="2">Partner Bisnis</th>
                                                         <th rowspan="2">Tipe</th>
                                                         <th colspan="2" class="center-align">Tanggal</th>
@@ -195,12 +195,12 @@
                                     <label class="" for="place_id">Plant</label>
                                 </div>
                                 <div class="input-field col m3 s12">
-                                    <select class="form-control" id="department_id" name="department_id">
-                                        @foreach ($department as $row)
-                                            <option value="{{ $row->id }}" {{ $row->id == session('bo_department_id') ? 'selected' : '' }}>{{ $row->name }}</option>
+                                    <select class="form-control" id="division_id" name="division_id">
+                                        @foreach ($division as $row)
+                                            <option value="{{ $row->id }}" {{ $row->id == session('bo_division_id') ? 'selected' : '' }}>{{ $row->name }}</option>
                                         @endforeach
                                     </select>
-                                    <label class="" for="department_id">Departemen</label>
+                                    <label class="" for="division_id">Divisi</label>
                                 </div>
                                 <div class="input-field col m3 s12">
                                     <textarea id="note" name="note" class="materialize-textarea" placeholder="Ulasan singkat produk..."></textarea>
@@ -656,7 +656,7 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'place_id', className: 'center-align' },
-                { name: 'department_id', className: 'center-align' },
+                { name: 'division_id', className: 'center-align' },
                 { name: 'account_id', className: 'center-align' },
                 { name: 'type', className: 'center-align' },
                 { name: 'date_post', className: 'center-align' },
@@ -980,7 +980,7 @@
                 $('#required_date').val(response.required_date);
                 $('#required_date').removeAttr('min');
                 $('#place_id').val(response.place_id).formSelect();
-                $('#department_id').val(response.department_id).formSelect();
+                $('#division_id').val(response.division_id).formSelect();
                 $('#termin_note').val(response.termin_note);
                 $('#payment_type').val(response.payment_type).formSelect();
                 $('#name_account').val(response.name_account);

@@ -41,6 +41,7 @@ use App\Models\Department;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportFundRequest;
 use App\Exports\ExportOutstandingFundRequest;
+use App\Models\Division;
 
 class FundRequestController extends Controller
 {
@@ -83,7 +84,7 @@ class FundRequestController extends Controller
             'user_id',
             'code',
             'place_id',
-            'department_id',
+            'division_id',
             'account_id',
             'type',
             'post_date',
@@ -183,7 +184,7 @@ class FundRequestController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->place->code,
-                    $val->department()->exists() ? $val->department->name : '',
+                    $val->division()->exists() ? $val->division->name : '',
                     $val->account->name,
                     $val->type(),
                     date('d/m/Y',strtotime($val->post_date)),
@@ -718,7 +719,7 @@ class FundRequestController extends Controller
             'title'         => 'Pengajuan Permohonan Dana - Pengguna',
             'content'       => 'admin.personal.fund_request',
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
-            'department'    => Department::where('status','1')->get(),
+            'division'      => Division::where('status','1')->get(),
             'currency'      => Currency::where('status','1')->get(),
             'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
             'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
@@ -736,7 +737,7 @@ class FundRequestController extends Controller
             'id',
             'code',
             'place_id',
-            'department_id',
+            'division_id',
             'account_id',
             'type',
             'post_date',
@@ -811,7 +812,7 @@ class FundRequestController extends Controller
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->place->code,
-                    $val->department()->exists() ? $val->department->name : '',
+                    $val->division()->exists() ? $val->division->name : '',
                     $val->account->name,
                     $val->type(),
                     date('d/m/Y',strtotime($val->post_date)),
@@ -891,7 +892,7 @@ class FundRequestController extends Controller
 			'post_date' 				=> 'required',
 			'required_date'		        => 'required',
             'place_id'                  => 'required',
-            'department_id'             => 'required',
+            'division_id'               => 'required',
             'note'		                => 'required',
             'payment_type'		        => 'required',
             'currency_id'		        => 'required',
@@ -909,7 +910,7 @@ class FundRequestController extends Controller
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
 			'required_date.required' 			=> 'Tanggal request pembayaran tidak boleh kosong.',
             'place_id.required'                 => 'Penempatan lokasi tidak boleh kosong.',
-            'department_id.required'            => 'Departemen tidak boleh kosong.',
+            'division_id.required'              => 'Divisi tidak boleh kosong.',
 			'note.required'				        => 'Keterangan tidak boleh kosong',
             'payment_type.required'				=> 'Tipe pembayaran tidak boleh kosong',
             'currency_id.required'				=> 'Mata uang tidak boleh kosong',
@@ -977,7 +978,7 @@ class FundRequestController extends Controller
                         $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->place_id = $request->place_id;
-                        $query->department_id = $request->department_id;
+                        $query->division_id = $request->division_id;
                         $query->account_id = $request->account_id;
                         $query->type = $request->type;
                         $query->post_date = $request->post_date;
@@ -1025,7 +1026,7 @@ class FundRequestController extends Controller
                         'code'			=> $newCode,
                         'user_id'		=> session('bo_id'),
                         'place_id'      => $request->place_id,
-                        'department_id'	=> $request->department_id,
+                        'division_id'	=> $request->division_id,
                         'account_id'    => $request->account_id,
                         'type'          => $request->type,
                         'post_date'     => $request->post_date,

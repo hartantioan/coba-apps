@@ -233,10 +233,10 @@
                                     </tr>
                                     <tr>
                                         <td width="40%">
-                                            Depart.
+                                            Divisi
                                         </td>
                                         <td width="60%">
-                                            : {{ $data->user->position->division->name }}
+                                            : {{ $data->division()->exists() ? $data->division->name : '' }}
                                         </td>
                                     </tr>
                                     <tr>

@@ -81,11 +81,11 @@ class StockMovementController extends Controller
                     });
                 }
             })
-            ->whereIn('id', function ($subquery) {
-                $subquery->select(DB::raw('MAX(id)'))
-                    ->from('item_cogs')
-                    ->groupBy('item_id');
-            })
+            // ->whereIn('id', function ($subquery) {
+            //     $subquery->select(DB::raw('MAX(id)'))
+            //         ->from('item_cogs')
+            //         ->groupBy('item_id');
+            // })
             ->orderBy('date', 'desc')
             ->groupBy('item_id')
             ->get();

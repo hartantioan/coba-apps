@@ -350,15 +350,16 @@ class ItemController extends Controller
 
                 $place = Place::where('status','1')->get();
                 
-
-                foreach($place as $row_place){
-                    foreach($query->itemGroup->itemGroupWarehouse as $rowwarehouse){
-                        ItemStock::create([
-                            'place_id'      => $row_place->id,
-                            'warehouse_id'  => $rowwarehouse->warehouse_id,
-                            'item_id'       => $query->id,
-                            'qty'           => 0
-                        ]);
+                if($request->temp == null){
+                    foreach($place as $row_place){
+                        foreach($query->itemGroup->itemGroupWarehouse as $rowwarehouse){
+                            ItemStock::create([
+                                'place_id'      => $row_place->id,
+                                'warehouse_id'  => $rowwarehouse->warehouse_id,
+                                'item_id'       => $query->id,
+                                'qty'           => 0
+                            ]);
+                        }
                     }
                 }
 

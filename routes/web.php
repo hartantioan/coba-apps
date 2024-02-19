@@ -2427,6 +2427,7 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('profit_loss')->middleware('operation.access:profit_loss,view')->group(function () {
                         Route::get('/',[ProfitLossController::class, 'index']);
                         Route::post('process', [ProfitLossController::class, 'process']);
+                        Route::get('export', [ProfitLossController::class, 'export']);
                     });
                     Route::prefix('cash_bank')->middleware('operation.access:cash_bank,view')->group(function () {
                         Route::get('/',[CashBankController::class, 'index']);

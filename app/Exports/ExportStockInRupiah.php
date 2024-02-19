@@ -127,9 +127,11 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                 $cum_val = 0;
             }
             if($row->type=='IN'){
+                $priceNow = $row->price_in;
                 $cum_qty=$row->qty_in;
                 $cum_val=$row->total_in;
             }else{
+                $priceNow = $row->price_out;
                 $cum_qty=$row->qty_out * -1;
                 $cum_val=$row->total_out * -1;
             }
@@ -140,7 +142,7 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                 'item' => $row->item->name,
                 'satuan' => $row->item->uomUnit->code,
                 'kode' => $row->item->code,
-                'final'=>number_format($row->price_final,2,',','.'),
+                'final'=>number_format($priceNow,2,',','.'),
                 'total'=>$perlu == 0 ? '-' : number_format($cum_val, 3, ',', '.'),
                 'qty'=>$perlu == 0 ? '-' : number_format($cum_qty, 3, ',', '.'),
                 'date' =>  date('d/m/Y',strtotime($row->date)),
@@ -179,8 +181,8 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                 ->first();
               
                 if($query_first){
-                    $last_nominal=number_format($query_first->price_final,3,',','.');
-                    $last_qty=number_format($query_first->qty_final,3,',','.');
+                    $last_nominal=number_format($query_first->total_final,2,',','.');
+                    $last_qty=number_format($query_first->qty_final,2,',','.');
                 }
                 
             }

@@ -353,6 +353,16 @@ class PurchaseInvoice extends Model
         ]);
     }
 
+    public function getTop(){
+        $top = 0;
+
+        foreach($this->purchaseInvoiceDetail as $row){
+            $top = $row->getTop();
+        }
+
+        return $top;
+    }
+
     public function getTotalPaid(){
         $total = $this->balance;
         $totalAfterMemo = $total - $this->totalMemo();
@@ -400,6 +410,15 @@ class PurchaseInvoice extends Model
         })->get() as $rowpayment){
             $total += $rowpayment->nominal;
         }
+        $totalPayByJournal = JournalDetail::whereHas('coa',function($query){
+            $query->where('code','200.01.03.01.01');
+        })->whereHas('journal',function($query)use($date){
+            $query->whereDate('post_date','<=',$date)
+                ->whereIn('status',['2','3']);
+        })->where('note','VOID*'.$this->code)->sum('nominal');
+
+        $total += $totalPayByJournal;
+
         return $total;
     }
 
@@ -419,6 +438,13 @@ class PurchaseInvoice extends Model
         })->get() as $rowpayment){
             $totalAfterMemo -= $rowpayment->nominal;
         }
+        $totalPayByJournal = JournalDetail::whereHas('coa',function($query){
+            $query->where('code','200.01.03.01.01');
+        })->whereHas('journal',function($query)use($date){
+            $query->whereDate('post_date','<=',$date)
+                ->whereIn('status',['2','3']);
+        })->where('note','VOID*'.$this->code)->sum('nominal');
+        $totalAfterMemo -= $totalPayByJournal;
         return $totalAfterMemo;
     }
 

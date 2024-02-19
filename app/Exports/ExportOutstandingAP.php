@@ -44,87 +44,22 @@ class ExportOutstandingAP implements FromView , WithEvents
 
         foreach($query_data as $row_invoice){
             $data_tempura = [
-                'code' => $row_invoice->code,
-                'vendor' => $row_invoice->account->name,
-                'post_date'=>date('d/m/Y',strtotime($row_invoice->post_date)),
-                'rec_date'=>date('d/m/Y',strtotime($row_invoice->received_date)),
-                'due_date'=>date('d/m/Y',strtotime($row_invoice->due_date)),
+                'code'      => $row_invoice->code,
+                'vendor'    => $row_invoice->account->name,
+                'post_date' =>date('d/m/Y',strtotime($row_invoice->post_date)),
+                'rec_date'  =>date('d/m/Y',strtotime($row_invoice->received_date)),
+                'due_date'  =>date('d/m/Y',strtotime($row_invoice->due_date)),
+                'top'       => $row_invoice->getTop(),
+                'total'     =>number_format($row_invoice->total,2,',','.'),
+                'tax'       =>number_format($row_invoice->tax,2,',','.'),
+                'wtax'      =>number_format($row_invoice->wtax,2,',','.'),
                 'grandtotal'=>number_format($row_invoice->balance,2,',','.'),
-                'payed'=>number_format($row_invoice->totalMemoByDate($this->date),2,',','.'),
-                'sisa'=>number_format($row_invoice->getTotalPaidByDate($this->date),2,',','.'),
+                'payed'     =>number_format($row_invoice->getTotalPaidDate($this->date),2,',','.'),
+                'sisa'      =>number_format($row_invoice->getTotalPaidByDate($this->date),2,',','.'),
             ];
-
-            $detail=[];
-            
-            foreach($row_invoice->purchaseInvoiceDetail as $row){
-                if($row->purchaseOrderDetail()){
-                    $detail[] = [
-                        'po'=> $row->lookable->purchaseOrder->code,
-                        'top'=>$row->lookable->purchaseOrder->payment_term,
-                        'item_name'=>$row->lookable->item_id ? $row->lookable->item->name : $row->lookable->coa->code,
-                        'note1'=>$row->note,
-                        'note2'=>$row->note2,
-                        'qty'=>number_format($row->qty,3,',','.'),
-                        'unit'=>$row->lookable->item_id ? $row->lookable->item->uomUnit->code : '-',
-                        'price_o'=>number_format($row->price,2,',','.'),
-                        'total' =>number_format($row->total,2,',','.'),
-                        'ppn'=>number_format($row->tax,2,',','.'),
-                        'pph'=>number_format($row->wtax,2,',','.'),
-                    ];
-                }
-                elseif($row->landedCostFeeDetail()){
-                    $detail[] = [
-                        'po'=> $row->lookable->landedCost->code,
-                        'top'=>'',
-                        'item_name'=>$row->lookable->landedCostFee->name,
-                        'note1'=>$row->note,
-                        'note2'=>$row->note2,
-                        'qty'=>number_format($row->qty,3,',','.'),
-                        'unit'=>'-',
-                        'price_o'=>number_format($row->price,2,',','.'),
-                        'total' =>number_format($row->total,2,',','.'),
-                        'ppn'=>number_format($row->tax,2,',','.'),
-                        'pph'=>number_format($row->wtax,2,',','.'),
-                       
-                    ];
-                }
-                elseif($row->goodReceiptDetail()){
-                    $detail[] = [
-                        'po'=> $row->lookable->goodReceipt->code,
-                        'top'=>'',
-                        'item_name'=>$row->lookable->item->name,
-                        'note1'=>$row->note,
-                        'note2'=>$row->note2,
-                        'qty'=>number_format($row->qty,3,',','.'),
-                        'unit'=>$row->lookable->item->uomUnit->code,
-                        'price_o'=>number_format($row->price,2,',','.'),
-                        'total' =>number_format($row->total,2,',','.'),
-                        'ppn'=>number_format($row->tax,2,',','.'),
-                        'pph'=>number_format($row->wtax,2,',','.'),
-                       
-                    ];
-                }
-                elseif($row->coa()){
-                    $detail[] = [
-                        'po'=> '-',
-                        'top'=>'',
-                        'item_name'=>$row->lookable->code.' '.$row->lookable->name,
-                        'note1'=>$row->note,
-                        'note2'=>$row->note2,
-                        'qty'=>number_format($row->qty,3,',','.'),
-                        'unit'=>'-',
-                        'price_o'=>number_format($row->price,2,',','.'),
-                        'total' =>number_format($row->total,2,',','.'),
-                        'ppn'=>number_format($row->tax,2,',','.'),
-                        'pph'=>number_format($row->wtax,2,',','.'),
-                    
-                    ];
-                }
-            }
 
             if($data_tempura['sisa'] != number_format(0,2,',','.')){
                 $totalAll += str_replace(',','.',str_replace('.','',$data_tempura['sisa']));
-                $data_tempura['details'] = $detail;
                 $array_filter[] = $data_tempura;
             }
             
@@ -134,34 +69,22 @@ class ExportOutstandingAP implements FromView , WithEvents
             $total = $row_dp->balancePaymentRequestByDate($this->date);
             $due_date = $row_dp->due_date ? $row_dp->due_date : date('Y-m-d', strtotime($row_dp->post_date. ' + '.$row_dp->top.' day'));
             $data_tempura = [
-                'code' => $row_dp->code,
-                'vendor' => $row_dp->supplier->name,
-                'post_date'=>date('d/m/Y',strtotime($row_dp->post_date)),
-                'rec_date'=>'',
-                'due_date'=>date('d/m/Y',strtotime($due_date)),
+                'code'      => $row_dp->code,
+                'vendor'    => $row_dp->supplier->name,
+                'post_date' =>date('d/m/Y',strtotime($row_dp->post_date)),
+                'rec_date'  =>'',
+                'due_date'  =>date('d/m/Y',strtotime($due_date)),
+                'top'       => 0,
+                'total'     =>number_format($row_invoice->total,2,',','.'),
+                'tax'       =>number_format($row_invoice->tax,2,',','.'),
+                'wtax'      =>number_format($row_invoice->wtax,2,',','.'),
                 'grandtotal'=>number_format($row_dp->grandtotal,2,',','.'),
-                'payed'=>number_format($row_dp->totalMemoByDate($this->date),2,',','.'),
-                'sisa'=>number_format($total,2,',','.'),
-            ];
-            
-            $detail=[];
-            $detail[] = [
-                'po'=> $row_dp->code,
-                'top'=>0,
-                'item_name'=>'-',
-                'note1'=>$row_dp->note,
-                'note2'=>'-',
-                'qty'=>number_format(1,2,',','.'),
-                'unit'=>'-',
-                'price_o'=>number_format(0,2,',','.'),
-                'total' =>number_format($row_dp->nominal,2,',','.'),
-                'ppn'=>number_format(0,2,',','.'),
-                'pph'=>number_format(0,2,',','.'),
+                'payed'     =>number_format($row_dp->totalMemoByDate($this->date),2,',','.'),
+                'sisa'      =>number_format($total,2,',','.'),
             ];
 
             if($total > 0){
                 $totalAll += $total;
-                $data_tempura['details'] = $detail;
                 $array_filter[] = $data_tempura;
             }
         }

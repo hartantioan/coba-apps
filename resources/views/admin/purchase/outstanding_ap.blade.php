@@ -83,17 +83,10 @@
                                                         <th class="center-align">No.</th>
                                                         <th class="center-align">No Invoice</th>
                                                         <th class="center-align">Supplier/Vendor</th>
-                                                        <th class="center-align">No Referensi</th>
                                                         <th class="center-align">Tgl.Post</th>
                                                         <th class="center-align">Tgl.Terima</th>
                                                         <th class="center-align">TOP(Hari)</th>
                                                         <th class="center-align">Tgl.Jatuh Tempo</th>
-                                                        <th class="center-align">Nama Item</th>
-                                                        <th class="center-align">Note 1</th>
-                                                        <th class="center-align">Note 2</th>
-                                                        <th class="center-align">Qty</th>
-                                                        <th class="center-align">Satuan</th>
-                                                        <th class="center-align">Harga Satuan</th>
                                                         <th class="center-align">Total</th>
                                                         <th class="center-align">PPN</th>
                                                         <th class="center-align">PPH</th>
@@ -104,7 +97,7 @@
                                                 </thead>
                                                 <tbody id="detail_invoice">
                                                     <tr>
-                                                        <td class="center-align" colspan="20">Silahkan pilih tanggal dan tekan tombol filter.</td>
+                                                        <td class="center-align" colspan="14">Silahkan pilih tanggal dan tekan tombol filter.</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -151,58 +144,31 @@
             },
             beforeSend: function() {
                 $('#validation_alert_multi').html('');
-                loadingOpen('#main-display');
+                loadingOpen('#main');
             },
             success: function(response) {
-                loadingClose('#main-display');
+                loadingClose('#main');
                 if(response.status == 200) {
                     $('#detail_invoice').empty();
                     if(response.message.length > 0){
                         $.each(response.message, function(i, val) {
-                            console.log(val.details.length);
                             $('#detail_invoice').append(`
                                 <tr>
-                                    <td class="center-align" rowspan="`+val.details.length+`">`+(i+1)+`</td>
-                                    <td rowspan="`+val.details.length+`">`+val.code+`</td>
-                                    <td rowspan="`+val.details.length+`">`+val.vendor+`</td>
-                                    <td>`+val.details[0].po+`</td>
-                                    <td class="center-align" rowspan="`+val.details.length+`">`+val.post_date+`</td>
-                                    <td class="center-align" rowspan="`+val.details.length+`">`+val.rec_date+`</td>
-                                    <td class="center-align">`+val.details[0].top+`</td>
-                                    <td class="center-align" rowspan="`+val.details.length+`">`+val.due_date+`</td>
-                                    <td >`+val.details[0].item_name+`</td>
-                                    <td >`+val.details[0].note1+`</td>
-                                    <td >`+val.details[0].note2+`</td>
-                                    <td class="center-align">`+val.details[0].qty+`</td>
-                                    <td class="center-align">`+val.details[0].unit+`</td>
-                                    <td class="right-align">`+val.details[0].price_o+`</td>
-                                    <td class="right-align">`+val.details[0].total+`</td>
-                                    <td class="right-align">`+val.details[0].ppn+`</td>
-                                    <td class="right-align">`+val.details[0].pph+`</td>
-                                    <td class="right-align" rowspan="`+val.details.length+`">`+val.grandtotal+`</td>
-                                    <td class="right-align" rowspan="`+val.details.length+`">`+val.payed+`</td>
-                                    <td class="right-align" rowspan="`+val.details.length+`">`+val.sisa+`</td>
+                                    <td class="center-align">`+(i+1)+`</td>
+                                    <td>`+val.code+`</td>
+                                    <td>`+val.vendor+`</td>
+                                    <td class="center-align">`+val.post_date+`</td>
+                                    <td class="center-align">`+val.rec_date+`</td>
+                                    <td class="center-align">`+val.top+`</td>
+                                    <td class="center-align">`+val.due_date+`</td>
+                                    <td class="right-align">`+val.total+`</td>
+                                    <td class="right-align">`+val.tax+`</td>
+                                    <td class="right-align">`+val.wtax+`</td>
+                                    <td class="right-align">`+val.grandtotal+`</td>
+                                    <td class="right-align">`+val.payed+`</td>
+                                    <td class="right-align">`+val.sisa+`</td>
                                 </tr>
                             `);
-                            $.each(val.details,function(j, details) {
-                                if(j>0){
-                                    $('#detail_invoice').append(`
-                                        <tr>
-                                            <td >`+val.details[j].po+`</td>
-                                            <td class="center-align">`+val.details[j].top+`</td>
-                                            <td >`+val.details[j].item_name+`</td>
-                                            <td >`+val.details[j].note1+`</td>
-                                            <td >`+val.details[j].note2+`</td>
-                                            <td class="center-align">`+val.details[j].qty+`</td>
-                                            <td class="center-align">`+val.details[j].unit+`</td>
-                                            <td class="right-align">`+val.details[j].price_o+`</td>
-                                            <td class="right-align">`+val.details[j].total+`</td>
-                                            <td class="right-align">`+val.details[j].ppn+`</td>
-                                            <td class="right-align">`+val.details[j].pph+`</td>
-                                        </tr>
-                                    `);
-                                }
-                            });
                         });
                         $('#detail_invoice').append(`
                             <tr>
@@ -222,7 +188,7 @@
                     });
                 } else if(response.status == 422) {
                     $('#validation_alert_multi').show();
-                    $('#main-display').scrollTop(0);
+                    $('#main').scrollTop(0);
                     swal({
                         title: 'Ups! Validation',
                         text: 'Check your form.',
@@ -250,8 +216,8 @@
                 }
             },
             error: function() {
-                $('#main-display').scrollTop(0);
-                loadingClose('#main-display');
+                $('#main').scrollTop(0);
+                loadingClose('#main');
                 swal({
                     title: 'Ups!',
                     text: 'Check your internet connection.',

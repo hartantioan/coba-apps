@@ -74,13 +74,26 @@ class AgingAPController extends Controller
                         AND pr.status IN ('2','3')
                         AND pr.payment_type = '5'
                 ),0) AS total_reconcile,
+                IFNULL((
+                    SELECT
+                        SUM(jd.nominal)
+                        FROM journal_details jd
+                        JOIN journals j
+                            ON j.id = jd.journal_id
+                        JOIN coas c
+                            ON jd.coa_id = c.id
+                        WHERE c.code = '200.01.03.01.01'
+                        AND jd.note = CONCAT('VOID*',pi.code)
+                        AND j.post_date <= :date4
+                        AND j.status IN ('2','3')
+                ),0) AS total_journal,
                 u.name AS account_name,
                 u.employee_no AS account_code
                 FROM purchase_invoices pi
                 LEFT JOIN users u
                     ON u.id = pi.account_id
                 WHERE 
-                    pi.post_date <= :date4
+                    pi.post_date <= :date5
                     AND pi.balance > 0
                     AND pi.status IN ('2','3')
         ", array(
@@ -88,6 +101,7 @@ class AgingAPController extends Controller
             'date2' => $date,
             'date3' => $date,
             'date4' => $date,
+            'date5' => $date,
         ));
 
         $results2 = DB::select("
@@ -176,7 +190,7 @@ class AgingAPController extends Controller
         $newData = []; 
 
         foreach($results as $row){
-            $balance = $row->balance - $row->total_payment - $row->total_memo - $row->total_reconcile;
+            $balance = $row->balance - $row->total_payment - $row->total_memo - $row->total_reconcile - $row->total_journal;
             if($balance > 0){
                 $daysDiff = $this->dateDiffInDays($row->due_date,$date);
                 $index = $this->findDuplicate($row->account_code,$newData);
@@ -620,8 +634,9 @@ class AgingAPController extends Controller
         $grandtotal = 0;
 
         foreach($arrInvoice as $row){
-            $prefix = substr($row,0,4);
-            if($prefix == 'APDP'){
+            $prefix1 = substr($row,0,4);
+            $prefix2 = substr($row,0,6);
+            if($prefix1 == 'APDP' || $prefix2 == '1-APDP'){
                 $dp = PurchaseDownPayment::where('code',$row)->first();
                 if($dp){
                     $memo = $dp->totalMemoByDate($date);

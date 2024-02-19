@@ -2810,7 +2810,7 @@ class PaymentRequestController extends Controller
                                         ],
                                         "key" => $row_pyr_cross->lookable->code,
                                         "name" => $row_pyr_cross->lookable->code,
-                                        'url'=>request()->root()."/admin/purchase/payment_request_cross?code=".CustomHelper::encrypt($row_pyr_cross->lookable->code),  
+                                        'url'=>request()->root()."/admin/finance/outgoing_payment?code=".CustomHelper::encrypt($row_pyr_cross->lookable->code),  
                                     ];
                         
                                     $data_go_chart[]=$data_pyrc_tempura;
@@ -2833,6 +2833,7 @@ class PaymentRequestController extends Controller
                 }
 
                 foreach($data_id_pyrcs as $payment_request_cross_id){
+                    
                     if(!in_array($payment_request_cross_id, $finished_data_id_pyrcs)){
                         $finished_data_id_pyrcs[]=$payment_request_cross_id;
                         $query_pyrc = PaymentRequestCross::find($payment_request_cross_id);
@@ -2843,7 +2844,7 @@ class PaymentRequestController extends Controller
                                 'properties'=> [
                                     ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query_pyrc->paymentRequest->post_date))],
                                 ],
-                                'url'   =>request()->root()."/admin/finance/payment_request_cross?code=".CustomHelper::encrypt($query_pyrc->paymentRequest->code),
+                                'url'   =>request()->root()."/admin/finance/outgoing_payment?code=".CustomHelper::encrypt($query_pyrc->paymentRequest->code),
                                 "title" =>$query_pyrc->paymentRequest->code,
                             ];
                             $data_go_chart[]=$data_pyr_tempura;
@@ -3520,7 +3521,8 @@ class PaymentRequestController extends Controller
                         }
                     }
                 }
-            }   
+            }
+             
             function unique_key($array,$keyname){
 
                 $new_array = array();

@@ -102,9 +102,10 @@
                                                         <th>#</th>
                                                         <th>Coa</th>
                                                         <th>Perusahaan</th>
+                                                        <th>Saldo Awal</th>
                                                         <th>Debit</th>
                                                         <th>Kredit</th>
-                                                        <th>Akhir</th>
+                                                        <th>Saldo Akhir</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -280,6 +281,7 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'coa', className: '' },
                 { name: 'company', className: '' },
+                { name: 'balance', searchable: false, orderable: false, className: 'right-align' },
                 { name: 'debit', searchable: false, orderable: false, className: 'right-align' },
                 { name: 'credit', searchable: false, orderable: false, className: 'right-align' },
                 { name: 'final', searchable: false, orderable: false, className: 'right-align' },

@@ -30,10 +30,6 @@ class CashBankController extends Controller
             'id',
             'code',
             'company',
-            'beginning',
-            'debit',
-            'credit',
-            'ending'
         ];
 
         $start  = $request->start;
@@ -98,18 +94,28 @@ class CashBankController extends Controller
                     $periode = "";
                 }
 
+                $balance_debit  = $val->journalDebit()->whereHas('journal',function($query)use($request){
+                    $query->whereDate('post_date','<',$request->start_date);
+                })->sum('nominal');
+                $balance_credit  = $val->journalCredit()->whereHas('journal',function($query)use($request){
+                    $query->whereDate('post_date','<',$request->start_date);
+                })->sum('nominal');
+
+                $balance = $balance_debit - $balance_credit;
+
                 $ending_debit  = $val->journalDebit()->whereHas('journal',function($query)use($periode){
                     $query->whereRaw($periode);
                 })->sum('nominal');
                 $ending_credit = $val->journalCredit()->whereHas('journal',function($query)use($periode){
                     $query->whereRaw($periode);
                 })->sum('nominal');
-                $ending_total  = $ending_debit - $ending_credit;
+                $ending_total  = $balance + $ending_debit - $ending_credit;
 
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" style="padding: 0 0 !important;" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code.' - '.$val->name,
                     $val->company->name,
+                    number_format($balance, 2, ',', '.'),
                     number_format($ending_debit, 2, ',', '.'),
                     number_format($ending_credit, 2, ',', '.'),
                     number_format($ending_total, 2, ',', '.')
@@ -152,6 +158,23 @@ class CashBankController extends Controller
 
         $beginning_total = 0;
         $no = 2;
+
+        $balance_debit  = $coa->journalDebit()->whereHas('journal',function($query)use($request){
+            $query->whereDate('post_date','<',$request->start_date);
+        })->sum('nominal');
+        $balance_credit  = $coa->journalCredit()->whereHas('journal',function($query)use($request){
+            $query->whereDate('post_date','<',$request->start_date);
+        })->sum('nominal');
+
+        $balance = $balance_debit - $balance_credit;
+
+        $string .= '<tr>
+            <td class="center-align" colspan="14"><b>SALDO PERIODE SEBELUMNYA</b></td>
+            <td class="right-align blue-text text-darken-2"><b>'.number_format($balance,2,',','.').'</b></td>
+        </tr>';
+
+        $beginning_total = $balance;
+
         foreach(JournalDetail::where('coa_id',$coa->id)->whereHas('journal',function($query)use($request){
             if($request->start_date && $request->finish_date) {
                 $query->whereDate('post_date', '>=', $request->start_date)

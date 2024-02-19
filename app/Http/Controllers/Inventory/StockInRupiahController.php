@@ -47,6 +47,7 @@ class StockInRupiahController extends Controller
         DB::statement("SET SQL_MODE=''");
         if($request->type == 'final'){
             $perlu = 0 ;
+            info($request);
             $query_data = ItemCogs::where(function($query) use ( $request) {
                 if($request->start_date && $request->finish_date) {
                     $query->whereDate('date', '>=', $request->start_date)
@@ -54,6 +55,7 @@ class StockInRupiahController extends Controller
                 } else if($request->start_date) {
                     $query->whereDate('date','>=', $request->start_date);
                 } else if($request->finish_date) {
+                    info('masuk sini');
                     $query->whereDate('date','<=', $request->finish_date);
                 }
                 if($request->item_id) {
@@ -79,11 +81,11 @@ class StockInRupiahController extends Controller
                     });
                 }
             })
-            ->whereIn('id', function ($subquery) {
-                $subquery->select(DB::raw('MAX(id)'))
-                    ->from('item_cogs')
-                    ->groupBy('item_id');
-            })
+            // ->whereIn('id', function ($subquery) {
+            //     $subquery->select(DB::raw('MAX(id)'))
+            //         ->from('item_cogs')
+            //         ->groupBy('item_id');
+            // })
             ->orderBy('date', 'desc')
             ->groupBy('item_id')
             ->get();

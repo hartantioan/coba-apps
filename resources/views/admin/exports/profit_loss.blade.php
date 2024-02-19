@@ -138,6 +138,86 @@
             $tempParent = $row->parent_id;
         @endphp
     @endforeach
+@elseif($level == '3')
+    @php
+        $tempParent1 = 0;
+        $tempParent2 = 0;
+    @endphp
+    @foreach($coas as $keymain => $row)
+        @if($tempParent2 !== $row->parentSub->parent_id)
+            <tr>
+                <td><b>{{ $row->parentSub->parentSub->name }}</b></td>
+                <td colspan="{{ (count($arrMonth) * 4) }}"></td>
+            </tr>';
+            @php
+                foreach($arrMonth as $key => $rowMonth) {
+                    $arrMonth[$key]['tempBalanceBefore'] = 0;
+                    $arrMonth[$key]['tempDebit'] = 0;
+                    $arrMonth[$key]['tempCredit'] = 0;
+                    $arrMonth[$key]['tempBalance'] = 0;
+                }
+            @endphp
+        @endif
+        @if($tempParent1 !== $row->parent_id)
+            <tr>
+                <td>&nbsp;&nbsp;&nbsp;{{ $row->parentSub->name }}</td>
+                <td colspan="{{ (count($arrMonth) * 4) }}"></td>
+            </tr>
+        @endif
+        <tr>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $row->name }}</td>
+
+        @foreach($arrMonth as $key => $rowMonth)
+            $val = $row->getTotalMonthFromParentExceptClosing($rowMonth['raw_month'],$level);
+            <td style="min-width:150px !important;" class="right-align">{{ number_format($val['totalBalanceBefore'],2,',','.') }}</td>
+            <td style="min-width:150px !important;" class="right-align">{{ number_format($val['totalDebit'],2,',','.') }}</td>
+            <td style="min-width:150px !important;" class="right-align">{{ number_format($val['totalCredit'],2,',','.') }}</td>
+            <td style="min-width:150px !important;" class="right-align">{{ number_format($val['totalBalance'],2,',','.') }}</td>
+            @php
+                $arrMonth[$key]['totalDebit'] += $val['totalDebit'];
+                $arrMonth[$key]['totalCredit'] += $val['totalCredit'];
+                $arrMonth[$key]['totalBalance'] += $val['totalBalanceBefore'] + $val['totalDebit'] - $val['totalCredit'];
+                $arrMonth[$key]['tempDebit'] += $val['totalDebit'];
+                $arrMonth[$key]['tempCredit'] += $val['totalCredit'];
+                $arrMonth[$key]['tempBalance'] += $val['totalBalanceBefore'] + $val['totalDebit'] - $val['totalCredit'];
+                $arrMonth[$key]['tempBalanceBefore'] += $val['totalBalanceBefore'];
+                $arrMonth[$key]['totalBalanceBefore'] += $val['totalBalanceBefore'];
+            @endphp
+        @endforeach
+
+        </tr>
+
+        @if(isset($coas[$keymain + 1]))
+            @if($coas[$keymain + 1]->parentSub->parent_id !== $row->parentSub->parent_id)
+                <tr>
+                    <td><b>TOTAL {{ $row->parentSub->parentSub->name }}</b></td>
+                @foreach($arrMonth as $key => $rowMonth)
+                    $html .= '
+                    <td style="min-width:150px !important;" class="right-align"><b>{{ number_format($rowMonth['tempBalanceBefore'],2,',','.') }}</b></td>
+                    <td style="min-width:150px !important;" class="right-align"><b>{{ number_format($rowMonth['tempDebit'],2,',','.') }}</b></td>
+                    <td style="min-width:150px !important;" class="right-align"><b>{{ number_format($rowMonth['tempCredit'],2,',','.') }}</b></td>
+                    <td style="min-width:150px !important;" class="right-align"><b>{{ number_format($rowMonth['tempBalance'],2,',','.') }}</b></td>';
+                @endforeach
+                </tr>
+            @endif
+        @else
+            <tr>
+                <td><b>TOTAL {{ $row->parentSub->parentSub->name }}</b></td>
+
+            @foreach($arrMonth as $key => $rowMonth)
+                $html .= '<td style="min-width:150px !important;" class="right-align"><b>{{ number_format($rowMonth['tempDebit'],2,',','.') }}</b></td>
+                <td style="min-width:150px !important;" class="right-align"><b>{{ number_format($rowMonth['tempCredit'],2,',','.') }}</b></td>
+                <td style="min-width:150px !important;" class="right-align"><b>{{ number_format($rowMonth['tempBalance'],2,',','.') }}</b></td>';
+            @endforeach
+
+            </tr>
+        @endif
+        
+        @php
+            $tempParent1 = $row->parent_id;
+            $tempParent2 = $row->parentSub->parent_id;
+        @endphp
+    @endforeach
 @endif
 
 </tbody><tfoot><tr><th class="right-align">TOTAL LABA (RUGI)</th>

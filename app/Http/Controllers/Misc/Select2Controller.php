@@ -1004,12 +1004,10 @@ class Select2Controller extends Controller {
         $search   = $request->search;
         $account_id = $request->account_id;
         $data = UserBank::where(function($query) use($search){
-                    $query->where('name', 'like', "%$search%")
+                    $query->where('bank', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%")
                         ->orWhere('no', 'like', "%$search%")
-                        ->orWhere('branch', 'like', "%$search%")
-                        ->orWhereHas('bank',function($query) use($search){
-                            $query->where('name','like',"%$search%");
-                        });
+                        ->orWhere('branch', 'like', "%$search%");
                 })
                 ->where('user_id',$account_id)
                 ->orderByDesc('is_default')->get();
@@ -1017,9 +1015,9 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->name.' - '.$d->bank->name.' - '.$d->no.' - '.$d->branch,
+                'text' 			=> $d->name.' - '.$d->bank.' - '.$d->no.' - '.$d->branch,
                 'name'          => $d->name,
-                'bank'          => $d->bank->name,
+                'bank'          => $d->bank,
                 'no'            => $d->no,
             ];
         }
@@ -1032,7 +1030,8 @@ class Select2Controller extends Controller {
         $response = [];
         $search   = $request->search;
         $data = UserBank::where(function($query) use($search){
-                    $query->where('name', 'like', "%$search%")
+                    $query->where('bank', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%")
                         ->orWhere('no', 'like', "%$search%")
                         ->orWhere('branch', 'like', "%$search%")
                         ->orWhereHas('user',function($query) use($search){
@@ -1045,9 +1044,9 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->user->name.' - '.$d->name.' - '.$d->bank->name.' - '.$d->no.' - '.$d->branch,
+                'text' 			=> $d->user->name.' - '.$d->name.' - '.$d->bank.' - '.$d->no.' - '.$d->branch,
                 'name'          => $d->name,
-                'bank'          => $d->bank->name,
+                'bank'          => $d->bank,
                 'no'            => $d->no,
             ];
         }

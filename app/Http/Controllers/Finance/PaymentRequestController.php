@@ -373,9 +373,9 @@ class PaymentRequestController extends Controller
         if($data){
             foreach($data->userBank()->orderByDesc('is_default')->get() as $row){
                 $banks[] = [
-                    'bank_id'   => $row->bank_id,
+                    'id'        => $row->id,
+                    'bank'      => $row->bank,
                     'name'      => $row->name,
-                    'bank_name' => $row->bank->name,
                     'no'        => $row->no,
                 ];
             }

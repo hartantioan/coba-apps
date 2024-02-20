@@ -663,7 +663,7 @@
                 { name: 'date_use', className: 'center-align' },
                 { name: 'currency_id', className: 'center-align' },
                 { name: 'currency_rate', className: 'center-align' },
-                { name: 'note', className: 'center-align' },
+                { name: 'note', className: '' },
                 { name: 'termin_note', className: 'center-align' },
                 { name: 'payment_type', className: 'center-align' },
                 { name: 'name_account', className: 'center-align' },

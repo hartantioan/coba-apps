@@ -81,6 +81,7 @@
                                                         <th>User</th>
                                                         <th>Tipe</th>
                                                         <th>Tanggal</th>
+                                                        <th>Posisi</th>
                                                         <th>Note</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
@@ -615,7 +616,8 @@
                 { name: 'account_id', className: 'center-align' },
                 { name: 'type', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
-                { name: 'note', className: 'center-align' },
+                { name: 'position', className: '' },
+                { name: 'note', className: '' },
                 { name: 'status', className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'right-align' },
             ],

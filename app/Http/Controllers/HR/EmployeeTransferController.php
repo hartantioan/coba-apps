@@ -50,6 +50,7 @@ class EmployeeTransferController extends Controller
             'account_id',
             'type',
             'post_date',
+            'position_id',
             'note',
             'status',
         ];
@@ -124,6 +125,7 @@ class EmployeeTransferController extends Controller
                     $val->account->name ?? '-',
                     $val->typeRaw(),
                     date('d/m/Y',strtotime($val->post_date)),
+                    $val->position->name,
                     $val->note,
                     $val->status(),
                     $btn

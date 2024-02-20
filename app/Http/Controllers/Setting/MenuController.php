@@ -38,6 +38,15 @@ class MenuController extends Controller
 {
     public function index()
     {
+        /* $user = User::where('type','3')->orderBy('id')->get();
+
+        foreach($user as $key => $row){
+            $no = $key + 1;
+            $row->update([
+                'employee_no'   => 'S'.str_pad($no, 6, 0, STR_PAD_LEFT),
+            ]);
+        } */
+
         $data = [
             'title'     => 'Menu',
             'menus'     => Menu::whereNull('parent_id')->get(),

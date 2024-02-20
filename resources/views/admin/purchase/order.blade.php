@@ -430,6 +430,7 @@
                                     <table class="bordered" style="width:3300px;font-size:0.9rem !important;" id="table-detail">
                                         <thead>
                                             <tr>
+                                                <th>Hapus</th>
                                                 <th>Item / Coa Jasa</th>
                                                 <th width="100px">Qty PO</th>
                                                 <th width="100px">Satuan PO</th>
@@ -464,7 +465,6 @@
                                                 <th>Gudang</th>
                                                 <th>Requester</th>
                                                 <th>Proyek</th>
-                                                <th>Hapus</th>
                                             </tr>
                                             <tr>
                                                 
@@ -1394,6 +1394,11 @@
                                         <tr class="row_item" data-id="` + response.id + `">
                                             <input type="hidden" name="arr_data[]" value="` + val.reference_id + `">
                                             <input type="hidden" name="arr_type[]" value="` + type + `">
+                                            <td class="center">
+                                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                                    <i class="material-icons">delete</i>
+                                                </a>
+                                            </td>
                                             <td style="pointer-events: none;">
                                                 <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                                             </td>
@@ -1492,11 +1497,6 @@
                                             <td>
                                                 <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
                                             </td>
-                                            <td class="center">
-                                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                                                    <i class="material-icons">delete</i>
-                                                </a>
-                                            </td>
                                         </tr>
                                     `);
                                     select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
@@ -1505,6 +1505,11 @@
                                         <tr class="row_item" data-id="` + response.id + `">
                                             <input type="hidden" name="arr_data[]" value="` + val.reference_id + `">
                                             <input type="hidden" name="arr_type[]" value="` + type + `">
+                                            <td class="center">
+                                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                                    <i class="material-icons">delete</i>
+                                                </a>
+                                            </td>
                                             <td style="pointer-events: none;">
                                                 <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                                             </td>
@@ -1606,11 +1611,6 @@
                                             <td>
                                                 <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
                                             </td>
-                                            <td class="center">
-                                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                                                    <i class="material-icons">delete</i>
-                                                </a>
-                                            </td>
                                         </tr>
                                     `);
                                     $('#arr_item' + count).append(`
@@ -1702,6 +1702,11 @@
                 <tr class="row_item">
                     <input type="hidden" name="arr_data[]" value="0">
                     <input type="hidden" name="arr_type[]" value="">
+                    <td class="center">
+                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                            <i class="material-icons">delete</i>
+                        </a>
+                    </td>
                     <td>
                         <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                     </td>
@@ -1805,11 +1810,6 @@
                     <td>
                         <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
                     </td>
-                    <td class="center">
-                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                            <i class="material-icons">delete</i>
-                        </a>
-                    </td>
                 </tr>
             `);
             select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
@@ -1820,6 +1820,11 @@
                 <tr class="row_item">
                     <input type="hidden" name="arr_data[]" value="0">
                     <input type="hidden" name="arr_type[]" value="">
+                    <td class="center">
+                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                            <i class="material-icons">delete</i>
+                        </a>
+                    </td>
                     <td>
                         <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                     </td>
@@ -1917,11 +1922,6 @@
                     </td>
                     <td>
                         <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
-                    </td>
-                    <td class="center">
-                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                            <i class="material-icons">delete</i>
-                        </a>
                     </td>
                 </tr>
             `);
@@ -2441,6 +2441,11 @@
                                 <tr class="row_item">
                                     <input type="hidden" name="arr_data[]" value="` + val.reference_id + `">
                                     <input type="hidden" name="arr_type[]" value="` + val.type + `">
+                                    <td class="center">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" onclick="removeUsedData('` + val.id + `')">
+                                            <i class="material-icons">delete</i>
+                                        </a>
+                                    </td>
                                     <td>
                                         <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                                     </td>
@@ -2541,11 +2546,6 @@
                                     <td>
                                         <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
                                     </td>
-                                    <td class="center">
-                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" onclick="removeUsedData('` + val.id + `')">
-                                            <i class="material-icons">delete</i>
-                                        </a>
-                                    </td>
                                 </tr>
                             `);
                             $('#arr_item' + count).append(`
@@ -2580,6 +2580,11 @@
                                 <tr class="row_item">
                                     <input type="hidden" name="arr_data[]" value="` + val.reference_id + `">
                                     <input type="hidden" name="arr_type[]" value="` + val.type + `">
+                                    <td class="center">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                            <i class="material-icons">delete</i>
+                                        </a>
+                                    </td>
                                     <td>
                                         <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                                     </td>
@@ -2677,11 +2682,6 @@
                                     </td>
                                     <td>
                                         <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
-                                    </td>
-                                    <td class="center">
-                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                                            <i class="material-icons">delete</i>
-                                        </a>
                                     </td>
                                 </tr>
                             `);

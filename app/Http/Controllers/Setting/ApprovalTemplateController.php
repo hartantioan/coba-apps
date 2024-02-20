@@ -109,6 +109,7 @@ class ApprovalTemplateController extends Controller
                     number_format($val->nominal_final,2,',','.').($val->nominal_type == '1' ? ' Rupiah' : ' %'),
                     $val->status(),
                     '
+                        <button type="button" class="btn-floating mb-1 btn-flat indigo accent-2 white-text btn-small" data-popup="tooltip" title="Salin" onclick="duplicate('.$val->id.')"><i class="material-icons dp48">content_copy</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
 					'

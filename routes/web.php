@@ -2419,6 +2419,7 @@ Route::prefix('admin')->group(function () {
                         Route::get('/',[LedgerController::class, 'index']);
                         Route::get('datatable',[LedgerController::class, 'datatable']);
                         Route::get('row_detail',[LedgerController::class, 'rowDetail']);
+                        Route::get('export', [LedgerController::class, 'export']);
                     });
                     Route::prefix('trial_balance')->middleware('operation.access:trial_balance,view')->group(function () {
                         Route::get('/',[TrialBalanceController::class, 'index']);
@@ -2433,7 +2434,6 @@ Route::prefix('admin')->group(function () {
                         Route::get('/',[CashBankController::class, 'index']);
                         Route::get('datatable',[CashBankController::class, 'datatable']);
                         Route::get('row_detail',[CashBankController::class, 'rowDetail']);
-                        Route::post('import', [CashBankController::class, 'import'])->middleware('operation.access:asset,update');
                     });
                 });
             });

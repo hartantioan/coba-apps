@@ -145,8 +145,8 @@ class SubsidiaryLedgerController extends Controller
     }
 
     public function export(Request $request){
-        $datestart = $request->datestart? $request->datestart : '';
-        $dateend = $request->dateend ? $request->dateend : '';
+        $datestart = $request->datestart ? $request->datestart : date('Y-m-d');
+        $dateend = $request->dateend ? $request->dateend : date('Y-m-d');
         $coastart = $request->coastart ? $request->coastart : '';
         $coaend = $request->coaend ? $request->coaend : '';
         $closing_journal = $request->closing_journal ? $request->closing_journal : '';

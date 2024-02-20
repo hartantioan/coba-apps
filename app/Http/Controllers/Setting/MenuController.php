@@ -46,6 +46,18 @@ class MenuController extends Controller
 
         return view('admin.layouts.index', ['data' => $data]);
 
+        /* $pr = PurchaseRequest::whereHas('purchaseRequestDetail',function($query){
+            $query->where('requester','sammy');
+        })->get();
+        $user = User::where('name','like',"%albayani%")->first();
+        foreach($pr as $row){
+            if($user){
+                $row->update([
+                    'user_id'   => $user->id
+                ]);
+            }
+        } */
+
         /* $pinv = PurchaseInvoice::all();
         foreach($pinv as $row){
             CustomHelper::sendJournal($row->getTable(),$row->id,$row->account_id);

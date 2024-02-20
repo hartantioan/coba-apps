@@ -187,16 +187,8 @@
     });
 
     function exportExcel(){
-        if($('.row_detail').length > 0){
-            var date = $('#date').val();
-            window.location = "{{ Request::url() }}/export?date=" + date;
-        }else{
-            swal({
-                title: 'Ups!',
-                text: 'Silahkan filter laporan terlebih dahulu ges.',
-                icon: 'warning'
-            });
-        }
+        var start_date = $('#start_date').val(), finish_date = $('#finish_date').val(), coa_id = $('#coa').val(), company_id = $('#company').val(), search = window.table.search();
+        window.location = "{{ Request::url() }}/export?start_date=" + start_date + "&end_date=" + finish_date + "&coa_id=" + coa_id + "&company_id=" + company_id + "&search=" + search;
     }
 
     function reset(){

@@ -9,6 +9,8 @@ use App\Models\Company;
 use App\Models\JournalDetail;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ExportLedger;
 
 class LedgerController extends Controller
 {
@@ -220,5 +222,15 @@ class LedgerController extends Controller
         $string .= '</tbody></table></div></div>';
 		
         return response()->json($string);
+    }
+
+    public function export(Request $request){
+        $start_date = $request->start_date ? $request->start_date : date('Y-m-d');
+        $end_date = $request->end_date ? $request->end_date : date('Y-m-d');
+        $coa_id = $request->coa_id ? $request->coa_id : '';
+        $company_id = $request->company_id ? $request->company_id : '';
+        $search = $request->search ? $request->search : '';
+
+		return Excel::download(new ExportLedger($start_date,$end_date,$coa_id,$company_id,$search), 'ledger_'.uniqid().'.xlsx');
     }
 }

@@ -58,13 +58,13 @@ class GoodIssueController extends Controller
             'content'   => 'admin.inventory.good_issue',
             'company'   => Company::where('status','1')->get(),
             'place'     => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
-            'department'=> Division::where('status','1')->get(),
+            'department'=> Division::where('status','1')->orderBy('name')->get(),
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
             'newcode'   => $menu->document_code.date('y'),
             'menucode'  => $menu->document_code,
             'line'      => Line::where('status','1')->get(),
-            'machine'   => Machine::where('status','1')->get(),
+            'machine'   => Machine::where('status','1')->orderBy('name')->get(),
             'coa_cost'  => InventoryCoa::where('status','1')->where('type','1')->get(),
         ];
 

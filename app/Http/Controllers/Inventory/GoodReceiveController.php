@@ -49,13 +49,13 @@ class GoodReceiveController extends Controller
             'company'   => Company::where('status','1')->get(),
             'place'     => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'currency'  => Currency::where('status','1')->get(),
-            'department'=> Division::where('status','1')->get(),
+            'department'=> Division::where('status','1')->orderBy('name')->get(),
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
             'newcode'   => $menu->document_code.date('y'),
             'menucode'  => $menu->document_code,
             'line'      => Line::where('status','1')->get(),
-            'machine'   => Machine::where('status','1')->get(),
+            'machine'   => Machine::where('status','1')->orderBy('name')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

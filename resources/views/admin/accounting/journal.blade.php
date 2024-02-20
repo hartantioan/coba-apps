@@ -869,8 +869,10 @@
     }
 
     function changePlace(element){
+        $(element).parent().next().find('select[name="arr_machine[]"] option').show();
         if($(element).val()){
             $(element).parent().prev().find('select[name="arr_place[]"]').val($(element).find(':selected').data('place'));
+            $(element).parent().next().find('select[name="arr_machine[]"] option[data-line!="' + $(element).val() + '"]').hide();
         }else{
             $(element).parent().prev().find('select[name="arr_place[]"]').val($(element).parent().prev().find('select[name="arr_place[]"] option:first').val());
         }

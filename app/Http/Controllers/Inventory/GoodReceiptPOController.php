@@ -69,7 +69,7 @@ class GoodReceiptPOController extends Controller
             'content'   => 'admin.inventory.good_receipt',
             'company'   => Company::where('status','1')->get(),
             'place'     => Place::whereIn('id',$this->dataplaces)->where('status','1')->get(),
-            'department'=> Division::where('status','1')->get(),
+            'department'=> Division::where('status','1')->orderBy('name')->get(),
             'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),

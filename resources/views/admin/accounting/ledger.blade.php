@@ -75,9 +75,9 @@
                                                 <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="reset();">
                                                     <i class="material-icons center">loop</i>
                                                 </a>
-                                                {{-- <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel();">
+                                                <a class="btn btn-small blue waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel();">
                                                     <i class="material-icons center">view_list</i>
-                                                </a> --}}
+                                                </a>
                                             </div>
                                         </div>
                                     </div>

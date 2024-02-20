@@ -70,9 +70,9 @@ class PurchaseRequestController extends Controller
             'content'   => 'admin.purchase.request',
             'company'   => Company::where('status','1')->get(),
             'place'     => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
-            'department'=> Division::where('status','1')->get(),
+            'department'=> Division::where('status','1')->orderBy('name')->get(),
             'line'      => Line::where('status','1')->get(),
-            'machine'   => Machine::where('status','1')->get(),
+            'machine'   => Machine::where('status','1')->orderBy('name')->get(),
             'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
@@ -535,6 +535,20 @@ class PurchaseRequestController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
+
+            $passedQty = true;
+            foreach($request->arr_qty as $key => $row){
+                if(str_replace(',','.',str_replace('.','',$row)) <= 0){
+                    $passedQty = false;
+                }
+            }
+
+            if(!$passedQty){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Qty item tidak boleh kurang dari sama dengan 0.'
+                ]);
+            }
 
 			if($request->temp){
                 DB::beginTransaction();

@@ -290,7 +290,7 @@ class DocumentTaxController extends Controller
        
 
         $validator = Validator::make(['code' => $xmlObject->nomorFaktur], [
-            'code' => ['required', Rule::unique('taxes','code')->whereNull('deleted_at')],
+            'code' => ['required', Rule::unique('document_taxes','code')->whereNull('deleted_at')],
         ],[
             'code.required'=> 'Kode tidak boleh kosong.',
             'code.unique'  => 'Kode telah dipakai',
@@ -339,7 +339,7 @@ class DocumentTaxController extends Controller
                         foreach ($detail_transaksi_faktur as $data) {
                             
                             $dataArray[] = [
-                                'tax_id'=>$query->id,
+                                'document_tax_id'=>$query->id,
                                 'item'=>$data['nama'],
                                 'price'=>$data['hargaSatuan'],
                                 'qty'=>$data['jumlahBarang'],
@@ -355,7 +355,7 @@ class DocumentTaxController extends Controller
 
                     } else {
                         DocumentTaxDetail::create([
-                        'tax_id'=>$query->id,
+                        'document_tax_id'=>$query->id,
                         'item'=>$detail_transaksi_faktur['nama'],
                         'price'=>$detail_transaksi_faktur['hargaSatuan'],
                         'qty'=>$detail_transaksi_faktur['jumlahBarang'],

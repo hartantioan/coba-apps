@@ -76,7 +76,7 @@
                                             </select>
                                             <label class="active" for="item_id">ITEM</label>
                                         </div>
-                                        <div class="input-field  col m6 s12 mt-2">
+                                        <div class="input-field  col m6 s12 ">
                                             <label for="filter_group" class="active" style="font-size:1rem;">Filter Group :</label>
                                             
                                             <select class="select2 browser-default" multiple="multiple" id="filter_group" name="filter_group[]" onchange="loadDataTable()">
@@ -135,7 +135,7 @@
                 </div>
                 <div class="row">
                     <table class="bordered" style="font-size:10px;">
-                        <thead>
+                        <thead id="t_head">
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Tanggal</th>
@@ -169,9 +169,11 @@
             var selectedType = $(this).val();
             
             if (selectedType === 'final') {
-                $('#start_date').prop('disabled', true).val('');
+                $('#start_date').prop('disabled', true);
+                
             } else {
                 $('#start_date').prop('disabled', false);
+                
             }
         });
         $(".select2").select2({
@@ -202,42 +204,112 @@
                 $('#export_button').show();
                 loadingClose('#main');
                 if(response.status == 200) {
-                    $('#table_body').empty();            
+                    $('#table_body').empty();
+                  
+                              
                     if (response.message.length > 0) {
-                        if(response.perlu == 1){
-                            $('#table_body').append(`
-                            <tr>
-                                <td colspan="5" class="center-align">Saldo Sebelumnya</td>
-                                <td colspan="1" class="right-align">`+response.latest+`</td>
-                                <td colspan="5" class="center-align">Qty Sebelumnya</td>
-                                <td colspan="2" class="right-align">`+response.latest_qty+`</td>
-                            </tr>`);
-                        }
-                        
-                        $.each(response.message, function(i, val) {     
-                            $('#table_body').append(`
+                       
+                        if($('#type').val() == 'final'){
+                            $('#t_head').empty();
+                            $('#t_head').append(`
                                 <tr>
-                                    <td class="center-align">`+(i+1)+`</td>
-                                    <td >`+val.date+`</td>
-                                    <td >`+val.plant+`</td>
-                                    <td >`+val.warehouse+`</td>
-                                    <td >`+val.kode+`</td>
-                                    <td >`+val.item+`</td>
-                                    <td >`+val.satuan+`</td>
-                                    <td >`+val.document+`</td>
-                                    <td class="right-align">`+val.qty+`</td>
-                                    <td class="right-align">`+val.final+`</td>
-                                    <td class="right-align">`+val.total+`</td>
-                                    <td class="right-align">`+val.cum_qty+`</td>
-                                    <td class="right-align">`+val.cum_val+`</td>
-                                </tr>
-                            `);
-                        });
-                        $('#table_body').append(`
-                            <tr>
-                                <td class="center-align" colspan="6">`+response.time+`</td>
-                            </tr>
-                        `);
+                                    <th class="center-align">No.</th>
+                                    <th class="center-align">Plant</th>
+                                    <th class="center-align">Gudang</th>
+                                    <th class="center-align">Kode</th>
+                                    <th class="center-align">Nama Item</th>
+                                    <th class="center-align">Satuan</th>
+                                    <th class="center-align">Cumulative Qty.</th>
+                                    <th class="center-align">Cumulative Value</th>
+                                </tr>`);
+                            $.each(response.message, function(i, val) { 
+                                
+                                $('#table_body').append(`
+                                    <tr>
+                                        <td class="center-align">`+(i+1)+`</td>               
+                                        <td >`+val.plant+`</td>
+                                        <td >`+val.warehouse+`</td>
+                                        <td >`+val.kode+`</td>
+                                        <td >`+val.item+`</td>
+                                        <td >`+val.satuan+`</td>
+                                        <td class="right-align">`+val.cum_qty+`</td>
+                                        <td class="right-align">`+val.cum_val+`</td>
+                                    </tr>
+                                `);
+                            });
+                        }else{
+                            var processedItems = [];
+                            $('#t_head').empty();
+                            $('#t_head').append(`
+                                <tr>
+                                    <th class="center-align">No.</th>
+                                    <th class="center-align">Tanggal</th>
+                                    <th class="center-align">Plant</th>
+                                    <th class="center-align">Gudang</th>
+                                    <th class="center-align">Kode</th>
+                                    <th class="center-align">Nama Item</th>
+                                    <th class="center-align">Satuan</th>
+                                    <th class="center-align">No. Dokumen</th>
+                                    <th class="center-align">Qty</th>
+                                    <th class="center-align">Harga </th>
+                                    <th class="center-align">Total</th>
+                                    <th class="center-align">Cumulative Qty.</th>
+                                    <th class="center-align">Cumulative Value</th>
+                                </tr>`);
+                            $.each(response.message, function(i, val) {
+                                if(response.perlu == 1){
+                                    if (!processedItems.includes(val.item)) {
+                                        // Mark the current item as processed
+                                        processedItems.push(val.item);
+
+                                        $.each(response.latest, function(j, vals) {
+                                            if (vals.item == val.item) {
+                                                $('#table_body').append(`
+                                                    <tr>
+                                                        <td class="center-align"></td>
+                                                        <td class="center-align"></td>
+                                                        <td class="center-align"></td>
+                                                        <td class="center-align"></td>
+                                                        <td class="center-align">` + response.latest[j]['kode'] + `</td>
+                                                        <td class="right-align">` + response.latest[j]['item'] + `</td>
+                                                        <td class="center-align">` + response.latest[j]['satuan'] + `</td>
+                                                        <td class="center-align">Saldo Awal</td>
+                                                        <td class="center-align"></td>
+                                                        <td class="center-align"></td>
+                                                        <td class="center-align"></td>
+                                                        <td class="right-align">` + response.latest[j]['last_qty'] + `</td>
+                                                        <td class="right-align">` + response.latest[j]['last_nominal'] + `</td>
+                                                    </tr>`
+                                                );
+                                            }
+                                        });
+                                    }
+                                }         
+                                $('#table_body').append(`
+                                    <tr>
+                                        <td class="center-align">`+(i+1)+`</td>
+                                        <td >`+val.date+`</td>
+                                        <td >`+val.plant+`</td>
+                                        <td >`+val.warehouse+`</td>
+                                        <td >`+val.kode+`</td>
+                                        <td >`+val.item+`</td>
+                                        <td >`+val.satuan+`</td>
+                                        <td >`+val.document+`</td>
+                                        <td class="right-align">`+val.qty+`</td>
+                                        <td class="right-align">`+val.final+`</td>
+                                        <td class="right-align">`+val.total+`</td>
+                                        <td class="right-align">`+val.cum_qty+`</td>
+                                        <td class="right-align">`+val.cum_val+`</td>
+                                    </tr>
+                                `);
+                            });
+                        }   
+                        
+                        // $('#table_body').append(`
+                        //     <tr>
+                        //         <td class="center-align" colspan="6">`+response.time+`</td>
+                        //     </tr>
+                        // `);
                         M.toast({
                             html: 'filtered'
                         });

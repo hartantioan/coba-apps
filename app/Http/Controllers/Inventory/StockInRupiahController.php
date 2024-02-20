@@ -47,16 +47,16 @@ class StockInRupiahController extends Controller
         DB::statement("SET SQL_MODE=''");
         if($request->type == 'final'){
             $perlu = 0 ;
-            info($request);
-            $query_data = ItemCogs::where(function($query) use ( $request) {
-                if($request->start_date && $request->finish_date) {
-                    $query->whereDate('date', '>=', $request->start_date)
-                        ->whereDate('date', '<=', $request->finish_date);
-                } else if($request->start_date) {
-                    $query->whereDate('date','>=', $request->start_date);
-                } else if($request->finish_date) {
-                    info('masuk sini');
-                    $query->whereDate('date','<=', $request->finish_date);
+            $query_data = ItemCogs::whereIn('id', function ($query) use ($request) {            
+                $query->selectRaw('MAX(id)')
+                    ->from('item_cogs')
+                    ->where('date', '<', $request->finish_date)
+                    ->groupBy('item_id');
+            })
+            ->where(function($query) use ( $request) {
+               if($request->finish_date) {
+                   
+                    $query->whereDate('date','<', $request->finish_date);
                 }
                 if($request->item_id) {
                     $query->whereHas('item',function($query) use($request){
@@ -75,19 +75,13 @@ class StockInRupiahController extends Controller
                 }
     
                 if($request->filter_group){
-                    info($request->filter_group);
+                   
                     $query->whereHas('item',function($query) use($request){
                         $query->whereIn('item_group_id', $request->filter_group);
                     });
                 }
             })
-            // ->whereIn('id', function ($subquery) {
-            //     $subquery->select(DB::raw('MAX(id)'))
-            //         ->from('item_cogs')
-            //         ->groupBy('item_id');
-            // })
             ->orderBy('date', 'desc')
-            ->groupBy('item_id')
             ->get();
         }else{
             $perlu = 1;
@@ -135,6 +129,8 @@ class StockInRupiahController extends Controller
         $array_filter=[];
         $firstDate = null;
         $uom_unit = null;
+        $previousId = null;
+        $array_last_item = [];
         foreach($query_data as $row){
             
             if($row->type=='IN'){
@@ -162,52 +158,55 @@ class StockInRupiahController extends Controller
                 'cum_val' => number_format($row->total_final,2,',','.'),
             ];
             $array_filter[]=$data_tempura;
-            $previousId = $row->item_id;
-            if ($firstDate === null) {
-                $firstDate = $row->date;
+            
+            
+            if ($row->item_id !== $previousId) {
+              
+                $query_first =
+                ItemCogs::where(function($query) use ( $request,$row) {
+                    $query->where('item_id',$row->item_id)
+                    ->where('date', '<', $row->date);
+                    
+                    if($request->plant != 'all'){
+                        $query->whereHas('place',function($query) use($request){
+                            $query->where('id',$request->plant);
+                        });
+                    }
+                    if($request->warehouse != 'all'){
+                        $query->whereHas('warehouse',function($query) use($request){
+                            $query->where('id',$request->warehouse);
+                        });
+                    }
+                })
+                ->orderBy('date', 'desc') // Order by 'date' column in descending order
+                ->first();
+
+                $array_last_item[] = [
+                    'date'         => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
+                    'last_nominal' => $query_first ? number_format($query_first->total_final, 2, ',', '.') : 0,
+                    'item'         => $row->item->name,
+                    'satuan'       => $row->item->uomUnit->code,
+                    'kode'         => $row->item->code,
+                    'last_qty'     => $query_first ? number_format($query_first->qty_final, 2, ',', '.') : 0,
+                ];
+
+
             }
+            $previousId = $row->item_id;
+            
             if($uom_unit ===null){
                 $uom_unit = $row->item->uomUnit->code;
             }
         }
-        $last_qty = 0 ; 
-        $last_nominal=0;
-        if($firstDate != null){
-            $query_first =
-            ItemCogs::where(function($query) use ( $request,$firstDate) {
-                $query->where('date', '<', $firstDate)
-                ->whereHas('item',function($query) use($request){
-                    $query->where('id',$request->item_id);
-                });
-                if($request->plant != 'all'){
-                    $query->whereHas('place',function($query) use($request){
-                        $query->where('id',$request->plant);
-                    });
-                }
-                if($request->warehouse != 'all'){
-                    $query->whereHas('warehouse',function($query) use($request){
-                        $query->where('id',$request->warehouse);
-                    });
-                }
-            })
-            ->orderBy('date', 'desc') // Order by 'date' column in descending order
-            ->first();
-            
-            if($query_first){
-                $last_nominal=number_format($query_first->total_final,2,',','.');
-                $last_qty=number_format($query_first->qty_final,2,',','.');
-            }
-            
-        }
+        // info($array_last_item);
+        
         $end_time = microtime(true);
        
         $execution_time = ($end_time - $start_time);
         $response =[
             'status'=>200,
             'message'       => $array_filter,
-            'latest'        => $last_nominal,
-            'latest_qty'    => $last_qty,
-            'uomunit'       => $uom_unit,
+            'latest'        => $array_last_item,
             'perlu'         => $perlu,
             'time'          => " Waktu proses : ".$execution_time." detik"
         ];

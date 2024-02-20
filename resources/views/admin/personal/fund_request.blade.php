@@ -719,7 +719,7 @@
                             `);
                             $.each(response.banks, function(i, val) {
                                 $('#user_bank_id').append(`
-                                    <option value="` + val.bank_id + `" data-name="` + val.name + `" data-bank="` + val.bank_name + `" data-no="` + val.no + `">` + val.bank_name + ` - ` + val.no + ` - ` + val.name + `</option>
+                                    <option value="` + val.id + `" data-name="` + val.name + `" data-bank="` + val.bank + `" data-no="` + val.no + `">` + val.bank + ` - ` + val.no + ` - ` + val.name + `</option>
                                 `);
                             });                        
                         }else{

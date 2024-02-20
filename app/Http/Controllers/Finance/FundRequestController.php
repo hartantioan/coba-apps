@@ -869,6 +869,7 @@ class FundRequestController extends Controller
         if($data){
             foreach($data->userBank()->orderByDesc('is_default')->get() as $row){
                 $banks[] = [
+                    'id'        => $row->id,
                     'bank'      => $row->bank,
                     'name'      => $row->name,
                     'no'        => $row->no,

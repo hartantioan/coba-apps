@@ -282,7 +282,7 @@ class UserController extends Controller
         $drivers = [];
 
         foreach($data->userBank as $row){
-            $banks[] = $row->bank->name.' No. rek '.$row->no.' Cab. '.$row->branch.' '.$row->isDefault();
+            $banks[] = $row->bank.' No. rek '.$row->no.' Cab. '.$row->branch.' '.$row->isDefault();
         }
 
         foreach($data->userData as $row){
@@ -664,7 +664,7 @@ class UserController extends Controller
                         if($request->arr_id_bank[$key]){
                             UserBank::find(intval($request->arr_id_bank[$key]))->update([
                                 'user_id'	    => $query->id,
-                                'bank_id'	    => $row,
+                                'bank'	        => $row,
                                 'name'          => $request->arr_name[$key],
                                 'no'            => $request->arr_no[$key],
                                 'branch'        => $request->arr_branch[$key],
@@ -673,7 +673,7 @@ class UserController extends Controller
                         }else{
                             UserBank::create([
                                 'user_id'	    => $query->id,
-                                'bank_id'	    => $row,
+                                'bank'	        => $row,
                                 'name'          => $request->arr_name[$key],
                                 'no'            => $request->arr_no[$key],
                                 'branch'        => $request->arr_branch[$key],
@@ -1075,8 +1075,7 @@ class UserController extends Controller
 		foreach($user->userBank as $row){
 			$banks[] = [
                 'id'            => $row->id,
-                'bank_id'       => $row->bank_id,
-                'bank_name'     => $row->bank->code.' - '.$row->bank->name,
+                'bank'          => $row->bank,
                 'name'          => $row->name,
                 'no'            => $row->no,
                 'branch'        => $row->branch,

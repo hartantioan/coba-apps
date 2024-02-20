@@ -291,9 +291,8 @@ class User extends Authenticatable
 
         foreach($this->userBank()->orderByDesc('is_default')->get() as $row){
             $banks[] = [
-                'bank_id'   => $row->bank_id,
+                'bank'      => $row->bank,
                 'name'      => $row->name,
-                'bank_name' => $row->bank->name,
                 'no'        => $row->no,
             ];
         }

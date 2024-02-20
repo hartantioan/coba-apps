@@ -1440,7 +1440,7 @@
             <tr class="row_bank">
                 <input type="hidden" name="arr_id_bank[]" value="">
                 <td>
-                    <select class="browser-default bank-array" id="arr_bank` + count + `" name="arr_bank[]"></select>
+                    <input name="arr_bank[]" type="text" placeholder="Nama Bank">
                 </td>
                 <td>
                     <input name="arr_name[]" type="text" placeholder="Atas nama">
@@ -1951,7 +1951,7 @@
                             <tr class="row_bank">
                                 <input type="hidden" name="arr_id_bank[]" value="` + val.id + `">
                                 <td>
-                                    <select class="browser-default bank-array" id="arr_bank` + i + `" name="arr_bank[]"></select>
+                                    <input name="arr_bank[]" type="text" placeholder="Atas nama" value="` + val.bank + `">
                                 </td>
                                 <td>
                                     <input name="arr_name[]" type="text" placeholder="Atas nama" value="` + val.name + `">

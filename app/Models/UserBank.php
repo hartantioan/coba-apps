@@ -16,7 +16,7 @@ class UserBank extends Model
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'user_id',
-        'bank_id',
+        'bank',
         'name',
         'no',
         'branch',
@@ -25,9 +25,6 @@ class UserBank extends Model
 
     public function user(){
         return $this->belongsTo('App\Models\User','user_id','id')->withTrashed();
-    }
-    public function bank(){
-        return $this->belongsTo('App\Models\Bank','bank_id','id')->withTrashed();
     }
 
     public function isDefault(){

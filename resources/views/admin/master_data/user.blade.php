@@ -893,6 +893,7 @@
                 $('#subdistrict_id').empty().append(`
                     <option value="">--Pilih ya--</option>
                 `);
+                $('#name').prop('readonly',false);
             }
         });
 
@@ -1944,6 +1945,10 @@
                 }
 
                 $('.row_bank').remove();
+
+                if(response.has_document){
+                    $('#name').prop('readonly',true);
+                }
 
                 if(response.banks.length > 0){
                     $.each(response.banks, function(i, val) {

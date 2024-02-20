@@ -304,6 +304,14 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\FundRequest','account_id','id')->whereIn('status',['2','3']);
     }
 
+    public function purchaseOrder(){
+        return $this->hasMany('App\Models\PurchaseOrder','account_id','id')->whereIn('status',['2','3']);
+    }
+
+    public function goodReceipt(){
+        return $this->hasMany('App\Models\GoodReceipt','account_id','id')->whereIn('status',['2','3']);
+    }
+
     public function purchaseDownPayment(){
         return $this->hasMany('App\Models\PurchaseDownPayment','account_id','id')->whereIn('status',['2','3']);
     }
@@ -326,6 +334,19 @@ class User extends Authenticatable
 
     public function marketingOrder(){
         return $this->hasMany('App\Models\MarketingOrder','account_id','id')->whereIn('status',['2','3']);
+    }
+
+    public function landedCost(){
+        return $this->hasMany('App\Models\LandedCost','account_id','id')->whereIn('status',['2','3']);
+    }
+
+    public function hasDocument(){
+        $has = false;
+        if($this->fundRequest()->exists() || $this->purchaseOrder()->exists() || $this->goodReceipt()->exists() || $this->purchaseDownPayment()->exists() || $this->purchaseInvoice()->exists() || $this->marketingOrderDownPayment()->exists() || $this->marketingOrderInvoice()->exists() || $this->marketingOrderMemo()->exists() || $this->marketingOrderMemo()->exists() || $this->landedCost()->exists()){
+            $has = true;
+        }
+
+        return $has;
     }
 
     public function grandtotalUnsentMod(){

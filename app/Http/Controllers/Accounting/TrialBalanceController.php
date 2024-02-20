@@ -9,6 +9,8 @@ use App\Models\Company;
 use App\Models\JournalDetail;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ExportTrialBalance;
 
 class TrialBalanceController extends Controller
 {
@@ -456,5 +458,14 @@ class TrialBalanceController extends Controller
             'status'            => 200,
             'html'              => $html,
         ]);
+    }
+
+    public function export(Request $request){
+        $month_start = $request->month_start ? $request->month_start : '';
+        $month_end = $request->month_end ? $request->month_end : '';
+        $level = $request->level ? $request->level : '';
+        $company = $request->company ? $request->company : '';
+
+		return Excel::download(new ExportTrialBalance($month_start,$month_end,$level,$company), 'trial_balance_'.uniqid().'.xlsx');
     }
 }

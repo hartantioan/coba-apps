@@ -419,7 +419,7 @@ class ApprovalTemplateController extends Controller
         foreach($approval->approvalTemplateOriginator as $row){
             $details[] = [
                 'user_id'   => $row->user_id,
-                'user_name' => $row->user->employee_no.' - '.$row->user->name.' Pos. '.$row->user->position->Level->name.' Div. '.$row->user->position->division->name,
+                'user_name' => $row->user->employee_no.' - '.$row->user->name.($row->user->position()->exists() ? ' Pos. '.$row->user->position->Level->name.' Div. '.$row->user->position->division->name : 'N/A'),
             ];
         }
 

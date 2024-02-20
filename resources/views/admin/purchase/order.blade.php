@@ -158,6 +158,11 @@
                                                     <p>Info : Khusus untuk Tipe Pembelian Persediaan Barang : 1 Dokumen PO hanya untuk 1 macam jenis grup item.</p>
                                                 </div>
                                             </div>
+                                            <div class="card-alert card blue">
+                                                <div class="card-content white-text">
+                                                    <p>Info : Untuk PO selain status <b>PROSES</b> dan <b>SELESAI</b>, maka tombol preview dan cetak tidak muncul.</p>
+                                                </div>
+                                            </div>
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>

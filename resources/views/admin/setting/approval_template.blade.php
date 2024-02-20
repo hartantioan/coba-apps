@@ -875,7 +875,7 @@
     function duplicate(id){
         swal({
             title: "Apakah anda yakin ingin salin?",
-            text: "Pastikan item yang ingin anda salin sudah sesuai!",
+            text: "Pastikan approval yang ingin anda salin sudah sesuai!",
             icon: 'warning',
             dangerMode: true,
             buttons: {

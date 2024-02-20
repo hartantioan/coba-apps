@@ -873,159 +873,172 @@
     }
 
     function duplicate(id){
-        $.ajax({
-            url: '{{ Request::url() }}/show',
-            type: 'POST',
-            dataType: 'JSON',
-            data: {
-                id: id
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                loadingOpen('#main');
-            },
-            success: function(response) {
-                loadingClose('#main');
-                $('#modal1').modal('open');
-                
-                $('#temp').val('');
-                $('#code').val(response.code);
-                $('#name').val(response.name);
-                $('#item_group').val(response.itemgroups).trigger('change');
-
-                if(response.status == '1'){
-                    $('#status').prop( "checked", true);
-                }else{
-                    $('#status').prop( "checked", false);
-                }
-
-                if(response.details.length > 0){
-                    $('.row_user').each(function(){
-                        $(this).remove();
-                    });
-
-                    $('.row_stage').each(function(){
-                        $(this).remove();
-                    });
-
-                    $('.row_menu').each(function(){
-                        $(this).remove();
-                    });
-
-                    $.each(response.details, function(i, val) {
-                        var count = makeid(10);
-                        $('#last-row-user').before(`
-                            <tr class="row_user">
-                                <td>
-                                    <select class="browser-default" id="arr_user` + count + `" name="arr_user[]"></select>
-                                </td>
-                                <td class="center">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-user" href="javascript:void(0);">
-                                        <i class="material-icons">delete</i>
-                                    </a>
-                                </td>
-                            </tr>
-                        `);
-
-                        select2ServerSide('#arr_user' + count, '{{ url("admin/select2/employee") }}');
+        swal({
+            title: "Apakah anda yakin ingin salin?",
+            text: "Pastikan item yang ingin anda salin sudah sesuai!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                $.ajax({
+                    url: '{{ Request::url() }}/show',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        id: id
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('#main');
+                    },
+                    success: function(response) {
+                        loadingClose('#main');
+                        $('#modal1').modal('open');
                         
-                        $('#arr_user' + count).append(`
-                            <option value="` + val.user_id + `">` + val.user_name + `</value>
-                        `);
-                    });
+                        $('#temp').val('');
+                        $('#code').val(response.code);
+                        $('#name').val(response.name);
+                        $('#item_group').val(response.itemgroups).trigger('change');
 
-                    $.each(response.stages, function(i, val) {
-                        var count = makeid(10);
-                        $('#last-row-stage').before(`
-                            <tr class="row_stage">
-                                <td>
-                                    <select class="browser-default" id="arr_approval_stage` + count + `" name="arr_approval_stage[]"></select>
-                                </td>
-                                <td class="center">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-stage" href="javascript:void(0);">
-                                        <i class="material-icons">delete</i>
-                                    </a>
-                                </td>
-                            </tr>
-                        `);
+                        if(response.status == '1'){
+                            $('#status').prop( "checked", true);
+                        }else{
+                            $('#status').prop( "checked", false);
+                        }
 
-                        select2ServerSide('#arr_approval_stage' + count, '{{ url("admin/select2/approval_stage") }}');
-                        
-                        $('#arr_approval_stage' + count).append(`
-                            <option value="` + val.approval_stage_id + `">` + val.approval_stage_code + `</value>
-                        `);
-                    });
+                        if(response.details.length > 0){
+                            $('.row_user').each(function(){
+                                $(this).remove();
+                            });
 
-                    $.each(response.menus, function(i, val) {
-                        var count = makeid(10);
-                        $('#last-row-menu').before(`
-                            <tr class="row_menu">
-                                <td>
-                                    <select class="browser-default" id="arr_approval_menu` + count + `" name="arr_approval_menu[]"></select>
-                                </td>
-                                <td class="center">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-menu" href="javascript:void(0);">
-                                        <i class="material-icons">delete</i>
-                                    </a>
-                                </td>
-                            </tr>
-                        `);
+                            $('.row_stage').each(function(){
+                                $(this).remove();
+                            });
 
-                        select2ServerSide('#arr_approval_menu' + count, '{{ url("admin/select2/menu") }}');
-                        
-                        $('#arr_approval_menu' + count).append(`
-                            <option value="` + val.menu_id + `">` + val.menu_name + `</value>
-                        `);
-                    });
-                }
+                            $('.row_menu').each(function(){
+                                $(this).remove();
+                            });
 
-                if(response.sign == '~'){
-                    $('#final-border').show();
-                    $('#nominal_final').val(response.nominal_final);
-                }else{
-                    $('#final-border').hide();
-                }
+                            $.each(response.details, function(i, val) {
+                                var count = makeid(10);
+                                $('#last-row-user').before(`
+                                    <tr class="row_user">
+                                        <td>
+                                            <select class="browser-default" id="arr_user` + count + `" name="arr_user[]"></select>
+                                        </td>
+                                        <td class="center">
+                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-user" href="javascript:void(0);">
+                                                <i class="material-icons">delete</i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                `);
 
-                if(response.is_coa_detail == '1'){
-                    $('#is_coa_detail').prop( "checked", true);
-                }
+                                select2ServerSide('#arr_user' + count, '{{ url("admin/select2/employee") }}');
+                                
+                                $('#arr_user' + count).append(`
+                                    <option value="` + val.user_id + `">` + val.user_name + `</value>
+                                `);
+                            });
 
-                if(response.is_check_benchmark == '1'){
-                    $('#is_check_benchmark').prop( "checked", true);
-                    $('#sign').attr('disabled',false).formSelect();
-                    $('#nominal').attr('disabled',false);
-                    $('#nominal_type').attr('disabled',false).formSelect();
-                    $('#sign').val(response.sign).formSelect();
-                    $('#nominal').val(response.nominal);
-                    $('#nominal_type').val(response.nominal_type).formSelect();
-                }else if(response.is_check_nominal == '1'){
-                    $('#is_check_nominal').prop( "checked", true);
-                    $('#sign').attr('disabled',false).formSelect();
-                    $('#nominal').attr('disabled',false);
-                    $('#nominal_type').attr('disabled',false).formSelect();
-                    $('#sign').val(response.sign).formSelect();
-                    $('#nominal').val(response.nominal);
-                    $('#nominal_type').val(response.nominal_type).formSelect();
-                }else{
-                    $('#is_check_benchmark').prop( "checked", false);
-                    $('#is_check_nominal').prop( "checked", false);
-                    $('#sign').attr('disabled',true).formSelect();
-                    $('#nominal').attr('disabled',true);
-                }
+                            $.each(response.stages, function(i, val) {
+                                var count = makeid(10);
+                                $('#last-row-stage').before(`
+                                    <tr class="row_stage">
+                                        <td>
+                                            <select class="browser-default" id="arr_approval_stage` + count + `" name="arr_approval_stage[]"></select>
+                                        </td>
+                                        <td class="center">
+                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-stage" href="javascript:void(0);">
+                                                <i class="material-icons">delete</i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                `);
 
-                $('.modal-content').scrollTop(0);
-                $('#code').focus();
-                M.updateTextFields();
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('#main');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
+                                select2ServerSide('#arr_approval_stage' + count, '{{ url("admin/select2/approval_stage") }}');
+                                
+                                $('#arr_approval_stage' + count).append(`
+                                    <option value="` + val.approval_stage_id + `">` + val.approval_stage_code + `</value>
+                                `);
+                            });
+
+                            $.each(response.menus, function(i, val) {
+                                var count = makeid(10);
+                                $('#last-row-menu').before(`
+                                    <tr class="row_menu">
+                                        <td>
+                                            <select class="browser-default" id="arr_approval_menu` + count + `" name="arr_approval_menu[]"></select>
+                                        </td>
+                                        <td class="center">
+                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-menu" href="javascript:void(0);">
+                                                <i class="material-icons">delete</i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                `);
+
+                                select2ServerSide('#arr_approval_menu' + count, '{{ url("admin/select2/menu") }}');
+                                
+                                $('#arr_approval_menu' + count).append(`
+                                    <option value="` + val.menu_id + `">` + val.menu_name + `</value>
+                                `);
+                            });
+                        }
+
+                        if(response.sign == '~'){
+                            $('#final-border').show();
+                            $('#nominal_final').val(response.nominal_final);
+                        }else{
+                            $('#final-border').hide();
+                        }
+
+                        if(response.is_coa_detail == '1'){
+                            $('#is_coa_detail').prop( "checked", true);
+                        }
+
+                        if(response.is_check_benchmark == '1'){
+                            $('#is_check_benchmark').prop( "checked", true);
+                            $('#sign').attr('disabled',false).formSelect();
+                            $('#nominal').attr('disabled',false);
+                            $('#nominal_type').attr('disabled',false).formSelect();
+                            $('#sign').val(response.sign).formSelect();
+                            $('#nominal').val(response.nominal);
+                            $('#nominal_type').val(response.nominal_type).formSelect();
+                        }else if(response.is_check_nominal == '1'){
+                            $('#is_check_nominal').prop( "checked", true);
+                            $('#sign').attr('disabled',false).formSelect();
+                            $('#nominal').attr('disabled',false);
+                            $('#nominal_type').attr('disabled',false).formSelect();
+                            $('#sign').val(response.sign).formSelect();
+                            $('#nominal').val(response.nominal);
+                            $('#nominal_type').val(response.nominal_type).formSelect();
+                        }else{
+                            $('#is_check_benchmark').prop( "checked", false);
+                            $('#is_check_nominal').prop( "checked", false);
+                            $('#sign').attr('disabled',true).formSelect();
+                            $('#nominal').attr('disabled',true);
+                        }
+
+                        $('.modal-content').scrollTop(0);
+                        $('#code').focus();
+                        M.updateTextFields();
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('#main');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
                 });
             }
         });

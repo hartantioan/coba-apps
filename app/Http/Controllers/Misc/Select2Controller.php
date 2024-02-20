@@ -510,7 +510,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text'          => $d->employee_no.' - '.$d->name.' - '.$d->phone.' Pos. '.($d->position()->exists() ? $d->position->name.' Div. '.$d->position->division->name : 'N/A'),
+                'text'          => $d->employee_no.' - '.$d->name.' Pos. '.($d->position()->exists() ? $d->position->name.' Div. '.$d->position->division->name : 'N/A'),
                 'limit_credit'  => $d->limit_credit,
                 'count_limit'   => $d->count_limit_credit,
                 'balance_limit' => $d->limit_credit - $d->count_limit_credit,

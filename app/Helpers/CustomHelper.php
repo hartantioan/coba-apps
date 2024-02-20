@@ -1711,6 +1711,10 @@ class CustomHelper {
 				);
 			}
 
+			if($gr){
+				$gr->updateRootDocumentStatusDone();
+			}
+
 		}elseif($table_name == 'good_return_issues'){
 			
 			$gr = GoodReturnIssue::find($table_id);

@@ -135,6 +135,16 @@ class MaterialRequest extends Model
         return $hasRelation;
     }
 
+    public function hasBalanceQtyPrGi(){
+        $status = false;
+        foreach($this->materialRequestDetail()->where('status','1')->get() as $row){
+            if($row->balancePrGi() > 0){
+                $status = true;
+            }
+        }
+        return $status;
+    }
+
     public function hasBalanceQtyPr(){
         $status = false;
         foreach($this->materialRequestDetail()->where('status','1')->get() as $row){

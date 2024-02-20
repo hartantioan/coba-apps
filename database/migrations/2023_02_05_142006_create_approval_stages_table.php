@@ -16,7 +16,7 @@ return new class extends Migration
         if(!Schema::hasTable('approval_stages'))
         Schema::create('approval_stages', function (Blueprint $table) {
             $table->id();
-            $table->string('code', 50)->unique();
+            $table->string('code', 50)->nullable();
             $table->bigInteger('approval_id')->nullable();
             $table->integer('level')->nullable();
             $table->integer('min_approve')->nullable();

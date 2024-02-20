@@ -606,7 +606,7 @@ class PurchaseOrderController extends Controller
                         ];
                     }
                 }
-                if(count($arrGroupItem) > 1){
+                /* if(count($arrGroupItem) > 1){
                     $arrError = [];
                     foreach($arrGroupItem as $row){
                         $arrError[] = $row['item_name'].' Grup : '.$row['group_name'];
@@ -615,7 +615,7 @@ class PurchaseOrderController extends Controller
                         'status'  => 500,
                         'message' => 'Mohon maaf PO tidak bisa memiliki lebih dari 1 macam group item. Daftarnya : '.implode(', ',$arrError),
                     ]);
-                }
+                } */
             }
 
             if($request->inventory_type == '2'){

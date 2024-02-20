@@ -187,7 +187,7 @@
     });
 
     function exportExcel(){
-        var start_date = $('#start_date').val(), finish_date = $('#finish_date').val(), coa_id = $('#coa').val(), company_id = $('#company').val(), search = window.table.search();
+        var start_date = $('#start_date').val(), finish_date = $('#finish_date').val(), coa_id = ($('#coa').val() ? $('#coa').val() : ''), company_id = ($('#company').val() ? $('#company').val() : ''), search = window.table.search();
         window.location = "{{ Request::url() }}/export?start_date=" + start_date + "&end_date=" + finish_date + "&coa_id=" + coa_id + "&company_id=" + company_id + "&search=" + search;
     }
 

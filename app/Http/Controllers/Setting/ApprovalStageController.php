@@ -134,7 +134,7 @@ class ApprovalStageController extends Controller
     public function create(Request $request){
         
         $validation = Validator::make($request->all(), [
-            'code' 				=> $request->temp ? ['required', Rule::unique('approval_stages', 'code')->ignore($request->temp)] : 'required|unique:approval_stages,code',
+            'code' 				=> $request->temp ? ['required', Rule::unique('approval_stages', 'code')->ignore($request->temp)] : ['required', Rule::unique('approval_stages', 'code')->withoutTrashed()],
             'approval_id'       => 'required',
             'level'             => 'required',
             'min_approve'       => 'required',

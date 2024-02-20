@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('approval_templates', function (Blueprint $table) {
             $table->id();
-            $table->string('code',155)->unique();
+            $table->string('code',155)->nullable();
             $table->bigInteger('user_id')->nullable();
             $table->string('name')->nullable();
             $table->char('status')->nullable();

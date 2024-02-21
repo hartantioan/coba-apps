@@ -20,7 +20,7 @@ class ExportDocumentTaxTable implements WithMultipleSheets,ShouldAutoSize
         $this->start_date = $start_date ? $start_date : '';
         $this->finish_date = $finish_date ? $finish_date : '';
         $this->search = $search ? $search : '';
-      
+       
     }
 
     public function sheets(): array

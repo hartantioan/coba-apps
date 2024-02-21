@@ -480,7 +480,7 @@
         var endDate = $('#finish-date').val();
         var startDate = $('#start-date').val();
         var search = window.table.search();
-        window.location = "{{ Request::url() }}/export_data_table?start_date=" + startDate+ "&end_date=" + endDate + "&search=" + search; 
+        window.location = "{{ Request::url() }}/export_data_table?start_date=" + startDate+ "&finish_date=" + endDate + "&search=" + search; 
     }
 
 

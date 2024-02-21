@@ -31,7 +31,7 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
         DB::statement("SET SQL_MODE=''");
         if($this->type == 'final'){
             $perlu = 0 ;
-            info($this->item);
+           
             $query_data = ItemCogs::whereIn('id', function ($query){            
                 $query->selectRaw('MAX(id)')
                     ->from('item_cogs')
@@ -106,7 +106,7 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
             ->orderBy('type')
             ->get();
         }
-        info($query_data);
+      
         
         $previousId = null; // Initialize the previous ID variable
         $cum_qty = 0;

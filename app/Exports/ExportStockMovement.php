@@ -26,46 +26,40 @@ class ExportStockMovement implements FromView,ShouldAutoSize
         DB::statement("SET SQL_MODE=''");
         if($this->type == 'final'){
             $perlu = 0 ;
-            $query_data = ItemCogs::where(function($query)  {
-                if($this->start_date && $this->finish_date) {
-                    $query->whereDate('date', '>=', $this->start_date)
-                        ->whereDate('date', '<=', $this->finish_date);
-                } else if($this->start_date) {
-                    $query->whereDate('date','>=', $this->start_date);
-                } else if($this->finish_date) {
-                    $query->whereDate('date','<=', $this->finish_date);
+            $query_data = ItemCogs::whereIn('id', function ($query){            
+                $query->selectRaw('MAX(id)')
+                    ->from('item_cogs')
+                    ->where('date', '<', $this->finish_date)
+                    ->groupBy('item_id');
+            })
+            ->where(function($query) {
+                if($this->finish_date) {
+                    $query->whereDate('date','<', $this->finish_date);
                 }
                 if($this->item) {
-                    $query->whereHas('item',function($query){
+                    $query->whereHas('item',function($query) {
                         $query->where('id',$this->item);
                     });
                 }
                 if($this->plant != 'all'){
-                    $query->whereHas('place',function($query){
+                    $query->whereHas('place',function($query) {
                         $query->where('id',$this->plant);
                     });
                 }
                 if($this->warehouse != 'all'){
-                    $query->whereHas('warehouse',function($query){
+                    $query->whereHas('warehouse',function($query) {
                         $query->where('id',$this->warehouse);
                     });
                 }
     
                 if($this->group){
-                    $groupIds = explode(',', $this->group);
-    
-                    $query->whereHas('item',function($query) use($groupIds){
-                        $query->whereIn('item_group_id', $groupIds);
+                   
+                    $query->whereHas('item',function($query) {
+                        $query->whereIn('item_group_id', $this->group);
                     });
                 }
             })
-            ->whereIn('id', function ($subquery) {
-                $subquery->select(DB::raw('MAX(id)'))
-                    ->from('item_cogs')
-                    ->groupBy('item_id');
-            })
             ->orderBy('date', 'desc')
-            ->groupBy('item_id')
             ->get();
         }else{
             $perlu = 1;
@@ -111,16 +105,12 @@ class ExportStockMovement implements FromView,ShouldAutoSize
         $cum_qty = 0;
         $cum_val = 0 ;
         $array_filter=[];
-        $firstDate = null;
         $uom_unit = null;
-        $last_qty = 0 ; 
-        $last_nominal=0;
+        $previousId = null;
+        $array_last_item = [];
 
         foreach($query_data as $row){
-            if ($previousId !== null && $row->item_id !== $previousId) {
-                $cum_qty = 0; // Reset the count when the ID changes
-                $cum_val = 0;
-            }
+          
             if($row->type=='IN'){
                 $cum_qty=$row->qty_in;
                 $cum_val=$row->total_in;
@@ -144,46 +134,48 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                 'cum_val' => number_format($row->total_final,2,',','.'),
             ];
             $array_filter[]=$data_tempura;
-            if ($firstDate === null) {
-                $firstDate = $row->date;
+            if ($row->item_id !== $previousId) {
+              
+                $query_first =
+                ItemCogs::where(function($query) use ( $row) {
+                    $query->where('item_id',$row->item_id)
+                    ->where('date', '<', $row->date);
+                    
+                    if($this->plant != 'all'){
+                        $query->whereHas('place',function($query){
+                            $query->where('id',$this->plant);
+                        });
+                    }
+                    if($this->warehouse != 'all'){
+                        $query->whereHas('warehouse',function($query){
+                            $query->where('id',$this->warehouse);
+                        });
+                    }
+                })
+                ->orderBy('date', 'desc') // Order by 'date' column in descending order
+                ->first();
+
+                $array_last_item[] = [
+                    'date'         => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
+                    'last_nominal' => $query_first ? number_format($query_first->total_final, 2, ',', '.') : 0,
+                    'item'         => $row->item->name,
+                    'satuan'       => $row->item->uomUnit->code,
+                    'kode'         => $row->item->code,
+                    'last_qty'     => $query_first ? number_format($query_first->qty_final, 3, ',', '.') : 0,
+                ];
+
+
             }
             if($uom_unit ===null){
                 $uom_unit = $row->item->uomUnit->code;
             }
         }
-        $last_nominal=0;
-        if($firstDate != null){
-            $query_first =
-            ItemCogs::where(function($query) use ($firstDate) {
-                $query->where('date', '<', $firstDate)
-                ->whereHas('item',function($query){
-                    $query->where('id',$this->item);
-                });
-                if($this->plant != 'all'){
-                    $query->whereHas('place',function($query){
-                        $query->where('id',$this->plant);
-                    });
-                }
-                if($this->warehouse != 'all'){
-                    $query->whereHas('warehouse',function($query){
-                        $query->where('id',$this->warehouse);
-                    });
-                }
-            })
-            ->orderBy('date', 'desc') // Order by 'date' column in descending order
-            ->first();
-          
-            if($query_first){
-                $last_nominal=number_format($query_first->qty_final,3,',','.');
-            }
-            
-        }
+        
 
       
         return view('admin.exports.stock_movement', [
             'data' => $array_filter,
-            'latest'   =>$last_nominal,
-            'uomunit'  =>$uom_unit,
+            'latest' => $array_last_item,
             'perlu'         =>  $perlu,
         ]);
     }

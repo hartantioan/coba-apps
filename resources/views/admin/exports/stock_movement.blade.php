@@ -1,47 +1,104 @@
-<table border="1" cellpadding="2" cellspacing="0" style="width:100%; font-size:13px;border-collapse: collapse;">
-    <thead>
-        <tr align="center">
-            <th class="center-align">No.</th>
-            <th class="center-align">Tanggal.</th>
-            <th class="center-align">Plant.</th>
-            <th class="center-align">Gudang.</th>
-            <th class="center-align">Kode Item</th>
-            <th class="center-align">Nama Item</th>
-            <th class="center-align">Satuan</th>
-            <th class="center-align">No Dokumen</th>
-            <th class="center-align">Mutasi</th>
-            <th class="center-align">Balance</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if($perlu == 1)
-            <tr>
-                <td colspan="10">Saldo Sebelumnya:</td>
-                <td align="center"> {{$latest}}</td>
+@if($perlu == 1)
+    <table border="1" cellpadding="2" cellspacing="0" style="width:100%; font-size:13px;border-collapse: collapse;">
+        <thead>
+            <tr align="center">
+                <th class="center-align">No.</th>
+                <th class="center-align">Tanggal.</th>
+                <th class="center-align">Plant.</th>
+                <th class="center-align">Gudang.</th>
+                <th class="center-align">Kode Item</th>
+                <th class="center-align">Nama Item</th>
+                <th class="center-align">Satuan</th>
+                <th class="center-align">No Dokumen</th>
+                <th class="center-align">Mutasi</th>
+                <th class="center-align">Balance</th>
             </tr>
-        @endif
-        @foreach($data as $key => $row)
-        <tr>
-            <td align="center">{{$key+1}}</td>
-            <td align="center">{{$row['date']}}</td>
-            <td align="center">{{$row['plant']}}</td>
-            <td align="center">{{$row['warehouse']}}</td>
-            <td align="center">{{$row['kode']}}</td>
-            <td align="center">{{$row['item']}}</td>
-            <td align="center">{{$row['satuan']}}</td>
-            <td align="center">{{$row['document']}}</td>
-            <td align="center">{{$row['qty']}}</td>
-            <td align="center">{{$row['cum_qty']}}</td>
-        </tr>
-        @endforeach
-        @if(count($data) == 0)
+        </thead>
+        <tbody>
+            @php
+                $processedItems = [];
+            @endphp
+            @foreach($data as $key => $row)
+                @if (!in_array($row['item'], $processedItems))
+                    @php
+                        $processedItems[] = $row['item'];
+                    @endphp
+
+                    @foreach($latest as $j => $vals)
+                        @if($vals['item'] == $row['item'])
+                            <tr>
+                                <td align="center"></td>
+                                <td align="center"></td>
+                                <td align="center"></td>
+                                <td align="center"></td>
+                                <td align="center">{{ $latest[$j]['kode'] }}</td>
+                                <td align="center">{{ $latest[$j]['item'] }}</td>
+                                <td align="center">{{ $latest[$j]['satuan'] }}</td>
+                                <td align="center">Saldo Awal</td>
+                                <td align="center"></td>
+                                <td align="right">{{ $latest[$j]['last_qty'] }}</td>
+                            </tr>
+                        @endif
+                    @endforeach
+                @endif
             <tr>
-                <td colspan="5" align="center">
-                    Data tidak ditemukan
-                </td>
+                <td align="center">{{$key+1}}</td>
+                <td align="center">{{$row['date']}}</td>
+                <td align="center">{{$row['plant']}}</td>
+                <td align="center">{{$row['warehouse']}}</td>
+                <td align="center">{{$row['kode']}}</td>
+                <td align="center">{{$row['item']}}</td>
+                <td align="center">{{$row['satuan']}}</td>
+                <td align="center">{{$row['document']}}</td>
+                <td align="center">{{$row['qty']}}</td>
+                <td align="center">{{$row['cum_qty']}}</td>
             </tr>
-        @endif
+            @endforeach
+            @if(count($data) == 0)
+                <tr>
+                    <td colspan="5" align="center">
+                        Data tidak ditemukan
+                    </td>
+                </tr>
+            @endif
+            
+        </tbody>
         
-    </tbody>
-    
-</table>
+    </table>
+@else
+    <table border="1" cellpadding="2" cellspacing="0" style="width:100%; font-size:13px;border-collapse: collapse;">
+        <thead>
+            <tr align="center">
+                <th align="center">No.</th>
+                <th align="center">Plant</th>
+                <th align="center">Gudang</th>
+                <th align="center">Kode</th>
+                <th align="center">Nama Item</th>
+                <th align="center">Satuan</th>
+                <th align="center">Balance</th>
+            </tr>
+        </thead>
+        <tbody>            
+            @foreach($data as $key => $row)
+            <tr>
+                <td align="center">{{$key+1}}</td>
+                <td align="center">{{$row['plant']}}</td>
+                <td align="center">{{$row['warehouse']}}</td>
+                <td align="center">{{$row['kode']}}</td>
+                <td align="center">{{$row['item']}}</td>
+                <td align="center">{{$row['satuan']}}</td>
+                <td align="center">{{$row['cum_qty']}}</td>
+            </tr>
+            @endforeach
+            @if(count($data) == 0)
+                <tr>
+                    <td colspan="13" align="center">
+                        Data tidak ditemukan
+                    </td>
+                </tr>
+            @endif
+            
+        </tbody>
+        
+    </table>
+@endif

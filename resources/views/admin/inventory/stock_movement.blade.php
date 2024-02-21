@@ -134,7 +134,7 @@
                 </div>
                 <div class="row">
                     <table class="bordered" style="font-size:10px;">
-                        <thead>
+                        <thead id="t_head">
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Tanggal.</th>
@@ -164,7 +164,7 @@
             var selectedType = $(this).val();
             
             if (selectedType === 'final') {
-                $('#start_date').prop('disabled', true).val('');
+                $('#start_date').prop('disabled', true);
             } else {
                 $('#start_date').prop('disabled', false);
             }
@@ -203,24 +203,74 @@
                     $('#movement_body').empty();
                     $('.uomunit').empty();
                     var gtall=0;
-                    
-                    if(response.uomunit!=null){
-                        $('.uomunit').append(`
-                            (`+response.uomunit+`)
-                        `);
-                    }
-                 
-                    if (response.message.length > 0) {
-                        if(response.perlu == 1){
+                    if($('#type').val() == 'final'){
+                        $('#t_head').empty();
+                        $('#t_head').append(`
+                            <tr>
+                                <th class="center-align">No.</th>
+                                <th class="center-align">Plant</th>
+                                <th class="center-align">Gudang</th>
+                                <th class="center-align">Kode</th>
+                                <th class="center-align">Nama Item</th>
+                                <th class="center-align">Satuan</th>
+                                <th class="center-align">Balance</th>
+                            </tr>`);
+                        $.each(response.message, function(i, val) { 
+                            
                             $('#movement_body').append(`
                                 <tr>
-                                    <td colspan="5" class="center-align">Saldo Sebelumnya</td>
-                                    <td colspan="1" class="right-align">`+response.latest+`</td>
-                                </tr>`);
-                        }
+                                    <td class="center-align">`+(i+1)+`</td>               
+                                    <td >`+val.plant+`</td>
+                                    <td >`+val.warehouse+`</td>
+                                    <td >`+val.kode+`</td>
+                                    <td >`+val.item+`</td>
+                                    <td >`+val.satuan+`</td>
+                                    <td class="right-align">`+val.cum_qty+`</td>
+                                </tr>
+                            `);
+                        });
+                    }else{
+                        var processedItems = [];
+                        $('#t_head').empty();
+                        $('#t_head').append(`
+                            <tr>
+                                <th class="center-align">No.</th>
+                                <th class="center-align">Tanggal.</th>
+                                <th class="center-align">Plant.</th>
+                                <th class="center-align">Gudang.</th>
+                                <th class="center-align">Kode Item</th>
+                                <th class="center-align">Nama Item</th>
+                                <th class="center-align">Satuan</th>
+                                <th class="center-align">No Dokumen</th>
+                                <th class="center-align">Mutasi</th>
+                                <th class="center-align">Balance</th>
+                            </tr>`);
                         $.each(response.message, function(i, val) {
-                            gtall+=val.grandtotal;
-                            
+                            if(response.perlu == 1){
+                                if (!processedItems.includes(val.item)) {
+                                    // Mark the current item as processed
+                                    processedItems.push(val.item);
+
+                                    $.each(response.latest, function(j, vals) {
+                                        if (vals.item == val.item) {
+                                            $('#movement_body').append(`
+                                                <tr>
+                                                    <td class="center-align"></td>
+                                                    <td class="center-align"></td>
+                                                    <td class="center-align"></td>
+                                                    <td class="center-align"></td>
+                                                    <td class="center-align">` + response.latest[j]['kode'] + `</td>
+                                                    <td class="right-align">` + response.latest[j]['item'] + `</td>
+                                                    <td class="center-align">` + response.latest[j]['satuan'] + `</td>
+                                                    <td class="center-align">Saldo Awal</td>
+                                                    <td class="center-align"></td>
+                                                    <td class="right-align">` + response.latest[j]['last_qty'] + `</td>
+                                                </tr>`
+                                            );
+                                        }
+                                    });
+                                }
+                            }         
                             $('#movement_body').append(`
                                 <tr>
                                     <td class="center-align">`+(i+1)+`</td>
@@ -236,20 +286,7 @@
                                 </tr>
                             `);
                         });
-                        $('#movement_body').append(`
-                            <tr>
-                                <td class="center-align" colspan="6">`+response.time+`</td>
-                            </tr>
-                        `);
-                        M.toast({
-                            html: 'filtered'
-                        });
-                    }else{
-                        $('#movement_body').append(`
-                            <tr>
-                                <td colspan="6" class="center-align">BELUM ADA PERGERAKAN</td>
-                            </tr>`);
-                    }
+                    } 
                     
                 } else if(response.status == 422) {
                     $('#validation_alert_multi').show();

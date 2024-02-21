@@ -136,11 +136,17 @@
         <div class="row">
             <div class="col s12">
                 <h4>Tambah/Edit {{ $title }}</h4>
+                <div class="card-alert card blue">
+                    <div class="card-content white-text">
+                        <p>Info : Untuk penambahan BP Supplier & Ekspedisi dibuka akses hanya pak Sandi.</p>
+                    </div>
+                </div>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
+
                         <div class="input-field col s3">
                             <select id="type" name="type" onchange="changeMode(this);refreshGroup();">
                                 <option value="1">Pegawai</option>

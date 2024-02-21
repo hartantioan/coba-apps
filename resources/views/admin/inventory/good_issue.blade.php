@@ -834,7 +834,6 @@
                                     </td>
                                     <td class="center">
                                         <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:100px !important;">
-                                            <option value="">--Kosong--</option>
                                             @foreach ($place as $row)
                                                 <option value="{{ $row->id }}">{{ $row->code }}</option>
                                             @endforeach
@@ -1025,7 +1024,6 @@
                 </td>
                 <td class="center">
                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:100px !important;">
-                        <option value="">--Kosong--</option>
                         @foreach ($place as $row)
                             <option value="{{ $row->id }}">{{ $row->code }}</option>
                         @endforeach
@@ -1033,7 +1031,6 @@
                 </td>
                 <td>
                     <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);" style="width:100px !important;">
-                        <option value="">--Kosong--</option>
                         @foreach ($line as $rowline)
                             <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
                         @endforeach
@@ -1457,7 +1454,6 @@
                                 </td>
                                 <td class="center">
                                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:100px !important;">
-                                        <option value="">--Kosong--</option>
                                         @foreach ($place as $row)
                                             <option value="{{ $row->id }}">{{ $row->code }}</option>
                                         @endforeach
@@ -1465,7 +1461,6 @@
                                 </td>
                                 <td>
                                     <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);" style="width:100px !important;">
-                                        <option value="">--Kosong--</option>
                                         @foreach ($line as $rowline)
                                             <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
                                         @endforeach

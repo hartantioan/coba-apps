@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Exports;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -11,21 +12,39 @@ use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromView;
 
-class ExportDocumentTax implements WithMultipleSheets,ShouldAutoSize
+class ExportDocumentTaxTable implements WithMultipleSheets,ShouldAutoSize
 {
-    protected $no_faktur;
-
-    public function __construct(string $no_faktur)
+    protected $start_date,$finish_date,$search;
+    public function __construct(string $start_date,string $finish_date,string $search)
     {
-        $this->no_faktur = $no_faktur ? $no_faktur : '';
+        $this->start_date = $start_date ? $start_date : '';
+        $this->finish_date = $finish_date ? $finish_date : '';
+        $this->search = $search ? $search : '';
       
     }
 
     public function sheets(): array
     {
-        $no_faktur_arr = explode(',', $this->no_faktur);
-        $taxes = DocumentTax::where(function($query) use($no_faktur_arr) {
-            $query->whereIn('code',$no_faktur_arr);
+        $taxes = DocumentTax::where(function($query){
+            if($this->start_date && $this->finish_date) {
+                $query->whereDate('date', '>=', $this->start_date)
+                    ->whereDate('date', '<=', $this->finish_date);
+            } else if($this->start_date) {
+                $query->whereDate('date','>=', $this->start_date);
+            } else if($this->finish_date) {
+                $query->whereDate('date','<=', $this->finish_date);
+            }
+            if($this->search){
+                $query->where('code', 'like', "%$this->search%")
+                    ->orWhere('date', 'like', "%$this->search%")
+                    ->orWhere('npwp_number', 'like', "%$this->search%")
+                    ->orWhere('npwp_name', 'like', "%$this->search%")
+                    ->orWhere('npwp_target', 'like', "%$this->search%")
+                    ->orWhere('npwp_target_name', 'like', "%$this->search%")
+                    ->orWhere('total', 'like', "%$this->search%")
+                    ->orWhere('tax', 'like', "%$this->search%");
+            }
+
         })->get();
         $taxDetail = DocumentTaxDetail::whereIn('document_tax_id', $taxes->pluck('id')->toArray())->get();
 
@@ -40,8 +59,6 @@ class ExportDocumentTax implements WithMultipleSheets,ShouldAutoSize
        
         return $sheets;
     }
-
-    
 }
 
 class DocumentTaxSheet implements FromView, WithTitle, ShouldAutoSize

@@ -86,6 +86,13 @@
                                                     <i class="material-icons right">view_list</i>
                                                 </a>
                                             </div>
+                                            <div class="input-field col s12">
+                                                <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="excelFilterTable();">
+                                                    <i class="material-icons hide-on-med-and-up">subtitles</i>
+                                                    <span class="hide-on-small-onl">EXCEL DATA TABLE</span>
+                                                    <i class="material-icons right">subtitles</i>
+                                                </a>
+                                            </div>
                                            
                                         </div>
                                     </div>
@@ -468,6 +475,14 @@
 
         window.location = "{{ Request::url() }}/export?no_faktur=" + arr_id_temp; 
     }
+
+    function excelFilterTable(){
+        var endDate = $('#finish-date').val();
+        var startDate = $('#start-date').val();
+        var search = window.table.search();
+        window.location = "{{ Request::url() }}/export_data_table?start_date=" + startDate+ "&end_date=" + endDate + "&search=" + search; 
+    }
+
 
 
     function success(){

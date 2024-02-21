@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Accounting;
 
 use App\Exports\ExportDocumentTax;
+use App\Exports\ExportDocumentTaxTable;
 use App\Helpers\CustomHelper;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -129,9 +130,9 @@ class DocumentTaxController extends Controller
                     $val->npwp_target,
                     $val->npwp_target_name,
                     $val->npwp_target_address,
-                    $val->total,
-                    $val->tax,
-                    $val->wtax,
+                    number_format($val->total,3,',','.'),
+                    number_format($val->tax,3,',','.'),
+                    number_format($val->wtax,3,',','.'),
                     $val->approval_status,
                     $val->tax_status,
                     $val->reference,
@@ -273,6 +274,13 @@ class DocumentTaxController extends Controller
 		$no_faktur = $request->no_faktur ? $request->no_faktur : ''   ;
         
 		return Excel::download(new ExportDocumentTax($no_faktur),'faktur_pajak'.uniqid().'.xlsx');
+    }
+
+    public function exportDataTable(Request $request){
+		$start_date = $request->start_date ? $request->start_date : ''   ;
+        $finish_date = $request->finish_date ? $request->finish_date : '';
+        $search = $request->search ? $request->search : '';
+		return Excel::download(new ExportDocumentTaxTable($start_date,$finish_date,$search),'faktur_pajak'.uniqid().'.xlsx');
     }
 
     public function store_w_barcode(Request $request){

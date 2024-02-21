@@ -29,7 +29,7 @@ class ExportAttendancePeriod implements FromView,ShouldAutoSize,WithTitle
         $startDateTime = Carbon::parse($attendance_period->start_date)->startOfDay();
         $endDateTime = Carbon::parse($attendance_period->end_date)->endOfDay();
         $attendances = Attendances::whereBetween('date', [$startDateTime, $endDateTime])
-        ->whereIn('employee_no',['323005','323007','323003','323009','323016','323017','323020','323021','323024','323025','323027','323029','323031','323033','323034','323036','324002','324003','324004'])
+        ->where('attendance_machine_id',5)
         ->orderBy('employee_no')
         ->orderBy('date')
         ->get();

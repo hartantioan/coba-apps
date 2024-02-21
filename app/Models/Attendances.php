@@ -17,6 +17,7 @@ class Attendances extends Model
     protected $fillable = [    
         'code',
         'employee_no',
+        'attendance_machine_id',
         'date',
         'verify_type',
         'location',

@@ -2348,6 +2348,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [DocumentTaxController::class, 'show']);
                     Route::post('print', [DocumentTaxController::class, 'print']);
                     Route::get('export', [DocumentTaxController::class, 'export']);
+                    Route::get('export_data_table', [DocumentTaxController::class, 'exportDataTable']);
                     Route::get('row_detail',[DocumentTaxController::class, 'rowDetail']);
                     Route::post('store_w_barcode', [DocumentTaxController::class, 'store_w_barcode'])->middleware('operation.access:document_tax,update');
                     Route::post('destroy', [DocumentTaxController::class, 'destroy'])->middleware('operation.access:document_tax,delete');

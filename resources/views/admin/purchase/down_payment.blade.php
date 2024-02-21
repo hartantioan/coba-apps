@@ -1203,7 +1203,7 @@
 
         tax = Math.floor(tax);
         wtax = Math.floor(wtax);
-        total = Math.ceil(total);
+        total = total;
 
         $('#total').text(
             (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))

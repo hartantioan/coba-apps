@@ -192,18 +192,18 @@
                             </div>
                         </fieldset>
                         <fieldset>
-                            <legend>2. Material Request (Jika Ada)</legend>
+                            <legend>2. Item Request (Jika Ada)</legend>
                             <div class="mt-1 mb-1">
-                                <b>Tarik data dari Material Request - jika ada stok yang tidak mencukupi maka qty akan diisi dengan selisih permintaan material stok dengan stok saat ini. Hanya item yang telah disetujui akan masuk disini.</b>
+                                <b>Tarik data dari Item Request - jika ada stok yang tidak mencukupi maka qty akan diisi dengan selisih permintaan material stok dengan stok saat ini. Hanya item yang telah disetujui akan masuk disini.</b>
                             </div>
                             <div class="row">
                                 <div class="input-field col m5 step9">
                                     <select class="browser-default" id="material_request_id" name="material_request_id"></select>
-                                    <label class="active" for="material_request_id">Daftar Material Request</label>
+                                    <label class="active" for="material_request_id">Daftar Item Request</label>
                                 </div>
                                 <div class="col m4 step10">
                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 mt-5" onclick="getMaterialRequest();" href="javascript:void(0);">
-                                        <i class="material-icons left">add</i> Material Request
+                                        <i class="material-icons left">add</i> Item Request
                                     </a>
                                 </div>
                             </div>
@@ -2570,19 +2570,19 @@
                 },
                
                 {
-                    title : 'Daftar Material Request',
+                    title : 'Daftar Item Request',
                     element : document.querySelector('.step9'),
-                    intro : 'Jika Purchase Request memiliki hubungan dengan Material Request, maka silahkan pilih untuk dimasukkan ke dalam Detail Produk. Anda bisa memasukkan lebih dari satu Material Request ke dalam Purchase Request.' 
+                    intro : 'Jika Purchase Request memiliki hubungan dengan Item Request, maka silahkan pilih untuk dimasukkan ke dalam Detail Produk. Anda bisa memasukkan lebih dari satu Item Request ke dalam Purchase Request.' 
                 },
                 {
-                    title : 'Tombol tambah Material Request',
+                    title : 'Tombol tambah Item Request',
                     element : document.querySelector('.step10'),
-                    intro : 'Tekan tombol setelah memilih Material Request untuk mengambil data Material Request ke dalam tabel detail produk.' 
+                    intro : 'Tekan tombol setelah memilih Item Request untuk mengambil data Item Request ke dalam tabel detail produk.' 
                 },
                 {
-                    title : 'Dafter dokumen Material Request Terpakai (Kunci dokumen)',
+                    title : 'Dafter dokumen Item Request Terpakai (Kunci dokumen)',
                     element : document.querySelector('.step11'),
-                    intro : 'Material Request yang terpakai pada form ini akan ditampilkan disini, silahkan tekan tombol X (hapus) agar bisa diakses oleh pengguna lainnya.' 
+                    intro : 'Item Request yang terpakai pada form ini akan ditampilkan disini, silahkan tekan tombol X (hapus) agar bisa diakses oleh pengguna lainnya.' 
                 },
                 {
                     title : 'Detail produk',

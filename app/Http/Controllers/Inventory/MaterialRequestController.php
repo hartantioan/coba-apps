@@ -62,7 +62,7 @@ class MaterialRequestController extends Controller
         $lastSegment = request()->segment(count(request()->segments()));
         $menu = Menu::where('url', $lastSegment)->first();
         $data = [
-            'title'     => 'Material Request',
+            'title'     => 'Item Request',
             'content'   => 'admin.inventory.request',
             'company'   => Company::where('status','1')->get(),
             'place'     => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
@@ -349,9 +349,9 @@ class MaterialRequestController extends Controller
                     ->performedOn(new MaterialRequest())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Void the material request data');
+                    ->log('Void the Item Request data');
     
-                CustomHelper::sendNotification($query->getTable(),$query->id,'Material Request No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Item Request No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval($query->getTable(),$query->id);
 
                 $response = [
@@ -390,7 +390,7 @@ class MaterialRequestController extends Controller
                 
                 if($pr){
                     $data = [
-                        'title'     => 'Material Request',
+                        'title'     => 'Item Request',
                         'data'      => $pr
                     ];
                     $img_path = 'website/logo_web_fix.png';
@@ -499,7 +499,7 @@ class MaterialRequestController extends Controller
                     if($approved && !$revised){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Material Request telah diapprove, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Item Request telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
 
@@ -520,7 +520,7 @@ class MaterialRequestController extends Controller
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status material request sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+					        'message' => 'Status Item Request sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                 }catch(\Exception $e){
@@ -588,13 +588,13 @@ class MaterialRequestController extends Controller
                 }
 
                 CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
-                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Material Request No. '.$query->code,$query->note,session('bo_id'));
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Item Request No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()
                     ->performedOn(new MaterialRequest())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit material request.');
+                    ->log('Add / edit Item Request.');
 
 				$response = [
 					'status'    => 200,
@@ -707,7 +707,7 @@ class MaterialRequestController extends Controller
                 ->performedOn(new MaterialRequest())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the material request data');
+                ->log('Delete the Item Request data');
 
             $response = [
                 'status'  => 200,
@@ -2193,7 +2193,7 @@ class MaterialRequestController extends Controller
                 
         if($pr){
             $data = [
-                'title'     => 'Material Request',
+                'title'     => 'Item Request',
                 'data'      => $pr
             ];
 
@@ -2209,7 +2209,7 @@ class MaterialRequestController extends Controller
                 
         if($pr){
             $data = [
-                'title'     => 'Material Request',
+                'title'     => 'Item Request',
                 'data'      => $pr
             ];
 
@@ -2302,7 +2302,7 @@ class MaterialRequestController extends Controller
                         $query = MaterialRequest::where('code', 'LIKE', '%'.$x)->first();
                         if($query){
                             $data = [
-                                'title'     => 'Material Request',
+                                'title'     => 'Item Request',
                                 'data'      => $query
                             ];
                             $img_path = 'website/logo_web_fix.png';
@@ -2373,7 +2373,7 @@ class MaterialRequestController extends Controller
                         $query = MaterialRequest::where('code', 'LIKE', '%'.$merged)->first();
                         if($query){
                             $data = [
-                                'title'     => 'Material Request',
+                                'title'     => 'Item Request',
                                 'data'      => $query
                             ];
                             $img_path = 'website/logo_web_fix.png';

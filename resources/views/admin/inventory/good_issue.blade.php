@@ -196,18 +196,18 @@
                             </div>
                         </fieldset>
                         <fieldset class="step6">
-                            <legend>2. Material Request (Jika Ada)</legend>
+                            <legend>2. Item Request (Jika Ada)</legend>
                             <div class="mt-1 mb-1">
-                                <b>Tarik data dari Material Request - qty yang muncul diambil dari selisih jumlah qty Material Request dikurangi stok saat ini. Jika selisih > 0, maka qty yang digunakan adalah qty stok. Jika selisih kurang <= 0, maka qty yang digunakan adalah qty Material Request. Hanya item yang telah disetujui akan masuk disini.</b>
+                                <b>Tarik data dari Item Request - qty yang muncul diambil dari selisih jumlah qty Item Request dikurangi stok saat ini. Jika selisih > 0, maka qty yang digunakan adalah qty stok. Jika selisih kurang <= 0, maka qty yang digunakan adalah qty Item Request. Hanya item yang telah disetujui akan masuk disini.</b>
                             </div>
                             <div class="row">
                                 <div class="input-field col m5 step9">
                                     <select class="browser-default" id="material_request_id" name="material_request_id"></select>
-                                    <label class="active" for="material_request_id">Daftar Material Request</label>
+                                    <label class="active" for="material_request_id">Daftar Item Request</label>
                                 </div>
                                 <div class="col m4 step10">
                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 mt-5" onclick="getMaterialRequest();" href="javascript:void(0);">
-                                        <i class="material-icons left">add</i> Material Request
+                                        <i class="material-icons left">add</i> Item Request
                                     </a>
                                 </div>
                             </div>
@@ -1956,9 +1956,9 @@
                     intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
                 },
                 {
-                    title : ' Material Request (Jika Ada)',
+                    title : ' Item Request (Jika Ada)',
                     element : document.querySelector('.step6'),
-                    intro : 'Digunakan apabila ada material request terkain yang nantinya item dari material request akan diinput ke dalam list detail produk.' 
+                    intro : 'Digunakan apabila ada Item Request terkain yang nantinya item dari Item Request akan diinput ke dalam list detail produk.' 
                 },
                 {
                     title : 'Detail Produk',

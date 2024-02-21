@@ -1905,7 +1905,7 @@
             exitOnOverlayClick : false,
             steps: [
                 {
-                    title : 'Material Request',
+                    title : 'Item Request',
                     intro : 'Form ini digunakan untuk menambahkan permintaan pembelian barang material sebelum purchase request. Silahkan ikuti panduan ini untuk penjelasan mengenai isian form.'
                 },
                 {

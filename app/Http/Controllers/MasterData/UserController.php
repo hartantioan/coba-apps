@@ -529,6 +529,18 @@ class UserController extends Controller
             ];
         } else {
 
+            $passedSupplierVendorUser = true;
+
+            if($request->type == '3' || $request->type == '4'){
+                $arrUserAllowedSupplierVendor = ['323020'];
+                if(!in_array(session('bo_employee_no'),$arrUserAllowedSupplierVendor)){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Mohon maaf, untuk user yang boleh memasukkan data supplier dan ekspedisi adalah : '.implode(', ',$arrUserAllowedSupplierVendor),
+                    ]);
+                }
+            }
+
             $passed = true;
 
             if($request->arr_bank){

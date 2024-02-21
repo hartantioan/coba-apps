@@ -2424,6 +2424,7 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('trial_balance')->middleware('operation.access:trial_balance,view')->group(function () {
                         Route::get('/',[TrialBalanceController::class, 'index']);
                         Route::post('process', [TrialBalanceController::class, 'process']);
+                        Route::get('export', [TrialBalanceController::class, 'export']);
                     });
                     Route::prefix('profit_loss')->middleware('operation.access:profit_loss,view')->group(function () {
                         Route::get('/',[ProfitLossController::class, 'index']);
@@ -2434,6 +2435,7 @@ Route::prefix('admin')->group(function () {
                         Route::get('/',[CashBankController::class, 'index']);
                         Route::get('datatable',[CashBankController::class, 'datatable']);
                         Route::get('row_detail',[CashBankController::class, 'rowDetail']);
+                        Route::get('export', [CashBankController::class, 'export']);
                     });
                 });
             });

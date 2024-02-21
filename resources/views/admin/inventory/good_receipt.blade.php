@@ -107,7 +107,6 @@
                                                         <th rowspan="2">No.Surat Jalan</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Status</th>
-                                                        <th rowspan="2">Operasi</th>
                                                     </tr>
                                                     <tr>
                                                         <th>Pengajuan</th>
@@ -218,6 +217,7 @@
                                         <table class="bordered" style="min-width:2500px !important;" id="table-detail">
                                             <thead>
                                                 <tr>
+                                                    <th class="center">Hapus</th>
                                                     <th class="center">Item</th>
                                                     <th class="center">Qty PO</th>
                                                     <th class="center">Satuan PO</th>
@@ -232,7 +232,6 @@
                                                     <th class="center">Divisi</th>
                                                     <th class="center">Gudang</th>
                                                     <th class="center">Timbangan</th>
-                                                    <th class="center">Hapus</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-item">
@@ -810,6 +809,11 @@
                                         <input type="hidden" name="arr_place[]" id="arr_place` + count + `" value="` + val.place_id + `">
                                         <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
                                         <input type="hidden" name="arr_warehouse[]" id="arr_warehouse` + count + `" value="` + val.warehouse_id + `">
+                                        <td class="center">
+                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                                <i class="material-icons">delete</i>
+                                            </a>
+                                        </td>
                                         <td>
                                             ` + val.item_name + `
                                         </td>
@@ -836,11 +840,6 @@
                                         </td>
                                         <td class="center">
                                             <select class="browser-default" id="arr_scale` + count + `" name="arr_scale[]"></select>
-                                        </td>
-                                        <td class="center">
-                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                                                <i class="material-icons">delete</i>
-                                            </a>
                                         </td>
                                     </tr>
                                 `);
@@ -1387,6 +1386,11 @@
                                         <input type="hidden" name="arr_machine[]" value="` + val.machine_id + `">
                                         <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
                                         <input type="hidden" name="arr_warehouse[]" id="arr_warehouse` + count + `" value="` + val.warehouse_id + `">
+                                        <td class="center">
+                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                                <i class="material-icons">delete</i>
+                                            </a>
+                                        </td>
                                         <td>
                                             ` + val.item_name + `
                                         </td>
@@ -1428,11 +1432,6 @@
                                         </td>
                                         <td class="center">
                                             <select class="browser-default" id="arr_scale` + count + `" name="arr_scale[]"></select>
-                                        </td>
-                                        <td class="center">
-                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                                                <i class="material-icons">delete</i>
-                                            </a>
                                         </td>
                                     </tr>
                                 `);
@@ -1608,6 +1607,11 @@
                                 <input type="hidden" name="arr_machine[]" value="` + val.machine_id + `">
                                 <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
                                 <input type="hidden" name="arr_warehouse[]" id="arr_warehouse` + count + `" value="` + val.warehouse_id + `">
+                                <td class="center">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
                                 <td>
                                     ` + val.item_name + `
                                 </td>
@@ -1649,11 +1653,6 @@
                                 </td>
                                 <td class="center">
                                     <select class="browser-default" id="arr_scale` + count + `" name="arr_scale[]"></select>
-                                </td>
-                                <td class="center">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                                        <i class="material-icons">delete</i>
-                                    </a>
                                 </td>
                             </tr>
                         `);

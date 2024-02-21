@@ -90,6 +90,9 @@
                                                 <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="reset();">
                                                     <i class="material-icons center">loop</i>
                                                 </a>
+                                                <a class="btn btn-small blue waves-effect waves-light breadcrumbs-btn mr-3 tooltipped" href="javascript:void(0);" onclick="exportExcel();" data-position="top" data-tooltip="Export Excel">
+                                                    <i class="material-icons center">view_list</i>
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
@@ -121,16 +124,8 @@
     });
 
     function exportExcel(){
-        if($('.row_detail').length > 0){
-            var date = $('#date').val();
-            window.location = "{{ Request::url() }}/export?date=" + date;
-        }else{
-            swal({
-                title: 'Ups!',
-                text: 'Silahkan filter laporan terlebih dahulu ges.',
-                icon: 'warning'
-            });
-        }
+        var month_start = $('#month_start').val(), month_end = $('#month_end').val(), level = $('#level').val(), company = $('#company').val();
+        window.location = "{{ Request::url() }}/export?month_start=" + month_start + "&month_end=" + month_end + "&level=" + level + "&company=" + company;
     }
 
     function reset(){

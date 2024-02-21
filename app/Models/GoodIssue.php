@@ -216,4 +216,26 @@ class GoodIssue extends Model
 
         return $hasRelation;
     }
+
+    public function updateRootDocumentStatusProcess(){
+        foreach($this->goodIssueDetail as $row){
+            if($row->materialRequestDetail()){
+                $row->lookable->materialRequest->update([
+                    'status'    => '2'
+                ]);
+            }
+        }
+    }
+
+    public function updateRootDocumentStatusDone(){
+        foreach($this->goodIssueDetail as $row){
+            if($row->materialRequestDetail()){
+                if(!$row->lookable->materialRequest->hasBalanceQtyPrGi()){
+                    $row->lookable->materialRequest->update([
+                        'status'    => '3'
+                    ]);
+                }
+            }
+        }
+    }
 }

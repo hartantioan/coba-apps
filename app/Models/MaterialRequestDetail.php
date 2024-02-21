@@ -106,6 +106,17 @@ class MaterialRequestDetail extends Model
         return $totalPr;
     }
 
+    public function balancePrGi(){
+        $total = $this->qty - $this->stock;
+        foreach($this->purchaseRequestDetail as $row){
+            $total -= $row->qty;
+        }
+        foreach($this->goodIssueDetail as $row){
+            $total -= round(($row->qty / $row->qty_conversion),3);
+        }
+        return $total;
+    }
+
     public function balanceGi(){
         $totalGi = $this->qty - $this->stock;
         if($totalGi > 0){

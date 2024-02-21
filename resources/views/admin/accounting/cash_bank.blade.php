@@ -75,9 +75,9 @@
                                                 <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="reset();">
                                                     <i class="material-icons center">loop</i>
                                                 </a>
-                                                {{-- <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel();">
+                                                <a class="btn btn-small blue waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel();">
                                                     <i class="material-icons center">view_list</i>
-                                                </a> --}}
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
@@ -201,16 +201,8 @@
     });
 
     function exportExcel(){
-        if($('.row_detail').length > 0){
-            var date = $('#date').val();
-            window.location = "{{ Request::url() }}/export?date=" + date;
-        }else{
-            swal({
-                title: 'Ups!',
-                text: 'Silahkan filter laporan terlebih dahulu ges.',
-                icon: 'warning'
-            });
-        }
+        var start_date = $('#start_date').val(), finish_date = $('#finish_date').val(), coa_id = ($('#coa').val() ? $('#coa').val() : ''), company_id = ($('#company').val() ? $('#company').val() : ''), search = window.table.search();
+        window.location = "{{ Request::url() }}/export?start_date=" + start_date + "&end_date=" + finish_date + "&coa_id=" + coa_id + "&company_id=" + company_id + "&search=" + search;
     }
 
     function reset(){

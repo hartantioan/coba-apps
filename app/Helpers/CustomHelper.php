@@ -248,7 +248,7 @@ class CustomHelper {
 			}
 		}
 
-		/* ResetCogs::dispatch($date,$place_id,$item_id); */
+		ResetCogs::dispatch($date,$place_id,$item_id);
 	}
 
 	public static function sendStock($place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $type = null, $area_id = null, $shading = null){
@@ -1709,6 +1709,10 @@ class CustomHelper {
 					$row->itemStock->area_id ? $row->itemStock->area_id : NULL,
 					$row->itemStock->item_shading_id ? $row->itemStock->item_shading_id : NULL,
 				);
+			}
+
+			if($gr){
+				$gr->updateRootDocumentStatusDone();
 			}
 
 		}elseif($table_name == 'good_return_issues'){

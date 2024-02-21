@@ -678,6 +678,8 @@ class GoodIssueController extends Controller
                     $row->delete();
                 }
 
+                $query->updateRootDocumentStatusProcess();
+
                 CustomHelper::removeJournal($query->getTable(),$query->id);
                 CustomHelper::removeCogs($query->getTable(),$query->id);
     

@@ -532,7 +532,7 @@ class UserController extends Controller
             $passedSupplierVendorUser = true;
 
             if($request->type == '3' || $request->type == '4'){
-                $arrUserAllowedSupplierVendor = ['323020'];
+                $arrUserAllowedSupplierVendor = ['323020','323002'];
                 if(!in_array(session('bo_employee_no'),$arrUserAllowedSupplierVendor)){
                     return response()->json([
                         'status'  => 500,

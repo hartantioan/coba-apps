@@ -9,7 +9,7 @@ use App\Models\ItemCogs;
 use App\Models\Place;
 use App\Models\ItemGroup;
 use App\Models\User;
-use App\Models\WareHouse;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;

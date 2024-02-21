@@ -669,8 +669,10 @@ class PurchaseOrderController extends Controller
 
                     if(in_array($query->status,['1','6'])){
                         if($request->has('file')) {
-                            if(Storage::exists($query->document_po)){
-                                Storage::delete($query->document_po);
+                            if($query->document_po){
+                                if(Storage::exists($query->document_po)){
+                                    Storage::delete($query->document_po);
+                                }
                             }
                             $document = $request->file('file')->store('public/purchase_orders');
                         } else {

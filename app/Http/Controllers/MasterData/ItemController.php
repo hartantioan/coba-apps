@@ -80,8 +80,8 @@ class ItemController extends Controller
             'content'   => 'admin.master_data.item',
             'group'     =>  $itemGroup,
             'unit'      => Unit::where('status','1')->get(),
-            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
-            'warehouse'     => Warehouse::where('status','1')->whereIn('id',$this->datawarehouses)->get(),
+            'place'     => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+            'warehouse' => Warehouse::where('status','1')->whereIn('id',$this->datawarehouses)->get(),
             'pallet'    => Pallet::where('status','1')->get(),
             'itemex'    => $result,
             'itemsh'    => $result1,
@@ -95,6 +95,7 @@ class ItemController extends Controller
             'id',
             'code',
             'name',
+            'other_name',
             'item_group_id',
             'uom_unit',
         ];
@@ -111,7 +112,8 @@ class ItemController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('name', 'like', "%$search%");
+                            ->orWhere('name', 'like', "%$search%")
+                            ->orWhere('other_name', 'like', "%$search%");
                     });
                 }
 
@@ -162,7 +164,8 @@ class ItemController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('name', 'like', "%$search%");
+                            ->orWhere('name', 'like', "%$search%")
+                            ->orWhere('other_name', 'like', "%$search%");
                     });
                 }
                 
@@ -205,6 +208,7 @@ class ItemController extends Controller
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->name,
+                    $val->other_name,
                     $val->itemGroup->name,
                     $val->uomUnit->code,
                     $val->status(),
@@ -287,6 +291,7 @@ class ItemController extends Controller
                     $query = Item::find($request->temp);
                     $query->code                = $request->code;
                     $query->name                = $request->name;
+                    $query->other_name          = $request->other_name;
                     $query->item_group_id       = $request->item_group_id;
                     $query->uom_unit            = $request->uom_unit;
                     $query->tolerance_gr        = str_replace(',','.',str_replace('.','',$request->tolerance_gr));
@@ -321,6 +326,7 @@ class ItemController extends Controller
                     $query = Item::create([
                         'code'              => $request->code,
                         'name'			    => $request->name,
+                        'other_name'        => $request->other_name,
                         'item_group_id'     => $request->item_group_id,
                         'uom_unit'          => $request->uom_unit,
                         'tolerance_gr'      => str_replace(',','.',str_replace('.','',$request->tolerance_gr)),
@@ -644,25 +650,31 @@ class ItemController extends Controller
     public function destroy(Request $request){
         $query = Item::find($request->id);
 
-        if($query->delete()) {
-            $query->itemStock()->delete();
-            activity()
-                ->performedOn(new Item())
-                ->causedBy(session('bo_id'))
-                ->withProperties($query)
-                ->log('Delete the item data');
-
-            $response = [
-                'status'  => 200,
-                'message' => 'Data deleted successfully.'
-            ];
-        } else {
+        if(!$query->hasChildDocument()){
+            if($query->delete()) {
+                $query->itemStock()->delete();
+                activity()
+                    ->performedOn(new Item())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Delete the item data');
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data deleted successfully.'
+                ];
+            } else {
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data failed to delete.'
+                ];
+            }
+        }else{
             $response = [
                 'status'  => 500,
-                'message' => 'Data failed to delete.'
+                'message' => 'Data tidak bisa dihapus karena telah digunakan pada form transaksi.'
             ];
         }
-
         return response()->json($response);
     }
 

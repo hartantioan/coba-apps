@@ -212,6 +212,7 @@
                                                         <th>#</th>
                                                         <th>Kode</th>
                                                         <th>Nama</th>
+                                                        <th>Nama Asing</th>
                                                         <th>Grup</th>
                                                         <th>UOM</th>
                                                         <th>Status</th>
@@ -325,10 +326,14 @@
                             <label class="active" for="name">Nama</label>
                         </div>
                         <div class="input-field col s6">
+                            <input id="other_name" name="other_name" type="text" placeholder="Nama Item (Ex : Spoon)">
+                            <label class="active" for="other_name">Nama Item (Bahasa Asing)</label>
+                        </div>
+                        <div class="input-field col s6">
                             <input id="note" name="note" type="text" placeholder="Keterangan : sparepart, aktiva, tools, etc">
                             <label class="active" for="note">Keterangan</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s6 unit-inputs">
                             <select class="select2 browser-default" id="item_group_id" name="item_group_id">
                                 @foreach($group->whereNull('parent_id') as $c)
                                         @if(!$c->childSub()->exists())
@@ -752,6 +757,7 @@
                 $('.unit-inputs').css('pointer-events','auto');
                 $("#item_group_id").val($("#item_group_id option:first").val()).trigger('change');
                 $('#temp').val('');
+                $('#code,#name,#other_name').prop('readonly',false);
             }
         });
 
@@ -1063,6 +1069,7 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: '' },
                 { name: 'name', className: '' },
+                { name: 'other_name', className: '' },
                 { name: 'group', className: '' },
                 { name: 'uom', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
@@ -1367,6 +1374,7 @@
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
+                $('#other_name').val(response.other_name);
                 $('#note').val(response.note);
                 $('#item_group_id').val(response.item_group_id).trigger('change');
                 $('#uom_unit').val(response.uom_unit_id).trigger('change');
@@ -1496,6 +1504,7 @@
                 }
 
                 if(response.used){
+                    $('#code,#name,#other_name').prop('readonly',true);
                     $('.unit-inputs').css('pointer-events','none');
                 }
 

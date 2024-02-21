@@ -556,7 +556,8 @@ class Select2Controller extends Controller {
         $search   = $request->search;
         $data = Item::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
-                        ->orWhere('name', 'like', "%$search%");
+                        ->orWhere('name', 'like', "%$search%")
+                        ->orWhere('other_name', 'like', "%$search%");
                 })
                 ->where('status','1')
                 ->where(function($query) use($search){

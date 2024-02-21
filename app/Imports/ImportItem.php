@@ -38,6 +38,7 @@ class ImportItem implements OnEachRow, WithHeadingRow, WithValidation, WithBatch
         $query = Item::create([
             'code' => $row['code'],
             'name' => $row['name'],
+            'other_name' => $row['other_name'],
             'item_group_id' =>$item_group_id->id,
             'uom_unit' => $item_unit_id->id,
             'tolerance_gr' => $row['tolerance_gr'],
@@ -67,6 +68,7 @@ class ImportItem implements OnEachRow, WithHeadingRow, WithValidation, WithBatch
         return [
             '*.code' => 'required|unique:items,code',
             '*.name' => 'required|string',
+            '*.other_name' => 'nullable',
             '*.item_group_id' => 'required',
             '*.uom_unit' => 'required',
             '*.tolerance_gr' => 'nullable',

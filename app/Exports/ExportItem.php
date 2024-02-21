@@ -28,6 +28,7 @@ class ExportItem implements FromCollection, WithTitle, WithHeadings, WithCustomS
         'ID',
         'KODE', 
         'NAMA',
+        'NAMA ASING',
         'GRUP',
         'SATUAN STOK',
         'ITEM STOK',
@@ -53,7 +54,8 @@ class ExportItem implements FromCollection, WithTitle, WithHeadings, WithCustomS
             if ($this->search) {
                 $query->where(function ($query) {
                     $query->where('code', 'like', "%$this->search%")
-                        ->orWhere('name', 'like', "%$this->search%");
+                        ->orWhere('name', 'like', "%$this->search%")
+                        ->orWhere('other_name', 'like', "%$this->search%");
                 });
                 
             }
@@ -94,6 +96,7 @@ class ExportItem implements FromCollection, WithTitle, WithHeadings, WithCustomS
                 'id'                => $row->id,
                 'code'              => $row->code,
                 'name'              => $row->name,
+                'other_name'        => $row->other_name,
                 'grup'              => $row->itemGroup->name,
                 'uom_unit'          => $row->uomUnit->code,
                 'is_stock'          => $row->is_inventory_item ? 'Ya' : 'Tidak',

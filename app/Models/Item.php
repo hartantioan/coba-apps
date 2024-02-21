@@ -17,6 +17,7 @@ class Item extends Model
     protected $fillable = [
         'code',
         'name',
+        'other_name',
         'item_group_id',
         'uom_unit',
         'buy_unit',
@@ -321,6 +322,11 @@ class Item extends Model
     public function itemStock()
     {
         return $this->hasMany('App\Models\ItemStock','item_id','id');
+    }
+
+    public function itemBuffer()
+    {
+        return $this->hasMany('App\Models\ItemBuffer','item_id','id');
     }
 
     public function benchmarkPrice()

@@ -107,6 +107,7 @@
                                                         <th rowspan="2">No.Surat Jalan</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Status</th>
+                                                        <th rowspan="2">Operasi</th>
                                                     </tr>
                                                     <tr>
                                                         <th>Pengajuan</th>

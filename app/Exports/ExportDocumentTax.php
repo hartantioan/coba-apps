@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Exports;
-
+use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\DocumentTax;
@@ -13,78 +13,42 @@ use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\FromView;
 
 class ExportDocumentTax implements WithMultipleSheets,ShouldAutoSize
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
+    protected $no_faktur;
 
-    public function __construct(string $search, string $start_date = null , string $finish_date = null)
+    public function __construct(string $no_faktur)
     {
-        $this->start_date = $start_date ? new \DateTime($start_date) : null;
-        $this->finish_date = $finish_date ? new \DateTime($finish_date) : null;
+        $this->no_faktur = $no_faktur ? $no_faktur : '';
+      
     }
 
     public function sheets(): array
     {
-        
-        $taxes = DocumentTax::where(function($query) {
-            if($this->start_date && $this->finish_date) {
-                $query->whereDate('date', '>=', $this->start_date)
-                    ->whereDate('date', '<=', $this->finish_date);
-            } else if($this->start_date) {
-                $query->whereDate('date', '>=', $this->start_date);
-            } else if($this->finish_date) {
-                $query->whereDate('date','<=', $this->finish_date);
-            }
-        })->get([
-            'id',
-            'transaction_code',
-            'replace',
-            'code',
-            'date',
-            'npwp_number',
-            'npwp_name',
-            'npwp_address',
-            'npwp_target',
-            'npwp_target_name',
-            'npwp_target_address',
-            'total',
-            'tax',
-            'wtax',
-            'approval_status',
-            'tax_status',
-            'reference',
-        ]);
+        $no_faktur_arr = explode(',', $this->no_faktur);
+        $taxes = DocumentTax::where(function($query) use($no_faktur_arr) {
+            $query->whereIn('code',$no_faktur_arr);
+        })->get();
+        $taxDetail = DocumentTaxDetail::whereIn('document_tax_id', $taxes->pluck('id')->toArray())->get();
 
         $sheets = [];
-        
+        $sheets[] = new DocumentTaxDetailSheet($taxDetail);
+
         $sheets[] = new DocumentTaxSheet($taxes);
 
        
-        $taxDetail = DocumentTaxDetail::whereIn('document_tax_id', $taxes->pluck('id')->toArray())->get([
-            'document_tax_id',
-            'item',
-            'price',
-            'qty',
-            'subtotal',
-            'discount',
-            'total',
-            'tax',
-            'nominal_ppnbm',
-            'ppnbm',
-        ]);
+        
 
-        $sheets[] = new DocumentTaxDetailSheet($taxDetail);
-
+       
         return $sheets;
     }
 
     
 }
 
-class DocumentTaxSheet implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell
+class DocumentTaxSheet implements FromView, WithTitle, ShouldAutoSize
 {
     private $taxes;
 
@@ -103,47 +67,21 @@ class DocumentTaxSheet implements FromCollection, WithTitle, WithHeadings, WithC
         return 'Laporan Faktur';
     }
 
-    public function startCell(): string
+    public function view(): View
     {
-        return 'A1';
-    }
-
-    public function headings(): array
-    {
-        return [
-            'ID',
-            'Kode Transaksi',
-            'FG Pengganti',
-            'No Faktur',
-            'Tanggal',
-            'No NPWP',
-            'Nama Pemilik NPWP',
-            'Alamat Pemilik NPWP',
-            'No Pembeli NPWP',
-            'Nama Pembeli NPWP',
-            'Alamat Pembeli NPWP',
-            'Total',
-            'Pajak',
-            'Harga setelah Pajak',
-            'Status Approval',
-            'Status Pajak',
-            'Referensi',
-        ];
+        return view('admin.exports.document_tax', [
+            'data' => $this->taxes,
+        ]);
     }
 }
 
-class DocumentTaxDetailSheet implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell
+class DocumentTaxDetailSheet implements FromView, WithTitle, ShouldAutoSize
 {
-    private $taxes;
+    private $documentTaxDetail;
 
     public function __construct(Collection $documentTaxDetail)
     {
         $this->documentTaxDetail = $documentTaxDetail;
-    }
-
-    public function collection()
-    {
-        return $this->documentTaxDetail;
     }
 
     public function title(): string
@@ -156,19 +94,10 @@ class DocumentTaxDetailSheet implements FromCollection, WithTitle, WithHeadings,
         return 'A1';
     }
 
-    public function headings(): array
+    public function view(): View
     {
-        return [
-            'document_tax_id',
-            'item',
-            'price',
-            'qty',
-            'subtotal',
-            'discount',
-            'total',
-            'tax',
-            'nominal_ppnbm',
-            'ppnbm',
-        ];
+        return view('admin.exports.document_tax_detail', [
+            'data' => $this->documentTaxDetail,
+        ]);
     }
 }

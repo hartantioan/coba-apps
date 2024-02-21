@@ -25,4 +25,8 @@ class DocumentTaxDetail extends Model
         'nominal_ppnbm',
         'ppnbm',
     ];
+
+    public function documentTax(){
+        return $this->belongsTo('App\Models\DocumentTax','document_tax_id','id')->withTrashed();
+    }
 }

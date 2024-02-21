@@ -244,6 +244,7 @@ class DocumentTaxController extends Controller
                         ->orWhere('npwp_target_name', 'like', "%$request->search%")
                         ->orWhere('total', 'like', "%$request->search%")
                         ->orWhere('tax', 'like', "%$request->search%");
+                        
                 }
                 if($request->start_date && $request->finish_date) {
                     $query->whereDate('date', '>=', $request->start_date)
@@ -269,18 +270,9 @@ class DocumentTaxController extends Controller
     }
 
     public function export(Request $request){
-		$start_date = $request->start_date ? $request->start_date : ''   ;
-        $finish_date = $request->finish_date ? $request->finish_date : ''   ;
-        if($start_date!=''){
-            $filename = 'faktur_masukan_from'.$start_date;
-        }if($finish_date !=''){
-            $filename = 'faktur_masukan_end'.$finish_date;
-        }if($finish_date !=''&&$start_date!=''){
-            $filename = 'faktur_masukan_from'.$start_date.'to'.$finish_date;
-        }if($finish_date ==''&&$start_date ==''){
-            $filename = 'faktur_masukan_';
-        }
-		return Excel::download(new ExportDocumentTax($request->start_date,$request->finish_date),$filename.uniqid().'.xlsx');
+		$no_faktur = $request->no_faktur ? $request->no_faktur : ''   ;
+        
+		return Excel::download(new ExportDocumentTax($no_faktur),'faktur_pajak'.uniqid().'.xlsx');
     }
 
     public function store_w_barcode(Request $request){

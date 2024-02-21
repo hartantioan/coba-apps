@@ -62,27 +62,43 @@
                     <!-- DataTables example -->
                     <div class="row">
                         <div class="col s12">
-                            <ul class="collapsible collapsible-accordion">
+                            <div class="card">
+                                <div class="card-content">
+                                    <h4 class="card-title">Filter</h4>
+                                    <div class="row">
+                                        <div class="col m4 s6 ">
+                                            <label for="start-date" style="font-size:1rem;">Tanggal Mulai :</label>
+                                            <div class="input-field col s12">
+                                            <input type="date" max="{{ date('9999'.'-12-31') }}" id="start-date" name="start-date"  onchange="loadDataTable()">
+                                            </div>
+                                        </div>
+                                        <div class="col m4 s6 ">
+                                            <label for="finish-date" style="font-size:1rem;">Tanggal Akhir :</label>
+                                            <div class="input-field col s12">
+                                                <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish-date" name="finish-date"  onchange="loadDataTable()">
+                                            </div>
+                                        </div>
+                                        <div class="col m4 s6 ">
+                                            <div class="input-field col s12">
+                                                <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="excelMultiData();">
+                                                    <i class="material-icons hide-on-med-and-up">view_list</i>
+                                                    <span class="hide-on-small-onl">EXCEL</span>
+                                                    <i class="material-icons right">view_list</i>
+                                                </a>
+                                            </div>
+                                           
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {{-- <ul class="collapsible collapsible-accordion">
                                 <li>
                                     <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
                                     <div class="collapsible-body">
-                                        <div class="row">
-                                            <div class="col m4 s6 ">
-                                                <label for="start-date" style="font-size:1rem;">Tanggal Mulai :</label>
-                                                <div class="input-field col s12">
-                                                <input type="date" max="{{ date('9999'.'-12-31') }}" id="start-date" name="start-date"  onchange="loadDataTable()">
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
-                                                <label for="finish-date" style="font-size:1rem;">Tanggal Akhir :</label>
-                                                <div class="input-field col s12">
-                                                    <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish-date" name="finish-date"  onchange="loadDataTable()">
-                                                </div>
-                                            </div>
-                                        </div>  
+                                          
                                     </div>
                                 </li>
-                            </ul>
+                            </ul> --}}
                             <div class="card">
                                 <div class="card-content">
                                     <h4 class="card-title">List Data</h4>
@@ -308,7 +324,7 @@
             "destroy": true,
             "iDisplayInLength": 10,
             "fixedColumns": {
-                left: 2,
+                left: 5,
                 right: 1
             },
             "order": [[0, 'desc']],
@@ -357,8 +373,12 @@
                     ],
             dom: 'Blfrtip',
             buttons: [
-                'columnsToggle' 
-            ]
+                'columnsToggle',
+                'selectNone' 
+            ],
+            select: {
+                style: 'multi'
+            },
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
@@ -438,6 +458,17 @@
             }
         });
     }
+
+    function excelMultiData(){
+        var arr_id_temp=[];
+        $.map(window.table.rows('.selected').nodes(), function (item) {
+            var poin = $(item).find('td:nth-child(4)').text().trim();
+            arr_id_temp.push(poin);
+        });
+
+        window.location = "{{ Request::url() }}/export?no_faktur=" + arr_id_temp; 
+    }
+
 
     function success(){
         loadDataTable();

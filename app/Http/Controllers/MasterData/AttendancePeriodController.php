@@ -166,7 +166,7 @@ class AttendancePeriodController extends Controller
         
         $user_data = User::where(function($query) use ( $request) {
             $query->where('type','1');
-            $query->whereIn('employee_no',['323004','323003','323005','323007','323009','323011','323016','323017','323020','323021','323022','323024','323026','323027','323029','323031','323033','323034']);
+            $query->whereIn('employee_no',['323005','323007','323003','323009','323016','323017','323020','323021','323024','323025','323027','323029','323031','323033','323034','323036','324002','324003','324004']);
             // $query->whereIn('employee_no',['323033']);    
             })->get();
         
@@ -243,9 +243,9 @@ class AttendancePeriodController extends Controller
                 $query_late_punishment = Punishment::where('place_id',$row_user->place_id)
                                             ->where('type','1')
                                             ->where('status','1')
-                                            ->orderBy('minutes')
+                                            ->orderBy(DB::raw('CAST(minutes AS DECIMAL)'))
                                             ->get();
-                
+               
                 $tipe_punish_counter=[];
                
                 $query_tidak_check_masuk = Punishment::where('place_id',$row_user->place_id)
@@ -2408,7 +2408,6 @@ class AttendancePeriodController extends Controller
                             ->where('account_id',$row_daily->user_id)
                             ->where('schedule_id',null)
                             ->get();
-                        info($overtime_request_perday);
                         foreach($overtime_request_perday as $key_overtime=>$row_overtime){
                            if($key_overtime == $x){
                                 $time_in = $row_overtime->time_in;
@@ -2524,22 +2523,22 @@ class AttendancePeriodController extends Controller
     public function salaryReport(Request $request){
         $salary_report  = SalaryReport::where('period_id',CustomHelper::decrypt($request->id))
         ->first();
-        info($salary_report);
+        
 
         $salary_report_template = SalaryReportTemplate::where('salary_report_id',$salary_report->id)->get();
-        info($salary_report_template);
+      
         $salary_report_user = SalaryReportUser::where('salary_report_id', $salary_report->id)
         ->whereHas('user', function ($query) {
             $query->where('type_payment', 1);
         })
         ->get();
-        info($salary_report_user);
+        
         $salary_report_user_harian = SalaryReportUser::where('salary_report_id', $salary_report->id)
         ->whereHas('user', function ($query) {
             $query->where('type_payment', 2);
         })
         ->get();
-        info($salary_report_user_harian);
+      
         $plant = Place::where('status',1)->get();
         $plant_for_user = [];
         $salary_for_perday_user = [];

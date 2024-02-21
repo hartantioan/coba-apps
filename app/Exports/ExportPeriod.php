@@ -35,6 +35,7 @@ class ExportPeriod implements WithMultipleSheets
         $sheets[] = new ExportPunishReport($this->period_id);
         $sheets[] = new ExportSalaryReport($this->period_id);
         $sheets[] = new ExportSalaryReportDailyPayment($this->period_id);
+        $sheets[] = new ExportAttendancePeriod($this->period_id);
         return $sheets;
     }
 

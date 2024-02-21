@@ -2279,7 +2279,7 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
-        $data = AttendancePeriod::where('name', 'like', "%$search%")->where('status',2)->get();
+        $data = AttendancePeriod::where('name', 'like', "%$search%")/* ->where('status',2) */->get();
 
         foreach($data as $d) {
             $response[] = [

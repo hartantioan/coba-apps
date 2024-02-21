@@ -69,9 +69,11 @@ class ExportMonthlyReport implements FromView,ShouldAutoSize,WithTitle
         
         $query_attendance_punish = AttendancePunishment::where('period_id',$this->period_id)
                                     ->get();
+       
         foreach($query_attendance_punish as $row_punish){
             foreach($array as $key_array=>$row_array){
-                if($row_array["user_id"]==$row_punish->user_id){
+            
+                if($row_array["user_id"]==$row_punish->employee->employee_no){
                     
                     if(array_key_exists($row_punish->punishment->code,$row_array)){
                         

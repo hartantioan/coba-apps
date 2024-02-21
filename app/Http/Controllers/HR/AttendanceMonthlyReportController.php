@@ -157,7 +157,7 @@ class AttendanceMonthlyReportController extends Controller
         
         $query_attendance_punish = AttendancePunishment::where('period_id',$request->period_id)
                                 ->orWhere('period_id',$request->temp)->get();
-        info($query_attendance_punish);
+        
         foreach($query_attendance_punish as $row_punish){
            foreach($array as $key_array=>$row_array){
                 if($row_array["user_id"]==$row_punish->employee_id){

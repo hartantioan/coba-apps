@@ -401,7 +401,7 @@ class PurchaseDownPaymentController extends Controller
 
             if($request->percent_tax > 0){
                 if($request->is_include_tax == '1'){
-                    $total = $total / (1 + ($request->percent_tax / 100));
+                    $total = round($total / (1 + ($request->percent_tax / 100)),2);
                 }
                 $tax = $total * ($request->percent_tax / 100);
             }
@@ -412,7 +412,6 @@ class PurchaseDownPaymentController extends Controller
 
             $tax = floor($tax);
             $wtax = floor($wtax);
-            $total = ceil($total);
 
             $grandtotal = $total + $tax - $wtax;
 

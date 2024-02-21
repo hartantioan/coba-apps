@@ -198,6 +198,14 @@
                                 {{ $data->receiver_phone }}
                             </td>
                         </tr>
+                        <tr>
+                            <td width="50%">
+                                Lampiran
+                            </td>
+                            <td width="50%">
+                                <a href="{{ $data->attachment() }}">FILE</a>
+                            </td>
+                        </tr>
                     </table>
                 </td>
                 <td width="33%" class="left-align">

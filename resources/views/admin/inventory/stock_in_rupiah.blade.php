@@ -259,7 +259,7 @@
                             $.each(response.message, function(i, val) {
                                 if(response.perlu == 1){
                                     if (!processedItems.includes(val.item)) {
-                                        // Mark the current item as processed
+
                                         processedItems.push(val.item);
 
                                         $.each(response.latest, function(j, vals) {
@@ -305,11 +305,6 @@
                             });
                         }   
                         
-                        // $('#table_body').append(`
-                        //     <tr>
-                        //         <td class="center-align" colspan="6">`+response.time+`</td>
-                        //     </tr>
-                        // `);
                         M.toast({
                             html: 'filtered'
                         });

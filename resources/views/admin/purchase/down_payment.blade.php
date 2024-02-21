@@ -1192,8 +1192,9 @@
 
         if(percent_tax > 0){
             if($('#is_include_tax').val() == '1'){
-                total = total / (1 + (percent_tax / 100));
+                total = Math.round(total / (1 + (percent_tax / 100)));
             }
+            console.log(total);
             tax = total * (percent_tax / 100);
         }
 

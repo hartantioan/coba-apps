@@ -368,7 +368,7 @@
                             <div class="file-field input-field col m3 s12 step18">
                                 <div class="btn">
                                     <span>Dokumen PO</span>
-                                    <input type="file" name="document_po" id="document_po">
+                                    <input type="file" name="file" id="file">
                                 </div>
                                 <div class="file-path-wrapper">
                                     <input class="file-path validate" type="text">

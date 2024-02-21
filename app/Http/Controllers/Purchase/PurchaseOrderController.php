@@ -668,11 +668,11 @@ class PurchaseOrderController extends Controller
                     }
 
                     if(in_array($query->status,['1','6'])){
-                        if($request->has('document_po')) {
+                        if($request->has('file')) {
                             if(Storage::exists($query->document_po)){
                                 Storage::delete($query->document_po);
                             }
-                            $document = $request->file('document_po')->store('public/purchase_orders');
+                            $document = $request->file('file')->store('public/purchase_orders');
                         } else {
                             $document = $query->document_po;
                         }
@@ -743,7 +743,7 @@ class PurchaseOrderController extends Controller
                         'shipping_type'             => $request->shipping_type,
                         'company_id'                => $request->company_id,
                         'document_no'               => $request->document_no,
-                        'document_po'               => $request->file('document_po') ? $request->file('document_po')->store('public/purchase_orders') : NULL,
+                        'document_po'               => $request->file('file') ? $request->file('file')->store('public/purchase_orders') : NULL,
                         'payment_type'              => $request->payment_type,
                         'payment_term'              => $request->payment_term,
                         'currency_id'               => $request->currency_id,

@@ -294,7 +294,7 @@ class UserDateController extends Controller
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Nama</th>
                                 <th class="center-align">Plant</th>
-                                <th class="center-align">Departemen</th>
+                                <th class="center-align">Divisi</th>
                             </tr>
                         </thead><tbody>';
 
@@ -302,8 +302,8 @@ class UserDateController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td>'.$row->user->name.'</td>
-                <td>'.$row->user->place->name.'</td>
-                <td>'.$row->user->position->division->name.'</td>
+                <td>'.($row->user->place()->exists() ? $row->user->place->name : '').'</td>
+                <td>'.($row->user->position()->exists() ? $row->user->position->division->name : '').'</td>
             </tr>';
         }
 

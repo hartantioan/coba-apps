@@ -1192,7 +1192,7 @@
 
         if(percent_tax > 0){
             if($('#is_include_tax').val() == '1'){
-                total = Math.round(total / (1 + (percent_tax / 100)));
+                total = Math.round(((total / (1 + (percent_tax / 100))) * 100) / 100);
             }
             tax = total * (percent_tax / 100);
         }
@@ -1318,7 +1318,7 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'user_id', className: 'center-align' },
-                { name: 'supplier_id', className: 'center-align' },
+                { name: 'supplier_id', className: '' },
                 { name: 'company_id', className: 'center-align' },
                 { name: 'type', className: 'center-align' },
                 { name: 'document', className: 'center-align' },
@@ -1331,7 +1331,7 @@
                 { name: 'top', className: 'center-align' },
                 { name: 'currency_id', className: 'center-align' },
                 { name: 'currency_rate', className: 'center-align' },
-                { name: 'note', className: 'center-align' },
+                { name: 'note', className: '' },
                 { name: 'subtotal', className: 'right-align' },
                 { name: 'discount', className: 'right-align' },
                 { name: 'total', className: 'right-align' },

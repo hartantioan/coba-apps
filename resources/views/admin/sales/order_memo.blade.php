@@ -1818,7 +1818,7 @@
             if($('#tax_id').val() !== '0'){
                 let percent_tax = parseFloat($('#tax_id').val());
                 if($('#is_include_tax').is(':checked')){
-                    total = total / (1 + (percent_tax / 100));
+                    total = Math.round(((total / (1 + (percent_tax / 100))) * 100) / 100);
                 }
                 tax = total * (percent_tax / 100);
             }

@@ -122,8 +122,6 @@ class DocumentTaxController extends Controller
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->date,
                     $val->transaction_code.$val->replace.$val->code,
-                    $val->replace,
-                    $val->replace,
                     $val->npwp_number,
                     $val->npwp_name,
                     $val->npwp_address,
@@ -160,15 +158,12 @@ class DocumentTaxController extends Controller
                         <tr>
                             <th align="center" rowspan="2"  style="background-color: navy; color: white;border: 1px solid white;">No</th>
                             <th align="center" colspan="2" style="background-color: navy; color: white;border: 1px solid white;">Faktur Pajak</th>
-                            <th align="center" colspan="2" style="background-color: navy; color: white;border: 1px solid white;">Faktur Pajak yang Diganti/Diretur</th>
                             <th align="center" colspan="3" style="background-color: navy; color: white;border: 1px solid white;">Supplier</th>
                             <th align="center" rowspan="2" style="background-color: navy; color: white;border: 1px solid white;">DPP</th>
                             <th align="center" rowspan="2" style="background-color: navy; color: white;border: 1px solid white;">PPN</th>
                             <th align="center" rowspan="2" style="background-color: navy; color: white;border: 1px solid white;">Nama Barang</th>
                         </tr>
                         <tr>
-                            <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Tanggal</th>
-                            <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Nomor</th>
                             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Tanggal</th>
                             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Nomor</th>
                             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">NPWP</th>
@@ -182,8 +177,6 @@ class DocumentTaxController extends Controller
                 <td class="center-align" style="border: 1px solid black;">'.($key + 1).'</td>
                 <td class="center-align" style="border: 1px solid black;">'.$row->documentTax->date.'</td>
                 <td class="center-align" style="border: 1px solid black;">'.$row->documentTax->transaction_code.$row->documentTax->replace.$row->documentTax->code.'</td>
-                <td class="center-align" style="border: 1px solid black;"></td>
-                <td class="center-align" style="border: 1px solid black;"></td>
                 <td class="center-align" style="border: 1px solid black;">'.$row->documentTax->npwp_number.'</td>
                 <td class="center-align" style="border: 1px solid black;">'.$row->documentTax->npwp_name.'</td>              
                 <td class="center-align" style="border: 1px solid black;">'.$row->documentTax->npwp_address.'</td>

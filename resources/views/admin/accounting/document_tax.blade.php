@@ -122,15 +122,12 @@
                                                     <tr>
                                                         <th align="center" rowspan="2"  style="background-color: navy; color: white;border: 1px solid white;">No</th>
                                                         <th align="center" colspan="2" style="background-color: navy; color: white;border: 1px solid white;">Faktur Pajak</th>
-                                                        <th align="center" colspan="2" style="background-color: navy; color: white;border: 1px solid white;">Faktur Pajak yang Diganti/Diretur</th>
                                                         <th align="center" colspan="3" style="background-color: navy; color: white;border: 1px solid white;">Supplier</th>
                                                         <th align="center" rowspan="2" style="background-color: navy; color: white;border: 1px solid white;">DPP</th>
                                                         <th align="center" rowspan="2" style="background-color: navy; color: white;border: 1px solid white;">PPN</th>
                                                         <th align="center" rowspan="2" style="background-color: navy; color: white;border: 1px solid white;">Nama Barang</th>
                                                     </tr>
                                                     <tr>
-                                                        <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Tanggal</th>
-                                                        <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Nomor</th>
                                                         <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Tanggal</th>
                                                         <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Nomor</th>
                                                         <th align="center" style="background-color: navy; color: white;border: 1px solid white;">NPWP</th>
@@ -354,8 +351,7 @@
             columns: [
                         { name: 'id', searchable: false, orderable: false, className: 'center-align' },
                         { name: 'transaction_code', className: 'center-align' },
-                        { name: 'replace', className: 'center-align' },
-                        { name: 'code', className: 'center-align' },
+                        
                         { name: 'date', className: 'center-align' },
                         { name: 'npwp_number', className: 'center-align' },
                         { name: 'npwp_name', className: 'center-align' },

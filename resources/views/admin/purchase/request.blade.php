@@ -531,24 +531,38 @@
                 <div id="validation_alert_done" style="display:none;"></div>
                 <p class="mt-2 mb-2">
                     <h4>Daftar Item <= Min Stock</h4>
+                    <div class="col s4">
+                        <label for="filter_place" style="font-size:1rem;">Filter Plant :</label>
+                        <div class="input-field col s12">
+                            <select class="browser-default" id="filter_place" onchange="addItemFromStock()">
+                                <option value="">Semua</option>
+                                @foreach ($place as $row)
+                                    <option value="{{ $row->id }}">{{ $row->code }}</option>
+                                @endforeach
+                                <option value="2">P2</option>
+                            </select>
+                        </div>
+                    </div>
                     <div id="datatable_buttons_multi"></div>
                     <b class="right">Silahkan pilih baris dan masukkan qty barang yang ingin diorder pada kolom Qty Order.</b>
-                    <table id="table_multi" class="display" style="width:100%;">
-                        <thead>
-                            <tr>
-                                <th class="center">Item</th>
-                                <th class="center">Plant</th>
-                                <th class="center">Satuan Stok</th>
-                                <th class="center">Qty Stok</th>
-                                <th class="center">Qty PR</th>
-                                <th class="center">Qty PO</th>
-                                <th class="center">Min Stok</th>
-                                <th class="center">Max Stok</th>
-                                <th class="center">Qty Order</th>
-                            </tr>
-                        </thead>
-                        <tbody id="body-stock"></tbody>
-                    </table>
+                    <div class="col s12">
+                        <table id="table_multi" class="display" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th class="center">Item</th>
+                                    <th class="center">Plant</th>
+                                    <th class="center">Satuan Stok</th>
+                                    <th class="center">Qty Stok</th>
+                                    <th class="center">Qty PR</th>
+                                    <th class="center">Qty PO</th>
+                                    <th class="center">Min Stok</th>
+                                    <th class="center">Max Stok</th>
+                                    <th class="center">Qty Order</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-stock"></tbody>
+                        </table>
+                    </div>
                 </p>
             </div>
         </div>
@@ -640,47 +654,12 @@
                 
             },
             onOpenEnd: function(modal, trigger) {
-                table_multi = $('#table_multi').DataTable({
-                    "ordering": false,
-                    scrollY: '50vh',
-                    scrollCollapse: true,
-                    "iDisplayInLength": 10,
-                    dom: 'Blfrtip',
-                    buttons: [
-                        'selectAll',
-                        'selectNone'
-                    ],
-                    "language": {
-                        "lengthMenu": "Menampilkan _MENU_ data per halaman",
-                        "zeroRecords": "Data tidak ditemukan / kosong",
-                        "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
-                        "infoEmpty": "Data tidak ditemukan / kosong",
-                        "infoFiltered": "(disaring dari _MAX_ total data)",
-                        "search": "Cari",
-                        "paginate": {
-                            first:      "<<",
-                            previous:   "<",
-                            next:       ">",
-                            last:       ">>"
-                        },
-                        "buttons": {
-                            selectAll: "Pilih semua",
-                            selectNone: "Hapus pilihan"
-                        },
-                        "select": {
-                            rows: "%d baris terpilih"
-                        }
-                    },
-                    select: {
-                        style: 'multi'
-                    }
-                });
-                $('#table_multi_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi');
-                $('select[name="table_multi_length"]').addClass('browser-default');
+                
             },
             onCloseEnd: function(modal, trigger){
                 $('#body-stock').empty();
                 $('#table_multi').DataTable().clear().destroy();
+                $('#filter_place').val('');
             }
         });
 
@@ -2295,18 +2274,21 @@
     }
 
     function addItemFromStock(){
+        $('#body-stock').empty();
+        $('#table_multi').DataTable().clear().destroy();
         $.ajax({
             url: '{{ Request::url() }}/get_items_from_stock',
             type: 'POST',
             dataType: 'JSON',
             data: {
-
+                place_id : $('#filter_place').val()
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             beforeSend: function() {
                 loadingOpen('#modal1');
+                loadingOpen('#modal7');
             },
             success: function(response) {
                 if(response.status == '200'){
@@ -2349,6 +2331,44 @@
                         });
                     }
 
+                    table_multi = $('#table_multi').DataTable({
+                        "ordering": false,
+                        scrollY: '50vh',
+                        scrollCollapse: true,
+                        "iDisplayInLength": 10,
+                        dom: 'Blfrtip',
+                        buttons: [
+                            'selectAll',
+                            'selectNone'
+                        ],
+                        "language": {
+                            "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                            "zeroRecords": "Data tidak ditemukan / kosong",
+                            "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
+                            "infoEmpty": "Data tidak ditemukan / kosong",
+                            "infoFiltered": "(disaring dari _MAX_ total data)",
+                            "search": "Cari",
+                            "paginate": {
+                                first:      "<<",
+                                previous:   "<",
+                                next:       ">",
+                                last:       ">>"
+                            },
+                            "buttons": {
+                                selectAll: "Pilih semua",
+                                selectNone: "Hapus pilihan"
+                            },
+                            "select": {
+                                rows: "%d baris terpilih"
+                            }
+                        },
+                        select: {
+                            style: 'multi'
+                        }
+                    });
+                    $('#table_multi_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi');
+                    $('select[name="table_multi_length"]').addClass('browser-default');
+
                     $('.modal-content').scrollTop(0);
                     M.updateTextFields();
                 }else{
@@ -2359,10 +2379,11 @@
                     });
                 }
                 loadingClose('#modal1');
+                loadingClose('#modal7');
             },
             error: function() {
-                $('#modal1').scrollTop(0);
-                loadingClose('.modal-content');
+                loadingClose('#modal1');
+                loadingClose('#modal7');
                 swal({
                     title: 'Ups!',
                     text: 'Check your internet connection.',

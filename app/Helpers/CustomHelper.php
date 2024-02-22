@@ -3495,6 +3495,8 @@ class CustomHelper {
 			if($pr){
 				$pr->updateRootDocumentStatusDone();
 			}
+		}elseif($table_name == 'journals'){
+			$je = Journal::find($table_id)->update(['status' => '3']);
 		}
 		/* else{
 

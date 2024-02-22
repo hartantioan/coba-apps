@@ -516,6 +516,14 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\MenuUser','user_id','id');
     }
 
+    public function menuDistinct(){
+        $arr = [];
+        foreach($this->menuUser()->distinct('menu_id')->pluck('menu_id') as $menu){
+            $arr[] = $menu;
+        }
+        return $arr;
+    }
+
     public function position(){
         return $this->belongsTo('App\Models\Position','position_id','id')->withTrashed();
     }

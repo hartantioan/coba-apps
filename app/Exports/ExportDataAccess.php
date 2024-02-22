@@ -4,7 +4,9 @@ namespace App\Exports;
 use Illuminate\Support\Facades\DB;
 use App\Models\ItemCogs;
 use App\Models\Menu;
+use App\Models\Place;
 use App\Models\User;
+use App\Models\Warehouse;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -34,31 +36,15 @@ class ExportDataAccess implements FromView,ShouldAutoSize
             }
         })->where('type','1')->get();
 
-        $data = [];        
-
-        foreach($user as $key => $row){
-            $menu_access = [];
-            $menus = $row->menuDistinct();
-            foreach($menus as $rowidmenu){
-                $menu = Menu::find($rowidmenu);
-                $menu_name = $menu->name;
-                $menu_id = $menu->id;
-                $arrAccess = []; 
-                foreach($row->menuUser()->where('menu_id',$menu->id)->get() as $rowmenu){
-                    $arrAccess[] = $rowmenu->type;
-                }
-                $menu_access[] = [
-                    'id'        => $menu_id,
-                    'name'      => $menu_name,
-                    'access'    => implode(',',$arrAccess),
-                ];
-            }
-            $row['menu_access'] = $menu_access;
-            $data[] = $row;
-        }
+        $menu = Menu::whereNull('parent_id')->where('status','1')->oldest('order')->get();
+        $place = Place::where('status','1')->orderBy('code')->get();
+        $warehouse = Warehouse::where('status','1')->orderBy('name')->get();
 
         return view('admin.exports.data_access', [
-            'data' => $data,
+            'user'      => $user,
+            'menu'      => $menu,
+            'place'     => $place,
+            'warehouse' => $warehouse,
         ]);
     }
 }

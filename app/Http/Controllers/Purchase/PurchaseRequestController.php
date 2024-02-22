@@ -47,6 +47,7 @@ use App\Models\Department;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportPurchaseRequest;
 use App\Models\Division;
+use App\Models\ItemBuffer;
 use App\Models\ItemUnit;
 
 class PurchaseRequestController extends Controller
@@ -2735,39 +2736,45 @@ class PurchaseRequestController extends Controller
             $arr = [];
 
             foreach($data as $key => $row){
-                $min_stock = $row->min_stock;
-                $max_stock = $row->max_stock;
-                $qtyStock = $row->itemStock()->whereIn('place_id',[$this->dataplaces])->sum('qty');
-                $prd = PurchaseRequestDetail::whereIn('place_id',[$this->dataplaces])->where('item_id',$row)->whereHas('purchaseRequest',function($query){
-                    $query->whereIn('status',['2','3']);
-                })->whereNull('status')->get();
-                $stockPrd = 0;
-                foreach($prd as $rowprd){
-                    $stockPrd += $rowprd->qtyBalance() * $rowprd->qty_conversion;
-                }
-                $pod = PurchaseOrderDetail::whereIn('place_id',[$this->dataplaces])->where('item_id',$row)->whereHas('purchaseOrder',function($query){
-                    $query->whereIn('status',['2','3']);
-                })->whereNull('status')->get();
-                $stockPo = 0;
-                foreach($pod as $rowpod){
-                    $stockPo += $rowpod->getBalanceReceipt() * $rowpod->qty_conversion;
-                }
-                $balance = $max_stock - $qtyStock - $stockPrd - $stockPo;
-                if($balance > $min_stock){
-                    $arr[] = [
-                        'item_id'       => $row->id,
-                        'item_name'     => $row->code.' - '.$row->name,
-                        'unit'          => $row->uomUnit->code,
-                        'in_stock'      => number_format($qtyStock,3,',','.'),
-                        'in_pr'         => number_format($stockPrd,3,',','.'),
-                        'in_po'         => number_format($stockPo,3,',','.'),
-                        'min_stock'     => number_format($min_stock,3,',','.'),
-                        'max_stock'     => number_format($max_stock,3,',','.'),
-                        'qty_request'   => number_format($balance,3,',','.'),
-                        'list_warehouse'=> $row->warehouseList(),
-                        'buy_units'     => $row->arrBuyUnits(),
-                        'uom_unit'      => $row->uomUnit->code,
-                    ];
+                foreach($this->dataplaces as $place_id){
+                    $place = Place::find($place_id);
+                    $itemBuffer = ItemBuffer::where('place_id',$place->id)->where('item_id',$row->id)->first();
+                    $min_stock = $itemBuffer ? $itemBuffer->min_stock : 0;
+                    $max_stock = $itemBuffer ? $itemBuffer->max_stock : 0;
+                    $qtyStock = $row->itemStock()->where('place_id',$place_id)->sum('qty');
+                    $prd = PurchaseRequestDetail::where('place_id',$place_id)->where('item_id',$row->id)->whereHas('purchaseRequest',function($query){
+                        $query->whereIn('status',['2','3']);
+                    })->whereNull('status')->get();
+                    $stockPrd = 0;
+                    foreach($prd as $rowprd){
+                        $stockPrd += $rowprd->qtyBalance() * $rowprd->qty_conversion;
+                    }
+                    $pod = PurchaseOrderDetail::where('place_id',$place_id)->where('item_id',$row->id)->whereHas('purchaseOrder',function($query){
+                        $query->whereIn('status',['2','3']);
+                    })->whereNull('status')->get();
+                    $stockPo = 0;
+                    foreach($pod as $rowpod){
+                        $stockPo += $rowpod->getBalanceReceipt() * $rowpod->qty_conversion;
+                    }
+                    $balance = $max_stock - $qtyStock - $stockPrd - $stockPo;
+                    if($balance > $min_stock){
+                        $arr[] = [
+                            'item_id'       => $row->id,
+                            'item_name'     => $row->code.' - '.$row->name,
+                            'unit'          => $row->uomUnit->code,
+                            'in_stock'      => number_format($qtyStock,3,',','.'),
+                            'in_pr'         => number_format($stockPrd,3,',','.'),
+                            'in_po'         => number_format($stockPo,3,',','.'),
+                            'min_stock'     => number_format($min_stock,3,',','.'),
+                            'max_stock'     => number_format($max_stock,3,',','.'),
+                            'qty_request'   => number_format($balance,3,',','.'),
+                            'list_warehouse'=> $row->warehouseList(),
+                            'buy_units'     => $row->arrBuyUnits(),
+                            'uom_unit'      => $row->uomUnit->code,
+                            'place_id'      => $place->id,
+                            'place_code'    => $place->code,
+                        ];
+                    }
                 }
             }
     

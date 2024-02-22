@@ -537,6 +537,7 @@
                         <thead>
                             <tr>
                                 <th class="center">Item</th>
+                                <th class="center">Plant</th>
                                 <th class="center">Satuan Stok</th>
                                 <th class="center">Qty Stok</th>
                                 <th class="center">Qty PR</th>
@@ -2315,9 +2316,12 @@
                         $.each(response.details, function(i, val) {
                             var count = makeid(10);
                             $('#body-stock').append(`
-                                <tr class="row_stock" data-item="` + val.item_id + `" data-uom="` + val.uom_unit + `" data-warehouse='` + JSON.stringify(val.list_warehouse) + `' data-unit='` + JSON.stringify(val.buy_units) + `' data-itemname="` + val.item_name + `" data-itemunit="`+ val.unit +`" data-code="` + count + `">
+                                <tr class="row_stock" data-item="` + val.item_id + `" data-uom="` + val.uom_unit + `" data-warehouse='` + JSON.stringify(val.list_warehouse) + `' data-unit='` + JSON.stringify(val.buy_units) + `' data-itemname="` + val.item_name + `" data-itemunit="`+ val.unit +`" data-code="` + count + `" data-place="` + val.place_id + `">
                                     <td class="">
                                         <span name="arr_item_name[]">` + val.item_name + `</span>
+                                    </td>
+                                    <td class="">
+                                        <span>` + val.place_code + `</span>
                                     </td>
                                     <td class="center-align">
                                         <span name="arr_item_unit[]">` + val.unit + `</span>

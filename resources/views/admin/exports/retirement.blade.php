@@ -48,7 +48,7 @@
                 <td>{{ $row->voidUser()->exists() ? date('d/m/Y',strtotime($row->void_date)) : '' }}</td>
                 <td>{{ $row->voidUser()->exists() ? $row->void_note : '' }}</td>
                 <td>{{ $rowdetail->asset->name }}</td>
-                <td align="center">{{ number_format($rowdetail->qty,3,',','.') }}</td>
+                <td align="center">{{ CustomHelper::formatConditionalQty($rowdetail->qty) }}</td>
                 <td align="center">{{ $rowdetail->unit->code }}</td>
                 <td align="right">{{ number_format($rowdetail->asset->nominal,3,',','.') }}</td>
                 <td align="right">{{ number_format($rowdetail->retirement_nominal,3,',','.') }}</td>

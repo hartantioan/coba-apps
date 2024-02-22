@@ -176,7 +176,7 @@
                                         @foreach($row->goodReceiveDetail as $key1 => $rowdetail)
                                         <tr align="center">
                                             <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name }}</td>
-                                            <td>{{ number_format($rowdetail->qty,3,',','.') }}</td>
+                                            <td>{{ CustomHelper::formatConditionalQty($rowdetail->qty) }}</td>
                                             <td>{{ $rowdetail->item->uomUnit->code }}</td>
                                             <td align="right">{{ number_format($rowdetail->price,3,',','.') }}</td>
                                             <td align="right">{{ number_format($rowdetail->total,3,',','.') }}</td>

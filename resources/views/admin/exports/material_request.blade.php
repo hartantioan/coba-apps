@@ -56,7 +56,7 @@
                     <td>{{ $rowdetail->place->code }}</td>
                     <td>{{ $rowdetail->note }}</td>
                     <td>{{ $rowdetail->note2 }}</td>
-                    <td>{{ number_format($rowdetail->qty,3,',','.') }}</td>
+                    <td>{{ CustomHelper::formatConditionalQty($rowdetail->qty) }}</td>
                   
                     <td>{{ $rowdetail->itemUnit->unit->code }}</td>
                  

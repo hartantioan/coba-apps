@@ -48,7 +48,7 @@
                 <td>{{ $row->placeTo->name.' - '.$row->warehouseTo->name }}</td>
                 <td>{{ $rowdetail->item->code }}</td>
                 <td>{{ $rowdetail->item->name }}</td>
-                <td>{{ number_format($rowdetail->qty,3,',','.') }}</td>
+                <td>{{ CustomHelper::formatConditionalQty($rowdetail->qty) }}</td>
                 <td>{{ $rowdetail->item->uomUnit->code }}</td>
                 <td>{{ $rowdetail->listSerial() }}</td>
                 <td>{{ $rowdetail->note }}</td>

@@ -278,7 +278,7 @@
                                 @foreach($data->inventoryTransferOut->inventoryTransferOutDetail as $key1 => $rowdetail)
                                 <tr align="center">
                                     <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name.' - '.($rowdetail->itemStock->area()->exists() ? $rowdetail->itemStock->area->name : '') }}</td>
-                                    <td>{{ number_format($rowdetail->qty,3,',','.') }}</td>
+                                    <td>{{ CustomHelper::formatConditionalQty($rowdetail->qty) }}</td>
                                     <td>{{ $rowdetail->item->uomUnit->code }}</td>
                                     <td>{{ $rowdetail->note }}</td>
                                     <td>{{ $rowdetail->area()->exists() ? $rowdetail->area->name : '' }}</td>

@@ -261,8 +261,8 @@
                                                     <td class="">` + response.latest[j]['kode'] + `</td>
                                                     <td class="">` + response.latest[j]['item'] + `</td>
                                                     <td class="">` + response.latest[j]['satuan'] + `</td>
-                                                    <td class="center-align">Saldo Awal</td>
-                                                    <td class="center-align"></td>
+                                                    <td>Saldo Awal</td>
+                                                    <td class="right-align"></td>
                                                     <td class="right-align">` + response.latest[j]['last_qty'] + `</td>
                                                 </tr>`
                                             );
@@ -279,7 +279,7 @@
                                     <td >`+val.kode+`</td>
                                     <td >`+val.item+`</td>
                                     <td >`+val.satuan+`</td>
-                                    <td class="right-align">`+val.document+`</td>
+                                    <td>`+val.document+`</td>
                                     <td class="right-align">`+val.qty+`</td>
                                     <td class="right-align">`+val.cum_qty+`</td>
                                 </tr>

@@ -166,6 +166,7 @@ class ExportStockMovement implements FromView,ShouldAutoSize
 
 
             }
+            $previousId = $row->item_id;
             if($uom_unit ===null){
                 $uom_unit = $row->item->uomUnit->code;
             }

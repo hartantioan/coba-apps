@@ -1151,7 +1151,7 @@ Route::prefix('admin')->group(function () {
                 Route::prefix('data_access')->middleware('operation.access:data_access,view')->group(function () {
                     Route::get('/',[DataAccessController::class, 'index']);
                     Route::post('refresh', [DataAccessController::class, 'refresh']);
-                    Route::post('create',[DataAccessController::class, 'create'])->middleware('operation.access:data_access,update');
+                    Route::get('export',[DataAccessController::class, 'export'])->middleware('operation.access:data_access,update');
                 });
 
                 Route::prefix('change_log')->middleware('operation.access:change_log,view')->group(function () {

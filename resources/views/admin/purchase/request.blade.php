@@ -539,7 +539,6 @@
                                 @foreach ($place as $row)
                                     <option value="{{ $row->id }}">{{ $row->code }}</option>
                                 @endforeach
-                                <option value="2">P2</option>
                             </select>
                         </div>
                     </div>
@@ -2130,7 +2129,7 @@
     }
 
     function useStock(){
-        let passed = false, arr_id = [], arr_name = [], arr_qty = [], arr_warehouse = [], arr_unit = [], arr_unit_uom = [];
+        let passed = false, arr_id = [], arr_name = [], arr_qty = [], arr_warehouse = [], arr_unit = [], arr_unit_uom = [], arr_place = [];
         $.map(table_multi.rows('.selected').nodes(), function (item) {
             passed = true;
             arr_id.push($(item).data('item'));
@@ -2139,6 +2138,7 @@
             arr_warehouse.push($(item).data('warehouse'));
             arr_unit.push($(item).data('unit'));
             arr_unit_uom.push($(item).data('uom'));
+            arr_place.push($(item).data('place'));
         });
         if(passed){
             $('.row_item').remove();
@@ -2253,6 +2253,7 @@
                     `);
                 }
                 $('#arr_satuan' + count).trigger('change');
+                $('#arr_place' + count).val(arr_place[i]);
             }
             $('#modal7').modal('close');
             

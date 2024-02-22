@@ -613,7 +613,7 @@ class MenuController extends Controller
         $data = [
             'title'     => 'Pengaturan Akses Transaksi',
             'menu'      => $menu,
-            'user'      => User::where('status','1')->get(),
+            'user'      => User::where('status','1')->where('type','1')->get(),
             'content'   => 'admin.setting.menu_operation_access'
         ];
 

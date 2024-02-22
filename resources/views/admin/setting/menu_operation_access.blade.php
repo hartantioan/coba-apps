@@ -40,7 +40,7 @@
                                             <table class="bordered centered">
                                                 <thead>
                                                     <tr>
-                                                        <th colspan="4">PEGAWAI</th>
+                                                        <th colspan="3">PEGAWAI</th>
                                                         <th colspan="4">AKSES</th>
                                                     </tr>
                                                     <tr>
@@ -57,8 +57,8 @@
                                                     @foreach($user as $row)
                                                     <tr>
                                                         <td>{{ $row->employee_no }}</td>
-                                                        <td>{{ $row->name }}</td>
-                                                        <td>{{ $row->position->name ?? '' }}</td>
+                                                        <td style="text-align:left !important;">{{ $row->name }}</td>
+                                                        <td style="text-align:left !important;">{{ $row->position->name ?? '' }}</td>
                                                         <td>
                                                             <label>
                                                                 <input type="checkbox" id="checkbox{{ $row->id.'_'.$menu->id }}" value="{{ $row->id.'_'.$menu->id }}" onclick="saveAccess({{ $menu->id }},{{ $row->id }},this,'view');" {{ $row->checkMenu($menu->id,'view') ? 'checked' : '' }}/>

@@ -217,7 +217,7 @@
                         <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
                         <td class="center-align">{{ $row->getCode() }}</td>
                         <td class="">{{ $row->lookable->lookable->item->name }}</td>
-                        <td class="right-align">{{ number_format($row->qty,3,',','.') }}</td>
+                        <td class="right-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                         <td class="center-align">{{ $row->lookable->lookable->item->sellUnit->code }}</td>
                         <td class="right-align">{{ number_format($row->total,2,',','.') }}</td>
                         <td class="right-align">{{ number_format($row->tax,2,',','.') }}</td>

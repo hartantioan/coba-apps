@@ -286,7 +286,7 @@
                                 <tr>
                                     <td class="center-align">{{ $key + 1 }}</td>
                                     <td>{{ $row->asset->name }}</td>
-                                    <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
+                                    <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                                     <td class="center-align">{{ $row->unit->code }}</td>
                                     <td class="right-align">{{ number_format($row->asset->nominal,3,',','.') }}</td>
                                     <td class="right-align">{{ number_format($row->retirement_nominal,3,',','.') }}</td>

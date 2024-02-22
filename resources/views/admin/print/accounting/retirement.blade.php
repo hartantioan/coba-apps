@@ -172,7 +172,7 @@
                                                 <td></td>
                                                 <td align="center">{{ $key1 + 1 }}</td>
                                                 <td>{{ $rowdetail->asset->name }}</td>
-                                                <td align="center">{{ number_format($rowdetail->qty,3,',','.') }}</td>
+                                                <td align="center">{{ CustomHelper::formatConditionalQty($rowdetail->qty) }}</td>
                                                 <td align="center">{{ $rowdetail->unit->code }}</td>
                                                 <td align="right">{{ number_format($rowdetail->asset->nominal,3,',','.') }}</td>
                                                 <td align="right">{{ number_format($rowdetail->retirement_nominal,3,',','.') }}</td>

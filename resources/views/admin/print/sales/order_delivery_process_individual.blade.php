@@ -322,7 +322,7 @@
                                     <td align="center">{{ ($key + 1) }}</td>
                                     <td>{{ $row->item->code }}</td>
                                     <td>{{ $row->item->name }}</td>
-                                    <td align="right">{{ number_format($row->qty,3,',','.') }}</td>
+                                    <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                                     <td align="center">{{ $row->item->sellUnit->code }}</td>
                                 </tr>
                                 <tr>

@@ -302,7 +302,7 @@
                                 <tr>
                                     <td align="center" rowspan="3">{{ ($key + 1) }}</td>
                                     <td align="left">{{ $row->item_id ? $row->item->code.' - '.$row->item->name : $row->coa->name }}</td>
-                                    <td align="center">{{ number_format($row->qty,3,',','.') }}</td>
+                                    <td align="center">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                                     <td align="center">{{ $row->item_id ? $row->itemUnit->unit->code : '-' }}</td>
                                     <td align="right">{{ number_format($row->price,2,',','.') }}</td>
                                     <td align="center">{{ number_format($row->percent_discount_1,2,',','.') }}</td>

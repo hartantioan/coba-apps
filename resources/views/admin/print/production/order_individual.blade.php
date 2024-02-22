@@ -359,7 +359,7 @@
                             <tr>
                                 <td align="center">{{ ($key + 1) }}</td>
                                 <td align="">{{ $row->item()->exists() ? $row->item->code.' - '.$row->item->name : ($row->coa()->exists() ? $row->coa->code.' - '.$row->coa->name : '') }}</td>
-                                <td align="right">{{ $row->item()->exists() ? number_format($row->qty,3,',','.') : '-' }}</td>
+                                <td align="right">{{ $row->item()->exists() ? CustomHelper::formatConditionalQty($row->qty) : '-' }}</td>
                                 <td align="center">{{ $row->item()->exists() ? $row->item->productionUnit->code : '-' }}</td>
                                 <td align="right">{{ $row->coa()->exists() ? number_format($row->nominal,2,',','.') : '-' }}</td>
                                 <td align="right">{{ $row->coa()->exists() ? number_format($row->total,2,',','.') : '-' }}</td>

@@ -227,7 +227,7 @@
                             <td>{{ ($row->project()->exists() ? $row->project->name : '-') }}</td>
                             <td>{{ ($row->costDistribution()->exists() ? $row->costDistribution->name : '-') }}</td>
                             <td class="right-align">{{ number_format($row->price,3,',','.') }}</td>
-                            <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
+                            <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                             <td class="center-align">{{ $row->unit->code }}</td>
                             <td class="right-align">{{ number_format($row->total,3,',','.') }}</td>
                             <td>{{ $row->note }}</td>

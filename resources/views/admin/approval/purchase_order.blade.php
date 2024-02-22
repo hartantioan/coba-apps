@@ -258,7 +258,7 @@
                     <tr>
                         <td class="center-align" rowspan="3">{{ ($key + 1) }}</td>
                         <td class="center-align">{{ $row->item_id ? $row->item->code.' - '.$row->item->name : $row->coa->code.' - '.$row->coa->name }}</td>
-                        <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
+                        <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                         <td class="center-align">{{ $row->item_id ? $row->itemUnit->unit->code : '-' }}</td>
                         <td class="right-align">{{ number_format($row->price,2,',','.') }}</td>
                         <td class="center-align">{{ number_format($row->percent_discount_1,2,',','.') }}</td>

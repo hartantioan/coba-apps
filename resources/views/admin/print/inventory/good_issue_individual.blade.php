@@ -285,7 +285,7 @@
                                 @foreach($data->goodIssueDetail as $row)
                                 <tr>
                                     <td>{{ $row->itemStock->item->code.' - '.$row->itemStock->item->name }}</td>
-                                    <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
+                                    <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                                     <td class="center-align">{{ $row->itemStock->item->uomUnit->code }}</td>
                                     <td class="center-align">{{ $row->inventoryCoa()->exists() ? $row->inventoryCoa->name : '-' }}</td>
                                     <td class="center-align">{{ $row->coa()->exists() ? $row->coa->code.' - '.$row->coa->name : '-' }}</td>

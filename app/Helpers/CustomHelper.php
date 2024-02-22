@@ -3936,4 +3936,16 @@ class CustomHelper {
 
 		return $newItem->id;
 	}
+
+	public static function formatConditionalQty($qty){
+		$arr = explode('.',strval($qty));
+		$value = 0;
+		if(count($arr) > 1){
+			$value = number_format(floatval($arr[0].'.'.$arr[1]),3,',','.');
+		}else{
+			$value = number_format(floatval($arr[0]),0,',','.');
+		}
+
+		return $value;
+	}
 }

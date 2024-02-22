@@ -173,7 +173,7 @@
                                         @foreach($row->goodIssueDetail as $key1 => $rowdetail)
                                         <tr align="center">
                                             <td>{{ $rowdetail->itemStock->item->code.' - '.$rowdetail->itemStock->item->name }}</td>
-                                            <td>{{ number_format($rowdetail->qty,3,',','.') }}</td>
+                                            <td>{{ CustomHelper::formatConditionalQty($rowdetail->qty) }}</td>
                                             <td>{{ $rowdetail->itemStock->item->uomUnit->code }}</td>
                                             <td>{{ $rowdetail->note }}</td>
                                             <td>{{ $rowdetail->coa->code.' - '.$rowdetail->coa->name }}</td>

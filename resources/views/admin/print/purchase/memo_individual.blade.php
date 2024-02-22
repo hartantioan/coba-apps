@@ -285,7 +285,7 @@
                                 <tr>
                                     <td align="center">{{($key + 1)}}</td>
                                     <td align="center">{{$row->getCode()}}</td>
-                                    <td align="right">{{number_format($row->qty,3,',','.')}}</td>
+                                    <td align="right">{{CustomHelper::formatConditionalQty($row->qty)}}</td>
                                     <td align="center">{{$row->description}}</td>
                                     <td align="center">{{$row->description2}}</td>
                                     <td align="right">{{number_format($row->total,2,',','.')}}</td>

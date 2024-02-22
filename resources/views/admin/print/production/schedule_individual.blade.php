@@ -279,7 +279,7 @@
                                 <td align="center" rowspan="2">{{ ($key + 1) }}</td>
                                 <td align="center">{{ $row->marketingOrderPlanDetail->marketingOrderPlan->code }}</td>
                                 <td align="">{{ $row->marketingOrderPlanDetail->item->name }}</td>
-                                <td align="right">{{ number_format($row->qty,3,',','.') }}</td>
+                                <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                                 <td align="right">{{ number_format($row->marketingOrderPlanDetail->qty * $row->marketingOrderPlanDetail->item->sell_convert,3,',','.') }}</td>
                                 <td align="center">{{ $row->marketingOrderPlanDetail->item->uomUnit->code }}</td>
                                 <td align="center">{{ date('d/m/Y',strtotime($row->marketingOrderPlanDetail->request_date)) }}</td>
@@ -317,7 +317,7 @@
                                 <td align="center">{{ date('d/m/Y',strtotime($row->production_date)) }}</td>
                                 <td align="center">{{ $row->shift->code }}</td>
                                 <td align="center">{{ $row->item->code.' - '.$row->item->name }}</td>
-                                <td align="right">{{ number_format($row->qty,3,',','.') }}</td>
+                                <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                                 <td align="center">{{ $row->item->uomUnit->code }}</td>
                                 <td align="center">{{ $row->line->code }}</td>
                                 <td align="center">{{ $row->group }}</td>

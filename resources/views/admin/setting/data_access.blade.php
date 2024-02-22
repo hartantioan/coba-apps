@@ -38,28 +38,26 @@
                         <div class="col s12">
                             <div class="card">
                                 <div class="card-content">
-                                    <form class="row" id="form_data" onsubmit="return false;">
-                                        <h4 class="card-title">List {{ $title }}</h4>
-                                        <div class="card-alert card blue">
-                                            <div class="card-content white-text">
-                                                <p>Form ini digunakan untuk mengunduh data hak akses semua karyawan (kosongi) atau perorangan.</p>
-                                            </div>
+                                    <h4 class="card-title">List {{ $title }}</h4>
+                                    <div class="card-alert card blue">
+                                        <div class="card-content white-text">
+                                            <p>Form ini digunakan untuk mengunduh data hak akses semua karyawan (kosongi) atau perorangan.</p>
                                         </div>
-                                        <div class="row mt-1">
-                                            <div class="input-field col s6">
-                                                <select class="browser-default select2" id="user_id[]" name="user_id[]" multiple>
-                                                    <option value=""></option>
-                                                    @foreach ($user as $row)
-                                                        <option value="{{ $row->id }}">{{ $row->employee_no.' '.$row->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                                <label class="active" for="user_id">Pegawai</label>
-                                            </div>
-                                            <div class="input-field col s3">
-                                                <button class="btn waves-effect waves-light" onclick="process();">Unduh <i class="material-icons right">archive</i></button>
-                                            </div>
+                                    </div>
+                                    <div class="row mt-1">
+                                        <div class="input-field col s6">
+                                            <select class="browser-default select2" id="user_id" name="user_id[]" multiple>
+                                                <option value=""></option>
+                                                @foreach ($user as $row)
+                                                    <option value="{{ $row->id }}">{{ $row->employee_no.' '.$row->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            <label class="active" for="user_id">Pegawai</label>
                                         </div>
-                                    </form>
+                                        <div class="input-field col s3">
+                                            <button class="btn waves-effect waves-light" onclick="process();">Unduh <i class="material-icons right">archive</i></button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -87,6 +85,7 @@
     });
 
     function process(){
-        
+        var employees = $('#filter_group').val() ? $('#filter_group').val():'';
+        window.location = "{{ Request::url() }}/export?plant=" + plant + "&warehouse=" + warehouse+"&item=" + item +"&group=" + group;
     }
 </script>

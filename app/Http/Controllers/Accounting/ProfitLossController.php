@@ -100,7 +100,7 @@ class ProfitLossController extends Controller
             foreach($coas as $keymain => $row){
                 if($tempParent !== $row->parent_id){
                     $html .= '<tr>
-                        <td style="left: 0px;position: sticky;background-color:white;"><b>'.$row->parentSub->name.'</b></td>
+                        <td style="left: 0px;position: sticky;background-color:white;"><b>'.$row->parentSub->code.' - '.$row->parentSub->name.'</b></td>
                         <td colspan="'.(count($arrMonth) * 4).'"></td>
                     </tr>';
                     foreach($arrMonth as $key => $rowMonth) {
@@ -135,7 +135,7 @@ class ProfitLossController extends Controller
                 if(isset($coas[$keymain + 1])){
                     if($coas[$keymain + 1]->parent_id !== $row->parent_id){
                         $html .= '<tr>
-                            <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->name.'</b></td>';
+                            <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->code.' - '.$row->parentSub->name.'</b></td>';
                         
                         foreach($arrMonth as $key => $rowMonth) {
                             $html .= '
@@ -149,7 +149,7 @@ class ProfitLossController extends Controller
                     }
                 }else{
                     $html .= '<tr>
-                        <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->name.'</b></td>';
+                        <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->code.' - '.$row->parentSub->name.'</b></td>';
 
                     foreach($arrMonth as $key => $rowMonth) {
                         $html .= '
@@ -170,7 +170,7 @@ class ProfitLossController extends Controller
             foreach($coas as $keymain => $row){
                 if($tempParent2 !== $row->parentSub->parent_id){
                     $html .= '<tr>
-                        <td style="left: 0px;position: sticky;background-color:white;"><b>'.$row->parentSub->parentSub->name.'</b></td>
+                        <td style="left: 0px;position: sticky;background-color:white;"><b>'.$row->parentSub->parentSub->code.' - '.$row->parentSub->parentSub->name.'</b></td>
                         <td colspan="'.(count($arrMonth) * 4).'"></td>
                     </tr>';
                     foreach($arrMonth as $key => $rowMonth) {
@@ -182,7 +182,7 @@ class ProfitLossController extends Controller
                 }
                 if($tempParent1 !== $row->parent_id){
                     $html .= '<tr>
-                        <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;'.$row->parentSub->name.'</td>
+                        <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;'.$row->parentSub->code.' - '.$row->parentSub->name.'</td>
                         <td colspan="'.(count($arrMonth) * 4).'"></td>
                     </tr>';
                 }
@@ -211,7 +211,7 @@ class ProfitLossController extends Controller
                 if(isset($coas[$keymain + 1])){
                     if($coas[$keymain + 1]->parentSub->parent_id !== $row->parentSub->parent_id){
                         $html .= '<tr>
-                            <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->parentSub->name.'</b></td>';
+                            <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->parentSub->code.' - '.$row->parentSub->parentSub->name.'</b></td>';
                         
                         foreach($arrMonth as $key => $rowMonth) {
                             $html .= '
@@ -225,7 +225,7 @@ class ProfitLossController extends Controller
                     }
                 }else{
                     $html .= '<tr>
-                        <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->parentSub->name.'</b></td>';
+                        <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->parentSub->code.' - '.$row->parentSub->parentSub->name.'</b></td>';
 
                     foreach($arrMonth as $key => $rowMonth) {
                         $html .= '<td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempDebit'],2,',','.').'</b></td>
@@ -246,7 +246,7 @@ class ProfitLossController extends Controller
             foreach($coas as $keymain => $row){
                 if($tempParent3 !== $row->parentSub->parentSub->parent_id){
                     $html .= '<tr>
-                        <td style="left: 0px;position: sticky;background-color:white;"><b>'.$row->parentSub->parentSub->parentSub->name.'</b></td>
+                        <td style="left: 0px;position: sticky;background-color:white;"><b>'.$row->parentSub->parentSub->parentSub->code.' - '.$row->parentSub->parentSub->parentSub->name.'</b></td>
                         <td colspan="'.(count($arrMonth) * 4).'"></td>
                     </tr>';
                     foreach($arrMonth as $key => $rowMonth) {
@@ -258,13 +258,13 @@ class ProfitLossController extends Controller
                 }
                 if($tempParent2 !== $row->parentSub->parent_id){
                     $html .= '<tr>
-                        <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;<b>'.$row->parentSub->parentSub->name.'</b></td>
+                        <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;<b>'.$row->parentSub->parentSub->code.' - '.$row->parentSub->parentSub->name.'</b></td>
                         <td colspan="'.(count($arrMonth) * 4).'"></td>
                     </tr>';
                 }
                 if($tempParent1 !== $row->parent_id){
                     $html .= '<tr>
-                        <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$row->parentSub->name.'</td>
+                        <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$row->parentSub->code.' - '.$row->parentSub->name.'</td>
                         <td colspan="'.(count($arrMonth) * 4).'"></td>
                     </tr>';
                 }
@@ -293,7 +293,7 @@ class ProfitLossController extends Controller
                 if(isset($coas[$keymain + 1])){
                     if($coas[$keymain + 1]->parentSub->parentSub->parent_id !== $row->parentSub->parentSub->parent_id){
                         $html .= '<tr>
-                            <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->parentSub->parentSub->name.'</b></td>';
+                            <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->parentSub->parentSub->code.' - '.$row->parentSub->parentSub->parentSub->name.'</b></td>';
                         
                         foreach($arrMonth as $key => $rowMonth) {
                             $html .= '<td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalanceBefore'],2,',','.').'</b></td>
@@ -306,7 +306,7 @@ class ProfitLossController extends Controller
                     }
                 }else{
                     $html .= '<tr>
-                        <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->parentSub->parentSub->name.'</b></td>';
+                        <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->parentSub->parentSub->code.' - '.$row->parentSub->parentSub->parentSub->name.'</b></td>';
 
                     foreach($arrMonth as $key => $rowMonth) {
                         $html .= '<td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalanceBefore'],2,',','.').'</b></td>
@@ -330,7 +330,7 @@ class ProfitLossController extends Controller
             foreach($coas as $keymain => $row){
                 if($tempParent4 !== $row->parentSub->parentSub->parentSub->parent_id){
                     $html .= '<tr>
-                        <td style="left: 0px;position: sticky;background-color:white;"><b>'.$row->parentSub->parentSub->parentSub->parentSub->name.'</b></td>
+                        <td style="left: 0px;position: sticky;background-color:white;"><b>'.$row->parentSub->parentSub->parentSub->parentSub->code.' - '.$row->parentSub->parentSub->parentSub->parentSub->name.'</b></td>
                         <td colspan="'.(count($arrMonth) * 4).'"></td>
                     </tr>';
                     foreach($arrMonth as $key => $rowMonth) {
@@ -342,19 +342,19 @@ class ProfitLossController extends Controller
                 }
                 if($tempParent3 !== $row->parentSub->parentSub->parent_id){
                     $html .= '<tr>
-                        <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;<b>'.$row->parentSub->parentSub->parentSub->name.'</b></td>
+                        <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;<b>'.$row->parentSub->parentSub->parentSub->code.' - '.$row->parentSub->parentSub->parentSub->name.'</b></td>
                         <td colspan="'.(count($arrMonth) * 4).'"></td>
                     </tr>';
                 }
                 if($tempParent2 !== $row->parentSub->parent_id){
                     $html .= '<tr>
-                        <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>'.$row->parentSub->parentSub->name.'</b></td>
+                        <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>'.$row->parentSub->parentSub->code.' - '.$row->parentSub->parentSub->name.'</b></td>
                         <td colspan="'.(count($arrMonth) * 4).'"></td>
                     </tr>';
                 }
                 if($tempParent1 !== $row->parent_id){
                     $html .= '<tr>
-                        <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$row->parentSub->name.'</td>
+                        <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$row->parentSub->code.' - '.$row->parentSub->name.'</td>
                         <td colspan="'.(count($arrMonth) * 4).'"></td>
                     </tr>';
                 }
@@ -383,7 +383,7 @@ class ProfitLossController extends Controller
                 if(isset($coas[$keymain + 1])){
                     if($coas[$keymain + 1]->parentSub->parentSub->parentSub->parent_id !== $row->parentSub->parentSub->parentSub->parent_id){
                         $html .= '<tr>
-                            <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->parentSub->parentSub->parentSub->name.'</b></td>';
+                            <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->parentSub->parentSub->parentSub->code.' - '.$row->parentSub->parentSub->parentSub->parentSub->name.'</b></td>';
                         
                         foreach($arrMonth as $key => $rowMonth) {
                             $html .= '<td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalanceBefore'],2,',','.').'</b></td>
@@ -396,7 +396,7 @@ class ProfitLossController extends Controller
                     }
                 }else{
                     $html .= '<tr>
-                        <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->parentSub->parentSub->parentSub->name.'</b></td>';
+                        <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->parentSub->parentSub->parentSub->code.' - '.$row->parentSub->parentSub->parentSub->parentSub->name.'</b></td>';
 
                     foreach($arrMonth as $key => $rowMonth) {
                         $html .= '<td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalanceBefore'],2,',','.').'</b></td>

@@ -120,25 +120,22 @@
                                             <table id="datatable_serverside" class="display responsive-table wrap">
                                                 <thead>
                                                     <tr>
-                                                        <th>#</th>
-                                                        <th>Kode Transaksi</th>
-                                                        <th>FG Pengganti</th>
-                                                        <th>No Faktur</th>
-                                                        <th>Tanggal</th>
-                                                        <th>No NPWP</th>
-                                                        <th>Nama Pemilik NPWP</th>
-                                                        <th>Alamat Pemilik NPWP</th>
-                                                        <th>No Pembeli NPWP</th>
-                                                        <th>Nama Pembeli NPWP</th>
-                                                        <th>Alamat Pembeli NPWP</th>
-                                                        <th>Total</th>
-                                                        <th>Pajak</th>
-                                                        <th>Harga setelah Pajak</th>
-                                                        <th>Status Approval</th>
-                                                        <th>Status Pajak</th>
-                                                        <th>Referensi</th>
-                                                        <th>Link</th>
-                                                        <th>Action</th>
+                                                        <th align="center" rowspan="2"  style="background-color: navy; color: white;border: 1px solid white;">No</th>
+                                                        <th align="center" colspan="2" style="background-color: navy; color: white;border: 1px solid white;">Faktur Pajak</th>
+                                                        <th align="center" colspan="2" style="background-color: navy; color: white;border: 1px solid white;">Faktur Pajak yang Diganti/Diretur</th>
+                                                        <th align="center" colspan="3" style="background-color: navy; color: white;border: 1px solid white;">Supplier</th>
+                                                        <th align="center" rowspan="2" style="background-color: navy; color: white;border: 1px solid white;">DPP</th>
+                                                        <th align="center" rowspan="2" style="background-color: navy; color: white;border: 1px solid white;">PPN</th>
+                                                        <th align="center" rowspan="2" style="background-color: navy; color: white;border: 1px solid white;">Nama Barang</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Tanggal</th>
+                                                        <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Nomor</th>
+                                                        <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Tanggal</th>
+                                                        <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Nomor</th>
+                                                        <th align="center" style="background-color: navy; color: white;border: 1px solid white;">NPWP</th>
+                                                        <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Nama </th>
+                                                        <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Alamat Lengkap</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -330,10 +327,7 @@
             "deferRender": true,
             "destroy": true,
             "iDisplayInLength": 10,
-            "fixedColumns": {
-                left: 5,
-                right: 1
-            },
+            
             "order": [[0, 'desc']],
             ajax: {
                 url: '{{ Request::url() }}/datatable',
@@ -358,7 +352,7 @@
                 }
             },
             columns: [
-                        { name: 'id', searchable: false, className: 'center-align details-control' },
+                        { name: 'id', searchable: false, orderable: false, className: 'center-align' },
                         { name: 'transaction_code', className: 'center-align' },
                         { name: 'replace', className: 'center-align' },
                         { name: 'code', className: 'center-align' },
@@ -366,16 +360,8 @@
                         { name: 'npwp_number', className: 'center-align' },
                         { name: 'npwp_name', className: 'center-align' },
                         { name: 'npwp_address', className: 'center-align' },
-                        { name: 'npwp_target', className: 'center-align' },
-                        { name: 'npwp_target_name', className: 'center-align' },
-                        { name: 'npwp_target_address', className: 'center-align' },
                         { name: 'total', className: 'center-align' },
                         { name: 'tax', className: 'center-align' },
-                        { name: 'wtax', className: 'center-align' },
-                        { name: 'approval_status', className: 'center-align' },
-                        { name: 'tax_status', className: 'center-align' },
-                        { name: 'reference', className: 'center-align' },
-                        { name: 'url', className: 'center-align' },
                         { name: 'action', searchable: false, orderable: false, className: 'center-align' }
                     ],
             dom: 'Blfrtip',

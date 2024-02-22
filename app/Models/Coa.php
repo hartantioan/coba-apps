@@ -190,6 +190,63 @@ class Coa extends Model
         return $arr;
     }
 
+    public function getTotalMonthFromParentExceptClosingBefore($month,$level){
+        if($level == '1'){
+            $child = $this->getFifthChildFromFirst();
+        }elseif($level == '2'){
+            $child = $this->getFifthChildFromSecond();
+        }elseif($level == '3'){
+            $child = $this->getFifthChildFromThird();
+        }elseif($level == '4'){
+            $child = $this->getFifthChildFromFourth();
+        }elseif($level == '5'){
+            $child = $this->getFifthChildFromFifth();
+        }
+
+        $totalBalanceBeforeDebit = 0;
+        $totalBalanceBeforeCredit = 0;
+        $totalDebit = 0;
+        $totalCredit = 0;
+        foreach($child as $row){
+            $totalBalanceBeforeDebit += $row->journalDebit()->whereHas('journal',function($query)use($month){
+                $query->whereIn('status',['2','3'])
+                    ->whereRaw("post_date < '$month-01'");
+            })->sum('nominal');
+
+            $totalBalanceBeforeCredit += $row->journalCredit()->whereHas('journal',function($query)use($month){
+                $query->whereIn('status',['2','3'])
+                    ->whereRaw("post_date < '$month-01'");
+            })->sum('nominal');
+
+            $totalDebit += $row->journalDebit()->whereHas('journal',function($query)use($month){
+                $query->whereIn('status',['2','3'])
+                    ->whereRaw("post_date LIKE '$month%'")
+                    ->where(function($query){
+                        $query->where('lookable_type','!=','closing_journals')
+                            ->orWhereNull('lookable_type');
+                    });
+            })->sum('nominal');
+
+            $totalCredit += $row->journalCredit()->whereHas('journal',function($query)use($month){
+                $query->whereIn('status',['2','3'])
+                    ->whereRaw("post_date LIKE '$month%'")
+                    ->where(function($query){
+                        $query->where('lookable_type','!=','closing_journals')
+                            ->orWhereNull('lookable_type');
+                    });
+            })->sum('nominal');
+        }
+
+        $arr = [
+            'totalBalanceBefore'    => $totalBalanceBeforeDebit - $totalBalanceBeforeCredit,
+            'totalDebit'            => $totalDebit,
+            'totalCredit'           => $totalCredit,
+            'totalBalance'          => $totalDebit - $totalCredit,
+        ];
+
+        return $arr;
+    }
+
     public function getFifthChildFromFirst(){
         $arr = [];
 

@@ -315,80 +315,72 @@
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
-                    <div class="col s12">
-                        <div class="input-field col s6">
-                            <input type="hidden" id="temp" name="temp">
-                            <input id="code" name="code" type="text" placeholder="Kode Item">
-                            <label class="active" for="code">Kode</label>
-                        </div>
-                        <div class="input-field col s6">
-                            <input id="name" name="name" type="text" placeholder="Nama Item">
-                            <label class="active" for="name">Nama</label>
-                        </div>
-                        <div class="input-field col s6">
-                            <input id="other_name" name="other_name" type="text" placeholder="Nama Item (Ex : Spoon)">
-                            <label class="active" for="other_name">Nama Item (Bahasa Asing)</label>
-                        </div>
-                        <div class="input-field col s6">
-                            <input id="note" name="note" type="text" placeholder="Keterangan : sparepart, aktiva, tools, etc">
-                            <label class="active" for="note">Keterangan</label>
-                        </div>
-                        <div class="input-field col s6 unit-inputs">
-                            <select class="select2 browser-default" id="item_group_id" name="item_group_id">
-                                @foreach($group->whereNull('parent_id') as $c)
-                                        @if(!$c->childSub()->exists())
-                                            <option value="{{ $c->id }}"> - {{ $c->name }}</option>
-                                        @else
-                                            <optgroup label=" - {{ $c->code.' - '.$c->name }}">
-                                            @foreach($c->childSub as $bc)
-                                                @if(!$bc->childSub()->exists())
-                                                    <option value="{{ $bc->id }}"> -  - {{ $bc->name }}</option>
-                                                @else
-                                                    <optgroup label=" -  - {{ $bc->code.' - '.$bc->name }}">
-                                                        @foreach($bc->childSub as $bcc)
-                                                            @if(!$bcc->childSub()->exists())
-                                                                <option value="{{ $bcc->id }}"> -  -  - {{ $bcc->name }}</option>
-                                                            @else
-                                                                <optgroup label=" -  -  - {{ $bcc->code.' - '.$bcc->name }}">
-                                                                    @foreach($bcc->childSub as $bccc)
-                                                                        @if(!$bccc->childSub()->exists())
-                                                                            <option value="{{ $bccc->id }}"> -  -  -  - {{ $bccc->name }}</option>
-                                                                        @else
-                                                                            <optgroup label=" -  -  -  - {{ $bccc->code.' - '.$bccc->name }}">
-                                                                                @foreach($bccc->childSub as $bcccc)
-                                                                                    @if(!$bcccc->childSub()->exists())
-                                                                                        <option value="{{ $bcccc->id }}"> -  -  -  -  - {{ $bcccc->name }}</option>
-                                                                                    @endif
-                                                                                @endforeach
-                                                                            </optgroup>
-                                                                        @endif
-                                                                    @endforeach
-                                                                </optgroup>
-                                                            @endif
-                                                        @endforeach
-                                                    </optgroup>
-                                                @endif
-                                            @endforeach
-                                            </optgroup>
-                                        @endif
-                                @endforeach
-                            </select>
-                            <label class="active" for="item_group_id">Grup Item</label>
-                        </div>
-                        <div class="col s12">
-                            <div class="input-field col s3">
+                    <div class="col s12 row">
+                        <div class="col s8 row">
+                            <div class="input-field col s4">
+                                <input type="hidden" id="temp" name="temp">
+                                <input id="code" name="code" type="text" placeholder="Kode Item">
+                                <label class="active" for="code">Kode</label>
+                            </div>
+                            <div class="input-field col s4">
+                                <input id="name" name="name" type="text" placeholder="Nama Item">
+                                <label class="active" for="name">Nama</label>
+                            </div>
+                            <div class="input-field col s4">
+                                <input id="other_name" name="other_name" type="text" placeholder="Nama Item (Ex : Spoon)">
+                                <label class="active" for="other_name">Nama Item (Bahasa Asing)</label>
+                            </div>
+                            <div class="input-field col s4">
+                                <input id="note" name="note" type="text" placeholder="Keterangan : sparepart, aktiva, tools, etc">
+                                <label class="active" for="note">Keterangan</label>
+                            </div>
+                            <div class="input-field col s8 unit-inputs">
+                                <select class="select2 browser-default" id="item_group_id" name="item_group_id">
+                                    @foreach($group->whereNull('parent_id') as $c)
+                                            @if(!$c->childSub()->exists())
+                                                <option value="{{ $c->id }}"> - {{ $c->name }}</option>
+                                            @else
+                                                <optgroup label=" - {{ $c->code.' - '.$c->name }}">
+                                                @foreach($c->childSub as $bc)
+                                                    @if(!$bc->childSub()->exists())
+                                                        <option value="{{ $bc->id }}"> -  - {{ $bc->name }}</option>
+                                                    @else
+                                                        <optgroup label=" -  - {{ $bc->code.' - '.$bc->name }}">
+                                                            @foreach($bc->childSub as $bcc)
+                                                                @if(!$bcc->childSub()->exists())
+                                                                    <option value="{{ $bcc->id }}"> -  -  - {{ $bcc->name }}</option>
+                                                                @else
+                                                                    <optgroup label=" -  -  - {{ $bcc->code.' - '.$bcc->name }}">
+                                                                        @foreach($bcc->childSub as $bccc)
+                                                                            @if(!$bccc->childSub()->exists())
+                                                                                <option value="{{ $bccc->id }}"> -  -  -  - {{ $bccc->name }}</option>
+                                                                            @else
+                                                                                <optgroup label=" -  -  -  - {{ $bccc->code.' - '.$bccc->name }}">
+                                                                                    @foreach($bccc->childSub as $bcccc)
+                                                                                        @if(!$bcccc->childSub()->exists())
+                                                                                            <option value="{{ $bcccc->id }}"> -  -  -  -  - {{ $bcccc->name }}</option>
+                                                                                        @endif
+                                                                                    @endforeach
+                                                                                </optgroup>
+                                                                            @endif
+                                                                        @endforeach
+                                                                    </optgroup>
+                                                                @endif
+                                                            @endforeach
+                                                        </optgroup>
+                                                    @endif
+                                                @endforeach
+                                                </optgroup>
+                                            @endif
+                                    @endforeach
+                                </select>
+                                <label class="active" for="item_group_id">Grup Item</label>
+                            </div>
+                            <div class="input-field col s4">
                                 <input id="tolerance_gr" name="tolerance_gr" type="text" value="0" onkeyup="formatRupiah(this);">
                                 <label class="active" for="tolerance_gr">Toleransi Penerimaan Qty Barang (%)</label>
                             </div>
-                            <div class="input-field col s3">
-                                <input id="min_stock" name="min_stock" type="text" value="0,000" onkeyup="formatRupiah(this);">
-                                <label class="active" for="min_stock">Minimal Stock (Satuan Stock)</label>
-                            </div>
-                            <div class="input-field col s3">
-                                <input id="max_stock" name="max_stock" type="text" value="0,000" onkeyup="formatRupiah(this);">
-                                <label class="active" for="max_stock">Maksimal Stock (Satuan Stock)</label>
-                            </div>
-                            <div class="input-field col s3">
+                            <div class="input-field col s4">
                                 <div class="switch mb-1">
                                     <label for="status">Status</label>
                                     <label class="right">
@@ -400,7 +392,53 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col s8 row">
+                        <div class="col s4 row">
+                            <div class="input-field col s12" style="margin:0 0 0 0 !important;">
+                                <div class="switch">
+                                    <label for="is_inventory_item">Item untuk Inventori</label>
+                                    <label class="right">
+                                        Tidak
+                                        <input type="checkbox" id="is_inventory_item" name="is_inventory_item" value="1">
+                                        <span class="lever"></span>
+                                        Ya
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="input-field col s12" style="margin:0 0 0 0 !important;">
+                                <div class="switch">
+                                    <label for="is_sales_item">Item untuk Penjualan</label>
+                                    <label class="right">
+                                        Tidak
+                                        <input type="checkbox" id="is_sales_item" name="is_sales_item" value="1" onclick="showSalesComposition();">
+                                        <span class="lever"></span>
+                                        Ya
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="input-field col s12" style="margin:0 0 0 0 !important;">
+                                <div class="switch">
+                                    <label for="is_purchase_item">Item untuk Pembelian</label>
+                                    <label class="right">
+                                        Tidak
+                                        <input type="checkbox" id="is_purchase_item" name="is_purchase_item" value="1">
+                                        <span class="lever"></span>
+                                        Ya
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="input-field col s12" style="margin:0 0 0 0 !important;">
+                                <div class="switch">
+                                    <label for="is_service">Item untuk Service</label>
+                                    <label class="right">
+                                        Tidak
+                                        <input type="checkbox" id="is_service" name="is_service" value="1">
+                                        <span class="lever"></span>
+                                        Ya
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col s7 row">
                             <div class="col s12">
                                 <div class="input-field col s12 unit-inputs">
                                     <select class="select2 browser-default" id="uom_unit" name="uom_unit" onchange="getUnitStock();">
@@ -410,9 +448,6 @@
                                         @endforeach
                                     </select>
                                     <label class="active" for="uom_unit">Satuan Stock</label>
-                                </div>
-                                <div class="input-field col s12">
-                                    
                                 </div>
                             </div>
                             <div class="col s12">
@@ -447,43 +482,33 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="input-field col s4">
-                            <div class="switch mb-1">
-                                <label for="is_inventory_item">Item untuk Inventori</label>
-                                <label class="right">
-                                    Tidak
-                                    <input type="checkbox" id="is_inventory_item" name="is_inventory_item" value="1">
-                                    <span class="lever"></span>
-                                    Ya
-                                </label>
+                        <div class="col s5">
+                            <div class="center">
+                                <h6>Stok Buffer (Satuan Stok/terkecil)</h6>
                             </div>
-                            <div class="switch mb-1">
-                                <label for="is_sales_item">Item untuk Penjualan</label>
-                                <label class="right">
-                                    Tidak
-                                    <input type="checkbox" id="is_sales_item" name="is_sales_item" value="1" onclick="showSalesComposition();">
-                                    <span class="lever"></span>
-                                    Ya
-                                </label>
-                            </div>
-                            <div class="switch mb-1">
-                                <label for="is_purchase_item">Item untuk Pembelian</label>
-                                <label class="right">
-                                    Tidak
-                                    <input type="checkbox" id="is_purchase_item" name="is_purchase_item" value="1">
-                                    <span class="lever"></span>
-                                    Ya
-                                </label>
-                            </div>
-                            <div class="switch mb-1">
-                                <label for="is_service">Item untuk Service</label>
-                                <label class="right">
-                                    Tidak
-                                    <input type="checkbox" id="is_service" name="is_service" value="1">
-                                    <span class="lever"></span>
-                                    Ya
-                                </label>
-                            </div>
+                            <table class="bordered">
+                                <thead>
+                                    <tr>
+                                        <th class="center">Plant</th>
+                                        <th class="center">Minimum Stok</th>
+                                        <th class="center">Maksimum Stok</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="body-buffer">
+                                    @foreach($place as $row)
+                                        <input name="arr_place_buffer[]" type="hidden" value="{{ $row->id }}">
+                                        <td>
+                                            {{ $row->code }}
+                                        </td>
+                                        <td>
+                                            <input name="arr_min_buffer[]" id="arr_min_buffer{{ $row->id }}" type="text" value="0,00" onkeyup="formatRupiahNoMinus(this)">
+                                        </td>
+                                        <td>
+                                            <input name="arr_max_buffer[]" id="arr_max_buffer{{ $row->id }}" type="text" value="0,00" onkeyup="formatRupiahNoMinus(this)">
+                                        </td>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
                         <div class="input-field col s8" id="item-sale-show" style="display:none;">
                             <div class="card-alert card green">
@@ -846,19 +871,19 @@
                 <td class="center-align unit-inputs">
                     <label>
                         <input type="checkbox" id="arr_sell_unit` + count + `" name="arr_sell_unit[]" value="1">
-                        <span>Pilih</span>
+                        <span>&nbsp;</span>
                     </label>
                 </td>
                 <td class="center-align unit-inputs">
                     <label>
                         <input type="checkbox" id="arr_buy_unit` + count + `" name="arr_buy_unit[]" value="1">
-                        <span>Pilih</span>
+                        <span>&nbsp;</span>
                     </label>
                 </td>
                 <td class="center-align unit-inputs">
                     <label>
                         <input type="radio" id="arr_default` + count + `" name="arr_default" value="1">
-                        <span>Pilih</span>
+                        <span>&nbsp;</span>
                     </label>
                 </td>
                 <td class="center-align unit-inputs">
@@ -1380,8 +1405,6 @@
                 $('#uom_unit').val(response.uom_unit_id).trigger('change');
                 $('#warehouse_id').val(response.warehouses).trigger('change');
                 $('#tolerance_gr').val(response.tolerance_gr);
-                $('#min_stock').val(response.min_stock);
-                $('#max_stock').val(response.max_stock);
                 $('.stock-unit').text(response.uom_code);
 
                 if(response.is_inventory_item == '1'){
@@ -1449,6 +1472,13 @@
                     $('#status').prop( "checked", false);
                 }
 
+                if(response.buffers.length > 0){
+                    $.each(response.buffers, function(i, val) {
+                        $('#arr_min_buffer' + val.place_id).val(val.min_stock);
+                        $('#arr_max_buffer' + val.place_id).val(val.max_stock);
+                    });
+                }
+
                 if(response.units.length > 0){
                     $('#body-unit').empty();
 
@@ -1473,19 +1503,19 @@
                                 <td class="center-align unit-inputs">
                                     <label>
                                         <input type="checkbox" id="arr_sell_unit` + count + `" name="arr_sell_unit[]" value="1" ` + (val.is_sell_unit ? 'checked' : '' ) + `>
-                                        <span>Pilih</span>
+                                        <span>&nbsp;</span>
                                     </label>
                                 </td>
                                 <td class="center-align unit-inputs">
                                     <label>
                                         <input type="checkbox" id="arr_buy_unit` + count + `" name="arr_buy_unit[]" value="1" ` + (val.is_buy_unit ? 'checked' : '' ) + `>
-                                        <span>Pilih</span>
+                                        <span>&nbsp;</span>
                                     </label>
                                 </td>
                                 <td class="center-align unit-inputs">
                                     <label>
                                         <input type="radio" id="arr_default` + count + `" name="arr_default" value="1" ` + (val.is_default ? 'checked' : '' ) + `>
-                                        <span>Pilih</span>
+                                        <span>&nbsp;</span>
                                     </label>
                                 </td>
                                 <td class="center-align unit-inputs">

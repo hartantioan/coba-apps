@@ -31,6 +31,7 @@ use Maatwebsite\Excel\Facades\Excel;
 
 use App\Exports\ExportItem;
 use App\Imports\ImportItemMaster;
+use App\Models\ItemBuffer;
 use App\Models\ItemUnit;
 use App\Models\User;
 
@@ -46,7 +47,6 @@ class ItemController extends Controller
     }
     public function index()
     {
-        
         $itemWithoutRelations = Item::whereDoesntHave('itemUnit')
         ->first();
 
@@ -246,8 +246,9 @@ class ItemController extends Controller
             'arr_unit'          => 'required',
             'arr_conversion'    => 'required',  
             'tolerance_gr'      => 'required',
-            'min_stock'         => 'required',
-            'max_stock'         => 'required',
+            'arr_place_buffer'  => 'required',
+            'arr_min_buffer'    => 'required|array',
+            'arr_max_buffer'    => 'required',
         ], [
             'code.required' 	        => 'Kode tidak boleh kosong.',
             'code.unique'               => 'Kode telah dipakai',
@@ -259,8 +260,12 @@ class ItemController extends Controller
             'arr_unit.required'         => 'Satuan konversi tidak boleh kosong.',
             'arr_conversion.required'   => 'Nilai konversi tidak boleh kosong.',
             'tolerance_gr.required'     => 'Toleransi penerimaan barang tidak boleh kosong.',
-            'min_stock.required'        => 'Nilai minimal stock tidak boleh kosong.',
-            'max_stock.required'        => 'Nilai maksimal stock tidak boleh kosong.',
+            'arr_place_buffer.required' => 'Buffer stock tidak boleh kosong.',
+            'arr_place_buffer.array'    => 'Buffer stock harus array.',
+            'arr_min_buffer.required'   => 'Buffer min stock tidak boleh kosong.',
+            'arr_min_buffer.array'      => 'Buffer min stock harus array.',
+            'arr_max_buffer.required'   => 'Buffer max stock tidak boleh kosong.',
+            'arr_max_buffer.array'      => 'Buffer max stock harus array.',
         ]);
 
         if($validation->fails()) {
@@ -271,6 +276,17 @@ class ItemController extends Controller
         } else {
 
             $passedDefaultUnit = false;
+            $passedBufferStock = true;
+
+            foreach($request->arr_place_buffer as $key => $row){
+                if(!$request->arr_min_buffer[$key]){
+                    $passedBufferStock = false;
+                }
+
+                if(!$request->arr_max_buffer[$key]){
+                    $passedBufferStock = false;
+                }
+            }
 
             foreach($request->arr_default as $key => $row){
                 if($row){
@@ -282,6 +298,13 @@ class ItemController extends Controller
                 return response()->json([
                     'status'  => 500,
                     'message' => 'Mohon maaf default satuan konversi harus ditentukan.'
+                ]);
+            }
+
+            if(!$passedBufferStock){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Mohon maaf buffer stock harus diisi.'
                 ]);
             }
 
@@ -300,8 +323,6 @@ class ItemController extends Controller
                     $query->is_purchase_item    = $request->is_purchase_item ? $request->is_purchase_item : NULL;
                     $query->is_service          = $request->is_service ? $request->is_service : NULL;
                     $query->note                = $request->note;
-                    $query->min_stock           = str_replace(',','.',str_replace('.','',$request->min_stock));
-                    $query->max_stock           = str_replace(',','.',str_replace('.','',$request->max_stock));
                     $query->status              = $request->status ? $request->status : '2';
                     $query->type_id             = $request->type_id ? $request->type_id : NULL;
                     $query->size_id             = $request->size_id ? $request->size_id : NULL;
@@ -335,8 +356,6 @@ class ItemController extends Controller
                         'is_purchase_item'  => $request->is_purchase_item ? $request->is_purchase_item : NULL,
                         'is_service'        => $request->is_service ? $request->is_service : NULL,
                         'note'              => $request->note,
-                        'min_stock'         => str_replace(',','.',str_replace('.','',$request->min_stock)),
-                        'max_stock'         => str_replace(',','.',str_replace('.','',$request->max_stock)),
                         'status'            => $request->status ? $request->status : '2',
                         'type_id'           => $request->type_id ? $request->type_id : NULL,
                         'size_id'           => $request->size_id ? $request->size_id : NULL,
@@ -364,6 +383,27 @@ class ItemController extends Controller
                                 'warehouse_id'  => $rowwarehouse->warehouse_id,
                                 'item_id'       => $query->id,
                                 'qty'           => 0
+                            ]);
+                        }
+                    }
+                }
+
+                if($request->arr_place_buffer){
+                    foreach($request->arr_place_buffer as $key => $row){
+                        $cek = ItemBuffer::where('place_id',$row)->where('item_id',$query->id)->get();
+                        if($cek->count() > 0){
+                            foreach($cek as $rowupdate){
+                                $rowupdate->update([
+                                    'min_stock' => str_replace(',','.',str_replace('.','',$request->arr_min_buffer[$key])),
+                                    'max_stock' => str_replace(',','.',str_replace('.','',$request->arr_max_buffer[$key])),
+                                ]);
+                            }
+                        }else{
+                            ItemBuffer::create([
+                                'item_id'   => $query->id,
+                                'place_id'  => $row,
+                                'min_stock' => str_replace(',','.',str_replace('.','',$request->arr_min_buffer[$key])),
+                                'max_stock' => str_replace(',','.',str_replace('.','',$request->arr_max_buffer[$key])),
                             ]);
                         }
                     }
@@ -489,6 +529,17 @@ class ItemController extends Controller
             $units .= '</tr>';
         }
 
+        $buffers = '';
+
+        foreach($data->itemBuffer as $key => $row){
+            $buffers .= '<tr>';
+            $buffers .= '<td>'.($key + 1).'</td>';
+            $buffers .= '<td>'.$row->place->code.'</td>';
+            $buffers .= '<td class="right-align">'.number_format($row->min_stock,2,',','.').'</td>';
+            $buffers .= '<td class="right-align">'.number_format($row->max_stock,2,',','.').'</td>';
+            $buffers .= '</tr>';
+        }
+
         $string = '<table style="min-width:50%;max-width:50%;">
                         <thead>
                             <tr>
@@ -507,6 +558,22 @@ class ItemController extends Controller
                                             <th>Default</th>
                                         </tr>
                                         '.$units.'
+                                    </table>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    Buffer Stock
+                                </th>
+                                <th>
+                                    <table class="bordered" style="min-width:100%;max-width:100%;">
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Plant</th>
+                                            <th>Min.Stock</th>
+                                            <th>Max.Stock</th>
+                                        </tr>
+                                        '.$buffers.'
                                     </table>
                                 </th>
                             </tr>
@@ -589,8 +656,6 @@ class ItemController extends Controller
         $item['uom_unit_id'] = $item->uomUnit->id;
         $item['uom_code'] = $item->uomUnit->code;
         $item['tolerance_gr'] = number_format($item->tolerance_gr,2,',','.');
-        $item['min_stock'] = number_format($item->min_stock,3,',','.');
-        $item['max_stock'] = number_format($item->max_stock,3,',','.');
         $item['type_name'] = $item->type()->exists() ? $item->type->code.' - '.$item->type->name : '';
         $item['type_code'] = $item->type()->exists() ? $item->type->code : '';
         $item['type_name_real'] = $item->type()->exists() ? $item->type->name : '';
@@ -615,6 +680,7 @@ class ItemController extends Controller
         $item['used'] = $item->hasChildDocument() ? '1' : '';
         
         $units = [];
+        $buffer = [];
         foreach($item->itemUnit as $row){
             $units[] = [
                 'unit_id'       => $row->unit_id,
@@ -624,7 +690,17 @@ class ItemController extends Controller
                 'is_default'    => $row->is_default ? $row->is_default : '', 
             ];
         }
+
+        foreach($item->itemBuffer as $row){
+            $buffer[] = [
+                'place_id'      => $row->place_id,
+                'min_stock'     => number_format($row->min_stock,2,',','.'),
+                'max_stock'     => number_format($row->max_stock,2,',','.'),
+            ];
+        }
+
         $item['units'] = $units;
+        $item['buffers'] = $buffer;
 
 		return response()->json($item);
     }

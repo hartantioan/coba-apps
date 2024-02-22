@@ -330,7 +330,7 @@
                                 <tr>
                                     <td align="center">{{ ($key + 1) }}</td>
                                     <td>{{ $row->item->code.' - '.$row->item->name }}</td>
-                                    <td align="right">{{ number_format($row->qty,3,',','.') }}</td>
+                                    <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                                     <td align="center">{{ $row->item->sellUnit->code }}</td>
                                     <td align="right">{{ number_format($row->price - $row->margin,2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->percent_discount_1,2,',','.') }}%</td>

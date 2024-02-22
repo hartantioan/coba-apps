@@ -254,7 +254,7 @@
                                     <td align="center" rowspan="2">{{ ($key + 1) }}</td>
                                     <td align="center">{{ $row->getCode() }}</td>
                                     <td align="">{{ $row->lookable->lookable->item->name }}</td>
-                                    <td align="right">{{ number_format($row->qty,3,',','.') }}</td>
+                                    <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                                     <td align="center">{{ $row->lookable->lookable->item->sellUnit->code }}</td>
                                     <td align="right">{{ number_format($row->total,2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->tax,2,',','.') }}</td>

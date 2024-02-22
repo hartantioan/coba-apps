@@ -366,7 +366,7 @@
                                                         <td class="center-align">{{ $row->warehouse->name }}</td>
                                                         <td class="center-align">{{ $row->area()->exists() ? $row->area->name : '-' }}</td>
                                                         <td class="center-align">{{ $row->itemShading()->exists() ? $row->itemShading->code : '-' }}</td>
-                                                        <td class="center-align">{{ number_format($row->qty,3,',','.').' '.$row->item->uomUnit->code }}</td>
+                                                        <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty).' '.$row->item->uomUnit->code }}</td>
                                                         <td class="center-align">{{ number_format($row->totalUndeliveredItem(),2,',','.').' '.$row->item->uomUnit->code }}</td>
                                                         <td class="right-align">{{ number_format($row->valueNow(),2,',','.') }}</td>
                                                     </tr>

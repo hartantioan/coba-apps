@@ -185,7 +185,7 @@
                         <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
                         <td class="center-align">{{ $row->marketingOrderDeliveryDetail->marketingOrderDelivery->marketingOrderDeliveryProcess->code }}</td>
                         <td class="center-align">{{ $row->item->code.' - '.$row->item->name }}</td>
-                        <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
+                        <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                         <td class="center-align">{{ $row->item->sellUnit->code }}</td>
                         <td class="center-align">{{ $row->place->code.' - '.$row->warehouse->name }}</td>
                     </tr>

@@ -324,7 +324,7 @@
                     <tr>
                         <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
                         <td class="center-align">{{ $row->item->code.' - '.$row->item->name }}</td>
-                        <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
+                        <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                         <td class="center-align">{{ $row->item->sellUnit->code }}</td>
                         <td class="right-align">{{ number_format($row->price,2,',','.') }}</td>
                         <td class="right-align">{{ number_format($row->margin,2,',','.') }}</td>

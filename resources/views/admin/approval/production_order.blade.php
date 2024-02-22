@@ -211,7 +211,7 @@
                     <tr>
                         <td class="center-align">{{ ($key + 1) }}</td>
                         <td class="">{{ $row->item()->exists() ? $row->item->code.' - '.$row->item->name : ($row->coa()->exists() ? $row->coa->code.' - '.$row->coa->name : '') }}</td>
-                        <td class="right-align">{{ $row->item()->exists() ? number_format($row->qty,3,',','.') : '-' }}</td>
+                        <td class="right-align">{{ $row->item()->exists() ? CustomHelper::formatConditionalQty($row->qty) : '-' }}</td>
                         <td class="center-align">{{ $row->item()->exists() ? $row->item->productionUnit->code : '-' }}</td>
                         <td class="right-align">{{ $row->coa()->exists() ? number_format($row->nominal,2,',','.') : '-' }}</td>
                         <td class="right-align">{{ $row->coa()->exists() ? number_format($row->total,2,',','.') : '-' }}</td>

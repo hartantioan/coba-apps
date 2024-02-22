@@ -32,7 +32,7 @@ class ExportDataAccess implements FromView,ShouldAutoSize
             }else{
                 $query->where('status','1');
             }
-        })->get();
+        })->where('type','1')->get();
 
         $data = [];        
 

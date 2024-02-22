@@ -4,7 +4,7 @@
             <th>NO.</th>
             <th>NIK</th>
             <th>NAMA</th>
-            <th>HAK AKSES</th>
+            <th colspan="2">HAK AKSES</th>
         </tr>
     </thead>
     <tbody>
@@ -14,7 +14,9 @@
         @foreach ($data as $row)
             <tr>
                 <td>{{ $no }}</td>
-                <td>{{ $row->employee_code }}</td>
+                <td>{{ $row->employee_no }}</td>
+                <td>{{ $row->name }}</td>
+                <td></td>
             </tr>
             @php
                 $no++;

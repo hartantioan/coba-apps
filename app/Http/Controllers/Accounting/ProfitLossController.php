@@ -81,7 +81,7 @@ class ProfitLossController extends Controller
                     <td style="left: 0px;position: sticky;background-color:white;">'.$row->name.'</td>';
 
                 foreach($arrMonth as $key => $rowMonth) {
-                    $val = $row->getTotalMonthFromParentExceptClosing($rowMonth['raw_month'],$level);
+                    $val = $row->getTotalMonthFromParent($rowMonth['raw_month'],$level);
                     $html .= '
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalanceBefore'],2,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalDebit'],2,',','.').'</td>
@@ -114,7 +114,7 @@ class ProfitLossController extends Controller
                     <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;'.$row->name.'</td>';
 
                 foreach($arrMonth as $key => $rowMonth) {
-                    $val = $row->getTotalMonthFromParentExceptClosing($rowMonth['raw_month'],$level);
+                    $val = $row->getTotalMonthFromParent($rowMonth['raw_month'],$level);
                     $html .= '
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalanceBefore'],2,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalDebit'],2,',','.').'</td>
@@ -190,7 +190,7 @@ class ProfitLossController extends Controller
                     <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$row->name.'</td>';
 
                 foreach($arrMonth as $key => $rowMonth) {
-                    $val = $row->getTotalMonthFromParentExceptClosing($rowMonth['raw_month'],$level);
+                    $val = $row->getTotalMonthFromParent($rowMonth['raw_month'],$level);
                     $html .= '
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalanceBefore'],2,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalDebit'],2,',','.').'</td>
@@ -272,7 +272,7 @@ class ProfitLossController extends Controller
                     <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$row->name.'</td>';
 
                 foreach($arrMonth as $key => $rowMonth) {
-                    $val = $row->getTotalMonthFromParentExceptClosing($rowMonth['raw_month'],$level);
+                    $val = $row->getTotalMonthFromParent($rowMonth['raw_month'],$level);
                     $html .= '
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalanceBefore'],2,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalDebit'],2,',','.').'</td>
@@ -362,7 +362,7 @@ class ProfitLossController extends Controller
                     <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$row->name.'</td>';
 
                 foreach($arrMonth as $key => $rowMonth) {
-                    $val = $row->getTotalMonthFromParentExceptClosing($rowMonth['raw_month'],$level);
+                    $val = $row->getTotalMonthFromParent($rowMonth['raw_month'],$level);
                     $html .= '
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalanceBefore'],2,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalDebit'],2,',','.').'</td>

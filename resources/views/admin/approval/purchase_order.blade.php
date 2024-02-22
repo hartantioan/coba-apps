@@ -234,6 +234,14 @@
                                 {{ date('d/m/Y',strtotime($data->delivery_date)) }}
                             </td>
                         </tr>
+                        <tr>
+                            <td width="50%">
+                                Pengiriman
+                            </td>
+                            <td width="50%">
+                                {{ $data->shippingType() }}
+                            </td>
+                        </tr>
                     </table>
                 </td>
             </tr>

@@ -28,7 +28,7 @@
                     <td style="border: 1px solid black;">{{ $row->code }}</td>
                     <td style="border: 1px solid black;"></td>
                     <td style="border: 1px solid black;"></td>
-                    <td style="border: 1px solid black;">{{ number_format($row->npwp_number, 0, ',', '.')}}</td>
+                    <td style="border: 1px solid black;">'{{ number_format($row->npwp_number, 0, '.', '') }}</td>
                     <td style="border: 1px solid black;">{{ $row->npwp_name }}</td>
                     <td style="border: 1px solid black;">{{ $row->npwp_address }}</td>
                     <td style="border: 1px solid black;">{{ number_format($row->total,3,',','.')}}</td>

@@ -111,7 +111,7 @@ class ProfitLossController extends Controller
                     }
                 }
                 $html .= '<tr>
-                    <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;'.$row->name.'</td>';
+                    <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;'.$row->code.' - '.$row->name.'</td>';
 
                 foreach($arrMonth as $key => $rowMonth) {
                     $val = $row->getTotalMonthFromParentExceptClosingBefore($rowMonth['raw_month'],$level);
@@ -187,7 +187,7 @@ class ProfitLossController extends Controller
                     </tr>';
                 }
                 $html .= '<tr>
-                    <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$row->name.'</td>';
+                    <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$row->code.' - '.$row->name.'</td>';
 
                 foreach($arrMonth as $key => $rowMonth) {
                     $val = $row->getTotalMonthFromParentExceptClosingBefore($rowMonth['raw_month'],$level);
@@ -269,7 +269,7 @@ class ProfitLossController extends Controller
                     </tr>';
                 }
                 $html .= '<tr>
-                    <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$row->name.'</td>';
+                    <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$row->code.' - '.$row->name.'</td>';
 
                 foreach($arrMonth as $key => $rowMonth) {
                     $val = $row->getTotalMonthFromParentExceptClosingBefore($rowMonth['raw_month'],$level);
@@ -359,7 +359,7 @@ class ProfitLossController extends Controller
                     </tr>';
                 }
                 $html .= '<tr>
-                    <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$row->name.'</td>';
+                    <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$row->code.' - '.$row->name.'</td>';
 
                 foreach($arrMonth as $key => $rowMonth) {
                     $val = $row->getTotalMonthFromParentExceptClosingBefore($rowMonth['raw_month'],$level);

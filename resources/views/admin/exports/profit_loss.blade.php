@@ -88,7 +88,7 @@
             @endphp
         @endif
         <tr>
-            <td>&nbsp;&nbsp;&nbsp;{{ $row->name }}</td>
+            <td>&nbsp;&nbsp;&nbsp;{{ $row->code.' - '.$row->name }}</td>
 
         @foreach($arrMonth as $key => $rowMonth)
             @php
@@ -170,7 +170,7 @@
             </tr>
         @endif
         <tr>
-            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $row->name }}</td>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $row->code.' - '.$row->name }}</td>
 
         @foreach($arrMonth as $key => $rowMonth)
             @php
@@ -260,7 +260,7 @@
             </tr>
         @endif
         <tr>
-            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $row->name }}</td>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $row->code.' - '.$row->name }}</td>
 
         @foreach($arrMonth as $key => $rowMonth)
             @php
@@ -362,7 +362,7 @@
             </tr>
         @endif
         <tr>
-            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $row->name }}</td>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $row->code.' - '.$row->name }}</td>
 
         @foreach($arrMonth as $key => $rowMonth)
             @php

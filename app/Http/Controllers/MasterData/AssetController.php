@@ -146,7 +146,7 @@ class AssetController extends Controller
                     $val->method(),
                     $val->note,
                     $val->status(),
-                    $val->place_id ? $val->place->name : '-',
+                    $val->place()->exists() ? $val->place->code : '-',
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>

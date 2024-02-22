@@ -25,7 +25,7 @@
                 <tr>
                     <td style="border: 1px solid black;">{{ $key + 1 }}.</td>
                     <td style="border: 1px solid black;">{{ $row->documentTax->date }}</td>
-                    <td style="border: 1px solid black;">{{ $row->documentTax->code }}</td>
+                    <td style="border: 1px solid black;">{{ $row->documentTax->transaction_code.$row->documentTax->replace.$row->documentTax->code }}</td>
                     <td style="border: 1px solid black;"></td>
                     <td style="border: 1px solid black;"></td>
                     <td style="border: 1px solid black;">'{{ number_format($row->documentTax->npwp_number, 0, '.', '') }}</td>

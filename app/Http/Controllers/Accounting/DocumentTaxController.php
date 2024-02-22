@@ -121,7 +121,7 @@ class DocumentTaxController extends Controller
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->date,
-                    $val->code,
+                    $val->transaction_code.$val->replace.$val->code,
                     $val->replace,
                     $val->replace,
                     $val->npwp_number,
@@ -181,7 +181,7 @@ class DocumentTaxController extends Controller
             $string .= '<tr>
                 <td class="center-align" style="border: 1px solid black;">'.($key + 1).'</td>
                 <td class="center-align" style="border: 1px solid black;">'.$row->documentTax->date.'</td>
-                <td class="center-align" style="border: 1px solid black;">'.$row->documentTax->code.'</td>
+                <td class="center-align" style="border: 1px solid black;">'.$row->documentTax->transaction_code.$row->documentTax->replace.$row->documentTax->code.'</td>
                 <td class="center-align" style="border: 1px solid black;"></td>
                 <td class="center-align" style="border: 1px solid black;"></td>
                 <td class="center-align" style="border: 1px solid black;">'.$row->documentTax->npwp_number.'</td>

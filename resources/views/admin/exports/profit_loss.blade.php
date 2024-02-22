@@ -52,7 +52,7 @@
 
         @foreach($arrMonth as $key => $rowMonth)
             @php
-                $val = $row->getTotalMonthFromParentExceptClosing($rowMonth['raw_month'],$level);
+                $val = $row->getTotalMonthFromParent($rowMonth['raw_month'],$level);
             @endphp
             
                 <td style="min-width:150px !important;" class="right-align">{{ number_format($val['totalBalanceBefore'],2,',','.') }}</td>
@@ -92,7 +92,7 @@
 
         @foreach($arrMonth as $key => $rowMonth)
             @php
-                $val = $row->getTotalMonthFromParentExceptClosing($rowMonth['raw_month'],$level);
+                $val = $row->getTotalMonthFromParent($rowMonth['raw_month'],$level);
             @endphp
             <td style="min-width:150px !important;" class="right-align">{{ number_format($val['totalBalanceBefore'],2,',','.') }}</td>
             <td style="min-width:150px !important;" class="right-align">{{ number_format($val['totalDebit'],2,',','.') }}</td>
@@ -174,7 +174,7 @@
 
         @foreach($arrMonth as $key => $rowMonth)
             @php
-                $val = $row->getTotalMonthFromParentExceptClosing($rowMonth['raw_month'],$level);
+                $val = $row->getTotalMonthFromParent($rowMonth['raw_month'],$level);
             @endphp
             <td style="min-width:150px !important;" class="right-align">{{ number_format($val['totalBalanceBefore'],2,',','.') }}</td>
             <td style="min-width:150px !important;" class="right-align">{{ number_format($val['totalDebit'],2,',','.') }}</td>
@@ -264,7 +264,7 @@
 
         @foreach($arrMonth as $key => $rowMonth)
             @php
-                $val = $row->getTotalMonthFromParentExceptClosing($rowMonth['raw_month'],$level);
+                $val = $row->getTotalMonthFromParent($rowMonth['raw_month'],$level);
             @endphp
             <td style="min-width:150px !important;" class="right-align">{{ number_format($val['totalBalanceBefore'],2,',','.') }}</td>
             <td style="min-width:150px !important;" class="right-align">{{ number_format($val['totalDebit'],2,',','.') }}</td>
@@ -366,7 +366,7 @@
 
         @foreach($arrMonth as $key => $rowMonth)
             @php
-                $val = $row->getTotalMonthFromParentExceptClosing($rowMonth['raw_month'],$level);
+                $val = $row->getTotalMonthFromParent($rowMonth['raw_month'],$level);
             @endphp
             <td style="min-width:150px !important;" class="right-align">{{ number_format($val['totalBalanceBefore'],2,',','.') }}</td>
             <td style="min-width:150px !important;" class="right-align">{{ number_format($val['totalDebit'],2,',','.') }}</td>

@@ -260,7 +260,7 @@
                                                     <td class="center-align"></td>
                                                     <td class="">` + response.latest[j]['kode'] + `</td>
                                                     <td class="">` + response.latest[j]['item'] + `</td>
-                                                    <td class="center-align">` + response.latest[j]['satuan'] + `</td>
+                                                    <td class="">` + response.latest[j]['satuan'] + `</td>
                                                     <td class="center-align">Saldo Awal</td>
                                                     <td class="center-align"></td>
                                                     <td class="right-align">` + response.latest[j]['last_qty'] + `</td>

@@ -24,8 +24,14 @@ class ExportDocumentTax implements WithMultipleSheets,ShouldAutoSize
     public function sheets(): array
     {
         $no_faktur_arr = explode(',', $this->no_faktur);
-        $taxes = DocumentTax::where(function($query) use($no_faktur_arr) {
-            $query->whereIn('code',$no_faktur_arr);
+        $outputArray = [];
+
+        foreach ($no_faktur_arr as $string) {
+            $result = substr($string, 3); // Start from the 4th character
+            $outputArray[] = $result;
+        }
+        $taxes = DocumentTax::where(function($query) use($outputArray) {
+            $query->whereIn('code',$outputArray);
         })->get();
         $taxDetail = DocumentTaxDetail::whereIn('document_tax_id', $taxes->pluck('id')->toArray())->get();
 

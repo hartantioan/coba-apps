@@ -455,7 +455,7 @@
     function excelMultiData(){
         var arr_id_temp=[];
         $.map(window.table.rows('.selected').nodes(), function (item) {
-            var poin = $(item).find('td:nth-child(4)').text().trim();
+            var poin = $(item).find('td:nth-child(3)').text().trim();
             arr_id_temp.push(poin);
         });
 

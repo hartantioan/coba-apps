@@ -25,7 +25,7 @@
                 <tr>
                     <td style="border: 1px solid black;">{{ $key + 1 }}.</td>
                     <td style="border: 1px solid black;">{{ $row->date }}</td>
-                    <td style="border: 1px solid black;">{{ $row->code }}</td>
+                    <td style="border: 1px solid black;">{{ $row->transaction_code.$row->replace.$row->code }}</td>
                     <td style="border: 1px solid black;"></td>
                     <td style="border: 1px solid black;"></td>
                     <td style="border: 1px solid black;">'{{ number_format($row->npwp_number, 0, '.', '') }}</td>

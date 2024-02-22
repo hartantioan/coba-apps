@@ -45,7 +45,7 @@
                                         </div>
                                     </div>
                                     <div class="row mt-1">
-                                        <div class="input-field col s6">
+                                        <div class="input-field col s9">
                                             <select class="browser-default select2" id="user_id" name="user_id[]" multiple>
                                                 <option value=""></option>
                                                 @foreach ($user as $row)
@@ -85,7 +85,7 @@
     });
 
     function process(){
-        var employees = $('#filter_group').val() ? $('#filter_group').val():'';
-        window.location = "{{ Request::url() }}/export?plant=" + plant + "&warehouse=" + warehouse+"&item=" + item +"&group=" + group;
+        var employees = $('#user_id').val() ? $('#user_id').val() : '';
+        window.location = "{{ Request::url() }}/export?employee=" + employees;
     }
 </script>

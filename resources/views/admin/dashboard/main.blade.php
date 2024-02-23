@@ -27,7 +27,7 @@
                             
                             <div class="card padding-2 animate fadeLeft row">
                                  <div class="col s4 m6 l4">
-                                    <h6 class="pl-2 pt-1">Absensi</h6>
+                                    <h6 class="pl-2 pt-1">Absensi {{$start_date}} - {{$end_date}}</h6>
                                  </div>
                                  <div class="col s4 m6 l4">
                                  </div>
@@ -42,110 +42,101 @@
                                        
                                        <div class="row">
                                           <div class="col s12 m6 l4">
-                                             <div class="card gradient-45deg-deep-orange-orange gradient-shadow min-height-100 white-text animate fadeLeft">
-                                                <div class="padding-4">
-                                                   <div class="row" style="">
-                                                      <div class="col s7 m7">
-                                                         <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                         <p>Hari Efektif &nbsp; &nbsp; </p>
-                                                      </div>
-                                                      <div class="col s5 m5 right-align">
-                                                         <p class="no-margin">Total</p>
-                                                         <h5 class="mb-0 white-text" id="attendance_count">{{$attendance_count}}</h5>
-                                                         
-                                                         <p></p>
-                                                      </div>
-                                                   </div>
-                                                </div>
+                                             <div class="card gradient-45deg-deep-orange-orange gradient-shadow white-text animate fadeLeft">
+                                                 <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;">
+                                                     <div style="flex: 1;">
+                                                         <img src="{{ url('website/day.png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
+                                                     </div>
+                                                     <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
+                                                      <p class="no-margin center-align">Hari Efektif</p>
+                                                      <h4 class="mb-0 white-text center-align" id="attendance_count">{{$attendance_count}}</h4>
+                                                  </div>
+                                                 </div>
                                              </div>
                                           </div>
+                                         
                                           <div class="col s12 m6 l4">
                                              <div class="card gradient-45deg-purple-deep-orange gradient-shadow min-height-100 white-text animate fadeLeft">
-                                                <div class="padding-4">
-                                                   <div class="row">
-                                                      <div class="col s7 m7">
-                                                         <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                         <p>Tepat Keluar &nbsp;</p>
-                                                      </div>
-                                                      <div class="col s5 m5 right-align">
-                                                         <p class="no-margin">Total</p>
-                                                         <h5 class="mb-0 white-text" id="tepatkeluar">{{$tepatkeluar}}</h5>
+                                                <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;">
+                                                
+                                                      <div style="flex: 1;">
+                                                         <img src="{{ url('website/exit.png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
                                                          
-                                                         <p></p>
                                                       </div>
-                                                   </div>
+                                                      <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
+                                                         <p class="no-margin center-align">Tepat Keluar &nbsp;</p>
+                                                         <h4 class="mb-0 white-text center-align" id="tepatkeluar">{{$tepatkeluar}}</h4>
+                                       
+                                                      </div>
+                                                   
                                                 </div>
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
                                              <div class="card gradient-45deg-purple-amber gradient-shadow min-height-100 white-text animate fadeLeft">
-                                                <div class="padding-4">
-                                                   <div class="row">
-                                                      <div class="col s7 m7">
-                                                         <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                         <p>Tepat Masuk &nbsp;</p>
-                                                      </div>
-                                                      <div class="col s5 m5 right-align">
-                                                         <p class="no-margin">Total</p>
-                                                         <h5 class="mb-0 white-text" id="tepatmasuk">{{$tepatmasuk}}</h5>
+                                                <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;">
+                                                 
+                                                      <div style="flex: 1;">
+                                                         <img src="{{ url('website/arrived.png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
                                                          
-                                                         <p></p>
                                                       </div>
-                                                   </div>
+                                                     <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
+                                                         <p class="no-margin center-align">Tepat Masuk</p>
+                                                         <h4 class="mb-0 white-text center-align" id="tepatmasuk">{{$tepatmasuk}}</h4>
+                                                         
+                                                      </div>
+                                                   
                                                 </div>
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
                                              <div class="card gradient-45deg-blue-indigo gradient-shadow min-height-100 white-text animate fadeLeft">
-                                                <div class="padding-4">
-                                                   <div class="row">
-                                                      <div class="col s7 m7">
-                                                         <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                         <p>Alpha &nbsp; &nbsp; &nbsp; &nbsp;</p>
+                                                <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;">
+                                                   
+                                                      <div style="flex: 1;">
+                                                         <img src="{{ url('website/absent.png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
+                                                       
                                                       </div>
-                                                      <div class="col s5 m5 right-align">
-                                                         <p class="no-margin">Total</p>
-                                                         <h5 class="mb-0 white-text" id="total_absen">{{$total_absen}}</h5>
+                                                     <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
+                                                         <p class="no-margin center-align">Alpha</p>
+                                                         <h4 class="mb-0 white-text center-align" id="total_absen">{{$total_absen}}</h4>
                                                          
-                                                         <p></p>
                                                       </div>
-                                                   </div>
+                                                  
                                                 </div>
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
                                              <div class="card gradient-45deg-indigo-blue gradient-shadow min-height-100 white-text animate fadeLeft">
-                                                <div class="padding-4">
-                                                   <div class="row">
-                                                      <div class="col s7 m7">
-                                                         <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                         <p>Tidak Absen Datang</p>
-                                                      </div>
-                                                      <div class="col s5 m5 right-align">
-                                                         <p class="no-margin">Total</p>
-                                                         <h5 class="mb-0 white-text" id="total_tidak_datang">{{$total_tidak_datang}}</h5>
+                                                <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;">
+                                                   
+                                                      <div style="flex: 1;">
+                                                         <img src="{{ url('website/no-data.png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
                                                          
-                                                         <p></p>
                                                       </div>
-                                                   </div>
+                                                     <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
+                                                         <p class="no-margin center-align">Tidak Absen Datang</p>
+                                                         <h4 class="mb-0 white-text center-align" id="total_tidak_datang">{{$total_tidak_datang}}</h4>
+                                                         
+                                                      </div>
+                                                   
                                                 </div>
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
                                              <div class="card gradient-45deg-indigo-purple gradient-shadow min-height-100 white-text animate fadeLeft">
-                                                <div class="padding-4">
-                                                   <div class="row">
-                                                      <div class="col s7 m7">
-                                                         <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                         <p>Tidak Absen Pulang</p>
+                                                <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;">
+                                                   
+                                                      <div style="flex: 1;">
+                                                         <img src="{{ url('website/no-data (1).png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
+                                                       
                                                       </div>
-                                                      <div class="col s5 m5 right-align">
-                                                         <p class="no-margin">Total</p>
-                                                         <h5 class="mb-0 white-text" id="total_tidak_pulang">{{$total_tidak_pulang}}</h5>
-                                                         
-                                                         <p></p>
+                                                     <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
+                                                         <p class="no-margin center-align">Tidak Absen Pulang</p>
+                                                         <h4 class="mb-0 white-text center-align" id="total_tidak_pulang">{{$total_tidak_pulang}}</h4>
+                                                      
                                                       </div>
-                                                   </div>
+                                                   
                                                 </div>
                                              </div>
                                           </div>
@@ -205,127 +196,123 @@
                                        <div class="row">
                                           <div class="col s12 m6 l4">
                                              <div class="card  deep-purple gradient-shadow min-height-100 white-text animate fadeLeft">
-                                                <div class="padding-4">
-                                                   <div class="row" style="">
-                                                      <div class="col s7 m7">
-                                                         <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                         <p>Total Cuti &nbsp; &nbsp; </p>
+                                                <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;">
+                                                  
+                                                      <div style="flex: 1;">
+                                                         <img src="{{ url('website/leave.png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
+                                                        
                                                       </div>
-                                                      <div class="col s5 m5 right-align">
-                                                         <p class="no-margin">Total</p>
-                                                         <h5 class="mb-0 white-text" id="counter_cuti">{{$counter_cuti}}</h5>
+                                                     <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
+                                                         <p class="no-margin center-align">Total Cuti</p>
+                                                         <h4 class="mb-0 white-text center-align" id="counter_cuti">{{$counter_cuti}}</h4>
                                                          
-                                                         <p></p>
+                                                        
                                                       </div>
-                                                   </div>
+                                                   
                                                 </div>
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
                                              <div class="card deep-purple darken-1 gradient-shadow min-height-100 white-text animate fadeLeft">
-                                                <div class="padding-4">
-                                                   <div class="row">
-                                                      <div class="col s7 m7">
-                                                         <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                         <p>Sakit &nbsp;</p>
+                                                <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;">
+                                                   
+                                                      <div style="flex: 1;">
+                                                         <img src="{{ url('website/bed.png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
+                                                      
                                                       </div>
-                                                      <div class="col s5 m5 right-align">
-                                                         <p class="no-margin">Total</p>
-                                                         <h5 class="mb-0 white-text" id="counter_sakit">{{$counter_sakit}}</h5>
+                                                     <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
+                                                         <p class="no-margin center-align">Sakit</p>
+                                                         <h4 class="mb-0 white-text center-align" id="counter_sakit">{{$counter_sakit}}</h4>
                                                          
-                                                         <p></p>
+                                                         
                                                       </div>
-                                                   </div>
+                                                   
                                                 </div>
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
                                              <div class="card deep-purple darken-2 gradient-shadow min-height-100 white-text animate fadeLeft">
-                                                <div class="padding-4">
-                                                   <div class="row">
-                                                      <div class="col s7 m7">
-                                                         <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                         <p> Ijin &nbsp;</p>
+                                                <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;">
+                                                  
+                                                      <div style="flex: 1;">
+                                                         <img src="{{ url('website/unemployment.png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
+                                                     
                                                       </div>
-                                                      <div class="col s5 m5 right-align">
-                                                         <p class="no-margin">Total</p>
-                                                         <h5 class="mb-0 white-text" id="counter_ijin">{{$counter_ijin}}</h5>
+                                                     <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
+                                                         <p class="no-margin center-align">Ijin</p>
+                                                         <h4 class="mb-0 white-text center-align" id="counter_ijin">{{$counter_ijin}}</h4>
                                                          
-                                                         <p></p>
                                                       </div>
-                                                   </div>
+                                                   
                                                 </div>
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
                                              <div class="card indigo gradient-shadow min-height-100 white-text animate fadeLeft">
-                                                <div class="padding-4">
-                                                   <div class="row">
-                                                      <div class="col s7 m7">
-                                                         <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                         <p>Dinas Luar &nbsp; &nbsp; &nbsp; &nbsp;</p>
+                                                <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;">
+                                                   
+                                                      <div style="flex: 1;">
+                                                         <img src="{{ url('website/svg.png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
+                                                     
                                                       </div>
-                                                      <div class="col s5 m5 right-align">
-                                                         <p class="no-margin">Total</p>
-                                                         <h5 class="mb-0 white-text" id="counter_dinas_luar">{{$counter_dinas_luar}}</h5>
+                                                     <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
+                                                         <p class="no-margin center-align">Dinas Luar</p>
+                                                         <h4 class="mb-0 white-text center-align" id="counter_dinas_luar">{{$counter_dinas_luar}}</h4>
                                                          
-                                                         <p></p>
+                                                       
                                                       </div>
-                                                   </div>
+                                                   
                                                 </div>
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
                                              <div class="card indigo darken-1 gradient-shadow min-height-100 white-text animate fadeLeft">
-                                                <div class="padding-4">
-                                                   <div class="row">
-                                                      <div class="col s7 m7">
-                                                         <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                         <p>Cuti Khsusus</p>
+                                                <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;">
+                                                   
+                                                      <div style="flex: 1;">
+                                                         <img src="{{ url('website/day.png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
+                                                        
                                                       </div>
-                                                      <div class="col s5 m5 right-align">
-                                                         <p class="no-margin">Total</p>
-                                                         <h5 class="mb-0 white-text" id="counter_cuti_kusus">{{$counter_cuti_kusus}}</h5>
+                                                     <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
+                                                         <p class="no-margin center-align">Cuti Khsusus</p>
+                                                         <h4 class="mb-0 white-text center-align" id="counter_cuti_kusus">{{$counter_cuti_kusus}}</h4>
                                                          
-                                                         <p></p>
                                                       </div>
-                                                   </div>
+                                                   
                                                 </div>
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
                                              <div class="card  indigo darken-2 gradient-shadow min-height-100 white-text animate fadeLeft">
-                                                <div class="padding-4">
-                                                   <div class="row">
-                                                      <div class="col s7 m7">
-                                                         <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                         <p>Dispen</p>
-                                                      </div>
-                                                      <div class="col s5 m5 right-align">
-                                                         <p class="no-margin">Total</p>
-                                                         <h5 class="mb-0 white-text" id="counter_dispen">{{$counter_dispen}}</h5>
+                                                <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;">
+                                                   
+                                                      <div style="flex: 1;">
+                                                         <img src="{{ url('website/verification.png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
                                                          
-                                                         <p></p>
                                                       </div>
-                                                   </div>
+                                                     <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
+                                                         <p class="no-margin center-align">Dispen</p>
+                                                         <h4 class="mb-0 white-text center-align" id="counter_dispen">{{$counter_dispen}}</h4>
+                                                         
+                                                      </div>
+                                                   
                                                 </div>
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
                                              <div class="card  blue darken-1 gradient-shadow min-height-100 white-text animate fadeLeft">
-                                                <div class="padding-4">
-                                                   <div class="row">
-                                                      <div class="col s7 m7">
-                                                         <i class="material-icons background-round mt-5">add_shopping_cart</i>
-                                                         <p>WFH</p>
+                                                <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;">
+                                                   
+                                                      <div style="flex: 1;">
+                                                         <img src="{{ url('website/work-from-home.png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
+                                                   
                                                       </div>
-                                                      <div class="col s5 m5 right-align">
-                                                         <p class="no-margin">Total</p>
-                                                         <h5 class="mb-0 white-text" id="counter_wfh">{{$counter_wfh}}</h5>
-                                                         
-                                                         <p></p>
+                                                     <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
+                                                         <p class="no-margin center-align">WFH</p>
+                                                         <h4 class="mb-0 white-text center-align" id="counter_wfh">{{$counter_wfh}}</h4>
+                                                        
                                                       </div>
-                                                   </div>
+                                                   
                                                 </div>
                                              </div>
                                           </div>

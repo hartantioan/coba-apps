@@ -136,7 +136,7 @@ class PurchaseRequestDetail extends Model
     public function purchaseOrderDetail()
     {
         return $this->hasMany('App\Models\PurchaseOrderDetail', 'purchase_request_detail_id', 'id')->whereHas('purchaseOrder',function($query){
-            $query->whereIn('status',['2','3']);
+            $query->whereIn('status',['1','2','3']);
         });
     }
 

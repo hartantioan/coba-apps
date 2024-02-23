@@ -14,7 +14,6 @@ class UserActivityController extends Controller
         $data = [
             'title'     => 'Aktivitas User',
             'content'   => 'admin.setting.activity_user',
-            'approval'  => Approval::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

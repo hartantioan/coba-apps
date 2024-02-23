@@ -237,7 +237,10 @@
                     <td class="center-align">{{ number_format($row->qty_return,3,',','.') }}</td>
                 </tr>
                 <tr>
-                    <td colspan="16">Keterangan : {{ $row->note }}</td>
+                    <td colspan="16">Keterangan 1 : {{ $row->note }}</td>
+                </tr>
+                <tr>
+                    <td colspan="16">Keterangan 2 : {{ $row->note2 }}</td>
                 </tr>
                 <tr>
                     <td colspan="16">Serial : {{ $row->listSerial() }}</td>

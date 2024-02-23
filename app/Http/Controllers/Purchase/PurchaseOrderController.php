@@ -154,6 +154,10 @@ class PurchaseOrderController extends Controller
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
                             })
+                            ->orWhereHas('supplier',function($query) use ($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            })
                             ->orWhereHas('purchaseOrderDetail',function($query) use ($search, $request){
                                 $query->whereHas('item',function($query) use ($search, $request){
                                     $query->where('code','like',"%$search%")
@@ -231,6 +235,10 @@ class PurchaseOrderController extends Controller
                             ->orWhere('tax', 'like', "%$search%")
                             ->orWhere('grandtotal', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use ($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('supplier',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
                             })->orWhereHas('purchaseOrderDetail',function($query) use ($search, $request){

@@ -1713,6 +1713,9 @@ class CustomHelper {
 
 			if($gr){
 				$gr->updateRootDocumentStatusDone();
+				$gr->update([
+					'status' => '3'
+				]);
 			}
 
 		}elseif($table_name == 'good_return_issues'){

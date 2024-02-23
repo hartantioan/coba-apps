@@ -84,8 +84,8 @@ class StockMovementController extends Controller
                     });
                 }
             })
-            ->orderBy('date', 'desc')
             ->orderBy('id', 'desc')
+            ->orderBy('date', 'desc')
             ->get();
         }else{
             $perlu = 1;
@@ -177,8 +177,8 @@ class StockMovementController extends Controller
                         });
                     }
                 })
-                ->orderBy('date', 'desc') // Order by 'date' column in descending order
                 ->orderBy('id', 'desc')
+                ->orderBy('date', 'desc') // Order by 'date' column in descending order
                 ->first();
 
                 $array_last_item[] = [

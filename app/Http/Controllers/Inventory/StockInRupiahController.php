@@ -40,7 +40,6 @@ class StockInRupiahController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
 
     }
-
     
     public function filter(Request $request){
         $start_time = microtime(true);
@@ -118,7 +117,6 @@ class StockInRupiahController extends Controller
             })
             ->orderBy('item_id')
             ->orderBy('date')
-            ->orderBy('type')
             ->get();
         }
         

@@ -1256,16 +1256,16 @@
                 });
 
                 $('select[name^="arr_item[]"]').each(function(index){
-                    if($('#arr_serial' + $(this).data('id')).length > 0){
+                    /* if($('#arr_serial' + $(this).data('id')).length > 0){
                         let arr = $('#arr_serial' + $(this).data('id')).val();
                         if(arr.length > 0){
                             formData.append('arr_serial[]',$('#arr_serial' + $(this).data('id')).val());
                         }else{
                             passedSerial = false;
                         }
-                    }else{
+                    }else{ */
                         formData.append('arr_serial[]','');
-                    }
+                    /* } */
                 });
 
                 $('input[name^="arr_qty[]"]').each(function(index){

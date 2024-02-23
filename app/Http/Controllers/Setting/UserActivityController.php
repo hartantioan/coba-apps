@@ -13,7 +13,7 @@ class UserActivityController extends Controller
     {
         $data = [
             'title'     => 'Aktivitas User',
-            'content'   => 'admin.setting.activity_user',
+            'content'   => 'admin.setting.user_activity',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

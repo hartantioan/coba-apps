@@ -142,11 +142,6 @@ class GoodReceipt extends Model
         return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
     }
 
-    public function landedCost()
-    {
-        return $this->hasMany('App\Models\LandedCost')->whereIn('status',['2','3']);;
-    }
-
     public function status(){
         $status = match ($this->status) {
           '1' => '<span class="amber medium-small white-text padding-3">Menunggu</span>',
@@ -202,19 +197,19 @@ class GoodReceipt extends Model
     public function hasChildDocument(){
         $hasRelation = false;
 
-        if($this->landedCost()->exists()){
-            $hasRelation = true;
-        }
-
-        if($this->purchaseInvoiceDetail()->exists()){
-            $hasRelation = true;
-        }
-
         foreach($this->goodReceiptDetail as $row){
-            foreach($row->goodReceiptDetailSerial as $row){
-                if($row->goodIssueDetail()->exists()){
+            foreach($row->itemSerial as $rowdetail){
+                if($rowdetail->goodIssueDetail()->exists()){
                     $hasRelation = true;
                 }
+            }
+
+            if($row->landedCostDetail()->exists()){
+                $hasRelation = true;
+            }
+
+            if($row->purchaseInvoiceDetail()->exists()){
+                $hasRelation = true;
             }
         }
 

@@ -2286,6 +2286,10 @@ class CustomHelper {
 				self::updateBalanceAsset($row->asset_id,$row->nominal,'OUT',$table_name);
 			}
 
+			$dpr->update([
+				'status'	=> '3',
+			]);
+
 		}elseif($table_name == 'work_orders'){
 
 		}elseif($table_name == 'request_spareparts'){

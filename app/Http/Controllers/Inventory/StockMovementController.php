@@ -53,13 +53,13 @@ class StockMovementController extends Controller
             $query_data = ItemCogs::whereIn('id', function ($query) use ($request) {            
                 $query->selectRaw('MAX(id)')
                     ->from('item_cogs')
-                    ->where('date', '<', $request->finish_date)
+                    ->where('date', '<=', $request->finish_date)
                     ->groupBy('item_id');
             })
             ->where(function($query) use ( $request) {
                if($request->finish_date) {
                    
-                    $query->whereDate('date','<', $request->finish_date);
+                    $query->whereDate('date','<=', $request->finish_date);
                 }
                 if($request->item_id) {
                     $query->whereHas('item',function($query) use($request){
@@ -84,8 +84,8 @@ class StockMovementController extends Controller
                     });
                 }
             })
-            ->orderBy('id', 'desc')
             ->orderBy('date', 'desc')
+            ->orderBy('id', 'desc')
             ->get();
         }else{
             $perlu = 1;
@@ -177,8 +177,8 @@ class StockMovementController extends Controller
                         });
                     }
                 })
-                ->orderBy('id', 'desc')
                 ->orderBy('date', 'desc') // Order by 'date' column in descending order
+                ->orderBy('id', 'desc')
                 ->first();
 
                 $array_last_item[] = [

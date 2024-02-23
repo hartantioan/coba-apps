@@ -102,8 +102,6 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                 }
             })
             ->orderBy('item_id')
-            ->orderBy('date')
-            ->orderBy('type')
             ->get();
         }
       

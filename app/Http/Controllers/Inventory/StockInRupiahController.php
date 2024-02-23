@@ -116,11 +116,8 @@ class StockInRupiahController extends Controller
                 }
             })
             ->orderBy('item_id')
-            ->orderBy('date')
             ->get();
         }
-        
-        
       
         $cum_qty = 0;
         $cum_val = 0 ;

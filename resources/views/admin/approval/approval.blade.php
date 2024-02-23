@@ -76,7 +76,7 @@
                             <div class="card">
                                 <div class="card-content">
                                     <h4 class="card-title">List Data
-                                        {{-- <button class="waves-effect waves-light btn mb-1 mr-1 cyan right hide btn-multi" onclick="multiApprove()">Proses</button> --}}
+                                        <button class="waves-effect waves-light btn mb-1 mr-1 cyan right hide btn-multi" onclick="multiApprove()">Proses</button>
                                         <button class="waves-effect waves-light btn mb-1 mr-1 right" onclick="selectAllRow()">BARIS TERPILIH : <b id="countSelected">0</b></button>
                                     </h4>
                                     <div class="row">

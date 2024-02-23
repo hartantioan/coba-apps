@@ -55,7 +55,7 @@ class StockInRupiahController extends Controller
             ->where(function($query) use ( $request) {
                if($request->finish_date) {
                    
-                    $query->whereDate('date','<=', $request->finish_date);
+                    $query->whereDate('date','<', $request->finish_date);
                 }
                 if($request->item_id) {
                     $query->whereHas('item',function($query) use($request){
@@ -80,7 +80,6 @@ class StockInRupiahController extends Controller
                     });
                 }
             })
-            ->orderBy('id', 'desc')
             ->orderBy('date', 'desc')
             ->get();
         }else{

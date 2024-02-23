@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use App\Http\Controllers\Controller;
+use App\Jobs\ResetCogs;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -47,13 +48,13 @@ class MenuController extends Controller
             ]);
         } */
 
-        $data = [
+        /* $data = [
             'title'     => 'Menu',
             'menus'     => Menu::whereNull('parent_id')->get(),
             'content'   => 'admin.setting.menu'
         ];
 
-        return view('admin.layouts.index', ['data' => $data]);
+        return view('admin.layouts.index', ['data' => $data]); */
 
         /* $pr = PurchaseRequest::whereHas('purchaseRequestDetail',function($query){
             $query->where('requester','sammy');
@@ -108,13 +109,22 @@ class MenuController extends Controller
             ]);
         } */
 
-        /* $gr = GoodReceipt::all();
-        $gi = GoodIssue::all();
-        $grcv = GoodReceive::all();
+        /* $gr = GoodReceipt::whereIn('status',['2','3'])->whereDate('post_date','>=','2024-02-01')->get();
+        $grcv = GoodReceive::whereIn('status',['2','3'])->whereDate('post_date','>=','2024-02-01')->get();
+        $gi = GoodIssue::whereIn('status',['2','3'])->whereDate('post_date','>=','2024-02-01')->get();
 
         $data = [];
 
         foreach($gr as $row){
+            $data[] = [
+                'type'          => 'IN',
+                'date'          => $row->post_date,
+                'lookable_type' => $row->getTable(),
+                'lookable_id'   => $row->id,
+            ];
+        }
+
+        foreach($grcv as $row){
             $data[] = [
                 'type'          => 'IN',
                 'date'          => $row->post_date,
@@ -132,15 +142,6 @@ class MenuController extends Controller
             ];
         }
 
-        foreach($grcv as $row){
-            $data[] = [
-                'type'          => 'IN',
-                'date'          => $row->post_date,
-                'lookable_type' => $row->getTable(),
-                'lookable_id'   => $row->id,
-            ];
-        }
-
         $collection = collect($data)->sortBy(function($item) {
                         return [$item['date'], $item['type']];
                     })->values();
@@ -148,6 +149,8 @@ class MenuController extends Controller
         foreach($collection as $row){
             CustomHelper::sendJournal($row['lookable_type'],$row['lookable_id']);
         } */
+
+        /* ResetCogs::dispatch('2024-02-19',1,900); */
 
         /* $podp = PurchaseDownPayment::all();
         foreach($podp as $row){

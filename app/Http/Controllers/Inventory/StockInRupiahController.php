@@ -81,6 +81,7 @@ class StockInRupiahController extends Controller
                 }
             })
             ->orderBy('date', 'desc')
+            ->orderBy('id', 'desc')
             ->get();
         }else{
             $perlu = 1;

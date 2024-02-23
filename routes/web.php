@@ -171,6 +171,7 @@ use App\Http\Controllers\Setting\ApprovalController;
 use App\Http\Controllers\Setting\ApprovalStageController;
 use App\Http\Controllers\Setting\ApprovalTemplateController;
 use App\Http\Controllers\Setting\DataAccessController;
+use App\Http\Controllers\Setting\UserActivityController;
 
 use App\Http\Controllers\Misc\Select2Controller;
 use App\Http\Controllers\Misc\NotificationController;
@@ -1161,6 +1162,11 @@ Route::prefix('admin')->group(function () {
                     Route::post('create',[ChangeLogController::class, 'create']);
                     Route::post('show',[ChangeLogController::class, 'show']);
                     Route::post('destroy', [ChangeLogController::class, 'destroy'])->middleware('operation.access:change_log,delete');
+                });
+
+                Route::prefix('user_activity')->middleware('operation.access:user_activity,view')->group(function () {
+                    Route::get('/',[UserActivityController::class, 'index']);
+                    Route::get('datatable',[UserActivityController::class, 'datatable']);
                 });
             });
 

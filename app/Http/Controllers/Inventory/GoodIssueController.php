@@ -53,6 +53,8 @@ class GoodIssueController extends Controller
     {
         $lastSegment = request()->segment(count(request()->segments()));
         $menu = Menu::where('url', $lastSegment)->first();
+
+
         $data = [
             'title'     => 'Barang Keluar',
             'content'   => 'admin.inventory.good_issue',
@@ -63,6 +65,7 @@ class GoodIssueController extends Controller
             'maxDate'   => $request->get('maxDate'),
             'newcode'   => $menu->document_code.date('y'),
             'menucode'  => $menu->document_code,
+            'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
             'line'      => Line::where('status','1')->get(),
             'machine'   => Machine::where('status','1')->orderBy('name')->get(),
             'coa_cost'  => InventoryCoa::where('status','1')->where('type','1')->get(),

@@ -21,6 +21,7 @@ class GoodIssueDetail extends Model
         'price',
         'total',
         'note',
+        'note2',
         'inventory_coa_id',
         'coa_id',
         'lookable_type',

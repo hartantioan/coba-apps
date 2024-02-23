@@ -17,7 +17,8 @@
             <th>Kode Item</th>
             <th>Nama Item</th>
             <th>Plant</th>
-            <th>Ket. Detail</th>
+            <th>Ket. Detail 1</th>
+            <th>Ket. Detail 2</th>
             <th>Tipe Pengeluaran</th>
             <th>COA</th>
             <th>Distribusi Biaya</th>
@@ -58,6 +59,7 @@
                 <td>{{ $rowdetail->itemStock->item->name }}</td>
                 <td>{{ $rowdetail->place()->exists() ? $rowdetail->place->code : '-' }}</td>
                 <td>{{ $rowdetail->note }}</td>
+                <td>{{ $rowdetail->note2 }}</td>
                 <td>{{ $rowdetail->inventoryCoa()->exists() ? $rowdetail->inventoryCoa->name : '-' }}</td>
                 <td>{{ $rowdetail->coa()->exists() ? $rowdetail->coa->code.' - '.$rowdetail->coa->name : '-' }}</td>
                 <td>{{ $rowdetail->costDistribution()->exists() ? $rowdetail->costDistribution->code.' - '.$rowdetail->costDistribution->name : '-' }}</td>

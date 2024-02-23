@@ -2126,7 +2126,7 @@ class MaterialRequestController extends Controller
                                     $good_issue_tempura = [
                                         'properties'=> [
                                             ['name'=> "Tanggal : ".$good_issue_detail->goodIssue->post_date],
-                                            ['name'=> "Vendor  : ".$good_issue_detail->goodIssue->supplier->name],
+                                            ['name'=> "Pengguna  : ".$good_issue_detail->goodIssue->user->name],
                                         ],
                                         'key'=>$good_issue_detail->goodIssue->code,
                                         'name'=>$good_issue_detail->goodIssue->code,

@@ -426,6 +426,7 @@ class GoodIssueController extends Controller
                             'price'                 => $rowprice,
                             'total'                 => round($rowprice * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),2),
                             'note'                  => $request->arr_note[$key],
+                            'note2'                 => $request->arr_note2[$key],
                             'inventory_coa_id'      => $request->arr_inventory_coa[$key] ? $request->arr_inventory_coa[$key] : NULL,
                             'coa_id'                => $request->arr_inventory_coa[$key] ? NULL : ($request->arr_coa[$key] ? $request->arr_coa[$key] : NULL),
                             'lookable_type'         => $request->arr_lookable_type[$key] ? $request->arr_lookable_type[$key] : NULL,
@@ -490,14 +491,15 @@ class GoodIssueController extends Controller
                     <table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="18">Daftar Item</th>
+                                <th class="center-align" colspan="19">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Item</th>
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
-                                <th class="center-align">Keterangan</th>
+                                <th class="center-align">Ket.1</th>
+                                <th class="center-align">Ket.2</th>
                                 <th class="center-align">Tipe Biaya</th>
                                 <th class="center-align">Coa</th>
                                 <th class="center-align">Dari Plant</th>
@@ -522,6 +524,7 @@ class GoodIssueController extends Controller
                 <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->itemStock->item->uomUnit->code.'</td>
                 <td class="">'.$row->note.'</td>
+                <td class="">'.$row->note2.'</td>
                 <td class="">'.($row->inventoryCoa()->exists() ? $row->inventoryCoa->name : '-').'</td>
                 <td class="">'.($row->coa()->exists() ? $row->coa->code.' - '.$row->coa->name : '-').'</td>
                 <td class="center-align">'.$row->itemStock->place->code.'</td>
@@ -619,6 +622,7 @@ class GoodIssueController extends Controller
                 'coa_id'                    => $row->coa()->exists() ? $row->coa_id : '',
                 'coa_name'                  => $row->coa()->exists() ? $row->coa->code.' - '.$row->coa->name : '',
                 'note'                      => $row->note ? $row->note : '',
+                'note2'                     => $row->note2 ? $row->note2 : '',
                 'lookable_type'             => $row->lookable_type ? $row->lookable_type : '',
                 'lookable_id'               => $row->lookable_id ? $row->lookable_id : '',
                 'reference_id'              => $row->lookable_type ? $row->lookable->materialRequest->id : '',

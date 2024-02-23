@@ -112,7 +112,7 @@ class MaterialRequestDetail extends Model
             $total -= $row->qty;
         }
         foreach($this->goodIssueDetail as $row){
-            $total -= round(($row->qty / $row->qty_conversion),3);
+            $total -= round(($row->qty / $this->qty_conversion),3);
         }
         return $total;
     }
@@ -125,7 +125,7 @@ class MaterialRequestDetail extends Model
             $totalGi = $this->qty;
         }
         foreach($this->goodIssueDetail as $row){
-            $totalGi -= round(($row->qty / $row->qty_conversion),3);
+            $totalGi -= round(($row->qty / $this->qty_conversion),3);
         }
         return $totalGi;
     }

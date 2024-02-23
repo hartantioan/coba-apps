@@ -233,7 +233,8 @@
                                                         <th class="center">Qty</th>
                                                         <th class="center">Satuan</th>
                                                         <th class="center" width="300px">No.Serial</th>
-                                                        <th class="center">Keterangan</th>
+                                                        <th class="center">Ket.1</th>
+                                                        <th class="center">Ket.2</th>
                                                         <th class="center">Tipe Pengeluaran</th>
                                                         <th class="center">Coa</th>
                                                         <th class="center">Dist.Biaya</th>
@@ -249,7 +250,7 @@
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td colspan="17">
+                                                        <td colspan="18">
                                                             
                                                         </td>
                                                     </tr>
@@ -823,7 +824,10 @@
                                         -
                                     </td>
                                     <td>
-                                        <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="Untuk ` + val.place_name + ` ` + val.warehouse_name + `">
+                                        <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 1..." value="Untuk ` + val.place_name + ` ` + val.warehouse_name + `">
+                                    </td>
+                                    <td>
+                                        <input name="arr_note2[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 2..." value="-">
                                     </td>
                                     <td class="center">
                                         <select class="browser-default" id="arr_inventory_coa` + count + `" name="arr_inventory_coa[]" onchange="applyLock('` + count + `');"></select>
@@ -1013,7 +1017,10 @@
                     -
                 </td>
                 <td>
-                    <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ...">
+                    <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 1...">
+                </td>
+                <td>
+                    <input name="arr_note2[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 2...">
                 </td>
                 <td class="center" id="inventory_coa` + count + `">
                     <select class="browser-default" id="arr_inventory_coa` + count + `" name="arr_inventory_coa[]" onchange="applyLock('` + count + `');"></select>
@@ -1443,7 +1450,10 @@
                                     -
                                 </td>
                                 <td>
-                                    <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
+                                    <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 1..." value="` + val.note + `">
+                                </td>
+                                <td>
+                                    <input name="arr_note2[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 2..." value="` + val.note2 + `">
                                 </td>
                                 <td class="center" id="inventory_coa` + count + `">
                                     <select class="browser-default" id="arr_inventory_coa` + count + `" name="arr_inventory_coa[]" onchange="applyLock('` + count + `');"></select>

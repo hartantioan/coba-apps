@@ -81,7 +81,7 @@ class UserActivityController extends Controller
                     $val->description,
                     $val->subject_type,
                     $val->properties,
-                    date('d/m/Y,',strtotime($val->updated_at)),
+                    date('d/m/Y H:i:s',strtotime($val->updated_at)),
                 ];
 
                 $nomor++;

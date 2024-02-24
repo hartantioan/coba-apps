@@ -48,13 +48,13 @@ class MenuController extends Controller
             ]);
         } */
 
-        $data = [
+        /* $data = [
             'title'     => 'Menu',
             'menus'     => Menu::whereNull('parent_id')->get(),
             'content'   => 'admin.setting.menu'
         ];
 
-        return view('admin.layouts.index', ['data' => $data]);
+        return view('admin.layouts.index', ['data' => $data]); */
 
         /* $pr = PurchaseRequest::whereHas('purchaseRequestDetail',function($query){
             $query->where('requester','sammy');
@@ -109,9 +109,9 @@ class MenuController extends Controller
             ]);
         } */
 
-        /* $gr = GoodReceipt::whereIn('status',['2','3'])->whereDate('post_date','>=','2024-02-01')->get();
-        $grcv = GoodReceive::whereIn('status',['2','3'])->whereDate('post_date','>=','2024-02-01')->get();
-        $gi = GoodIssue::whereIn('status',['2','3'])->whereDate('post_date','>=','2024-02-01')->get();
+        $gr = GoodReceipt::whereIn('status',['2','3'])->whereDate('post_date','>=','2024-02-23')->get();
+        $grcv = GoodReceive::whereIn('status',['2','3'])->whereDate('post_date','>=','2024-02-23')->get();
+        $gi = GoodIssue::whereIn('status',['2','3'])->whereDate('post_date','>=','2024-02-23')->get();
 
         $data = [];
 
@@ -148,7 +148,7 @@ class MenuController extends Controller
 
         foreach($collection as $row){
             CustomHelper::sendJournal($row['lookable_type'],$row['lookable_id']);
-        } */
+        }
 
         /* ResetCogs::dispatch('2024-02-19',1,900); */
 

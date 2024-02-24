@@ -330,7 +330,7 @@
                         <table style="width:100%">
                             <tr class="break-row">
                                 <td>
-                                    {!! ucwords(strtolower($data->user->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
+                                    {!! ucwords(strtolower($data->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
                                    
                                 </td>
                                 

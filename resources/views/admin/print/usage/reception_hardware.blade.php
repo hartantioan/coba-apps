@@ -335,7 +335,7 @@
                                 <br>
                             </td>
                             <td width:"30%" align="right" style="font-size: 0.8rem !important">
-                                {!! ucwords(strtolower($data->user->company->city->name)).', '.CustomHelper::tgl_indo($data->date) !!}
+                                {!! ucwords(strtolower($data->company->city->name)).', '.CustomHelper::tgl_indo($data->date) !!}
                                 
                             </td>
                         </tr>

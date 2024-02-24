@@ -335,7 +335,7 @@
                         <table class="table-bot1" width="100%" border="0">
                             <tr>
                                 <td class="center-align">
-                                    {!! ucwords(strtolower($data->user->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
+                                    {!! ucwords(strtolower($data->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
                                     <br>
                                     Dibuat oleh,
                                     @if($data->user->signature)

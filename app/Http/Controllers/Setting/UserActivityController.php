@@ -8,6 +8,8 @@ use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use App\Models\ApprovalStage;
 use App\Models\Approval;
+use App\Exports\ExportUserActivity;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UserActivityController extends Controller
 {
@@ -27,8 +29,8 @@ class UserActivityController extends Controller
             'causer_id',
             'description',
             'subject_type',
-            'properties',
             'updated_at',
+            'properties',
         ];
 
         $start  = $request->start;
@@ -80,8 +82,8 @@ class UserActivityController extends Controller
                     $val->user()->exists() ? $val->user->employee_no.' - '.$val->user->name : 'System',
                     $val->description,
                     $val->subject_type,
-                    $val->properties,
                     date('d/m/Y H:i:s',strtotime($val->updated_at)),
+                    $val->properties,
                 ];
 
                 $nomor++;
@@ -99,5 +101,11 @@ class UserActivityController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function export(Request $request){
+        $search = $request->search ? $request->search : '';
+
+		return Excel::download(new ExportUserActivity($search), 'user_activity_'.uniqid().'.xlsx');
     }
 }

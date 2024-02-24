@@ -63,8 +63,8 @@
                                                         <th>Pengguna</th>
                                                         <th>Aktivitas</th>
                                                         <th>Form</th>
-                                                        <th>Data</th>
                                                         <th>Waktu</th>
+                                                        <th>Data</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -89,9 +89,7 @@
 
     function exportExcel(){
         var search = window.table.search();
-        var item = $('#item_id').val() ? $('#item_id').val():'';
-        var inventory_type = $('#filter_type').val();
-        window.location = "{{ Request::url() }}/export?search=" + search + "&item=" + item+"&inventory_type=" + inventory_type;
+        window.location = "{{ Request::url() }}/export?search=" + search;
     }
 
     function loadDataTable() {
@@ -152,8 +150,8 @@
                 { name: 'causer_id', searchable: false, orderable: false, className: '' },
                 { name: 'description', searchable: false, orderable: false, className: '' },
                 { name: 'form', searchable: false, orderable: false, className: '' },
-                { name: 'data', searchable: false, orderable: false, className: '' },
                 { name: 'updated_at', searchable: false, className: '' },
+                { name: 'data', searchable: false, orderable: false, className: '' },
             ],
         });
         $('.dt-buttons').appendTo('#datatable_buttons');

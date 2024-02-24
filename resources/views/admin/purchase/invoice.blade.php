@@ -2318,8 +2318,8 @@
                 if(percent_tax > 0 && $('#arr_include_tax' + element.data('id')).val() == '1'){
                     rowtotal = rowtotal / (1 + (percent_tax / 100));
                 }
-                rowtax = Math.floor(rowtotal * (percent_tax / 100));
-                rowwtax = Math.floor(rowtotal * (percent_wtax / 100));
+                rowtax = rowtotal * (percent_tax / 100);
+                rowwtax = rowtotal * (percent_wtax / 100);
                 $('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val(
                     (rowtotal >= 0 ? '' : '-') + formatRupiahIni(rowtotal.toFixed(2).toString().replace('.',','))
                 );
@@ -2342,7 +2342,6 @@
                 tax += rowtax;
                 wtax += rowwtax;
                 rowgrandtotal = rowtotal + rowtax - rowwtax;
-                grandtotal += rowgrandtotal;
                 $('input[name^="arr_grandtotal"][data-id="' + element.data('id') + '"]').val(
                     (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(rowgrandtotal.toFixed(2).toString().replace('.',','))
                 );
@@ -2351,7 +2350,10 @@
                 );
             });
 
-            grandtotal += rounding;
+            tax = Math.floor(tax);
+            wtax = Math.floor(wtax);
+
+            grandtotal = total + tax - wtax + rounding;
 
             $('input[name^="arr_dp_code"]').each(function(index){
                 downpayment += parseFloat($('input[name^="arr_nominal"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));

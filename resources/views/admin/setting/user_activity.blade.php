@@ -38,29 +38,10 @@
                     <!-- DataTables example -->
                     <div class="row">
                         <div class="col s12">
-                            <ul class="collapsible collapsible-accordion">
-                                <li>
-                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
-                                    <div class="collapsible-body">
-                                        <div class="row">
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_status" style="font-size:1rem;">Status :</label>
-                                                <div class="input-field">
-                                                    <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
-                                                        <option value="1">Aktif</option>
-                                                        <option value="2">Non-Aktif</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                            </ul>
                             <div class="card">
                                 <div class="card-content">
                                     <h4 class="card-title">
-                                        List Data
+                                        List Data Log History
                                     </h4>
                                     <div class="row mt-2">
                                         <div class="col s12">
@@ -69,6 +50,11 @@
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
                                                 <span class="hide-on-small-onl">Refresh</span>
                                                 <i class="material-icons right">refresh</i>
+                                            </a>
+                                            <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-1" href="javascript:void(0);" onclick="exportExcel();">
+                                                <i class="material-icons hide-on-med-and-up">refresh</i>
+                                                <span class="hide-on-small-onl">Download</span>
+                                                <i class="material-icons right">file_download</i>
                                             </a>
                                             <table id="datatable_serverside" class="display responsive-table wrap">
                                                 <thead>

@@ -460,7 +460,7 @@ class ApprovalController extends Controller
                                                 ]);
                                             }
                                         }else{
-                                            info('kambing');
+                                            
                                         }
                                     }else{
                                         if($query->checkOtherApproval()){
@@ -500,12 +500,6 @@ class ApprovalController extends Controller
         
                         CustomHelper::sendNotification($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,'Pengajuan '.$query->approvalSource->fullName().' No. '.$query->approvalSource->lookable->code.' telah '.$text.' di level '.$query->approvalTemplateStage->approvalStage->level.'.',$query->note,$query->approvalSource->lookable->user_id);
         
-                        activity()
-                            ->performedOn(new ApprovalMatrix())
-                            ->causedBy(session('bo_id'))
-                            ->withProperties($query)
-                            ->log('Add / edit approval data.');
-        
                         $response = [
                             'status'    => 200,
                             'message'   => 'Data successfully saved.',
@@ -522,6 +516,12 @@ class ApprovalController extends Controller
                         'message' => $message,
                     ];
                 }
+
+                activity()
+                    ->performedOn(new ApprovalMatrix())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Add / edit approval data.');
             }else{
                 $response = [
                     'status'  => 500,

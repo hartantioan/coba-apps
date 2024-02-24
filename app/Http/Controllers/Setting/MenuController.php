@@ -48,13 +48,13 @@ class MenuController extends Controller
             ]);
         } */
 
-        /* $data = [
+        $data = [
             'title'     => 'Menu',
             'menus'     => Menu::whereNull('parent_id')->get(),
             'content'   => 'admin.setting.menu'
         ];
 
-        return view('admin.layouts.index', ['data' => $data]); */
+        return view('admin.layouts.index', ['data' => $data]);
 
         /* $pr = PurchaseRequest::whereHas('purchaseRequestDetail',function($query){
             $query->where('requester','sammy');

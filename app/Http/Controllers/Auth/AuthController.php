@@ -63,6 +63,13 @@ class AuthController extends Controller
 
                 User::where('employee_no', $request->id_card)->where('type','1')->where('status','1')->update([ 'token' => $token ]);
                 Auth::login($user);
+
+                activity()
+                    ->performedOn(new User())
+                    ->causedBy($user->id)
+                    ->withProperties($user) 
+                    ->log('Login ke dalam aplikasi.');
+
                 $response = [
                     'status' 	=> 200,
                     'message'	=> 'Successfull logged in. Please wait!'
@@ -156,6 +163,12 @@ class AuthController extends Controller
     
 
     public function logout(){
+        $user = User::find(session('bo_id'));
+        activity()
+            ->performedOn(new User())
+            ->causedBy($user->id)
+            ->withProperties($user) 
+            ->log('Logout dari aplikasi.');
         session()->flush();
         Auth::logout();
         return redirect('admin/login');

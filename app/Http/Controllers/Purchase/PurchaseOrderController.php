@@ -676,13 +676,26 @@ class PurchaseOrderController extends Controller
                     }
 
                     if(in_array($query->status,['1','6'])){
+
                         if($request->has('file')) {
+
                             if($query->document_po){
-                                if(Storage::exists($query->document_po)){
-                                    Storage::delete($query->document_po);
+                                $arrFile = explode(',',$query->document_po);
+                                foreach($arrFile as $row){
+                                    if(Storage::exists($row)){
+                                        Storage::delete($row);
+                                    }
                                 }
                             }
-                            $document = $request->file('file')->store('public/purchase_orders');
+
+                            $arrFile = [];
+
+                            foreach($request->file('file') as $key => $file)
+                            {
+                                $arrFile[] = $file->store('public/purchase_orders');
+                            }
+
+                            $document = implode(',',$arrFile);
                         } else {
                             $document = $query->document_po;
                         }

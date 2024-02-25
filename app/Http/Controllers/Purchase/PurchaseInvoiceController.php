@@ -1029,8 +1029,8 @@ class PurchaseInvoiceController extends Controller
             }
             
             if($query) {
-                DB::beginTransaction();
-                try {
+                /* DB::beginTransaction();
+                try { */
                     if($request->type_detail == '1'){
                         if($request->arr_type){
                         
@@ -1108,10 +1108,10 @@ class PurchaseInvoiceController extends Controller
                         }
                     }
                 
-                    DB::commit();
+                    /* DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
-                }
+                } */
 
                 CustomHelper::sendApproval('purchase_invoices',$query->id,$query->note);
                 CustomHelper::sendNotification('purchase_invoices',$query->id,'Pengajuan A/P Invoice No. '.$query->code,$query->note,session('bo_id'));

@@ -3188,7 +3188,7 @@
                             $('#arr_department' + count).val(val.department_id);
                             $('#arr_warehouse' + count).val(val.warehouse_id);
                             $('#arr_coa' + count).append(`
-                                <option value="` + val.lookable_id + `">` + val.name + `</option>
+                                <option value="` + val.id + `">` + val.name + `</option>
                             `);
                             select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
                             if(val.project_id){

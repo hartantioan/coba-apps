@@ -319,7 +319,7 @@ class PurchaseOrderController extends Controller
                     $val->shippingType(),
                     $val->company->name,
                     $val->document_no,
-                    '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
+                    $val->attachments(),
                     $val->paymentType(),
                     $val->payment_term,
                     $val->currency->name,
@@ -741,6 +741,17 @@ class PurchaseOrderController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
+                    $fileUpload = '';
+
+                    if($request->file('file')){
+                        $arrFile = [];
+                        foreach($request->file('file') as $key => $file)
+                        {
+                            $arrFile[] = $file->store('public/purchase_orders');
+                        }
+                        $fileUpload = implode(',',$arrFile);
+                    }
+
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=PurchaseOrder::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
@@ -753,7 +764,7 @@ class PurchaseOrderController extends Controller
                         'shipping_type'             => $request->shipping_type,
                         'company_id'                => $request->company_id,
                         'document_no'               => $request->document_no,
-                        'document_po'               => $request->file('file') ? $request->file('file')->store('public/purchase_orders') : NULL,
+                        'document_po'               => $fileUpload ? $fileUpload : NULL,
                         'payment_type'              => $request->payment_type,
                         'payment_term'              => $request->payment_term,
                         'currency_id'               => $request->currency_id,

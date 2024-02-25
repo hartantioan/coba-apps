@@ -207,6 +207,24 @@ class PurchaseOrder extends Model
         return $document_po;
     }
 
+    public function attachments() 
+    {
+        if($this->document_po){
+            $arr = explode(',',$this->document_po);
+            $arrDoc = [];
+            foreach($arr as $key => $row){
+                if(Storage::exists($row)){
+                    $arrDoc[] = '<a href="'.asset(Storage::url($row)).'" target="_blank">Lampiran '.($key + 1).'</a>';
+                }
+            }
+            $document_po = implode(' ',$arrDoc);
+        }else{
+            $document_po = 'Tidak ada';
+        }
+
+        return $document_po;
+    }
+
     public function deleteFile(){
 		if(Storage::exists($this->document_po)) {
             Storage::delete($this->document_po);

@@ -32,11 +32,10 @@ class ResetCogs implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(string $date = null, int $place_id = null, int $item_id = null)
+    public function __construct(string $date = null, int $place_id = null)
     {
         $this->date = $date;
         $this->place_id = $place_id;
-        $this->item_id = $item_id;
     }
 
     /**
@@ -46,94 +45,100 @@ class ResetCogs implements ShouldQueue
      */
     public function handle()
     {
-        $data = ItemCogs::where('place_id',$this->place_id)->where('item_id',$this->item_id)->whereDate('date','>=',$this->date)->orderBy('date')->orderBy('id')->get();
-		$databefore = ItemCogs::where('place_id',$this->place_id)->where('item_id',$this->item_id)->whereDate('date','<',$this->date)->orderByDesc('date')->orderByDesc('id')->first();
+		$itemcogs = ItemCogs::where('post_date','>=',$this->date)->where('place_id',$this->place_id)->get();
 
-		if(count($data) > 1){
-			foreach($data as $row){
-				$row->delete();
+		foreach($itemcogs as $row){
+			$journal = Journal::where('lookable_type',$row->lookable_type)->where('lookable_id',$row->lookable_id)->get();
+			if($journal){
+				foreach($journal as $rowjournal){
+					$rowjournal->journalDetail()->delete();
+					$rowjournal->delete;
+				}
 			}
+			$qty = $row->type == 'IN' ? $row->qty_in : $row->qty_out;
+			CustomHelper::resetStock($row->place_id,$row->warehouse_id,$row->area_id,$row->item_id,$row->item_shading_i,$qty,$row->type);
+			$row->delete();
+		}
 
-			$gr = GoodReceipt::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
-			$grcv = GoodReceive::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
-			$lc = LandedCost::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
-			$gi = GoodIssue::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
-			$grt = GoodReturnPO::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
-			$gri = GoodReturnIssue::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
-			$pm = PurchaseMemo::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
+		$gr = GoodReceipt::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
+		$grcv = GoodReceive::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
+		$lc = LandedCost::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
+		$gi = GoodIssue::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
+		$grt = GoodReturnPO::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
+		$gri = GoodReturnIssue::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
+		$pm = PurchaseMemo::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
 
-			$data = [];
+		$data = [];
 
-			foreach($gr as $row){
-				$data[] = [
-					'type'          => 0,
-					'date'          => $row->post_date,
-					'lookable_type' => $row->getTable(),
-					'lookable_id'   => $row->id,
-				];
-			}
+		foreach($gr as $row){
+			$data[] = [
+				'type'          => 0,
+				'date'          => $row->post_date,
+				'lookable_type' => $row->getTable(),
+				'lookable_id'   => $row->id,
+			];
+		}
 
-			foreach($grt as $row){
-				$data[] = [
-					'type'          => 1,
-					'date'          => $row->post_date,
-					'lookable_type' => $row->getTable(),
-					'lookable_id'   => $row->id,
-				];
-			}
+		foreach($grt as $row){
+			$data[] = [
+				'type'          => 1,
+				'date'          => $row->post_date,
+				'lookable_type' => $row->getTable(),
+				'lookable_id'   => $row->id,
+			];
+		}
 
-			foreach($grcv as $row){
-				$data[] = [
-					'type'          => 0,
-					'date'          => $row->post_date,
-					'lookable_type' => $row->getTable(),
-					'lookable_id'   => $row->id,
-				];
-			}
+		foreach($grcv as $row){
+			$data[] = [
+				'type'          => 0,
+				'date'          => $row->post_date,
+				'lookable_type' => $row->getTable(),
+				'lookable_id'   => $row->id,
+			];
+		}
 
-			foreach($lc as $row){
-				$data[] = [
-					'type'          => 1,
-					'date'          => $row->post_date,
-					'lookable_type' => $row->getTable(),
-					'lookable_id'   => $row->id,
-				];
-			}
+		foreach($lc as $row){
+			$data[] = [
+				'type'          => 1,
+				'date'          => $row->post_date,
+				'lookable_type' => $row->getTable(),
+				'lookable_id'   => $row->id,
+			];
+		}
 
-			foreach($gi as $row){
-				$data[] = [
-					'type'          => 2,
-					'date'          => $row->post_date,
-					'lookable_type' => $row->getTable(),
-					'lookable_id'   => $row->id,
-				];
-			}
+		foreach($gi as $row){
+			$data[] = [
+				'type'          => 2,
+				'date'          => $row->post_date,
+				'lookable_type' => $row->getTable(),
+				'lookable_id'   => $row->id,
+			];
+		}
 
-			foreach($gri as $row){
-				$data[] = [
-					'type'          => 3,
-					'date'          => $row->post_date,
-					'lookable_type' => $row->getTable(),
-					'lookable_id'   => $row->id,
-				];
-			}
+		foreach($gri as $row){
+			$data[] = [
+				'type'          => 3,
+				'date'          => $row->post_date,
+				'lookable_type' => $row->getTable(),
+				'lookable_id'   => $row->id,
+			];
+		}
 
-			foreach($pm as $row){
-				$data[] = [
-					'type'          => 4,
-					'date'          => $row->post_date,
-					'lookable_type' => $row->getTable(),
-					'lookable_id'   => $row->id,
-				];
-			}
+		foreach($pm as $row){
+			$data[] = [
+				'type'          => 4,
+				'date'          => $row->post_date,
+				'lookable_type' => $row->getTable(),
+				'lookable_id'   => $row->id,
+			];
+		}
 
-			$collection = collect($data)->sortBy(function($item) {
-							return [$item['date'], $item['type']];
-						})->values();
+		$collection = collect($data)->sortBy(function($item) {
+						return [$item['date'], $item['type']];
+					})->values();
 
-			foreach($collection as $row){
-				CustomHelper::sendCogsFromReset($row['lookable_type'],$row['lookable_id']);
-			}
+		foreach($collection as $row){
+			CustomHelper::sendCogsFromReset($row['lookable_type'],$row['lookable_id']);
 		}
     }
 }

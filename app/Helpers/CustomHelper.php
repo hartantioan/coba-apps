@@ -787,7 +787,7 @@ class CustomHelper {
 		}
 	}
 
-	public static function sendCogsFromReset($table_name = null,$table_id = null,$account_id = null){
+	public static function sendCogsFromReset($table_name = null,$table_id = null){
 		if($table_name == 'good_receipts'){
 
 			$gr = GoodReceipt::find($table_id);
@@ -4019,6 +4019,25 @@ class CustomHelper {
 				ResetCogs::dispatch($row->date,$place_id,$item_id);
 				ResetStock::dispatch($place_id,$warehouse_id,$area_id,$item_id,$item_shading_id,$qty,$type);
 			}
+		}
+	}
+
+	public static function resetStock($place_id,$warehouse_id,$area_id,$item_id,$shading,$qty,$type){
+		$data = ItemStock::where('place_id',$place_id)->where('warehouse_id',$warehouse_id)->where('area_id',$area_id)->where('item_id',$item_id)->where('item_shading_id',$shading)->first();
+
+		if($data){
+			$data->update([
+				'qty' => $type == 'IN' ? $data->qty - $qty : $data->qty + $qty,
+			]);
+		}else{
+			ItemStock::create([
+				'place_id'		    => $place_id,
+				'warehouse_id'	    => $warehouse_id,
+                'area_id'           => $area_id,
+				'item_id'		    => $item_id,
+                'item_shading_id'   => $shading,
+				'qty'			    => $type == 'IN' ? 0 - $qty : $qty,
+			]);
 		}
 	}
 

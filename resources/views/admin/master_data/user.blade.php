@@ -1678,6 +1678,7 @@
             dom: 'Blfrtip',
             buttons: [
                 'columnsToggle',
+                'selectAll',
                 'selectNone' 
             ],
             "language": {

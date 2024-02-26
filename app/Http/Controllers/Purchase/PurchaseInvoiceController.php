@@ -894,9 +894,10 @@ class PurchaseInvoiceController extends Controller
                     $total += floatval($row);
                     $tax += floatval($request->arr_multi_ppn[$key]);
                 }
+                $grandtotal = $total + $tax - $wtax;
             }
 
-            $grandtotal = $grandtotal + $tax - $wtax + $rounding;
+            $grandtotal += $rounding;
 
             $balance = $grandtotal - $downpayment;
 

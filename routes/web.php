@@ -1757,6 +1757,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('remove_used_data', [GoodIssueController::class, 'removeUsedData']);
                     Route::get('print_individual/{id}',[GoodIssueController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('export',[GoodIssueController::class, 'export']);
+                    Route::get('viewstructuretree',[GoodIssueController::class, 'viewStructureTree']);
                     Route::get('view_journal/{id}',[GoodIssueController::class, 'viewJournal'])->middleware('operation.access:good_issue,journal');
                     Route::post('create',[GoodIssueController::class, 'create'])->middleware('operation.access:good_issue,update');
                     Route::get('approval/{id}',[GoodIssueController::class, 'approval'])->withoutMiddleware('direct.access');

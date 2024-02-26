@@ -2087,25 +2087,25 @@ class GoodReturnPOController extends Controller
                         foreach($query_good_issue->goodIssueDetail as $data_detail_good_issue){
                             if($data_detail_good_issue->materialRequestDetail()){
                                 $material_request_tempura = [
-                                    "key" => $data_detail_good_issue->materialRequestDetail->materialRequest->code,
-                                    "name" => $data_detail_good_issue->materialRequestDetail->materialRequest->code,
+                                    "key" => $data_detail_good_issue->lookable->materialRequest->code,
+                                    "name" => $data_detail_good_issue->lookable->materialRequest->code,
                                     'properties'=> [
-                                        ['name'=> "Tanggal :".$data_detail_good_issue->materialRequestDetail->materialRequest->post_date],
-                                        ['name'=> "Nominal : Rp.:".number_format($data_detail_good_issue->materialRequestDetail->materialRequest->grandtotal,2,',','.')],
+                                        ['name'=> "Tanggal :".$data_detail_good_issue->lookable->materialRequest->post_date],
+                                        ['name'=> "Nominal : Rp.:".number_format($data_detail_good_issue->lookable->materialRequest->grandtotal,2,',','.')],
                                     ],
-                                    'url'=>request()->root()."/admin/inventory/material_request?code=".CustomHelper::encrypt($data_detail_good_issue->materialRequestDetail->materialRequest->code),
+                                    'url'=>request()->root()."/admin/inventory/material_request?code=".CustomHelper::encrypt($data_detail_good_issue->lookable->materialRequest->code),
                                 ];
 
                                 $data_go_chart[]=$material_request_tempura;
                                 $data_link[]=[
-                                    'from'=>$data_detail_good_issue->materialRequestDetail->materialRequest->code,
+                                    'from'=>$data_detail_good_issue->lookable->materialRequest->code,
                                     'to'=>$query_good_issue->code,
-                                    'string_link'=>$data_detail_good_issue->materialRequestDetail->materialRequest->code.$query_good_issue->code,
+                                    'string_link'=>$data_detail_good_issue->lookable->materialRequest->code.$query_good_issue->code,
                                 ];
-                                $data_id_mr[] = $data_detail_good_issue->materialRequestDetail->materialRequest->id;
+                                $data_id_mr[] = $data_detail_good_issue->lookable->materialRequest->id;
                             }
 
-                            if($data_detail_good_issue->purchaseOrderDetail->exists()){
+                            if($data_detail_good_issue->purchaseOrderDetail()->exists()){
                                 foreach($data_detail_good_issue->purchaseOrderDetail as $data_purchase_order_detail){
                                     $po_tempura = [
                                         "key" => $data_purchase_order_detail->purchaseOrder->code,
@@ -2504,7 +2504,7 @@ class GoodReturnPOController extends Controller
                                     $good_issue_tempura = [
                                         'properties'=> [
                                             ['name'=> "Tanggal : ".$good_issue_detail->goodIssue->post_date],
-                                            ['name'=> "Vendor  : ".$good_issue_detail->goodIssue->supplier->name],
+                                            ['name'=> "User  : ".$good_issue_detail->goodIssue->user->name],
                                         ],
                                         'key'=>$good_issue_detail->goodIssue->code,
                                         'name'=>$good_issue_detail->goodIssue->code,
@@ -2528,7 +2528,7 @@ class GoodReturnPOController extends Controller
                         }
                     }
                 }
-            }     
+            }      
             function unique_key($array,$keyname){
 
                 $new_array = array();

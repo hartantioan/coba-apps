@@ -107,8 +107,17 @@ class MaterialRequestDetail extends Model
         return $totalPr;
     }
 
+    public function getStockNow(){
+        $stock = 0;
+        $itemStock = ItemStock::where('place_id',$this->place_id)->where('warehouse_id',$this->warehouse_id)->where('item_id',$this->item_id)->first();
+        if($itemStock){
+            $stock = $itemStock->qty;
+        }
+        return $stock;
+    }
+
     public function balancePrGi(){
-        $total = $this->qty - $this->stock;
+        $total = $this->qty - $this->getStockNow();
         foreach($this->purchaseRequestDetail as $row){
             $total -= $row->qty;
         }
@@ -119,7 +128,7 @@ class MaterialRequestDetail extends Model
     }
 
     public function balanceGi(){
-        $totalGi = $this->qty - $this->stock;
+        $totalGi = $this->qty - $this->getStockNow();
         if($totalGi > 0){
             $totalGi = $this->stock;
         }else{

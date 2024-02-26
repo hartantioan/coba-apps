@@ -245,7 +245,7 @@ class MaterialRequestController extends Controller
                 <td class="center-align">'.($key + 1).'</td>
                 <td>'.$row->item->code.' - '.$row->item->name.'</td>
                 <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
-                <td class="right-align">'.number_format($row->stock,3,',','.').'</td>
+                <td class="right-align">'.number_format($row->getStockNow(),3,',','.').'</td>
                 <td class="center-align">'.$row->itemUnit->unit->code.'</td>
                 <td class="">'.$row->note.'</td>
                 <td class="">'.$row->note2.'</td>

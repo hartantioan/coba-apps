@@ -262,7 +262,7 @@
                                 <td>{{ $key + 1 }}</td>
                                 <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                                 <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
-                                <td align="right">{{ number_format($row->stock,3,',','.') }}</td>
+                                <td align="right">{{ number_format($row->getStockNow(),3,',','.') }}</td>
                                 <td align="center">{{ $row->itemUnit->unit->code }}</td>
                                 <td align="center">{{ date('d/m/Y',strtotime($row->required_date)) }}</td>
                                 <td align="center">{{ $row->place->code }}</td>

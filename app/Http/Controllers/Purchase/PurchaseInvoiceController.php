@@ -897,9 +897,6 @@ class PurchaseInvoiceController extends Controller
                 $grandtotal = $total + $tax - $wtax;
             }
 
-            $tax = floor($tax);
-            $wtax = floor($wtax);
-
             $grandtotal = $grandtotal + $tax - $wtax + $rounding;
 
             $balance = $grandtotal - $downpayment;

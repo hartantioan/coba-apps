@@ -737,53 +737,18 @@ class CustomHelper {
 		
 		$menu = Menu::where('table_name',$table_name)->first();
 
-		$arrUser = [];
-
 		if($menu){
-			foreach($menu->menuUser as $row){
-				$arrUser[] = $row->user_id;
-			}
-
-			$arrUser = array_values(array_unique($arrUser));
-
-			$targets = User::whereIn('id',$arrUser)->where('status','1')->where('type','1')->get();
-
-			$adato = false;
-
-			foreach($targets as $row){
-				if($to){
-					if($row->id == $to){
-						$adato = true;
-					}
-				}
-				Notification::create([
-					'code'				=> Str::random(20),
-					'menu_id'			=> $menu->id,
-					'from_user_id'		=> $from,
-					'to_user_id'		=> $row->id,
-					'lookable_type'		=> $table_name,
-					'lookable_id'		=> $table_id,
-					'title'				=> $title,
-					'note'				=> $note,
-					'status'			=> '1'
-				]);
-			}
-			
-			if($to){
-				if($adato == false){
-					Notification::create([
-						'code'				=> Str::random(20),
-						'menu_id'			=> $menu->id,
-						'from_user_id'		=> $from,
-						'to_user_id'		=> $to,
-						'lookable_type'		=> $table_name,
-						'lookable_id'		=> $table_id,
-						'title'				=> $title,
-						'note'				=> $note,
-						'status'			=> '1'
-					]);
-				}
-			}
+			Notification::create([
+				'code'				=> Str::random(20),
+				'menu_id'			=> $menu->id,
+				'from_user_id'		=> $from,
+				'to_user_id'		=> $to,
+				'lookable_type'		=> $table_name,
+				'lookable_id'		=> $table_id,
+				'title'				=> $title,
+				'note'				=> $note,
+				'status'			=> '1'
+			]);
 		}
 	}
 

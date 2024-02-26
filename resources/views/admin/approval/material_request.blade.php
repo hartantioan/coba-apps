@@ -221,7 +221,7 @@
                         </td>
                         <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                         <td class="right-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
-                        <td class="right-align">{{ number_format($row->getStockNow(),3,',','.') }}</td>
+                        <td class="right-align">{{ number_format($row->getStockNow($row->qty_conversion),3,',','.') }}</td>
                         <td class="center-align">{{ $row->itemUnit->unit->code }}</td>
                         <td class="right-align">{{ number_format($row->total,2,',','.') }}</td>
                         <td class="indigo-text center-align">{{ date('d/m/Y',strtotime($row->required_date)) }}</td>

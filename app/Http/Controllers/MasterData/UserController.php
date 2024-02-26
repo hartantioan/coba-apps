@@ -793,6 +793,14 @@ class UserController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
+
+            $arrUserNotAllowedEmployeeAccess = ['323020'];
+            if(in_array(session('bo_employee_no'),$arrUserNotAllowedEmployeeAccess)){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Mohon maaf, untuk user anda tidak boleh mengubah data akses.',
+                ]);
+            }
 			
             DB::beginTransaction();
             try {

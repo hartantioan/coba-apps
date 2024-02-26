@@ -646,7 +646,7 @@ class PaymentRequestController extends Controller
                                 'memo'          => number_format($data->totalMemo(),2,',','.'),
                                 'currency_id'   => $data->currency()->id,
                                 'currency_rate' => number_format($data->currencyRate(),2,',','.'),
-                                'note'          => $data->invoice_no,
+                                'note'          => $data->invoice_no ? $data->invoice_no : '',
                                 'name_account'  => '',
                                 'no_account'    => '',
                                 'bank_account'  => '',

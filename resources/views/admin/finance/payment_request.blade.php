@@ -351,12 +351,13 @@
                                                                 <th class="center">Divisi</th>
                                                                 <th class="center">Proyek</th>
                                                                 <th class="center">Rekening</th>
+                                                                <th class="center">Remark</th>
                                                                 <th class="center">Hapus</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody id="body-detail">
                                                             <tr id="empty-detail">
-                                                                <td colspan="20" class="center">
+                                                                <td colspan="21" class="center">
                                                                     Pilih partner bisnis untuk memulai...
                                                                 </td>
                                                             </tr>
@@ -1754,6 +1755,9 @@
                                             ` + val.bank_account + ` ` + val.no_account + ` ` + val.name_account + `    
                                         </td>
                                         <td class="center">
+                                            <input id="arr_remark` + count + `" name="arr_remark[]" class="browser-default" type="text" style="width:150px;" value="` + val.remark + `">
+                                        </td>
+                                        <td class="center">
                                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
                                                 <i class="material-icons">delete</i>
                                             </a>
@@ -2233,6 +2237,7 @@
                 formData.delete("arr_machine[]");
                 formData.delete("arr_department[]");
                 formData.delete("arr_project[]");
+                formData.delete("arr_remark[]");
 
                 let passed = true, passedGrandtotal = true, passedReconcile = true, passedCashBank = true;
 
@@ -2244,6 +2249,11 @@
                                 formData.append('arr_type[]',$('input[name^="arr_type"][data-id="' + $(this).data('id') + '"]').val());
                                 formData.append('arr_pay[]',$('#arr_pay' + $(this).data('id')).val());
                                 formData.append('arr_note[]',$('#arr_note' + $(this).data('id')).val());
+                                if($('#arr_remark' + $(this).data('id')).length > 0){
+                                    formData.append('arr_remark[]',$('#arr_remark' + $(this).data('id')).val());
+                                }else{
+                                    formData.append('arr_remark[]','');
+                                }
                                 formData.append('arr_coa[]',$('#arr_coa' + $(this).data('id')).val());
                                 formData.append('arr_cost_distribution[]',
                                     ($('#arr_cost_distribution' + $(this).data('id')).length > 0 ? 
@@ -2692,6 +2702,9 @@
                                         ` + val.bank_account + ` ` + val.no_account + ` ` + val.name_account + `    
                                     </td>
                                     <td class="center">
+                                        <input id="arr_remark` + count + `" name="arr_remark[]" class="browser-default" type="text" style="width:150px;" value="` + val.remark + `">
+                                    </td>
+                                    <td class="center">
                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
                                             <i class="material-icons">delete</i>
                                         </a>
@@ -2788,7 +2801,7 @@
                     `);
                     $.each(response.banks, function(i, val) {
                         $('#user_bank_id').append(`
-                            <option value="` + val.bank_id + `" data-name="` + val.name + `" data-bank="` + val.bank_name + `" data-no="` + val.no + `">` + val.bank_name + ` - ` + val.no + ` - ` + val.name + `</option>
+                            <option value="` + val.id + `" data-name="` + val.name + `" data-bank="` + val.bank_name + `" data-no="` + val.no + `">` + val.bank_name + ` - ` + val.no + ` - ` + val.name + `</option>
                         `);
                     });                        
                 }else{

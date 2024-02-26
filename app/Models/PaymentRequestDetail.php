@@ -22,6 +22,7 @@ class PaymentRequestDetail extends Model
         'coa_id',
         'nominal',
         'note',
+        'remark',
         'place_id',
         'warehouse_id',
         'line_id',

@@ -255,6 +255,9 @@
                         <td>{{ $row->project()->exists() ? $row->project->name : '-' }}</td>
                         <td class="right-align">{{ number_format($row->nominal,3,',','.') }}</td>
                     </tr>
+                    <tr>
+                        <td colspan="10">Remark : {{ $row->remark }}</td>
+                    </tr>
                     @php
                         $total += $row->nominal;
                     @endphp

@@ -576,6 +576,7 @@ class PaymentRequestController extends Controller
                                     'place_id'      => $data->place_id,
                                     'department_id' => $data->department_id,
                                     'account_code'  => $data->account->employee_no,
+                                    'remark'        => $data->note
                                 ];
                             }
                         }
@@ -614,6 +615,7 @@ class PaymentRequestController extends Controller
                                 'place_id'      => '',
                                 'department_id' => '',
                                 'account_code'  => $data->supplier->employee_no,
+                                'remark'        => $data->note
                             ];
                         }
                     }
@@ -651,6 +653,7 @@ class PaymentRequestController extends Controller
                                 'place_id'      => '',
                                 'department_id' => '',
                                 'account_code'  => $data->account->employee_no,
+                                'remark'        => $data->note
                             ];
                         }
                     }
@@ -688,6 +691,7 @@ class PaymentRequestController extends Controller
                                 'place_id'      => '',
                                 'department_id' => '',
                                 'account_code'  => $data->account->employee_no,
+                                'remark'        => $data->note
                             ];
                         }
                     }
@@ -969,6 +973,7 @@ class PaymentRequestController extends Controller
                                 'coa_id'                        => $request->arr_coa[$key],
                                 'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_pay[$key])),
                                 'note'                          => $request->arr_note[$key],
+                                'remark'                        => $request->arr_remark[$key],
                                 'place_id'                      => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
                                 'line_id'                       => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
                                 'machine_id'                    => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
@@ -1040,13 +1045,14 @@ class PaymentRequestController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="13">Daftar Pembayaran</th>
+                                <th class="center-align" colspan="14">Daftar Pembayaran</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Referensi</th>
                                 <th class="center-align">Tipe</th>
                                 <th class="center-align">Keterangan</th>
+                                <th class="center-align">Remark</th>
                                 <th class="center-align">Dist.Biaya</th>
                                 <th class="center-align">Coa</th>
                                 <th class="center-align">Plant</th>
@@ -1065,6 +1071,7 @@ class PaymentRequestController extends Controller
                 <td class="center-align">'.$row->lookable->code.'</td>
                 <td class="center-align">'.$row->type().'</td>
                 <td class="center-align">'.$row->note.'</td>
+                <td class="center-align">'.$row->remark.'</td>
                 <td class="center-align">'.($row->cost_distribution_id ? $row->costDistribution->code.' - '.$row->costDistribution->name : '-').'</td>
                 <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
                 <td class="center-align">'.($row->place()->exists() ? $row->place->code : '-').'</td>
@@ -1188,9 +1195,9 @@ class PaymentRequestController extends Controller
         if($pr->account()->exists()){
             foreach($pr->account->userBank()->orderByDesc('is_default')->get() as $row){
                 $banks[] = [
-                    'bank_id'   => $row->bank_id,
+                    'id'        => $row->id,
                     'name'      => $row->name,
-                    'bank_name' => $row->bank->name,
+                    'bank_name' => $row->bank,
                     'no'        => $row->no,
                 ];
             }
@@ -1215,6 +1222,7 @@ class PaymentRequestController extends Controller
                 'nominal'       => number_format($row->nominal,3,',','.'),
                 'balance'       => number_format($row->lookable->balancePaymentRequest() + $row->nominal,3,',','.'),
                 'note'          => $row->note ? $row->note : '',
+                'remark'        => $row->remark ? $row->remark : '',
                 'cost_distribution_id'        => $row->cost_distribution_id ? $row->cost_distribution_id : '',
                 'cost_distribution_name'      => $row->cost_distribution_id ? $row->costDistribution->code.' - '.$row->costDistribution->name : '',
                 'coa_id'        => $row->coa_id,
@@ -1767,16 +1775,17 @@ class PaymentRequestController extends Controller
                 $html = '<div class="row pt-1 pb-1"><div class="col s12"><table>
                         <thead>
                             <tr>
-                                <th class="" colspan="10"><h6>Mata Uang : '.$data->currency->code.', Konversi = '.number_format($data->currency_rate,2,',','.').', Bayar dengan <b>'.$data->coaSource->name.'</b>, Sisa Tagihan <b>'.$data->currency->symbol.' '.number_format($data->balance,2,',','.').'</b></h6></th>
+                                <th class="" colspan="13"><h6>Mata Uang : '.$data->currency->code.', Konversi = '.number_format($data->currency_rate,2,',','.').', Bayar dengan <b>'.$data->coaSource->name.'</b>, Sisa Tagihan <b>'.$data->currency->symbol.' '.number_format($data->balance,2,',','.').'</b></h6></th>
                             </tr>
                             <tr>
-                                <th class="center-align" colspan="7">Daftar Item</th>
+                                <th class="center-align" colspan="13">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Referensi</th>
                                 <th class="center-align">Tipe</th>
                                 <th class="center-align">Keterangan</th>
+                                <th class="center-align">Remark</th>
                                 <th class="center-align">Dist.Biaya</th>
                                 <th class="center-align">Coa</th>
                                 <th class="center-align">Plant</th>
@@ -1795,6 +1804,7 @@ class PaymentRequestController extends Controller
                         <td class="center-align">'.$row->lookable->code.'</td>
                         <td class="center-align">'.$row->type().'</td>
                         <td class="center-align">'.$row->note.'</td>
+                        <td class="center-align">'.$row->remark.'</td>
                         <td class="center-align">'.($row->cost_distribution_id ? $row->costDistribution->code.' - '.$row->costDistribution->name : '-').'</td>
                         <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
                         <td class="center-align">'.($row->place()->exists() ? $row->place->code : '').'</td>

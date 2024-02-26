@@ -533,14 +533,22 @@ class UserController extends Controller
             ];
         } else {
 
-            $passedSupplierVendorUser = true;
-
             if($request->type == '3' || $request->type == '4'){
                 $arrUserAllowedSupplierVendor = ['323020','323002','112005','323004'];
                 if(!in_array(session('bo_employee_no'),$arrUserAllowedSupplierVendor)){
                     return response()->json([
                         'status'  => 500,
                         'message' => 'Mohon maaf, untuk user yang boleh memasukkan data supplier dan ekspedisi adalah : '.implode(', ',$arrUserAllowedSupplierVendor),
+                    ]);
+                }
+            }
+
+            if($request->type == '1' || $request->type == '2'){
+                $arrUserAllowedCustomerEmployee = ['323020'];
+                if(in_array(session('bo_employee_no'),$arrUserAllowedCustomerEmployee)){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Mohon maaf, untuk user anda tidak boleh memasukkan data customer dan pegawai.',
                     ]);
                 }
             }

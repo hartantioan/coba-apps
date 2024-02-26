@@ -3232,6 +3232,11 @@
                                     <input type="hidden" name="arr_code[]" value="` + val.id + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_temp_qty[]" value="` + val.qty_balance + `" data-id="` + count + `">
                                     <td class="center">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                            <i class="material-icons">delete</i>
+                                        </a>
+                                    </td>
+                                    <td class="center">
                                         ` + val.rawcode + `
                                     </td>
                                     <td class="center">

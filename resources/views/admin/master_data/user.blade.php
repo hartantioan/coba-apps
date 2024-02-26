@@ -319,7 +319,7 @@
                                     <label for="is_special_lock_user">Spesial (Kunci Periode)</label>
                                     <label>
                                         Tidak
-                                        <input checked type="checkbox" id="is_special_lock_user" name="is_special_lock_user" value="1">
+                                        <input type="checkbox" id="is_special_lock_user" name="is_special_lock_user" value="1">
                                         <span class="lever"></span>
                                         Ya
                                     </label>

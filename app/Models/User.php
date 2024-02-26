@@ -183,16 +183,21 @@ class User extends Authenticatable
             if($kind){
                 if($kind == '1'){
                     $prefix = '3'.date('y');
+                    $query = User::selectRaw('RIGHT(employee_no, 3) as code')
+                        ->whereRaw("employee_no LIKE '$prefix%'")
+                        ->withTrashed()
+                        ->orderByDesc('employee_no')
+                        ->limit(1)
+                        ->get();
                 }elseif($kind == '2'){
                     $prefix = '3'.'.'.$place_id.'-'.date('y').date('m');
+                    $query = User::selectRaw('RIGHT(employee_no, 8) as code')
+                        ->whereRaw("employee_no LIKE '$prefix%'")
+                        ->withTrashed()
+                        ->orderByDesc('employee_no')
+                        ->limit(1)
+                        ->get();
                 }
-
-                $query = User::selectRaw('RIGHT(employee_no, 3) as code')
-                    ->whereRaw("employee_no LIKE '$prefix%'")
-                    ->withTrashed()
-                    ->orderByDesc('employee_no')
-                    ->limit(1)
-                    ->get();
 
                 if($query->count() > 0) {
                     $code = (int)$query[0]->code + 1;

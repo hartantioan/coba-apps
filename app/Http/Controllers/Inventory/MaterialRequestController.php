@@ -559,8 +559,8 @@ class MaterialRequestController extends Controller
                         $price = $item->priceNow($request->arr_place[$key],date('Y-m-d'));
                         $total = $price * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) * $itemUnit->conversion;
                         $grandtotal += $total;
-                        $total = ItemStock::where('item_id',$row)->where('place_id',$request->arr_place[$key])->where('warehouse_id',$request->arr_warehouse[$key])->sum('qty');
-                        $purchaseQty = $total > 0 ? $total / $itemUnit->conversion : 0;
+                        $totalQty = ItemStock::where('item_id',$row)->where('place_id',$request->arr_place[$key])->where('warehouse_id',$request->arr_warehouse[$key])->sum('qty');
+                        $purchaseQty = $totalQty > 0 ? $totalQty / $itemUnit->conversion : 0;
                         MaterialRequestDetail::create([
                             'material_request_id'   => $query->id,
                             'item_id'               => $row,

@@ -28,7 +28,10 @@ use App\Models\GoodReceiptDetail;
 use App\Models\GoodReceive;
 use App\Models\GoodReceiveDetail;
 use App\Models\Item;
+use App\Models\ItemCogs;
 use App\Models\ItemStock;
+use App\Models\MaterialRequest;
+use App\Models\MaterialRequestDetail;
 use App\Models\MenuUser;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
@@ -55,6 +58,17 @@ class MenuController extends Controller
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+
+        /* foreach(MaterialRequestDetail::all() as $row){
+            $total = 0;
+            $itemCogs = ItemCogs::where('item_id',$row->item_id)->where('place_id',$row->place_id)->whereDate('date','<=',$row->materialRequest->post_date)->orderByDesc('id')->first();
+            if($itemCogs){
+                $total = $itemCogs->price_final * $row->qty * $row->qty_conversion;
+            }
+            $row->update([
+                'total' => $total
+            ]);
+        } */
 
         /* $pr = PurchaseRequest::whereHas('purchaseRequestDetail',function($query){
             $query->where('requester','sammy');

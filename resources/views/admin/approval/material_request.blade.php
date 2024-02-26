@@ -195,6 +195,7 @@
                         <th class="center-align">Req.</th>
                         <th class="center-align">Stok</th>
                         <th class="center-align">Sat.</th>
+                        <th class="center-align">Nilai Barang</th>
                         <th class="center-align">Tgl.Dipakai</th>
                         <th class="center-align">Plant</th>
                         <th class="center-align">Gudang</th>
@@ -222,6 +223,7 @@
                         <td class="right-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                         <td class="right-align">{{ number_format($row->stock,3,',','.') }}</td>
                         <td class="center-align">{{ $row->itemUnit->unit->code }}</td>
+                        <td class="right-align">{{ number_format($row->total,2,',','.') }}</td>
                         <td class="indigo-text center-align">{{ date('d/m/Y',strtotime($row->required_date)) }}</td>
                         <td class="center-align">{{ $row->place->code }}</td>
                         <td class="center-align">{{ $row->warehouse->name }}</td>
@@ -232,10 +234,10 @@
                         <td class="">{{ $row->requester }}</td>
                     </tr>
                     <tr>
-                        <td colspan="13">Keterangan 1 : {{ $row->note }}</td>
+                        <td colspan="14">Keterangan 1 : {{ $row->note }}</td>
                     </tr>
                     <tr>
-                        <td colspan="13">Keterangan 2 : {{ $row->note2 }}</td>
+                        <td colspan="14">Keterangan 2 : {{ $row->note2 }}</td>
                     </tr>
                     @endforeach
                 </tbody>

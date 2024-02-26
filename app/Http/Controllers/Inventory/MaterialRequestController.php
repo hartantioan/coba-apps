@@ -557,7 +557,8 @@ class MaterialRequestController extends Controller
                         $item = Item::find(intval($row));
                         $itemUnit = ItemUnit::find(intval($request->arr_satuan[$key]));
                         $price = $item->priceNow($request->arr_place[$key],date('Y-m-d'));
-                        $grandtotal += $price * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) * $itemUnit->conversion;
+                        $total = $price * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) * $itemUnit->conversion;
+                        $grandtotal += $total;
                         $total = ItemStock::where('item_id',$row)->where('place_id',$request->arr_place[$key])->where('warehouse_id',$request->arr_warehouse[$key])->sum('qty');
                         $purchaseQty = $total > 0 ? $total / $itemUnit->conversion : 0;
                         MaterialRequestDetail::create([
@@ -577,6 +578,7 @@ class MaterialRequestController extends Controller
                             'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
                             'project_id'            => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
                             'requester'             => $request->arr_requester[$key],
+                            'total'                 => $total,
                         ]);
                     }
                     MaterialRequest::find($query->id)->update([

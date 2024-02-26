@@ -32,6 +32,7 @@ class MaterialRequestDetail extends Model
         'project_id',
         'status',
         'requester',
+        'total',
     ];
 
     public function materialRequest()

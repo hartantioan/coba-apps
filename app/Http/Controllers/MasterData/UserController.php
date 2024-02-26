@@ -569,7 +569,7 @@ class UserController extends Controller
                     $query->name            = $request->name;
                     $query->username        = $request->username ? $request->username : NULL;
                     $query->password        = $request->password ? bcrypt($request->password) : $query->password;
-                    $query->phone	        = $request->phone;
+                    $query->phone	        = $request->phone ? $request->phone : NULL;
                     $query->email           = $request->email;
                     $query->address	        = $request->address;
                     $query->type            = $request->type;

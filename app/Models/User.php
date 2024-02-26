@@ -190,7 +190,7 @@ class User extends Authenticatable
                 $query = User::selectRaw('RIGHT(employee_no, 3) as code')
                     ->whereRaw("employee_no LIKE '$prefix%'")
                     ->withTrashed()
-                    ->orderByDesc('id')
+                    ->orderByDesc('employee_no')
                     ->limit(1)
                     ->get();
 
@@ -215,7 +215,7 @@ class User extends Authenticatable
     
             $query = User::selectRaw('type, RIGHT(employee_no, 6) as code')
                 ->where('type',$type)
-                ->orderByDesc('id')
+                ->orderByDesc('employee_no')
                 ->limit(1)
                 ->get();
     

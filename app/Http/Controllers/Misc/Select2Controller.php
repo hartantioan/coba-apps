@@ -3251,7 +3251,7 @@ class Select2Controller extends Controller {
                             'list_warehouse'=> $row->item->warehouseList(),
                             'buy_units'     => $row->item->arrBuyUnits(),
                             'unit_stock'    => $row->item->uomUnit->code,
-                            'qty_stock'     => number_format($row->balancePr() * $row->qty_conversion,3,',','.'),
+                            'qty_stock'     => number_format($row->getStockNow($row->qty_conversion),3,',','.'),
                         ];
                     }
                 }

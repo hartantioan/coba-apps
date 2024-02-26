@@ -100,24 +100,24 @@ class MaterialRequestDetail extends Model
     }
 
     public function balancePr(){
-        $totalPr = $this->qty - $this->getStockNow();
+        $totalPr = $this->qty - $this->getStockNow($this->qty_conversion);
         foreach($this->purchaseRequestDetail as $row){
             $totalPr -= $row->qty;
         }
         return $totalPr;
     }
 
-    public function getStockNow(){
+    public function getStockNow($conversion){
         $stock = 0;
         $itemStock = ItemStock::where('place_id',$this->place_id)->where('warehouse_id',$this->warehouse_id)->where('item_id',$this->item_id)->first();
         if($itemStock){
-            $stock = $itemStock->qty;
+            $stock = $itemStock->qty > 0 ? round($itemStock->qty / $conversion,3) : 0;
         }
         return $stock;
     }
 
     public function balancePrGi(){
-        $total = $this->qty - $this->getStockNow();
+        $total = $this->qty - $this->getStockNow($this->qty_conversion);
         foreach($this->purchaseRequestDetail as $row){
             $total -= $row->qty;
         }
@@ -128,9 +128,9 @@ class MaterialRequestDetail extends Model
     }
 
     public function balanceGi(){
-        $totalGi = $this->qty - $this->getStockNow();
+        $totalGi = $this->qty - $this->getStockNow($this->qty_conversion);
         if($totalGi > 0){
-            $totalGi = $this->getStockNow();
+            $totalGi = $this->getStockNow($this->qty_conversion);
         }else{
             $totalGi = $this->qty;
         }

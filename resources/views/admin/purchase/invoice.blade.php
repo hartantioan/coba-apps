@@ -2201,13 +2201,13 @@
                     -
                 </td>
                 <td class="center">
-                    -
-                </td>
-                <td class="center">
-                    -
-                </td>
-                <td class="center">
                     <input class="browser-default" type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                </td>
+                <td class="center">
+                    -
+                </td>
+                <td class="center">
+                    -
                 </td>
                 <td class="center">
                     <input class="browser-default" type="text" name="arr_price[]" onfocus="emptyThis(this);" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">

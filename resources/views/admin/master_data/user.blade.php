@@ -165,6 +165,10 @@
                             <input id="username" name="username" type="text" placeholder="Username">
                             <label class="active" for="username">Username</label>
                         </div>
+                        <div class="input-field col s3">
+                            <input id="employee_no" name="employee_no" type="text" placeholder="Kode BP...">
+                            <label class="active" for="employee_no">Kode/NIK (Kosongkan untuk autogenerate)</label>
+                        </div>
                         <div class="input-field col s3 employee_inputs">
                             <input id="password" name="password" type="password" placeholder="Password">
                             <label class="active" for="password">Password</label>
@@ -1867,6 +1871,7 @@
                 $('#temp').val(id);
                 $('#name').val(response.name);
                 $('#username').val(response.username);
+                $('#employee_no').val(response.employee_no);
                 $('#phone').val(response.phone);
                 $('#email').val(response.email);
                 $("#address").val(response.address);
@@ -1933,6 +1938,7 @@
                 $('#id_card_address').val(response.id_card_address);
                 $('#gender').val(response.gender).formSelect();
                 $('#group_id').val(response.group_id).formSelect();
+                $('#limit_credit').val(response.limit_credit);
 
                 if(response.type == '1'){
                     $('#company_id').val(response.company_id).formSelect();

@@ -253,7 +253,7 @@
                         <td>{{ $row->machine()->exists() ? $row->machine->code : '-' }}</td>
                         <td>{{ $row->department()->exists() ? $row->department->code : '-' }}</td>
                         <td>{{ $row->project()->exists() ? $row->project->name : '-' }}</td>
-                        <td class="right-align">{{ number_format($row->nominal,3,',','.') }}</td>
+                        <td class="right-align">{{ number_format($row->nominal,2,',','.') }}</td>
                     </tr>
                     <tr>
                         <td colspan="10">Remark : {{ $row->remark }}</td>

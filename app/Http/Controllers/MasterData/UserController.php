@@ -447,6 +447,7 @@ class UserController extends Controller
             $validation = Validator::make($request->all(), [
                 // 'name' 				=> 'required|uppercase',
                 'username'			=> $request->temp ? ['required', Rule::unique('users', 'username')->ignore($request->temp)] : 'required|unique:users,username',
+                'employee_no'		=> $request->employee_no ? ($request->temp ? [Rule::unique('users', 'employee_no')->ignore($request->temp)] : 'unique:users,employee_no') : '',
                 /* 'phone'		        => $request->temp ? ['required', Rule::unique('users', 'phone')->ignore($request->temp)] : 'required|unique:users,phone', */
                 /* 'email'             => $request->temp ? ['required', Rule::unique('users', 'email')->ignore($request->temp)] : 'required|unique:users,email', */
                 'address'           => 'required',
@@ -467,7 +468,8 @@ class UserController extends Controller
                 // 'name.uppercase' 	            => 'Nama harus menggunakan huruf kapital.',
                 'username.required'             => 'Username tidak boleh kosong.',
                 'username.unique'               => 'Username telah terpakai.',
-                /* 'phone.required'                => 'Telepon tidak boleh kosong.',
+                'employee_no.unique'            => 'Kode BP / NIK telah terpakai.',
+                /* 'phone.required'             => 'Telepon tidak boleh kosong.',
                 'phone.unique'                  => 'Telepon telah terpakai.', */
                 /* 'email.required'	            => 'Email tidak boleh kosong.',
                 'email.unique'                  => 'Email telah terpakai.', */
@@ -489,6 +491,7 @@ class UserController extends Controller
             $validation = Validator::make($request->all(), [
                 'name' 				=> 'required|uppercase',
                 'phone'		        => $request->temp ? ['required', Rule::unique('users', 'phone')->ignore($request->temp)] : 'required|unique:users,phone',
+                'employee_no'		=> $request->employee_no ? ($request->temp ? [Rule::unique('users', 'employee_no')->ignore($request->temp)] : 'unique:users,employee_no') : '',
                 /* 'email'             => $request->temp ? ['required', Rule::unique('users', 'email')->ignore($request->temp)] : 'required|unique:users,email', */
                 'address'           => 'required',
                 'type'              => 'required',
@@ -506,6 +509,7 @@ class UserController extends Controller
                 'name.uppercase' 	            => 'Nama harus menggunakan huruf kapital.',
                 'phone.required'                => 'Telepon tidak boleh kosong.',
                 'phone.unique'                  => 'Telepon telah terpakai.',
+                'employee_no.unique'            => 'Kode BP / NIK telah terpakai.',
                 /* 'email.required'	            => 'Email tidak boleh kosong.',
                 'email.unique'                  => 'Email telah terpakai.', */
                 'address.required'              => 'Alamat tidak boleh kosong.',
@@ -568,6 +572,7 @@ class UserController extends Controller
                     $query = User::find($request->temp);
                     $query->name            = $request->name;
                     $query->username        = $request->username ? $request->username : NULL;
+                    $query->employee_no     = $request->employee_no ? $request->employee_no : $query->employee_no;
                     $query->password        = $request->password ? bcrypt($request->password) : $query->password;
                     $query->phone	        = $request->phone ? $request->phone : NULL;
                     $query->email           = $request->email;
@@ -612,7 +617,7 @@ class UserController extends Controller
                 try {
                     $query = User::create([
                         'name'			        => $request->name,
-                        'employee_no'           => User::generateCode($request->type,$request->employee_type,$request->place_id),
+                        'employee_no'           => $request->employee_no ? $request->employee_no : User::generateCode($request->type,$request->employee_type,$request->place_id),
                         'username'	            => $request->username ? $request->username : NULL,
                         'password'		        => $request->password ? bcrypt($request->password) : NULL,
                         'phone'	                => $request->phone ? $request->phone : NULL,

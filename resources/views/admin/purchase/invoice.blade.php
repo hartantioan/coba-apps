@@ -319,6 +319,7 @@
                                                                 <table class="bordered" style="width:3500px !important;" id="table-detail">
                                                                     <thead>
                                                                         <tr>
+                                                                            <th class="center">Hapus</th>
                                                                             <th class="center">GR/LC/PO/Coa No.</th>
                                                                             <th class="center">NO.PO/GRPO</th>
                                                                             <th class="center">No.SJ</th>
@@ -351,7 +352,7 @@
                                                                     </thead>
                                                                     <tbody id="body-detail">
                                                                         <tr id="last-row-detail">
-                                                                            <td colspan="28">
+                                                                            <td colspan="29">
                                                                                 <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                                                     <i class="material-icons left">add</i> Pembulatan Manual
                                                                                 </a>
@@ -987,6 +988,11 @@
         $('#body-multi').on('click', '.delete-data-multi', function() {
             $(this).closest('tr').remove();
             countAllMulti();
+        });
+
+        $('#body-detail').on('click', '.delete-data-detail', function() {
+            $(this).closest('tr').remove();
+            countAll();
         });
 
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/supplier_vendor") }}');
@@ -1826,6 +1832,11 @@
                                                 <input type="hidden" name="arr_code[]" value="` + val.id + `" data-id="` + count + `">
                                                 <input type="hidden" name="arr_temp_qty[]" value="` + val.qty_balance + `" data-id="` + count + `">
                                                 <td class="center">
+                                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                                        <i class="material-icons">delete</i>
+                                                    </a>
+                                                </td>
+                                                <td class="center">
                                                     ` + val.rawcode + `
                                                 </td>
                                                 <td class="center">
@@ -2163,6 +2174,11 @@
                 <input type="hidden" name="arr_wtax[]" value="0" data-id="` + count + `">
                 <input type="hidden" name="arr_grandtotal[]" value="0" data-id="` + count + `">
                 <input type="hidden" name="arr_temp_qty[]" value="1" data-id="` + count + `">
+                <td class="center">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
                 <td class="center">
                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                 </td>
@@ -3057,6 +3073,11 @@
                                     <input type="hidden" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_temp_qty[]" value="` + val.qty_balance + `" data-id="` + count + `">
+                                    <td class="center">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                            <i class="material-icons">delete</i>
+                                        </a>
+                                    </td>
                                     <td class="center">
                                         <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                                     </td>

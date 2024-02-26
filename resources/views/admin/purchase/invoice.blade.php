@@ -270,7 +270,7 @@
                                     <label class="active" for="due_date">Tgl. Jatuh Tempo</label>
                                 </div>
                                 <div class="input-field col m3 s12 step11">
-                                    <input id="document_date" name="document_date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. dokumen">
+                                    <input id="document_date" name="document_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. dokumen">
                                     <label class="active" for="document_date">Tgl. Dokumen</label>
                                 </div>
                                 <div class="input-field col m3 s12 step12">
@@ -282,7 +282,7 @@
                                     <label class="active" for="tax_cut_no">No. Bukti Potong</label>
                                 </div>
                                 <div class="input-field col m3 s12 step14">
-                                    <input id="cut_date" name="cut_date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Bukti potong">
+                                    <input id="cut_date" name="cut_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Bukti potong">
                                     <label class="active" for="cut_date">Tgl. Bukti Potong</label>
                                 </div>
                                 <div class="input-field col m3 s12 step15">

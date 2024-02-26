@@ -365,10 +365,10 @@
                                 <input id="receiver_phone" name="receiver_phone" type="text" placeholder="Kontak Penerima">
                                 <label class="active" for="receiver_phone">Kontak Penerima (Opsional)</label>
                             </div>
-                            <div class="file-field input-field col m3 s12 step18">
+                            <div class="file-field input-field col m12 s12 step18">
                                 <div class="btn">
                                     <span>Dokumen PO</span>
-                                    <input type="file" name="file" id="file">
+                                    <input type="file" name="file[]" id="file" multiple accept=".pdf, .xlsx, .xls, .jpeg, .jpg, .png, .gif, .word">
                                 </div>
                                 <div class="file-path-wrapper">
                                     <input class="file-path validate" type="text">
@@ -2233,119 +2233,139 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                var formData = new FormData($('#form_data')[0]), passedUnit = true;
+                let passedUpload = true;
+                var files = document.getElementById('file');
 
-                formData.delete("arr_tax[]");
-                formData.delete("arr_is_include_tax[]");
-                formData.delete("arr_wtax[]");
-                formData.delete("arr_wtax[]");
-                formData.delete("arr_warehouse[]");
-                formData.delete("arr_line[]");
-                formData.delete("arr_project[]");
-
-                if($('select[name^="arr_unit[]"]').length > 0){
-                    $('select[name^="arr_unit[]"]').each(function(index){
-                        if(!$(this).val()){
-                            passedUnit = false;
+                if(files.files.length > 0){
+                    for (var i = 0; i < files.files.length; i++) {
+                        var imageSize = files.files[i].size;
+                        if(Math.round(imageSize/1024) >= 2048){
+                            passedUpload = false;
                         }
-                    });
+                    }
                 }
 
-                $('select[name^="arr_tax"]').each(function(index){
-                    formData.append('arr_tax[]',$(this).val());
-                    formData.append('arr_tax_id[]',$('option:selected',this).data('id'));
-                    formData.append('arr_wtax_id[]',$('select[name^="arr_wtax"]').eq(index).find(':selected').data('id'));
-                    formData.append('arr_is_include_tax[]',($('input[name^="arr_is_include_tax"]').eq(index).is(':checked') ? '1' : '0'));
-                    formData.append('arr_wtax[]',$('select[name^="arr_wtax"]').eq(index).val());
-                    formData.append('arr_line[]',($('select[name^="arr_line"]').eq(index).val() ? $('select[name^="arr_line"]').eq(index).val() : ''));
-                    formData.append('arr_warehouse[]',($('select[name^="arr_warehouse"]').eq(index).val() ? $('select[name^="arr_warehouse"]').eq(index).val() : ''));
-                    formData.append('arr_project[]',($('select[name^="arr_project[]"]').eq(index).val() ? $('select[name^="arr_project[]"]').eq(index).val() : ''));
-                });
+                if(passedUpload){
+                    var formData = new FormData($('#form_data')[0]), passedUnit = true;
 
-                if(passedUnit){
-                    var path = window.location.pathname;
-                    path = path.replace(/^\/|\/$/g, '');
+                    formData.delete("arr_tax[]");
+                    formData.delete("arr_is_include_tax[]");
+                    formData.delete("arr_wtax[]");
+                    formData.delete("arr_wtax[]");
+                    formData.delete("arr_warehouse[]");
+                    formData.delete("arr_line[]");
+                    formData.delete("arr_project[]");
 
-                    
-                    var segments = path.split('/');
-                    var lastSegment = segments[segments.length - 1];
-                
-                    formData.append('lastsegment',lastSegment);
-                    
-                    $.ajax({
-                        url: '{{ Request::url() }}/create',
-                        type: 'POST',
-                        dataType: 'JSON',
-                        data: formData,
-                        contentType: false,
-                        processData: false,
-                        cache: true,
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        beforeSend: function() {
-                            $('#validation_alert').hide();
-                            $('#validation_alert').html('');
-                            loadingOpen('.modal-content');
-                        },
-                        success: function(response) {
-                            $('input').css('border', 'none');
-                            $('input').css('border-bottom', '0.5px solid black');
-                            loadingClose('.modal-content');
-                            if(response.status == 200) {
-                                success();
-                                M.toast({
-                                    html: response.message
-                                });
-                            } else if(response.status == 422) {
-                                $('#validation_alert').show();
-                                $('.modal-content').scrollTop(0);
-                                
-                                swal({
-                                    title: 'Ups! Validation',
-                                    text: 'Check your form.',
-                                    icon: 'warning'
-                                });
-                                $.each(response.error, function(field, errorMessage) {
-                                    $('#' + field).addClass('error-input');
-                                    $('#' + field).css('border', '1px solid red');
-                                    
-                                });
+                    if($('select[name^="arr_unit[]"]').length > 0){
+                        $('select[name^="arr_unit[]"]').each(function(index){
+                            if(!$(this).val()){
+                                passedUnit = false;
+                            }
+                        });
+                    }
 
-                                $.each(response.error, function(i, val) {
-                                    $.each(val, function(i, val) {
-                                        $('#validation_alert').append(`
-                                            <div class="card-alert card red">
-                                                <div class="card-content white-text">
-                                                    <p>` + val + `</p>
-                                                </div>
-                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                    <span aria-hidden="true">×</span>
-                                                </button>
-                                            </div>
-                                        `);
+                    $('select[name^="arr_tax"]').each(function(index){
+                        formData.append('arr_tax[]',$(this).val());
+                        formData.append('arr_tax_id[]',$('option:selected',this).data('id'));
+                        formData.append('arr_wtax_id[]',$('select[name^="arr_wtax"]').eq(index).find(':selected').data('id'));
+                        formData.append('arr_is_include_tax[]',($('input[name^="arr_is_include_tax"]').eq(index).is(':checked') ? '1' : '0'));
+                        formData.append('arr_wtax[]',$('select[name^="arr_wtax"]').eq(index).val());
+                        formData.append('arr_line[]',($('select[name^="arr_line"]').eq(index).val() ? $('select[name^="arr_line"]').eq(index).val() : ''));
+                        formData.append('arr_warehouse[]',($('select[name^="arr_warehouse"]').eq(index).val() ? $('select[name^="arr_warehouse"]').eq(index).val() : ''));
+                        formData.append('arr_project[]',($('select[name^="arr_project[]"]').eq(index).val() ? $('select[name^="arr_project[]"]').eq(index).val() : ''));
+                    });
+
+                    if(passedUnit){
+                        var path = window.location.pathname;
+                        path = path.replace(/^\/|\/$/g, '');
+
+                        
+                        var segments = path.split('/');
+                        var lastSegment = segments[segments.length - 1];
+
+                        formData.append('lastsegment',lastSegment);
+                        
+                        $.ajax({
+                            url: '{{ Request::url() }}/create',
+                            type: 'POST',
+                            dataType: 'JSON',
+                            data: formData,
+                            contentType: false,
+                            processData: false,
+                            cache: true,
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            beforeSend: function() {
+                                $('#validation_alert').hide();
+                                $('#validation_alert').html('');
+                                loadingOpen('.modal-content');
+                            },
+                            success: function(response) {
+                                $('input').css('border', 'none');
+                                $('input').css('border-bottom', '0.5px solid black');
+                                loadingClose('.modal-content');
+                                if(response.status == 200) {
+                                    success();
+                                    M.toast({
+                                        html: response.message
                                     });
-                                });
-                            } else {
-                                M.toast({
-                                    html: response.message
+                                } else if(response.status == 422) {
+                                    $('#validation_alert').show();
+                                    $('.modal-content').scrollTop(0);
+                                    
+                                    swal({
+                                        title: 'Ups! Validation',
+                                        text: 'Check your form.',
+                                        icon: 'warning'
+                                    });
+                                    $.each(response.error, function(field, errorMessage) {
+                                        $('#' + field).addClass('error-input');
+                                        $('#' + field).css('border', '1px solid red');
+                                        
+                                    });
+
+                                    $.each(response.error, function(i, val) {
+                                        $.each(val, function(i, val) {
+                                            $('#validation_alert').append(`
+                                                <div class="card-alert card red">
+                                                    <div class="card-content white-text">
+                                                        <p>` + val + `</p>
+                                                    </div>
+                                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                        <span aria-hidden="true">×</span>
+                                                    </button>
+                                                </div>
+                                            `);
+                                        });
+                                    });
+                                } else {
+                                    M.toast({
+                                        html: response.message
+                                    });
+                                }
+                            },
+                            error: function() {
+                                $('.modal-content').scrollTop(0);
+                                loadingClose('.modal-content');
+                                swal({
+                                    title: 'Ups!',
+                                    text: 'Check your internet connection.',
+                                    icon: 'error'
                                 });
                             }
-                        },
-                        error: function() {
-                            $('.modal-content').scrollTop(0);
-                            loadingClose('.modal-content');
-                            swal({
-                                title: 'Ups!',
-                                text: 'Check your internet connection.',
-                                icon: 'error'
-                            });
-                        }
-                    });
+                        });
+                    }else{
+                        swal({
+                            title: 'Ups!',
+                            text: 'Salah satu item belum diatur satuannya.',
+                            icon: 'error'
+                        });
+                    }
                 }else{
                     swal({
                         title: 'Ups!',
-                        text: 'Salah satu item belum diatur satuannya.',
+                        text: 'Ukuran masing-masing file adalah maksimal 2048 Kb / 2 Mb.',
                         icon: 'error'
                     });
                 }

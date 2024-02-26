@@ -1167,6 +1167,7 @@ Route::prefix('admin')->group(function () {
                 Route::prefix('user_activity')->middleware('operation.access:user_activity,view')->group(function () {
                     Route::get('/',[UserActivityController::class, 'index']);
                     Route::get('datatable',[UserActivityController::class, 'datatable']);
+                    Route::get('export',[UserActivityController::class, 'export']);
                 });
             });
 

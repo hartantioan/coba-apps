@@ -120,8 +120,6 @@ class StockMovementController extends Controller
                 }
             })
             ->orderBy('item_id')
-            ->orderBy('date')
-            ->orderBy('type')
             ->get();
         }
      

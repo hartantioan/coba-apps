@@ -4,11 +4,17 @@ namespace App\Jobs;
 
 use App\Helpers\CustomHelper;
 use App\Models\GoodIssue;
+use App\Models\GoodReceipt;
+use App\Models\GoodReceive;
+use App\Models\GoodReturnIssue;
+use App\Models\GoodReturnPO;
 use App\Models\InventoryTransferIn;
 use App\Models\InventoryTransferOut;
 use App\Models\ItemCogs;
 use App\Models\Journal;
+use App\Models\LandedCost;
 use App\Models\MarketingOrderDeliveryProcess;
+use App\Models\PurchaseMemo;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -26,11 +32,10 @@ class ResetCogs implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(string $date = null, int $place_id = null, int $item_id = null)
+    public function __construct(string $date = null, int $place_id = null)
     {
         $this->date = $date;
         $this->place_id = $place_id;
-        $this->item_id = $item_id;
     }
 
     /**
@@ -40,114 +45,100 @@ class ResetCogs implements ShouldQueue
      */
     public function handle()
     {
-        $data = ItemCogs::where('place_id',$this->place_id)->where('item_id',$this->item_id)->whereDate('date','>=',$this->date)->orderBy('date')->orderBy('id')->get();
-		$databefore = ItemCogs::where('place_id',$this->place_id)->where('item_id',$this->item_id)->whereDate('date','<',$this->date)->orderByDesc('date')->orderByDesc('id')->first();
+		$itemcogs = ItemCogs::where('post_date','>=',$this->date)->where('place_id',$this->place_id)->get();
 
-		foreach($data as $key => $row){
-			if($key == 0){
-				if($row->type == 'IN'){
-					if($databefore){
-						$finalprice = round(($databefore->total_final + $row->total_in) / ($databefore->qty_final + $row->qty_in),2);
-						$totalprice = round($databefore->total_final + $row->total_in,2);
-						$qtyfinal = $databefore->qty_final + $row->qty_in;
-					}else{
-						$finalprice = $row->qty_in > 0 ? round($row->total_in / $row->qty_in,2) : 0;
-						$totalprice = round($finalprice * $row->qty_in,2);
-						$totalprice = $row->total_in;
-						$qtyfinal = $row->qty_in;
-					}
-					$row->update([
-						'qty_final' 	=> $qtyfinal,
-						'price_final'	=> $finalprice,
-						'total_final'	=> $totalprice
-					]);
-				}
-			}else{
-				$prevqty = $data[$key-1]->qty_final;
-				$prevtotal = $data[$key-1]->total_final;
-				if($row->type == 'IN'){
-					if($row->lookable_type == 'inventory_transfer_ins'){
-						$it = InventoryTransferIn::find($row->lookable_id);
-						$it->updateJournal();
-					}
-
-					$finalprice = round(($prevtotal + $row->total_in) / ($prevqty + $row->qty_in),2);
-					$totalprice = $prevtotal + $row->total_in;
-					$row->update([
-						'qty_final' 	=> $prevqty + $row->qty_in,
-						'price_final'	=> $finalprice,
-						'total_final'	=> $totalprice
-					]);
-				}elseif($row->type == 'OUT'){
-					if($row->lookable_type == 'good_issues' || $row->lookable_type == 'inventory_transfer_outs' || $row->lookable_type == 'marketing_order_delivery_processes'){
-						$prevprice = $data[$key-1]->price_final;
-						if($row->lookable_type == 'good_issues'){
-							$gi = GoodIssue::find($row->lookable_id);
-							$journal = Journal::where('lookable_type',$row->lookable_type)->where('lookable_id',$row->lookable_id)->first();
-							foreach($gi->goodIssueDetail()->whereHas('itemStock',function($query)use($row){ 
-								$query->where('item_id',$row->item_id);
-							})->get() as $rowgid){
-								if($rowgid->cost_distribution_id){
-									$total = $prevprice * $rowgid->qty;
-									$lastIndex = count($rowgid->costDistribution->costDistributionDetail) - 1;
-									$accumulation = 0;
-									if($journal){
-										$jd = $journal->journalDetail()->where('type','1')->get();
-										foreach($rowgid->costDistribution->costDistributionDetail as $key => $rowcost){
-											if($key == $lastIndex){
-												$nominal = $total - $accumulation;
-											}else{
-												$nominal = round(($rowcost->percentage / 100) * $total);
-												$accumulation += $nominal;
-											}
-											$jd[$key]->update([
-												'nominal'   => $nominal
-											]);
-										}
-									}
-								}else{
-									if($journal){
-										foreach($journal->journalDetail()->where('item_id',$rowgid->item_id)->get() as $rowupdate){
-											$rowupdate->update([
-												'nominal'   => $prevprice * $rowgid->qty
-											]);
-										}
-									}
-								}
-								$rowgid->update([
-									'price'	=> $prevprice,
-									'total'	=> $prevprice * $rowgid->qty,
-								]);
-							}
-							GoodIssue::find($row->lookable_id)->updateGrandtotal();
-						}elseif($row->lookable_type == 'inventory_transfer_outs'){
-							$it = InventoryTransferOut::find($row->lookable_id);
-							$it->updateJournal();
-						}elseif($row->lookable_type == 'marketing_order_delivery_processes'){
-							$modp = MarketingOrderDeliveryProcess::find($row->lookable_id);
-							$modp->updateJournal();
-						}
-						$finalprice = $prevprice;
-						$totalprice = $prevtotal - $row->total_out;
-						$row->update([
-							'price_out'		=> $finalprice,
-							'total_out'		=> $finalprice * $row->qty_out,
-							'qty_final' 	=> $prevqty - $row->qty_out,
-							'price_final'	=> $finalprice,
-							'total_final'	=> $totalprice
-						]);
-					}else{
-						$prevprice = ($prevqty - $row->qty_out) > 0 ? round(($prevtotal - $row->total_out) / ($prevqty - $row->qty_out),2) : $data[$key-1]->price_final;
-						$finalprice = $prevprice;
-						$totalprice = $prevtotal - $row->total_out;
-						$row->update([
-							'qty_final' 	=> $prevqty - $row->qty_out,
-							'price_final'	=> $finalprice,
-							'total_final'	=> $totalprice
-						]);
-					}
+		foreach($itemcogs as $row){
+			$journal = Journal::where('lookable_type',$row->lookable_type)->where('lookable_id',$row->lookable_id)->get();
+			if($journal){
+				foreach($journal as $rowjournal){
+					$rowjournal->journalDetail()->delete();
+					$rowjournal->delete;
 				}
 			}
+			$qty = $row->type == 'IN' ? $row->qty_in : $row->qty_out;
+			CustomHelper::resetStock($row->place_id,$row->warehouse_id,$row->area_id,$row->item_id,$row->item_shading_i,$qty,$row->type);
+			$row->delete();
+		}
+
+		$gr = GoodReceipt::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
+		$grcv = GoodReceive::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
+		$lc = LandedCost::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
+		$gi = GoodIssue::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
+		$grt = GoodReturnPO::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
+		$gri = GoodReturnIssue::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
+		$pm = PurchaseMemo::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
+
+		$data = [];
+
+		foreach($gr as $row){
+			$data[] = [
+				'type'          => 0,
+				'date'          => $row->post_date,
+				'lookable_type' => $row->getTable(),
+				'lookable_id'   => $row->id,
+			];
+		}
+
+		foreach($grt as $row){
+			$data[] = [
+				'type'          => 1,
+				'date'          => $row->post_date,
+				'lookable_type' => $row->getTable(),
+				'lookable_id'   => $row->id,
+			];
+		}
+
+		foreach($grcv as $row){
+			$data[] = [
+				'type'          => 0,
+				'date'          => $row->post_date,
+				'lookable_type' => $row->getTable(),
+				'lookable_id'   => $row->id,
+			];
+		}
+
+		foreach($lc as $row){
+			$data[] = [
+				'type'          => 1,
+				'date'          => $row->post_date,
+				'lookable_type' => $row->getTable(),
+				'lookable_id'   => $row->id,
+			];
+		}
+
+		foreach($gi as $row){
+			$data[] = [
+				'type'          => 2,
+				'date'          => $row->post_date,
+				'lookable_type' => $row->getTable(),
+				'lookable_id'   => $row->id,
+			];
+		}
+
+		foreach($gri as $row){
+			$data[] = [
+				'type'          => 3,
+				'date'          => $row->post_date,
+				'lookable_type' => $row->getTable(),
+				'lookable_id'   => $row->id,
+			];
+		}
+
+		foreach($pm as $row){
+			$data[] = [
+				'type'          => 4,
+				'date'          => $row->post_date,
+				'lookable_type' => $row->getTable(),
+				'lookable_id'   => $row->id,
+			];
+		}
+
+		$collection = collect($data)->sortBy(function($item) {
+						return [$item['date'], $item['type']];
+					})->values();
+
+		foreach($collection as $row){
+			CustomHelper::sendCogsFromReset($row['lookable_type'],$row['lookable_id']);
 		}
     }
 }

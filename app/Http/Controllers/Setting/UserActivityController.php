@@ -3,9 +3,13 @@
 namespace App\Http\Controllers\Setting;
 use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
+use App\Models\Activity;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use App\Models\ApprovalStage;
 use App\Models\Approval;
+use App\Exports\ExportUserActivity;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UserActivityController extends Controller
 {
@@ -22,9 +26,11 @@ class UserActivityController extends Controller
     public function datatable(Request $request){
         $column = [
             'id',
-            'code',
-            'approval_id',
-            'level',
+            'causer_id',
+            'description',
+            'subject_type',
+            'updated_at',
+            'properties',
         ];
 
         $start  = $request->start;
@@ -33,54 +39,35 @@ class UserActivityController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = ApprovalStage::count();
+        $total_data = ActivityLog::count();
         
-        $query_data = ApprovalStage::where(function($query) use ($search, $request) {
+        $query_data = ActivityLog::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search) {
-                        $query->where('code', 'like', "%$search%")
-                            ->orWhere('level', 'like', "%$search%")
-                            ->orWhereHas('approval',function($query) use($search){
+                        $query->where('description', 'like', "%$search%")
+                        ->orWhere('properties', 'like', "%$search%")
+                            ->orWhereHas('user',function($query) use($search){
                                 $query->where('name','like',"%$search%")
-                                    ->orWhere('document_text','like',"%$search%");
-                            })
-                            ->orWhereHas('approvalStageDetail', function($query) use($search){
-                                $query->orWhereHas('user',function($query) use($search){
-                                    $query->where('name','like',"%$search%");
-                                });
+                                    ->orWhere('employee_no','like',"%$search%");
                             });
                     });
                 }
-
-                if($request->status){
-                    $query->where('status', $request->status);
-                }
-
             })
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = ApprovalStage::where(function($query) use ($search, $request) {
+        $total_filtered = ActivityLog::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search) {
-                        $query->where('code', 'like', "%$search%")
-                            ->orWhere('level', 'like', "%$search%")
-                            ->orWhereHas('approval',function($query) use($search){
+                        $query->where('description', 'like', "%$search%")
+                            ->orWhere('properties', 'like', "%$search%")
+                            ->orWhereHas('user',function($query) use($search){
                                 $query->where('name','like',"%$search%")
-                                    ->orWhere('document_text','like',"%$search%");
-                            })
-                            ->orWhereHas('approvalStageDetail', function($query) use($search){
-                                $query->orWhereHas('user',function($query) use($search){
-                                    $query->where('name','like',"%$search%");
-                                });
+                                    ->orWhere('employee_no','like',"%$search%");
                             });
                     });
-                }
-
-                if($request->status){
-                    $query->where('status', $request->status);
                 }
             })
             ->count();
@@ -91,17 +78,12 @@ class UserActivityController extends Controller
             foreach($query_data as $val) {
 				
                 $response['data'][] = [
-                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
-                    $val->code,
-                    $val->approval->name.' - '.$val->approval->document_text,
-                    $val->level,
-                    $val->min_approve,
-                    $val->min_reject,
-                    $val->status(),
-                    '
-						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
-					'
+                    $nomor,
+                    $val->user()->exists() ? $val->user->employee_no.' - '.$val->user->name : 'System',
+                    $val->description,
+                    $val->subject_type,
+                    date('d/m/Y H:i:s',strtotime($val->updated_at)),
+                    $val->properties,
                 ];
 
                 $nomor++;
@@ -119,5 +101,11 @@ class UserActivityController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function export(Request $request){
+        $search = $request->search ? $request->search : '';
+
+		return Excel::download(new ExportUserActivity($search), 'user_activity_'.uniqid().'.xlsx');
     }
 }

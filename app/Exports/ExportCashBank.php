@@ -40,7 +40,6 @@ class ExportCashBank implements FromCollection, WithTitle, WithHeadings, ShouldA
 
     public function collection()
     {
-        info($this->coa_id);
         $query_data = Coa::where(function($query) {
             if($this->search !== '') {
                 $query->where(function($query){

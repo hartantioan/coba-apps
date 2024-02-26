@@ -1748,8 +1748,12 @@ class GoodIssueController extends Controller
                 $passed = true;
                 $passedQtyMinus = true;
                 $arrItemNotPassed = [];
+                $passedZeroQty = true;
 
                 foreach($request->arr_item_stock as $key => $row){
+                    if(str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) <= 0){
+                        $passedZeroQty = false;
+                    }
                     $rowprice = NULL;
                     $item_stock = ItemStock::find(intval($row));
                     $rowprice = $item_stock->priceNow();
@@ -1802,6 +1806,13 @@ class GoodIssueController extends Controller
                             'message' => 'Maaf, salah satu item aktiva jumlah qty dengan jumlah nomor serial tidak sama.',
                         ]);
                     }
+                }
+
+                if($passedZeroQty == false){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Maaf, qty tidak boleh 0.',
+                    ]);
                 }
 
                 if($passedQtyMinus == false){

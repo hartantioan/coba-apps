@@ -270,7 +270,7 @@
                                     <label class="active" for="due_date">Tgl. Jatuh Tempo</label>
                                 </div>
                                 <div class="input-field col m3 s12 step11">
-                                    <input id="document_date" name="document_date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. dokumen">
+                                    <input id="document_date" name="document_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. dokumen">
                                     <label class="active" for="document_date">Tgl. Dokumen</label>
                                 </div>
                                 <div class="input-field col m3 s12 step12">
@@ -282,7 +282,7 @@
                                     <label class="active" for="tax_cut_no">No. Bukti Potong</label>
                                 </div>
                                 <div class="input-field col m3 s12 step14">
-                                    <input id="cut_date" name="cut_date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Bukti potong">
+                                    <input id="cut_date" name="cut_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Bukti potong">
                                     <label class="active" for="cut_date">Tgl. Bukti Potong</label>
                                 </div>
                                 <div class="input-field col m3 s12 step15">
@@ -319,6 +319,7 @@
                                                                 <table class="bordered" style="width:3500px !important;" id="table-detail">
                                                                     <thead>
                                                                         <tr>
+                                                                            <th class="center">Hapus</th>
                                                                             <th class="center">GR/LC/PO/Coa No.</th>
                                                                             <th class="center">NO.PO/GRPO</th>
                                                                             <th class="center">No.SJ</th>
@@ -351,7 +352,7 @@
                                                                     </thead>
                                                                     <tbody id="body-detail">
                                                                         <tr id="last-row-detail">
-                                                                            <td colspan="28">
+                                                                            <td colspan="29">
                                                                                 <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                                                     <i class="material-icons left">add</i> Pembulatan Manual
                                                                                 </a>
@@ -785,7 +786,6 @@
                 $('#post_date').attr('min','{{ $minDate }}');
                 $('#post_date').attr('max','{{ $maxDate }}');
                 $('#due_date').attr('min','{{ date("Y-m-d") }}');
-                $('#document_date').attr('min','{{ date("Y-m-d") }}');
             },
             onOpenEnd: function(modal, trigger) {
                 $('#name').focus();
@@ -987,6 +987,11 @@
         $('#body-multi').on('click', '.delete-data-multi', function() {
             $(this).closest('tr').remove();
             countAllMulti();
+        });
+
+        $('#body-detail').on('click', '.delete-data-detail', function() {
+            $(this).closest('tr').remove();
+            countAll();
         });
 
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/supplier_vendor") }}');
@@ -1826,6 +1831,11 @@
                                                 <input type="hidden" name="arr_code[]" value="` + val.id + `" data-id="` + count + `">
                                                 <input type="hidden" name="arr_temp_qty[]" value="` + val.qty_balance + `" data-id="` + count + `">
                                                 <td class="center">
+                                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                                        <i class="material-icons">delete</i>
+                                                    </a>
+                                                </td>
+                                                <td class="center">
                                                     ` + val.rawcode + `
                                                 </td>
                                                 <td class="center">
@@ -2164,6 +2174,11 @@
                 <input type="hidden" name="arr_grandtotal[]" value="0" data-id="` + count + `">
                 <input type="hidden" name="arr_temp_qty[]" value="1" data-id="` + count + `">
                 <td class="center">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
+                <td class="center">
                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                 </td>
                 <td class="center">
@@ -2185,13 +2200,13 @@
                     -
                 </td>
                 <td class="center">
-                    -
-                </td>
-                <td class="center">
-                    -
-                </td>
-                <td class="center">
                     <input class="browser-default" type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                </td>
+                <td class="center">
+                    -
+                </td>
+                <td class="center">
+                    -
                 </td>
                 <td class="center">
                     <input class="browser-default" type="text" name="arr_price[]" onfocus="emptyThis(this);" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
@@ -2318,8 +2333,8 @@
                 if(percent_tax > 0 && $('#arr_include_tax' + element.data('id')).val() == '1'){
                     rowtotal = rowtotal / (1 + (percent_tax / 100));
                 }
-                rowtax = Math.floor(rowtotal * (percent_tax / 100));
-                rowwtax = Math.floor(rowtotal * (percent_wtax / 100));
+                rowtax = rowtotal * (percent_tax / 100);
+                rowwtax = rowtotal * (percent_wtax / 100);
                 $('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val(
                     (rowtotal >= 0 ? '' : '-') + formatRupiahIni(rowtotal.toFixed(2).toString().replace('.',','))
                 );
@@ -2342,7 +2357,6 @@
                 tax += rowtax;
                 wtax += rowwtax;
                 rowgrandtotal = rowtotal + rowtax - rowwtax;
-                grandtotal += rowgrandtotal;
                 $('input[name^="arr_grandtotal"][data-id="' + element.data('id') + '"]').val(
                     (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(rowgrandtotal.toFixed(2).toString().replace('.',','))
                 );
@@ -2351,7 +2365,10 @@
                 );
             });
 
-            grandtotal += rounding;
+            tax = Math.floor(tax);
+            wtax = Math.floor(wtax);
+
+            grandtotal = total + tax - wtax + rounding;
 
             $('input[name^="arr_dp_code"]').each(function(index){
                 downpayment += parseFloat($('input[name^="arr_nominal"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
@@ -3054,6 +3071,12 @@
                                     <input type="hidden" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_temp_qty[]" value="` + val.qty_balance + `" data-id="` + count + `">
+                                    <td class="center">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                            <i class="material-icons">delete</i>
+                                        </a>
+                                    </td>
                                     <td class="center">
                                         <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                                     </td>
@@ -3185,7 +3208,7 @@
                             $('#arr_department' + count).val(val.department_id);
                             $('#arr_warehouse' + count).val(val.warehouse_id);
                             $('#arr_coa' + count).append(`
-                                <option value="` + val.lookable_id + `">` + val.name + `</option>
+                                <option value="` + val.id + `">` + val.name + `</option>
                             `);
                             select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
                             if(val.project_id){

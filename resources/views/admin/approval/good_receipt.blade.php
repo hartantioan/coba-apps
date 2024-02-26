@@ -240,7 +240,7 @@
         <div class="invoice-subtotal mt-3">
             <div class="row">
                 <div class="col m6 s6 l6">
-                    {!! ucwords(strtolower($data->user->company->city->name)).', '.CustomHelper::tgl_indo($data->document_date) !!}
+                    {!! ucwords(strtolower($data->company->city->name)).', '.CustomHelper::tgl_indo($data->document_date) !!}
                 </div>
                 <div class="col m6 s6 l6">
                     Catatan : {{ $data->note }}

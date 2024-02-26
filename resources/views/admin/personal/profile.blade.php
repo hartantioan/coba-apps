@@ -46,10 +46,10 @@
                                                 <div class="col s4">Email</div><div class="col s8">: {{ $data->email }}</div>
                                                 <div class="col s4">HP</div><div class="col s8">: {{ $data->phone }}</div>
                                                 <div class="col s4">Alamat</div><div class="col s8">: {{ $data->address }}</div>
-                                                <div class="col s4">Kota</div><div class="col s8">: {{ $data->city->name }}</div>
-                                                <div class="col s4">Provinsi</div><div class="col s8">: {{ $data->province->name }}</div>
+                                                <div class="col s4">Kota</div><div class="col s8">: {{ $data->city()->exists() ? $data->city->name : '' }}</div>
+                                                <div class="col s4">Provinsi</div><div class="col s8">: {{ $data->province()->exists() ? $data->province->name : '' }}</div>
                                                 <div class="col s12"><hr></div>
-                                                <div class="col s4">Perusahaan</div><div class="col s8">: {{ $data->company->name }}</div>
+                                                <div class="col s4">Perusahaan</div><div class="col s8">: {{ $data->company()->exists() ? $data->company->name : '' }}</div>
                                                 <div class="col s4">Penempatan</div><div class="col s8">: {{ $data->place_id ? $data->place->code : '-' }}</div>
                                                 <div class="col s4">Departemen</div><div class="col s8">: {{ $data->department_id ? $data->department->name : '-' }}</div>
                                                 <div class="col s4">Posisi</div><div class="col s8">: {{ $data->position_id ? $data->position->name : '-' }}</div>

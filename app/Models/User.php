@@ -592,4 +592,16 @@ class User extends Authenticatable
         $this->save();
         return $token;
     }
+
+    public function statusRaw(){
+        
+        $status = match ($this->status) {
+            '1' => 'Aktif',
+            '2' => 'Tidak Aktif',
+
+            default => 'Invalid',
+        };
+
+        return $status;
+    }
 }

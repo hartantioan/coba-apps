@@ -89,6 +89,15 @@
                                                 <option value="4">Ekspedisi</option>
                                             </select>
                                         </div>
+
+                                        <label for="group_type" style="font-size:1.2rem;">Filter Group :</label>
+                                        <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;">
+                                            <select id="group_type" multiple="multiple" name="group_type" onchange="loadDataTable()">
+                                                @foreach($group as $row)
+                                                    <option value="{{ $row['id'] }}">{{ $row['name'] }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1652,7 +1661,8 @@
                 type: 'GET',
                 data: {
                     status : $('#filter_status').val(),
-                    type : $('#filter_type').val()
+                    type : $('#filter_type').val(),
+                    group : $('#group_type').val()
                 },
                 beforeSend: function() {
                     loadingOpen('#datatable_serverside');
@@ -2328,8 +2338,8 @@
         var search = window.table.search();
         var status = $('#filter_status').val();
         var type = $('#filter_type').val();
-        
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type;
+        var group = $('#group_type').val();
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type + "&group=" + group;
     }
 
     function checkAll(element,parent,mode){

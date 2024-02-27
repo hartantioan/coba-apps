@@ -85,7 +85,7 @@ class UserController extends Controller
             'address',
             'id_card'
         ];
-
+       
         $start  = $request->start;
         $length = $request->length;
         $order  = $column[$request->input('order.0.column')];
@@ -112,6 +112,9 @@ class UserController extends Controller
                 if($request->type){
                     $query->where('type', $request->type);
                 }
+                if($request->group){
+                    $query->whereIn('group_id', $request->group);
+                }
             })
             /* ->where('type','<>','1') */
             ->offset($start)
@@ -136,6 +139,9 @@ class UserController extends Controller
 
                 if($request->type){
                     $query->where('type', $request->type);
+                }
+                if($request->group){
+                    $query->whereIn('group_id', $request->group);
                 }
             })
             /* ->where('type','<>','1') */
@@ -450,19 +456,19 @@ class UserController extends Controller
                 'employee_no'		=> $request->employee_no ? ($request->temp ? [Rule::unique('users', 'employee_no')->ignore($request->temp)] : 'unique:users,employee_no') : '',
                 /* 'phone'		        => $request->temp ? ['required', Rule::unique('users', 'phone')->ignore($request->temp)] : 'required|unique:users,phone', */
                 /* 'email'             => $request->temp ? ['required', Rule::unique('users', 'email')->ignore($request->temp)] : 'required|unique:users,email', */
-                'address'           => 'required',
+                // 'address'           => 'required',
                 'type'              => 'required',
-                'id_card'           => 'required',
-                'id_card_address'   => 'required',
-                'company_id'        => 'required',
+                // 'id_card'           => 'required',
+                // 'id_card_address'   => 'required',
+                // 'company_id'        => 'required',
                 /* 'province_id'       => 'required',
                 'city_id'           => 'required',
                 'district_id'       => 'required',
                 'subdistrict_id'    => 'required', */
-                'country_id'        => 'required',
-                'limit_credit'      => 'required',
-                'employee_type'     => 'required',
-                'place_id'          => 'required',
+                // 'country_id'        => 'required',
+                // 'limit_credit'      => 'required',
+                // 'employee_type'     => 'required',
+                // 'place_id'          => 'required',
             ], [
                 // 'name.required' 	            => 'Nama tidak boleh kosong.',
                 // 'name.uppercase' 	            => 'Nama harus menggunakan huruf kapital.',
@@ -473,19 +479,19 @@ class UserController extends Controller
                 'phone.unique'                  => 'Telepon telah terpakai.', */
                 /* 'email.required'	            => 'Email tidak boleh kosong.',
                 'email.unique'                  => 'Email telah terpakai.', */
-                'address.required'              => 'Alamat tidak boleh kosong.',
+                // 'address.required'              => 'Alamat tidak boleh kosong.',
                 'type.required'	                => 'Tipe pengguna tidak boleh kosong.',
-                'id_card.required'              => 'No Identitas tidak boleh kosong.',
-                'id_card_address.required'      => 'Alamat Identitas tidak boleh kosong.',
-                'company.required'              => 'Perusahaan tidak boleh kosong.',
+                // 'id_card.required'              => 'No Identitas tidak boleh kosong.',
+                // 'id_card_address.required'      => 'Alamat Identitas tidak boleh kosong.',
+                // 'company.required'              => 'Perusahaan tidak boleh kosong.',
                 /* 'province_id.required'          => 'Provinsi tidak boleh kosong.',
                 'city_id.required'              => 'Kota tidak boleh kosong.',
                 'district_id.required'          => 'Kecamatan tidak boleh kosong.',
                 'subdistrict_id.required'       => 'Kelurahan tidak boleh kosong.', */
-                'country_id.required'           => 'Negara tidak boleh kosong.',
-                'limit_credit.required'         => 'Limit BS Karyawan tidak boleh kosong.',
-                'employee_type.required'        => 'Tipe Pegawai tidak boleh kosong.',
-                'place_id.required'             => 'Plant pegawai tidak boleh kosong.'
+                // 'country_id.required'           => 'Negara tidak boleh kosong.',
+                // 'limit_credit.required'         => 'Limit BS Karyawan tidak boleh kosong.',
+                // 'employee_type.required'        => 'Tipe Pegawai tidak boleh kosong.',
+                // 'place_id.required'             => 'Plant pegawai tidak boleh kosong.'
             ]);
         }else{
             $validation = Validator::make($request->all(), [
@@ -1246,8 +1252,9 @@ class UserController extends Controller
         $search = $request->search ? $request->search : '';
 		$status = $request->status ? $request->status : '';
         $type = $request->type ? $request->type : '';
+        $group = $request->group ? $request->group : '';
 		
-		return Excel::download(new ExportUser($search,$status,$type), 'user_'.uniqid().'.xlsx');
+		return Excel::download(new ExportUser($search,$status,$type,$group), 'user_'.uniqid().'.xlsx');
     }
 
     public function import(Request $request)

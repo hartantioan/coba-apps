@@ -45,6 +45,7 @@ use App\Models\Department;
 use App\Models\Division;
 use App\Models\ItemUnit;
 use App\Models\Menu;
+use App\Exports\ExportOutstandingMaterialRequest;
 
 class MaterialRequestController extends Controller
 {
@@ -2429,5 +2430,10 @@ class MaterialRequestController extends Controller
         $end_date = $request->end_date ? $request->end_date : '';
         $mode = $request->mode ? $request->mode : '';
 		return Excel::download(new ExportMaterialRequest($post_date,$end_date,$mode), 'item_request_'.uniqid().'.xlsx');
+    }
+
+    public function getOutstanding(Request $request){
+       
+		return Excel::download(new ExportOutstandingMaterialRequest(), 'item_request_'.uniqid().'.xlsx');
     }
 }

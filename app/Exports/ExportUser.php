@@ -15,18 +15,19 @@ class ExportUser implements FromCollection, WithTitle, WithHeadings, WithCustomS
     * @return \Illuminate\Support\Collection
     */
 
-    protected $search, $status, $type;
+    protected $search, $status, $type,$group;
 
-    public function __construct(string $search, string $status, string $type)
+    public function __construct(string $search, string $status, string $type,string $group)
     {
         $this->search = $search ? $search : '';
 		$this->status = $status ? $status : '';
         $this->type = $type ? $type : '';
+        $this->group = $group ? $group : '';
     }
 
     private $headings = [
         'ID',
-        'KODE', 
+        'KODE NIK', 
         'NAMA',
         'TIPE',
         'ALAMAT',
@@ -49,10 +50,12 @@ class ExportUser implements FromCollection, WithTitle, WithHeadings, WithCustomS
         'EMAIL',
         'GENDER',
         'STATUS KARYAWAN',
+        'STATUS AKTIF',
     ];
 
     public function collection()
     {
+        
         $data = User::where(function ($query) {
             if ($this->search) {
                 $query->where(function ($query) {
@@ -69,6 +72,10 @@ class ExportUser implements FromCollection, WithTitle, WithHeadings, WithCustomS
             if($this->type){
                 $query->where('type', $this->type);
             }
+            if($this->group){
+                $groupIds = explode(',', $this->group);
+                $query->whereIn('group_id', $groupIds);
+            }
         })->get();
 
         $arr = [];
@@ -82,23 +89,24 @@ class ExportUser implements FromCollection, WithTitle, WithHeadings, WithCustomS
                 'address'           => $row->address,
                 'subdistrict'       => $row->subdistrict()->exists() ? $row->subdistrict->name : '-',
                 'district'          => $row->district_id ? $row->district->name : '-',
-                'city'              => $row->city->name,
-                'province'          => $row->province->name,
-                'id_card'           => $row->id_card,
-                'id_card_address'   => $row->id_card_address,
+                'city'              => $row->city->name ?? '-',
+                'province'          => $row->province->name  ?? '-',
+                'id_card'           => $row->id_card  ?? '-',
+                'id_card_address'   => $row->id_card_address  ?? '-',
                 'group'             => $row->group()->exists() ? $row->group->name : '-',
-                'company'           => $row->company->name,
+                'company'           => $row->company->name  ?? '-',
                 'plant'             => $row->place()->exists() ? $row->place->code : '-',
                 'position'          => $row->position()->exists() ? $row->position->name : '-',
-                'npwp_no'           => $row->tax_id,
-                'npwp_name'         => $row->tax_name,
-                'npwp_address'      => $row->tax_address,
-                'pic'               => $row->pic,
-                'pic_no'            => $row->pic_no,
-                'office_no'         => $row->office_no,
-                'email'             => $row->email,
+                'npwp_no'           => $row->tax_id  ?? '-',
+                'npwp_name'         => $row->tax_name  ?? '-', 
+                'npwp_address'      => $row->tax_address  ?? '-',
+                'pic'               => $row->pic  ?? '-',
+                'pic_no'            => $row->pic_no  ?? '-',
+                'office_no'         => $row->office_no  ?? '-',
+                'email'             => $row->email  ?? '-',
                 'gender'            => $row->gender(),
                 'employee_status'   => $row->employeeType(),
+                'status'            => $row->statusRaw(),
             ];
         }
 

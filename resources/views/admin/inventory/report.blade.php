@@ -62,14 +62,18 @@
 
 <!-- END: Page Main-->
 <script>
-     $('#btn_out').hide();
+    $('#btn_out').hide();
     $(document).ready(function() {
         $('#type').change(function() {
             var selectedValue = $(this).val();
-           
+            
             if (selectedValue === 'inventory/good_receipt_po') {
                 $('#btn_out').show();
-            } else {
+            }
+            if (selectedValue === 'inventory/material_request') {
+                $('#btn_out').show();
+            }
+            else {
                 $('#btn_out').hide();
             }
         });

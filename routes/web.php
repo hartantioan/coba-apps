@@ -1809,7 +1809,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [MaterialRequestController::class, 'show']);
                     Route::post('get_items', [MaterialRequestController::class, 'getItems']);
                     Route::post('get_code', [MaterialRequestController::class, 'getCode']);
-                    Route::post('get_outstanding', [MaterialRequestController::class, 'getOutstanding']);
+                    Route::get('get_outstanding', [MaterialRequestController::class, 'getOutstanding']);
                     Route::post('get_items_from_stock', [MaterialRequestController::class, 'getItemFromStock']);
                     Route::post('print',[MaterialRequestController::class, 'print']);
                     Route::get('export',[MaterialRequestController::class, 'export']);

@@ -66,7 +66,7 @@ class ExportApprovalTemplate implements FromCollection, WithTitle, WithHeadings,
                     foreach($row->approvalTemplateStage as $rowstage){
                         $arr[] = [
                             'no'                => 1,
-                            'form'              => $rowmenu->menu->name,
+                            'form'              => $rowmenu->menu->fullName(),
                             'code'              => $row->code,
                             'name'              => $row->name,
                             'item_type'         => $row->itemGroupList(),

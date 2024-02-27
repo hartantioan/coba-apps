@@ -107,6 +107,22 @@ class MaterialRequestDetail extends Model
         return $totalPr;
     }
 
+    public function totalPr(){
+        $total = 0;
+        foreach($this->purchaseRequestDetail as $row){
+            $total += $row->qty;
+        }
+        return $total;
+    }
+
+    public function totalGi(){
+        $total = 0;
+        foreach($this->goodIssueDetail as $row){
+            $total += round($row->qty / $this->qty_conversion,3);
+        }
+        return $total;
+    }
+
     public function getStockNow($conversion){
         $stock = 0;
         $itemStock = ItemStock::where('place_id',$this->place_id)->where('warehouse_id',$this->warehouse_id)->where('item_id',$this->item_id)->first();

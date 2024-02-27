@@ -2428,6 +2428,6 @@ class MaterialRequestController extends Controller
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $mode = $request->mode ? $request->mode : '';
-		return Excel::download(new ExportMaterialRequest($post_date,$end_date,$mode), 'material_request_'.uniqid().'.xlsx');
+		return Excel::download(new ExportMaterialRequest($post_date,$end_date,$mode), 'item_request_'.uniqid().'.xlsx');
     }
 }

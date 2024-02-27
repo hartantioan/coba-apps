@@ -36,7 +36,7 @@
                         <div class="col s12">
                             <div class="card-panel">
                                 <div class="row">
-                                    <div class="col s12 ">
+                                    <div class="col s6 ">
                                         <label for="filter_status" style="font-size:1.2rem;">Filter Status :</label>
                                         <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;">
                                             <select class="form-control" id="filter_status" onchange="loadDataTable()">
@@ -45,6 +45,13 @@
                                                 <option value="2">Non-Aktif</option>
                                             </select>
                                         </div>
+                                    </div>
+                                    <div class="col s6">
+                                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="exportExcel();">
+                                            <i class="material-icons hide-on-med-and-up">view_list</i>
+                                            <span class="hide-on-small-onl">Excel</span>
+                                            <i class="material-icons right">view_list</i>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -1085,5 +1092,12 @@
                 });
             }
         });
+    }
+
+    function exportExcel(){
+        var search = window.table.search();
+        var status = $('#filter_status').val();
+        
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status;
     }
 </script>

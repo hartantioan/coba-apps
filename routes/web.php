@@ -1125,6 +1125,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [ApprovalTemplateController::class, 'show']);
                     Route::get('row_detail',[ApprovalTemplateController::class, 'rowDetail']);
                     Route::post('destroy', [ApprovalTemplateController::class, 'destroy'])->middleware('operation.access:approval_template,delete');
+                    Route::get('export',[ApprovalTemplateController::class, 'export']);
                 });
 
                 Route::prefix('menu')->middleware('operation.access:menu,view')->group(function () {

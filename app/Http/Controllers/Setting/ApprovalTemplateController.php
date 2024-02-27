@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Setting;
+
+use App\Exports\ExportApprovalTemplate;
 use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Menu;
@@ -476,5 +478,13 @@ class ApprovalTemplateController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function export(Request $request){
+        $search = $request->search ? $request->search : '';
+		$status = $request->status ? $request->status : '';
+        $type = $request->type ? $request->type : '';
+		
+		return Excel::download(new ExportApprovalTemplate($search,$status), 'approval_template_'.uniqid().'.xlsx');
     }
 }

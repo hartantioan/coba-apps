@@ -1263,11 +1263,10 @@ class CustomHelper {
 								'coa_id'		=> $row->lookable_id,
 								'account_id'	=> $ip->account_id ? $ip->account_id : NULL,
 								'type'			=> '2',
-								'nominal'		=> $row->total * $ip->currency_rate,
-								'nominal_fc'	=> $ip->currency->type == '1' ? $row->total * $ip->currency_rate : $row->total,
+								'nominal'		=> floatval($row->total * $ip->currency_rate),
+								'nominal_fc'	=> $ip->currency->type == '1' ? floatval($row->total * $ip->currency_rate) : floatval($row->total),
 								'note'			=> $row->note,
 							]);
-							info($row->total);
 						}
 						
 					}elseif($row->lookable_type == 'outgoing_payments'){

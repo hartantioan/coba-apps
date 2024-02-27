@@ -926,7 +926,7 @@
                     <input id="arr_total_item` + count + `" name="arr_total_item[]" onfocus="emptyThis(this);" data-limit="0" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
                 </td>
                 <td class="center">
-                    <input id="arr_rounding_item` + count + `" name="arr_rounding_item[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;" readonly>
+                    <input id="arr_rounding_item` + count + `" name="arr_rounding_item[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
                 </td>
                 <td class="center">
                     <input id="arr_subtotal_item` + count + `" name="arr_subtotal_item[]" onfocus="emptyThis(this);" data-limit="0" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);" style="width:150px;text-align:right;" readonly>

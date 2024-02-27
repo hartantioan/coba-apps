@@ -207,6 +207,9 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @php
+                        $total = 0;
+                    @endphp
                     @foreach($data->materialRequestDetail as $key => $row)
                     <tr>
                         <td class="center-align">
@@ -239,6 +242,9 @@
                     <tr>
                         <td colspan="14">Keterangan 2 : {{ $row->note2 }}</td>
                     </tr>
+                    @php
+                        $total += $row->total;
+                    @endphp
                     @endforeach
                 </tbody>
             </table>
@@ -247,11 +253,14 @@
     <div class="divider mt-3 mb-3"></div>
         <div class="invoice-subtotal">
             <div class="row">
-                <div class="col m6 s6 l6">
+                <div class="col m4 s12 l4">
                     {!! ucwords(strtolower($data->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
                 </div>
-                <div class="col m6 s6 l6">
+                <div class="col m4 s12 l4">
                     Catatan : {{ $data->note }}
+                </div>
+                <div class="col m4 s12 l4 right-align">
+                    <h6>TOTAL NILAI BARANG : {{ number_format($total,2,',','.') }}</h6>
                 </div>
             </div>
             <table class="mt-3" width="100%" border="0">

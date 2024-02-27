@@ -163,7 +163,7 @@ class ApprovalTemplateController extends Controller
             ]);
         }else{
             $validation = Validator::make($request->all(), [
-                'code' 				=> $request->temp ? ['required', Rule::unique('approval_templates', 'code')->ignore($request->temp)] : 'required|unique:approval_templates,code',
+                'code' 				=> $request->temp ? ['required', Rule::unique('approval_templates', 'code')->ignore($request->temp)] : ['required', Rule::unique('approval_templates', 'code')->withoutTrashed()],
                 'name'                  => 'required',
                 'arr_user'              => 'required|array',
                 'arr_approval_stage'    => 'required|array',

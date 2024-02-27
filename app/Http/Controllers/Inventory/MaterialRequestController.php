@@ -96,7 +96,7 @@ class MaterialRequestController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = MaterialRequest::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
+        $total_data = MaterialRequest::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->where('user_id',session('bo_id'))->count();
         
         $query_data = MaterialRequest::where(function($query) use ($search, $request) {
                 if($search) {
@@ -130,6 +130,7 @@ class MaterialRequestController extends Controller
                     $query->whereIn('status', $request->status);
                 }
             })
+            ->where('user_id',session('bo_id'))
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->offset($start)
             ->limit($length)
@@ -168,6 +169,7 @@ class MaterialRequestController extends Controller
                     $query->whereIn('status', $request->status);
                 }
             })
+            ->where('user_id',session('bo_id'))
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->count();
 

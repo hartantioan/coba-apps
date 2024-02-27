@@ -1291,10 +1291,10 @@
                     beforeSend: function() {
                         $('#validation_alert_access').hide();
                         $('#validation_alert_access').html('');
-                        loadingOpen('.modal-content');
+                        loadingOpen('#modal3');
                     },
                     success: function(response) {
-                        loadingClose('.modal-content');
+                        loadingClose('#modal3');
 
                         if(response.status == 200) {
                             $('#modal3').modal('close');
@@ -1333,7 +1333,7 @@
                     },
                     error: function() {
                         $('.modal-content').scrollTop(0);
-                        loadingClose('.modal-content');
+                        loadingClose('#modal3');
                         swal({
                             title: 'Ups!',
                             text: 'Check your internet connection.',

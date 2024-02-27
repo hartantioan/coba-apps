@@ -80,6 +80,10 @@ class PurchaseOrder extends Model
         return $this->belongsTo('App\Models\User','account_id','id')->withTrashed();
     }
 
+    public function account(){
+        return $this->belongsTo('App\Models\User','account_id','id')->withTrashed();
+    }
+
     public function purchasingType(){
         $type = match ($this->purchasing_type) {
           '1' => 'Standart PO',

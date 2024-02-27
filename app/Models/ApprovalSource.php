@@ -64,4 +64,16 @@ class ApprovalSource extends Model
 
         return $text;
     }
+
+    public function getAccountInfo(){
+        $name = '';
+        if(isset($this->lookable->account_id)){
+            $name = $this->lookable->account->name;
+        }else{
+            if(isset($this->lookable->user_id)){
+                $name = $this->lookable->user->name;
+            }
+        }
+        return $name;
+    }
 }

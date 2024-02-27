@@ -44,6 +44,7 @@ use App\Models\PurchaseDownPaymentDetail;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportPurchaseDownPayment;
 use App\Models\ChecklistDocumentList;
+use App\Models\MenuUser;
 use App\Models\User;
 use App\Models\Tax;
 
@@ -64,6 +65,7 @@ class PurchaseDownPaymentController extends Controller
     {
        
         $menu = $this->menu;
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
 
         $data = [
             'title'         => 'AP Down Payment',
@@ -78,7 +80,8 @@ class PurchaseDownPaymentController extends Controller
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
             'menu'          => $menu,
-            'menucode'      => $menu->document_code
+            'menucode'      => $menu->document_code,
+            'modedata'      => $menuUser->mode ? $menuUser->mode : '',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -154,7 +157,11 @@ class PurchaseDownPaymentController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = PurchaseDownPayment::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */count();
+        $total_data = PurchaseDownPayment::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */where(function($query)use($request){
+            if(!$request->modedata){
+                $query->where('user_id',session('bo_id'));
+            }
+        })->count();
         
         $query_data = PurchaseDownPayment::where(function($query) use ($search, $request) {
                 if($search) {
@@ -218,6 +225,10 @@ class PurchaseDownPaymentController extends Controller
                 
                 if($request->currency_id){
                     $query->whereIn('currency_id',$request->currency_id);
+                }
+
+                if(!$request->modedata){
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
@@ -288,6 +299,10 @@ class PurchaseDownPaymentController extends Controller
                 
                 if($request->currency_id){
                     $query->whereIn('currency_id',$request->currency_id);
+                }
+
+                if(!$request->modedata){
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */

@@ -49,6 +49,7 @@ use App\Exports\ExportPurchaseRequest;
 use App\Models\Division;
 use App\Models\ItemBuffer;
 use App\Models\ItemUnit;
+use App\Models\MenuUser;
 
 class PurchaseRequestController extends Controller
 {
@@ -66,6 +67,7 @@ class PurchaseRequestController extends Controller
         $lastSegment = request()->segment(count(request()->segments()));
        
         $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
             'title'     => 'Purchase Request',
             'content'   => 'admin.purchase.request',
@@ -79,6 +81,7 @@ class PurchaseRequestController extends Controller
             'maxDate'   => $request->get('maxDate'),
             'newcode'   =>  $menu->document_code.date('y'),
             'menucode'  => $menu->document_code,
+            'modedata'  => $menuUser->mode ? $menuUser->mode : '',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -102,7 +105,11 @@ class PurchaseRequestController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = PurchaseRequest::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */count();
+        $total_data = PurchaseRequest::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */where(function($query)use($request){
+            if(!$request->modedata){
+                $query->where('user_id',session('bo_id'));
+            }
+        })->count();
         
         $query_data = PurchaseRequest::where(function($query) use ($search, $request) {
                 if($search) {
@@ -135,6 +142,10 @@ class PurchaseRequestController extends Controller
 
                 if($request->status){
                     $query->whereIn('status', $request->status);
+                }
+
+                if(!$request->modedata){
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
@@ -174,6 +185,10 @@ class PurchaseRequestController extends Controller
 
                 if($request->status){
                     $query->whereIn('status', $request->status);
+                }
+
+                if(!$request->modedata){
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */

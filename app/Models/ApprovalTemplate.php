@@ -43,6 +43,14 @@ class ApprovalTemplate extends Model
     {
         return $this->hasMany('App\Models\ApprovalTemplateItemGroup');
     }
+
+    public function itemGroupList(){
+        $arr = [];
+        foreach($this->approvalTemplateItemGroup as $row){
+            $arr[] = $row->itemGroup->name;
+        }
+        return implode(',',$arr);
+    }
     
     public function approvalTemplateOriginator()
     {
@@ -86,5 +94,15 @@ class ApprovalTemplate extends Model
         };
 
         return $status;
+    }
+
+    public function formatSignNominal(){
+        $text = '';
+        if($this->sign == '~'){
+            $text = number_format($this->nominal,2,',','.').' '.$this->sign.' '.number_format($this->nominal_final,2,',','.');
+        }else{
+            $text = $this->sign.' '.number_format($this->nominal,2,',','.');
+        }
+        return $text;
     }
 }

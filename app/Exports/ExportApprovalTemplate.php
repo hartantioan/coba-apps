@@ -61,32 +61,28 @@ class ExportApprovalTemplate implements FromCollection, WithTitle, WithHeadings,
         $arr = [];
 
         foreach($query_data as $row){
-            $arr[] = [
-                'id'                => $row->id,
-                'code'              => $row->employee_no,
-                'name'              => $row->name,
-                'type'              => $row->type(),
-                'address'           => $row->address,
-                'subdistrict'       => $row->subdistrict()->exists() ? $row->subdistrict->name : '-',
-                'district'          => $row->district_id ? $row->district->name : '-',
-                'city'              => $row->city->name,
-                'province'          => $row->province->name,
-                'id_card'           => $row->id_card,
-                'id_card_address'   => $row->id_card_address,
-                'group'             => $row->group()->exists() ? $row->group->name : '-',
-                'company'           => $row->company->name,
-                'plant'             => $row->place()->exists() ? $row->place->code : '-',
-                'position'          => $row->position()->exists() ? $row->position->name : '-',
-                'npwp_no'           => $row->tax_id,
-                'npwp_name'         => $row->tax_name,
-                'npwp_address'      => $row->tax_address,
-                'pic'               => $row->pic,
-                'pic_no'            => $row->pic_no,
-                'office_no'         => $row->office_no,
-                'email'             => $row->email,
-                'gender'            => $row->gender(),
-                'employee_status'   => $row->employeeType(),
-            ];
+            foreach($row->approvalTemplateMenu as $rowmenu){
+                foreach($row->approvalTemplateOriginator as $roworiginator){
+                    foreach($row->approvalTemplateStage as $rowstage){
+                        $arr[] = [
+                            'no'                => 1,
+                            'form'              => $rowmenu->menu->name,
+                            'code'              => $row->code,
+                            'name'              => $row->name,
+                            'item_type'         => $row->itemGroupList(),
+                            'is_check_nominal'  => $row->is_check_nominal ? 'Yes '.$row->nominalType() : 'No',
+                            'is_check_benchmark'=> $row->is_check_benchmark ? 'Yes' : 'No',
+                            'nominal'           => $row->is_check_nominal ? $row->formatSignNominal() : '',
+                            'originator_code'   => $roworiginator->user->employee_no,
+                            'originator_name'   => $roworiginator->user->name,
+                            'stage'             => $rowstage->approvalStage->level,
+                            'authorizer'        => $rowstage->approvalStage->textApprover(),
+                            'min_approve'       => $rowstage->approvalStage->min_approve,
+                            'min_reject'        => $rowstage->approvalStage->min_reject,
+                        ];
+                    }
+                }
+            }
         }
 
         return collect($arr);
@@ -94,7 +90,7 @@ class ExportApprovalTemplate implements FromCollection, WithTitle, WithHeadings,
 
     public function title(): string
     {
-        return 'Laporan Pengguna';
+        return 'Laporan Template Approval';
     }
 
     public function startCell(): string

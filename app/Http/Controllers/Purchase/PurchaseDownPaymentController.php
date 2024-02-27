@@ -368,6 +368,7 @@ class PurchaseDownPaymentController extends Controller
             'currency_id'               => 'required',
             'currency_rate'             => 'required',
             'subtotal'                  => 'required',
+            'note'                      => 'required',
 		], [
             'code_place_id.required'            => 'Plant Tidak boleh kosong',
             /* 'code.required' 	                => 'Kode tidak boleh kosong.',
@@ -381,6 +382,7 @@ class PurchaseDownPaymentController extends Controller
             'post_date.required'                => 'Tgl post tidak boleh kosong.',
             'currency_id.required'              => 'Mata uang tidak boleh kosong.',
             'subtotal.required'                 => 'Subtotal tidak boleh kosong.',
+            'note.required'                     => 'Keterangan tidak boleh kosong.',
 		]);
 
         if($validation->fails()) {

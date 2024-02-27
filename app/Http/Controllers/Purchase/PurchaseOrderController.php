@@ -48,6 +48,7 @@ use App\Models\Tax;
 use App\Models\Coa;
 use App\Models\Division;
 use App\Models\ItemUnit;
+use App\Models\MenuUser;
 use Milon\Barcode\DNS2D;
 use Milon\Barcode\Facades\DNS2DFacade;
 
@@ -67,6 +68,7 @@ class PurchaseOrderController extends Controller
         $lastSegment = request()->segment(count(request()->segments()));
        
         $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
             'title'         => 'Purchase Order',
             'content'       => 'admin.purchase.order',
@@ -82,7 +84,8 @@ class PurchaseOrderController extends Controller
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
             'newcode'       => $menu->document_code.date('y'),
-            'menucode'      => $menu->document_code
+            'menucode'      => $menu->document_code,
+            'modedata'      => $menuUser->mode ? $menuUser->mode : '',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -95,7 +98,6 @@ class PurchaseOrderController extends Controller
     }
 
     public function datatable(Request $request){
-        info(request()->segment(count(request()->segments()) - 1));
         $column = [
             'id',
             'code',
@@ -138,7 +140,11 @@ class PurchaseOrderController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = PurchaseOrder::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */count();
+        $total_data = PurchaseOrder::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */where(function($query)use($request){
+            if(!$request->modedata){
+                $query->where('user_id',session('bo_id'));
+            }
+        })->count();
         
         $query_data = PurchaseOrder::where(function($query) use ($search, $request) {
                 if($search) {
@@ -217,6 +223,9 @@ class PurchaseOrderController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
 
+                if(!$request->modedata){
+                    $query->where('user_id',session('bo_id'));
+                }
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
             ->offset($start)
@@ -298,6 +307,10 @@ class PurchaseOrderController extends Controller
                 
                 if($request->currency_id){
                     $query->whereIn('currency_id',$request->currency_id);
+                }
+
+                if(!$request->modedata){
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */

@@ -99,7 +99,7 @@ class PurchaseOrderController extends Controller
             'id',
             'code',
             'user_id',
-            'supplier_id',
+            'account_id',
             'inventory_type',
             'shipping_type',
             'company_id',

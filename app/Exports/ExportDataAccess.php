@@ -30,7 +30,7 @@ class ExportDataAccess implements FromView,ShouldAutoSize
         
         $user = User::where(function($query)use($employees){
             if($this->employees){
-                $query->whereIn('id',$employees);
+                $query->whereIn('id',$employees)->where('status','1');
             }else{
                 $query->where('status','1');
             }

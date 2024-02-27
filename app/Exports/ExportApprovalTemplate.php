@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Models\ApprovalTemplate;
 use App\Models\User;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithTitle;
@@ -24,55 +25,42 @@ class ExportApprovalTemplate implements FromCollection, WithTitle, WithHeadings,
     }
 
     private $headings = [
-        'ID',
-        'KODE', 
-        'NAMA',
-        'TIPE',
-        'ALAMAT',
-        'KELURAHAN',
-        'KECAMATAN',
-        'KOTA',
-        'PROVINSI',
-        'NO IDENTITAS',
-        'ALAMAT IDENTITAS',
-        'GROUP',
-        'PERUSAHAAN',
-        'PLANT',
-        'POSISI',
-        'NO NPWP',
-        'NAMA NPWP',
-        'ALAMAT NPWP',
-        'NAMA PIC',
-        'NOMOR PIC',
-        'NOMOR KANTOR',
-        'EMAIL',
-        'GENDER',
-        'STATUS KARYAWAN',
+        'NO',
+        'FORM', 
+        'KODE',
+        'NAMA TEMPLATE',
+        'ITEM TYPE',
+        'SYARAT GRANDTOTAL',
+        'SYARAT BENCHMARK',
+        'NOMINAL',
+        'NIK ORIGINATOR',
+        'NAMA ORIGINATOR',
+        'STAGE / LEVEL',
+        'AUTHORIZER',
+        'MIN APPROVAL',
+        'MIN REJECT',
     ];
 
     public function collection()
     {
-        $data = User::where(function ($query) {
-            if ($this->search) {
-                $query->where(function ($query) {
-                    $query->where('name', 'like', "%$this->search%")
-                        ->orWhere('employee_no', 'like', "%$this->search%")
-                        ->orWhere('username', 'like', "%$this->search%")
-                        ->orWhere('phone', 'like', "%$this->search%")
-                        ->orWhere('address', 'like', "%$this->search%");
+        $query_data = ApprovalTemplate::where(function($query){
+            if($this->search) {
+                $query->where(function($query){
+                    $query->where('code', 'like', "%$this->search%")
+                        ->orWhere('name', 'like', "%$this->search%");
                 });
             }
+
             if($this->status){
                 $query->where('status', $this->status);
             }
-            if($this->type){
-                $query->where('type', $this->type);
-            }
-        })->get();
+
+        })
+        ->get();
 
         $arr = [];
 
-        foreach($data as $row){
+        foreach($query_data as $row){
             $arr[] = [
                 'id'                => $row->id,
                 'code'              => $row->employee_no,

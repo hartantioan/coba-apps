@@ -137,7 +137,7 @@ class PurchaseOrderController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = PurchaseOrder::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */where('user_id',session('bo_id'))->count();
+        $total_data = PurchaseOrder::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */count();
         
         $query_data = PurchaseOrder::where(function($query) use ($search, $request) {
                 if($search) {
@@ -217,7 +217,6 @@ class PurchaseOrderController extends Controller
                 }
 
             })
-            ->where('user_id',session('bo_id'))
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
             ->offset($start)
             ->limit($length)
@@ -301,7 +300,6 @@ class PurchaseOrderController extends Controller
                 }
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
-            ->where('user_id',session('bo_id'))
             ->count();
 
         $response['data'] = [];

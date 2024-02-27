@@ -1625,7 +1625,7 @@
                         }
                         $('#last-row-detail').before(`
                             <tr class="row_detail">
-                                <input type="hidden" name="arr_type[]" value="` + val.type + `">
+                                <input type="hidden" name="` + (val.type == 'coas' ? 'arr_type_item[]' : 'arr_type[]') + `" value="` + val.type + `">
                                 ` + 
                                 (val.type == 'coas' ? `` : 
                                 `
@@ -1634,7 +1634,7 @@
                                 `)
                                 + `
                                 <td>
-                                    ` + (val.type == 'coas' ? `<select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>` : val.name) + `
+                                    ` + (val.type == 'coas' ? `<select class="browser-default" id="arr_coa_item` + count + `" name="arr_coa_item[]"></select>` : val.name) + `
                                 </td>
                                 <td class="center">
                                     ` + val.post_date + `
@@ -1643,13 +1643,13 @@
                                     -
                                 </td>
                                 <td class="center">
-                                    <input id="arr_total` + count + `" name="arr_total[]" onfocus="emptyThis(this);" data-limit="0" class="browser-default" type="text" value="` + val.total + `" onkeyup="formatRupiah(this);countRow('` + count + `');countAll();" style="width:150px;text-align:right;" ` + readonly + `>
+                                    <input id="` + (val.type == 'coas' ? 'arr_total_item' + count : 'arr_total' + count) + `" name="` + (val.type == 'coas' ? 'arr_total_item[]' : 'arr_total[]') + `" onfocus="emptyThis(this);" data-limit="0" class="browser-default" type="text" value="` + val.total + `" onkeyup="formatRupiah(this);countRow('` + count + `');countAll();" style="width:150px;text-align:right;" ` + readonly + `>
                                 </td>
                                 <td class="center">
-                                    <input id="arr_rounding` + count + `" name="arr_rounding[]" class="browser-default" type="text" value="` + val.rounding + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;" ` + readonly + `>
+                                    <input id="` + (val.type == 'coas' ? 'arr_rounding_item' + count : 'arr_rounding' + count) + `" name="` + (val.type == 'coas' ? 'arr_rounding_item[]' : 'arr_rounding[]') + `" class="browser-default" type="text" value="` + val.rounding + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;" ` + readonly + `>
                                 </td>
                                 <td class="center">
-                                    <input id="arr_subtotal` + count + `" name="arr_subtotal[]" onfocus="emptyThis(this);" data-limit="0" class="browser-default" type="text" value="` + val.subtotal + `" onkeyup="formatRupiah(this);" style="width:150px;text-align:right;" readonly>
+                                    <input id="` + (val.type == 'coas' ? 'arr_subtotal_item' + count : 'arr_subtotal' + count) + `" name="` + (val.type == 'coas' ? 'arr_subtotal_item[]' : 'arr_subtotal[]') + `" onfocus="emptyThis(this);" data-limit="0" class="browser-default" type="text" value="` + val.subtotal + `" onkeyup="formatRupiah(this);" style="width:150px;text-align:right;" readonly>
                                 </td>
                                 <td class="center">
                                     ` + (val.type == 'coas' ? `<select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="applyCoa('` + count + `');"></select>` : `-`) + `
@@ -1665,10 +1665,10 @@
                             </tr>
                         `);
                         if(val.type == 'coas'){
-                            $('#arr_coa' + count).append(`
+                            $('#arr_coa_item' + count).append(`
                                 <option value="` + val.coa_id + `">` + val.name + `</option>
                             `);
-                            select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+                            select2ServerSide('#arr_coa_item' + count, '{{ url("admin/select2/coa") }}');
                         }
                         if(val.cost_distribution_name){
                             $('#arr_cost_distribution' + count).append(`

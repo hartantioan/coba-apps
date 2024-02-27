@@ -993,8 +993,8 @@ class CustomHelper {
 					'warehouse_id'	=> $rowdetail->warehouse_id,
 					'project_id'	=> $rowdetail->purchaseOrderDetail->project_id ? $rowdetail->purchaseOrderDetail->project_id : NULL,
 					'type'			=> '1',
-					'nominal'		=> $rowtotal,
-					'nominal_fc'	=> $rowdetail->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? $rowtotal : $rowdetail->getRowTotal(),
+					'nominal'		=> floatval($rowtotal),
+					'nominal_fc'	=> $rowdetail->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? floatval($rowtotal) : floatval($rowdetail->getRowTotal()),
 					'note'			=> $gr->delivery_no,
 				]);
 
@@ -1010,8 +1010,8 @@ class CustomHelper {
 						'warehouse_id'	=> $rowdetail->warehouse_id,
 						'project_id'	=> $rowdetail->purchaseOrderDetail->project_id ? $rowdetail->purchaseOrderDetail->project_id : NULL,
 						'type'			=> '2',
-						'nominal'		=> $rowtotal,
-						'nominal_fc'	=> $rowdetail->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? $rowtotal : $rowdetail->getRowTotal(),
+						'nominal'		=> floatval($rowtotal),
+						'nominal_fc'	=> $rowdetail->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? floatval($rowtotal) : floatval($rowdetail->getRowTotal()),
 					]);
 				}
 
@@ -1022,7 +1022,7 @@ class CustomHelper {
 					$rowdetail->warehouse_id,
 					$rowdetail->item_id,
 					$rowdetail->qtyConvert(),
-					$rowtotal,
+					floatval($rowtotal),
 					'IN',
 					$gr->post_date,
 					NULL,
@@ -1121,8 +1121,8 @@ class CustomHelper {
 						'coa_id'		=> $row->asset->assetGroup->depreciation_coa_id,
 						'place_id'		=> $row->asset->place_id,
 						'type'			=> '1',
-						'nominal'		=> $totalDepre * $ret->currency_rate,
-						'nominal_fc'	=> $ret->currency->type == '1' ? $totalDepre * $ret->currency_rate : $totalDepre,
+						'nominal'		=> floatval($totalDepre * $ret->currency_rate),
+						'nominal_fc'	=> $ret->currency->type == '1' ? floatval($totalDepre * $ret->currency_rate) : floatval($totalDepre),
 					]);
 				}
 
@@ -1132,8 +1132,8 @@ class CustomHelper {
 						'coa_id'		=> Coa::where('code','701.01.01.01.07')->where('company_id',$ret->company_id)->first()->id,
 						'place_id'		=> $row->asset->place_id,
 						'type'			=> '1',
-						'nominal'		=> $row->asset->book_balance * $ret->currency_rate,
-						'nominal_fc'	=> $ret->currency->type == '1' ? $row->asset->book_balance * $ret->currency_rate : $row->asset->book_balance,
+						'nominal'		=> floatval($row->asset->book_balance * $ret->currency_rate),
+						'nominal_fc'	=> $ret->currency->type == '1' ? floatval($row->asset->book_balance * $ret->currency_rate) : floatval($row->asset->book_balance),
 					]);
 				}
 
@@ -1143,8 +1143,8 @@ class CustomHelper {
 						'coa_id'		=> Coa::where('code','100.01.01.99.05')->where('company_id',$ret->company_id)->first()->id,
 						'place_id'		=> $row->asset->place_id,
 						'type'			=> '1',
-						'nominal'		=> $row->retirement_nominal * $ret->currency_rate,
-						'nominal_fc'	=> $ret->currency->type == '1' ? $row->retirement_nominal * $ret->currency_rate : $row->retirement_nominal,
+						'nominal'		=> floatval($row->retirement_nominal * $ret->currency_rate),
+						'nominal_fc'	=> $ret->currency->type == '1' ? floatval($row->retirement_nominal * $ret->currency_rate) : floatval($row->retirement_nominal),
 					]);
 
 					$balanceProfitLoss = ($totalDepre + $row->retirement_nominal) - $row->asset->nominal;
@@ -1155,8 +1155,8 @@ class CustomHelper {
 							'coa_id'		=> $coaProfitLoss,
 							'place_id'		=> $row->asset->place_id,
 							'type'			=> '2',
-							'nominal'		=> $balanceProfitLoss * $ret->currency_rate,
-							'nominal_fc'	=> $ret->currency->type == '1' ? $balanceProfitLoss * $ret->currency_rate : $balanceProfitLoss,
+							'nominal'		=> floatval($balanceProfitLoss * $ret->currency_rate),
+							'nominal_fc'	=> $ret->currency->type == '1' ? floatval($balanceProfitLoss * $ret->currency_rate) : floatval($balanceProfitLoss),
 						]);
 					}
 
@@ -1166,8 +1166,8 @@ class CustomHelper {
 							'coa_id'		=> $coaProfitLoss,
 							'place_id'		=> $row->asset->place_id,
 							'type'			=> '1',
-							'nominal'		=> abs($balanceProfitLoss) * $ret->currency_rate,
-							'nominal_fc'	=> $ret->currency->type == '1' ? abs($balanceProfitLoss) * $ret->currency_rate : abs($balanceProfitLoss),
+							'nominal'		=> floatval(abs($balanceProfitLoss) * $ret->currency_rate),
+							'nominal_fc'	=> $ret->currency->type == '1' ? floatval(abs($balanceProfitLoss) * $ret->currency_rate) : floatval(abs($balanceProfitLoss)),
 						]);
 					}
 				}
@@ -1177,11 +1177,11 @@ class CustomHelper {
 					'coa_id'		=> $row->asset->assetGroup->coa_id,
 					'place_id'		=> $row->asset->place_id,
 					'type'			=> '2',
-					'nominal'		=> $row->asset->nominal * $ret->currency_rate,
-					'nominal_fc'	=> $ret->currency->type == '1' ? $row->asset->nominal * $ret->currency_rate : $row->asset->nominal,
+					'nominal'		=> floatval($row->asset->nominal * $ret->currency_rate),
+					'nominal_fc'	=> $ret->currency->type == '1' ? floatval($row->asset->nominal * $ret->currency_rate) : floatval($row->asset->nominal),
 				]);
 
-				self::updateBalanceAsset($row->asset_id,$row->asset->book_balance,'OUT',$table_name);
+				self::updateBalanceAsset($row->asset_id,floatval($row->asset->book_balance),'OUT',$table_name);
 			}
 		
 		}elseif($table_name == 'incoming_payments'){
@@ -1210,7 +1210,7 @@ class CustomHelper {
 						'coa_id'		=> $ip->wTaxMaster->coa_purchase_id,
 						'account_id'	=> $ip->wTaxMaster->coaPurchase->bp_journal ? ($ip->account_id ? $ip->account_id : NULL) : NULL,
 						'type'			=> '1',
-						'nominal'		=> $ip->wtax * $ip->currency_rate,
+						'nominal'		=> floatval($ip->wtax * $ip->currency_rate),
 						'nominal_fc'	=> $ip->currency->type == '1' ? $ip->wtax * $ip->currency_rate : $ip->wtax,
 					]);
 				}
@@ -1220,8 +1220,8 @@ class CustomHelper {
 					'coa_id'		=> $ip->coa_id,
 					'account_id'	=> $ip->coa->bp_journal ? ($ip->account_id ? $ip->account_id : NULL) : NULL,
 					'type'			=> '1',
-					'nominal'		=> $ip->grandtotal * $ip->currency_rate,
-					'nominal_fc'	=> $ip->currency->type == '1' ? $ip->grandtotal * $ip->currency_rate : $ip->grandtotal,
+					'nominal'		=> floatval($ip->grandtotal * $ip->currency_rate),
+					'nominal_fc'	=> $ip->currency->type == '1' ? floatval($ip->grandtotal * $ip->currency_rate) : floatval($ip->grandtotal),
 				]);
 
 				$coarounding = Coa::where('code','700.01.01.01.05')->where('company_id',$ip->company_id)->first();
@@ -1252,8 +1252,8 @@ class CustomHelper {
 									'department_id'                 => $rowcost->department_id ? $rowcost->department_id : NULL,
 									'warehouse_id'                  => $rowcost->warehouse_id ? $rowcost->warehouse_id : NULL,
 									'type'                          => '2',
-									'nominal'                       => $nominal * $ip->currency_rate,
-									'nominal_fc'					=> $ip->currency->type == '1' ? $nominal * $ip->currency_rate : $nominal,
+									'nominal'                       => floatval($nominal * $ip->currency_rate),
+									'nominal_fc'					=> $ip->currency->type == '1' ? floatval($nominal * $ip->currency_rate) : floatval($nominal),
 									'note'							=> $row->note,
 								]);
 							}
@@ -1275,11 +1275,11 @@ class CustomHelper {
 							'coa_id'		=> $coareceivable->id,
 							'account_id'	=> $coareceivable->bp_journal ? ($ip->account_id ? $ip->account_id : NULL) : NULL,
 							'type'			=> '2',
-							'nominal'		=> $row->total * $ip->currency_rate,
-							'nominal_fc'	=> $ip->currency->type == '1' ? $row->total * $ip->currency_rate : $row->total,
+							'nominal'		=> floatval($row->total * $ip->currency_rate),
+							'nominal_fc'	=> $ip->currency->type == '1' ? floatval($row->total * $ip->currency_rate) : floatval($row->total),
 							'note'			=> $row->note,
 						]);
-						CustomHelper::removeCountLimitCredit($row->lookable->account_id,$row->total * $ip->currency_rate);
+						CustomHelper::removeCountLimitCredit($row->lookable->account_id,floatval($row->total * $ip->currency_rate));
 						if(self::checkArrayRaw($arrNote,$row->lookable->code) < 0){
 							$arrNote[] = $row->lookable->code;
 						}
@@ -1290,8 +1290,8 @@ class CustomHelper {
 								'coa_id'		=> $coapiutangusaha->id,
 								'account_id'	=> $coapiutangusaha->bp_journal ? ($ip->account_id ? $ip->account_id : NULL) : NULL,
 								'type'			=> '1',
-								'nominal'		=> abs($row->total * $ip->currency_rate),
-								'nominal_fc'	=> $ip->currency->type == '1' ? abs($row->total * $ip->currency_rate) : abs($row->total),
+								'nominal'		=> floatval(abs($row->total * $ip->currency_rate)),
+								'nominal_fc'	=> $ip->currency->type == '1' ? floatval(abs($row->total * $ip->currency_rate)) : floatval(abs($row->total)),
 								'note'			=> $row->note,
 							]);
 						}else{
@@ -1300,15 +1300,15 @@ class CustomHelper {
 								'coa_id'		=> $coapiutangusaha->id,
 								'account_id'	=> $coapiutangusaha->bp_journal ? ($ip->account_id ? $ip->account_id : NULL) : NULL,
 								'type'			=> '2',
-								'nominal'		=> $row->total * $ip->currency_rate,
-								'nominal_fc'	=> $ip->currency->type == '1' ? $row->total * $ip->currency_rate : $row->total,
+								'nominal'		=> floatval($row->total * $ip->currency_rate),
+								'nominal_fc'	=> $ip->currency->type == '1' ? floatval($row->total * $ip->currency_rate) : floatval($row->total),
 								'note'			=> $row->note,
 							]);
 							if($row->lookable_type == 'marketing_order_down_payments'){
-								self::addDeposit($row->lookable->account_id,$row->total * $ip->currency_rate);
+								self::addDeposit($row->lookable->account_id,floatval($row->total * $ip->currency_rate));
 							}
 						}
-						CustomHelper::removeCountLimitCredit($row->lookable->account_id,$row->total * $ip->currency_rate);
+						CustomHelper::removeCountLimitCredit($row->lookable->account_id,floatval($row->total * $ip->currency_rate));
 						if(self::checkArrayRaw($arrNote,$row->lookable->code) < 0){
 							$arrNote[] = $row->lookable->code;
 						}
@@ -1322,8 +1322,8 @@ class CustomHelper {
 							'coa_id'		=> $coarounding->id,
 							'account_id'	=> $coarounding->bp_journal ? ($ip->account_id ? $ip->account_id : NULL) : NULL,
 							'type'			=> $row->rounding > 0 ? '2' : '1',
-							'nominal'		=> abs($row->rounding * $ip->currency_rate),
-							'nominal_fc'	=> $ip->currency->type == '1' ? abs($row->rounding * $ip->currency_rate) : abs($row->rounding),
+							'nominal'		=> floatval(abs($row->rounding * $ip->currency_rate)),
+							'nominal_fc'	=> $ip->currency->type == '1' ? floatval(abs($row->rounding * $ip->currency_rate)) : floatval(abs($row->rounding)),
 						]);
 					}
 				}
@@ -1375,8 +1375,8 @@ class CustomHelper {
 								'warehouse_id'                  => $rowcost->warehouse_id ? $rowcost->warehouse_id : NULL,
 								'project_id'					=> $row->project_id ? $row->project_id : NULL,
 								'type'                          => '1',
-								'nominal'                       => $nominal * $pr->currency_rate,
-								'nominal_fc'					=> $pr->currency->type == '1' ? $nominal * $pr->currency_rate : $nominal,
+								'nominal'                       => floatval($nominal * $pr->currency_rate),
+								'nominal_fc'					=> $pr->currency->type == '1' ? floatval($nominal * $pr->currency_rate) : floatval($nominal),
 							]);
 						}
 					}else{
@@ -1391,8 +1391,8 @@ class CustomHelper {
 							'department_id'	=> $row->department_id ? $row->department_id : NULL,
 							'project_id'	=> $row->project_id ? $row->project_id : NULL,
 							'type'			=> '1',
-							'nominal'		=> $row->nominal * $pr->currency_rate,
-							'nominal_fc'	=> $pr->currency->type == '1' ? $row->nominal * $pr->currency_rate : $row->nominal,
+							'nominal'		=> floatval($row->nominal * $pr->currency_rate),
+							'nominal_fc'	=> $pr->currency->type == '1' ? floatval($row->nominal * $pr->currency_rate) : floatval($row->nominal),
 						]);
 					}
 				}
@@ -1406,8 +1406,8 @@ class CustomHelper {
 							'coa_id'		=> $coarounding->id,
 							'account_id'	=> $coarounding->bp_journal ? $account_id : NULL,
 							'type'			=> $pr->rounding > 0 ? '1' : '2',
-							'nominal'		=> abs($pr->rounding * $pr->currency_rate),
-							'nominal_fc'	=> $pr->currency->type == '1' ? abs($pr->rounding * $pr->currency_rate) : abs($pr->rounding),
+							'nominal'		=> floatval(abs($pr->rounding * $pr->currency_rate)),
+							'nominal_fc'	=> $pr->currency->type == '1' ? floatval(abs($pr->rounding * $pr->currency_rate)) : floatval(abs($pr->rounding)),
 						]);
 					}
 				}
@@ -1419,10 +1419,10 @@ class CustomHelper {
 						'coa_id'                        => $coa->id,
 						'account_id'                    => $coa->bp_journal ? $row->lookable->account_id : NULL,
 						'type'                          => '2',
-						'nominal'                       => $row->nominal * $pr->currency_rate,
-						'nominal_fc'					=> $pr->currency->type == '1' ? $row->nominal * $pr->currency_rate : $row->nominal,
+						'nominal'                       => floatval($row->nominal * $pr->currency_rate),
+						'nominal_fc'					=> $pr->currency->type == '1' ? floatval($row->nominal * $pr->currency_rate) : floatval($row->nominal),
 					]);
-					CustomHelper::removeCountLimitCredit($row->lookable->account_id,$row->nominal * $pr->currency_rate);
+					CustomHelper::removeCountLimitCredit($row->lookable->account_id,floatval($row->nominal * $pr->currency_rate));
 				}
 
 				$pr->update([
@@ -1520,8 +1520,8 @@ class CustomHelper {
 							'warehouse_id'                  => $rowcost->warehouse_id ? $rowcost->warehouse_id : NULL,
 							'project_id'					=> $row->project_id ? $row->project_id : NULL,
 							'type'                          => '1',
-							'nominal'                       => $nominal * $op->currency_rate,
-							'nominal_fc'					=> $op->currency->type == '1' ? $nominal * $op->currency_rate : $nominal,
+							'nominal'                       => floatval($nominal * $op->currency_rate),
+							'nominal_fc'					=> $op->currency->type == '1' ? floatval($nominal * $op->currency_rate) : floatval($nominal),
 						]);
 					}
 				}else{
@@ -1536,8 +1536,8 @@ class CustomHelper {
 						'department_id'	=> $row->department_id ? $row->department_id : NULL,
 						'project_id'	=> $row->project_id ? $row->project_id : NULL,
 						'type'			=> '1',
-						'nominal'		=> $balanceReal,
-						'nominal_fc'	=> $balanceReal, #benerin
+						'nominal'		=> floatval($balanceReal),
+						'nominal_fc'	=> $op->currency->type == '1' ? floatval($balanceReal * $op->currency_rate) : floatval($balanceReal), #benerin
 					]);
 					if($row->lookable_type == 'marketing_order_memos'){
 						CustomHelper::addCountLimitCredit($op->account_id,$balanceReal);
@@ -1554,8 +1554,8 @@ class CustomHelper {
 						'coa_id'		=> $coarounding->id,
 						'account_id'	=> $coarounding->bp_journal ? $account_id : NULL,
 						'type'			=> $op->rounding > 0 ? '1' : '2',
-						'nominal'		=> abs($op->rounding * $op->currency_rate),
-						'nominal_fc'	=> $op->currency->type == '1' ? abs($op->rounding * $op->currency_rate) : abs($op->rounding),
+						'nominal'		=> floatval(abs($op->rounding * $op->currency_rate)),
+						'nominal_fc'	=> $op->currency->type == '1' ? floatval(abs($op->rounding * $op->currency_rate)) : floatval(abs($op->rounding)),
 					]);
 				}
 			}elseif($op->rounding > 0 && $op->currency_rate > 1){
@@ -1573,8 +1573,8 @@ class CustomHelper {
 						'place_id'		=> $row->lookable_type == 'fund_requests' ? $row->lookable->place_id : NULL,
 						'department_id'	=> $row->lookable_type == 'fund_requests' ? $row->lookable->department_id : NULL,
 						'type'			=> $balanceKurs < 0  ? '1' : '2',
-						'nominal'		=> abs($balanceKurs),
-						'nominal_fc'	=> abs($balanceKurs),
+						'nominal'		=> floatval(abs($balanceKurs)),
+						'nominal_fc'	=> floatval(abs($balanceKurs)),
 					]);
 				}
 			}
@@ -1603,8 +1603,8 @@ class CustomHelper {
 							'department_id'                 => $rowcost->department_id ? $rowcost->department_id : NULL,
 							'warehouse_id'                  => $rowcost->warehouse_id ? $rowcost->warehouse_id : NULL,
 							'type'                          => '1',
-							'nominal'                       => $nominal * $op->currency_rate,
-							'nominal_fc'					=> $op->currency->type == '1' ? $nominal * $op->currency_rate : $nominal,
+							'nominal'                       => floatval($nominal * $op->currency_rate),
+							'nominal_fc'					=> $op->currency->type == '1' ? floatval($nominal * $op->currency_rate) : floatval($nominal),
 						]);
 					}
 				}else{
@@ -1613,8 +1613,8 @@ class CustomHelper {
 						'coa_id'		=> $coa_admin ? $coa_admin->id : NULL,
 						'account_id'	=> $coa_admin->bp_journal ? $op->account_id : NULL,
 						'type'			=> '1',
-						'nominal'		=> $row->nominal * $op->currency_rate,
-						'nominal_fc'	=> $op->currency->type == '1' ? $row->nominal * $op->currency_rate : $row->nominal,
+						'nominal'		=> floatval($row->nominal * $op->currency_rate),
+						'nominal_fc'	=> $op->currency->type == '1' ? floatval($row->nominal * $op->currency_rate) : floatval($row->nominal),
 					]);
 				}
 			}
@@ -1626,8 +1626,8 @@ class CustomHelper {
 					'coa_id'                        => $coa->id,
 					'account_id'                    => $coa->bp_journal ? $row->lookable->account_id : NULL,
 					'type'                          => '2',
-					'nominal'                       => $row->nominal * $op->currency_rate,
-					'nominal_fc'					=> $op->currency->type == '1' ? $row->nominal * $op->currency_rate : $row->nominal,
+					'nominal'                       => floatval($row->nominal * $op->currency_rate),
+					'nominal_fc'					=> $op->currency->type == '1' ? floatval($row->nominal * $op->currency_rate) : floatval($row->nominal),
 				]);
 			}
 
@@ -1636,8 +1636,8 @@ class CustomHelper {
 				'coa_id'		=> $op->coa_source_id,
 				'account_id'	=> $op->coaSource->bp_journal ? $op->account_id : NULL,
 				'type'			=> '2',
-				'nominal'		=> $totalPay,
-				'nominal_fc'	=> $op->currency->type == '1' ? $totalPay : ($totalPay / $op->currency_rate),
+				'nominal'		=> floatval($totalPay),
+				'nominal_fc'	=> $op->currency->type == '1' ? floatval($totalPay) : floatval($totalPay / $op->currency_rate),
 			]);
 
 			$journal = Journal::find($query->id);

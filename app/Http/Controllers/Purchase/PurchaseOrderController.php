@@ -665,7 +665,7 @@ class PurchaseOrderController extends Controller
                 try {
                     $query = PurchaseOrder::where('code',CustomHelper::decrypt($request->temp))->first();
 
-                    $approved = false;
+                    /* $approved = false;
                     $revised = false;
 
                     if($query->approval()){
@@ -687,7 +687,7 @@ class PurchaseOrderController extends Controller
                             'status'  => 500,
                             'message' => 'Purchase Order telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
-                    }
+                    } */
 
                     if(in_array($query->status,['1','6'])){
 

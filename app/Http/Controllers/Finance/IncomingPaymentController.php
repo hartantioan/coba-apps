@@ -572,6 +572,10 @@ class IncomingPaymentController extends Controller
 
                     if(in_array($query->status,['1','2','6'])){
 
+                        if($query->journal()->exists()){
+                            CustomHelper::removeJournal($query->getTable(),$query->id);
+                        }
+
                         if($request->has('document')) {
                             if($query->document){
                                 if(Storage::exists($query->document)){

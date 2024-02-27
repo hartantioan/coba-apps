@@ -1267,6 +1267,7 @@ class CustomHelper {
 								'nominal_fc'	=> $ip->currency->type == '1' ? $row->total * $ip->currency_rate : $row->total,
 								'note'			=> $row->note,
 							]);
+							info($row->total);
 						}
 						
 					}elseif($row->lookable_type == 'outgoing_payments'){

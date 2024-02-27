@@ -21,7 +21,7 @@ return new class extends Migration
             $table->bigInteger('from_user_id')->nullable();
             $table->bigInteger('to_user_id')->nullable();
             $table->string('lookable_type')->nullable();
-            $table->string('lookable_id')->nullable();
+            $table->bigInteger('lookable_id')->nullable();
             $table->string('title')->nullable();
             $table->string('note')->nullable();
             $table->char('status', 1)->nullable();

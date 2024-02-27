@@ -95,6 +95,7 @@ class PurchaseOrderController extends Controller
     }
 
     public function datatable(Request $request){
+        info(request()->segment(count(request()->segments()) - 1));
         $column = [
             'id',
             'code',

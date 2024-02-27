@@ -266,7 +266,8 @@ class UserController extends Controller
 		foreach(MenuUser::where('user_id',$request->id)->get() as $row){
 			$menus[] = [
 				'menu_id'	=> $row->menu_id,
-				'type'	    => ucfirst($row->type)
+				'type'	    => ucfirst($row->type),
+                'mode'      => $row->mode ? $row->mode : '',
 			];
 		}
 
@@ -540,7 +541,7 @@ class UserController extends Controller
         } else {
 
             if($request->type == '3' || $request->type == '4'){
-                $arrUserAllowedSupplierVendor = ['323020','323002','112005','323004'];
+                $arrUserAllowedSupplierVendor = ['323020','323002','112005','323004','323014'];
                 if(!in_array(session('bo_employee_no'),$arrUserAllowedSupplierVendor)){
                     return response()->json([
                         'status'  => 500,
@@ -550,7 +551,7 @@ class UserController extends Controller
             }
 
             if($request->type == '1' || $request->type == '2'){
-                $arrUserAllowedCustomerEmployee = ['323020'];
+                $arrUserAllowedCustomerEmployee = ['323020','323014'];
                 if(in_array(session('bo_employee_no'),$arrUserAllowedCustomerEmployee)){
                     return response()->json([
                         'status'  => 500,
@@ -820,24 +821,36 @@ class UserController extends Controller
                     }
 
                     foreach($request->checkboxView as $row){
-                        $cek = MenuUser::where('user_id',$request->tempuseraccess)->where('menu_id',$row)->where('type','view')->count();
-                        if($cek == 0){
+                        $cek = MenuUser::where('user_id',$request->tempuseraccess)->where('menu_id',$row)->where('type','view');
+                        if($cek->count() == 0){
                             MenuUser::create([
                                 'user_id'   => $request->tempuseraccess,
                                 'menu_id'   => $row,
                                 'type'      => 'view'
                             ]);
+                        }else{
+                            foreach($cek as $rowcek){
+                                $rowcek->update([
+                                    'mode'      => NULL,
+                                ]);
+                            }
                         }
 
                         if($request->arr_user){
                             foreach($request->arr_user as $rowuser){
-                                $cek2 = MenuUser::where('user_id',$rowuser)->where('menu_id',$row)->where('type','view')->count();
-                                if($cek2 == 0){
+                                $cek2 = MenuUser::where('user_id',$rowuser)->where('menu_id',$row)->where('type','view');
+                                if($cek2->count() == 0){
                                     MenuUser::create([
                                         'user_id'   => $rowuser,
                                         'menu_id'   => $row,
                                         'type'      => 'view'
                                     ]);
+                                }else{
+                                    foreach($cek2 as $rowcek){
+                                        $rowcek->update([
+                                            'mode'      => NULL,
+                                        ]);
+                                    }
                                 }
                             }
                         }
@@ -850,6 +863,23 @@ class UserController extends Controller
                         }
                     }
                 }
+
+                /* if($request->checkboxViewData){
+                    foreach($request->checkboxViewData as $key => $row){
+                        $cek = MenuUser::where('user_id',$request->tempuseraccess)->where('menu_id',$row)->where('type','view');
+                        if($cek->count() > 0){
+                            $cek->update([
+                                'mode'  => 'all'
+                            ]);
+                        }
+
+                        if($request->arr_user){
+                            foreach($request->arr_user as $rowuser){
+                                $cek2 = MenuUser::where('user_id',$rowuser)->where('menu_id',$row)->where('type','view')->count();
+                            }
+                        }
+                    }
+                } */
 
                 if($request->checkboxUpdate){
                     MenuUser::where('user_id',$request->tempuseraccess)->whereNotIn('menu_id',$request->checkboxUpdate)->where('type','update')->delete();

@@ -17,7 +17,8 @@ class MenuUser extends Model
     protected $fillable = [
         'menu_id',
         'user_id',
-        'type'
+        'type',
+        'mode',
     ];
 
     public function menu(){

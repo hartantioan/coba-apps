@@ -649,9 +649,19 @@
                                                                         </td>
                                                                         <td class="center">
                                                                             <label>
-                                                                                <input type="checkbox" name="checkboxView[]" id="checkboxView{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}"/>
+                                                                                <input type="checkbox" name="checkboxView[]" id="checkboxView{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}" onclick="showDataView(this);"/>
                                                                                 <span>Pilih</span>
                                                                             </label>
+                                                                            @if ($msub2->type == '1')
+                                                                                <div class="switch">
+                                                                                    <label>
+                                                                                        Tidak
+                                                                                        <input type="checkbox" name="checkboxViewData[]" id="checkboxViewData{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}" disabled>
+                                                                                        <span class="lever"></span>
+                                                                                        Semua Data
+                                                                                    </label>
+                                                                                </div>
+                                                                            @endif
                                                                         </td>
                                                                         <td class="center">
                                                                             <label>
@@ -687,9 +697,19 @@
                                                                 </td>
                                                                 <td class="center">
                                                                     <label>
-                                                                        <input type="checkbox" name="checkboxView[]" id="checkboxView{{ $msub->id }}" value="{{ $msub->id }}" data-parent="{{ $msub->parentsub->id }}"/>
+                                                                        <input type="checkbox" name="checkboxView[]" id="checkboxView{{ $msub->id }}" value="{{ $msub->id }}" data-parent="{{ $msub->parentsub->id }}" onclick="showDataView(this);"/>
                                                                         <span>Pilih</span>
                                                                     </label>
+                                                                    @if ($msub->type == '1')
+                                                                    <div class="switch">
+                                                                        <label>
+                                                                            Tidak
+                                                                            <input type="checkbox" name="checkboxViewData[]" id="checkboxViewData{{ $msub->id }}" value="{{ $msub->id }}" data-parent="{{ $msub->parentsub->id }}" disabled>
+                                                                            <span class="lever"></span>
+                                                                            Semua Data
+                                                                        </label>
+                                                                    </div>
+                                                                    @endif
                                                                 </td>
                                                                 <td class="center">
                                                                     <label>
@@ -953,6 +973,7 @@
                 $('#tempuseraccess').val('');
                 $('#tempname').text('');
                 $('#form_data_access input:checkbox').prop( "checked", false);
+                $('#form_data_access input[name="checkboxViewData[]"]').prop( "disabled", true);
                 $('#arr_user').empty();
             }
         });
@@ -1135,6 +1156,17 @@
         $('#group_id').formSelect();
     }
 
+    function showDataView(element){
+        if($(element).is(':checked')){
+            $(element).parent().parent().find('input[name="checkboxViewData[]"]').prop('disabled',false);
+        }else{
+            if($(element).parent().parent().find('input[name="checkboxViewData[]"]').is(':checked')){
+                $(element).parent().parent().find('input[name="checkboxViewData[]"]').prop('checked',false);
+            }
+            $(element).parent().parent().find('input[name="checkboxViewData[]"]').prop('disabled',true);
+        }
+    }
+
     function access(id,name){
         $('#modal3').modal('open');
         $('#tempuseraccess').val(id);
@@ -1159,6 +1191,12 @@
                 if(response.menus.length > 0){
                     $.each(response.menus, function(i, val) {
                         $('#checkbox' + val.type + val.menu_id).prop( "checked", true);
+                        if(val.type == 'View'){
+                            $('#checkbox' + val.type + 'Data' + val.menu_id).prop( "disabled", false);
+                            if(val.mode == 'all'){
+                                $('#checkbox' + val.type + 'Data' + val.menu_id).prop( "checked", true);
+                            }
+                        }
                     });
                 }
 

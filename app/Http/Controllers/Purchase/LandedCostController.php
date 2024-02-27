@@ -49,6 +49,7 @@ use App\Models\Currency;
 use App\Models\ItemCogs;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportLandedCost;
+use App\Models\MenuUser;
 use App\Models\User;
 
 class LandedCostController extends Controller
@@ -68,6 +69,7 @@ class LandedCostController extends Controller
         $lastSegment = request()->segment(count(request()->segments()));
        
         $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
             'title'         => 'Landed Cost',
             'content'       => 'admin.purchase.landed_cost',
@@ -82,6 +84,7 @@ class LandedCostController extends Controller
             'newcode'       =>  $menu->document_code.date('y'),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'menucode'      => $menu->document_code,
+            'modedata'      => $menuUser->mode ? $menuUser->mode : '',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -369,7 +372,12 @@ class LandedCostController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = LandedCost::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
+        $total_data = LandedCost::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+        ->where(function($query)use($request){
+            if(!$request->modedata){
+                $query->where('user_id',session('bo_id'));
+            }
+        })->count();
         
         $query_data = LandedCost::where(function($query) use ($search, $request) {
                 if($search) {
@@ -412,6 +420,10 @@ class LandedCostController extends Controller
 
                 if($request->currency_id){
                     $query->whereIn('currency_id',$request->currency_id);
+                }
+
+                if(!$request->modedata){
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
@@ -461,6 +473,10 @@ class LandedCostController extends Controller
 
                 if($request->currency_id){
                     $query->whereIn('currency_id',$request->currency_id);
+                }
+
+                if(!$request->modedata){
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")

@@ -50,6 +50,7 @@ use App\Exports\ExportPurchaseInvoice;
 use App\Exports\ExportTemplatePurchaseInvoice;
 use App\Models\Division;
 use App\Models\LandedCostFeeDetail;
+use App\Models\MenuUser;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\Tax;
@@ -72,6 +73,7 @@ class PurchaseInvoiceController extends Controller
         $lastSegment = request()->segment(count(request()->segments()));
        
         $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
             'title'         => 'A/P Invoice',
             'content'       => 'admin.purchase.invoice',
@@ -88,6 +90,7 @@ class PurchaseInvoiceController extends Controller
             'maxDate'       => $request->get('maxDate'),
             'newcode'       => $menu->document_code.date('y'),
             'menucode'      => $menu->document_code,
+            'modedata'      => $menuUser->mode ? $menuUser->mode : '',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -613,7 +616,11 @@ class PurchaseInvoiceController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = PurchaseInvoice::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */count();
+        $total_data = PurchaseInvoice::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */where(function($query)use($request){
+            if(!$request->modedata){
+                $query->where('user_id',session('bo_id'));
+            }
+        })->count();
         
         $query_data = PurchaseInvoice::where(function($query) use ($search, $request) {
                 if($search) {
@@ -668,6 +675,10 @@ class PurchaseInvoiceController extends Controller
 
                 if($request->company_id){
                     $query->where('company_id',$request->company_id);
+                }
+
+                if(!$request->modedata){
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
@@ -729,6 +740,10 @@ class PurchaseInvoiceController extends Controller
 
                 if($request->company_id){
                     $query->where('company_id',$request->company_id);
+                }
+
+                if(!$request->modedata){
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */

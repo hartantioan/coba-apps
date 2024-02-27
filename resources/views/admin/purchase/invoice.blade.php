@@ -2533,6 +2533,7 @@
                     company_id : $('#filter_company').val(),
                     start_date : $('#start_date').val(),
                     finish_date : $('#finish_date').val(),
+                    'modedata' : '{{ $modedata }}',
                 },
                 beforeSend: function() {
                     loadingOpen('#datatable_serverside');

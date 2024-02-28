@@ -2240,7 +2240,7 @@
                 if(files.files.length > 0){
                     for (var i = 0; i < files.files.length; i++) {
                         var imageSize = files.files[i].size;
-                        if(Math.round(imageSize/1024) >= 2048){
+                        if(Math.round(imageSize/1024) >= 7168){
                             passedUpload = false;
                         }
                     }

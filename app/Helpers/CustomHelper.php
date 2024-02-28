@@ -633,6 +633,20 @@ class CustomHelper {
 				if(!$passedGroupItem){
 					$passed = false;
 				}
+
+				if($row->is_coa_detail){
+					$passedGroupCoa = false;
+					foreach($source->lookable->details as $rowdetail){
+						if($rowdetail->coa()->exists()){
+							$passedGroupCoa = true;
+						}
+					}
+					if($passedGroupCoa){
+						$passed = true;
+					}else{
+						$passed = false;
+					}
+				}
 			}
 
 			if($passed == true){

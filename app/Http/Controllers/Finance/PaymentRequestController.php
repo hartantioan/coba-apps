@@ -51,6 +51,7 @@ use App\Models\Department;
 use App\Models\Division;
 use App\Models\Menu;
 use App\Models\MarketingOrderMemo;
+use App\Models\MenuUser;
 use App\Models\OutgoingPayment;
 use App\Models\Warehouse;
 use Illuminate\Database\Eloquent\Builder;
@@ -71,6 +72,7 @@ class PaymentRequestController extends Controller
     {
         $lastSegment = request()->segment(count(request()->segments()));
         $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
             'title'         => 'Payment Request',
             'content'       => 'admin.finance.payment_request',
@@ -86,6 +88,7 @@ class PaymentRequestController extends Controller
             'line'          => Line::where('status','1')->get(),
             'machine'       => Machine::where('status','1')->get(),
             'department'    => Division::where('status','1')->get(),
+            'modedata'      => $menuUser->mode ? $menuUser->mode : '',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -133,7 +136,11 @@ class PaymentRequestController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = PaymentRequest::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */count();
+        $total_data = PaymentRequest::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */where(function($query)use($request){
+            if(!$request->modedata){
+                $query->where('user_id',session('bo_id'));
+            }
+        })->count();
         
         $query_data = PaymentRequest::where(function($query) use ($search, $request) {
                 if($search) {
@@ -185,6 +192,10 @@ class PaymentRequestController extends Controller
 
                 if($request->company_id){
                     $query->where('company_id',$request->company_id);
+                }
+
+                if(!$request->modedata){
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
@@ -243,6 +254,10 @@ class PaymentRequestController extends Controller
 
                 if($request->company_id){
                     $query->where('company_id',$request->company_id);
+                }
+
+                if(!$request->modedata){
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */

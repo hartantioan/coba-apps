@@ -31,6 +31,7 @@ use App\Models\Division;
 use App\Models\Line;
 use App\Models\Machine;
 use App\Models\Menu;
+use App\Models\MenuUser;
 
 class InventoryRevaluationController extends Controller
 {
@@ -48,6 +49,7 @@ class InventoryRevaluationController extends Controller
     {
         $lastSegment = request()->segment(count(request()->segments()));
         $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
             'title'     => 'Revaluasi Inventori',
             'content'   => 'admin.inventory.revaluation',
@@ -61,6 +63,7 @@ class InventoryRevaluationController extends Controller
             'line'      => Line::where('status','1')->get(),
             'machine'   => Machine::where('status','1')->orderBy('name')->get(),
             'department'=> Division::where('status','1')->orderBy('name')->get(),
+            'modedata'  => $menuUser->mode ? $menuUser->mode : '',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -88,7 +91,12 @@ class InventoryRevaluationController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = InventoryRevaluation::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
+        $total_data = InventoryRevaluation::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+        ->where(function($query)use($request){
+            if(!$request->modedata){
+                $query->where('user_id',session('bo_id'));
+            }
+        })->count();
         
         $query_data = InventoryRevaluation::where(function($query) use ($search, $request) {
                 if($search) {
@@ -114,6 +122,10 @@ class InventoryRevaluationController extends Controller
 
                 if($request->status){
                     $query->whereIn('status', $request->status);
+                }
+
+                if(!$request->modedata){
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
@@ -146,6 +158,10 @@ class InventoryRevaluationController extends Controller
 
                 if($request->status){
                     $query->whereIn('status', $request->status);
+                }
+
+                if(!$request->modedata){
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")

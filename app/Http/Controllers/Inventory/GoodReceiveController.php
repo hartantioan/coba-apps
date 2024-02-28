@@ -595,7 +595,7 @@ class GoodReceiveController extends Controller
         if($data->approval() && $data->hasDetailMatrix()){
             foreach($data->approval() as $detail){
                 $string .= '<tr>
-                    <td class="center-align" colspan="4"><h6>'.$detail->getTemplateName().'</h6></td>
+                    <td class="center-align" colspan="5"><h6>'.$detail->getTemplateName().'</h6></td>
                 </tr>';
                 foreach($detail->approvalMatrix as $key => $row){
                     $icon = '';
@@ -617,6 +617,7 @@ class GoodReceiveController extends Controller
                         <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
                         <td class="center-align">'.$icon.'<br></td>
                         <td class="center-align">'.$row->note.'</td>
+                        <td class="center-align">' . ($row->date_process ? \Carbon\Carbon::parse($row->date_process)->format('d/m/Y H:i:s') : '-') . '</td>
                     </tr>';
                 }
             }

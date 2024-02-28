@@ -166,7 +166,7 @@ class AttendancePeriodController extends Controller
         
         $user_data = User::where(function($query) use ( $request) {
             $query->where('type','1');
-            $query->whereIn('employee_no',['323005','323007','323003','323009','323016','323017','323020','323021','323024','323025','323027','323029','323031','323033','323034','323036','324002','324003','324004']);
+            $query->whereIn('employee_no',['312401001','3230801','312312001','312312002','312310001','312401002','312401003','312402001','312402002','312402004']);
             // $query->whereIn('employee_no',['323033']);    
             })->get();
         
@@ -243,8 +243,16 @@ class AttendancePeriodController extends Controller
                 $query_late_punishment = Punishment::where('place_id',$row_user->place_id)
                                             ->where('type','1')
                                             ->where('status','1')
+                                            ->whereNull('shift_id')
                                             ->orderBy(DB::raw('CAST(minutes AS DECIMAL)'))
                                             ->get();
+
+                $query_late_tambahan1 = Punishment::where('place_id',$row_user->place_id)
+                    ->where('type','1')
+                    ->where('status','1')
+                    ->whereNotNull('shift_id') 
+                    ->orderByDesc(DB::raw('CAST(minutes AS DECIMAL)'))
+                    ->get();
                
                 $tipe_punish_counter=[];
                
@@ -259,7 +267,13 @@ class AttendancePeriodController extends Controller
                                         ->first();
 
                 
-               
+                foreach($query_late_tambahan1 as $row_type){
+                    $tipe_punish_counter[$row_type->code]['counter']=0;
+                    $tipe_punish_counter[$row_type->code]['date']=[]; 
+                    $tipe_punish_counter[$row_type->code]['uid']=$row_user->id;
+                    $tipe_punish_counter[$row_type->code]['punish_id']=$row_type->id;
+                    $tipe_punish_counter[$row_type->code]['price']=$row_type->price;   
+                }
                 
                 foreach($query_late_punishment as $row_type){
                     $tipe_punish_counter[$row_type->code]['counter']=0;
@@ -268,6 +282,7 @@ class AttendancePeriodController extends Controller
                     $tipe_punish_counter[$row_type->code]['punish_id']=$row_type->id;
                     $tipe_punish_counter[$row_type->code]['price']=$row_type->price;   
                 } 
+                
                 $query_special_1_forLimit = UserSpecial::where('user_id',$row_user->id)
                         ->where('start_date','<=', $date)
                         ->where('status',1)->first();
@@ -323,7 +338,9 @@ class AttendancePeriodController extends Controller
                                 ->where('end_date','>=',$date)
                                 ->where('status',1)
                                 ->first();
-                    
+
+                    $array_tambahan_denda_pershift = [];
+
                     //perhitungan schedule biasa dari user pada tanggal yang ada di loop
                     foreach($query_data as $key=> $row_schedule_filter){//perlusd
                         $query_lembur= null;
@@ -333,7 +350,9 @@ class AttendancePeriodController extends Controller
                         $lembur_awal_shift = 0;
                         $time_in = $row_schedule_filter->shift->time_in;
                         $time_out = $row_schedule_filter->shift->time_out;
-                  
+
+                        
+                        
                         if($row_schedule_filter->status == 5){
                             
                             $query_lembur = OvertimeRequest::where('schedule_id',$row_schedule_filter->id)
@@ -843,6 +862,13 @@ class AttendancePeriodController extends Controller
                         $nama_shifts[]=$row_schedule_filter->shift->name;
                         $shift_id[]=$row_schedule_filter->shift->id;
                        
+                        $query_late_tambahan = Punishment::where('place_id',$row_user->place_id)
+                                                ->where('type','1')
+                                                ->where('status','1')
+                                                ->where('shift_id',$row_schedule_filter->shift_id)
+                                                ->orderBy(DB::raw('CAST(minutes AS DECIMAL)'))
+                                                ->get();
+     
                         
 
                         if($query_special){
@@ -881,10 +907,37 @@ class AttendancePeriodController extends Controller
                                     $pembanding= $pembandingdate->format('H:i:s');
                                     $carbonTimeIn = Carbon::parse($time_in);
                                     
+                                    $tambahan_time = 0;
+                                    if (count($query_late_tambahan)>0) {
+
+                                        $tambahan_time = $query_late_tambahan[count($query_late_tambahan)-1]->minutes;
+                                        foreach($query_late_tambahan as $key_tambahan=>$row_late_tambahan){
+                                           
+                                            if ($key_tambahan === 0) {
+                                               
+                                                // Use a different condition for the first key
+                                                if ($pembanding > $time_in && $pembanding < Carbon::parse($time_in)->addMinutes($row_late_tambahan->minutes)->format('H:i:s')) {
+                                                    $tipe_punish_counter[$row_late_tambahan->code]['counter']++;
+                                                    $tipe_punish_counter[$row_late_tambahan->code]['date'][] = $date->format('d/M/y');
+                                                    break;
+                                                }
+                                            }
+                                            if($key_tambahan != count($query_late_tambahan)-1){
+                                                if($pembanding < Carbon::parse($time_in)->addMinutes($query_late_tambahan[$key_tambahan]->minutes)->format('H:i:s') && $pembanding > Carbon::parse($time_in)->addMinutes($query_late_tambahan[$key_tambahan-1]->minutes)->format('H:i:s')){    
+                                                    $tipe_punish_counter[$query_late_tambahan[$key_tambahan]->code]['counter']++;
+                                                    $tipe_punish_counter[$query_late_tambahan[$key_tambahan]->code]['date'][]=$date->format('d/M/y');
+                                                    break;
+                                                }
+                                            }
+                                        }
+
+                                    }
+                                    
                                     if($pembanding > $time_in ){
                                         if(count($query_late_punishment)> 0){
                                       
-                                            if($pembanding > $time_in && $pembanding <= Carbon::parse($time_in)->addMinutes($query_late_punishment[0]->minutes)->format('H:i:s')){
+                                            if($pembanding > $time_in && $pembanding <= Carbon::parse($time_in)->addMinutes($tambahan_time)->addMinutes($query_late_punishment[0]->minutes)->format('H:i:s')){
+                                                
                                                 if (($max_punish_id != null && $limit > 0 && $max_punish_id != $tipe_punish_counter[$query_late_punishment[0]->code]['punish_id'] && ($key_id_punish!=null && $key <= $key_id_punish) ) ) {
                                                     $limit--;
                                                     
@@ -899,10 +952,10 @@ class AttendancePeriodController extends Controller
                                                 }
                                             }else{
                                                 foreach($query_late_punishment as $key=>$row_punish_type){
-                                                    $newCarbonTime = Carbon::parse($time_in)->addMinutes($row_punish_type->minutes)->format('H:i:s');
+                                                    $newCarbonTime = Carbon::parse($time_in)->addMinutes($tambahan_time)->addMinutes($row_punish_type->minutes)->format('H:i:s');
                                                     if($key !=0 ){
                                                         
-                                                        if($pembanding < Carbon::parse($time_in)->addMinutes($query_late_punishment[$key]->minutes)->format('H:i:s') && $pembanding > Carbon::parse($time_in)->addMinutes($query_late_punishment[$key-1]->minutes)->format('H:i:s')){
+                                                        if($pembanding < Carbon::parse($time_in)->addMinutes($tambahan_time)->addMinutes($query_late_punishment[$key]->minutes)->format('H:i:s') && $pembanding > Carbon::parse($time_in)->addMinutes($tambahan_time)->addMinutes($query_late_punishment[$key-1]->minutes)->format('H:i:s')){
                                                             if (($max_punish_id != null && $limit > 0 && $max_punish_id != $tipe_punish_counter[$query_late_punishment[$key]->code]['punish_id']&&($key_id_punish!=null && $key <= $key_id_punish))) {
                                                                 $limit--;
                                                                 
@@ -920,7 +973,7 @@ class AttendancePeriodController extends Controller
                                                         }
                                                     }
                                                     if($key == count($query_late_punishment)){
-                                                        if($pembanding > Carbon::parse($time_in)->addMinutes($query_late_punishment[$key]->minutes)->format('H:i:s')&&$pembanding<Carbon::parse($time_in)->addHours(2)->format('H:i:s')){
+                                                        if($pembanding > Carbon::parse($time_in)->addMinutes($tambahan_time)->addMinutes($query_late_punishment[$key]->minutes)->format('H:i:s')&&$pembanding<Carbon::parse($time_in)->addHours(2)->format('H:i:s')){
                                                             if (($max_punish_id != null && $limit > 0 && $max_punish_id != $tipe_punish_counter[$query_late_punishment[$key]->code]['punish_id']&&($key_id_punish!=null && $key <= $key_id_punish))) {
                                                                 $limit--;
                                                                 
@@ -972,20 +1025,47 @@ class AttendancePeriodController extends Controller
                                 
                                 $pembanding= $pembandingdate->format('H:i:s');
                                 $carbonTimeIn = Carbon::parse($time_in);
-                              
+                                
+                                $tambahan_time = 0;
+                                if (count($query_late_tambahan)>0) {
+                                    
+                                    $tambahan_time = $query_late_tambahan[count($query_late_tambahan)-1]->minutes;
+                                    foreach($query_late_tambahan as $key_tambahan=>$row_late_tambahan){
+                                        
+                                        if ($key_tambahan === 0) {
+                                            // Use a different condition for the first key
+                                            if ($pembanding > $time_in && $pembanding < Carbon::parse($time_in)->addMinutes($row_late_tambahan->minutes)->format('H:i:s')) {
+                                               
+                                                $tipe_punish_counter[$row_late_tambahan->code]['counter']++;
+                                               
+                                                $tipe_punish_counter[$row_late_tambahan->code]['date'][] = $date->format('d/M/y');
+                                                break;
+                                            }
+                                        }
+                                        if($key_tambahan != count($query_late_tambahan)-1){
+                                            if($pembanding < Carbon::parse($time_in)->addMinutes($query_late_tambahan[$key_tambahan]->minutes)->format('H:i:s') && $pembanding > Carbon::parse($time_in)->addMinutes($query_late_tambahan[$key_tambahan-1]->minutes)->format('H:i:s')){    
+                                                $tipe_punish_counter[$query_late_tambahan[$key_tambahan]->code]['counter']++;
+                                                $tipe_punish_counter[$query_late_tambahan[$key_tambahan]->code]['date'][]=$date->format('d/M/y');
+                                                break;
+                                            }
+                                        }
+                                    }
+                                  
+                                }
+                               
                                 if($pembanding > $time_in ){
                                     if(count($query_late_punishment)> 0){
                                         
-                                        if($pembanding > $time_in && $pembanding <= Carbon::parse($time_in)->addMinutes($query_late_punishment[0]->minutes)->format('H:i:s')){
-                                            
+                                        if($pembanding > Carbon::parse($time_in)->addMinutes($tambahan_time)->format('H:i:s') && $pembanding <= Carbon::parse($time_in)->addMinutes($tambahan_time)->addMinutes($query_late_punishment[0]->minutes)->format('H:i:s')){
+                                           
                                             $tipe_punish_counter[$query_late_punishment[0]->code]['counter']++;
                                             $tipe_punish_counter[$query_late_punishment[0]->code]['date'][]=Carbon::parse($date)->format('d/M/y');  
                                         }else{
                                             foreach($query_late_punishment as $key=>$row_punish_type){
-                                                $newCarbonTime = Carbon::parse($time_in)->addMinutes($row_punish_type->minutes)->format('H:i:s');
+                                                $newCarbonTime = Carbon::parse($time_in)->addMinutes($tambahan_time)->addMinutes($row_punish_type->minutes)->format('H:i:s');
                                                 if($key !=0 ){
                                                     
-                                                    if($pembanding < Carbon::parse($time_in)->addMinutes($query_late_punishment[$key]->minutes)->format('H:i:s') && $pembanding > Carbon::parse($time_in)->addMinutes($query_late_punishment[$key-1]->minutes)->format('H:i:s')){
+                                                    if($pembanding < Carbon::parse($time_in)->addMinutes($tambahan_time)->addMinutes($query_late_punishment[$key]->minutes)->format('H:i:s') && $pembanding > Carbon::parse($time_in)->addMinutes($tambahan_time)->addMinutes($query_late_punishment[$key-1]->minutes)->format('H:i:s')){
                                                        
                                                         $tipe_punish_counter[$query_late_punishment[$key]->code]['counter']++;
                                                         $tipe_punish_counter[$query_late_punishment[$key]->code]['date'][]=$date->format('d/M/y');
@@ -993,7 +1073,7 @@ class AttendancePeriodController extends Controller
                                                     }
                                                 }
                                                 if($key == count($query_late_punishment)){
-                                                    if($pembanding > Carbon::parse($time_in)->addMinutes($query_late_punishment[$key]->minutes)->format('H:i:s')&&$pembanding<Carbon::parse($time_in)->addHours(2)->format('H:i:s')){
+                                                    if($pembanding > Carbon::parse($time_in)->addMinutes($tambahan_time)->addMinutes($query_late_punishment[$key]->minutes)->format('H:i:s')&&$pembanding<Carbon::parse($time_in)->addHours(2)->format('H:i:s')){
                                                         $tipe_punish_counter[$row_punish_type->code]['counter']++;
                                                         $tipe_punish_counter[$row_punish_type->code]['date'][]=$date->format('d/M/y');
                                                     }else{
@@ -1013,6 +1093,7 @@ class AttendancePeriodController extends Controller
                         }
 
                     }
+                    
                     
                     
                     $attendance_detail[$row_user->id][]=[
@@ -1411,7 +1492,7 @@ class AttendancePeriodController extends Controller
                                     //                     if($pembanding > $time_in && $pembanding <= Carbon::parse($time_in)->addMinutes($query_late_punishment[0]->minutes)->format('H:i:s')){
                                     //                         if (($max_punish_id != null && $limit_temp > 0 && $max_punish_id != $tipe_punish_counter[$query_late_punishment[$key]->code]['punish_id']&&($key_id_punish!=null && $key <= $key_id_punish))) {
                                     //                             $limit_temp--;
-                                    //                             info($pembanding);
+                                    
                                     //                             foreach ($exact_in as $key_in => $row_ins) {
                                     //                                 $exact_in[$key_in] = 1;
                                     //                             }
@@ -1535,7 +1616,7 @@ class AttendancePeriodController extends Controller
                                         if($pembanding > $time_in ){
                                             if(count($query_late_punishment)> 0){
                                             
-                                                if($pembanding > $time_in && $pembanding <= Carbon::parse($time_in)->addMinutes($query_late_punishment[0]->minutes)->format('H:i:s')){
+                                                if($pembanding > Carbon::parse($time_in)->addMinutes($tambahan_time)->format('H:i:s') && $pembanding <= Carbon::parse($time_in)->addMinutes($query_late_punishment[0]->minutes)->format('H:i:s')){
                                                     $tipe_punish_counter[$query_late_punishment[0]->code]['counter']++;
                                                     $tipe_punish_counter[$query_late_punishment[0]->code]['date'][]=Carbon::parse($date_leave_req)->format('d/M/y');  
                                                 }else{

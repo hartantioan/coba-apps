@@ -526,13 +526,14 @@ class RequestSparepartController extends Controller
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="4">Approval</th>
+                                <th class="center-align" colspan="5">Approval</th>
                             </tr>
                             <tr>
                                 <th class="center-align">Level</th>
                                 <th class="center-align">Kepada</th>
                                 <th class="center-align">Status</th>
                                 <th class="center-align">Catatan</th>
+                                <th class="center-align">Tanggal</th>
                             </tr>
                         </thead><tbody>';
         

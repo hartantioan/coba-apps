@@ -88,6 +88,7 @@ class PunishmentController extends Controller
                     $val->price,
                     $val->minutes,
                     $val->place->name,
+                    $val->shift->name ?? '',
                     $val->type(),
                     $val->status(),
                     '
@@ -123,6 +124,7 @@ class PunishmentController extends Controller
         ], [
             'code.required' 	    => 'Kode tidak boleh kosong.',
             'code.unique'           => 'Kode telah terpakai.',
+
             'name.required'         => 'Nama tidak boleh kosong.',
             'price.required'        => 'Denda harus memiliki nominal',
             'place_id'              => 'Penempatan tidak boleh kosong',
@@ -138,15 +140,19 @@ class PunishmentController extends Controller
 			if($request->temp){
                 DB::beginTransaction();
                 try {
+                
                     $query = Punishment::find($request->temp);
                     $query->code            = $request->code;
                     $query->name	        = $request->name;
                     $query->price	        = $request->price;
                     $query->place_id	    = $request->place_id;
+                    $query->shift_id	    = $request->shift_id;
                     $query->minutes	        = $request->minute;
+                  
                     $query->type	        = $request->type;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
+                   
                     DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
@@ -160,6 +166,7 @@ class PunishmentController extends Controller
                         'price'			=> $request->price,
                         'minutes'       => $request->minute,
                         'place_id'      => $request->place_id,
+                        'shift_id'      => $request->shift_id,
                         'type'          => $request->type,
                         'status'        => $request->status ? $request->status : '2'
                     ]);
@@ -194,7 +201,11 @@ class PunishmentController extends Controller
 
     public function show(Request $request){
         $project = Punishment::find($request->id);
-        				
+        $name = '';
+        if($project->shift){
+            $name = $project->shift->name.'|'. $project->shift->time_in.' - '.$project->shift->time_out;
+        }
+        $project['shift_name'] = $name;
 		return response()->json($project);
     }
 

@@ -543,20 +543,21 @@ class GoodScaleController extends Controller
         $string .= '</tbody></table></div><div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="4">Approval</th>
+                                <th class="center-align" colspan="5">Approval</th>
                             </tr>
                             <tr>
                                 <th class="center-align">Level</th>
                                 <th class="center-align">Kepada</th>
                                 <th class="center-align">Status</th>
                                 <th class="center-align">Catatan</th>
+                                <th class="center-align">Tanggal</th>
                             </tr>
                         </thead><tbody>';
         
         if($data->approval() && $data->hasDetailMatrix()){
             foreach($data->approval() as $detail){
                 $string .= '<tr>
-                    <td class="center-align" colspan="4"><h6>'.$detail->getTemplateName().'</h6></td>
+                    <td class="center-align" colspan="5"><h6>'.$detail->getTemplateName().'</h6></td>
                 </tr>';
                 foreach($detail->approvalMatrix as $key => $row){
                     $icon = '';
@@ -578,6 +579,7 @@ class GoodScaleController extends Controller
                         <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
                         <td class="center-align">'.$icon.'<br></td>
                         <td class="center-align">'.$row->note.'</td>
+                        <td class="center-align">' . ($row->date_process ? \Carbon\Carbon::parse($row->date_process)->format('d/m/Y H:i:s') : '-') . '</td>
                     </tr>';
                 }
             }

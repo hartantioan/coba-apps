@@ -1,21 +1,53 @@
 <table border="1" cellpadding="2" cellspacing="0" style="width:100%; font-size:13px;border-collapse: collapse;">
     <thead>
         <tr>
-            <th>NIK</th>
-            <th>Nama</th>
-            <th>Tanggal</th>
-            <th>Shift</th>
-            <th>Min Time in</th>
-            <th>Time In</th>
-            <th>Check Clock Masuk</th>
-            <th>Time Out</th>
-            <th>Check Clock Pulang</th>
-            <th>Max Time Out</th>
-            <th>Status</th>
+            <th rowspan="3">NIK</th>
+            <th rowspan="3">Nama</th>
+            <th align="center" colspan="{{ $distinctDatesCount }}">Tanggal</th>
+        </tr>
+        <tr>
+            
+            @foreach($date as $dateItem)
+                @php
+                    $colspan = 0;
+                    foreach($shift_per_date as $row_shift_date) {
+                        if ($row_shift_date['date'] == $dateItem) {
+                            $colspan = count($row_shift_date['shift'])*2;
+                            break;
+                        }
+                    }
+                @endphp
+                <th class="center-align" colspan="{{ $colspan }}">{{ $dateItem }}</th>
+            @endforeach
+        </tr>
+        <tr>
+            @foreach ($shift_per_date as $row_shift_date )
+                @if (empty($row_shift_date['shift']))
+                    <th></th> <!-- Add an empty th for dates without shifts -->
+                @else
+                    @foreach ($row_shift_date['shift'] as $row_shift)
+                        <th colspan="2">{{ $row_shift['limit_masuk'] }} - {{ $row_shift['limit_keluar'] }}</th>
+                    @endforeach
+                @endif
+            @endforeach
         </tr>
     </thead>
     <tbody>
-        @foreach($data as $key => $row_detail)
+        @foreach ($user_id as $row_user )
+            <tr>
+                <td class='center-align'>{{$row_user->employee_no}}</td>
+                <td class='center-align'>{{$row_user->name}}</td>
+                @foreach ($attendanceUser as $key_user_attendance=>$row_attendance_user )
+                    @if ($row_user->id == $key_user_attendance)
+                        @foreach ($row_attendance_user as $row_attendance )
+                            <td class='center-align'>{{$row_attendance['masuk']?? ''}}</td>
+                            <td class='center-align'>{{$row_attendance['pulang'] ?? ''}}</td> 
+                        @endforeach
+                    @endif
+                @endforeach
+            </tr>
+        @endforeach
+        {{-- @foreach($data as $key => $row_detail)
             @foreach ($row_detail as $key_daily=>$row_daily)
                 <tr>      
                     <td class='center-align'>{{$row_daily['user_id']}}</td>
@@ -38,7 +70,7 @@
                     Data tidak ditemukan
                 </td>
             </tr>
-        @endif
+        @endif --}}
         
     </tbody>
 </table>

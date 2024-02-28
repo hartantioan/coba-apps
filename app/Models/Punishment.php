@@ -22,6 +22,7 @@ class Punishment extends Model
         'minutes',
         'place_id',
         'type',
+        'shift_id',
         'status',
     ];
 
@@ -43,6 +44,10 @@ class Punishment extends Model
 
     public function place(){
         return $this->belongsTo('App\Models\Place','place_id','id')->withTrashed();
+    }
+
+    public function shift(){
+        return $this->belongsTo('App\Models\Shift','shift_id','id')->withTrashed();
     }
 
     public function type(){

@@ -73,6 +73,7 @@
                                                         <th>Nominal</th>
                                                         <th>Menit</th>
                                                         <th>Penempatan</th>
+                                                        <th>Shift</th>
                                                         <th>Tipe</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
@@ -128,11 +129,11 @@
                             </select>
                             <label class="" for="place_id">Plant </label>
                         </div>
-                        <div class="input-field col s6 employee_inputs">
-                            <select class="browser-default item-array" id="punishment_id" name="punishment_id">
-                               
+                        <div class="input-field col s6">
+                            <select class="select2 browser-default" id="shift_id" name="shift_id">
+                                
                             </select>
-                            <label class="active" for="punishment_id">Batas Maksimal Hukuman</label>
+                            <label class="active" for="shift_id">Select Shift</label>
                         </div>
                         <div class="input-field col s6">
                             <select class="form-control" id="type" name="type" onchange="seeType()">
@@ -181,7 +182,7 @@
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
         });
-
+        select2ServerSide('#shift_id', '{{ url("admin/select2/shift") }}');
         $('#punishment_id').select2({
             placeholder: '-- Kosong --',
             minimumInputLength: 1,
@@ -221,6 +222,7 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
+                $('#shift_id').empty()
                 $('#temp').val('');
                 M.updateTextFields();
             }
@@ -266,6 +268,7 @@
                 { name: 'name', className: 'center-align' },
                 { name: 'price', className: '' },
                 { name: 'minutes', className: '' },
+                { name: 'place_id', className: 'center-align' },
                 { name: 'place_id', className: 'center-align' },
                 { name: 'type', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
@@ -479,7 +482,9 @@
                 $('#price').val(response.price);
                 $('#minute').val(response.minutes);
                 $('#type').val(response.type).formSelect();
-               
+                $('#shift_id').empty().append(`
+                    <option value="` + response.shift_id + `">` + response.shift_name + `</option>
+                `);
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{

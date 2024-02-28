@@ -280,6 +280,7 @@
                                         <div>{!! $row->user->signature() !!}</div>
                                     @endif
                                     <div class="{{ $row->user->signature ? '' : 'mt-5' }}">{{ $row->user->name }}</div>
+                                    <div class="{{ $row->user->date_process ? '' : 'mt-2' }}">{{ ($row->date_process ? \Carbon\Carbon::parse($row->date_process)->format('d/m/Y H:i:s') : '-') }}</div>
                                     @if ($row->user->position()->exists())
                                         <div class="mt-1">{{ $row->user->position->Level->name.' - '.$row->user->position->division->name }}</div>
                                     @endif

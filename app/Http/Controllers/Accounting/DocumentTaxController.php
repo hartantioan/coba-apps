@@ -123,7 +123,7 @@ class DocumentTaxController extends Controller
                     ->get();
         
 
-        $total_filtered = DocumentTax::where(function($query) use ($search, $request) {
+        $total_filtered = DocumentTax::where(function($query) use ($search, $request , $conditions) {
                 $query->where(function($query) use ($search) {
                     $query->where('code', 'like', "%$search%")
                         ->orWhere('date', 'like', "%$search%")
@@ -134,6 +134,18 @@ class DocumentTaxController extends Controller
                         ->orWhere('total', 'like', "%$search%")
                         ->orWhere('tax', 'like', "%$search%");
                 });
+
+                if($request->multiple){
+                    $query->where(function($innerQuery) use ($conditions) {
+                        foreach ($conditions as $condition) {
+                            $innerQuery->orWhere(function($subInnerQuery) use ($condition) {
+                                $subInnerQuery->where('transaction_code', $condition['transaction_code'])
+                                              ->where('replace', $condition['replace'])
+                                              ->where('code', $condition['code']);
+                            });
+                        }
+                    });
+                }
             
                 if($request->start_date && $request->finish_date) {
                     $query->whereDate('date', '>=', $request->start_date)

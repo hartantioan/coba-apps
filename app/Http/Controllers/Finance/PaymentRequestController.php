@@ -833,7 +833,7 @@ class PaymentRequestController extends Controller
                         ]);
                     }
 
-                    if(in_array($query->status,['1','2','6'])){
+                    if(in_array($query->status,['1','2','3','6'])){
 
                         if($request->has('document')) {
                             if($query->document){

@@ -400,7 +400,7 @@ class PurchaseInvoiceController extends Controller
             }elseif($row == 'purchase_orders'){
                 $datapo = PurchaseOrder::find(intval($request->arr_id[$key]));
                 foreach($datapo->purchaseOrderDetail as $rowdetail){
-                    if($rowdetail->balanceInvoice() > 0){
+                    if($rowdetail->balanceInvoice() > 0 || $rowdetail->balanceInvoice() < 0){
                         $arrTotal = $rowdetail->getArrayTotal();
                         $details[] = [
                             'type'          => 'purchase_order_details',

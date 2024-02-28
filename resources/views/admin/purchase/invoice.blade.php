@@ -1949,7 +1949,7 @@
                                         $('#cut_date').val(val.cut_date);
                                         $('#spk_no').val(val.spk_no);
                                         $('#invoice_no').val(val.invoice_no);
-
+                                        $('#note').val(val.header_note);
                                     });                        
                                 }else{
                                     $('.row_detail').remove();

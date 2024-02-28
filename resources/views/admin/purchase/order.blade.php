@@ -2693,7 +2693,7 @@
                                         </select>
                                     </td>
                                     <td>
-                                        <select class="form-control" id="arr_department` + count + `" name="arr_department[]">
+                                        <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
                                             <option value="">--Kosong--</option>
                                             @foreach ($department as $rowdept)
                                                 <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>

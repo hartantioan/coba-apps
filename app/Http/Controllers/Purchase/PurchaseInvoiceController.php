@@ -449,6 +449,7 @@ class PurchaseInvoiceController extends Controller
                             'cut_date'      => $datapo->cut_date ?? '',
                             'spk_no'        => $datapo->spk_no ?? '',
                             'invoice_no'    => $datapo->invoice_no ?? '',
+                            'header_note'   => $datapo->note,
                         ];
                     }
                 }
@@ -512,6 +513,7 @@ class PurchaseInvoiceController extends Controller
                             'cut_date'      => '',
                             'spk_no'        => '',
                             'invoice_no'    => '',
+                            'header_note'   => $datagr->note,
                         ];
                     }
                 }
@@ -567,6 +569,7 @@ class PurchaseInvoiceController extends Controller
                             'cut_date'      => '',
                             'spk_no'        => '',
                             'invoice_no'    => '',
+                            'header_note'   => $datalc->note,
                         ];
                     }
                 }

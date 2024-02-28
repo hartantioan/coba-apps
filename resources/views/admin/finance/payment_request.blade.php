@@ -2379,10 +2379,10 @@
                         beforeSend: function() {
                             $('#validation_alert').hide();
                             $('#validation_alert').html('');
-                            loadingOpen('.modal-content');
+                            loadingOpen('#modal1');
                         },
                         success: function(response) {
-                            loadingClose('.modal-content');
+                            loadingClose('#modal1');
                             $('input').css('border', 'none');
                             $('input').css('border-bottom', '0.5px solid black');
                             if(response.status == 200) {
@@ -2426,7 +2426,7 @@
                         },
                         error: function() {
                             $('.modal-content').scrollTop(0);
-                            loadingClose('.modal-content');
+                            loadingClose('#modal1');
                             swal({
                                 title: 'Ups!',
                                 text: 'Check your internet connection.',

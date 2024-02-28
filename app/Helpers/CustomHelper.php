@@ -1465,7 +1465,7 @@ class CustomHelper {
 
 				if($row->lookable_type == 'purchase_invoices'){
 					$mustpay = $row->lookable->getTotalPaidExcept($row->id);
-					$balanceReal = $row->lookable->getTotalPaidExcept($row->id) * $row->lookable->currencyRate();
+					$balanceReal = $row->nominal * $row->lookable->currencyRate();
 					if($row->lookable->getTotalPaid() <= 0){
 						$row->lookable->update([
 							'status'	=> '3'

@@ -1126,6 +1126,11 @@ class UserController extends Controller
                     }
                 }
 
+                activity()
+                    ->performedOn(new MenuUser())
+                    ->causedBy(session('bo_id'))
+                    ->log('Add / edit access data.');
+
                 DB::commit();
             }catch(\Exception $e){
                 DB::rollback();

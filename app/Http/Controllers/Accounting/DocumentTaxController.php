@@ -55,6 +55,27 @@ class DocumentTaxController extends Controller
             'reference',
             'url',
         ];
+        $conditions = [];
+        if($request->multiple){
+            $codes = explode(',', $request->multiple);
+
+            // Initialize an array to store the conditions
+            
+
+            foreach ($codes as $code) {
+                // Extract parts of the code
+                $transactionCode = substr($code, 0, 2);
+                $replace = substr($code, 2, 1);
+                $documentCode = substr($code, 3);
+
+                // Add conditions to the array
+                $conditions[] = [
+                    'transaction_code' => $transactionCode,
+                    'replace' => $replace,
+                    'code' => $documentCode,
+                ];
+            }
+        }
 
         $start  = $request->start;
         $length = $request->length;
@@ -64,7 +85,7 @@ class DocumentTaxController extends Controller
 
         $total_data = DocumentTax::count();
         
-        $query_data = DocumentTax::where(function($query) use ($search, $request) {
+        $query_data = DocumentTax::where(function($query) use ($search, $request , $conditions) {
                         $query->where(function($query) use ($search) {
                             $query->where('code', 'like', "%$search%")
                                 ->orWhere('date', 'like', "%$search%")
@@ -75,6 +96,17 @@ class DocumentTaxController extends Controller
                                 ->orWhere('total', 'like', "%$search%")
                                 ->orWhere('tax', 'like', "%$search%");
                         });
+                        if($request->multiple){
+                            $query->where(function($innerQuery) use ($conditions) {
+                                foreach ($conditions as $condition) {
+                                    $innerQuery->orWhere(function($subInnerQuery) use ($condition) {
+                                        $subInnerQuery->where('transaction_code', $condition['transaction_code'])
+                                                      ->where('replace', $condition['replace'])
+                                                      ->where('code', $condition['code']);
+                                    });
+                                }
+                            });
+                        }
                     
                         if($request->start_date && $request->finish_date) {
                             $query->whereDate('date', '>=', $request->start_date)
@@ -270,7 +302,9 @@ class DocumentTaxController extends Controller
 		$start_date = $request->start_date ? $request->start_date : ''   ;
         $finish_date = $request->finish_date ? $request->finish_date : '';
         $search = $request->search ? $request->search : '';
-		return Excel::download(new ExportDocumentTaxTable($start_date,$finish_date,$search),'faktur_pajak'.uniqid().'.xlsx');
+        $multiple = $request->multiple ? $request->multiple : '';
+
+		return Excel::download(new ExportDocumentTaxTable($start_date,$finish_date,$search,$multiple),'faktur_pajak'.uniqid().'.xlsx');
     }
 
     public function store_w_barcode(Request $request){

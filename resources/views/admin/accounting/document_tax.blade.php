@@ -95,6 +95,15 @@
                                             </div>
                                            
                                         </div>
+                                        <div class="col m10 s6 ">
+                                            <label for="textarea_multiple">Multiple Find (,)</label>
+                                            <div class="input-field col s12">
+                                                <textarea type="text" id="textarea_multiple" name="textarea_multiple" class="materialize-textarea" onchange="loadDataTable()"></textarea>
+                                            </div>
+                                        </div>
+                                        {{-- <div class="col m12 s6 ">
+                                            <a class="waves-effect waves-light btn-small"><i class="material-icons left">cloud</i>button</a>
+                                        </div> --}}
                                     </div>
                                 </div>
                             </div>
@@ -315,6 +324,7 @@
                 data: {
                     start_date : $('#start-date').val(),
                     finish_date : $('#finish-date').val(),
+                    multiple : $('#textarea_multiple').val(),
                 },
                 beforeSend: function() {
                     loadingOpen('#datatable_serverside');
@@ -445,7 +455,8 @@
         var endDate = $('#finish-date').val();
         var startDate = $('#start-date').val();
         var search = window.table.search();
-        window.location = "{{ Request::url() }}/export_data_table?start_date=" + startDate+ "&finish_date=" + endDate + "&search=" + search; 
+        var multiple = $('#textarea_multiple').val();
+        window.location = "{{ Request::url() }}/export_data_table?start_date=" + startDate+ "&finish_date=" + endDate + "&search=" + search + "&multiple=" + multiple; 
     }
 
 

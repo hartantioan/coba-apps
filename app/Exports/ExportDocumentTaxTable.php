@@ -14,18 +14,40 @@ use Maatwebsite\Excel\Concerns\FromView;
 
 class ExportDocumentTaxTable implements WithMultipleSheets,ShouldAutoSize
 {
-    protected $start_date,$finish_date,$search;
-    public function __construct(string $start_date,string $finish_date,string $search)
+    protected $start_date,$finish_date,$search,$multiple;
+    public function __construct(string $start_date,string $finish_date,string $search,string $multiple)
     {
         $this->start_date = $start_date ? $start_date : '';
         $this->finish_date = $finish_date ? $finish_date : '';
         $this->search = $search ? $search : '';
+        $this->multiple = $multiple ? $multiple : '';
        
     }
 
     public function sheets(): array
     {
-        $taxes = DocumentTax::where(function($query){
+        $conditions = [];
+        if($this->multiple){
+            $codes = explode(',', $this->multiple);
+
+            // Initialize an array to store the conditions
+            
+
+            foreach ($codes as $code) {
+                // Extract parts of the code
+                $transactionCode = substr($code, 0, 2);
+                $replace = substr($code, 2, 1);
+                $documentCode = substr($code, 3);
+
+                // Add conditions to the array
+                $conditions[] = [
+                    'transaction_code' => $transactionCode,
+                    'replace' => $replace,
+                    'code' => $documentCode,
+                ];
+            }
+        }
+        $taxes = DocumentTax::where(function($query) use ($conditions){
             if($this->start_date && $this->finish_date) {
                 $query->whereDate('date', '>=', $this->start_date)
                     ->whereDate('date', '<=', $this->finish_date);
@@ -43,6 +65,17 @@ class ExportDocumentTaxTable implements WithMultipleSheets,ShouldAutoSize
                     ->orWhere('npwp_target_name', 'like', "%$this->search%")
                     ->orWhere('total', 'like', "%$this->search%")
                     ->orWhere('tax', 'like', "%$this->search%");
+            }
+            if($this->multiple){
+                $query->where(function($innerQuery) use ($conditions) {
+                    foreach ($conditions as $condition) {
+                        $innerQuery->orWhere(function($subInnerQuery) use ($condition) {
+                            $subInnerQuery->where('transaction_code', $condition['transaction_code'])
+                                          ->where('replace', $condition['replace'])
+                                          ->where('code', $condition['code']);
+                        });
+                    }
+                });
             }
 
         })->get();

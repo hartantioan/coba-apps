@@ -44,6 +44,7 @@ use App\Helpers\CustomHelper;
 use App\Exports\ExportGoodReturnPO;
 use App\Models\ItemSerial;
 use App\Models\Menu;
+use App\Models\MenuUser;
 
 class GoodReturnPOController extends Controller
 {
@@ -60,6 +61,7 @@ class GoodReturnPOController extends Controller
     {
         $lastSegment = request()->segment(count(request()->segments()));
         $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
             'title'     => 'Pengembalian Barang PO',
             'content'   => 'admin.inventory.good_return_po',
@@ -69,7 +71,8 @@ class GoodReturnPOController extends Controller
             'maxDate'   => $request->get('maxDate'),
             'newcode'   => $menu->document_code.date('y'),
             'place'     => Place::whereIn('id',$this->dataplaces)->where('status','1')->get(),
-            'menucode'  => $menu->document_code
+            'menucode'  => $menu->document_code,
+            'modedata'  => $menuUser->mode ? $menuUser->mode : '',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -92,7 +95,12 @@ class GoodReturnPOController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = GoodReturnPO::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
+        $total_data = GoodReturnPO::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+        ->where(function($query)use($request){
+            if(!$request->modedata){
+                $query->where('user_id',session('bo_id'));
+            }
+        })->count();
         
         $query_data = GoodReturnPO::where(function($query) use ($search, $request) {
                 if($search) {
@@ -123,6 +131,10 @@ class GoodReturnPOController extends Controller
 
                 if($request->status){
                     $query->whereIn('status', $request->status);
+                }
+
+                if(!$request->modedata){
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
@@ -160,6 +172,10 @@ class GoodReturnPOController extends Controller
 
                 if($request->status){
                     $query->whereIn('status', $request->status);
+                }
+
+                if(!$request->modedata){
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")

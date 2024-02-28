@@ -55,6 +55,7 @@ use App\Models\ItemSerial;
 use App\Models\Line;
 use App\Models\Machine;
 use App\Models\Menu;
+use App\Models\MenuUser;
 
 class GoodIssueController extends Controller
 {
@@ -72,7 +73,7 @@ class GoodIssueController extends Controller
     {
         $lastSegment = request()->segment(count(request()->segments()));
         $menu = Menu::where('url', $lastSegment)->first();
-
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
 
         $data = [
             'title'     => 'Barang Keluar',
@@ -88,6 +89,7 @@ class GoodIssueController extends Controller
             'line'      => Line::where('status','1')->get(),
             'machine'   => Machine::where('status','1')->orderBy('name')->get(),
             'coa_cost'  => InventoryCoa::where('status','1')->where('type','1')->get(),
+            'modedata'  => $menuUser->mode ? $menuUser->mode : '',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -1580,7 +1582,11 @@ class GoodIssueController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = GoodIssue::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */count();
+        $total_data = GoodIssue::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */where(function($query)use($request){
+            if(!$request->modedata){
+                $query->where('user_id',session('bo_id'));
+            }
+        })->count();
         
         $query_data = GoodIssue::where(function($query) use ($search, $request) {
                 if($search) {
@@ -1613,6 +1619,10 @@ class GoodIssueController extends Controller
 
                 if($request->status){
                     $query->whereIn('status', $request->status);
+                }
+
+                if(!$request->modedata){
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
@@ -1652,6 +1662,10 @@ class GoodIssueController extends Controller
 
                 if($request->status){
                     $query->whereIn('status', $request->status);
+                }
+
+                if(!$request->modedata){
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */

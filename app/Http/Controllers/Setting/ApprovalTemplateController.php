@@ -137,7 +137,7 @@ class ApprovalTemplateController extends Controller
     public function create(Request $request){
         if($request->is_check_nominal || $request->is_check_benchmark){
             $validation = Validator::make($request->all(), [
-                'code' 				    => $request->temp ? ['required', Rule::unique('approval_templates', 'code')->ignore($request->temp)] : ['required', Rule::unique('approval_templates', 'code')->withoutTrashed()],
+                'code' 				    => $request->temp ? ['required', Rule::unique('approval_templates', 'code')->ignore($request->temp)->withoutTrashed()] : ['required', Rule::unique('approval_templates', 'code')->withoutTrashed()],
                 'name'                  => 'required',
                 /* 'is_check_nominal'      => 'required', */
                 'item_group'            => $request->is_check_benchmark ? 'required' : '',

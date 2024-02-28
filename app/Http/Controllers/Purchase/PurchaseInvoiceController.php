@@ -400,7 +400,7 @@ class PurchaseInvoiceController extends Controller
             }elseif($row == 'purchase_orders'){
                 $datapo = PurchaseOrder::find(intval($request->arr_id[$key]));
                 foreach($datapo->purchaseOrderDetail as $rowdetail){
-                    if($rowdetail->balanceInvoice() > 0){
+                    if($rowdetail->balanceInvoice() > 0 || $rowdetail->balanceInvoice() < 0){
                         $arrTotal = $rowdetail->getArrayTotal();
                         $details[] = [
                             'type'          => 'purchase_order_details',
@@ -449,6 +449,7 @@ class PurchaseInvoiceController extends Controller
                             'cut_date'      => $datapo->cut_date ?? '',
                             'spk_no'        => $datapo->spk_no ?? '',
                             'invoice_no'    => $datapo->invoice_no ?? '',
+                            'header_note'   => $datapo->note,
                         ];
                     }
                 }
@@ -512,6 +513,7 @@ class PurchaseInvoiceController extends Controller
                             'cut_date'      => '',
                             'spk_no'        => '',
                             'invoice_no'    => '',
+                            'header_note'   => $datagr->note,
                         ];
                     }
                 }
@@ -567,6 +569,7 @@ class PurchaseInvoiceController extends Controller
                             'cut_date'      => '',
                             'spk_no'        => '',
                             'invoice_no'    => '',
+                            'header_note'   => $datalc->note,
                         ];
                     }
                 }
@@ -949,7 +952,7 @@ class PurchaseInvoiceController extends Controller
                         ]);
                     }
 
-                    if(in_array($query->status,['1','6'])){
+                    if(in_array($query->status,['1','2','6'])){
 
                         if($request->has('document')) {
                             if($query->document){

@@ -1779,6 +1779,8 @@
                                 $('#account_no').val(val.no_account);
                                 $('#account_bank').val(val.bank_account);
                                 $('#account_name').val(val.name_account);
+
+                                $('#note').val(val.remark);
                             });
                             
                         }else{

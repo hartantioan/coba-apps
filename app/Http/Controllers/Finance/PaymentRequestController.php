@@ -929,8 +929,8 @@ class PaymentRequestController extends Controller
 			}
 			
 			if($query) {
-                DB::beginTransaction();
-                try {
+                /* DB::beginTransaction();
+                try { */
 
                     if($request->arr_coa_cost){
                         foreach($request->arr_coa_cost as $key => $row){
@@ -1002,10 +1002,10 @@ class PaymentRequestController extends Controller
                         }
                     }
 
-                    DB::commit();
+                    /* DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
-                }
+                } */
 
                 CustomHelper::sendApproval('payment_requests',$query->id,$query->note);
                 CustomHelper::sendNotification('payment_requests',$query->id,'Payment Request No. '.$query->code,$query->note,session('bo_id'));

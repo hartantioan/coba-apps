@@ -108,6 +108,10 @@ class PurchaseDownPayment extends Model
         return $this->belongsTo('App\Models\User','account_id','id')->withTrashed();
     }
 
+    public function account(){
+        return $this->belongsTo('App\Models\User','account_id','id')->withTrashed();
+    }
+
     public function isIncludeTax(){
         $type = match ($this->is_include_tax) {
           '1' => 'Termasuk',

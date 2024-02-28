@@ -46,6 +46,7 @@ class StockMovementController extends Controller
     }
 
     public function filter(Request $request){
+
         $start_time = microtime(true);
         DB::statement("SET SQL_MODE=''");
         if($request->type == 'final'){
@@ -57,6 +58,10 @@ class StockMovementController extends Controller
                     ->groupBy('item_id');
             })
             ->where(function($query) use ( $request) {
+                $query->whereHas('item',function($query){
+                    $query->where('status',1);
+                });
+
                if($request->finish_date) {
                    
                     $query->whereDate('date','<', $request->finish_date);
@@ -89,6 +94,9 @@ class StockMovementController extends Controller
         }else{
             $perlu = 1;
             $query_data = ItemCogs::where(function($query) use ( $request) {
+                $query->whereHas('item',function($query){
+                    $query->where('status',1);
+                });
                 if($request->start_date && $request->finish_date) {
                     $query->whereDate('date', '>=', $request->start_date)
                         ->whereDate('date', '<=', $request->finish_date);

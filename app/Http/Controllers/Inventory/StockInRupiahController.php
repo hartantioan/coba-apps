@@ -53,7 +53,10 @@ class StockInRupiahController extends Controller
                     ->groupBy('item_id');
             })
             ->where(function($query) use ( $request) {
-               if($request->finish_date) {
+                $query->whereHas('item',function($query) use($request){
+                    $query->where('status',1);
+                });
+                if($request->finish_date) {
                    
                     $query->whereDate('date','<', $request->finish_date);
                 }
@@ -85,6 +88,9 @@ class StockInRupiahController extends Controller
         }else{
             $perlu = 1;
             $query_data = ItemCogs::where(function($query) use ( $request) {
+                $query->whereHas('item',function($query) use($request){
+                    $query->where('status',1);
+                });
                 if($request->start_date && $request->finish_date) {
                     $query->whereDate('date', '>=', $request->start_date)
                         ->whereDate('date', '<=', $request->finish_date);

@@ -66,6 +66,8 @@ class StockInQtyController extends Controller
         // })->get();
         $query_data = ItemStock::join('items', 'item_stocks.item_id', '=', 'items.id')
         ->where(function ($query) use ($request) {
+            $query->whereIn('items.status', 1);
+            
             if ($request->item_id) {
                 $query->where('item_stocks.item_id', $request->item_id);
             }

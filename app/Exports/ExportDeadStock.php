@@ -31,6 +31,9 @@ class ExportDeadStock implements FromView,ShouldAutoSize
                 ->groupBy('item_id');
         })
         ->where(function($query){
+            $query->whereHas('item',function($query){
+                $query->where('status',1);
+            });
             if($this->plant != 'all'){
                 $query->where('place_id',$this->plant);
             }

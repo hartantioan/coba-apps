@@ -59,7 +59,9 @@ class MinimumStockController extends Controller
         // ->get();
        
         $query_data = ItemStock::where(function($querys) use ( $request) {
-           
+            $querys->whereHas('item',function($query){
+                $query->where('status',1);
+            });
             if($request->filter_group){
                 
                 $querys->whereHas('item', function ($query) use ($request) {

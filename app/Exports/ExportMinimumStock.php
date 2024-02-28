@@ -29,6 +29,9 @@ class ExportMinimumStock implements FromView,ShouldAutoSize
     public function view(): View
     {
         $query_data = ItemStock::where(function($querys){
+            $querys->whereHas('item',function($query){
+                $query->where('status',1);
+            });
             if($this->item_id != 'null'){
 
                 $querys->where('id',$this->item_id);

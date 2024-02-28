@@ -51,6 +51,9 @@ class DeadStockController extends Controller
                 ->groupBy('item_id');
         })
         ->where(function($query)use($request){
+            $query->whereHas('item',function($query){
+                $query->where('status',1);
+            });
             if($request->plant != 'all'){
                 $query->where('place_id',$request->plant);
             }

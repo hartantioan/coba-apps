@@ -203,7 +203,7 @@
                                 Lampiran
                             </td>
                             <td width="50%">
-                                <a href="{{ $data->attachments() }}">FILE</a>
+                                {!! $data->attachments() !!}
                             </td>
                         </tr>
                     </table>

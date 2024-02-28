@@ -24,7 +24,7 @@ class ExportStockInQty implements FromView,ShouldAutoSize
     {
         $query_data = ItemStock::join('items', 'item_stocks.item_id', '=', 'items.id')
         ->where(function ($query) {
-            $query->whereIn('items.status', 1);
+            $query->where('items.status', 1);
             if ($this->item) {
                 $query->where('item_stocks.item_id', $this->item);
             }

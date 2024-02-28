@@ -117,7 +117,11 @@ class FundRequestController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('required_date', 'like', "%$search%")
-                            ->orWhere('note', 'like', "%$search%");
+                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhereHas('account',function($query) use($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            });
                     });
                 }
                 if($request->start_date && $request->finish_date) {
@@ -149,7 +153,11 @@ class FundRequestController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('required_date', 'like', "%$search%")
-                            ->orWhere('note', 'like', "%$search%");
+                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhereHas('account',function($query) use($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            });
                     });
                 }
                 if($request->start_date && $request->finish_date) {
@@ -770,7 +778,11 @@ class FundRequestController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('required_date', 'like', "%$search%")
-                            ->orWhere('note', 'like', "%$search%");
+                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhereHas('account',function($query) use($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            });
                     });
                 }
 
@@ -790,7 +802,11 @@ class FundRequestController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('required_date', 'like', "%$search%")
-                            ->orWhere('note', 'like', "%$search%");
+                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhereHas('account',function($query) use($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            });
                     });
                 }
 

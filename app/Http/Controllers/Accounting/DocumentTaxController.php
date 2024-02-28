@@ -279,7 +279,7 @@ class DocumentTaxController extends Controller
         $xmlObject = simplexml_load_string($xmlDataString);
        
 
-        $validator = Validator::make(['code' => $xmlObject->nomorFaktur], [
+        $validator = Validator::make(['code' => $xmlObject->kdJenisTransaksi.$xmlObject->fgPengganti.$xmlObject->nomorFaktur], [
             'code' => ['required', Rule::unique('document_taxes','code')->whereNull('deleted_at')],
         ],[
             'code.required'=> 'Kode tidak boleh kosong.',

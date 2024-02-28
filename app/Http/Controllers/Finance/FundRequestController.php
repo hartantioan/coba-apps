@@ -253,12 +253,12 @@ class FundRequestController extends Controller
                     <table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="6">Daftar Item</th>
+                                <th class="center-align" colspan="9">Daftar Item Dokumen '.$data->code.'</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
-                                <th class="center-align">Item</th>
-                                <th class="center-align">Qty</th>
+                                <th class="">Item</th>
+                                <th class="right-align">Qty</th>
                                 <th class="center-align">Satuan</th>
                                 <th class="right-align">Harga Satuan</th>
                                 <th class="right-align">Subtotal</th>
@@ -282,7 +282,14 @@ class FundRequestController extends Controller
             </tr>';
         }
         
-        $string .= '</tbody></table></div>';
+        $string .= '</tbody>
+                        <tfoot>
+                            <tr>
+                                <th class="right-align" colspan="8">Total</th>
+                                <th class="right-align">'.number_format($data->grandtotal,2,',','.').'</th>
+                            </tr>
+                        </tfoot>
+                        </table></div>';
 
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
                         <thead>

@@ -12,9 +12,8 @@ use Maatwebsite\Excel\Events\AfterSheet;
 
 class ExportOutstandingAR implements FromView , WithEvents
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
+    protected $date;
+
     public function __construct(string $date)
     {
         $this->date = $date ? $date : '';

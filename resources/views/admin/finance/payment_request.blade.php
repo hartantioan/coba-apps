@@ -1773,14 +1773,16 @@
                                     select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
                                 }
                                 
-                                $('#currency_id').val(val.currency_id).formSelect();
-                                $('#currency_rate').val(val.currency_rate);
+                                
 
-                                $('#account_no').val(val.no_account);
-                                $('#account_bank').val(val.bank_account);
-                                $('#account_name').val(val.name_account);
-
-                                $('#note').val(val.remark);
+                                if(!$('#temp').val()){
+                                    $('#currency_id').val(val.currency_id).formSelect();
+                                    $('#currency_rate').val(val.currency_rate);
+                                    $('#account_no').val(val.no_account);
+                                    $('#account_bank').val(val.bank_account);
+                                    $('#account_name').val(val.name_account);
+                                    $('#note').val(val.remark);
+                                }
                             });
                             
                         }else{

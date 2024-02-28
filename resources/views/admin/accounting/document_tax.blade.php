@@ -126,6 +126,7 @@
                                                         <th align="center" rowspan="2" style="background-color: navy; color: white;border: 1px solid white;">DPP</th>
                                                         <th align="center" rowspan="2" style="background-color: navy; color: white;border: 1px solid white;">PPN</th>
                                                         <th align="center" rowspan="2" style="background-color: navy; color: white;border: 1px solid white;">Nama Barang</th>
+                                                        <th align="center" rowspan="2" style="background-color: navy; color: white;border: 1px solid white;">Action</th>
                                                     </tr>
                                                     <tr>
                                                         <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Tanggal</th>
@@ -269,36 +270,18 @@
                         $('#barcode-form')[0].reset();
                     }else if(response.status == 422) {
                         $('#barcode-form')[0].reset();
-                        $.each(response.error, function(i, val) {
-                            $('#validation_alert_barcode').show();
-                            $('.modal-content').scrollTop(0);
-                            $('#validation_alert_barcode').append(`
-                                    <div class="card-alert card red">
-                                        <div class="card-content white-text">
-                                            <p>` +val+` </p>
-                                        </div>
-                                        <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                            <span aria-hidden="true">×</span>
-                                        </button>
-                                    </div>
-                            `);
-                        });
-                    }else if(response.status == 432) {
                         $('#validation_alert_barcode').show();
                         $('.modal-content').scrollTop(0);
-                        $('#barcode-form')[0].reset();
-                        $.each(response.error, function(i, val) {
-                            $('#validation_alert_barcode').append(`
-                                    <div class="card-alert card red">
-                                        <div class="card-content white-text">
-                                            <p> ` +val+`</p>
-                                        </div>
-                                        <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                            <span aria-hidden="true">×</span>
-                                        </button>
-                                    </div>
-                                `);
-                        });
+                        $('#validation_alert_barcode').append(`
+                            <div class="card-alert card red">
+                                <div class="card-content white-text">
+                                    <p>` +response.error+` </p>
+                                </div>
+                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                        `);
                     } else {
                         $('#barcode-form')[0].reset();
                         M.toast({
@@ -351,7 +334,7 @@
             columns: [
                         { name: 'id', searchable: false, orderable: false, className: 'center-align' },
                         { name: 'transaction_code', className: 'center-align' },
-                        
+                        { name: 'date', className: 'center-align' },
                         { name: 'date', className: 'center-align' },
                         { name: 'npwp_number', className: 'center-align' },
                         { name: 'npwp_name', className: 'center-align' },

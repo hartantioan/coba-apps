@@ -275,21 +275,39 @@ class DocumentTaxController extends Controller
 
     public function store_w_barcode(Request $request){
         $barcode = $request->input('barcode');
-        $xmlDataString = file_get_contents($barcode);
+        $xmlDataString = @file_get_contents($barcode);
         $xmlObject = simplexml_load_string($xmlDataString);
-       
-
-        $validator = Validator::make(['code' => $xmlObject->kdJenisTransaksi.$xmlObject->fgPengganti.$xmlObject->nomorFaktur], [
-            'code' => ['required', Rule::unique('document_taxes','code')->whereNull('deleted_at')],
-        ],[
-            'code.required'=> 'Kode tidak boleh kosong.',
-            'code.unique'  => 'Kode telah dipakai',
-        ]);
-
-        if ($validator->fails()) {
+        if ($xmlDataString === false) {
+           
             $response = [
                 'status' => 422,
-                'error'  => $validator->errors()
+                'error'  => 'Bukan merupakan barcode yang dimaksud'
+            ];
+            return response()->json($response);
+        }
+
+        $existingRecord = DB::table('document_taxes')
+            ->where('code', $xmlObject->nomorFaktur)
+            ->where('replace', $xmlObject->fgPengganti)
+            ->where('transaction_code', $xmlObject->kdJenisTransaksi)
+            ->first();
+        // $validator = Validator::make(['code' => $xmlObject->kdJenisTransaksi.$xmlObject->fgPengganti.$xmlObject->nomorFaktur],[
+        //     'code' => [
+        //         'required',
+        //         Rule::unique('document_taxes', 'code')->where(function ($query) use ($xmlObject) {
+        //             return $query->where('transaction_code', $xmlObject->transaction_code)
+        //                           ->where('replace', $xmlObject->replace);
+        //         })->whereNull('deleted_at'),]
+        //     ],
+        //     [
+        //     'code.required'=> 'Kode tidak boleh kosong.',
+        //     'code.unique'  => 'Kode telah dipakai',
+        //     ]);
+        
+        if ($existingRecord) {
+            $response = [
+                'status' => 422,
+                'error'  => 'kode sudah pernah diinput'
             ];
             return response()->json($response);
         }else{

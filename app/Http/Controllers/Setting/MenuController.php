@@ -53,19 +53,19 @@ class MenuController extends Controller
             ]);
         } */
 
-        /* $data = [
+        $data = [
             'title'     => 'Menu',
             'menus'     => Menu::whereNull('parent_id')->get(),
             'content'   => 'admin.setting.menu'
         ];
 
-        return view('admin.layouts.index', ['data' => $data]); */
+        return view('admin.layouts.index', ['data' => $data]);
 
-        $data = OutgoingPayment::whereHas('paymentRequest',function($query){
+        /* $data = OutgoingPayment::whereHas('paymentRequest',function($query){
             $query->whereBetween('code',['PREQ-24P1-00000037','PREQ-24P1-00000060']);
         })->get();
 
-        info($data);
+        echo($data); */
 
         /* foreach(MaterialRequestDetail::all() as $row){
             $total = 0;

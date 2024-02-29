@@ -1284,6 +1284,7 @@ class FundRequestController extends Controller
         $fr = FundRequest::where('code',CustomHelper::decrypt($request->id))->first();
         $fr['code_place_id'] = substr($fr->code,7,2);
         $fr['limit_credit'] = number_format(floatval($fr->account->limit_credit - $fr->account->count_limit_credit),2,',','.');
+        $fr['limit_credit_raw'] = floatval($fr->account->limit_credit - $fr->account->count_limit_credit);
         $fr['account_name'] = $fr->account->name;
         $fr['currency_rate'] = number_format($fr->currency_rate,2,',','.');
         $fr['total'] = number_format($fr->total,2,',','.');

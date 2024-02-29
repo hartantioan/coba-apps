@@ -996,6 +996,7 @@
                     <option value="` + response.account_id + `">` + response.account_name + `</option>
                 `);
                 $('#limit').text(response.limit_credit);
+                $('#tempLimit').val(response.limit_credit_raw);
 
                 if(response.details.length > 0){
                     $('.row_item').each(function(){

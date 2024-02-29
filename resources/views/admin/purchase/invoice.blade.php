@@ -556,6 +556,7 @@
                                         <thead>
                                             <tr>
                                                 <th class="center-align">GR/LC/PO No.</th>
+                                                <th class="center-align">Detail Item</th>
                                                 <th class="center-align">Tgl.Post</th>
                                                 <th class="center-align">Grandtotal</th>
                                                 <th class="center-align">Ter-Invoice</th>
@@ -2099,6 +2100,9 @@
                                 <tr data-type="` + val.type + `" data-id="` + val.id + `">
                                     <td>
                                         ` + val.code + `
+                                    </td>
+                                    <td>
+                                        ` + val.list_item + `
                                     </td>
                                     <td class="center">
                                         ` + val.post_date + `

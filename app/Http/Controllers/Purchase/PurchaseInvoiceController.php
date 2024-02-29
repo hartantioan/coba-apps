@@ -334,6 +334,7 @@ class PurchaseInvoiceController extends Controller
                     'invoice'       => number_format($invoice,2,',','.'),
                     'balance'       => $row->currency->symbol.' '.number_format($row->grandtotal - $invoice,2,',','.'),
                     'info'          => $row->note,
+                    'list_item'     => $row->getListItem(),
                 ];
             }
         }
@@ -352,6 +353,7 @@ class PurchaseInvoiceController extends Controller
                     'invoice'       => number_format($invoice,2,',','.'),
                     'balance'       => $row->currency()->symbol.' '.number_format($row->grandtotal - $invoice,2,',','.'),
                     'info'          => $row->note,
+                    'list_item'     => $row->getListItem(),
                 ];
             }
         }
@@ -370,6 +372,7 @@ class PurchaseInvoiceController extends Controller
                     'invoice'       => number_format($invoice,2,',','.'),
                     'balance'       => $row->currency->symbol.' '.number_format($row->grandtotal - $invoice,2,',','.'),
                     'info'          => $row->note,
+                    'list_item'     => $row->getListItem(),
                 ];
             }
         }

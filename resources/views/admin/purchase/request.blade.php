@@ -1757,7 +1757,7 @@
     function countRow(id){
         if($('#arr_item' + id).val()){
             var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")),
-                conversion = parseFloat($('#arr_satuan' + id).find(':selected').data('conversion').toString().replaceAll(".", "").replaceAll(",","."));
+                conversion = parseFloat($('#arr_satuan' + id).find(':selected').data('conversion'));
             let qtyConversion = qty * conversion;
             $('#qty_stock' + id).text(formatRupiahIni(qtyConversion.toFixed(3).toString().replace('.',',')));
         }

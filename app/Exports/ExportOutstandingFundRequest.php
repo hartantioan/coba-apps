@@ -12,7 +12,6 @@ class ExportOutstandingFundRequest implements FromView,ShouldAutoSize
     public function view(): View
     {
         $data = FundRequest::whereIn('status',['2','3'])->get();
-        info($data);
         $array=[];
         foreach($data as $row){
             $entry = [];
@@ -28,8 +27,6 @@ class ExportOutstandingFundRequest implements FromView,ShouldAutoSize
             if($row->balancePaymentRequest()> 0){
                 $array[] = $entry;
             }
-            
-            
         }
         
         

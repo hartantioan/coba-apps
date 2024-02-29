@@ -91,7 +91,7 @@ class FundRequest extends Model
 
     public function hasPaymentRequestDetail(){
         return $this->hasMany('App\Models\PaymentRequestDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('paymentRequest',function($query){
-            $query->whereIn('status',['2','3']);
+            $query->whereIn('status',['1','2','3']);
         });
     }
 
@@ -175,7 +175,7 @@ class FundRequest extends Model
 
     public function closeBillDetail(){
         return $this->hasMany('App\Models\CloseBillDetail','fund_request_id','id')->whereHas('closeBill',function($query){
-            $query->whereIn('status',['2','3']);
+            $query->whereIn('status',['1','2','3']);
         });
     }
 
@@ -183,19 +183,31 @@ class FundRequest extends Model
         $total = $this->grandtotal;
 
         foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest', function($query){
-            $query->whereIn('status',['2','3']);
+            $query->whereIn('status',['1','2','3']);
         })->get() as $row){
-            $total -= $row->nominal;
+            $total -= ($row->nominal + $row->totalWeightAdmin() + $row->totalWeightRounding());
         }
 
-        return $total;
+        return ceil($total);
     }
 
     public function totalPaymentRequest(){
         $total = 0;
 
         foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest', function($query){
-            $query->whereIn('status',['2','3']);
+            $query->whereDoesntHave('outgoingPayment');
+        })->get() as $row){
+            $total += $row->nominal;
+        }
+
+        return $total;
+    }
+
+    public function totalOutgoingPayment(){
+        $total = 0;
+
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest', function($query){
+            $query->whereHas('outgoingPayment');
         })->get() as $row){
             $total += $row->nominal;
         }

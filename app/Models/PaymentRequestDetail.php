@@ -206,4 +206,16 @@ class PaymentRequestDetail extends Model
 
         return $result;
     }
+
+    public function totalWeightAdmin(){
+        $admin = $this->paymentRequest->admin;
+        $newNominal = ($this->nominal / $this->paymentRequest->total) * $admin;
+        return $newNominal;
+    }
+
+    public function totalWeightRounding(){
+        $rounding = $this->paymentRequest->rounding;
+        $newNominal = ($this->nominal / $this->paymentRequest->total) * $rounding;
+        return $newNominal;
+    }
 }

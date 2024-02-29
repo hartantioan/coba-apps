@@ -2879,7 +2879,7 @@
                 disc1 = parseFloat($('#rowDisc1' + id).val().replaceAll(".", "").replaceAll(",",".")), 
                 disc2 = parseFloat($('#rowDisc2' + id).val().replaceAll(".", "").replaceAll(",",".")), 
                 disc3 = parseFloat($('#rowDisc3' + id).val().replaceAll(".", "").replaceAll(",",".")),
-                conversion = $('#arr_item' + id).val() ? parseFloat($('#arr_unit' + id).find(':selected').data('conversion').toString().replaceAll(".", "").replaceAll(",",".")) : 1;
+                conversion = $('#arr_item' + id).val() ? parseFloat($('#arr_unit' + id).find(':selected').data('conversion')) : 1;
 
             if(qtylimit > 0){
                 if(qty > qtylimit){

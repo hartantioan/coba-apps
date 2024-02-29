@@ -126,6 +126,8 @@
                                                         <th rowspan="2">Diterima</th>
                                                         <th rowspan="2">Dipakai</th>
                                                         <th rowspan="2">Sisa</th>
+                                                        <th rowspan="2">Total PYR</th>
+                                                        <th rowspan="2">Total OP</th>
                                                         <th rowspan="2">Lampiran</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Status</th>
@@ -431,6 +433,8 @@
                 { name: 'received', searchable: false, orderable: false, className: 'right-align' },
                 { name: 'used', searchable: false, orderable: false, className: 'right-align' },
                 { name: 'balance', searchable: false, orderable: false, className: 'right-align' },
+                { name: 'total_pyr', searchable: false, orderable: false, className: 'right-align' },
+                { name: 'total_op', searchable: false, orderable: false, className: 'right-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'document_status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },

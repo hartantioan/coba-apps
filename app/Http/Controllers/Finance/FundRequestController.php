@@ -227,6 +227,8 @@ class FundRequestController extends Controller
                     number_format($totalReceivable,2,',','.'),
                     number_format($totalReceivableUsed,2,',','.'),
                     number_format($totalReceivableBalance,2,',','.'),
+                    number_format($val->totalPaymentRequest(),2,',','.'),
+                    number_format($val->totalOutgoingPayment(),2,',','.'),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     '
                         <select class="browser-default" onfocus="updatePrevious(this);" onchange="updateDocumentStatus(`'.CustomHelper::encrypt($val->code).'`,this)" style="width:150px;">

@@ -932,6 +932,10 @@ class CapitalizationController extends Controller
     }
 
     public function viewJournal(Request $request,$id){
+        $total_debit_asli = 0;
+        $total_debit_konversi = 0;
+        $total_kredit_asli = 0;
+        $total_kredit_konversi = 0;
         $query = Capitalization::where('code',CustomHelper::decrypt($id))->first();
         if($query->journal()->exists()){
             $response = [
@@ -952,6 +956,15 @@ class CapitalizationController extends Controller
             })
             ->orderBy('type');
         })->get() as $key => $row){
+                if($row->type == '1'){
+                    $total_debit_asli += $row->nominal_fc;
+                    $total_debit_konversi += $row->nominal;
+                }
+                if($row->type == '2'){
+                    $total_kredit_asli += $row->nominal_fc;
+                    $total_kredit_konversi += $row->nominal;
+                }
+                
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
@@ -969,7 +982,17 @@ class CapitalizationController extends Controller
                     <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
                     <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
                 </tr>';
+
+                
             }
+            $string .= '<tr>
+                    <td class="center-align" colspan="11"> Total </td>
+                    <td class="center-align">'.number_format($total_debit_asli,2,',','.').'</td>
+                    <td class="center-align">'.number_format($total_kredit_asli,2,',','.').'</td>
+                    <td class="center-align">'.number_format($total_debit_konversi,2,',','.').'</td>
+                    <td class="center-align">'.number_format($total_kredit_konversi,2,',','.').'</td>
+                    </tr>
+            ';
             $response["tbody"] = $string; 
         }else{
             $response = [

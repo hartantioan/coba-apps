@@ -2987,6 +2987,10 @@ class LandedCostController extends Controller
     }
 
     public function viewJournal(Request $request,$id){
+        $total_debit_asli = 0;
+        $total_debit_konversi = 0;
+        $total_kredit_asli = 0;
+        $total_kredit_konversi = 0;
         $query = LandedCost::where('code',CustomHelper::decrypt($id))->first();
         if($query->journal()->exists()){
             $response = [

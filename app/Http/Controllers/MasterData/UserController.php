@@ -551,7 +551,7 @@ class UserController extends Controller
             }
 
             if($request->type == '1' || $request->type == '2'){
-                $arrUserAllowedCustomerEmployee = ['323020','323014'];
+                $arrUserAllowedCustomerEmployee = ['323020'];
                 if(in_array(session('bo_employee_no'),$arrUserAllowedCustomerEmployee)){
                     return response()->json([
                         'status'  => 500,

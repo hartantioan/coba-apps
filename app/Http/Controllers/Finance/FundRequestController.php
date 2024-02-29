@@ -229,7 +229,7 @@ class FundRequestController extends Controller
                     number_format($totalReceivableBalance,2,',','.'),
                     number_format($val->totalPaymentRequest(),2,',','.'),
                     number_format($val->totalOutgoingPayment(),2,',','.'),
-                    '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
+                    $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'KOSONG',
                     '
                         <select class="browser-default" onfocus="updatePrevious(this);" onchange="updateDocumentStatus(`'.CustomHelper::encrypt($val->code).'`,this)" style="width:150px;">
                             <option value="1" '.($val->document_status == '1' ? 'selected' : '').'>MENUNGGU</option>

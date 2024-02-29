@@ -42,6 +42,7 @@ use App\Helpers\CustomHelper;
 use App\Exports\ExportFundRequest;
 use App\Exports\ExportOutstandingFundRequest;
 use App\Models\Division;
+use App\Models\MenuUser;
 
 class FundRequestController extends Controller
 {
@@ -58,6 +59,7 @@ class FundRequestController extends Controller
     {
         $lastSegment = request()->segment(count(request()->segments()));
         $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
             'title'         => 'Permohonan Dana',
             'content'       => 'admin.finance.fund_request',
@@ -67,6 +69,7 @@ class FundRequestController extends Controller
             'newcode'       => $menu->document_code.date('y'),
             'menucode'      => $menu->document_code,
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+            'modedata'      => $menuUser->mode ? $menuUser->mode : '',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -109,7 +112,11 @@ class FundRequestController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = FundRequest::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */count();
+        $total_data = FundRequest::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */where(function($query)use($request){
+            if(!$request->modedata){
+                $query->where('user_id',session('bo_id'));
+            }
+        })->count();
         
         $query_data = FundRequest::where(function($query) use ($search, $request) {
                 if($search) {
@@ -139,6 +146,10 @@ class FundRequestController extends Controller
 
                 if($request->document){
                     $query->where('document_status', $request->document);
+                }
+
+                if(!$request->modedata){
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
@@ -175,6 +186,10 @@ class FundRequestController extends Controller
 
                 if($request->document){
                     $query->where('document_status', $request->document);
+                }
+
+                if(!$request->modedata){
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */

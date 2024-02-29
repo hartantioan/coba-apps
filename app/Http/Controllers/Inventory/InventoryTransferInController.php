@@ -28,6 +28,7 @@ use App\Helpers\CustomHelper;
 use App\Exports\ExportInventoryTransferIn;
 use App\Models\ItemSerial;
 use App\Models\Menu;
+use App\Models\MenuUser;
 
 class InventoryTransferInController extends Controller
 {
@@ -44,6 +45,7 @@ class InventoryTransferInController extends Controller
     {
         $lastSegment = request()->segment(count(request()->segments()));
         $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
             'title'     => 'Transfer Antar Gudang - Masuk',
             'content'   => 'admin.inventory.transfer_in',
@@ -52,7 +54,8 @@ class InventoryTransferInController extends Controller
             'maxDate'   => $request->get('maxDate'),
             'newcode'   => $menu->document_code.date('y'),
             'place'     => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
-            'menucode'  => $menu->document_code
+            'menucode'  => $menu->document_code,
+            'modedata'  => $menuUser->mode ? $menuUser->mode : '',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -128,6 +131,11 @@ class InventoryTransferInController extends Controller
                 /* $query->whereIn('place_to',$this->dataplaces)
                     ->whereIn('warehouse_to',$this->datawarehouses); */
             });
+        })
+        ->where(function($query)use($request){
+            if(!$request->modedata){
+                $query->where('user_id',session('bo_id'));
+            }
         })->count();
         
         $query_data = InventoryTransferIn::where(function($query) use ($search, $request) {
@@ -152,6 +160,10 @@ class InventoryTransferInController extends Controller
 
                 if($request->status){
                     $query->whereIn('status', $request->status);
+                }
+
+                if(!$request->modedata){
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             ->whereHas('inventoryTransferOut',function($query){
@@ -193,6 +205,10 @@ class InventoryTransferInController extends Controller
 
                 if($request->status){
                     $query->whereIn('status', $request->status);
+                }
+
+                if(!$request->modedata){
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             ->whereHas('inventoryTransferOut',function($query){

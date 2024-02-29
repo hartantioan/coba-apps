@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Helpers\CustomHelper;
 use App\Models\Line;
 use App\Models\Machine;
+use App\Models\MenuUser;
 use App\Models\Warehouse;
 
 class CapitalizationController extends Controller
@@ -46,6 +47,7 @@ class CapitalizationController extends Controller
     {
         $lastSegment = request()->segment(count(request()->segments()));
         $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
             'title'         => 'Kapitalisasi Aset',
             'content'       => 'admin.accounting.capitalization',
@@ -60,6 +62,7 @@ class CapitalizationController extends Controller
             'line'          => Line::where('status','1')->get(),
             'machine'       => Machine::where('status','1')->get(),
             'warehouse'     => Warehouse::where('status','1')->whereIn('id',$this->datawarehouses)->get(),
+            'modedata'      => $menuUser->mode ? $menuUser->mode : '',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -89,7 +92,12 @@ class CapitalizationController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = Capitalization::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
+        $total_data = Capitalization::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+        ->where(function($query)use($request){
+            if(!$request->modedata){
+                $query->where('user_id',session('bo_id'));
+            }
+        })->count();
         
         $query_data = Capitalization::where(function($query) use ($search, $request) {
                 if($search) {
@@ -112,6 +120,10 @@ class CapitalizationController extends Controller
                 
                 if($request->status){
                     $query->whereIn('status', $request->status);
+                }
+
+                if(!$request->modedata){
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
@@ -142,6 +154,10 @@ class CapitalizationController extends Controller
 
                 if($request->status){
                     $query->whereIn('status', $request->status);
+                }
+
+                if(!$request->modedata){
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")

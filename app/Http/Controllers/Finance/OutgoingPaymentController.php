@@ -33,6 +33,7 @@ use App\Models\Currency;
 use App\Models\Menu;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportOutgoingPayment;
+use App\Models\MenuUser;
 use App\Models\Place;
 
 class OutgoingPaymentController extends Controller
@@ -50,6 +51,7 @@ class OutgoingPaymentController extends Controller
     {
         $lastSegment = request()->segment(count(request()->segments()));
         $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
             'title'         => 'Outgoing Payment',
             'content'       => 'admin.finance.outgoing_payment',
@@ -59,6 +61,7 @@ class OutgoingPaymentController extends Controller
             'newcode'       => $menu->document_code.date('y'),
             'menucode'      => $menu->document_code,
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+            'modedata'      => $menuUser->mode ? $menuUser->mode : '',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -89,7 +92,11 @@ class OutgoingPaymentController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = OutgoingPayment::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */count();
+        $total_data = OutgoingPayment::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */where(function($query)use($request){
+            if(!$request->modedata){
+                $query->where('user_id',session('bo_id'));
+            }
+        })->count();
         
         $query_data = OutgoingPayment::where(function($query) use ($search, $request) {
                 if($search) {
@@ -134,6 +141,10 @@ class OutgoingPaymentController extends Controller
 
                 if($request->company_id){
                     $query->where('company_id',$request->company_id);
+                }
+
+                if(!$request->modedata){
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
@@ -185,6 +196,10 @@ class OutgoingPaymentController extends Controller
 
                 if($request->company_id){
                     $query->where('company_id',$request->company_id);
+                }
+
+                if(!$request->modedata){
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */

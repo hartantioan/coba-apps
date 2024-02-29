@@ -346,9 +346,9 @@
                             @foreach($data->purchaseInvoiceDetail as $key => $row)
                             <tr>
                                 <td class="center-align" style="text-align: center;">{{ ($key + 1) }}</td>
-                                <td class="center-align">{{ 
-                                    $row->getCode()
-                                }}</td>
+                                <td class="center-align">{!! 
+                                    $row->getCode().'<br>'.$row->getHeaderCode()
+                                !!}</td>
                                 <td class="">{{ $row->note }}</td>
                                 <td class="">{{ $row->note2 }}</td>
                                 <td class="right-align" style="text-align: right;">{{ number_format($row->total,2,',','.') }}</td>

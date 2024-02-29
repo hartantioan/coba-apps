@@ -132,6 +132,16 @@ class MaterialRequest extends Model
     public function hasChildDocument(){
         $hasRelation = false;
 
+        foreach($this->materialRequestDetail as $row){
+            if($row->purchaseRequestDetail()->exists()){
+                $hasRelation = true;
+            }
+
+            if($row->goodIssueDetail()->exists()){
+                $hasRelation = true;
+            }
+        }
+
         return $hasRelation;
     }
 

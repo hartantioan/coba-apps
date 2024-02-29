@@ -498,31 +498,14 @@ class MaterialRequestController extends Controller
                 try {
                     $query = MaterialRequest::where('code',CustomHelper::decrypt($request->temp))->first();
 
-                    $approved = false;
-                    $revised = false;
-
-                    if($query->approval()){
-                        foreach ($query->approval() as $detail){
-                            foreach($detail->approvalMatrix as $row){
-                                if($row->approved){
-                                    $approved = true;
-                                }
-
-                                if($row->revised){
-                                    $revised = true;
-                                }
-                            }
-                        }
-                    }
-
-                    if($approved && !$revised){
+                    if($query->hasChildDocument()){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Item Request telah diapprove, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Item Request telah dipakai pada dokumen lain, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
 
-                    if(in_array($query->status,['1','6'])){
+                    if(in_array($query->status,['1','2','6'])){
                         $query->user_id = session('bo_id');
                         $query->code = $request->code;
                         $query->post_date = $request->post_date;

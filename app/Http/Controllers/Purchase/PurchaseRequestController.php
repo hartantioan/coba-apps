@@ -573,31 +573,14 @@ class PurchaseRequestController extends Controller
                 try {
                     $query = PurchaseRequest::where('code',CustomHelper::decrypt($request->temp))->first();
 
-                    $approved = false;
-                    $revised = false;
-
-                    if($query->approval()){
-                        foreach ($query->approval() as $detail){
-                            foreach($detail->approvalMatrix as $row){
-                                if($row->approved){
-                                    $approved = true;
-                                }
-
-                                if($row->revised){
-                                    $revised = true;
-                                }
-                            }
-                        }
-                    }
-
-                    if($approved && !$revised){
+                    if($query->hasChildDocument()){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Purchase Request telah diapprove, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Purchase Request telah dipakai pada dokumen lain, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
 
-                    if(in_array($query->status,['1','6'])){
+                    if(in_array($query->status,['1','2','6'])){
                         if($request->has('file')) {
                             if($query->document){
                                 if(Storage::exists($query->document)){

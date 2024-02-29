@@ -742,7 +742,7 @@ class PurchaseOrderController extends Controller
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status purchase order sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+					        'message' => 'Status purchase order sudah SELESAI, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                 }catch(\Exception $e){

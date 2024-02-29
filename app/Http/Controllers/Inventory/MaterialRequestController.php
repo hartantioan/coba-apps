@@ -522,7 +522,7 @@ class MaterialRequestController extends Controller
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status Item Request sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+					        'message' => 'Status Item Request sudah SELESAI, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                 }catch(\Exception $e){

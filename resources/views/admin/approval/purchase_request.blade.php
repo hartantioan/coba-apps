@@ -164,13 +164,13 @@
                         Posisi
                     </div>
                     <div class="col s9">
-                        {{ $data->user->position->Level->name }}
+                        {{ $data->user->position_id ? $data->user->position->Level->name : '-' }}
                     </div>
                     <div class="col s3">
                         Depart.
                     </div>
                     <div class="col s9">
-                        {{ $data->user->position->division->name }}
+                        {{ $data->user->position_id ? $data->user->position->division->name : '-' }}
                     </div>
                     <div class="col s3">
                         HP

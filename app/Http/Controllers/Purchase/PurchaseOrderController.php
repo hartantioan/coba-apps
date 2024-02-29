@@ -664,32 +664,15 @@ class PurchaseOrderController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = PurchaseOrder::where('code',CustomHelper::decrypt($request->temp))->first();
-
-                    /* $approved = false;
-                    $revised = false;
-
-                    if($query->approval()){
-                        foreach ($query->approval() as $detail){
-                            foreach($detail->approvalMatrix as $row){
-                                if($row->approved){
-                                    $approved = true;
-                                }
-
-                                if($row->revised){
-                                    $revised = true;
-                                }
-                            }
-                        }
-                    }
-
-                    if($approved && !$revised){
+            
+                    if($query->hasChildDocument()){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Purchase Order telah diapprove, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Purchase Order telah digunakan di dokumen lain, anda tidak bisa melakukan perubahan.'
                         ]);
-                    } */
+                    }
 
-                    if(in_array($query->status,['1','6'])){
+                    if(in_array($query->status,['1','2','6'])){
 
                         if($request->has('file')) {
 

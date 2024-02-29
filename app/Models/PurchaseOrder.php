@@ -163,6 +163,13 @@ class PurchaseOrder extends Model
         return $this->hasMany('App\Models\PurchaseOrderDetail');
     }
 
+    public function purchaseDownPaymentDetail()
+    {
+        return $this->hasMany('App\Models\PurchaseDownPaymentDetail','purchase_order_id','id')->whereHas('purchaseDownPayment',function($query){
+            $query->whereIn('status',['1','2','3']);
+        });
+    }
+
     public function details()
     {
         return $this->hasMany('App\Models\PurchaseOrderDetail');
@@ -342,6 +349,14 @@ class PurchaseOrder extends Model
             if($row->goodReceiptDetail()->exists()){
                 $hasRelation = true;
             }
+
+            if($row->purchaseInvoiceDetail()->exists()){
+                $hasRelation = true;
+            }
+        }
+
+        if($this->purchaseDownPaymentDetail()->exists()){
+            $hasRelation = true;
         }
 
         return $hasRelation;

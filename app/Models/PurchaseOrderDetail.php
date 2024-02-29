@@ -133,7 +133,7 @@ class PurchaseOrderDetail extends Model
 
     public function goodReceiptDetail(){
         return $this->hasMany('App\Models\GoodReceiptDetail','purchase_order_detail_id','id')->whereHas('goodReceipt',function($query){
-            $query->whereIn('status',['2','3']);
+            $query->whereIn('status',['1','2','3']);
         });
     }
 
@@ -229,7 +229,7 @@ class PurchaseOrderDetail extends Model
     public function purchaseInvoiceDetail()
     {
         return $this->hasMany('App\Models\PurchaseInvoiceDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('purchaseInvoice',function($query){
-            $query->whereIn('status',['2','3']);
+            $query->whereIn('status',['1','2','3']);
         });
     }
 

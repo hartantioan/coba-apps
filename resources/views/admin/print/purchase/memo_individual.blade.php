@@ -216,7 +216,7 @@
                                             Posisi
                                         </td>
                                         <td width="60%">
-                                            {{ $data->user->position->Level->name }}
+                                            {{ $data->user->position_id ? $data->user->position->Level->name : '-' }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -224,7 +224,7 @@
                                             Depart.
                                         </td>
                                         <td width="60%">
-                                            {{ $data->user->position->division->name }}
+                                            {{ $data->user->position_id ? $data->user->position->division->name : '-' }}
                                         </td>
                                     </tr>
                                 </table>

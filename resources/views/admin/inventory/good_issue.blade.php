@@ -852,10 +852,10 @@
                                         -
                                     </td>
                                     <td>
-                                        <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 1..." value="Untuk ` + val.place_name + ` ` + val.warehouse_name + `">
+                                        <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 1..." value="Untuk ` + val.note + `">
                                     </td>
                                     <td>
-                                        <input name="arr_note2[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 2..." value="-">
+                                        <input name="arr_note2[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 2..." value="` + val.note2 + `">
                                     </td>
                                     <td class="center">
                                         <select class="browser-default" id="arr_inventory_coa` + count + `" name="arr_inventory_coa[]" onchange="applyLock('` + count + `');"></select>

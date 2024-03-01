@@ -195,7 +195,6 @@
                         <th class="center-align">Req.</th>
                         <th class="center-align">Stok</th>
                         <th class="center-align">Sat.</th>
-                        <th class="center-align">Nilai Barang</th>
                         <th class="center-align">Tgl.Dipakai</th>
                         <th class="center-align">Plant</th>
                         <th class="center-align">Gudang</th>
@@ -207,9 +206,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @php
-                        $total = 0;
-                    @endphp
                     @foreach($data->materialRequestDetail as $key => $row)
                     <tr>
                         <td class="center-align">
@@ -226,7 +222,6 @@
                         <td class="right-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                         <td class="right-align">{{ number_format($row->getStockNow($row->qty_conversion),3,',','.') }}</td>
                         <td class="center-align">{{ $row->itemUnit->unit->code }}</td>
-                        <td class="right-align">{{ number_format($row->total,2,',','.') }}</td>
                         <td class="indigo-text center-align">{{ date('d/m/Y',strtotime($row->required_date)) }}</td>
                         <td class="center-align">{{ $row->place->code }}</td>
                         <td class="center-align">{{ $row->warehouse->name }}</td>
@@ -242,9 +237,6 @@
                     <tr>
                         <td colspan="14">Keterangan 2 : {{ $row->note2 }}</td>
                     </tr>
-                    @php
-                        $total += $row->total;
-                    @endphp
                     @endforeach
                 </tbody>
             </table>
@@ -258,9 +250,6 @@
                 </div>
                 <div class="col m4 s12 l4">
                     Catatan : {{ $data->note }}
-                </div>
-                <div class="col m4 s12 l4 right-align">
-                    <h6>TOTAL NILAI BARANG : {{ number_format($total,2,',','.') }}</h6>
                 </div>
             </div>
             <table class="mt-3" width="100%" border="0">

@@ -3374,6 +3374,7 @@ class Select2Controller extends Controller {
                             'qty'           => number_format($row->qty * $row->qty_conversion,3,',','.'),
                             'unit'          => $row->item->uomUnit->code,
                             'note'          => $row->note ? $row->note : '',
+                            'note2'         => $row->note2 ? $row->note2 : '',
                             'date'          => $row->required_date,
                             'place_id'      => $row->place_id,
                             'place_name'    => $row->place->code,

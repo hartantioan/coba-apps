@@ -1464,7 +1464,7 @@ class CustomHelper {
 				'currency_id'	=> $op->currency_id,
 				'currency_rate'	=> $op->currency_rate,
 				'post_date'		=> $op->pay_date,
-				'note'			=> $op->code,
+				'note'			=> $op->note,
 				'status'		=> '3'
 			]);
 
@@ -3201,7 +3201,7 @@ class CustomHelper {
 				'currency_id'	=> isset($data->currency_id) ? $data->currency_id : NULL,
 				'currency_rate'	=> isset($data->currency_rate) ? $data->currency_rate : NULL,
 				'post_date'		=> $data->post_date,
-				'note'			=> $data->code,
+				'note'			=> $data->note,
 				'status'		=> '3'
 			]);
 

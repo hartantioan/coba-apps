@@ -493,18 +493,19 @@ class GoodIssueRequestController extends Controller
         } else {
 
 			if($request->temp){
-                /* DB::beginTransaction();
-                try { */
+                DB::beginTransaction();
+                try {
                     $query = GoodIssueRequest::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     if($query->hasChildDocument()){
+                        info('kambing');
                         return response()->json([
                             'status'  => 500,
                             'message' => 'Good Issue Request telah dipakai pada dokumen lain, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
 
-                    if(in_array($query->status,['1','2','6'])){
+                    /* if(in_array($query->status,['1','2','6'])){
                         $query->user_id = session('bo_id');
                         $query->code = $request->code;
                         $query->post_date = $request->post_date;
@@ -517,16 +518,16 @@ class GoodIssueRequestController extends Controller
                             $row->delete();
                         }
 
-                        /* DB::commit(); */
+                        DB::commit();
                     }else{
                         return response()->json([
                             'status'  => 500,
 					        'message' => 'Status Good Issue Request sudah SELESAI, anda tidak bisa melakukan perubahan.'
                         ]);
-                    }
-                /* }catch(\Exception $e){
+                    } */
+                }catch(\Exception $e){
                     DB::rollback();
-                } */
+                }
 			}else{
                 DB::beginTransaction();
                 try {
@@ -552,7 +553,7 @@ class GoodIssueRequestController extends Controller
 			if($query) {
 
                 /* DB::beginTransaction();
-                try { */
+                try {
                     $grandtotal = 0;
                     foreach($request->arr_item as $key => $row){
                         $item = Item::find(intval($row));
@@ -585,7 +586,7 @@ class GoodIssueRequestController extends Controller
                     GoodIssueRequest::find($query->id)->update([
                         'grandtotal'    => $grandtotal,
                     ]);
-                    /* DB::commit();
+                    DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
                 } */

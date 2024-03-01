@@ -410,6 +410,17 @@
                         passed = false;
                     }
                 }
+                if($('input[name^="arr_status_good_issue_request[]"]').length > 0){
+                    $('input[name^="arr_status_good_issue_request[]"]').each(function(index){
+                        if($(this).is(':checked')){
+                            formData.append('arr_status_good_issue_request[]',$(this).val());
+                            countChecked++;
+                        }
+                    });
+                    if(countChecked == 0){
+                        passed = false;
+                    }
+                }
                 if(passed){
                     $.ajax({
                         url: '{{ Request::url() }}/approve',

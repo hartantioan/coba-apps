@@ -1758,6 +1758,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('print_by_range',[GoodIssueRequestController::class, 'printByRange']);
                     Route::post('send_used_data',[GoodIssueRequestController::class, 'sendUsedData']);
                     Route::post('remove_used_data', [GoodIssueRequestController::class, 'removeUsedData']);
+                    Route::get('get_outstanding', [GoodIssueRequestController::class, 'getOutstanding']);
                     Route::get('print_individual/{id}',[GoodIssueRequestController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('export',[GoodIssueRequestController::class, 'export']);
                     Route::get('viewstructuretree',[GoodIssueRequestController::class, 'viewStructureTree']);

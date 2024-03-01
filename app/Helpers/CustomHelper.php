@@ -20,6 +20,7 @@ use App\Models\EmployeeLeaveQuotas;
 use App\Models\EmployeeSchedule;
 use App\Models\EmployeeTransfer;
 use App\Models\GoodIssue;
+use App\Models\GoodIssueRequest;
 use App\Models\GoodReceipt;
 use App\Models\GoodReceiptDetail;
 use App\Models\GoodReceiptMain;
@@ -685,6 +686,13 @@ class CustomHelper {
 				]);
 			}
 
+			if($table_name == 'good_issue_requests'){
+				$mr = GoodIssueRequest::find($table_id);
+				$mr->goodIssueRequestDetail()->update([
+					'status'	=> '1'
+				]);
+			}
+
 			if(isset($data->account_id)){
 				self::sendJournal($table_name,$table_id,$data->account_id);
 			}else{
@@ -1076,8 +1084,8 @@ class CustomHelper {
 			
 		}elseif($table_name == 'material_requests'){
 
+		}elseif($table_name == 'good_issue_requests'){
 
-			
 		}elseif($table_name == 'leave_requests'){
 			$lr = LeaveRequest::find($table_id);
 			$user= $lr->account;

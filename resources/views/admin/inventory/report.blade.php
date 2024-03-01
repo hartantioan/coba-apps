@@ -73,6 +73,9 @@
             if (selectedValue === 'inventory/material_request') {
                 $('#btn_out').show();
             }
+            if (selectedValue === 'inventory/good_issue_request') {
+                $('#btn_out').show();
+            }
             else {
                 $('#btn_out').hide();
             }

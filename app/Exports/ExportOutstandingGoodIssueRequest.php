@@ -35,7 +35,7 @@ class ExportOutstandingGoodIssueRequest implements FromView,ShouldAutoSize
             $entry["plant"] = $row->place->code;
             $entry["ket1"] = $row->note;
             $entry["ket2"] = $row->note2;
-            $entry["satuan"] =$row->itemUnit->unit->code;
+            $entry["satuan"] =$row->item->uomUnit->code;
             $entry["qty"] = number_format($row->qty,3,',','.');
             $entry["qty_gi"] = number_format($row->totalGi(),3,',','.');
             $entry["qty_balance"] = number_format($row->balanceGi(),3,',','.');

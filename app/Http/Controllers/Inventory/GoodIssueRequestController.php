@@ -69,7 +69,7 @@ class GoodIssueRequestController extends Controller
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
             'title'     => 'Good Issue Request',
-            'content'   => 'admin.inventory.request',
+            'content'   => 'admin.inventory.good_issue_request',
             'company'   => Company::where('status','1')->get(),
             'place'     => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'department'=> Division::where('status','1')->orderBy('name')->get(),
@@ -266,7 +266,7 @@ class GoodIssueRequestController extends Controller
                 <td>'.$row->item->code.' - '.$row->item->name.'</td>
                 <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="right-align">'.number_format($row->getStockNow($row->qty_conversion),3,',','.').'</td>
-                <td class="center-align">'.$row->itemUnit->unit->code.'</td>
+                <td class="center-align">'.$row->item->uomUnit->code.'</td>
                 <td class="">'.$row->note.'</td>
                 <td class="">'.$row->note2.'</td>
                 <td class="center-align">'.date('d/m/Y',strtotime($row->required_date)).'</td>
@@ -466,7 +466,6 @@ class GoodIssueRequestController extends Controller
             'company_id'                => 'required',
 			'post_date' 				=> 'required',
             'note'		                => 'required',
-            'arr_satuan'                => 'required|array',
             'arr_item'                  => 'required|array',
             'arr_place'                 => 'required|array',
             'arr_warehouse'             => 'required|array',
@@ -476,8 +475,6 @@ class GoodIssueRequestController extends Controller
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
 			'note.required'				        => 'Keterangan tidak boleh kosong',
-            'arr_satuan.array'                  => 'Satuan harus dalam bentuk array.',
-            'arr_satuan.required'               => 'Satuan tidak boleh kosong',
             'arr_item.array'                    => 'Item harus dalam bentuk array.',
             'arr_place.required'                => 'Penempatan tujuan tidak boleh kosong.',
             'arr_place.array'                   => 'Penempatan tujuan harus dalam bentuk array.',
@@ -497,17 +494,14 @@ class GoodIssueRequestController extends Controller
                 try {
                     $query = GoodIssueRequest::where('code',CustomHelper::decrypt($request->temp))->first();
 
-                    info($query);
-
                     if($query->hasChildDocument()){
-                        info('kambing');
                         return response()->json([
                             'status'  => 500,
                             'message' => 'Good Issue Request telah dipakai pada dokumen lain, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
 
-                    /* if(in_array($query->status,['1','2','6'])){
+                    if(in_array($query->status,['1','2','6'])){
                         $query->user_id = session('bo_id');
                         $query->code = $request->code;
                         $query->post_date = $request->post_date;
@@ -526,7 +520,7 @@ class GoodIssueRequestController extends Controller
                             'status'  => 500,
 					        'message' => 'Status Good Issue Request sudah SELESAI, anda tidak bisa melakukan perubahan.'
                         ]);
-                    } */
+                    }
                 }catch(\Exception $e){
                     DB::rollback();
                 }
@@ -554,24 +548,23 @@ class GoodIssueRequestController extends Controller
 			
 			if($query) {
 
-                /* DB::beginTransaction();
+                DB::beginTransaction();
                 try {
                     $grandtotal = 0;
                     foreach($request->arr_item as $key => $row){
                         $item = Item::find(intval($row));
-                        $itemUnit = ItemUnit::find(intval($request->arr_satuan[$key]));
                         $price = $item->priceNow($request->arr_place[$key],date('Y-m-d'));
-                        $total = $price * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) * $itemUnit->conversion;
+                        $total = $price * str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
                         $grandtotal += $total;
                         $totalQty = ItemStock::where('item_id',$row)->where('place_id',$request->arr_place[$key])->where('warehouse_id',$request->arr_warehouse[$key])->sum('qty');
-                        $purchaseQty = $totalQty > 0 ? $totalQty / $itemUnit->conversion : 0;
+                        $purchaseQty = $totalQty > 0 ? $totalQty : 0;
                         GoodIssueRequestDetail::create([
                             'good_issue_request_id' => $query->id,
                             'item_id'               => $row,
                             'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'stock'                 => $purchaseQty,
-                            'item_unit_id'          => $request->arr_satuan[$key],
-                            'qty_conversion'        => $itemUnit->conversion,
+                            'item_unit_id'          => NULL,
+                            'qty_conversion'        => 1,
                             'note'                  => $request->arr_note[$key],
                             'note2'                 => $request->arr_note2[$key],
                             'required_date'         => $request->arr_required_date[$key],
@@ -591,7 +584,7 @@ class GoodIssueRequestController extends Controller
                     DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
-                } */
+                }
 
                 CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Good Issue Request No. '.$query->code,$query->note,session('bo_id'));
@@ -630,7 +623,6 @@ class GoodIssueRequestController extends Controller
                 'qty'               => number_format($row->qty,3,',','.'),
                 'qty_stock'         => $row->item_id ? number_format($row->qty * $row->qty_conversion,3,',','.') : '-',
                 'unit_stock'        => $row->item_id ? $row->item->uomUnit->code : '-',
-                'item_unit_id'      => $row->item_unit_id,
                 'note'              => $row->note ? $row->note : '',
                 'note2'             => $row->note2 ? $row->note2 : '',
                 'date'              => $row->required_date,

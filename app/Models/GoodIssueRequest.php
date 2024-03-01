@@ -132,7 +132,7 @@ class GoodIssueRequest extends Model
     public function hasChildDocument(){
         $hasRelation = false;
 
-        foreach($this->goodIssueRequestDetail() as $row){
+        foreach($this->goodIssueRequestDetail as $row){
             if($row->goodIssueDetail()->exists()){
                 $hasRelation = true;
             }

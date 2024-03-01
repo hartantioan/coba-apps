@@ -1934,7 +1934,7 @@ class CustomHelper {
 				'lookable_type'	=> 'good_issues',
 				'lookable_id'	=> $gr->id,
 				'post_date'		=> $gr->post_date,
-				'note'			=> $gr->code,
+				'note'			=> $gr->note,
 				'status'		=> '3'
 			]);
 

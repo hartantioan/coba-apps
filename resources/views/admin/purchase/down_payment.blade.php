@@ -1135,7 +1135,7 @@
                                         ` + val.grandtotal + `
                                     </td>
                                     <td class="center">
-                                        <input name="arr_nominal[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.grandtotal + `" onkeyup="formatRupiah(this);countAll()" style="text-align:right;width:100%;" id="rowNominal` + count + `">
+                                        <input name="arr_nominal[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.grandtotal + `" onkeyup="formatRupiah(this);countRow()" style="text-align:right;width:100%;" id="rowNominal` + count + `">
                                     </td>
                                 </tr>
                             `);
@@ -1167,6 +1167,20 @@
             $('.row_purchase').each(function(){
                 $(this).remove();
             });
+        }
+    }
+
+    function countRow(){
+        if($('input[name^="arr_code"]').length > 0){
+            let dp = 0;
+            $('input[name^="arr_code"]').each(function(){
+                let element = $(this);
+                if($(element).is(':checked')){
+                    dp += parseFloat($('#rowNominal' + element.data('id')).val().replaceAll(".", "").replaceAll(",","."));
+                }
+            });
+            $('#subtotal').val(formatRupiahIni(dp.toFixed(2).toString().replace('.',',')));
+            countAll();
         }
     }
 

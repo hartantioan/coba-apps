@@ -497,6 +497,8 @@ class GoodIssueRequestController extends Controller
                 try {
                     $query = GoodIssueRequest::where('code',CustomHelper::decrypt($request->temp))->first();
 
+                    info($query);
+
                     if($query->hasChildDocument()){
                         info('kambing');
                         return response()->json([

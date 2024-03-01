@@ -457,7 +457,7 @@ class JournalController extends Controller
                                 'note2'                         => $request->arr_note2[$key] == '' ? NULL : $request->arr_note2[$key],
                                 'type'                          => $row,
                                 'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
-                                'nominal_fc'                    => str_replace(',','.',str_replace('.','',$request->arr_nominal_fc[$key])),
+                                'nominal_fc'                    => $request->arr_nominal_fc[$key] ? str_replace(',','.',str_replace('.','',$request->arr_nominal_fc[$key])) : 0,
                             ]);
                         }
                     }

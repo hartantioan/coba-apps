@@ -1315,8 +1315,8 @@
                         formData.append('arr_project[]',($('select[name^="arr_project[]"]').eq(index).val() ? $('select[name^="arr_project[]"]').eq(index).val() : 'NULL'));
                         formData.append('arr_note[]',($('input[name^="arr_note[]"]').eq(index).val() ? $('input[name^="arr_note[]"]').eq(index).val() : ''));
                         formData.append('arr_note2[]',($('input[name^="arr_note2[]"]').eq(index).val() ? $('input[name^="arr_note2[]"]').eq(index).val() : ''));
-                        formData.append('arr_nominal[]',($('input[name^="arr_nominal[]"]').eq(index).val() ? $('input[name^="arr_nominal[]"]').eq(index).val() : 'NULL'));
-                        formData.append('arr_nominal_fc[]',($('input[name^="arr_nominal_fc[]"]').eq(index).val() ? $('input[name^="arr_nominal_fc[]"]').eq(index).val() : 'NULL'));
+                        formData.append('arr_nominal[]',($('input[name^="arr_nominal[]"]').eq(index).val() ? $('input[name^="arr_nominal[]"]').eq(index).val() : '0'));
+                        formData.append('arr_nominal_fc[]',($('input[name^="arr_nominal_fc[]"]').eq(index).val() ? $('input[name^="arr_nominal_fc[]"]').eq(index).val() : '0'));
                     });
 
                     var path = window.location.pathname;

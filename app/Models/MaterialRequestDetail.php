@@ -100,7 +100,7 @@ class MaterialRequestDetail extends Model
     }
 
     public function balancePr(){
-        $totalPr = $this->qty - $this->getStockNow($this->qty_conversion);
+        $totalPr = $this->qty;
         foreach($this->purchaseRequestDetail as $row){
             $totalPr -= $row->qty;
         }

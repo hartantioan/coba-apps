@@ -25,6 +25,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportCoa;
 use Illuminate\Database\Eloquent\Builder;
 use App\Helpers\CustomHelper;
+use App\Models\GoodIssueRequestDetail;
 
 class ApprovalController extends Controller
 {
@@ -319,7 +320,7 @@ class ApprovalController extends Controller
         $response['data'] = [];
         if($query_data <> FALSE) {
             $nomor = $start + 1;
-            $special = ['material_requests'];
+            $special = ['material_requests','good_issue_requests'];
             foreach($query_data as $val) {
                 $response['data'][] = [
                     $val->status == '1' && !in_array($val->approvalSource->lookable_type,$special) ? '<span class="pick" data-id="'.CustomHelper::encrypt($val->code).'">'.$nomor.'</span>' : $nomor,
@@ -414,6 +415,18 @@ class ApprovalController extends Controller
                         ]);
                         foreach($request->arr_status_material_request as $key => $row){
                             MaterialRequestDetail::find(intval($row))->update([
+                                'status'    => '1'
+                            ]);
+                        }
+                    }
+                }
+                if($query->approvalSource->lookable_type == 'good_issue_requests'){
+                    if($request->arr_status_good_issue_request){
+                        $query->approvalSource->lookable->goodIssueRequestDetail()->whereNotIn('id',$request->arr_status_good_issue_request)->update([
+                            'status'    => '2'
+                        ]);
+                        foreach($request->arr_status_good_issue_request as $key => $row){
+                            GoodIssueRequestDetail::find(intval($row))->update([
                                 'status'    => '1'
                             ]);
                         }

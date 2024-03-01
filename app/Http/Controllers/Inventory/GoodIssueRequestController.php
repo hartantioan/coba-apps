@@ -103,7 +103,7 @@ class GoodIssueRequestController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = MaterialRequest::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+        $total_data = GoodIssueRequest::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
         ->where(function($query)use($request){
             if(!$request->modedata){
                 $query->where('user_id',session('bo_id'));
@@ -116,7 +116,7 @@ class GoodIssueRequestController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('materialRequestDetail',function($query) use($search, $request){
+                            ->orWhereHas('goodIssueRequestDetail',function($query) use($search, $request){
                                 $query->whereHas('item',function($query) use($search, $request){
                                     $query->where('code', 'like', "%$search%")
                                         ->orWhere('name','like',"%$search%");
@@ -158,7 +158,7 @@ class GoodIssueRequestController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('materialRequestDetail',function($query) use($search, $request){
+                            ->orWhereHas('goodIssueRequestDetail',function($query) use($search, $request){
                                 $query->whereHas('item',function($query) use($search, $request){
                                     $query->where('code', 'like', "%$search%")
                                         ->orWhere('name','like',"%$search%");
@@ -421,7 +421,7 @@ class GoodIssueRequestController extends Controller
                     $img_base_64 = base64_encode($image_temp);
                     $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                     $data["image"]=$path_img;
-                    $pdf = Pdf::loadView('admin.print.inventory.request_individual', $data)->setPaper('a5', 'landscape');
+                    $pdf = Pdf::loadView('admin.print.inventory.good_issue_request_individual', $data)->setPaper('a5', 'landscape');
                     $pdf->render();
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                     $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -493,8 +493,8 @@ class GoodIssueRequestController extends Controller
         } else {
 
 			if($request->temp){
-                DB::beginTransaction();
-                try {
+                /* DB::beginTransaction();
+                try { */
                     $query = GoodIssueRequest::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     if($query->hasChildDocument()){
@@ -517,16 +517,16 @@ class GoodIssueRequestController extends Controller
                             $row->delete();
                         }
 
-                        DB::commit();
+                        /* DB::commit(); */
                     }else{
                         return response()->json([
                             'status'  => 500,
 					        'message' => 'Status Good Issue Request sudah SELESAI, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                }catch(\Exception $e){
+                /* }catch(\Exception $e){
                     DB::rollback();
-                }
+                } */
 			}else{
                 DB::beginTransaction();
                 try {
@@ -563,7 +563,7 @@ class GoodIssueRequestController extends Controller
                         $totalQty = ItemStock::where('item_id',$row)->where('place_id',$request->arr_place[$key])->where('warehouse_id',$request->arr_warehouse[$key])->sum('qty');
                         $purchaseQty = $totalQty > 0 ? $totalQty / $itemUnit->conversion : 0;
                         GoodIssueRequestDetail::create([
-                            'material_request_id'   => $query->id,
+                            'good_issue_request_id' => $query->id,
                             'item_id'               => $row,
                             'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'stock'                 => $purchaseQty,
@@ -636,7 +636,7 @@ class GoodIssueRequestController extends Controller
                 'line_id'           => $row->line_id,
                 'machine_id'        => $row->machine_id,
                 'department_id'     => $row->department_id,
-                'requester'         => $row->requester,
+                'requester'         => $row->requester ? $row->requester : '',
                 'stock_list'        => $row->item->currentStockPurchase($this->dataplaces,$this->datawarehouses),
                 'list_warehouse'    => $row->item->warehouseList(),
                 'project_id'        => $row->project()->exists() ? $row->project->id : '',
@@ -2200,7 +2200,7 @@ class GoodIssueRequestController extends Controller
                 'data'      => $pr
             ];
 
-            return view('admin.approval.material_request', $data);
+            return view('admin.approval.good_issue_request', $data);
         }else{
             abort(404);
         }
@@ -2229,7 +2229,7 @@ class GoodIssueRequestController extends Controller
             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
             $data["image"]=$path_img;
              
-            $pdf = Pdf::loadView('admin.print.inventory.request_individual', $data)->setPaper('a5', 'landscape');
+            $pdf = Pdf::loadView('admin.print.inventory.good_issue_request_individual', $data)->setPaper('a5', 'landscape');
             $pdf->render();
     
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
@@ -2314,7 +2314,7 @@ class GoodIssueRequestController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.inventory.request_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.inventory.good_issue_request_individual', $data)->setPaper('a5', 'landscape');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -2385,7 +2385,7 @@ class GoodIssueRequestController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.inventory.request_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.inventory.good_issue_request_individual', $data)->setPaper('a5', 'landscape');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));

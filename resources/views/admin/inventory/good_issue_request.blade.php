@@ -1392,12 +1392,18 @@
                                             -
                                         </td>
                                         <td>
-                                            <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinusNoMinus(this)">
+                                            <input name="arr_qty[]" id="rowQty` + count + `" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinusNoMinus(this);countRow('` + count + `')">
                                         </td>
                                         <td class="center">
-                                            <select class="browser-default" id="arr_satuan` + count + `" name="arr_satuan[]" required>
+                                            <select class="browser-default" id="arr_satuan` + count + `" name="arr_satuan[]" required onchange="countRow('` + count + `')">
                                                 <option value="">--Silahkan pilih item--</option>    
                                             </select>
+                                        </td>
+                                        <td class="center" id="qty_stock` + count + `">
+                                            ` + val.qty_stock + `
+                                        </td>
+                                        <td class="center" id="unit_stock` + count + `">
+                                            ` + val.unit_stock + `
                                         </td>
                                         <td>
                                             <input name="arr_note[]" type="text" placeholder="Keterangan barang 1..." value="` + val.note + `">
@@ -1462,7 +1468,7 @@
                                 `);
                                 select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
                                 $('#arr_place' + count).val(val.place_id);
-
+                                
                                 if(val.line_id){
                                     $('#arr_line' + count).val(val.line_id);
                                 }
@@ -1511,12 +1517,12 @@
                                         -
                                     `);
                                 }
-
+                                
                                 if(val.buy_units.length > 0){
                                     $('#arr_satuan' + count).empty();
                                     $.each(val.buy_units, function(i, value) {
                                         $('#arr_satuan' + count).append(`
-                                            <option value="` + value.id + `" ` + (value.id == val.item_unit_id ? 'selected' : '') + `>` + value.code  + ` Konv. : ` + value.conversion + `</option>
+                                            <option value="` + value.id + `" ` + (value.id == val.item_unit_id ? 'selected' : '') + ` data-conversion="` + value.conversion + `">` + value.code + `</option>
                                         `);
                                     });
                                 }

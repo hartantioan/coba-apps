@@ -643,7 +643,7 @@ class MaterialRequestController extends Controller
                 'line_id'           => $row->line_id,
                 'machine_id'        => $row->machine_id,
                 'department_id'     => $row->department_id,
-                'requester'         => $row->requester,
+                'requester'         => $row->requester ? $row->requester : '',
                 'stock_list'        => $row->item->currentStockPurchase($this->dataplaces,$this->datawarehouses),
                 'list_warehouse'    => $row->item->warehouseList(),
                 'project_id'        => $row->project()->exists() ? $row->project->id : '',

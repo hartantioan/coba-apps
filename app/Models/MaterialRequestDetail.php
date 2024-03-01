@@ -145,11 +145,6 @@ class MaterialRequestDetail extends Model
 
     public function balanceGi(){
         $totalGi = $this->qty;
-        if($totalGi > 0){
-            $totalGi = $this->getStockNow($this->qty_conversion);
-        }else{
-            $totalGi = $this->qty;
-        }
         foreach($this->goodIssueDetail as $row){
             $totalGi -= round(($row->qty / $this->qty_conversion),3);
         }

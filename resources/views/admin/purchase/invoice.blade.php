@@ -1085,7 +1085,7 @@
                                                 </td>
                                                 <td class="center">
                                                     <select class="browser-default" id="arr_percent_tax` + count + `" name="arr_percent_tax[]" data-id="` + count + `" onchange="countAll();">
-                                                        <option value="0" data-id="">-- Non-PPN --</option>
+                                                        <option value="0.00000" data-id="">-- Non-PPN --</option>
                                                         @foreach ($tax as $row1)
                                                             <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
                                                         @endforeach
@@ -1102,7 +1102,7 @@
                                                 </td>
                                                 <td class="center">
                                                     <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
-                                                        <option value="0" data-id="">-- Non-PPh --</option>
+                                                        <option value="0.00000" data-id="">-- Non-PPh --</option>
                                                         @foreach ($wtax as $row2)
                                                             <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
                                                         @endforeach
@@ -2651,6 +2651,7 @@
                     formData.delete("arr_department[]");
                     formData.delete("arr_warehouse[]");
                     formData.delete("arr_project[]");
+                    formData.delete("arr_percent_wtax[]");
 
                     $('select[name^="arr_percent_tax"]').each(function(){
                         formData.append('arr_tax_id[]',($(this).find(':selected').data('id') ? $(this).find(':selected').data('id') : ''));
@@ -2658,6 +2659,7 @@
 
                     $('select[name^="arr_percent_wtax"]').each(function(){
                         formData.append('arr_wtax_id[]',($(this).find(':selected').data('id') ? $(this).find(':selected').data('id') : ''));
+                        formData.append('arr_percent_wtax[]',$(this).val());
                     });
 
                     $('input[name^="arr_code"]').each(function(){
@@ -3123,7 +3125,7 @@
                                     </td>
                                     <td class="center">
                                         <select class="browser-default" id="arr_percent_tax` + count + `" name="arr_percent_tax[]" data-id="` + count + `" onchange="countAll();">
-                                            <option value="0" data-id="">-- Non-PPN --</option>
+                                            <option value="0.00000" data-id="">-- Non-PPN --</option>
                                             @foreach ($tax as $row1)
                                                 <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
                                             @endforeach
@@ -3140,7 +3142,7 @@
                                     </td>
                                     <td class="center">
                                         <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
-                                            <option value="0" data-id="">-- Non-PPh --</option>
+                                            <option value="0.00000" data-id="">-- Non-PPh --</option>
                                             @foreach ($wtax as $row2)
                                                 <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
                                             @endforeach

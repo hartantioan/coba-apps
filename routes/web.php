@@ -148,6 +148,7 @@ use App\Http\Controllers\Inventory\InventoryTransferOutController;
 use App\Http\Controllers\Inventory\InventoryTransferInController;
 use App\Http\Controllers\Inventory\GoodReceiveController;
 use App\Http\Controllers\Inventory\GoodIssueController;
+use App\Http\Controllers\Inventory\GoodIssueRequestController;
 use App\Http\Controllers\Inventory\InventoryRevaluationController;
 use App\Http\Controllers\Inventory\StockMovementController;
 use App\Http\Controllers\Inventory\MaterialRequestController;
@@ -1744,6 +1745,26 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[GoodReceiveController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [GoodReceiveController::class, 'voidStatus'])->middleware('operation.access:good_receive,void');
                     Route::post('destroy', [GoodReceiveController::class, 'destroy'])->middleware('operation.access:good_receive,delete');
+                });
+
+                Route::prefix('good_issue_request')->middleware(['operation.access:good_issue_request,view','lockacc'])->group(function () {
+                    Route::get('/',[GoodIssueRequestController::class, 'index']);
+                    Route::get('datatable',[GoodIssueRequestController::class, 'datatable']);
+                    Route::get('row_detail',[GoodIssueRequestController::class, 'rowDetail']);
+                    Route::post('show', [GoodIssueRequestController::class, 'show']);
+                    Route::post('get_code', [GoodIssueRequestController::class, 'getCode']);
+                    Route::post('print',[GoodIssueRequestController::class, 'print']);
+                    Route::post('print_by_range',[GoodIssueRequestController::class, 'printByRange']);
+                    Route::post('send_used_data',[GoodIssueRequestController::class, 'sendUsedData']);
+                    Route::post('remove_used_data', [GoodIssueRequestController::class, 'removeUsedData']);
+                    Route::get('print_individual/{id}',[GoodIssueRequestController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::get('export',[GoodIssueRequestController::class, 'export']);
+                    Route::get('viewstructuretree',[GoodIssueRequestController::class, 'viewStructureTree']);
+                    Route::get('view_journal/{id}',[GoodIssueRequestController::class, 'viewJournal'])->middleware('operation.access:good_issue_request,journal');
+                    Route::post('create',[GoodIssueRequestController::class, 'create'])->middleware('operation.access:good_issue_request,update');
+                    Route::get('approval/{id}',[GoodIssueRequestController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [GoodIssueRequestController::class, 'voidStatus'])->middleware('operation.access:good_issue_request,void');
+                    Route::post('destroy', [GoodIssueRequestController::class, 'destroy'])->middleware('operation.access:good_issue_request,delete');
                 });
 
                 Route::prefix('good_issue')->middleware(['operation.access:good_issue,view','lockacc'])->group(function () {

@@ -63,6 +63,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Color;
 use App\Models\DeliveryCost;
+use App\Models\GoodIssueRequest;
 use App\Models\GoodReceiptDetailSerial;
 use App\Models\InventoryCoa;
 use App\Models\ItemSerial;
@@ -3297,6 +3298,74 @@ class Select2Controller extends Controller {
                 $details = [];
 
                 foreach($d->materialRequestDetail()->where('status','1')->get() as $row){
+                    if($row->balanceGi() > 0){
+                        $details[] = [
+                            'id'            => $row->id,
+                            'item_id'       => $row->item_id,
+                            'item_name'     => $row->item->code.' - '.$row->item->name,
+                            'qty'           => number_format($row->qty * $row->qty_conversion,3,',','.'),
+                            'unit'          => $row->item->uomUnit->code,
+                            'note'          => $row->note ? $row->note : '',
+                            'date'          => $row->required_date,
+                            'place_id'      => $row->place_id,
+                            'place_name'    => $row->place->code,
+                            'warehouse_id'  => $row->warehouse_id,
+                            'warehouse_name'=> $row->warehouse->name,
+                            'line_id'       => $row->line_id,
+                            'machine_id'    => $row->machine_id,
+                            'department_id' => $row->department_id,
+                            'requester'     => $row->requester ? $row->requester : '',
+                            'qty_balance'   => number_format($row->balanceGi() * $row->qty_conversion,3,',','.'),
+                            'type'          => $row->getTable(),
+                            'project_id'    => $row->project()->exists() ? $row->project->id : '',
+                            'project_name'  => $row->project()->exists() ? $row->project->name : '',
+                            'stock_list'    => $row->item->currentStock($this->dataplaces,$this->datawarehouses),
+                            'is_activa'     => $row->item->itemGroup->is_activa,
+                        ];
+                    }
+                }
+
+                $response[] = [
+                    'id'   			=> $d->id,
+                    'text' 			=> $d->code.' Tgl. Post : '.date('d/m/Y',strtotime($d->post_date)).' Keterangan : '.$d->note,
+                    'code'          => $d->code,
+                    'table'         => $d->getTable(),
+                    'details'       => $details,
+                ];
+            }
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function gooIssueRequestGi(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = GoodIssueRequest::where(function($query) use($search){
+            $query->where('code', 'like', "%$search%")
+                ->orWhere('note','like',"%$search%")
+                ->orWhereHas('user',function($query) use ($search){
+                    $query->where('name','like',"%$search%")
+                        ->orWhere('employee_no','like',"%$search%");
+                })
+                ->orWhereHas('goodIssueRequestDetail',function($query)use($search){
+                    $query->whereHas('item',function($query)use($search){
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('name','like',"%$search%");
+                    });
+                });
+        })
+        ->whereDoesntHave('used')
+        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+        ->whereIn('status',['2','3'])
+        ->get();
+
+        foreach($data as $d) {
+            if($d->hasBalanceQtyGi()){
+                $details = [];
+
+                foreach($d->goodIssueRequestDetail()->where('status','1')->get() as $row){
                     if($row->balanceGi() > 0){
                         $details[] = [
                             'id'            => $row->id,

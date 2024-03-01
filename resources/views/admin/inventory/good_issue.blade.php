@@ -196,18 +196,15 @@
                             </div>
                         </fieldset>
                         <fieldset class="step6">
-                            <legend>2. Item Request (Jika Ada)</legend>
-                            <div class="mt-1 mb-1">
-                                <b>Tarik data dari Item Request - qty yang muncul diambil dari selisih jumlah qty Item Request dikurangi stok saat ini. Jika selisih > 0, maka qty yang digunakan adalah qty stok. Jika selisih kurang <= 0, maka qty yang digunakan adalah qty Item Request. Hanya item yang telah disetujui akan masuk disini.</b>
-                            </div>
+                            <legend>2. Good Issue Request / Req. Barang Keluar (Jika Ada)</legend>
                             <div class="row">
                                 <div class="input-field col m5 step9">
-                                    <select class="browser-default" id="material_request_id" name="material_request_id"></select>
-                                    <label class="active" for="material_request_id">Daftar Item Request</label>
+                                    <select class="browser-default" id="good_issue_request_id" name="good_issue_request_id"></select>
+                                    <label class="active" for="good_issue_request_id">Daftar Good Issue Request</label>
                                 </div>
                                 <div class="col m4 step10">
-                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 mt-5" onclick="getMaterialRequest();" href="javascript:void(0);">
-                                        <i class="material-icons left">add</i> Item Request
+                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 mt-5" onclick="getGoodIssueRequest();" href="javascript:void(0);">
+                                        <i class="material-icons left">add</i> Req. Barang Keluar
                                     </a>
                                 </div>
                             </div>
@@ -568,7 +565,7 @@
                 }else{
                     $('.row_item').remove();
                 }
-                $('#material_request_id').empty();
+                $('#good_issue_request_id').empty();
                 window.onbeforeunload = function() {
                     return null;
                 };
@@ -626,7 +623,7 @@
             $(this).closest('tr').remove();
         });
 
-        select2ServerSide('#material_request_id', '{{ url("admin/select2/material_request_gi") }}');
+        select2ServerSide('#good_issue_request_id', '{{ url("admin/select2/good_issue_request_gi") }}');
     });
 
     String.prototype.replaceAt = function(index, replacement) {
@@ -796,15 +793,15 @@
         });
 	}
 
-    function getMaterialRequest(){
-        if($('#material_request_id').val()){
-            let datakuy = $('#material_request_id').select2('data')[0];
+    function getGoodIssueRequest(){
+        if($('#good_issue_request_id').val()){
+            let datakuy = $('#good_issue_request_id').select2('data')[0];
             $.ajax({
                 url: '{{ Request::url() }}/send_used_data',
                 type: 'POST',
                 dataType: 'JSON',
                 data: {
-                    id: $('#material_request_id').val(),
+                    id: $('#good_issue_request_id').val(),
                     type: datakuy.table,
                 },
                 headers: {
@@ -827,7 +824,7 @@
                         $('#list-used-data').append(`
                             <div class="chip purple darken-4 gradient-shadow white-text">
                                 ` + datakuy.code + `
-                                <i class="material-icons close data-used" onclick="removeUsedData('` + datakuy.table + `','` + $('#material_request_id').val() + `')">close</i>
+                                <i class="material-icons close data-used" onclick="removeUsedData('` + datakuy.table + `','` + $('#good_issue_request_id').val() + `')">close</i>
                             </div>
                         `);
 
@@ -836,7 +833,7 @@
                         $.each(datakuy.details, function(i, val) {
                             var count = makeid(10);
                             $('#last-row-item').before(`
-                                <tr class="row_item" data-id="` + $('#material_request_id').val() + `">
+                                <tr class="row_item" data-id="` + $('#good_issue_request_id').val() + `">
                                     <input type="hidden" name="arr_lookable_type[]" value="` + val.type + `">
                                     <input type="hidden" name="arr_lookable_id[]" value="` + val.id + `">
                                     <td>
@@ -982,7 +979,7 @@
                             }
                         });
 
-                        $('#material_request_id').empty();
+                        $('#good_issue_request_id').empty();
                     }
                 },
                 error: function() {

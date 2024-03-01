@@ -591,7 +591,7 @@
         });
 
         $('#arr_place0,#arr_department0').formSelect();
-        select2ServerSide('#arr_item0', '{{ url("admin/select2/purchase_item") }}');
+        select2ServerSide('#arr_item0', '{{ url("admin/select2/item") }}');
         select2ServerSide('#arr_project0', '{{ url("admin/select2/project") }}');
 
         $("#table-detail th").resizable({
@@ -1264,7 +1264,7 @@
                         $('#arr_item' + count).append(`
                             <option value="` + val.item_id + `">` + val.item_name + `</option>
                         `);
-                        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+                        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
                         $('#arr_place' + count).val(val.place_id);
                         
                         if(val.line_id){
@@ -1460,7 +1460,7 @@
                                 $('#arr_item' + count).append(`
                                     <option value="` + val.item_id + `">` + val.item_name + `</option>
                                 `);
-                                select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+                                select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
                                 $('#arr_place' + count).val(val.place_id);
 
                                 if(val.line_id){
@@ -1776,7 +1776,7 @@
                 </td>
             </tr>
         `);
-        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
     }
 
@@ -1906,7 +1906,7 @@
             exitOnOverlayClick : false,
             steps: [
                 {
-                    title : 'Item Request',
+                    title : 'Good Issue Request',
                     intro : 'Form ini digunakan untuk menambahkan permintaan pembelian barang material sebelum purchase request. Silahkan ikuti panduan ini untuk penjelasan mengenai isian form.'
                 },
                 {

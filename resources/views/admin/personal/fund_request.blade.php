@@ -503,8 +503,8 @@
         var count = makeid(10);
         $('#last-row-item').before(`
             <tr class="row_item">
-                <input type="hidden" name="arr_percent_tax[]" value="0" id="arr_percent_tax` + count + `">
-                <input type="hidden" name="arr_percent_wtax[]" value="0" id="arr_percent_wtax` + count + `">
+                <input type="hidden" name="arr_percent_tax[]" value="0.00000" id="arr_percent_tax` + count + `">
+                <input type="hidden" name="arr_percent_wtax[]" value="0.00000" id="arr_percent_wtax` + count + `">
                 <input type="hidden" name="arr_tax[]" value="0" id="arr_tax` + count + `">
                 <input type="hidden" name="arr_wtax[]" value="0" id="arr_wtax` + count + `">
                 <input type="hidden" name="arr_grandtotal[]" value="0" id="arr_grandtotal` + count + `">

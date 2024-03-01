@@ -87,6 +87,8 @@ class AppServiceProvider extends ServiceProvider
             'closing_journals'                      => 'App\Models\ClosingJournal',
             'material_requests'                     => 'App\Models\MaterialRequest',
             'material_request_details'              => 'App\Models\MaterialRequestDetail',
+            'good_issue_requests'                   => 'App\Models\GoodIssueRequest',
+            'good_issue_request_details'            => 'App\Models\GoodIssueRequestDetail',
             'lock_periods'                          => 'App\Models\LockPeriod',
             'production_orders'                     => 'App\Models\ProductionOrder',
             'employee_reward_punishments'           => 'App\Models\EmployeeRewardPunishment',

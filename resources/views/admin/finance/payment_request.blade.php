@@ -3123,6 +3123,7 @@
                     $('#modal3').modal('open');
                     $('#tempPay').val(code);
                     $('#pay_date_pay').val(response.data.pay_date);
+                    $('#notePay').val(response.data.note);
                     $('.modal-content').scrollTop(0);
                     M.updateTextFields();
                     $('#list-used-data-pay').append(`

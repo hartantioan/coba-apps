@@ -1219,7 +1219,7 @@ class CustomHelper {
 				'currency_id'	=> $ip->currency_id,
 				'currency_rate'	=> $ip->currency_rate,
 				'post_date'		=> $ip->post_date,
-				'note'			=> $ip->code,
+				'note'			=> $ip->note,
 				'status'		=> '3'
 			]);
 
@@ -1349,10 +1349,6 @@ class CustomHelper {
 						]);
 					}
 				}
-
-				$journal = Journal::find($query->id);
-				$journal->note = $journal->note.' - '.implode(', ',$arrNote);
-				$journal->save();
 			}
 
 		}elseif($table_name == 'payment_requests'){
@@ -1661,10 +1657,6 @@ class CustomHelper {
 				'nominal'		=> floatval($totalPay),
 				'nominal_fc'	=> $op->currency->type == '1' ? floatval($totalPay) : floatval($totalPay / $op->currency_rate),
 			]);
-
-			$journal = Journal::find($query->id);
-			$journal->note = $journal->note.' - '.implode(', ',$arrNote);
-			$journal->save();
 
 			$op->paymentRequest->update([
 				'status'	=> '3',
@@ -3559,10 +3551,6 @@ class CustomHelper {
 					]);
 				}
 			}
-
-			$journal = Journal::find($query->id);
-			$journal->note = $journal->note.' - '.implode(', ',$arrNote);
-			$journal->save();
 
 			$pi->updateRootDocumentStatusDone();
 

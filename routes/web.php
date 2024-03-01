@@ -1764,6 +1764,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('viewstructuretree',[GoodIssueRequestController::class, 'viewStructureTree']);
                     Route::get('view_journal/{id}',[GoodIssueRequestController::class, 'viewJournal'])->middleware('operation.access:good_issue_request,journal');
                     Route::post('create',[GoodIssueRequestController::class, 'create'])->middleware('operation.access:good_issue_request,update');
+                    Route::post('done',[GoodIssueRequestController::class, 'done'])->middleware('operation.access:good_issue_request,update');
                     Route::get('approval/{id}',[GoodIssueRequestController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [GoodIssueRequestController::class, 'voidStatus'])->middleware('operation.access:good_issue_request,void');
                     Route::post('destroy', [GoodIssueRequestController::class, 'destroy'])->middleware('operation.access:good_issue_request,delete');

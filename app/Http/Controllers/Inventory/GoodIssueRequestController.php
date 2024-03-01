@@ -204,6 +204,7 @@ class GoodIssueRequestController extends Controller
                     $val->note,
                     $val->status(),
                     '
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
@@ -643,6 +644,37 @@ class GoodIssueRequestController extends Controller
         $pr['details'] = $arr;
         				
 		return response()->json($pr);
+    }
+
+    public function done(Request $request){
+        $gir = GoodIssueRequest::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($gir){
+
+            if(in_array($gir->status,['1','2'])){
+                $gir->update([
+                    'status'    => '3'
+                ]);
+    
+                activity()
+                        ->performedOn(new GoodIssueRequest())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($gir)
+                        ->log('Done the Good Issue Request data');
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data updated successfully.'
+                ];
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+                ];
+            }
+
+            return response()->json($response);
+        }
     }
 
     public function getCode(Request $request){

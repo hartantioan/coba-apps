@@ -2651,7 +2651,6 @@
                     formData.delete("arr_department[]");
                     formData.delete("arr_warehouse[]");
                     formData.delete("arr_project[]");
-                    formData.delete("arr_percent_wtax[]");
 
                     $('select[name^="arr_percent_tax"]').each(function(){
                         formData.append('arr_tax_id[]',($(this).find(':selected').data('id') ? $(this).find(':selected').data('id') : ''));
@@ -2659,7 +2658,6 @@
 
                     $('select[name^="arr_percent_wtax"]').each(function(){
                         formData.append('arr_wtax_id[]',($(this).find(':selected').data('id') ? $(this).find(':selected').data('id') : ''));
-                        formData.append('arr_percent_wtax[]',$(this).val());
                     });
 
                     $('input[name^="arr_code"]').each(function(){

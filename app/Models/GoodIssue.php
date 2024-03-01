@@ -225,6 +225,14 @@ class GoodIssue extends Model
                 ]);
             }
         }
+
+        if($row->goodIssueRequestDetail()){
+            if(!$row->lookable->goodIssueRequest->hasBalanceQtyGi()){
+                $row->lookable->goodIssueRequest->update([
+                    'status'    => '2'
+                ]);
+            }
+        }
     }
 
     public function updateRootDocumentStatusDone(){
@@ -232,6 +240,14 @@ class GoodIssue extends Model
             if($row->materialRequestDetail()){
                 if(!$row->lookable->materialRequest->hasBalanceQtyPrGi()){
                     $row->lookable->materialRequest->update([
+                        'status'    => '3'
+                    ]);
+                }
+            }
+
+            if($row->goodIssueRequestDetail()){
+                if(!$row->lookable->goodIssueRequest->hasBalanceQtyGi()){
+                    $row->lookable->goodIssueRequest->update([
                         'status'    => '3'
                     ]);
                 }

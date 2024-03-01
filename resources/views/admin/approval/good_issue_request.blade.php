@@ -195,7 +195,6 @@
                         <th class="center-align">Req.</th>
                         <th class="center-align">Stok</th>
                         <th class="center-align">Sat.</th>
-                        <th class="center-align">Nilai Barang</th>
                         <th class="center-align">Tgl.Dipakai</th>
                         <th class="center-align">Plant</th>
                         <th class="center-align">Gudang</th>
@@ -204,6 +203,7 @@
                         <th class="center-align">Divisi</th>
                         <th class="center-align">Proyek</th>
                         <th class="center-align">Requester</th>
+                        <th class="center-align">Nilai Barang</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -226,7 +226,6 @@
                         <td class="right-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                         <td class="right-align">{{ number_format($row->getStockNow($row->qty_conversion),3,',','.') }}</td>
                         <td class="center-align">{{ $row->item->uomUnit->code }}</td>
-                        <td class="right-align">{{ number_format($row->total,2,',','.') }}</td>
                         <td class="indigo-text center-align">{{ date('d/m/Y',strtotime($row->required_date)) }}</td>
                         <td class="center-align">{{ $row->place->code }}</td>
                         <td class="center-align">{{ $row->warehouse->name }}</td>
@@ -235,6 +234,7 @@
                         <td class="center-align">{{ $row->department()->exists() ? $row->department->name : '-' }}</td>
                         <td class="center-align">{{ $row->project()->exists() ? $row->project->name : '-' }}</td>
                         <td class="">{{ $row->requester }}</td>
+                        <td class="right-align">{{ number_format($row->total,2,',','.') }}</td>
                     </tr>
                     <tr>
                         <td colspan="14">Keterangan 1 : {{ $row->note }}</td>

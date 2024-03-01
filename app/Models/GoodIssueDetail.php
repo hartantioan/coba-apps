@@ -120,6 +120,15 @@ class GoodIssueDetail extends Model
         }
     }
 
+    public function goodIssueRequestDetail()
+    {
+        if($this->lookable_type == 'good_issue_request_details'){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public function inventoryCoa()
     {
         return $this->belongsTo('App\Models\InventoryCoa', 'inventory_coa_id', 'id')->withTrashed();

@@ -312,8 +312,8 @@ class JournalController extends Controller
     }
 
     public function create(Request $request){
-        DB::beginTransaction();
-        try {
+        /* DB::beginTransaction();
+        try { */
             $validation = Validator::make($request->all(), [
                 'code'                      => 'required',
                /*  'code' 				        => $request->temp ? ['required', Rule::unique('journals', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:journals,code', */
@@ -446,7 +446,7 @@ class JournalController extends Controller
                             JournalDetail::create([
                                 'journal_id'                    => $query->id,
                                 'cost_distribution_detail_id'   => $request->arr_cost_distribution_detail[$key] == 'NULL' ? NULL : $request->arr_cost_distribution_detail[$key],
-                                'coa_id'                        => $request->arr_coa[$key],
+                                'coa_id'                        => $request->arr_coa[$key] == 'NULL' ? NULL : $request->arr_coa[$key],
                                 'place_id'                      => $request->arr_place[$key] == 'NULL' ? NULL : $request->arr_place[$key],
                                 'line_id'                       => $request->arr_line[$key] == 'NULL' ? NULL : $request->arr_line[$key],
                                 'machine_id'                    => $request->arr_machine[$key] == 'NULL' ? NULL : $request->arr_machine[$key],
@@ -483,10 +483,10 @@ class JournalController extends Controller
                 }
             }
             
-            DB::commit();
+            /* DB::commit();
         }catch(\Exception $e){
             DB::rollback();
-        }
+        } */
 
         return response()->json($response);
     }

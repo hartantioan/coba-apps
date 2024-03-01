@@ -330,7 +330,7 @@ class DepreciationController extends Controller
     public function rowDetail(Request $request){
         $data   = Depreciation::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;max-width:100%;">
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -339,8 +339,9 @@ class DepreciationController extends Controller
                                 <th class="center-align">Nominal</th>
                             </tr>
                         </thead><tbody>';
-        
+        $total_nominal = 0;
         foreach($data->depreciationDetail as $key => $row){
+            $total_nominal += $row->nominal;
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td>'.$row->asset->code.' - '.$row->asset->name.'</td>
@@ -348,6 +349,10 @@ class DepreciationController extends Controller
                 <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
             </tr>';
         }
+        $string .= '<tr>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="3"> Total </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_nominal, 2, ',', '.') . '</td>     
+        </tr>';
         
         $string .= '</tbody></table></div>';
 
@@ -925,13 +930,12 @@ class DepreciationController extends Controller
                 
             }
             $string .= '<tr>
-                    <td class="center-align" colspan="11"> Total </td>
-                    <td class="center-align">'.number_format($total_debit_asli,2,',','.').'</td>
-                    <td class="center-align">'.number_format($total_kredit_asli,2,',','.').'</td>
-                    <td class="center-align">'.number_format($total_debit_konversi,2,',','.').'</td>
-                    <td class="center-align">'.number_format($total_kredit_konversi,2,',','.').'</td>
-                    </tr>
-            ';
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="11"> Total </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_asli, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_kredit_asli, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_konversi, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_kredit_konversi, 2, ',', '.') . '</td>
+            </tr>';
             $response["tbody"] = $string; 
         }else{
             $response = [

@@ -387,7 +387,7 @@ class GoodReturnIssueController extends Controller
     public function rowDetail(Request $request){
         $data   = GoodReturnIssue::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12">
                     <table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
@@ -410,8 +410,11 @@ class GoodReturnIssueController extends Controller
                                 <th class="center-align">Requester</th>
                             </tr>
                         </thead><tbody>';
-        
+        $totalqtykeluar=0;
+        $totalqtykembali=0;
         foreach($data->goodReturnIssueDetail as $key => $row){
+            $totalqtykeluar+=$row->goodIssueDetail->qtyBalanceReturn();
+            $totalqtykembali+=$row->qty;
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="">'.$row->item->code.' - '.$row->item->name.'</td>
@@ -426,6 +429,12 @@ class GoodReturnIssueController extends Controller
                 <td class="">'.$row->note.'</td>
             </tr>';
         }
+        $string .= '<tr>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="7"> Total </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqtykeluar, 3, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqtykembali, 3, ',', '.') . '</td>
+            </tr>  
+        ';
         
         $string .= '</tbody></table></div>';
 
@@ -1006,13 +1015,12 @@ class GoodReturnIssueController extends Controller
                 
             }
             $string .= '<tr>
-                    <td class="center-align" colspan="11"> Total </td>
-                    <td class="center-align">'.number_format($total_debit_asli,2,',','.').'</td>
-                    <td class="center-align">'.number_format($total_kredit_asli,2,',','.').'</td>
-                    <td class="center-align">'.number_format($total_debit_konversi,2,',','.').'</td>
-                    <td class="center-align">'.number_format($total_kredit_konversi,2,',','.').'</td>
-                    </tr>
-            ';
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="11"> Total </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_asli, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_kredit_asli, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_konversi, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_kredit_konversi, 2, ',', '.') . '</td>
+            </tr>';
             $response["tbody"] = $string; 
         }else{
             $response = [

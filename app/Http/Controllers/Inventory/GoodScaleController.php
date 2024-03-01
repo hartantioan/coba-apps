@@ -498,6 +498,7 @@ class GoodScaleController extends Controller
         $data   = GoodScale::where('code',CustomHelper::decrypt($request->id))->first();
         
         $string = '<div class="row pt-1 pb-1 lighten-4">
+                    <div class="col s12">'.$data->code.'</div>
                         <div class="col s12">
                             <table class="bordered" style="min-width:100%;max-width:100%;">
                                 <thead>
@@ -519,8 +520,13 @@ class GoodScaleController extends Controller
                                     </tr>
                                 </thead>
                                 <tbody>';
-        
+        $totalqtyin=0;
+        $totalqtyout=0;
+        $totalqtybalance=0;
         foreach($data->goodScaleDetail as $key => $rowdetail){
+            $totalqtyin+=$rowdetail->qty_in;
+            $totalqtyout+=$rowdetail->qty_out;
+            $totalqtybalance+=$rowdetail->qty_balance;
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.($rowdetail->purchase_order_detail_id ? $rowdetail->purchaseOrderDetail->purchaseOrder->code : '-').'</td>
@@ -535,6 +541,13 @@ class GoodScaleController extends Controller
                 <td class="center-align">'.$rowdetail->warehouse->name.'</td>
             </tr>';
         }
+        $string .= '<tr>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="3"> Total </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqtyin, 3, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqtyout, 3, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqtybalance, 3, ',', '.') . '</td>
+            </tr>  
+        ';
         
         $string .= '</tbody></table>';
 

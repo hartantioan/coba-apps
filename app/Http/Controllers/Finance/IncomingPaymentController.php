@@ -713,7 +713,7 @@ class IncomingPaymentController extends Controller
     public function rowDetail(Request $request){
         $data   = IncomingPayment::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12">
                     <table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
@@ -730,8 +730,13 @@ class IncomingPaymentController extends Controller
                                 <th class="center-align">Keterangan</th>
                             </tr>
                         </thead><tbody>';
-        
+        $totals=0;
+        $totalpembulatan=0;
+        $totalsubtotal=0;
         foreach($data->incomingPaymentDetail as $key => $row){
+            $totals+=$row->total;
+            $totalpembulatan+=$row->rounding;
+            $totalsubtotal+=$row->subtotal;
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->lookable->code.'</td>
@@ -743,6 +748,14 @@ class IncomingPaymentController extends Controller
                 <td class="">'.$row->note.'</td>
             </tr>';
         }
+        $string .= '<tr>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="4"> Total </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totals, 3, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalpembulatan, 3, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalsubtotal, 3, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;"></td> 
+            </tr>  
+        ';
         
         $string .= '</tbody></table></div>';
 
@@ -1031,13 +1044,12 @@ class IncomingPaymentController extends Controller
                 
             }
             $string .= '<tr>
-                    <td class="center-align" colspan="11"> Total </td>
-                    <td class="center-align">'.number_format($total_debit_asli,2,',','.').'</td>
-                    <td class="center-align">'.number_format($total_kredit_asli,2,',','.').'</td>
-                    <td class="center-align">'.number_format($total_debit_konversi,2,',','.').'</td>
-                    <td class="center-align">'.number_format($total_kredit_konversi,2,',','.').'</td>
-                    </tr>
-            ';
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="11"> Total </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_asli, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_kredit_asli, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_konversi, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_kredit_konversi, 2, ',', '.') . '</td>
+            </tr>';
             $response["tbody"] = $string; 
         }else{
             $response = [

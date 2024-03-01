@@ -493,7 +493,7 @@ class MarketingOrderDownPaymentController extends Controller
     {
         $data   = MarketingOrderDownPayment::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12 mt-1"><table style="min-width:100%;">
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12 mt-1"><table style="min-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="4">Sales Order</th>
@@ -505,9 +505,10 @@ class MarketingOrderDownPaymentController extends Controller
                                 <th class="center-align">Grandtotal</th>
                             </tr>
                         </thead><tbody>';
-
+        $totalgrandtotal=0;
         if($data->marketingOrderDownPaymentDetail()->exists()){
             foreach($data->marketingOrderDownPaymentDetail as $row){
+                $totalgrandtotal+=$row->marketingOrder->grandtotal;
                 $string .= '<tr>
                     <td class="center-align">'.$row->marketingOrder->code.'</td>
                     <td class="center-align">'.date('d/m/Y',strtotime($row->marketingOrder->post_date)).'</td>
@@ -515,6 +516,11 @@ class MarketingOrderDownPaymentController extends Controller
                     <td class="right-align">'.number_format($row->marketingOrder->grandtotal,2,',','.').'</td>
                 </tr>';
             }
+            $string .= '<tr>
+                    <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="3"> Total </td>
+                    <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalgrandtotal, 2, ',', '.') . '</td>
+                </tr>  
+            ';
         }else{
             $string .= '<tr>
                 <td colspan="4" class="center-align">Data tidak ditemukan.</td>
@@ -967,13 +973,12 @@ class MarketingOrderDownPaymentController extends Controller
                 
             }
             $string .= '<tr>
-                    <td class="center-align" colspan="11"> Total </td>
-                    <td class="center-align">'.number_format($total_debit_asli,2,',','.').'</td>
-                    <td class="center-align">'.number_format($total_kredit_asli,2,',','.').'</td>
-                    <td class="center-align">'.number_format($total_debit_konversi,2,',','.').'</td>
-                    <td class="center-align">'.number_format($total_kredit_konversi,2,',','.').'</td>
-                    </tr>
-            ';
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="11"> Total </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_asli, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_kredit_asli, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_konversi, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_kredit_konversi, 2, ',', '.') . '</td>
+            </tr>';
             $response["tbody"] = $string; 
         }else{
             $response = [

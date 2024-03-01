@@ -578,7 +578,7 @@ class MarketingOrderDeliveryProcessController extends Controller
     {
         $data   = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;">
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="17">Daftar Item</th>
@@ -593,8 +593,9 @@ class MarketingOrderDeliveryProcessController extends Controller
                                 <th class="center-align">Keterangan</th>
                             </tr>
                         </thead><tbody>';
-        
+        $totalqty=0;
         foreach($data->marketingOrderDelivery->marketingOrderDeliveryDetail as $key => $row){
+            $totalqty+=$row->qty;
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->marketingOrderDetail->marketingOrder->code.'</td>
@@ -605,6 +606,11 @@ class MarketingOrderDeliveryProcessController extends Controller
                 <td class="">'.$row->note.'</td>
             </tr>';
         }
+        $string .= '<tr>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="4"> Total </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqty, 3, ',', '.') . '</td>
+            </tr>  
+        ';
         
         $string .= '</tbody></table></div>';
 

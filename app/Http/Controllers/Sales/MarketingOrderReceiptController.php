@@ -459,7 +459,7 @@ class MarketingOrderReceiptController extends Controller
     {
         $data   = MarketingOrderReceipt::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;">
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="11">Daftar AR Invoice</th>
@@ -481,8 +481,27 @@ class MarketingOrderReceiptController extends Controller
                                 <th class="center-align">Final</th>
                             </tr>
                         </thead><tbody>';
-        
+        $totals=0;
+        $totaltax=0;
+        $totalaftertax=0;
+        $totalrounding=0;
+        $totalgrandtotal=0;
+        $totaldownpayment=0;
+        $totaltagihan=0;
+        $totalterbayar=0;
+        $totalmemo=0;$totalfinal=0;
         foreach($data->marketingOrderReceiptDetail as $key => $row){
+            $totals+=$row->lookable->total;
+            $totaltax+=$row->lookable->tax;
+            $totalaftertax+=$row->lookable->total_after_tax;
+            $totalrounding+=$row->lookable->rounding;
+            $totalgrandtotal+=$row->lookable->grandtotal;
+            $totaldownpayment+=$row->lookable->downpayment;
+            $totaltagihan+=$row->lookable->balance;
+            $totalterbayar+=$row->lookable->totalPay();
+            $totalmemo+=$row->lookable->totalMemo();
+            $totalfinal+=$row->lookable->balancePayment();
+            
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="">'.$row->lookable->code.'</td>
@@ -500,7 +519,20 @@ class MarketingOrderReceiptController extends Controller
                 <td class="right-align">'.number_format($row->lookable->balancePaymentIncoming(),2,',','.').'</td>
             </tr>';
         }
-        
+        $string .= '<tr>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="4"> Total </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totals, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totaltax, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalaftertax, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalrounding, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalgrandtotal, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totaldownpayment, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totaltagihan, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalterbayar, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalmemo, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalfinal, 2, ',', '.') . '</td>
+            </tr>  
+        ';
         $string .= '</tbody></table></div>';
 
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">

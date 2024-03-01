@@ -806,7 +806,7 @@ class MarketingOrderController extends Controller
     {
         $data   = MarketingOrder::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;">
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="17">Daftar Item</th>
@@ -828,8 +828,24 @@ class MarketingOrderController extends Controller
                                 <th class="center-align">Total</th>
                             </tr>
                         </thead><tbody>';
+        $totalqty=0;
+        $totalmargin=0;
+        $totaldiskon1=0;
+        $totaldiskon2=0;
+        $totaldiskon3=0;
+        $totalother=0;
+        $totalpriceafterdiscount=0;
+        $totals=0;
         
         foreach($data->marketingOrderDetail as $key => $row){
+            $totalqty+=$row->qty;
+            $totalmargin+=$row->margin;
+            $totaldiskon1+=$row->percent_discount_1;
+            $totaldiskon2+=$row->percent_discount_2;
+            $totaldiskon3+=$row->discount3;
+            $totalother+=$row->other_fee;
+            $totalpriceafterdiscount+=$row->price_after_discount;
+            $totals+=$row->total;
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
@@ -847,6 +863,20 @@ class MarketingOrderController extends Controller
                 <td class="right-align">'.number_format($row->total,2,',','.').'</td>
             </tr>';
         }
+        $string .= '<tr>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2"> Total </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqty, 3, ',', '.') . '</td>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2">  </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalmargin, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totaldiskon1, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totaldiskon2, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totaldiskon3, 2, ',', '.') . '</td>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2">  </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalother, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalpriceafterdiscount, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totals, 2, ',', '.') . '</td>
+            </tr>  
+        ';
 
         $string .= '<tr>
                         <td class="right-align" colspan="13">Subtotal</td>

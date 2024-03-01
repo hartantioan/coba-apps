@@ -772,7 +772,7 @@ class LandedCostController extends Controller
     {
         $data   = LandedCost::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;max-width:100%;">
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="12">Daftar Order Pembelian</th>
@@ -792,9 +792,12 @@ class LandedCostController extends Controller
                                 <th class="center-align">Proyek</th>
                             </tr>
                         </thead><tbody>';
-        
+        $totalqty=0;
+        $totalnominal=0;
         if(count($data->landedCostDetail) > 0){
             foreach($data->landedCostDetail as $key => $row){
+                $totalqty+=$row->qty;
+                $totalnominal+=$row->nominal;
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td>'.$row->item->code.' - '.$row->item->name.'</td>
@@ -810,6 +813,13 @@ class LandedCostController extends Controller
                     <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
                 </tr>';
             }
+            $string .= '<tr>
+                    <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2"> Total </td>
+                    <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqty, 3, ',', '.') . '</td>
+                    <td class="right-align" style="font-weight: bold; font-size: 16px;"></td>
+                    <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalnominal, 2, ',', '.') . '</td>
+                </tr>  
+            ';
         }else{
             $string .= '<tr>
                 <td class="center-align" colspan="12">Data item tidak ditemukan.</td>

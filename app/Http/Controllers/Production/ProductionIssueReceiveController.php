@@ -515,7 +515,7 @@ class ProductionIssueReceiveController extends Controller
     {
         $data   = ProductionIssueReceive::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;" class="bordered" id="table-detail-row">
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;" class="bordered" id="table-detail-row">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="12" style="font-size:20px !important;">Daftar Item/Coa Issue (Terpakai)</th>
@@ -529,8 +529,11 @@ class ProductionIssueReceiveController extends Controller
                                 <th class="center">Plant & Gudang</th>
                             </tr>
                         </thead><tbody>';
-        
+        $totalqtyplanned=0;
+        $totalqtyreal=0;
         foreach($data->productionIssueReceiveDetail()->where('type','1')->get() as $key => $row){
+            $totalqtyplanned+=$row->productionOrderDetail->qty;
+            $totalqtyreal+=$row->qty;
             $string .= '<tr>
                 <td class="center-align">'.($key+1).'.</td>
                 <td>'.($row->item()->exists() ? $row->item->code.' - '.$row->item->name : $row->coa->code.' - '.$row->coa->name).'</td>
@@ -540,7 +543,12 @@ class ProductionIssueReceiveController extends Controller
                 <td>'.($row->item()->exists() ? $row->itemStock->fullName() : '-').'</td>
             </tr>';
         }
-        
+        $string .= '<tr>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2"> Total </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqtyplanned, 3, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqtyreal, 3, ',', '.') . '</td>
+            </tr>  
+        ';
         $string .= '</tbody></table></div><div class="col s12 mt-3"><table style="min-width:100%;" class="bordered" id="table-detail-row">
             <thead>
                 <tr>
@@ -1874,13 +1882,12 @@ class ProductionIssueReceiveController extends Controller
                 
             }
             $string .= '<tr>
-                    <td class="center-align" colspan="11"> Total </td>
-                    <td class="center-align">'.number_format($total_debit_asli,2,',','.').'</td>
-                    <td class="center-align">'.number_format($total_kredit_asli,2,',','.').'</td>
-                    <td class="center-align">'.number_format($total_debit_konversi,2,',','.').'</td>
-                    <td class="center-align">'.number_format($total_kredit_konversi,2,',','.').'</td>
-                    </tr>
-            ';
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="11"> Total </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_asli, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_kredit_asli, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_konversi, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_kredit_konversi, 2, ',', '.') . '</td>
+            </tr>';
             $response["tbody"] = $string; 
         }else{
             $response = [

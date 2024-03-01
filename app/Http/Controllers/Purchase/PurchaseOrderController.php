@@ -966,7 +966,7 @@ class PurchaseOrderController extends Controller
     {
         $data   = PurchaseOrder::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;">
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="18">Daftar Item</th>
@@ -993,8 +993,18 @@ class PurchaseOrderController extends Controller
                                 <th class="center-align">Proyek</th>
                             </tr>
                         </thead><tbody>';
+        $totalqty=0;
         
+        $totaldiskon1=0;
+        $totaldiskon2=0;
+        $totaldiskon3=0;
+        $totalsubtotal=0;
         foreach($data->purchaseOrderDetail as $key => $row){
+            $totalqty+=$row->qty;
+            $totaldiskon1+=$row->percent_discount_1;
+            $totaldiskon1+=$row->percent_discount_2;
+            $totaldiskon3+=$row->discount_3;
+            $totalsubtotal+=$row->subtotal;
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.($row->item_id ? $row->item->code.' - '.$row->item->name : $row->coa->name).'</td>
@@ -1017,7 +1027,16 @@ class PurchaseOrderController extends Controller
                 <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
             </tr>';
         }
-        
+        $string .= '<tr>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2"> Total </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqty, 3, ',', '.') . '</td>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2">  </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totaldiskon1, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totaldiskon2, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totaldiskon3, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalsubtotal, 2, ',', '.') . '</td>
+            </tr>  
+        ';
         $string .= '</tbody></table></div>';
 
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">

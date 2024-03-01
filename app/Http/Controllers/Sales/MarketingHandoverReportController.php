@@ -119,7 +119,7 @@ class MarketingHandoverReportController extends Controller
     {
         $data   = MarketingOrderInvoice::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;">
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="9">Daftar Item & Surat Jalan</th>

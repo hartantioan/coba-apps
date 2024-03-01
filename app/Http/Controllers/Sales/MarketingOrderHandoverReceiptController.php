@@ -449,7 +449,7 @@ class MarketingOrderHandoverReceiptController extends Controller
     {
         $data   = MarketingOrderHandoverReceipt::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;">
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="8">Daftar Kwitansi</th>
@@ -466,8 +466,9 @@ class MarketingOrderHandoverReceiptController extends Controller
                                 <th class="center-align">Update</th>
                             </tr>
                         </thead><tbody>';
-        
+        $totalgrandtotal=0;
         foreach($data->marketingOrderHandoverReceiptDetail as $key => $row){
+            $totalgrandtotal+=$row->marketingOrderReceipt->grandtotal;
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="">'.$row->marketingOrderReceipt->code.'</td>
@@ -480,6 +481,11 @@ class MarketingOrderHandoverReceiptController extends Controller
                 <td class="center-align">'.$row->updated_at.'</td>
             </tr>';
         }
+        $string .= '<tr>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="4"> Total </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalgrandtotal, 2, ',', '.') . '</td>
+            </tr>  
+        ';
         
         $string .= '</tbody></table></div>';
 

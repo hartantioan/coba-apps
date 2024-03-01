@@ -266,7 +266,7 @@ class FundRequestController extends Controller
     public function rowDetail(Request $request){
         $data   = FundRequest::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12">
                     <table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
@@ -284,8 +284,19 @@ class FundRequestController extends Controller
                                 <th class="right-align">Grandtotal</th>
                             </tr>
                         </thead><tbody>';
-        
+        $totalqty=0;
+        $totalhargasatuan=0;
+        $totalsubtotal=0;
+        $totalppn=0;
+        $totalpph=0;
+        $totalgrandtotal=0;
         foreach($data->fundRequestDetail as $key => $row){
+            $totalqty+=$row->qty;
+            $totalhargasatuan+=$row->price;
+            $totalsubtotal+=$row->total;
+            $totalppn+=$row->tax;
+            $totalpph+=$row->wtax;
+            $totalgrandtotal+=$row->grandtotal;
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->note.'</td>
@@ -298,6 +309,17 @@ class FundRequestController extends Controller
                 <td class="right-align">'.number_format($row->grandtotal,2,',','.').'</td>
             </tr>';
         }
+        $string .= '<tr>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2"> Total </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqty, 3, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;"></td>   
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalhargasatuan, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalsubtotal, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalppn, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalpph, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalgrandtotal, 2, ',', '.') . '</td>      
+            </tr>  
+        ';
         
         $string .= '</tbody>
                         <tfoot>

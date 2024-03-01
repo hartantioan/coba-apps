@@ -232,7 +232,7 @@ class MaterialRequestController extends Controller
     {
         $data   = MaterialRequest::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row pt-1 pb-1"><div class="col s12"><table style="min-width:100%;max-width:100%;">
+        $string = '<div class="row pt-1 pb-1"> <div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="16">Daftar Item (Stok yang tampil adalah stok realtime pada saat dokumen dibuat)</th>
@@ -256,8 +256,9 @@ class MaterialRequestController extends Controller
                                 <th class="center-align">Status</th>
                             </tr>
                         </thead><tbody>';
-        
+        $totalqty=0;
         foreach($data->materialRequestDetail as $key => $row){
+            $totalqty+=$row->qty;
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td>'.$row->item->code.' - '.$row->item->name.'</td>
@@ -277,6 +278,11 @@ class MaterialRequestController extends Controller
                 <td class="center-align" style="font-size:20px !important;">'.$row->status().'</td>
             </tr>';
         }
+        $string .= '<tr>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2"> Total </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqty, 3, ',', '.') . '</td>
+            </tr>  
+        ';
         
         $string .= '</tbody></table></div>';
 

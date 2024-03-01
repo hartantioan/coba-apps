@@ -425,7 +425,7 @@ class MarketingOrderPlanController extends Controller
     {
         $data   = MarketingOrderPlan::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;">
+        $string = '<div class="row pt-1 pb-1 lighten-4"> <div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="7">Daftar Item</th>
@@ -440,8 +440,9 @@ class MarketingOrderPlanController extends Controller
                                 <th class="center-align">Urgent</th>
                             </tr>
                         </thead><tbody>';
-        
+        $totalqty=0;
         foreach($data->marketingOrderPlanDetail as $key => $row){
+            $totalqty+=$row->qty;
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
@@ -452,6 +453,11 @@ class MarketingOrderPlanController extends Controller
                 <td class="center-align">'.$row->isUrgent().'</td>
             </tr>';
         }
+        $string .= '<tr>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2"> Total </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqty, 3, ',', '.') . '</td>
+            </tr>  
+        ';
         
         $string .= '</tbody></table></div>';
 

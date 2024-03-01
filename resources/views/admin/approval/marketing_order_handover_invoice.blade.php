@@ -206,31 +206,33 @@
             <table class="mt-3" width="100%" border="0">
                 <tr>
                     <td class="">
-                        Dibuat oleh,
-                        @if($data->user->signature)
-                            <div>{!! $data->user->signature() !!}</div>
-                        @endif
-                        <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $data->user->name }}</div>
-                        <div class="mt-1">{{ $data->user->position->Level->name.' - '.$data->user->position->division->name }}</div>
+                        
+                        
+                        <div >Dibuat oleh, {{ $data->user->name }} {{ $data->user->position->Level->name}} {{ ($data->post_date ? \Carbon\Carbon::parse($data->updated_at)->format('d/m/Y H:i:s') : '-') }}</div></div>
+                       
                     </td>
+                </tr>
                     @if($data->approval())
                         @foreach ($data->approval() as $detail)
                             @foreach ($detail->approvalMatrix()->where('status','2')->get() as $row)
-                                <td class="center-align">
-                                    {{ $row->approvalTemplateStage->approvalStage->approval->document_text }}
-                                    @if($row->user->signature)
-                                        <div>{!! $row->user->signature() !!}</div>
-                                    @endif
-                                    <div class="{{ $row->user->signature ? '' : 'mt-5' }}">{{ $row->user->name }}</div>
-                                    <div class="{{ $row->user->date_process ? '' : 'mt-2' }}">{{ ($row->date_process ? \Carbon\Carbon::parse($row->date_process)->format('d/m/Y H:i:s') : '-') }}</div>
-                                    @if ($row->user->position()->exists())
-                                        <div class="mt-1">{{ $row->user->position->Level->name.' - '.$row->user->position->division->name }}</div>
-                                    @endif
+                            <tr>    
+                                <td>
+                                        
+                                        
+                                        <div>{{ $row->approvalTemplateStage->approvalStage->approval->document_text }}
+                                            {{ $row->user->name }} 
+                                            @if ($row->user->position()->exists())
+                                            {{ $row->user->position->Level->name }}
+                                            @endif
+                                            {{ ($row->date_process ? \Carbon\Carbon::parse($row->date_process)->format('d/m/Y H:i:s') : '-') }}</div>
+                                        <div class="{{ $row->user->date_process ? '' : 'mt-2' }}"></div>
+                                        
                                 </td>
+                            </tr>
                             @endforeach
                         @endforeach
                     @endif
-                </tr>
+                
             </table>   
         </div>
     </div>

@@ -312,8 +312,8 @@ class JournalController extends Controller
     }
 
     public function create(Request $request){
-        /* DB::beginTransaction();
-        try { */
+        DB::beginTransaction();
+        try {
             $validation = Validator::make($request->all(), [
                 'code'                      => 'required',
                /*  'code' 				        => $request->temp ? ['required', Rule::unique('journals', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:journals,code', */
@@ -483,10 +483,10 @@ class JournalController extends Controller
                 }
             }
             
-            /* DB::commit();
+            DB::commit();
         }catch(\Exception $e){
             DB::rollback();
-        } */
+        }
 
         return response()->json($response);
     }

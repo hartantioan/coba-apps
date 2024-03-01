@@ -229,13 +229,8 @@ class JournalController extends Controller
                             </tr>
                         </thead><tbody>';
         
-        foreach($data->journalDetail()->where(function($query){
-            $query->whereHas('coa',function($query){
-                $query->orderBy('code');
-            })
-            ->orderBy('type');
-        })
-        ->get() as $key => $row){
+        foreach($data->journalDetail()
+        ->orderBy('id')->get() as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
@@ -443,6 +438,7 @@ class JournalController extends Controller
                     
                     if($request->arr_type){
                         foreach($request->arr_type as $key => $row){
+                           
                             JournalDetail::create([
                                 'journal_id'                    => $query->id,
                                 'cost_distribution_detail_id'   => $request->arr_cost_distribution_detail[$key] == 'NULL' ? NULL : $request->arr_cost_distribution_detail[$key],
@@ -673,12 +669,7 @@ class JournalController extends Controller
 
         $arr = [];
         
-        foreach($jou->journalDetail()->where(function($query){
-            $query->whereHas('coa',function($query){
-                $query->orderBy('code');
-            })
-            ->orderBy('type');
-        })->get() as $row){
+        foreach($jou->journalDetail()->orderBy('id')->get() as $row){
             $arr[] = [
                 'type'                          => $row->type,
                 'cost_distribution_detail_id'   => $row->cost_distribution_detail_id ? $row->cost_distribution_detail_id : '', 
@@ -700,9 +691,9 @@ class JournalController extends Controller
                 'note2'                         => $row->note2 ? $row->note2 : '',
             ];
         }
-
+        
         $jou['details'] = $arr;
-        				
+        	
 		return response()->json($jou);
     }
 

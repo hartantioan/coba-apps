@@ -297,12 +297,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($data->journalDetail()->where(function($query){
-            $query->whereHas('coa',function($query){
-                $query->orderBy('code');
-            })
-            ->orderBy('type');
-        })->get() as $key => $row)
+                            @foreach($data->journalDetail()->orderBy('id')->get() as $key => $row)
                                 <tr>
                                     <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
                                     <td class="center-align">{{ $row->account_id ? $row->account->name : '-' }}</td>

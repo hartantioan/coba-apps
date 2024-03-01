@@ -670,7 +670,7 @@
                             <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                         </td>
                         <td>
-                            <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:200px !important;">
+                            <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" >
                                 <option value="">--Kosong--</option>
                                 @foreach ($place as $row)
                                     <option value="{{ $row->id }}">{{ $row->code }}</option>
@@ -678,7 +678,7 @@
                             </select>
                         </td>
                         <td>
-                            <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" style="width:200px !important;" onchange="changePlace(this);">
+                            <select class="browser-default" id="arr_line` + count + `" name="arr_line[]"  onchange="changePlace(this);">
                                 <option value="">--Kosong--</option>
                                 @foreach ($line as $rowline)
                                     <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
@@ -686,7 +686,7 @@
                             </select>    
                         </td>
                         <td>
-                            <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" style="width:200px !important;" onchange="changeLine(this);">
+                            <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]"  onchange="changeLine(this);">
                                 <option value="">--Kosong--</option>
                                 @foreach ($machine as $row)
                                     <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
@@ -694,7 +694,7 @@
                             </select>
                         </td>
                         <td>
-                            <select class="browser-default" id="arr_department` + count + `" name="arr_department[]" style="width:200px !important;">
+                            <select class="browser-default" id="arr_department` + count + `" name="arr_department[]" >
                                 <option value="">--Kosong--</option>
                                 @foreach ($department as $row)
                                     <option value="{{ $row->id }}">{{ $row->name }}</option>
@@ -757,7 +757,7 @@
                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                 </td>
                 <td>
-                    <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:200px !important;">
+                    <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" >
                         <option value="">--Kosong--</option>
                         @foreach ($place as $row)
                             <option value="{{ $row->id }}">{{ $row->code }}</option>
@@ -765,7 +765,7 @@
                     </select>
                 </td>
                 <td>
-                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" style="width:200px !important;" onchange="changePlace(this);">
+                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]"  onchange="changePlace(this);">
                         <option value="">--Kosong--</option>
                         @foreach ($line as $rowline)
                             <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
@@ -773,7 +773,7 @@
                     </select>    
                 </td>
                 <td>
-                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" style="width:200px !important;" onchange="changeLine(this);">
+                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]"  onchange="changeLine(this);">
                         <option value="">--Kosong--</option>
                         @foreach ($machine as $row)
                             <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
@@ -781,7 +781,7 @@
                     </select>
                 </td>
                 <td>
-                    <select class="browser-default" id="arr_department` + count + `" name="arr_department[]" style="width:200px !important;">
+                    <select class="browser-default" id="arr_department` + count + `" name="arr_department[]" >
                         <option value="">--Kosong--</option>
                         @foreach ($department as $row)
                             <option value="{{ $row->id }}">{{ $row->name }}</option>
@@ -1613,7 +1613,7 @@
                                 <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                             </td>
                             <td>
-                                <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:200px !important;">
+                                <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" >
                                     <option value="">--Kosong--</option>
                                     @foreach ($place as $row)
                                         <option value="{{ $row->id }}">{{ $row->code }}</option>
@@ -1621,7 +1621,7 @@
                                 </select>
                             </td>
                             <td>
-                                <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);" style="width:200px !important;">
+                                <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);" >
                                     <option value="">--Kosong--</option>
                                     @foreach ($line as $rowline)
                                         <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
@@ -1629,7 +1629,7 @@
                                 </select>    
                             </td>
                             <td>
-                                <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);" style="width:200px !important;">
+                                <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);" >
                                     <option value="">--Kosong--</option>
                                     @foreach ($machine as $row)
                                         <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
@@ -1637,7 +1637,7 @@
                                 </select>
                             </td>
                             <td>
-                                <select class="browser-default" id="arr_department` + count + `" name="arr_department[]" style="width:200px !important;">
+                                <select class="browser-default" id="arr_department` + count + `" name="arr_department[]" >
                                     <option value="">--Kosong--</option>
                                     @foreach ($department as $row)
                                         <option value="{{ $row->id }}">{{ $row->name }}</option>

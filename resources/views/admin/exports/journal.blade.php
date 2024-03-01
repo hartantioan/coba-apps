@@ -37,12 +37,7 @@
             $no = 1;
         @endphp
         @foreach($data as $key => $row)
-            @foreach($row->journalDetail()->where(function($query){
-                $query->whereHas('coa',function($query){
-                    $query->orderBy('code');
-                })
-                ->orderBy('type');
-            })->get() as $rowdetail)
+            @foreach($row->journalDetail()->orderBy('id')->get() as $rowdetail)
             <tr align="center" style="background-color:#d6d5d5;">
                 <td>{{ $no }}</td>
                 <td>{{ $row->code }}</td>

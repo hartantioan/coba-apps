@@ -3246,8 +3246,8 @@ class CustomHelper {
 							'type'			=> '1',
 							'nominal'		=> $row->tax,
 							'nominal_fc'	=> $row->tax,
-							'note'			=> $row->purchaseInvoice->tax_no,
-							'note2'			=> date('d/m/Y',strtotime($row->purchaseInvoice->cut_date))
+							'note'			=> $row->purchaseInvoice->tax_no ? $row->purchaseInvoice->tax_no : '',
+							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
 						]);
 					}
 	
@@ -3264,8 +3264,8 @@ class CustomHelper {
 							'type'			=> '2',
 							'nominal'		=> $row->wtax,
 							'nominal_fc'	=> $row->wtax,
-							'note'			=> $row->purchaseInvoice->tax_cut_no,
-							'note2'			=> date('d/m/Y',strtotime($row->purchaseInvoice->cut_date))
+							'note'			=> $row->purchaseInvoice->tax_cut_no ? $row->purchaseInvoice->tax_cut_no : '',
+							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
 						]);
 					}
 	
@@ -3320,8 +3320,8 @@ class CustomHelper {
 							'type'			=> '1',
 							'nominal'		=> $row->tax * $pod->purchaseOrder->currency_rate,
 							'nominal_fc'	=> $pod->purchaseOrder->currency->type == '1' ? $row->tax * $pod->purchaseOrder->currency_rate : $row->tax,
-							'note'			=> $row->purchaseInvoice->tax_no,
-							'note2'			=> date('d/m/Y',strtotime($row->purchaseInvoice->cut_date))
+							'note'			=> $row->purchaseInvoice->tax_no ? $row->purchaseInvoice->tax_no : '',
+							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
 						]);
 					}
 	
@@ -3338,8 +3338,8 @@ class CustomHelper {
 							'type'			=> '2',
 							'nominal'		=> $row->wtax * $pod->purchaseOrder->currency_rate,
 							'nominal_fc'	=> $pod->purchaseOrder->currency->type == '1' ? $row->wtax * $pod->purchaseOrder->currency_rate : $row->wtax,
-							'note'			=> $row->purchaseInvoice->tax_cut_no,
-							'note2'			=> date('d/m/Y',strtotime($row->purchaseInvoice->cut_date))
+							'note'			=> $row->purchaseInvoice->tax_cut_no ? $row->purchaseInvoice->tax_cut_no : '',
+							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
 						]);
 					}
 	
@@ -3386,8 +3386,8 @@ class CustomHelper {
 							'type'			=> '1',
 							'nominal'		=> $row->tax * $row->lookable->landedCost->currency_rate,
 							'nominal_fc'	=> $row->lookable->landedCost->currency->type == '1' ? $row->tax * $row->lookable->landedCost->currency_rate : $row->tax,
-							'note'			=> $row->purchaseInvoice->tax_no,
-							'note2'			=> date('d/m/Y',strtotime($row->purchaseInvoice->cut_date))
+							'note'			=> $row->purchaseInvoice->tax_no ? $row->purchaseInvoice->tax_no : '',
+							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
 						]);
 					}
 	
@@ -3399,8 +3399,8 @@ class CustomHelper {
 							'type'			=> '2',
 							'nominal'		=> $row->wtax * $row->lookable->landedCost->currency_rate,
 							'nominal_fc'	=> $row->lookable->landedCost->currency->type == '1' ? $row->wtax * $row->lookable->landedCost->currency_rate : $row->wtax,
-							'note'			=> $row->purchaseInvoice->tax_cut_no,
-							'note2'			=> date('d/m/Y',strtotime($row->purchaseInvoice->cut_date))
+							'note'			=> $row->purchaseInvoice->tax_cut_no ? $row->purchaseInvoice->tax_cut_no : '',
+							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
 						]);
 					}
 	
@@ -3450,8 +3450,8 @@ class CustomHelper {
 							'type'			=> '1',
 							'nominal'		=> $row->tax * $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate,
 							'nominal_fc'	=> $row->lookable->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? $row->tax * $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate : $row->tax,
-							'note'			=> $row->purchaseInvoice->tax_no,
-							'note2'			=> date('d/m/Y',strtotime($row->purchaseInvoice->cut_date))
+							'note'			=> $row->purchaseInvoice->tax_no ? $row->purchaseInvoice->tax_no : '',
+							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
 						]);
 					}
 	
@@ -3468,8 +3468,8 @@ class CustomHelper {
 							'type'			=> '2',
 							'nominal'		=> $row->wtax * $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate,
 							'nominal_fc'	=> $row->lookable->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? $row->wtax * $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate : $row->wtax,
-							'note'			=> $row->purchaseInvoice->tax_cut_no,
-							'note2'			=> date('d/m/Y',strtotime($row->purchaseInvoice->cut_date))
+							'note'			=> $row->purchaseInvoice->tax_cut_no ? $row->purchaseInvoice->tax_cut_no : '',
+							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
 						]);
 					}
 	

@@ -110,14 +110,9 @@ class GoodIssueRequestDetail extends Model
     }
 
     public function balanceGi(){
-        $totalGi = $this->qty - $this->getStockNow($this->qty_conversion);
-        if($totalGi > 0){
-            $totalGi = $this->getStockNow($this->qty_conversion);
-        }else{
-            $totalGi = $this->qty;
-        }
+        $totalGi = $this->qty;
         foreach($this->goodIssueDetail as $row){
-            $totalGi -= round(($row->qty / $this->qty_conversion),3);
+            $totalGi -= $row->qty;
         }
         return $totalGi;
     }

@@ -119,7 +119,7 @@ class SubsidiaryLedgerController extends Controller
                                 <td>'.($detail['data']->warehouse()->exists() ? $detail['data']->warehouse->name : '-').'</td>
                                 <td>'.($detail['data']->line()->exists() ? $detail['data']->line->code : '-').'</td>
                                 <td>'.($detail['data']->machine()->exists() ? $detail['data']->machine->code : '-').'</td>
-                                <td>'.($detail['data']->department()->exists() ? $detail['data']->department->code : '-').'</td>
+                                <td>'.($detail['data']->department()->exists() ? $detail['data']->department->name : '-').'</td>
                                 <td>'.($detail['data']->project()->exists() ? $detail['data']->project->code : '-').'</td>
                             </tr>';
                 }

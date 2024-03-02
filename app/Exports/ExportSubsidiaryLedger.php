@@ -76,7 +76,7 @@ class ExportSubsidiaryLedger implements  FromView,ShouldAutoSize
                     $data_tempura['j_warehouse'][]=($detail['data']->warehouse()->exists() ? $detail['data']->warehouse->name : '-');
                     $data_tempura['j_line'][]=($detail['data']->line()->exists() ? $detail['data']->line->code : '-');
                     $data_tempura['j_machine'][]=($detail['data']->machine()->exists() ? $detail['data']->machine->code : '-');
-                    $data_tempura['j_department'][]=($detail['data']->department()->exists() ? $detail['data']->department->code : '-');
+                    $data_tempura['j_department'][]=($detail['data']->department()->exists() ? $detail['data']->department->name : '-');
                     $data_tempura['j_project'][]=($detail['data']->project()->exists() ? $detail['data']->project->code : '-');
                 }
             }

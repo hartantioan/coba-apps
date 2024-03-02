@@ -256,7 +256,7 @@
                                     <label class="active" for="top">TOP (hari) Autofill</label>
                                 </div>
                                 <div class="input-field col m3 s12 op-element step9">
-                                    <input id="pay_date" name="pay_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. bayar">
+                                    <input id="pay_date" name="pay_date" type="date" value="{{ date('Y-m-d') }}" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. bayar">
                                     <label class="active" for="pay_date">Tgl. Bayar</label>
                                 </div>
                                 <div class="file-field input-field col m3 s12 step10">

@@ -253,6 +253,18 @@
                                 <th class="center-align"></th>
                                 <th class="center-align"></th>
                             </tr>
+                            <tr>
+                                <th class="center-align">Daftar Item</th>
+                                <th colspan="7">
+                                    <ol>
+                                    @if($row->purchaseOrder()->exists())
+                                        @foreach ($row->purchaseOrder->purchaseOrderDetail as $rowdetail)
+                                            <li>{{ ($rowdetail->item_id ? $rowdetail->item->code.' - '.$rowdetail->item->name : $rowdetail->coa->code.' - '.$rowdetail->coa->name).' Qty : '.number_format($rowdetail->qty,3,',','.').' Sat. '.($rowdetail->item_id ? $rowdetail->itemUnit->unit->code : '-') }}</li>
+                                        @endforeach
+                                    @endif
+                                    </ol>
+                                </th>
+                            </tr>
                         </thead>
                     </table>
                 @endforeach

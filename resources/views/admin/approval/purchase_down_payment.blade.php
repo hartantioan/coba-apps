@@ -255,7 +255,7 @@
                             </tr>
                             <tr>
                                 <th class="center-align">Daftar Item</th>
-                                <th class="center-align" colspan="7">
+                                <th colspan="7">
                                     <ol>
                                     @if($row->purchaseOrder()->exists())
                                         @foreach ($row->purchaseOrder->purchaseOrderDetail as $rowdetail)

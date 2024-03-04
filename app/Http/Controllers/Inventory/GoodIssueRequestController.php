@@ -773,10 +773,10 @@ class GoodIssueRequestController extends Controller
         return response()->json($response);
     }
     public function viewStructureTree(Request $request){
-        $query = MaterialRequest::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = GoodIssueRequest::where('code',CustomHelper::decrypt($request->id))->first();
         $data_go_chart = [];
         $data_link = [];
-        $mr = [
+        $gir = [
                 'key'   => $query->code,
                 "name"  => $query->code,
                 "color" => "lightblue",
@@ -786,7 +786,7 @@ class GoodIssueRequestController extends Controller
                 'url'   =>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($query->code),
                 "title" =>$query->code,
             ];
-        $data_go_chart[]=$mr;
+        $data_go_chart[]=$gir;
         
         $data_id_good_scale = [];
         $data_id_good_issue = [];
@@ -802,6 +802,8 @@ class GoodIssueRequestController extends Controller
         $data_id_pr=[];
         $data_id_memo=[];
         $data_id_pyrcs=[];
+        $data_id_gir = [];
+      
 
         $data_id_mo=[];
         $data_id_mo_delivery = [];
@@ -817,7 +819,7 @@ class GoodIssueRequestController extends Controller
         
         if($query) {
 
-            $data_id_mr[]=$query->id;
+            $data_id_gir[]=$query->id;
             //Pengambilan Main Branch beserta id terkait
             
             $finished_data_id_gr=[];
@@ -834,6 +836,8 @@ class GoodIssueRequestController extends Controller
             $finished_data_id_po=[];
             $finished_data_id_pr=[];
             $finished_data_id_mr=[];
+            $finished_data_id_gir=[];
+
             $added = true;
             while($added){
                
@@ -1799,6 +1803,25 @@ class GoodIssueRequestController extends Controller
                                 }
                             }
                             
+                            if($data_detail_good_issue->goodIssueRequestDetail()){
+                                $good_issue_request_tempura = [
+                                    "key" => $data_detail_good_issue->lookable->goodIssueRequest->code,
+                                    "name" => $data_detail_good_issue->lookable->goodIssueRequest->code,
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :".$data_detail_good_issue->lookable->goodIssueRequest->post_date],
+                                        ['name'=> "Nominal : Rp.:".number_format($data_detail_good_issue->lookable->goodIssueRequest->grandtotal,2,',','.')],
+                                    ],
+                                    'url'=>request()->root()."/admin/inventory/good_issue_request?code=".CustomHelper::encrypt($data_detail_good_issue->lookable->goodIssueRequest->code),
+                                ];
+
+                                $data_go_chart[]=$good_issue_request_tempura;
+                                $data_link[]=[
+                                    'from'=>$data_detail_good_issue->lookable->goodIssueRequest->code,
+                                    'to'=>$query_good_issue->code,
+                                    'string_link'=>$data_detail_good_issue->lookable->goodIssueRequest->code.$query_good_issue->code,
+                                ];
+                                $data_id_gir[] = $data_detail_good_issue->lookable->goodIssueRequest->id;  
+                            }
                         }
                     }
                 }
@@ -2136,6 +2159,40 @@ class GoodIssueRequestController extends Controller
                                 
                             }
                         }
+                    }
+                }
+
+                foreach($data_id_gir as $gir_id){
+                    if(!in_array($gir_id, $finished_data_id_gir)){
+                        $finished_data_id_gir[]=$gir_id;
+                        $query_good_issue_request = GoodIssueRequest::find($gir_id);
+                        foreach($query_good_issue_request->goodIssueRequestDetail as $row_gird){
+                            if($row_gird->goodIssueDetail()->exists()){
+                                foreach($row_gird->goodIssueDetail as $good_issue_detail){
+                                    $good_issue_tempura = [
+                                        'properties'=> [
+                                            ['name'=> "Tanggal : ".$good_issue_detail->goodIssue->post_date],
+                                        ],
+                                        'key'=>$good_issue_detail->goodIssue->code,
+                                        'name'=>$good_issue_detail->goodIssue->code,
+                                        'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($good_issue_detail->goodIssue->code),
+                                    ];
+        
+                                    $data_go_chart[]=$good_issue_tempura;
+                                    $data_link[]=[
+                                        'from'=>$query_good_issue_request->code,
+                                        'to'=>$good_issue_detail->goodIssue->code,
+                                        'string_link'=>$query_good_issue_request->code.$good_issue_detail->goodIssue->code,
+                                    ];
+                                    if(!in_array($good_issue_detail->goodIssue->id,$data_id_good_issue)){
+                                        $data_id_good_issue[] = $good_issue_detail->goodIssue->id;
+                                        $added = true;
+                                    }
+                                }
+                            }
+                            
+                        }
+
                     }
                 }
 

@@ -1385,6 +1385,7 @@ class MarketingOrderController extends Controller
         $data_id_pr=[];
         $data_id_memo=[];
         $data_id_pyrcs=[];
+        $data_id_gir = [];
 
         $data_id_mo=[];
         $data_id_mo_delivery = [];

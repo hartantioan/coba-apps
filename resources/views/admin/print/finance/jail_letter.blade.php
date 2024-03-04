@@ -209,7 +209,7 @@
                                             Jabatan
                                         </td>
                                         <td>
-                                            : {{ strtoupper($data->user->position->name) }}
+                                            : {{ $data->user->position()->exists() ? strtoupper($data->user->position->name) : '-' }}
                                         </td>
                                     </tr>
                                     <tr>

@@ -1365,7 +1365,7 @@ class CustomHelper {
 					'currency_id'	=> $pr->currency_id,
 					'currency_rate'	=> $pr->currency_rate,
 					'post_date'		=> $pr->post_date,
-					'note'			=> $pr->code,
+					'note'			=> $pr->note,
 					'status'		=> '3'
 				]);
 	

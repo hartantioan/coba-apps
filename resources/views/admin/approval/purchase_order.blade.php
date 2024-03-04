@@ -335,7 +335,7 @@
             <table class="mt-3" width="100%" border="0">
                 <tr>
                     <td class="">
-                        <div >Dibuat oleh, {{ $data->user->name }} {{ $data->user->position->Level->name}} {{ ($data->post_date ? \Carbon\Carbon::parse($data->updated_at)->format('d/m/Y H:i:s') : '-') }}</div></div>
+                        <div >Dibuat oleh, {{ $data->user->name }} {{ $data->user->position()->exists() ? $data->user->position->name : '-' }} {{ ($data->post_date ? \Carbon\Carbon::parse($data->updated_at)->format('d/m/Y H:i:s') : '-') }}</div></div>
                     </td>
                 </tr>
                     @if($data->approval())

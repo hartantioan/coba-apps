@@ -205,7 +205,7 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            Posisi: {{ $data->user->position->Level->name}}
+                                            Posisi: {{ $data->user->position()->exists() ? $data->user->position->name : '-' }}
                                         </td>
                                         
                                     </tr>
@@ -303,7 +303,7 @@
                                         <div>{!! $data->user->signature() !!}</div>
                                     @endif
                                     <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $data->user->name }}</div>
-                                    <div class="mt-1">{{ $data->user->position->Level->code.' - '.$data->user->position->division->name }}</div>
+                                    <div class="mt-1">{{ $data->user->position()->exists() ? $data->user->position->Level->code.' - '.$data->user->position->division->name : '-' }}</div>
                                 </td>
                                 @if($data->approval())
                                     @foreach ($data->approval() as $detail)

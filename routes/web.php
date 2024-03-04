@@ -260,6 +260,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('coa_journal', [Select2Controller::class, 'coaJournal']);
                 Route::get('raw_coa', [Select2Controller::class, 'rawCoa']);
                 Route::get('employee', [Select2Controller::class, 'employee']);
+                Route::get('user', [Select2Controller::class, 'user']);
                 Route::get('supplier', [Select2Controller::class, 'supplier']);
                 Route::get('customer', [Select2Controller::class, 'customer']);
                 Route::get('employee_customer', [Select2Controller::class, 'employeeCustomer']);
@@ -2232,6 +2233,12 @@ Route::prefix('admin')->group(function () {
                         Route::post('filter',[EmployeeReceivableController::class, 'filter']);
                         Route::get('export',[EmployeeReceivableController::class, 'export']);
                     });
+                    Route::prefix('cash_bank')->middleware('operation.access:cash_bank,view')->group(function () {
+                        Route::get('/',[CashBankController::class, 'index']);
+                        Route::get('datatable',[CashBankController::class, 'datatable']);
+                        Route::get('row_detail',[CashBankController::class, 'rowDetail']);
+                        Route::get('export', [CashBankController::class, 'export']);
+                    });
                 });
 
                 Route::prefix('payment_request')->middleware(['operation.access:payment_request,view','lockacc'])->group(function () {
@@ -2464,12 +2471,6 @@ Route::prefix('admin')->group(function () {
                         Route::get('/',[ProfitLossController::class, 'index']);
                         Route::post('process', [ProfitLossController::class, 'process']);
                         Route::get('export', [ProfitLossController::class, 'export']);
-                    });
-                    Route::prefix('cash_bank')->middleware('operation.access:cash_bank,view')->group(function () {
-                        Route::get('/',[CashBankController::class, 'index']);
-                        Route::get('datatable',[CashBankController::class, 'datatable']);
-                        Route::get('row_detail',[CashBankController::class, 'rowDetail']);
-                        Route::get('export', [CashBankController::class, 'export']);
                     });
                 });
             });

@@ -1355,7 +1355,7 @@ class CustomHelper {
 			
 			$pr = PaymentRequest::find($table_id);
 			
-			if($pr->paymentRequestCross()->exists()){
+			if($pr->paymentRequestCross()->exists() && $pr->balance == 0){
 				$query = Journal::create([
 					'user_id'		=> session('bo_id'),
 					'company_id'	=> $pr->company_id,

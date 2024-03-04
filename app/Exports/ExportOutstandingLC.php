@@ -37,7 +37,7 @@ class ExportOutstandingLC implements FromView,ShouldAutoSize
         }
         
         
-        return view('admin.exports.outstanding_down_payment', [
+        return view('admin.exports.outstanding_lc', [
             'data' => $array,
             
         ]);

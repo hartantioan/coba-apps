@@ -136,8 +136,16 @@ class MarketingHandoverReportController extends Controller
                                 <th class="center-align">Grandtotal</th>
                             </tr>
                         </thead><tbody>';
-        
+        $totalqty=0;
+        $totals=0;
+        $totalppn=0;
+        $totalgrandtotal=0;
         foreach($data->marketingOrderInvoiceDeliveryProcess as $key => $row){
+            $totalqty+=$row->qty;
+            $totals+=$row->total;
+            $totalppn+=$row->tax;
+            $totalgrandtotal+=$row->grandtotal;
+    
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code.'</td>
@@ -150,7 +158,15 @@ class MarketingHandoverReportController extends Controller
                 <td class="right-align">'.number_format($row->grandtotal,2,',','.').'</td>
             </tr>';
         }
-        
+        $string .= '<tr>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="3"> Total </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqty, 3, ',', '.') . '</td>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2">  </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totals, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalppn, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalgrandtotal, 2, ',', '.') . '</td>
+            </tr>  
+        ';
         $string .= '</tbody></table></div>';
 
         $string .= '<div class="col s12 mt-3"><table style="min-width:100%;">

@@ -20,6 +20,16 @@
     .select2-container {
         height: 3.6rem !important;
     }
+
+    #no_position{
+        background-color: red;
+        animation-name: blinking;
+        animation-duration: 1s;
+        animation-iteration-count: 100;
+        padding: 5px;
+        color: black;
+        border-radius: 5px;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -121,6 +131,7 @@
                                                         <th>NIK/Code</th>
                                                         <th>Tipe</th>
                                                         <th>Grup</th>
+                                                        <th>Posisi</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -1723,6 +1734,7 @@
                 { name: 'username', className: 'center-align' },
                 { name: 'id_card', className: 'center-align' },
                 { name: 'type', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'group_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'group_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'right-align' },

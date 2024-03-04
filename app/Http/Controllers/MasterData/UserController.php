@@ -158,6 +158,12 @@ class UserController extends Controller
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>';
 
+                if($val->type==1){
+                    $position = $val->position()->exists() ? $val->position->name : '<div id="no_position">belum memiliki posisi</div>';
+                }else{
+                    $position = '-';
+                }
+                
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->employee_no).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->name,
@@ -165,6 +171,7 @@ class UserController extends Controller
                     $val->employee_no,
                     $val->type(),
                     $val->group()->exists() ? $val->group->code.' - '.$val->group->name : '-',
+                    $position,
                     $val->status(),
                     $btn
                 ];

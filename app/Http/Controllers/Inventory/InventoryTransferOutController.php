@@ -131,7 +131,17 @@ class InventoryTransferOutController extends Controller
                 }
 
                 if(!$request->modedata){
-                    $query->where('user_id',session('bo_id'));
+                    
+                    if(session('bo_postion_id') == ''){
+                        $query->where('user_id',session('bo_id'));
+                    }else{
+                        $query->whereHas('user', function ($subquery) {
+                            $subquery->whereHas('position', function($subquery1) {
+                                $subquery1->where('division_id',session('bo_division_id'));
+                            });
+                        });
+                    }
+                    
                 }
             })
             ->where(function($query){
@@ -179,7 +189,17 @@ class InventoryTransferOutController extends Controller
                 }
 
                 if(!$request->modedata){
-                    $query->where('user_id',session('bo_id'));
+                    
+                    if(session('bo_postion_id') == ''){
+                        $query->where('user_id',session('bo_id'));
+                    }else{
+                        $query->whereHas('user', function ($subquery) {
+                            $subquery->whereHas('position', function($subquery1) {
+                                $subquery1->where('division_id',session('bo_division_id'));
+                            });
+                        });
+                    }
+                    
                 }
             })
             ->where(function($query){

@@ -3064,9 +3064,12 @@ class PurchaseInvoiceController extends Controller
                 }
                 
                 foreach($data_id_dp as $downpayment_id){
+                    
                     if(!in_array($downpayment_id, $finished_data_id_dp)){
                         $finished_data_id_dp[]=$downpayment_id;
+                        
                         $query_dp = PurchaseDownPayment::find($downpayment_id);
+                       
                         foreach($query_dp->purchaseDownPaymentDetail as $row){
                             if($row->purchaseOrder->exists()){
                                 $po=[
@@ -3198,6 +3201,32 @@ class PurchaseInvoiceController extends Controller
                             ];
                             
 
+                        }
+
+                        if($query_dp->hasPaymentRequestDetail()->exists()){
+                            
+                            foreach($query_dp->hasPaymentRequestDetail as $row_pyr_detail){
+                                $data_pyr_tempura=[
+                                    "name"=>$row_pyr_detail->paymentRequest->code,
+                                    "key" => $row_pyr_detail->paymentRequest->code,
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
+                                        ['name'=> "Nominal : Rp.:".number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')],
+                                        ],
+                                    'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),           
+                                ];
+                                $data_go_chart[]=$data_pyr_tempura;
+                                $data_link[]=[
+                                    'from'=>$query_dp->code,
+                                    'to'=>$row_pyr_detail->paymentRequest->code,
+                                    'string_link'=>$query_dp->code.$row_pyr_detail->paymentRequest->code,
+                                ];
+
+                                if(!in_array($query_dp->id, $data_id_dp)){
+                                    $data_id_dp[] = $query_dp->id;
+                                    $added=true;
+                                }
+                            }
                         }
                     }
 
@@ -3597,7 +3626,33 @@ class PurchaseInvoiceController extends Controller
                                 
                                 
                             }
+                            
+                        }
 
+                        if($query_po->purchaseDownPaymentDetail()->exists()){
+                            
+                            foreach($query_po->purchaseDownPaymentDetail as $row_dp_detail){
+                                $data_apdp_tempura = [
+                                    'key'   => $row_dp_detail->purchaseDownPayment->code,
+                                    "name"  => $row_dp_detail->purchaseDownPayment->code,
+                                
+                                    'properties'=> [
+                                        ['name'=> "Tanggal: ".$row_dp_detail->purchaseDownPayment->post_date],
+                                        ['name'=> "Vendor  : ".$row_dp_detail->purchaseDownPayment->name],
+                                    ],
+                                    'url'   =>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_dp_detail->purchaseDownPayment->code),
+                                ];
+                                $data_go_chart[]=$data_apdp_tempura;
+                                $data_link[]=[
+                                    'from'  =>  $query_po->code,
+                                    'to'    =>  $row_dp_detail->purchaseDownPayment->code,
+                                    'string_link'=>$query_po->code.$row_dp_detail->purchaseDownPayment->code,
+                                ];
+                                if(!in_array($row_dp_detail->purchaseDownPayment->id,$data_id_dp)){
+                                    $data_id_dp[]=$row_dp_detail->purchaseDownPayment->id;
+                                    $added = true;
+                                } 
+                            }
                         }
                     }
 
@@ -3675,7 +3730,7 @@ class PurchaseInvoiceController extends Controller
                                         ],
                                         'key'=>$good_issue_detail->goodIssue->code,
                                         'name'=>$good_issue_detail->goodIssue->code,
-                                        'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($good_issue_detail->goodIssue->code),
+                                        'url'=>request()->root()."/admin/inventory/good_issue_request?code=".CustomHelper::encrypt($good_issue_detail->goodIssue->code),
                                     ];
         
                                     $data_go_chart[]=$good_issue_tempura;
@@ -3757,7 +3812,7 @@ class PurchaseInvoiceController extends Controller
                         }
                     }
                 }
-            }   
+            }     
             function unique_key($array,$keyname){
 
                 $new_array = array();

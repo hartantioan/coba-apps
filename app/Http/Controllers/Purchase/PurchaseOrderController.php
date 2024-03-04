@@ -144,7 +144,7 @@ class PurchaseOrderController extends Controller
         $total_data = PurchaseOrder::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */where(function($query)use($request){
             if(!$request->modedata){
                     
-                if(session('bo_postion_id') == ''){
+                /*if(session('bo_position_id') == ''){
                     $query->where('user_id',session('bo_id'));
                 }else{
                     $query->whereHas('user', function ($subquery) {
@@ -152,8 +152,8 @@ class PurchaseOrderController extends Controller
                             $subquery1->where('division_id',session('bo_division_id'));
                         });
                     });
-                }
-                
+                }*/
+                $query->where('user_id',session('bo_id'));
             }
         })->count();
         
@@ -236,7 +236,7 @@ class PurchaseOrderController extends Controller
 
                 if(!$request->modedata){
                     
-                    if(session('bo_postion_id') == ''){
+                    /*if(session('bo_position_id') == ''){
                         $query->where('user_id',session('bo_id'));
                     }else{
                         $query->whereHas('user', function ($subquery) {
@@ -244,7 +244,8 @@ class PurchaseOrderController extends Controller
                                 $subquery1->where('division_id',session('bo_division_id'));
                             });
                         });
-                    }
+                    }*/
+                    $query->where('user_id',session('bo_id'));
                     
                 }
             })
@@ -332,7 +333,7 @@ class PurchaseOrderController extends Controller
 
                 if(!$request->modedata){
                     
-                    if(session('bo_postion_id') == ''){
+                    /*if(session('bo_position_id') == ''){
                         $query->where('user_id',session('bo_id'));
                     }else{
                         $query->whereHas('user', function ($subquery) {
@@ -340,7 +341,8 @@ class PurchaseOrderController extends Controller
                                 $subquery1->where('division_id',session('bo_division_id'));
                             });
                         });
-                    }
+                    }*/
+                    $query->where('user_id',session('bo_id'));
                     
                 }
             })

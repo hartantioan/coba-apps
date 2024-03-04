@@ -136,7 +136,7 @@ class GoodReturnPOController extends Controller
 
                 if(!$request->modedata){
                     
-                    if(session('bo_postion_id') == ''){
+                    /*if(session('bo_position_id') == ''){
                         $query->where('user_id',session('bo_id'));
                     }else{
                         $query->whereHas('user', function ($subquery) {
@@ -144,7 +144,8 @@ class GoodReturnPOController extends Controller
                                 $subquery1->where('division_id',session('bo_division_id'));
                             });
                         });
-                    }
+                    }*/
+                    $query->where('user_id',session('bo_id'));
                     
                 }
             })
@@ -187,7 +188,7 @@ class GoodReturnPOController extends Controller
 
                 if(!$request->modedata){
                     
-                    if(session('bo_postion_id') == ''){
+                    /*if(session('bo_position_id') == ''){
                         $query->where('user_id',session('bo_id'));
                     }else{
                         $query->whereHas('user', function ($subquery) {
@@ -195,7 +196,8 @@ class GoodReturnPOController extends Controller
                                 $subquery1->where('division_id',session('bo_division_id'));
                             });
                         });
-                    }
+                    }*/
+                    $query->where('user_id',session('bo_id'));
                     
                 }
             })

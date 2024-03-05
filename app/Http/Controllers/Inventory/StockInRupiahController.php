@@ -57,7 +57,6 @@ class StockInRupiahController extends Controller
                     $query->where('status',1);
                 });
                 if($request->finish_date) {
-                    info($request->finish_date);
                     $query->whereDate('date','<=', $request->finish_date);
                 }
                 if($request->item_id) {
@@ -85,7 +84,6 @@ class StockInRupiahController extends Controller
             })
             ->orderBy('date', 'desc')
             ->get();
-            info($query_data);
         }else{
             $perlu = 1;
             $query_data = ItemCogs::where(function($query) use ( $request) {
@@ -200,7 +198,7 @@ class StockInRupiahController extends Controller
                 $uom_unit = $row->item->uomUnit->code;
             }
         }
-        // info($array_last_item);
+       
         
         $end_time = microtime(true);
        

@@ -249,7 +249,7 @@ class GoodReceiveController extends Controller
 			'post_date'		            => 'required',
 			'currency_id'		        => 'required',
             'currency_rate'		        => 'required',
-            'arr_price'                 => 'required|array',
+            'arr_total'                 => 'required|array',
             'arr_item'                  => 'required|array',
             'arr_qty'                   => 'required|array',
             'arr_coa'                   => 'required|array',
@@ -262,8 +262,8 @@ class GoodReceiveController extends Controller
 			'currency_id.required' 				=> 'Mata uang tidak boleh kosong.',
             'Currency_rate.required' 			=> 'Konversi tidak boleh kosong.',
 			'warehouse_id.required'				=> 'Gudang tujuan tidak boleh kosong',
-            'arr_price.required'                => 'Harga satuan tidak boleh kosong',
-            'arr_price.array'                   => 'Harga satuan harus dalam bentuk array',
+            'arr_total.required'                => 'Harga total tidak boleh kosong',
+            'arr_total.array'                   => 'Harga total harus dalam bentuk array',
             'arr_item.required'                 => 'Item tidak boleh kosong',
             'arr_item.array'                    => 'Item harus dalam bentuk array',
             'arr_qty.required'                  => 'Qty item tidak boleh kosong',
@@ -292,8 +292,8 @@ class GoodReceiveController extends Controller
             $arrErrorSerial = [];
 
             foreach($request->arr_item as $key => $row){
-                if(isset($request->arr_price[$key]) && isset($request->arr_qty[$key])){
-                    if(str_replace(',','.',str_replace('.','',$request->arr_price[$key])) == 0 || str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) == 0){
+                if(isset($request->arr_total[$key]) && isset($request->arr_qty[$key])){
+                    if(str_replace(',','.',str_replace('.','',$request->arr_total[$key])) == 0 || str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) == 0){
                         $passed = false;
                     }
                 }else{
@@ -375,7 +375,7 @@ class GoodReceiveController extends Controller
             $grandtotal = 0;
 
             foreach($request->arr_item as $key => $row){
-                $grandtotal += str_replace(',','.',str_replace('.','',$request->arr_price[$key])) * str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
+                $grandtotal += str_replace(',','.',str_replace('.','',$request->arr_total[$key]));
             }
 
 			if($request->temp){
@@ -485,8 +485,8 @@ class GoodReceiveController extends Controller
                             'warehouse_id'          => $warehouse,
                             'place_id'              => $place,
                             'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                            'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
-                            'total'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])) * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                            'price'                 => round(str_replace(',','.',str_replace('.','',$request->arr_total[$key])) / str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),2),
+                            'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
                             'note'                  => $request->arr_note[$key],
                             'inventory_coa_id'      => $request->arr_inventory_coa[$key] ? $request->arr_inventory_coa[$key] : NULL,
                             'coa_id'                => $request->arr_inventory_coa[$key] ? NULL : ($request->arr_coa[$key] ? $request->arr_coa[$key] : NULL),

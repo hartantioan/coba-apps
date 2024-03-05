@@ -824,11 +824,10 @@
                     <input name="arr_serial_number[]" class="materialize-textarea" type="text" placeholder="Pisahkan koma jika > 1">
                 </td>
                 <td class="center">
-                    <input list="tempPrice` + count + `" onfocus="emptyThis(this);" name="arr_price[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowPrice`+ count +`">
-                    <datalist id="tempPrice` + count + `"></datalist>
+                    <span id="arr_price` + count + `">0,00</span>
                 </td>
                 <td class="right-align">
-                    <span id="arr_total` + count + `" class="arr_total">0</span>
+                    <input onfocus="emptyThis(this);" name="arr_total[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="arr_total`+ count +`">
                 </td>
                 <td>
                     <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ...">
@@ -935,12 +934,12 @@
     }
 
     function countRow(id){
-        var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")), price = parseFloat($('#rowPrice' + id).val().replaceAll(".", "").replaceAll(",","."));
+        var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")), total = parseFloat($('#arr_total' + id).val().replaceAll(".", "").replaceAll(",","."));
 
-        if((price * qty).toFixed(3) >= 0){
-            $('#arr_total' + id).text(formatRupiahIni((price * qty).toFixed(3).toString().replace('.',',')));
+        if((total / qty).toFixed(2) >= 0){
+            $('#arr_price' + id).text(formatRupiahIni((total / qty).toFixed(2).toString().replace('.',',')));
         }else{
-            $('#arr_total' + id).text('-' + formatRupiahIni((price * qty).toFixed(3).toString().replace('.',',')));
+            $('#arr_price' + id).text('-' + formatRupiahIni((total / qty).toFixed(2).toString().replace('.',',')));
         }
     }
 
@@ -1134,11 +1133,10 @@
                                     <input name="arr_serial_number[]" class="materialize-textarea" type="text" placeholder="Pisahkan koma jika > 1" value="` + val.list_serial + `">
                                 </td>
                                 <td class="center">
-                                    <input name="arr_price[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowPrice`+ count +`">
-                                    <datalist id="tempPrice` + count + `"></datalist>
+                                    <span id="arr_price` + count + `">` + val.price + `</span>
                                 </td>
                                 <td class="right-align">
-                                    <span id="arr_total` + count + `" class="arr_total">` + val.total + `</span>
+                                    <input onfocus="emptyThis(this);" name="arr_total[]" class="browser-default" type="text" value="` + val.total + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="arr_total`+ count +`">
                                 </td>
                                 <td>
                                     <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">

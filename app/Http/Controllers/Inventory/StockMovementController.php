@@ -64,7 +64,7 @@ class StockMovementController extends Controller
 
                if($request->finish_date) {
                    
-                    $query->whereDate('date','<', $request->finish_date);
+                    $query->whereDate('date','<=', $request->finish_date);
                 }
                 if($request->item_id) {
                     $query->whereHas('item',function($query) use($request){

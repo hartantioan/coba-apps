@@ -1759,6 +1759,10 @@ class CustomHelper {
 					$row->item_shading_id ? $row->item_shading_id : NULL,
 				);
 			}
+
+			$gr->update([
+				'status'	=> '3',
+			]);
 		}elseif($table_name == 'marketing_order_returns'){
 			$mor = MarketingOrderReturn::find($table_id);
 

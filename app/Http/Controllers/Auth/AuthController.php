@@ -163,12 +163,14 @@ class AuthController extends Controller
     
 
     public function logout(){
-        $user = User::find(session('bo_id'));
-        activity()
-            ->performedOn(new User())
-            ->causedBy($user->id)
-            ->withProperties($user) 
-            ->log('Logout dari aplikasi.');
+        if(session('bo_id')){
+            $user = User::find(session('bo_id'));
+            activity()
+                ->performedOn(new User())
+                ->causedBy($user->id)
+                ->withProperties($user) 
+                ->log('Logout dari aplikasi.');
+        }
         session()->flush();
         Auth::logout();
         return redirect('admin/login');

@@ -195,7 +195,7 @@ class TrialBalanceController extends Controller
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalanceBefore'],2,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalDebit'],2,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalCredit'],2,',','.').'</td>
-                        <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalance'],2,',','.').'</td>';
+                        <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalanceBefore'] + $val['totalBalance'],2,',','.').'</td>';
                     $arrMonth[$key]['totalDebit'] += $val['totalDebit'];
                     $arrMonth[$key]['totalCredit'] += $val['totalCredit'];
                     $arrMonth[$key]['totalBalance'] += $val['totalBalanceBefore'] + $val['totalDebit'] - $val['totalCredit'];
@@ -229,7 +229,8 @@ class TrialBalanceController extends Controller
 
                     foreach($arrMonth as $key => $rowMonth) {
                         $html .= '
-                        <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalanceBefore'],2,',','.').'</b></td><td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempDebit'],2,',','.').'</b></td>
+                        <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalanceBefore'],2,',','.').'</b></td>
+                        <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempDebit'],2,',','.').'</b></td>
                         <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempCredit'],2,',','.').'</b></td>
                         <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalance'],2,',','.').'</b></td>';
                     }

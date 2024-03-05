@@ -130,13 +130,17 @@
                                                     </div>
                                                     <div class="input-field col s6">
                                                         <select class="browser-default" id="province_id" name="province_id">
+                                                            @if($data->province_id)
                                                             <option value="{{ $data->province_id }}">{{ $data->province->name }}</option>
+                                                            @endif
                                                         </select>
                                                         <label class="active" for="province_id">Provinsi</label>
                                                     </div>
                                                     <div class="input-field col s6">
                                                         <select class="browser-default" id="city_id" name="city_id">
+                                                            @if($data->city_id)
                                                             <option value="{{ $data->city_id }}">{{ $data->city->name }}</option>
+                                                            @endif
                                                         </select>
                                                         <label class="active" for="city_id">Kota/Kabupaten</label>
                                                     </div>

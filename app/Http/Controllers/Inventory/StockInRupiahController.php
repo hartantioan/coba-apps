@@ -178,9 +178,10 @@ class StockInRupiahController extends Controller
                         });
                     }
                 })
+                ->orderBy('id', 'desc')
                 ->orderBy('date', 'desc') // Order by 'date' column in descending order
                 ->first();
-
+                
                 $array_last_item[] = [
                     'date'         => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
                     'last_nominal' => $query_first ? number_format($query_first->total_final, 2, ',', '.') : 0,

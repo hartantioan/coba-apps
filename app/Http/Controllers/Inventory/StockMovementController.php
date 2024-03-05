@@ -184,6 +184,7 @@ class StockMovementController extends Controller
                         });
                     }
                 })
+                ->orderBy('id', 'desc')
                 ->orderBy('date', 'desc') // Order by 'date' column in descending order
                 ->first();
 

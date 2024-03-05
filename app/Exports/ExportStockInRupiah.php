@@ -164,6 +164,7 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                         });
                     }
                 })
+                ->orderBy('id','desc')
                 ->orderBy('date', 'desc') // Order by 'date' column in descending order
                 ->first();
 

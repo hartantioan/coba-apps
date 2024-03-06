@@ -487,6 +487,7 @@
                 $('input').css('border', 'none');
                 $('input').css('border-bottom', '0.5px solid black');
                 $('#temp').val('');
+                $('#total').text('0,00');
                 M.updateTextFields();
                 resetDetailForm();
                 window.onbeforeunload = function() {

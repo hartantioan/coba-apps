@@ -220,7 +220,6 @@
                                             <th class="center">Nama Aset</th>
                                             <th class="center">Plant Aset</th>
                                             <th class="center">Plant Biaya</th>
-                                            <th class="center">Gudang</th>
                                             <th class="center">Line</th>
                                             <th class="center">Mesin</th>
                                             <th class="center">Departemen</th>
@@ -236,7 +235,7 @@
                                     </thead>
                                     <tbody id="body-asset">
                                         <tr id="empty-detail">
-                                            <td colspan="17" class="center">
+                                            <td colspan="16" class="center">
                                                 Pilih aset untuk memulai...
                                             </td>
                                         </tr>
@@ -631,7 +630,7 @@
         });
         $('#body-asset').empty().append(`
             <tr id="empty-detail">
-                <td colspan="17" class="center">
+                <td colspan="16" class="center">
                     Pilih aset untuk memulai...
                 </td>
             </tr>
@@ -663,14 +662,6 @@
                             <option value="">--Kosong--</option>
                             @foreach ($place as $row)
                                 <option value="{{ $row->id }}">{{ $row->code }}</option>
-                            @endforeach
-                        </select>    
-                    </td>
-                    <td>
-                        <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]" style="width:200px !important;">
-                            <option value="">--Kosong--</option>
-                            @foreach ($warehouse as $row)
-                                <option value="{{ $row->id }}">{{ $row->name }}</option>
                             @endforeach
                         </select>    
                     </td>
@@ -864,7 +855,6 @@
                 formData.delete("arr_machine[]");
                 formData.delete("arr_department[]");
                 formData.delete("arr_project[]");
-                formData.delete("arr_warehouse[]");
                 formData.delete("arr_cost_distribution_cost[]");
 
                 $('select[name^="arr_line[]"]').each(function(index){
@@ -881,9 +871,6 @@
                 });
                 $('select[name^="arr_project[]"]').each(function(index){
                     formData.append('arr_project[]',($(this).val() ? $(this).val() : ''));
-                });
-                $('select[name^="arr_warehouse[]"]').each(function(index){
-                    formData.append('arr_warehouse[]',($(this).val() ? $(this).val() : ''));
                 });
                 $('select[name^="arr_cost_distribution_cost[]"]').each(function(index){
                     formData.append('arr_cost_distribution_cost[]',($(this).val() ? $(this).val() : ''));
@@ -1025,14 +1012,6 @@
                                 </select>    
                             </td>
                             <td>
-                                <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]" style="width:200px !important;">
-                                    <option value="">--Kosong--</option>
-                                    @foreach ($warehouse as $row)
-                                        <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                    @endforeach
-                                </select>    
-                            </td>
-                            <td>
                                 <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" style="width:200px !important;" onchange="changePlace(this);">
                                     <option value="">--Kosong--</option>
                                     @foreach ($line as $rowline)
@@ -1088,7 +1067,6 @@
                         <option value="` + val.unit_id + `">` + val.unit_name + `</option>
                     `);
                     $('#arr_place' + count).val(val.place_id);
-                    $('#arr_warehouse' + count).val(val.warehouse_id);
                     $('#arr_line' + count).val(val.line_id);
                     $('#arr_machine' + count).val(val.machine_id);
                     $('#arr_department' + count).val(val.department_id);

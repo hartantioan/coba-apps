@@ -61,7 +61,6 @@ class CapitalizationController extends Controller
             'department'    => Division::where('status','1')->get(),
             'line'          => Line::where('status','1')->get(),
             'machine'       => Machine::where('status','1')->get(),
-            'warehouse'     => Warehouse::where('status','1')->whereIn('id',$this->datawarehouses)->get(),
             'modedata'      => $menuUser->mode ? $menuUser->mode : '',
         ];
 
@@ -349,7 +348,6 @@ class CapitalizationController extends Controller
                         'capitalization_id'     => $query->id,
                         'asset_id'              => $row,
                         'place_id'              => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
-                        'warehouse_id'          => $request->arr_warehouse[$key] ? $request->arr_warehouse[$key] : NULL,
                         'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
                         'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
                         'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
@@ -515,7 +513,6 @@ class CapitalizationController extends Controller
                 'place_name'            => $row->asset->place->name,
                 'place_code'            => $row->asset->place->code,
                 'place_id'              => $row->place_id ? $row->place_id : '',
-                'warehouse_id'          => $row->warehouse_id ? $row->warehouse_id : '',
                 'line_id'               => $row->line_id ? $row->line_id : '',
                 'machine_id'            => $row->machine_id ? $row->machine_id : '',
                 'department_id'         => $row->department_id ? $row->department_id : '',

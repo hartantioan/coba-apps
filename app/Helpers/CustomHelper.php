@@ -2326,7 +2326,7 @@ class CustomHelper {
 				'currency_id'	=> $data->currency_id,
 				'currency_rate'	=> $data->currency_rate,
 				'post_date'		=> $data->post_date,
-				'note'			=> $data->code,
+				'note'			=> $data->note,
 				'status'		=> '3'
 			]);
 			

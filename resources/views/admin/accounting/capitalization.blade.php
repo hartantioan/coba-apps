@@ -240,6 +240,13 @@
                                             </td>
                                         </tr>
                                     </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th class="center" colspan="13">TOTAL</th>
+                                            <th class="center"><span id="total">0,00</span></th>
+                                            <th class="center" colspan="2"></th>
+                                        </tr>
+                                    </tfoot>
                                 </table>
                             </div>
                         </div>
@@ -618,10 +625,13 @@
     }
 
     function count(){
+        let total = 0;
         $('input[name^="arr_price"]').each(function(index){
             let price = parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")), qty = parseFloat($('input[name^="arr_qty"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
             $('input[name^="arr_total"]').eq(index).val(formatRupiahIni((price * qty).toFixed(2).toString().replace('.',',')));
+            total += price * qty;
         });
+        $('#total').text(formatRupiahIni(total.toFixed(2).toString().replace('.',',')));
     }
 
     function resetDetailForm(){

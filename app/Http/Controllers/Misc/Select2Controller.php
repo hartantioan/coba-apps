@@ -544,6 +544,7 @@ class Select2Controller extends Controller {
                 'limit_credit'          => $d->limit_credit,
                 'count_limit'           => $d->count_limit_credit,
                 'balance_limit'         => $d->limit_credit - $d->count_limit_credit,
+                'type'                  => $d->type,
                 'arrinfo'               => $d,
             ];
         }
@@ -696,8 +697,8 @@ class Select2Controller extends Controller {
                 'name'                  => $d->name,
                 'unit_name'             => $capital ? $capital->unit->name : '',
                 'unit_id'               => $capital ? $capital->unit_id : '',
-                'nominal'               => $d->nominal > 0 ? number_format($d->nominal,3,',','.') : '0,000',
-                'price'                 => $capital ? number_format($capital->price,3,',','.') : '0,000',
+                'nominal'               => $d->nominal > 0 ? number_format($d->nominal,3,',','.') : '0,00',
+                'price'                 => $capital ? number_format($capital->price,3,',','.') : '0,00',
                 'place_id'              => $d->place_id,
                 'place_name'            => $d->place->name,
                 'place_code'            => $d->place->code,

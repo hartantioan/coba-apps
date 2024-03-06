@@ -37,13 +37,13 @@ class DocumentTaxController extends Controller
     public function datatable(Request $request){
         $column = [
             'id',
-            'transaction_code',
-            'replace',
-            'code',
             'date',
+            'code',
             'npwp_number',
             'npwp_name',
             'npwp_address',
+            'replace',
+            'transaction_code',
             'npwp_target',
             'npwp_target_name',
             'npwp_target_address',
@@ -117,6 +117,7 @@ class DocumentTaxController extends Controller
                             $query->whereDate('date','<=', $request->finish_date);
                         }
                     })
+                    
                     ->offset($start)
                     ->limit($length)
                     ->orderBy($order, $dir)

@@ -342,7 +342,7 @@
                 }
             },
             columns: [
-                        { name: 'id', searchable: false, orderable: false, className: 'center-align' },
+                        { name: 'id', searchable: false, className: 'center-align' },
                         { name: 'transaction_code', className: 'center-align' },
                         { name: 'date', className: 'center-align' },
                         { name: 'date', className: 'center-align' },

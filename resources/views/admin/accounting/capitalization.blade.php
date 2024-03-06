@@ -242,7 +242,9 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <span class="right" id="total">0,00</span>
+                            <div class="right">
+                                <h5>TOTAL <span id="total">0,00</span></h5>
+                            </div>
                         </div>
                         <div class="col s12 mt-3 step9">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>

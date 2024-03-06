@@ -62,7 +62,7 @@
                     font-size:0.5em !important;
                 }
                 .tbl-info td{
-                    font-size:0.7em !important;
+                    font-size:0.8em !important;
                 }
                 .table-data-item td{
                     font-size:0.5em !important;
@@ -195,27 +195,19 @@
                         <td width="33%" class="left-align" style="vertical-align: top !important;">
                             <table border="0" width="100%">
                                 <tr>
-                                    <td width="50%">
+                                    <td width="35%">
                                         Supplier/Vendor
                                     </td>
-                                    <td width="50%">
+                                    <td width="65%">
                                         {{ $data->account->name }}
                                     </td>
                                 </tr>
                                 <tr>
                                     <td width="50%">
-                                        Alamat
+                                        Tipe
                                     </td>
                                     <td width="50%">
-                                        {{ $data->account->address }}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td width="50%">
-                                        Telepon
-                                    </td>
-                                    <td width="50%">
-                                        {{ $data->account->phone.' / '.$data->account->office_no }}
+                                        {{ $data->type() }}
                                     </td>
                                 </tr>
                                 <tr>
@@ -244,12 +236,13 @@
                                 </tr>
                                 <tr>
                                     <td width="50%">
-                                        Tgl.Tenggat
+                                        Tgl. Jatuh Tempo
                                     </td>
                                     <td width="50%">
                                         {{ date('d/m/Y',strtotime($data->due_date)) }}
                                     </td>
                                 </tr>
+                                
                             </table>
                         </td>
                         <td width="33%" class="left-align" style="vertical-align: top !important;">
@@ -262,52 +255,38 @@
                                         {{ date('d/m/Y',strtotime($data->post_date)) }}
                                     </td>
                                 </tr>
+                                
+                                
                                 <tr>
-                                    <td width="50%">
-                                        Tipe
-                                    </td>
-                                    <td width="50%">
-                                        {{ $data->type() }}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td width="50%">
-                                        Tgl. Jatuh Tempo
-                                    </td>
-                                    <td width="50%">
-                                        {{ date('d/m/Y',strtotime($data->due_date)) }}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td width="50%">
-                                        Tgl. Jatuh Tempo
-                                    </td>
-                                    <td width="50%">
-                                        {{ date('d/m/Y',strtotime($data->due_date)) }}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td width="50%">
+                                    <td width="35%">
                                         Invoice Vendor
                                     </td>
-                                    <td width="50%">
+                                    <td width="65%">
                                         {{ $data->invoice_no }}
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td width="50%">
+                                    <td width="35%">
                                         Faktur Pajak
                                     </td>
-                                    <td width="50%">
+                                    <td width="65%">
                                         {{ $data->tax_no }}
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td width="50%">
+                                    <td width="35%">
                                         No. Bukti Potong
                                     </td>
-                                    <td width="50%">
+                                    <td width="65%">
                                         {{ $data->tax_cut_no }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="50%">
+                                        Tgl. Bukti Potong
+                                    </td>
+                                    <td width="50%">
+                                        {{ $data->cut_date }}
                                     </td>
                                 </tr>
                             </table>
@@ -321,7 +300,7 @@
                                 </tr>
                                 <tr>
                                     <td align="center">
-                                        <h3>{{ $data->code }}</h3>
+                                        <h2>{{ $data->code }}</h2>
                                     </td>
                                 </tr>
                             </table>
@@ -334,8 +313,7 @@
                             <tr>
                                 <th class="center-align" width="5%">No.</th>
                                 <th class="center-align" width="35%">Referensi/Item/Jasa</th>
-                                <th class="center-align">Ket.1</th>
-                                <th class="center-align">Ket.2</th>
+                                <th class="center-align">Qty</th>
                                 <th class="center-align" width="10%" style="max-width:10%">Total</th>
                                 <th class="center-align" width="10%" style="max-width:10%">PPN</th>
                                 <th class="center-align" width="10%" style="max-width:10%">PPh</th>
@@ -349,8 +327,7 @@
                                 <td class="center-align">{!! 
                                     $row->getCode().'<br>'.$row->getHeaderCode()
                                 !!}</td>
-                                <td class="">{{ $row->note }}</td>
-                                <td class="">{{ $row->note2 }}</td>
+                                <td class="">{{ $row->qty_received }}</td>
                                 <td class="right-align" style="text-align: right;">{{ number_format($row->total,2,',','.') }}</td>
                                 <td class="right-align" style="text-align: right;">{{ number_format($row->tax,2,',','.') }}</td>
                                 <td class="right-align" style="text-align: right;">{{ number_format($row->wtax,2,',','.') }}</td>
@@ -368,8 +345,7 @@
                         <table style="width:100%">
                             <tr class="break-row">
                                 <td>
-                                    Rekening :
-                                    {{ $data->account->defaultBank() ? $data->account->defaultBank() : ' - ' }}
+                                   
                                     <div class="mt-3">
                                         Catatan : {{ $data->note }}
                                     </div>

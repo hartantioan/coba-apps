@@ -230,7 +230,7 @@
                                     </select>
                                     <label class="" for="payment_type">Tipe Pembayaran</label>
                                 </div>
-                                <div class="input-field col m3 s12 op-element step5">
+                                <div class="input-field col m6 s12 l6 op-element step5">
                                     <select class="browser-default" id="coa_source_id" name="coa_source_id"></select>
                                     <label class="active" for="coa_source_id">Kas / Bank</label>
                                     <span class="helper-text" data-error="wrong" data-success="right">Pilih kosong jika rekonsiliasi dengan piutang karyawan dan sisa bayar = 0.</span>

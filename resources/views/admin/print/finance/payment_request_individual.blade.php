@@ -36,6 +36,10 @@
                 padding: 5px;
             }
 
+            #kode_barcode {
+                font-size: 2.3em !important;
+            }
+
             /* Clearfix (clear floats) */
             .row::after {
             content: "";
@@ -66,7 +70,7 @@
                     font-size:0.8em !important;
                 }
                 .tbl-info td{
-                    font-size:1em !important;
+                    font-size:1.3em !important;
                 }
                 .table-data-item td{
                     font-size:0.8em !important;
@@ -218,18 +222,9 @@
             <div class="card">
                 <div class="card-content invoice-print-area ">
                     <table border="0" width="100%">
-                        <tr
-                            <td width="56%" class="left-align" class="tbl-info">
+                        <tr>
+                            <td width="33%" class="left-align" class="tbl-info">
                                 <table border="0" width="100%">
-                                    <tr>
-                                        <td width="40%">
-                                           Tipe Pembayaran
-                                        </td>
-                                        <td width="1%">:</td>
-                                        <td width="60%">
-                                            {{ $data->paymentType() }}
-                                        </td>
-                                    </tr>
                                     <tr>
                                         <td width="40%">
                                             Partner Bisnis
@@ -239,6 +234,16 @@
                                             {{ $data->account->name }}
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td width="40%">
+                                           Tipe Pembayaran
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="60%">
+                                            {{ $data->paymentType() }}
+                                        </td>
+                                    </tr>
+                                   
                                     <tr>
                                         <td width="40%">
                                             Vendor Bank
@@ -266,19 +271,43 @@
                                             {{ $data->account_name }}
                                         </td>
                                     </tr>
+                                    
+                                </table>
+                            </td>
+                            <td width="33%" class="left-align" class="tbl-info">
+                                <table border="0" width="100%">
                                     <tr>
                                         <td width="40%">
-                                           Kas / Bank
+                                            Tgl. Posting
                                         </td>
                                         <td width="1%">:</td>
                                         <td width="60%">
-                                            {{ $data->coa_source_id ? $data->coaSource->name : '-' }}
+                                            {{ $data->post_date }}
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td width="40%">
+                                            Tgl. Req. Date
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="60%">
+                                            {{ $data->pay_date }}
+                                        </td>
+                                    </tr>
+                                   
+                                    <tr>
+                                        <td width="40%">
+                                            Tgl Outgoing Payment
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="60%">
+                                            @if($data->outgoingPayment)
+                                                {{ $row->outgoing_payment->pay_date ?? '' }}
+                                            @endif
+                                        </td>
+                                    </tr>
+                                   
                                 </table>
-                            </td>
-                            <td width="10%" class="left-align">
-                                
                             </td>
                             <td width="33%" class="left-align">
                                 <table border="0" width="100%">
@@ -289,7 +318,7 @@
                                     </tr>
                                     <tr>
                                         <td align="center">
-                                            <h1>{{ $data->code }}</h1>
+                                            <h1 id="kode_barcode">{{ $data->code }}</h1>
                                         </td>
                                     </tr>
                                 </table>
@@ -307,10 +336,7 @@
                                     <th class="center">Tgl.Tenggat</th>
                                     <th class="center">Keterangan</th>
                                     <th class="center">Coa</th>
-                                    <th class="center">Plant</th>
-                                    <th class="center">Line</th>
-                                    <th class="center">Mesin</th>
-                                    <th class="center">Divisi</th>
+
                                     <th class="center">Proyek</th>
                                     <th class="center">Bayar</th>
                                 </tr>
@@ -326,10 +352,6 @@
                                     <td align="center">{{ $row->purchaseInvoice() ? date('d/m/Y',strtotime($row->lookable->due_date)) : '-' }}</td>
                                     <td>{{ $row->note }}</td>
                                     <td>{{ $row->coa->name }}</td>
-                                    <td>{{ $row->place()->exists() ? $row->place->code : '-' }}</td>
-                                    <td>{{ $row->line()->exists() ? $row->line->code : '-' }}</td>
-                                    <td>{{ $row->machine()->exists() ? $row->machine->code : '-' }}</td>
-                                    <td>{{ $row->department()->exists() ? $row->department->code : '-' }}</td>
                                     <td>{{ $row->project()->exists() ? $row->project->name : '-' }}</td>
                                     <td align="right">{{ number_format($row->nominal,2,',','.') }}</td>
                                 </tr>
@@ -414,7 +436,7 @@
                                 @endif
                                 <td class="center-align">
                                     @if ($data->payment_type == '2')
-                                        <img src="{{ $e_banking }}" width="50%" style="position: absolute; width:20%; right:0px;">
+                                        <img src="{{ $e_banking }}" width="50%" style="position: absolute; width:25%; right:-6px;">
                                     @endif
                                 </td>
                             </tr>

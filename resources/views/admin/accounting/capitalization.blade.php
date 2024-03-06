@@ -240,15 +240,9 @@
                                             </td>
                                         </tr>
                                     </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <th class="center" colspan="13">TOTAL</th>
-                                            <th class="center"><span id="total">0,00</span></th>
-                                            <th class="center" colspan="2"></th>
-                                        </tr>
-                                    </tfoot>
                                 </table>
                             </div>
+                            <span class="right" id="total">0,00</span>
                         </div>
                         <div class="col s12 mt-3 step9">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>

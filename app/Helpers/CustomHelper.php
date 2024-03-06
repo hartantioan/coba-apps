@@ -3983,8 +3983,9 @@ class CustomHelper {
 				
 				$row->delete();
 
-				ResetCogs::dispatch($row->date,$place_id,$item_id);
-				ResetStock::dispatch($place_id,$warehouse_id,$area_id,$item_id,$item_shading_id,$qty,$type);
+				/* ResetCogs::dispatch($row->date,$place_id,$item_id);
+				ResetStock::dispatch($place_id,$warehouse_id,$area_id,$item_id,$item_shading_id,$qty,$type); */
+				self::resetStock($place_id,$warehouse_id,$area_id,$item_id,$item_shading_id,$qty,$type);
 			}
 		}
 	}

@@ -26,8 +26,8 @@
                     <td style="border: 1px solid black;">'{{ number_format($row->documentTax->npwp_number, 0, '.', '') }}</td>
                     <td style="border: 1px solid black;">{{ $row->documentTax->npwp_name }}</td>
                     <td style="border: 1px solid black;">{{ $row->documentTax->npwp_address }}</td>
-                    <td style="border: 1px solid black;">{{ number_format(ceil($row->total),2,',','.')}}</td>
-                    <td style="border: 1px solid black;">{{ number_format(ceil($row->tax),2,',','.') }}</td>
+                    <td style="border: 1px solid black;">{{ number_format(round($row->total - 0.5, 0, PHP_ROUND_HALF_UP),2,',','.')}}</td>
+                    <td style="border: 1px solid black;">{{ number_format(round($row->tax - 0.5, 0, PHP_ROUND_HALF_UP),2,',','.') }}</td>
                     <td style="border: 1px solid black;">{{ $row->item}}</td>
                 </tr>
             @endforeach

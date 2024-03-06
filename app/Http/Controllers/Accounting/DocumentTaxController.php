@@ -225,8 +225,8 @@ class DocumentTaxController extends Controller
                 <td class="center-align" style="border: 1px solid black;">'.$row->documentTax->npwp_number.'</td>
                 <td class="center-align" style="border: 1px solid black;">'.$row->documentTax->npwp_name.'</td>              
                 <td class="center-align" style="border: 1px solid black;">'.$row->documentTax->npwp_address.'</td>
-                <td class="center-align" style="border: 1px solid black;">'.number_format(ceil($row->total),2,',','.').'</td>
-                <td class="center-align" style="border: 1px solid black;">'.number_format(ceil($row->tax),2,',','.').'</td>
+                <td class="center-align" style="border: 1px solid black;">'.number_format(round($row->total - 0.5, 0, PHP_ROUND_HALF_UP),2,',','.').'</td>
+                <td class="center-align" style="border: 1px solid black;">'.number_format(round($row->tax - 0.5, 0, PHP_ROUND_HALF_UP),2,',','.').'</td>
                 <td class="center-align" style="border: 1px solid black;">'.$row->item.'</td>
             </tr>';
         } 

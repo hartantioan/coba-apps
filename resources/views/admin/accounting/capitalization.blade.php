@@ -1095,7 +1095,7 @@
                     select2ServerSide('#arr_unit' + count, '{{ url("admin/select2/unit") }}');
                     $('#asset_id').empty();
                 });
-
+                $('#total').text(response.grandtotal);
                 $('.modal-content').scrollTop(0);
                 $('#code').focus();
                 M.updateTextFields();

@@ -500,7 +500,8 @@ class CapitalizationController extends Controller
 
     public function show(Request $request){
         $cap = Capitalization::where('code',CustomHelper::decrypt($request->id))->first();
-        $cap['currency_rate'] = number_format($cap->currency_rate,3,',','.');
+        $cap['currency_rate'] = number_format($cap->currency_rate,2,',','.');
+        $cap['grandtotal'] = number_format($cap->grandtotal,2,',','.');
         $cap['code_place_id'] = substr($cap->code,7,2);
 
         $arr = [];

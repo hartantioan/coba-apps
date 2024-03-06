@@ -170,8 +170,8 @@ class DocumentTaxController extends Controller
                     $val->npwp_number,
                     $val->npwp_name,
                     $val->npwp_address,
-                    number_format($val->total,3,',','.'),
-                    number_format($val->tax,3,',','.'),
+                    number_format($val->total,2,',','.'),
+                    number_format($val->tax,2,',','.'),
                     $val->documentTaxDetail->first()->item ?? '-',
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
@@ -225,8 +225,8 @@ class DocumentTaxController extends Controller
                 <td class="center-align" style="border: 1px solid black;">'.$row->documentTax->npwp_number.'</td>
                 <td class="center-align" style="border: 1px solid black;">'.$row->documentTax->npwp_name.'</td>              
                 <td class="center-align" style="border: 1px solid black;">'.$row->documentTax->npwp_address.'</td>
-                <td class="center-align" style="border: 1px solid black;">'.number_format($row->total,3,',','.').'</td>
-                <td class="center-align" style="border: 1px solid black;">'.number_format($row->tax,3,',','.').'</td>
+                <td class="center-align" style="border: 1px solid black;">'.number_format(ceil($row->total),2,',','.').'</td>
+                <td class="center-align" style="border: 1px solid black;">'.number_format(ceil($row->tax),2,',','.').'</td>
                 <td class="center-align" style="border: 1px solid black;">'.$row->item.'</td>
             </tr>';
         } 

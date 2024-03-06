@@ -27,8 +27,8 @@
                     <td style="border: 1px solid black;">'{{ number_format($row->npwp_number, 0, '.', '') }}</td>
                     <td style="border: 1px solid black;">{{ $row->npwp_name }}</td>
                     <td style="border: 1px solid black;">{{ $row->npwp_address }}</td>
-                    <td style="border: 1px solid black;">{{ number_format($row->total,3,',','.')}}</td>
-                    <td style="border: 1px solid black;">{{ number_format($row->tax,3,',','.') }}</td>
+                    <td style="border: 1px solid black;">{{ number_format($row->total,2,',','.')}}</td>
+                    <td style="border: 1px solid black;">{{ number_format($row->tax,2,',','.') }}</td>
                     <td style="border: 1px solid black;">{{ $row->documentTaxDetail->first()->item ?? '-' }}</td>
                 </tr>
             @endforeach

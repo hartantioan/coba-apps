@@ -2339,7 +2339,7 @@ class GoodIssueController extends Controller
                         'usable_id'  => NULL,
                         'usable_type'=> NULL,
                     ]);
-                    $row->delete();
+                    /* $row->delete(); */
                 }
 
                 $query->updateRootDocumentStatusProcess();

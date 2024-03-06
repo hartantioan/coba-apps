@@ -45,7 +45,7 @@ class ResetCogs implements ShouldQueue
      */
     public function handle()
     {
-		$itemcogs = ItemCogs::where('post_date','>=',$this->date)->where('place_id',$this->place_id)->get();
+		/* $itemcogs = ItemCogs::where('post_date','>=',$this->date)->where('place_id',$this->place_id)->get();
 
 		foreach($itemcogs as $row){
 			$journal = Journal::where('lookable_type',$row->lookable_type)->where('lookable_id',$row->lookable_id)->get();
@@ -139,6 +139,6 @@ class ResetCogs implements ShouldQueue
 
 		foreach($collection as $row){
 			CustomHelper::sendCogsFromReset($row['lookable_type'],$row['lookable_id']);
-		}
+		} */
     }
 }

@@ -1,5 +1,10 @@
     <!-- BEGIN: Page Main-->
-
+<style>
+   [onclick="ambilefektif"]:hover {
+         cursor: pointer;
+         box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+   }
+</style>
 <div id="main">
     <div class="row">
         <div class="pt-3 pb-1" id="breadcrumbs-wrapper">
@@ -42,8 +47,8 @@
                                        
                                        <div class="row">
                                           <div class="col s12 m6 l4">
-                                             <div class="card gradient-45deg-deep-orange-orange gradient-shadow white-text animate fadeLeft">
-                                                 <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;">
+                                             <div onclick="ambilefektif()" class="card gradient-45deg-deep-orange-orange gradient-shadow white-text animate fadeLeft" style="cursor: pointer; transition: box-shadow 0.3s;">
+                                                 <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;" onmouseover="this.style.boxShadow='0 0 10px rgba(0, 0, 0, 0.2)'" onmouseout="this.style.boxShadow='none'">
                                                      <div style="flex: 1;">
                                                          <img src="{{ url('website/day.png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
                                                      </div>
@@ -56,8 +61,8 @@
                                           </div>
                                          
                                           <div class="col s12 m6 l4">
-                                             <div class="card gradient-45deg-purple-deep-orange gradient-shadow min-height-100 white-text animate fadeLeft">
-                                                <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;">
+                                             <div class="card gradient-45deg-purple-deep-orange gradient-shadow min-height-100 white-text animate fadeLeft" onclick="ambilKeluar()" style="cursor: pointer; transition: box-shadow 0.3s;">
+                                                <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;" onmouseover="this.style.boxShadow='0 0 10px rgba(0, 0, 0, 0.2)'" onmouseout="this.style.boxShadow='none'">
                                                 
                                                       <div style="flex: 1;">
                                                          <img src="{{ url('website/exit.png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
@@ -73,8 +78,8 @@
                                              </div>
                                           </div>
                                           <div class="col s12 m6 l4">
-                                             <div class="card gradient-45deg-purple-amber gradient-shadow min-height-100 white-text animate fadeLeft">
-                                                <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;">
+                                             <div class="card gradient-45deg-purple-amber gradient-shadow min-height-100 white-text animate fadeLeft" onclick="ambilMasuk()" style="cursor: pointer; transition: box-shadow 0.3s;">
+                                                <div class="padding-4" style="display: flex; align-items: center;min-height: 8rem;" onmouseover="this.style.boxShadow='0 0 10px rgba(0, 0, 0, 0.2)'" onmouseout="this.style.boxShadow='none'">
                                                  
                                                       <div style="flex: 1;">
                                                          <img src="{{ url('website/arrived.png') }}" class="responsive-img" alt="Day" style="height: 4rem; margin-right: 1rem;">
@@ -412,8 +417,126 @@
     </div>
 </div>
 
+<div id="modalmasuk" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+   <div class="modal-content">
+       <div class="row">
+           <div class="col s12" >
+               <div class="card subscriber-list-card animate fadeRight">
+                  <div class="card-content">
+                     <h4 class="card-title">Jam Kedatangan (00:00 - 12:00) <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat float-right">Close</a></h4>
+                  </div>
+                  <table class="subscription-table responsive-table highlight">
+                     <thead>
+                        <tr>
+                           <th>Date</th>
+                           <th>Time</th>
+                        </tr>
+                     </thead>
+                     <tbody id="attendance_masuk">
+                        
+                     </tbody>
+                  </table>
+               </div>
+           </div>
+       </div>
+   </div>
+</div>
+
+<div id="modalkeluar" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+   <div class="modal-content">
+       <div class="row">
+           <div class="col s12" >
+            <div class="card subscriber-list-card animate fadeRight">
+               <div class="card-content">
+                  <h4 class="card-title">Jam Keluar (12:01 - 23:59) <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat float-right">Close</a></h4>
+               </div>
+               <table class="subscription-table responsive-table highlight">
+                  <thead>
+                     <tr>
+                        <th>Date</th>
+                        <th>Time</th>
+                     </tr>
+                  </thead>
+                  <tbody id="attendance_keluar">
+                     
+                  </tbody>
+               </table>
+            </div>
+           </div>
+       </div>
+   </div>
+   <div class="modal-footer">
+       <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+   </div>
+</div>
+
+<div id="modalefektif" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+   <div class="modal-content">
+       <div class="row">
+           <div class="col s12" >
+            <div class="card subscriber-list-card animate fadeRight">
+               <div class="card-content">
+                  <h4 class="card-title">Jadwal Harian<a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat float-right">Close</a></h4>
+               </div>
+               <table class="subscription-table responsive-table highlight">
+                  <thead>
+                     <tr>
+                        <th>Date</th>
+                        <th>Nama Shift</th>
+                        <th>Jadwal</th>
+                     </tr>
+                  </thead>
+                  <tbody id="shift">
+                     
+                  </tbody>
+               </table>
+            </div>
+           </div>
+       </div>
+   </div>
+   <div class="modal-footer">
+       <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+   </div>
+</div>
+
 <script>
    $(function(){
+      
+      $('#modalmasuk').modal({
+         onOpenStart: function(modal,trigger) {
+               
+         },
+         onOpenEnd: function(modal, trigger) { 
+               
+         },
+         onCloseEnd: function(modal, trigger){
+               $('#attendance_masuk').html('');
+         }
+      });
+
+      $('#modalkeluar').modal({
+         onOpenStart: function(modal,trigger) {
+               
+         },
+         onOpenEnd: function(modal, trigger) { 
+               
+         },
+         onCloseEnd: function(modal, trigger){
+               $('#attendance_keluar').html('');
+         }
+      });
+
+      $('#modalefektif').modal({
+         onOpenStart: function(modal,trigger) {
+               
+         },
+         onOpenEnd: function(modal, trigger) { 
+               
+         },
+         onCloseEnd: function(modal, trigger){
+               $('#shift').html('');
+         }
+      });
       select2ServerSide('#period_id', '{{ url("admin/select2/period") }}');
    });
    var originalHtml = $('.todo-collection').html();
@@ -505,5 +628,125 @@
          $('#counter_dispen').text('{{ $counter_dispen }}');
          $('#counter_wfh').text('{{ $counter_wfh }}');
       }
+   }
+
+   function ambilMasuk(){
+      $.ajax({
+         url: '{{ Request::url() }}/get_in_attendance',
+         type: 'POST',
+         dataType: 'JSON',
+         data: {
+            temp: $('#period_id').val(),
+         },
+         headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+         },
+         beforeSend: function() {
+            loadingOpen('.modal-content');
+         },
+         success: function(response) {
+            loadingClose('.modal-content');
+            var attendancePerDay = response.message;
+            if (attendancePerDay.length > 0) {
+               
+               $.each(attendancePerDay, function(index, rowDate) {
+                 
+                  var listItem = ' <tr><td>' + rowDate.date + '</td>'+
+                        '  <td>' + rowDate.time + '</td>';
+                  $('#attendance_masuk').append(listItem);
+               });
+            }   
+            $('#modalmasuk').modal('open');
+         },
+         error: function() {
+               $('.modal-content').scrollTop(0);
+               loadingClose('.modal-content');
+               swal({
+                  title: 'Ups!',
+                  text: 'Check your internet connection.',
+                  icon: 'error'
+               });
+         }
+      });
+   }
+
+   function ambilKeluar(){
+      $.ajax({
+         url: '{{ Request::url() }}/get_out_attendance',
+         type: 'POST',
+         dataType: 'JSON',
+         data: {
+            temp: $('#period_id').val(),
+         },
+         headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+         },
+         beforeSend: function() {
+            loadingOpen('.modal-content');
+         },
+         success: function(response) {
+            loadingClose('.modal-content');
+            var attendancePerDay = response.message;
+            if (attendancePerDay.length > 0) {
+               
+               $.each(attendancePerDay, function(index, rowDate) {
+                 
+                  var listItem = ' <tr><td>' + rowDate.date + '</td>'+
+                        '  <td>' + rowDate.time + '</td>';
+                  $('#attendance_keluar').append(listItem);
+               });
+            }   
+            $('#modalkeluar').modal('open');
+         },
+         error: function() {
+               $('.modal-content').scrollTop(0);
+               loadingClose('.modal-content');
+               swal({
+                  title: 'Ups!',
+                  text: 'Check your internet connection.',
+                  icon: 'error'
+               });
+         }
+      });
+   }
+
+   function ambilefektif(){
+      $.ajax({
+         url: '{{ Request::url() }}/get_effective',
+         type: 'POST',
+         dataType: 'JSON',
+         data: {
+            temp: $('#period_id').val(),
+         },
+         headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+         },
+         beforeSend: function() {
+            loadingOpen('.modal-content');
+         },
+         success: function(response) {
+            loadingClose('.modal-content');
+            var attendancePerDay = response.message;
+            if (attendancePerDay.length > 0) {
+               
+               $.each(attendancePerDay, function(index, rowDate) {
+                 
+                  var listItem = ' <tr><td>' + rowDate.date + '</td>'+
+                        '  <td>' + rowDate.nama_shift + '</td>'+'<td>' + rowDate.jadwal + '</td></tr>';
+                  $('#shift').append(listItem);
+               });
+            }   
+            $('#modalefektif').modal('open');
+         },
+         error: function() {
+               $('.modal-content').scrollTop(0);
+               loadingClose('.modal-content');
+               swal({
+                  title: 'Ups!',
+                  text: 'Check your internet connection.',
+                  icon: 'error'
+               });
+         }
+      });
    }
 </script>

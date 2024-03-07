@@ -357,6 +357,9 @@ Route::prefix('admin')->group(function () {
 
             Route::prefix('dashboard')->group(function () {
                 Route::post('change_period',[DashboardController::class, 'changePeriod']);
+                Route::post('get_in_attendance',[DashboardController::class, 'getInAttendance']);
+                Route::post('get_out_attendance',[DashboardController::class, 'getOutAttendance']);
+                Route::post('get_effective',[DashboardController::class, 'getEffective']);
             });
 
             Route::prefix('menu')->group(function () {

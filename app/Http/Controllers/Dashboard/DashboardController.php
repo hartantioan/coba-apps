@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Dashboard;
-
+use Illuminate\Support\Facades\DB;
 use App\Models\ItemStock;
 use App\Models\Attendances;
 use App\Models\UserSpecial;
@@ -1299,7 +1299,192 @@ class DashboardController extends Controller
         return response()->json($response);
     }
 
-    public function ambilMasuk(){
-        
+    public function getInAttendance(Request $request){
+        DB::statement("SET SQL_MODE=''");
+        if($request->temp){
+            $attendance_monthly_user = AttendanceMonthlyReport::where('period_id',$request->temp)
+            ->where('user_id',session('bo_id'))->first();
+            $period_start_date = $attendance_monthly_user->period->start_date;
+            $period_end_date = $attendance_monthly_user->period->end_date;
+            $attendance = Attendances::where('employee_no', $this->user->employee_no)
+                ->where(function ($query) {
+                    // Filter records where 'date' is before 12 o'clock
+                    $query->whereRaw("TIME(date) < '12:00:00'");
+                })
+                ->whereBetween(DB::raw("STR_TO_DATE(date, '%d-%m-%Y')"), [
+                    date('Y-m-d', strtotime('22-10-2023')),
+                    date('Y-m-d', strtotime('22-11-2023'))
+                ])
+                ->orderBy('date', 'desc')
+                ->groupByRaw('DATE(date)') // Group by date
+                ->limit(20)
+                ->get();
+
+        }else{
+            $currentMonth = Carbon::now()->month;
+            $currentYear = Carbon::now()->year;
+            $startDate = Carbon::create($currentYear, $currentMonth - 1, 21);
+            $endDate = Carbon::create($currentYear, $currentMonth, 20);
+            if ($endDate->isFuture()) {
+                $endDate = Carbon::today();
+            }
+           
+            $attendance = Attendances::where('employee_no', $this->user->employee_no)
+            ->whereBetween('date', [$startDate, $endDate]) // Filter by date range
+            ->whereRaw("TIME(date) < '12:00:00'") // Filter entries before 12 o'clock
+            ->orderBy('date', 'desc')
+            ->groupByRaw('DATE(date)') // Group by date
+            ->limit(20)
+            ->get();
+
+            foreach ($attendance as $row_att) {
+                $carbonDate = Carbon::parse($row_att->date);
+                
+                $attendance_per_day[] = [
+                    'date' => $carbonDate->format('d-m-Y'), // Format date as dd-mm-yyyy
+                    'time' => $carbonDate->format('h:i A'), // Format time as hh:mm AM/PM
+                    
+                ];
+            }
+        }
+        $response = [
+            'status'    => 200,
+            'message'   => $attendance_per_day,
+        ];
+        return response()->json($response);
+
+
+    }
+
+    public function getOutAttendance(Request $request){
+        DB::statement("SET SQL_MODE=''");
+        if($request->temp){
+            $attendance_monthly_user = AttendanceMonthlyReport::where('period_id',$request->temp)
+            ->where('user_id',session('bo_id'))->first();
+            $period_start_date = $attendance_monthly_user->period->start_date;
+            $period_end_date = $attendance_monthly_user->period->end_date;
+            $attendance = Attendances::where('employee_no', $this->user->employee_no)
+                ->where(function ($query) {
+                    // Filter records where 'date' is before 12 o'clock
+                    $query->whereRaw("TIME(date) < '12:00:00'");
+                })
+                ->whereBetween(DB::raw("STR_TO_DATE(date, '%d-%m-%Y')"), [
+                    date('Y-m-d', strtotime('22-10-2023')),
+                    date('Y-m-d', strtotime('22-11-2023'))
+                ])
+                ->orderBy('date', 'desc')
+                ->groupByRaw('DATE(date)') // Group by date
+                ->limit(20)
+                ->get();
+
+        }else{
+            $currentMonth = Carbon::now()->month;
+            $currentYear = Carbon::now()->year;
+            $startDate = Carbon::create($currentYear, $currentMonth - 1, 21);
+            $endDate = Carbon::create($currentYear, $currentMonth, 20);
+            if ($endDate->isFuture()) {
+                $endDate = Carbon::today();
+            }
+
+            $attendance = Attendances::where('employee_no', $this->user->employee_no)
+            ->whereBetween('date', [$startDate, $endDate]) // Filter by date range
+            ->whereRaw("TIME(date) > '12:00:00'") // Filter entries before 12 o'clock
+            ->orderBy('date', 'desc')
+            ->groupByRaw('DATE(date)') // Group by date
+            ->limit(20)
+            ->get();
+
+            foreach ($attendance as $row_att) {
+                $carbonDate = Carbon::parse($row_att->date);
+                
+                $attendance_per_day[] = [
+                    'date' => $carbonDate->format('d-m-Y'), // Format date as dd-mm-yyyy
+                    'time' => $carbonDate->format('h:i A'), // Format time as hh:mm AM/PM
+                    
+                ];
+            }
+        }
+
+        $response = [
+            'status'    => 200,
+            'message'   => $attendance_per_day,
+        ];
+        return response()->json($response);
+
+
+    }
+
+    public function getEffective(Request $request){
+        DB::statement("SET SQL_MODE=''");
+        if($request->temp){
+            $attendance_monthly_user = AttendanceMonthlyReport::where('period_id',$request->temp)
+            ->where('user_id',session('bo_id'))->first();
+            $period_start_date = $attendance_monthly_user->period->start_date;
+            $period_end_date = $attendance_monthly_user->period->end_date;
+            $attendance = Attendances::where('employee_no', $this->user->employee_no)
+                ->where(function ($query) {
+                    // Filter records where 'date' is before 12 o'clock
+                    $query->whereRaw("TIME(date) < '12:00:00'");
+                })
+                ->whereBetween(DB::raw("STR_TO_DATE(date, '%d-%m-%Y')"), [
+                    date('Y-m-d', strtotime('22-10-2023')),
+                    date('Y-m-d', strtotime('22-11-2023'))
+                ])
+                ->orderBy('date', 'desc')
+                ->groupByRaw('DATE(date)') // Group by date
+                ->limit(20)
+                ->get();
+
+        }else{
+            $currentMonth = Carbon::now()->month;
+            $currentYear = Carbon::now()->year;
+            $startDate = Carbon::create($currentYear, $currentMonth - 1, 21);
+            $endDate = Carbon::create($currentYear, $currentMonth, 20);
+            if ($endDate->isFuture()) {
+                $endDate = Carbon::today();
+            }
+            $schedule = EmployeeSchedule::join('shifts', 'employee_schedules.shift_id', '=', 'shifts.id')
+            ->where('employee_schedules.user_id', $this->user->employee_no)
+            ->whereBetween('employee_schedules.date', [$startDate, $endDate])
+            ->orderBy('shifts.time_in')
+            ->select('employee_schedules.*') 
+            ->get();
+            $date = $startDate->copy();
+            $attendance_per_day = [];
+            while ($date->lte($endDate)) {
+                $matchingSchedules = $schedule->where('date', $date->format('Y-m-d'));
+
+                if ($matchingSchedules->isNotEmpty()) {
+                    $scheduleData = $matchingSchedules->map(function ($matchingSchedule) {
+                        return [
+                            'name' => $matchingSchedule->shift->name,
+                            'jadwal' => $matchingSchedule->shift->time_in.'-'.$matchingSchedule->shift->time_out,
+                         
+                        ];
+                    });
+                
+                    $scheduleNames = $scheduleData->pluck('name')->toArray();
+                    $jadwal = $scheduleData->pluck('jadwal')->toArray();
+                } else {
+                    $scheduleNames = ['No Schedule'];
+                    $jadwal = ['No Schedule'];
+                }
+
+                $attendance_per_day[] = [
+                    'date' => $date->format('d-m-Y'),
+                    'nama_shift' => $scheduleNames,
+                    'jadwal' => $jadwal,
+                ];
+                $date->addDay();
+            }
+        }
+        info($attendance_per_day);
+        $response = [
+            'status'    => 200,
+            'message'   => $attendance_per_day,
+        ];
+        return response()->json($response);
+
+
     }
 }

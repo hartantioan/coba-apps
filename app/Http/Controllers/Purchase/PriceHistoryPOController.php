@@ -49,6 +49,9 @@ class PriceHistoryPOController extends Controller
                 if($search) {
                     $query->whereHas('purchaseOrder',function($query) use($search){
                         $query->where('code', 'like', "%$search%");
+                    })->orWhereHas('item',function($query)use($search){
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('name', 'like', "%$search%");
                     });
                 }
                 if($request->item){
@@ -72,6 +75,9 @@ class PriceHistoryPOController extends Controller
                 if($search) {
                     $query->whereHas('purchaseOrder',function($query) use($request,$search){
                         $query->where('code', 'like', "%$search%");
+                    })->orWhereHas('item',function($query)use($search){
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('name', 'like', "%$search%");
                     });
                 }
                 if($request->item){

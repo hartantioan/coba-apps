@@ -327,7 +327,9 @@
                                 <td class="center-align">{!! 
                                     $row->getCode().'<br>'.$row->getHeaderCode()
                                 !!}</td>
-                                <td class="">{{ $row->qty_received }}</td>
+                                <td class="right-align" style="text-align: right;">
+                                    {{ $row->getGoodReceiptQty() }}
+                                </td>
                                 <td class="right-align" style="text-align: right;">{{ number_format($row->total,2,',','.') }}</td>
                                 <td class="right-align" style="text-align: right;">{{ number_format($row->tax,2,',','.') }}</td>
                                 <td class="right-align" style="text-align: right;">{{ number_format($row->wtax,2,',','.') }}</td>
@@ -349,6 +351,8 @@
                                     <div class="mt-3">
                                         Catatan : {{ $data->note }}
                                     </div>
+                                    <br>
+                                    <br>
                                     Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->balance).' Rupiah' }}
                                 </td>
                                 
@@ -395,7 +399,7 @@
                                 <br>
                                 Dibuat oleh,
                                 @if($data->user->signature)
-                                    <div>{!! $data->user->signature() !!}</div>
+                                    {{-- <div>{!! $data->user->signature() !!}</div> --}}
                                 @endif
                                 <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $data->user->name }}</div>
                                 <div class="mt-1">{{ $data->user->position()->exists() ? $data->user->position->Level->name.' - '.$data->user->position->division->name : '-' }}</div>

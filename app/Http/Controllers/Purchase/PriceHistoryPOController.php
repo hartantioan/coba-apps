@@ -42,7 +42,8 @@ class PriceHistoryPOController extends Controller
         $search = $request->input('search.value');
 
         $total_data = PurchaseOrderDetail::whereHas('purchaseOrder',function($query){
-            $query->whereIn('status',['2','3']);
+            $query->whereIn('status',['2','3'])
+                ->where('inventory_type','1');
         })->count();
         
         $query_data = PurchaseOrderDetail::where(function($query) use ($search, $request) {
@@ -64,7 +65,8 @@ class PriceHistoryPOController extends Controller
                 }
             })
             ->whereHas('purchaseOrder',function($query){
-                $query->whereIn('status',['2','3']);
+                $query->whereIn('status',['2','3'])
+                    ->where('inventory_type','1');
             })
             ->offset($start)
             ->limit($length)
@@ -90,7 +92,8 @@ class PriceHistoryPOController extends Controller
                 }
             })
             ->whereHas('purchaseOrder',function($query){
-                $query->whereIn('status',['2','3']);
+                $query->whereIn('status',['2','3'])
+                    ->where('inventory_type','1');
             })
             ->count();
 

@@ -63,6 +63,7 @@
                 }
                 .tbl-info td{
                     font-size:0.8em !important;
+                    vertical-align:top !important;
                 }
                 .table-data-item td{
                     font-size:0.5em !important;
@@ -195,10 +196,10 @@
                         <td width="33%" class="left-align" style="vertical-align: top !important;">
                             <table border="0" width="100%">
                                 <tr>
-                                    <td width="35%">
+                                    <td width="20%">
                                         Supplier/Vendor
                                     </td>
-                                    <td width="65%">
+                                    <td width="80%">
                                         {{ $data->account->name }}
                                     </td>
                                 </tr>
@@ -399,7 +400,7 @@
                                 <br>
                                 Dibuat oleh,
                                 @if($data->user->signature)
-                                    {{-- <div>{!! $data->user->signature() !!}</div> --}}
+                                    <div>{!! $data->user->signature() !!}</div>
                                 @endif
                                 <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $data->user->name }}</div>
                                 <div class="mt-1">{{ $data->user->position()->exists() ? $data->user->position->Level->name.' - '.$data->user->position->division->name : '-' }}</div>

@@ -71,6 +71,7 @@
                 }
                 .tbl-info td{
                     font-size:1.3em !important;
+                    vertical-align:top !important;
                 }
                 .table-data-item td{
                     font-size:0.8em !important;

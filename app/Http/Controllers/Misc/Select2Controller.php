@@ -1662,12 +1662,12 @@ class Select2Controller extends Controller {
                  })->where('level',5)
                 ->where('status','1')
                 ->whereIn('company_id',$arrCompany)
-                /* ->whereNotNull('show_journal')
+                ->whereNotNull('show_journal')
                 ->where(function($query)use($request){
                     if($request->account_id){
                         $query->whereNotNull('bp_journal');
                     }
-                }) */
+                })
                 ->get();
 
         foreach($data as $d) {

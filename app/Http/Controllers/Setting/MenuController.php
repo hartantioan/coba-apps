@@ -27,6 +27,7 @@ use App\Models\GoodReceipt;
 use App\Models\GoodReceiptDetail;
 use App\Models\GoodReceive;
 use App\Models\GoodReceiveDetail;
+use App\Models\GoodReturnPO;
 use App\Models\Item;
 use App\Models\ItemCogs;
 use App\Models\ItemStock;
@@ -53,13 +54,21 @@ class MenuController extends Controller
             ]);
         } */
 
-        $data = [
+        /* $data = [
             'title'     => 'Menu',
             'menus'     => Menu::whereNull('parent_id')->get(),
             'content'   => 'admin.setting.menu'
         ];
 
-        return view('admin.layouts.index', ['data' => $data]);
+        return view('admin.layouts.index', ['data' => $data]); */
+
+        /* $gr = GoodReceipt::whereIn('status',['2','3'])->whereDate('post_date','<=','2024-02-29')->whereDate('post_date','>=','2024-02-01')->get();
+
+        foreach($gr as $row){
+            if(round($row->totalFromDetail(),2) !== round($row->totalFromJournal(),2)){
+                echo $row->code.' '.$row->totalFromDetail().' jurnal '.$row->totalFromJournal().'<br>';
+            }
+        } */
 
         /* $data = OutgoingPayment::whereHas('paymentRequest',function($query){
             $query->whereBetween('code',['PREQ-24P1-00000037','PREQ-24P1-00000060']);
@@ -135,9 +144,10 @@ class MenuController extends Controller
             ]);
         } */
 
-        /* $gr = GoodReceipt::whereIn('status',['2','3'])->whereDate('post_date','>=','2024-02-23')->get();
-        $grcv = GoodReceive::whereIn('status',['2','3'])->whereDate('post_date','>=','2024-02-23')->get();
-        $gi = GoodIssue::whereIn('status',['2','3'])->whereDate('post_date','>=','2024-02-23')->get();
+        $gr = GoodReceipt::whereIn('status',['2','3'])->whereDate('post_date','>=','2024-02-01')->get();
+        $grcv = GoodReceive::whereIn('status',['2','3'])->whereDate('post_date','>=','2024-02-01')->get();
+        $gi = GoodIssue::whereIn('status',['2','3'])->whereDate('post_date','>=','2024-02-01')->get();
+        $grrt = GoodReturnPO::whereIn('status',['2','3'])->whereDate('post_date','>=','2024-02-01')->get();
 
         $data = [];
 
@@ -168,13 +178,22 @@ class MenuController extends Controller
             ];
         }
 
+        foreach($grrt as $row){
+            $data[] = [
+                'type'          => 'OUT',
+                'date'          => $row->post_date,
+                'lookable_type' => $row->getTable(),
+                'lookable_id'   => $row->id,
+            ];
+        }
+
         $collection = collect($data)->sortBy(function($item) {
                         return [$item['date'], $item['type']];
                     })->values();
 
         foreach($collection as $row){
             CustomHelper::sendJournal($row['lookable_type'],$row['lookable_id']);
-        } */
+        }
 
         /* ResetCogs::dispatch('2024-02-19',1,900); */
 

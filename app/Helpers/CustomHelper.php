@@ -1051,7 +1051,7 @@ class CustomHelper {
 					NULL,
 				);
 
-				self::sendStock(
+				/* self::sendStock(
 					$rowdetail->place_id,
 					$rowdetail->warehouse_id,
 					$rowdetail->item_id,
@@ -1059,7 +1059,7 @@ class CustomHelper {
 					'IN',
 					NULL,
 					NULL,
-				);
+				); */
 			}
 
 			$gr->updateRootDocumentStatusDone();
@@ -1749,7 +1749,7 @@ class CustomHelper {
 					$row->item_shading_id ? $row->item_shading_id : NULL,
 				);
 
-				self::sendStock(
+				/* self::sendStock(
 					$row->place_id,
 					$row->warehouse_id,
 					$row->item_id,
@@ -1757,7 +1757,7 @@ class CustomHelper {
 					'IN',
 					$row->area_id ? $row->area_id : NULL,
 					$row->item_shading_id ? $row->item_shading_id : NULL,
-				);
+				); */
 			}
 
 			$gr->update([
@@ -1843,7 +1843,7 @@ class CustomHelper {
 				'lookable_type'	=> 'good_returns',
 				'lookable_id'	=> $gr->id,
 				'post_date'		=> $gr->post_date,
-				'note'			=> $gr->code.' - '.$gr->account->name,
+				'note'			=> $gr->note,
 				'status'		=> '3'
 			]);
 
@@ -1899,7 +1899,7 @@ class CustomHelper {
 					NULL,
 				);
 
-				self::sendStock(
+				/* self::sendStock(
 					$row->goodReceiptDetail->place_id,
 					$row->goodReceiptDetail->warehouse_id,
 					$row->item_id,
@@ -1907,14 +1907,11 @@ class CustomHelper {
 					'OUT',
 					NULL,
 					NULL,
-				);
+				); */
 
 				$row->goodReceiptDetail->goodReceipt->updateRootDocumentStatusProcess();
 			}
 
-			$journal = Journal::find($query->id);
-			$journal->note = $journal->note.' - '.implode(', ',$arrNote);
-			$journal->save();
 		}elseif($table_name == 'marketing_order_delivery_processes'){
 
 			
@@ -1936,7 +1933,7 @@ class CustomHelper {
 
 			foreach($gr->goodIssueDetail as $row){
 
-				$total = round($row->itemStock->priceDate($gr->post_date) * $row->qty);
+				$total = round($row->itemStock->priceDate($gr->post_date) * $row->qty,2);
 
 				if($row->cost_distribution_id){
 					$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
@@ -2006,7 +2003,7 @@ class CustomHelper {
 					$row->itemStock->item_shading_id ? $row->itemStock->item_shading_id : NULL,
 				);
 
-				self::sendStock(
+				/* self::sendStock(
 					$row->itemStock->place_id,
 					$row->itemStock->warehouse_id,
 					$row->itemStock->item_id,
@@ -2014,7 +2011,7 @@ class CustomHelper {
 					'OUT',
 					$row->itemStock->area_id ? $row->itemStock->area_id : NULL,
 					$row->itemStock->item_shading_id ? $row->itemStock->item_shading_id : NULL,
-				);
+				); */
 
 				$row->update([
 					'total'	=> $total,

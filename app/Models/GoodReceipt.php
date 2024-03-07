@@ -305,4 +305,20 @@ class GoodReceipt extends Model
             }
         }
     }
+
+    public function totalFromDetail(){
+        $total = 0;
+        foreach($this->goodReceiptDetail as $row){
+            $total += $row->getRowTotal();
+        }
+        return $total;
+    }
+
+    public function totalFromJournal(){
+        $total = 0;
+        if($this->journal()->exists()){
+            $total = $this->journal->journalDetail()->where('type','1')->sum('nominal');
+        }
+        return $total;
+    }
 }

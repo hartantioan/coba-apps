@@ -102,8 +102,8 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                 }
             })
             ->orderBy('item_id')
+            ->orderBy('id')
             ->orderBy('date')
-            ->orderBy('type')
             ->get();
         }
         

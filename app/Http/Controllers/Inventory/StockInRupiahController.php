@@ -121,6 +121,8 @@ class StockInRupiahController extends Controller
                 }
             })
             ->orderBy('item_id')
+            ->orderBy('id')
+            ->orderBy('date')
             ->get();
         }
       

@@ -256,12 +256,33 @@
                                     <th class="center-align">Cumulative Qty.</th>
                                     <th class="center-align">Cumulative Value</th>
                                 </tr>`);
+                                $.each(response.first, function(j, vals) {
+                                            
+                                    $('#table_body').append(`
+                                        <tr>
+                                            <td class="center-align"></td>
+                                            <td class="center-align"></td>
+                                            <td class="center-align"></td>
+                                            <td class="center-align"></td>
+                                            <td class="center-align">` + response.first[j]['kode'] + `</td>
+                                            <td class="right-align">` + response.first[j]['item'] + `</td>
+                                            <td class="center-align">` + response.first[j]['satuan'] + `</td>
+                                            <td class="center-align">Saldo Awal</td>
+                                            <td class="center-align"></td>
+                                            <td class="center-align"></td>
+                                            <td class="center-align"></td>
+                                            <td class="right-align">` + response.first[j]['last_qty'] + `</td>
+                                            <td class="right-align">` + response.first[j]['last_nominal'] + `</td>
+                                        </tr>`
+                                    );
+                                    
+                                });
                             $.each(response.message, function(i, val) {
                                 if(response.perlu == 1){
                                     if (!processedItems.includes(val.item)) {
 
                                         processedItems.push(val.item);
-
+                                        
                                         $.each(response.latest, function(j, vals) {
                                             if (vals.item == val.item) {
                                                 $('#table_body').append(`

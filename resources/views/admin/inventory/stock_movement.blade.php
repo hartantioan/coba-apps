@@ -245,6 +245,24 @@
                                 <th class="center-align">Mutasi</th>
                                 <th class="center-align">Balance</th>
                             </tr>`);
+                            $.each(response.first, function(j, vals) {
+                                            
+                            $('#movement_body').append(`
+                                <tr>
+                                    <td class="center-align"></td>
+                                    <td class="center-align"></td>
+                                    <td class="center-align"></td>
+                                    <td class="center-align"></td>
+                                    <td class="center-align">` + response.first[j]['kode'] + `</td>
+                                    <td class="right-align">` + response.first[j]['item'] + `</td>
+                                    <td class="center-align">` + response.first[j]['satuan'] + `</td>
+                                    <td class="center-align">Saldo Awal</td>
+                                    <td class="center-align"></td>
+                                    <td class="right-align">` + response.first[j]['last_qty'] + `</td>
+                                </tr>`
+                            );
+                            
+                        });
                         $.each(response.message, function(i, val) {
                             if(response.perlu == 1){
                                 if (!processedItems.includes(val.item)) {

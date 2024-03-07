@@ -23,7 +23,20 @@
                     @php
                         $processedItems[] = $row['item'];
                     @endphp
-
+                    @foreach($first as $j => $vals)
+                        <tr>
+                            <td align="center"></td>
+                            <td align="center"></td>
+                            <td align="center"></td>
+                            <td align="center"></td>
+                            <td align="center">{{ $first[$j]['kode'] }}</td>
+                            <td align="center">{{ $first[$j]['item'] }}</td>
+                            <td align="center">{{ $first[$j]['satuan'] }}</td>
+                            <td align="center">Saldo Awal</td>
+                            <td align="center"></td>
+                            <td align="right">{{ $first[$j]['last_qty'] }}</td>
+                        </tr>
+                    @endforeach
                     @foreach($latest as $j => $vals)
                         @if($vals['item'] == $row['item'])
                             <tr>

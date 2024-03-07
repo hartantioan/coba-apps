@@ -133,6 +133,7 @@ class StockInRupiahController extends Controller
         $uom_unit = null;
         $previousId = null;
         $array_last_item = [];
+        $array_first_item = [];
         foreach($query_data as $row){
             
             if($row->type=='IN'){
@@ -183,8 +184,8 @@ class StockInRupiahController extends Controller
                 ->orderBy('id', 'desc')
                 ->orderBy('date', 'desc') // Order by 'date' column in descending order
                 ->first();
-                
                 $array_last_item[] = [
+                    'id'           => $query_first->id ?? null, 
                     'date'         => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
                     'last_nominal' => $query_first ? number_format($query_first->total_final, 2, ',', '.') : 0,
                     'item'         => $row->item->name,
@@ -201,6 +202,50 @@ class StockInRupiahController extends Controller
                 $uom_unit = $row->item->uomUnit->code;
             }
         }
+
+        if(!$request->item_id){
+            $query_no = ItemCogs::where(function($query) use ($request, $row, $array_last_item) {
+                $query->where('date', '<', $request->finish_date);
+            
+                if ($request->plant != 'all') {
+                    $query->whereHas('place', function($query) use ($request) {
+                        $query->where('id', $request->plant);
+                    });
+                }
+            
+                if ($request->warehouse != 'all') {
+                    $query->whereHas('warehouse', function($query) use ($request) {
+                        $query->where('id', $request->warehouse);
+                    });
+                }
+            
+                // Exclude records with matching ids from $array_last_item
+                $array_last_item = collect($array_last_item);
+                $excludeIds = $array_last_item->pluck('id')->filter()->toArray();
+                
+                if (!empty($excludeIds)) {
+                    $query->whereNotIn('id', $excludeIds);
+                }
+            })
+            ->groupBy('item_id')
+            ->orderBy('id', 'desc')
+            ->orderBy('date', 'desc')
+            ->get();
+    
+            foreach($query_no as $row_tidak_ada){
+    
+                $array_first_item[] = [
+                    'id'           => $row_tidak_ada->id, 
+                    'date'         => $row_tidak_ada ? date('d/m/Y', strtotime($row_tidak_ada->date)) : null,
+                    'last_nominal' => $row_tidak_ada ? number_format($row_tidak_ada->total_final, 2, ',', '.') : 0,
+                    'item'         => $row_tidak_ada->item->name,
+                    'satuan'       => $row_tidak_ada->item->uomUnit->code,
+                    'kode'         => $row_tidak_ada->item->code,
+                    'last_qty'     => $row_tidak_ada ? number_format($row_tidak_ada->qty_final, 2, ',', '.') : 0,
+                ]; 
+            }
+        }
+        
        
         
         $end_time = microtime(true);
@@ -210,6 +255,7 @@ class StockInRupiahController extends Controller
             'status'=>200,
             'message'       => $array_filter,
             'latest'        => $array_last_item,
+            'first'         => $array_first_item,
             'perlu'         => $perlu,
             'time'          => " Waktu proses : ".$execution_time." detik"
         ];

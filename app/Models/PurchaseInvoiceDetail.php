@@ -48,6 +48,14 @@ class PurchaseInvoiceDetail extends Model
         return $this->belongsTo('App\Models\Tax', 'tax_id', 'id')->withTrashed();
     }
 
+    public function getGoodReceiptQty(){
+        if($this->lookable_type == 'good_receipt_details'){
+            return number_format($this->lookable->qty,3,',','.').' ' . $this->lookable->itemUnit->unit->name;
+        }else{
+            return '-';
+        }
+    }
+
     public function wTaxMaster()
     {
         return $this->belongsTo('App\Models\Tax', 'wtax_id', 'id')->withTrashed();

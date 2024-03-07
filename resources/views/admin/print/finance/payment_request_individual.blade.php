@@ -179,32 +179,7 @@
                                     <span class="invoice-number mr-1"># {{ $data->code }}</span>
                                 </td>
                             </tr>
-                            <tr>
-                                <td style="margin-top: -2px;">
-                                    <small>Diajukan:</small>
-                                    <span>{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="margin-top: -2px;">
-                                    <small>Dibayar:</small>
-                                    <span>
-                                        {{ date('d/m/Y',strtotime($data->pay_date)) }}
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="margin-top: -2px;">
-                                    <small>Outgoing Payment:</small>
-                                    <span>
-                                        @if ($data->outgoingPayment()->exists())
-                                            {{ date('d/m/Y',strtotime($data->outgoingPayment->pay_date)) }}
-                                        @else
-                                            -
-                                        @endif
-                                    </span>
-                                </td>
-                            </tr>
+                            
                         </table>
                     </td>
                     <td width="33%" align="center">
@@ -255,7 +230,7 @@
                                     </tr>
                                     <tr>
                                         <td width="40%">
-                                            Vendor Bank Account No
+                                            Vendor Bank No
                                         </td>
                                         <td width="1%">:</td>
                                         <td width="60%">
@@ -264,7 +239,7 @@
                                     </tr>
                                     <tr>
                                         <td width="40%">
-                                            Vendor Bank Account Name
+                                            Vendor Bank Name
                                         </td>
                                         <td width="1%">:</td>
                                         <td width="60%">
@@ -296,11 +271,12 @@
                                     </tr>
                                    
                                     <tr>
-                                        <td width="40%">
+                                        <td width="60%">
                                             Tgl Outgoing Payment
                                         </td>
                                         <td width="1%">:</td>
-                                        <td width="60%">
+                                        <td width="40%">
+                                            
                                             @if($data->outgoingPayment)
                                                 {{ $row->outgoing_payment->pay_date ?? '' }}
                                             @endif
@@ -373,6 +349,8 @@
                                             <div class="mt-3">
                                                 Catatan : {{ $data->note }}
                                             </div>
+                                            <br>
+                                            <br>
                                             Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.$data->currency->document_text }}
                                         </td>
                                         

@@ -40,7 +40,7 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
             })
             ->where(function($query) {
                 $query->whereHas('item',function($query){
-                    $query->where('status',1);
+                    $query->whereIn('status',['1','2']);
                 });
                 if($this->finish_date) {
                     $query->whereDate('date','<=', $this->finish_date);
@@ -74,7 +74,7 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
             $perlu = 1;
             $query_data = ItemCogs::where(function($query) {
                 $query->whereHas('item',function($query){
-                    $query->where('status',1);
+                    $query->whereIn('status',['1','2']);
                 });
                 if($this->start_date && $this->finish_date) {
                     $query->whereDate('date', '>=', $this->start_date)

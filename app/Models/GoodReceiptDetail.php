@@ -125,7 +125,7 @@ class GoodReceiptDetail extends Model
             $total = $total / (1 + ($datarow->percent_tax / 100));
         }
 
-        return round($total);
+        return round($total,2);
     }
 
     public function qtyConvert(){

@@ -1051,7 +1051,7 @@ class CustomHelper {
 					NULL,
 				);
 
-				/* self::sendStock(
+				self::sendStock(
 					$rowdetail->place_id,
 					$rowdetail->warehouse_id,
 					$rowdetail->item_id,
@@ -1059,7 +1059,7 @@ class CustomHelper {
 					'IN',
 					NULL,
 					NULL,
-				); */
+				);
 			}
 
 			$gr->updateRootDocumentStatusDone();
@@ -1749,7 +1749,7 @@ class CustomHelper {
 					$row->item_shading_id ? $row->item_shading_id : NULL,
 				);
 
-				/* self::sendStock(
+				self::sendStock(
 					$row->place_id,
 					$row->warehouse_id,
 					$row->item_id,
@@ -1757,7 +1757,7 @@ class CustomHelper {
 					'IN',
 					$row->area_id ? $row->area_id : NULL,
 					$row->item_shading_id ? $row->item_shading_id : NULL,
-				); */
+				);
 			}
 
 			$gr->update([
@@ -1899,7 +1899,7 @@ class CustomHelper {
 					NULL,
 				);
 
-				/* self::sendStock(
+				self::sendStock(
 					$row->goodReceiptDetail->place_id,
 					$row->goodReceiptDetail->warehouse_id,
 					$row->item_id,
@@ -1907,7 +1907,7 @@ class CustomHelper {
 					'OUT',
 					NULL,
 					NULL,
-				); */
+				);
 
 				$row->goodReceiptDetail->goodReceipt->updateRootDocumentStatusProcess();
 			}
@@ -2003,7 +2003,7 @@ class CustomHelper {
 					$row->itemStock->item_shading_id ? $row->itemStock->item_shading_id : NULL,
 				);
 
-				/* self::sendStock(
+				self::sendStock(
 					$row->itemStock->place_id,
 					$row->itemStock->warehouse_id,
 					$row->itemStock->item_id,
@@ -2011,7 +2011,7 @@ class CustomHelper {
 					'OUT',
 					$row->itemStock->area_id ? $row->itemStock->area_id : NULL,
 					$row->itemStock->item_shading_id ? $row->itemStock->item_shading_id : NULL,
-				); */
+				);
 
 				$row->update([
 					'total'	=> $total,

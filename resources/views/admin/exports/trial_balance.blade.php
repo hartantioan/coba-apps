@@ -48,7 +48,7 @@
 @if($level == '1')
     @foreach($coas as $key => $row)
         <tr>
-            <td>{{ $row->name }}</td>
+            <td>{{ $row->code.' - '.$row->name }}</td>
 
         @foreach($arrMonth as $key => $rowMonth)
             @php
@@ -75,7 +75,7 @@
     @foreach($coas as $keymain => $row)
         @if($tempParent !== $row->parent_id)
             <tr>
-                <td><b>{{ $row->parentSub->name }}</b></td>
+                <td><b>{{ $row->parentSub->code.' - '.$row->parentSub->name }}</b></td>
                 <td colspan="{{ (count($arrMonth) * 4) }}"></td>
             </tr>
             @php
@@ -88,7 +88,7 @@
             @endphp
         @endif
         <tr>
-            <td>&nbsp;&nbsp;&nbsp;{{ $row->name }}</td>
+            <td>&nbsp;&nbsp;&nbsp;{{ $row->code.' - '.$row->name }}</td>
 
         @foreach($arrMonth as $key => $rowMonth)
             @php
@@ -115,7 +115,7 @@
         @if(isset($coas[$keymain + 1]))
             @if($coas[$keymain + 1]->parent_id !== $row->parent_id)
                 <tr>
-                    <td><b>TOTAL {{ $row->parentSub->name }}</b></td>
+                    <td><b>TOTAL {{ $row->parentSub->code.' - '.$row->parentSub->name }}</b></td>
                 
                 @foreach($arrMonth as $key => $rowMonth)
                     <td style="min-width:150px !important;" class="right-align"><b>{{ number_format($rowMonth['tempBalanceBefore'],2,',','.') }}</b></td>
@@ -128,7 +128,7 @@
             @endif
         @else
             <tr>
-                <td><b>TOTAL {{ $row->parentSub->name }}</b></td>
+                <td><b>TOTAL {{ $row->parentSub->code.' - '.$row->parentSub->name }}</b></td>
 
             @foreach($arrMonth as $key => $rowMonth)
                 <td style="min-width:150px !important;" class="right-align"><b>{{ number_format($rowMonth['tempBalanceBefore'],2,',','.') }}</b></td>
@@ -151,7 +151,7 @@
     @foreach($coas as $keymain => $row)
         @if($tempParent2 !== $row->parentSub->parent_id)
             <tr>
-                <td><b>{{ $row->parentSub->parentSub->name }}</b></td>
+                <td><b>{{ $row->parentSub->parentSub->code.' - '.$row->parentSub->parentSub->name }}</b></td>
                 <td colspan="{{ (count($arrMonth) * 4) }}"></td>
             </tr>
             @php
@@ -165,12 +165,12 @@
         @endif
         @if($tempParent1 !== $row->parent_id)
             <tr>
-                <td>&nbsp;&nbsp;&nbsp;{{ $row->parentSub->name }}</td>
+                <td>&nbsp;&nbsp;&nbsp;{{ $row->parentSub->code.' - '.$row->parentSub->name }}</td>
                 <td colspan="{{ (count($arrMonth) * 4) }}"></td>
             </tr>
         @endif
         <tr>
-            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $row->name }}</td>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $row->code.' - '.$row->name }}</td>
 
         @foreach($arrMonth as $key => $rowMonth)
             @php
@@ -197,7 +197,7 @@
         @if(isset($coas[$keymain + 1]))
             @if($coas[$keymain + 1]->parentSub->parent_id !== $row->parentSub->parent_id)
                 <tr>
-                    <td><b>TOTAL {{ $row->parentSub->parentSub->name }}</b></td>
+                    <td><b>TOTAL {{ $row->parentSub->parentSub->code.' - '.$row->parentSub->parentSub->name }}</b></td>
                 @foreach($arrMonth as $key => $rowMonth)
                     <td style="min-width:150px !important;" class="right-align"><b>{{ number_format($rowMonth['tempBalanceBefore'],2,',','.') }}</b></td>
                     <td style="min-width:150px !important;" class="right-align"><b>{{ number_format($rowMonth['tempDebit'],2,',','.') }}</b></td>
@@ -208,7 +208,7 @@
             @endif
         @else
             <tr>
-                <td><b>TOTAL {{ $row->parentSub->parentSub->name }}</b></td>
+                <td><b>TOTAL {{ $row->parentSub->parentSub->code.' - '.$row->parentSub->parentSub->name }}</b></td>
 
             @foreach($arrMonth as $key => $rowMonth)
                 <td style="min-width:150px !important;" class="right-align"><b>{{ number_format($rowMonth['tempDebit'],2,',','.') }}</b></td>
@@ -234,7 +234,7 @@
     @foreach($coas as $keymain => $row)
         @if($tempParent3 !== $row->parentSub->parentSub->parent_id)
             <tr>
-                <td><b>{{ $row->parentSub->parentSub->parentSub->name }}</b></td>
+                <td><b>{{ $row->parentSub->parentSub->parentSub->code.' - '.$row->parentSub->parentSub->parentSub->name }}</b></td>
                 <td colspan="{{ (count($arrMonth) * 4) }}"></td>
             </tr>
             @php
@@ -249,18 +249,18 @@
         @endif
         @if($tempParent2 !== $row->parentSub->parent_id)
             <tr>
-                <td>&nbsp;&nbsp;&nbsp;<b>{{ $row->parentSub->parentSub->name }}</b></td>
+                <td>&nbsp;&nbsp;&nbsp;<b>{{ $row->parentSub->parentSub->code.' - '.$row->parentSub->parentSub->name }}</b></td>
                 <td colspan="{{ (count($arrMonth) * 4) }}"></td>
             </tr>
         @endif
         @if($tempParent1 !== $row->parent_id)
             <tr>
-                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $row->parentSub->name }}</td>
+                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $row->parentSub->code.' - '.$row->parentSub->name }}</td>
                 <td colspan="{{ (count($arrMonth) * 4) }}"></td>
             </tr>
         @endif
         <tr>
-            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $row->name }}</td>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $row->code.' - '.$row->name }}</td>
 
         @foreach($arrMonth as $key => $rowMonth)
             @php
@@ -287,7 +287,7 @@
         @if(isset($coas[$keymain + 1]))
             @if($coas[$keymain + 1]->parentSub->parentSub->parent_id !== $row->parentSub->parentSub->parent_id)
                 <tr>
-                    <td><b>TOTAL {{ $row->parentSub->parentSub->parentSub->name }}</b></td>
+                    <td><b>TOTAL {{ $row->parentSub->parentSub->parentSub->code.' - '.$row->parentSub->parentSub->parentSub->name }}</b></td>
                 
                 @foreach($arrMonth as $key => $rowMonth)
                     <td style="min-width:150px !important;" class="right-align"><b>{{ number_format($rowMonth['tempBalanceBefore'],2,',','.') }}</b></td>
@@ -300,7 +300,7 @@
             @endif
         @else
             <tr>
-                <td><b>TOTAL '.$row->parentSub->parentSub->parentSub->name.'</b></td>
+                <td><b>TOTAL '.$row->parentSub->parentSub->parentSub->code.' - '.$row->parentSub->parentSub->parentSub->name.'</b></td>
 
             @foreach($arrMonth as $key => $rowMonth)
                 <td style="min-width:150px !important;" class="right-align"><b>{{ number_format($rowMonth['tempBalanceBefore'],2,',','.') }}</b></td>
@@ -330,7 +330,7 @@
     @foreach($coas as $keymain => $row)
         @if($tempParent4 !== $row->parentSub->parentSub->parentSub->parent_id)
             <tr>
-                <td><b>{{ $row->parentSub->parentSub->parentSub->parentSub->name }}</b></td>
+                <td><b>{{ $row->parentSub->parentSub->parentSub->parentSub->code.' - '.$row->parentSub->parentSub->parentSub->parentSub->name }}</b></td>
                 <td colspan="{{ (count($arrMonth) * 4) }}"></td>
             </tr>
             @php
@@ -345,24 +345,24 @@
         @endif
         @if($tempParent3 !== $row->parentSub->parentSub->parent_id)
             <tr>
-                <td>&nbsp;&nbsp;&nbsp;<b>{{ $row->parentSub->parentSub->parentSub->name }}</b></td>
+                <td>&nbsp;&nbsp;&nbsp;<b>{{ $row->parentSub->parentSub->parentSub->code.' - '.$row->parentSub->parentSub->parentSub->name }}</b></td>
                 <td colspan="{{ (count($arrMonth) * 4) }}"></td>
             </tr>
         @endif
         @if($tempParent2 !== $row->parentSub->parent_id)
             <tr>
-                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>{{ $row->parentSub->parentSub->name }}</b></td>
+                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>{{ $row->parentSub->parentSub->code.' - '.$row->parentSub->parentSub->name }}</b></td>
                 <td colspan="{{ (count($arrMonth) * 4) }}"></td>
             </tr>
         @endif
         @if($tempParent1 !== $row->parent_id)
             <tr>
-                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $row->parentSub->name }}</td>
+                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $row->parentSub->code.' - '.$row->parentSub->name }}</td>
                 <td colspan="{{ (count($arrMonth) * 4) }}"></td>
             </tr>
         @endif
         <tr>
-            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $row->name }}</td>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $row->code.' - '.$row->name }}</td>
 
         @foreach($arrMonth as $key => $rowMonth)
             @php
@@ -389,7 +389,7 @@
         @if(isset($coas[$keymain + 1]))
             @if($coas[$keymain + 1]->parentSub->parentSub->parentSub->parent_id !== $row->parentSub->parentSub->parentSub->parent_id)
                 <tr>
-                    <td><b>TOTAL {{ $row->parentSub->parentSub->parentSub->parentSub->name }}</b></td>
+                    <td><b>TOTAL {{ $row->parentSub->parentSub->parentSub->parentSub->code.' - '.$row->parentSub->parentSub->parentSub->parentSub->name }}</b></td>
                 
                 @foreach($arrMonth as $key => $rowMonth)
                     <td style="min-width:150px !important;" class="right-align"><b>{{ number_format($rowMonth['tempBalanceBefore'],2,',','.') }}</b></td>
@@ -402,7 +402,7 @@
             @endif
         @else
             <tr>
-                <td><b>TOTAL {{ $row->parentSub->parentSub->parentSub->parentSub->name }}</b></td>
+                <td><b>TOTAL {{ $row->parentSub->parentSub->parentSub->parentSub->code.' - '.$row->parentSub->parentSub->parentSub->parentSub->name }}</b></td>
 
             @foreach($arrMonth as $key => $rowMonth)
                 <td style="min-width:150px !important;" class="right-align"><b>{{ number_format($rowMonth['tempBalanceBefore'],2,',','.') }}</b></td>

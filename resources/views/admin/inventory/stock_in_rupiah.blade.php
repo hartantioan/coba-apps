@@ -40,7 +40,7 @@
                                         <div class="input-field col m3 s12">
                                             <select class="form-control" id="type" name="type">
                                                 <option value="all">SEMUA</option>
-                                                <option value="final">Final</option>
+                                                <option value="final">FINAL</option>
                                             </select>
                                             <label class="" for="type">Tipe</label>
                                         </div>

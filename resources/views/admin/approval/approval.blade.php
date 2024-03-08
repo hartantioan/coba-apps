@@ -126,7 +126,7 @@
                     </div>
                     <div class="col s12 center">
                         <div class="input-field col s12">
-                            <select class="form-control" id="approve_reject_revision" name="approve_reject_revision">
+                            <select class="browser-default" id="approve_reject_revision" name="approve_reject_revision">
                                 <option value="1">Setuju</option>
                                 <option value="2">Tolak</option>
                                 <option value="3">Revisi</option>
@@ -169,7 +169,7 @@
                     </div>
                     <div class="col s12 center">
                         <div class="input-field col s12" style="zoom:1.5;">
-                            <select class="form-control" id="approve_reject_revision_multi" name="approve_reject_revision_multi">
+                            <select class="browser-default" id="approve_reject_revision_multi" name="approve_reject_revision_multi">
                                 <option value="1">Setuju</option>
                                 <option value="2">Tolak</option>
                                 <option value="3">Revisi</option>

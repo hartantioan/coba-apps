@@ -59,7 +59,7 @@
                 <td>{{ $row->receiver_name }}</td>
                 <td>{{ $row->note }}</td>
                 {{-- <td>{{ $row->company->name }}</td> --}}
-                <td><a href="{{ $row->attachment() }}" target="_blank">File</a></td>
+                <td>{!! $row->document ? '<a href="'.$row->attachment().'">File</a>' : 'NO FILE' !!}</td>
                 <td>{{ $rowdetail->item->code }}</td>
                 <td>{{ $rowdetail->item->name }}</td>
                 <td align="center">{{ $rowdetail->place->code }}</td>

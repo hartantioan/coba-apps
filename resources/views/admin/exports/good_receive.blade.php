@@ -54,7 +54,7 @@
                 <td>{{ $row->user->name }}</td>
                 <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                 <td>{{ $row->note }}</td>
-                <td><a href="{{ $row->attachment() }}">File</a></td>
+                <td>{!! $row->document ? '<a href="'.$row->attachment().'">File</a>' : 'NO FILE' !!}</td>
                 <td>{{ $rowdetail->item->code }}</td>
                 <td>{{$rowdetail->item->name }}</td>
                 <td>{{ $rowdetail->getPlace() }}</td>

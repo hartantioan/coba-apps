@@ -153,6 +153,7 @@ class StockMovementController extends Controller
             }
             
             $data_tempura = [
+                'item_id'      => $row->item->id,
                 'plant' => $row->place->code,
                 'warehouse' => $row->warehouse->name,
                 'item' => $row->item->name,
@@ -210,30 +211,45 @@ class StockMovementController extends Controller
         }
         
         if(!$request->item_id){
-            $query_no = ItemCogs::where(function($query) use ($request, $row, $array_last_item) {
-                $query->where('date', '<', $request->finish_date);
-            
-                if ($request->plant != 'all') {
-                    $query->whereHas('place', function($query) use ($request) {
-                        $query->where('id', $request->plant);
+            $query_no = ItemCogs::whereIn('id', function ($query) use ($request) {            
+                $query->selectRaw('MAX(id)')
+                    ->from('item_cogs')
+                    ->where('date', '<=', $request->finish_date)
+                    ->groupBy('item_id');
+            })
+            ->where(function($query) use ( $request,$array_last_item) {
+                $query->whereHas('item',function($query) use($request){
+                    $query->whereIn('status',['1','2']);
+                });
+                if($request->finish_date) {
+                    $query->whereDate('date','<=', $request->finish_date);
+                }
+                
+                if($request->plant != 'all'){
+                    $query->whereHas('place',function($query) use($request){
+                        $query->where('id',$request->plant);
                     });
                 }
-            
-                if ($request->warehouse != 'all') {
-                    $query->whereHas('warehouse', function($query) use ($request) {
-                        $query->where('id', $request->warehouse);
+                if($request->warehouse != 'all'){
+                    $query->whereHas('warehouse',function($query) use($request){
+                        $query->where('id',$request->warehouse);
                     });
                 }
-            
-                // Exclude records with matching ids from $array_last_item
+    
+                if($request->filter_group){
+                   
+                    $query->whereHas('item',function($query) use($request){
+                        $query->whereIn('item_group_id', $request->filter_group);
+                    });
+                }
                 $array_last_item = collect($array_last_item);
-                $excludeIds = $array_last_item->pluck('id')->filter()->toArray();
+                $excludeIds = $array_last_item->pluck('item_id')->filter()->toArray();
                 
                 if (!empty($excludeIds)) {
-                    $query->whereNotIn('id', $excludeIds);
+                   
+                    $query->whereNotIn('item_id', $excludeIds);
                 }
             })
-            ->groupBy('item_id')
             ->orderBy('id', 'desc')
             ->orderBy('date', 'desc')
             ->get();

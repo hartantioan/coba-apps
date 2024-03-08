@@ -171,6 +171,7 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                 ->first();
 
                 $array_last_item[] = [
+                    'item_id'      => $row->item->id,
                     'id'           => $query_first->id ?? null,
                     'date'         => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
                     'last_nominal' => $query_first ? number_format($query_first->total_final, 2, ',', '.') : 0,
@@ -191,30 +192,45 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
             
         }
         if(!$this->item){
-            $query_no = ItemCogs::where(function($query) use ($row, $array_last_item) {
-                $query->where('date', '<', $this->finish_date);
-            
-                if ($this->plant != 'all') {
-                    $query->whereHas('place', function($query) {
-                        $query->where('id', $this->plant);
-                    });
+            $query_no = ItemCogs::whereIn('id', function ($query) {            
+                $query->selectRaw('MAX(id)')
+                    ->from('item_cogs')
+                    ->where('date', '<=', $this->finish_date)
+                    ->groupBy('item_id');
+            })
+            ->where(function($query) use ($array_last_item) {
+                $query->whereHas('item',function($query) {
+                    $query->whereIn('status',['1','2']);
+                });
+                if($this->finish_date) {
+                    $query->whereDate('date','<=', $this->finish_date);
                 }
-            
-                if ($this->warehouse != 'all') {
-                    $query->whereHas('warehouse', function($query) {
-                        $query->where('id', $this->warehouse);
-                    });
-                }
-            
-                // Exclude records with matching ids from $array_last_item
-                $array_last_item = collect($array_last_item);
-                $excludeIds = $array_last_item->pluck('id')->filter()->toArray();
                 
+                if($this->plant != 'all'){
+                    $query->whereHas('place',function($query) {
+                        $query->where('id',$this->plant);
+                    });
+                }
+                if($this->warehouse != 'all'){
+                    $query->whereHas('warehouse',function($query) {
+                        $query->where('id',$this->warehouse);
+                    });
+                }
+    
+                if($this->group){
+                   
+                    $query->whereHas('item',function($query) {
+                        $query->whereIn('item_group_id', $this->group);
+                    });
+                }
+                $array_last_item = collect($array_last_item);
+                $excludeIds = $array_last_item->pluck('item_id')->filter()->toArray();
+             
                 if (!empty($excludeIds)) {
-                    $query->whereNotIn('id', $excludeIds);
+                    
+                    $query->whereNotIn('item_id', $excludeIds);
                 }
             })
-            ->groupBy('item_id')
             ->orderBy('id', 'desc')
             ->orderBy('date', 'desc')
             ->get();

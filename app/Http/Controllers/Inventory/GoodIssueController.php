@@ -2282,7 +2282,7 @@ class GoodIssueController extends Controller
                 'note2'                     => $row->note2 ? $row->note2 : '',
                 'lookable_type'             => $row->lookable_type ? $row->lookable_type : '',
                 'lookable_id'               => $row->lookable_id ? $row->lookable_id : '',
-                'reference_id'              => $row->lookable_type ? $row->lookable->materialRequest->id : '',
+                'reference_id'              => $row->lookable_type ? ($row->lookable->materialRequest()->exists() ? $row->lookable->materialRequest->id : $row->lookable->goodIssueRequest->id) : '',
                 'stock_list'                => $row->itemStock->item->currentStock($this->dataplaces,$this->datawarehouses),
                 'place_id'                  => $row->place_id,
                 'line_id'                   => $row->line_id,
@@ -2840,7 +2840,7 @@ class GoodIssueController extends Controller
 
     public function sendUsedData(Request $request){
 
-        $data = MaterialRequest::find($request->id);
+        $data = GoodIssueRequest::find($request->id);
        
         if(!$data->used()->exists()){
             CustomHelper::sendUsedData($request->type,$request->id,'Form Good Issue / Barang Keluar');

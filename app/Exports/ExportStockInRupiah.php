@@ -220,7 +220,7 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                 if($this->group){
                    
                     $query->whereHas('item',function($query) {
-                        $query->whereIn('item_group_id', $this->group);
+                        $query->whereIn('item_group_id', explode(',',$this->group));
                     });
                 }
                 $array_last_item = collect($array_last_item);

@@ -19,68 +19,47 @@
         </thead>
         <tbody>
             @php
-                $processedItems = [];
+                $x = 0;
             @endphp
-            @foreach($first as $j => $vals)
-                <tr>
-                    <td align="center"></td>
-                    <td align="center"></td>
-                    <td align="center"></td>
-                    <td align="center"></td>
-                    <td align="center">{{ $first[$j]['kode'] }}</td>
-                    <td align="center">{{ $first[$j]['item'] }}</td>
-                    <td align="center">{{ $first[$j]['satuan'] }}</td>
-                    <td align="center">Saldo Awal</td>
-                    <td align="center"></td>
-                    <td align="center"></td>
-                    <td align="center"></td>
-                    <td align="right">{{ $first[$j]['last_qty'] }}</td>
-                    <td align="right">{{ $first[$j]['last_nominal'] }}</td>
-                </tr>
-            @endforeach
-            @foreach($data as $key => $row)
-                @if (!in_array($row['item'], $processedItems))
+            @foreach($data as $i => $row)
+                @if($row['perlu'] == 1)
+                    <tr>
+                        <td align="center">{{ $x + 1 }}</td>
+                        <td align="center"></td>
+                        <td align="center"></td>
+                        <td align="center"></td>
+                        <td align="center">{{ $row['kode'] }}</td>
+                        <td align="center">{{ $row['item'] }}</td>
+                        <td align="center">{{ $row['satuan'] }}</td>
+                        <td align="center">Saldo Awal</td>
+                        <td align="center"></td>
+                        <td align="center"></td>
+                        <td align="center"></td>
+                        <td align="right">{{ $row['last_qty'] }}</td>
+                        <td align="right">{{ $row['last_nominal'] }}</td>
+                    </tr>
                     @php
-                        $processedItems[] = $row['item'];
+                        $x++;
                     @endphp
-
-                    @foreach($latest as $j => $vals)
-                        @if($vals['item'] == $row['item'])
-                            <tr>
-                                <td align="center"></td>
-                                <td align="center"></td>
-                                <td align="center"></td>
-                                <td align="center"></td>
-                                <td align="center">{{ $latest[$j]['kode'] }}</td>
-                                <td align="center">{{ $latest[$j]['item'] }}</td>
-                                <td align="center">{{ $latest[$j]['satuan'] }}</td>
-                                <td align="center">Saldo Awal</td>
-                                <td align="center"></td>
-                                <td align="center"></td>
-                                <td align="center"></td>
-                                <td align="right">{{ $latest[$j]['last_qty'] }}</td>
-                                <td align="right">{{ $latest[$j]['last_nominal'] }}</td>
-                            </tr>
-                        @endif
-                    @endforeach
+                @else
+                    <tr>
+                        <td align="center"></td>
+                        <td align="center">{{ $row['date'] }}</td>
+                        <td align="center">{{ $row['plant'] }}</td>
+                        <td align="center">{{ $row['warehouse'] }}</td>
+                        <td align="center">{{ $row['kode'] }}</td>
+                        <td align="center">{{ $row['item'] }}</td>
+                        <td align="center">{{ $row['satuan'] }}</td>
+                        <td align="center">{{ $row['document'] }}</td>
+                        <td  align="right">{{ $row['qty'] }}</td>
+                        <td  align="right">{{ $row['final'] }}</td>
+                        <td  align="right">{{ $row['total'] }}</td>
+                        <td  align="right">{{ $row['cum_qty'] }}</td>
+                        <td  align="right">{{ $row['cum_val'] }}</td>
+                    </tr>
                 @endif
-
-                <tr>
-                    <td align="center">{{ $key + 1 }}</td>
-                    <td align="center">{{ $row['date'] }}</td>
-                    <td align="center">{{ $row['plant'] }}</td>
-                    <td align="center">{{ $row['warehouse'] }}</td>
-                    <td align="center">{{ $row['kode'] }}</td>
-                    <td align="center">{{ $row['item'] }}</td>
-                    <td align="center">{{ $row['satuan'] }}</td>
-                    <td align="center">{{ $row['document'] }}</td>
-                    <td  align="right">{{ $row['qty'] }}</td>
-                    <td  align="right">{{ $row['final'] }}</td>
-                    <td  align="right">{{ $row['total'] }}</td>
-                    <td  align="right">{{ $row['cum_qty'] }}</td>
-                    <td  align="right">{{ $row['cum_val'] }}</td>
-                </tr>
             @endforeach
+          
             @if(count($data) == 0)
                 <tr>
                     <td colspan="13" align="center">

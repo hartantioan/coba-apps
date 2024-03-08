@@ -256,74 +256,49 @@
                                     <th class="center-align">Cumulative Qty.</th>
                                     <th class="center-align">Cumulative Value</th>
                                 </tr>`);
-                                $.each(response.first, function(j, vals) {
-                                            
+                                var itung = 0;
+                                $.each(response.message, function(i, val) {
+                                if(val.perlu == 1){
                                     $('#table_body').append(`
                                         <tr>
+                                            <td class="center-align">`+(itung+1)+`</td>
                                             <td class="center-align"></td>
                                             <td class="center-align"></td>
                                             <td class="center-align"></td>
-                                            <td class="center-align"></td>
-                                            <td class="center-align">` + response.first[j]['kode'] + `</td>
-                                            <td class="right-align">` + response.first[j]['item'] + `</td>
-                                            <td class="center-align">` + response.first[j]['satuan'] + `</td>
+                                            <td class="center-align">` + val.kode + `</td>
+                                            <td class="right-align">` + val.item + `</td>
+                                            <td class="center-align">` + val.satuan + `</td>
                                             <td class="center-align">Saldo Awal</td>
                                             <td class="center-align"></td>
                                             <td class="center-align"></td>
                                             <td class="center-align"></td>
-                                            <td class="right-align">` + response.first[j]['last_qty'] + `</td>
-                                            <td class="right-align">` + response.first[j]['last_nominal'] + `</td>
+                                            <td class="right-align">` + val.last_qty + `</td>
+                                            <td class="right-align">` + val.last_nominal + `</td>
                                         </tr>`
                                     );
-                                    
-                                });
-                            $.each(response.message, function(i, val) {
-                                if(response.perlu == 1){
-                                    if (!processedItems.includes(val.item)) {
-
-                                        processedItems.push(val.item);
-                                        
-                                        $.each(response.latest, function(j, vals) {
-                                            if (vals.item == val.item) {
-                                                $('#table_body').append(`
-                                                    <tr>
-                                                        <td class="center-align"></td>
-                                                        <td class="center-align"></td>
-                                                        <td class="center-align"></td>
-                                                        <td class="center-align"></td>
-                                                        <td class="center-align">` + response.latest[j]['kode'] + `</td>
-                                                        <td class="right-align">` + response.latest[j]['item'] + `</td>
-                                                        <td class="center-align">` + response.latest[j]['satuan'] + `</td>
-                                                        <td class="center-align">Saldo Awal</td>
-                                                        <td class="center-align"></td>
-                                                        <td class="center-align"></td>
-                                                        <td class="center-align"></td>
-                                                        <td class="right-align">` + response.latest[j]['last_qty'] + `</td>
-                                                        <td class="right-align">` + response.latest[j]['last_nominal'] + `</td>
-                                                    </tr>`
-                                                );
-                                            }
-                                        });
-                                    }
+                                    itung++;
+                                }else{
+                                    $('#table_body').append(`
+                                        <tr>
+                                            <td class="center-align"></td>
+                                            <td >`+val.date+`</td>
+                                            <td >`+val.plant+`</td>
+                                            <td >`+val.warehouse+`</td>
+                                            <td >`+val.kode+`</td>
+                                            <td >`+val.item+`</td>
+                                            <td >`+val.satuan+`</td>
+                                            <td >`+val.document+`</td>
+                                            <td class="right-align">`+val.qty+`</td>
+                                            <td class="right-align">`+val.final+`</td>
+                                            <td class="right-align">`+val.total+`</td>
+                                            <td class="right-align">`+val.cum_qty+`</td>
+                                            <td class="right-align">`+val.cum_val+`</td>
+                                        </tr>
+                                    `);
                                 }         
-                                $('#table_body').append(`
-                                    <tr>
-                                        <td class="center-align">`+(i+1)+`</td>
-                                        <td >`+val.date+`</td>
-                                        <td >`+val.plant+`</td>
-                                        <td >`+val.warehouse+`</td>
-                                        <td >`+val.kode+`</td>
-                                        <td >`+val.item+`</td>
-                                        <td >`+val.satuan+`</td>
-                                        <td >`+val.document+`</td>
-                                        <td class="right-align">`+val.qty+`</td>
-                                        <td class="right-align">`+val.final+`</td>
-                                        <td class="right-align">`+val.total+`</td>
-                                        <td class="right-align">`+val.cum_qty+`</td>
-                                        <td class="right-align">`+val.cum_val+`</td>
-                                    </tr>
-                                `);
+                                
                             });
+                            
                         }   
                         
                         M.toast({

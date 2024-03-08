@@ -1555,7 +1555,7 @@ class CustomHelper {
 						'project_id'	=> $row->project_id ? $row->project_id : NULL,
 						'type'			=> '1',
 						'nominal'		=> floatval($balanceReal),
-						'nominal_fc'	=> $op->currency->type == '1' ? floatval($balanceReal * $op->currency_rate) : floatval($balanceReal), #benerin
+						'nominal_fc'	=> $op->currency->type == '1' ? floatval(round($balanceReal * $op->currency_rate,2)) : floatval(round($balanceReal,2)), #benerin
 					]);
 					if($row->lookable_type == 'marketing_order_memos'){
 						CustomHelper::addCountLimitCredit($op->account_id,$balanceReal);

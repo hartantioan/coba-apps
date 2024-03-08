@@ -214,7 +214,7 @@ class StockMovementController extends Controller
             }
         }
         
-        if(!$request->item_id){
+        if(!$request->item_id && $request->type != 'final'){
             $query_no = ItemCogs::whereIn('id', function ($query) use ($request) {            
                 $query->selectRaw('MAX(id)')
                     ->from('item_cogs')
@@ -301,6 +301,9 @@ class StockMovementController extends Controller
             // If 'kode' is the same, prioritize 'perlu' in descending order
             return $b['perlu'] - $a['perlu'];
         });
+        if($request->type == 'final'){
+            $combinedArray=$array_filter;
+        }
         $end_time = microtime(true);
         $execution_time = ($end_time - $start_time);
         $response =[

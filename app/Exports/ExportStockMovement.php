@@ -183,7 +183,7 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                 $uom_unit = $row->item->uomUnit->code;
             }
         }
-        if(!$this->item){
+        if(!$this->item && $this->type != 'final'){
             $query_no = ItemCogs::whereIn('id', function ($query) {            
                 $query->selectRaw('MAX(id)')
                     ->from('item_cogs')
@@ -273,7 +273,9 @@ class ExportStockMovement implements FromView,ShouldAutoSize
             return $b['perlu'] - $a['perlu'];
         });
 
-      
+        if($this->type == 'final'){
+            $combinedArray=$array_filter;
+        }
         return view('admin.exports.stock_movement', [
             'data' => $combinedArray,
             'latest' => $array_last_item,

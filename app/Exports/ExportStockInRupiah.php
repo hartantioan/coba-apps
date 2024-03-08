@@ -194,7 +194,7 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
             
             
         }
-        if(!$this->item){
+        if(!$this->item && $this->type != 'final'){
             $query_no = ItemCogs::whereIn('id', function ($query) {            
                 $query->selectRaw('MAX(id)')
                     ->from('item_cogs')
@@ -284,7 +284,9 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
             // If 'kode' is the same, prioritize 'perlu' in descending order
             return $b['perlu'] - $a['perlu'];
         });
-
+        if($this->type == 'final'){
+            $combinedArray=$array_filter;
+        }
         return view('admin.exports.stock_in_rupiah', [
             'data'          => $combinedArray,
             'latest'        => $array_last_item,

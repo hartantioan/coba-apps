@@ -2282,7 +2282,7 @@ class GoodIssueController extends Controller
                 'note2'                     => $row->note2 ? $row->note2 : '',
                 'lookable_type'             => $row->lookable_type ? $row->lookable_type : '',
                 'lookable_id'               => $row->lookable_id ? $row->lookable_id : '',
-                'reference_id'              => $row->lookable_type ? ($row->lookable->materialRequest()->exists() ? $row->lookable->materialRequest->id : $row->lookable->goodIssueRequest->id) : '',
+                'reference_id'              => $row->lookable_type ? ($row->lookable_type == 'material_request_details' ? $row->lookable->materialRequest->id : $row->lookable->goodIssueRequest->id) : '',
                 'stock_list'                => $row->itemStock->item->currentStock($this->dataplaces,$this->datawarehouses),
                 'place_id'                  => $row->place_id,
                 'line_id'                   => $row->line_id,

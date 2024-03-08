@@ -154,6 +154,8 @@ class StockMovementController extends Controller
             
             $data_tempura = [
                 'item_id'      => $row->item->id,
+                'perlu'        => 0,
+                'item_id'      => $row->item->id,
                 'plant' => $row->place->code,
                 'warehouse' => $row->warehouse->name,
                 'item' => $row->item->name,
@@ -192,13 +194,15 @@ class StockMovementController extends Controller
                 ->first();
 
                 $array_last_item[] = [
+                    'perlu'        => 1,
+                    'item_id'      => $row->item->id,
                     'id'           => $query_first->id ?? null, 
                     'date'         => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
                     'last_nominal' => $query_first ? number_format($query_first->total_final, 2, ',', '.') : 0,
                     'item'         => $row->item->name,
                     'satuan'       => $row->item->uomUnit->code,
                     'kode'         => $row->item->code,
-                    'last_qty'     => $query_first ? number_format($query_first->qty_final, 3, ',', '.') : 0,
+                    'last_qty'     => $query_first ? number_format($query_first->qty_final, 2, ',', '.') : 0,
                 ];
 
 
@@ -256,22 +260,52 @@ class StockMovementController extends Controller
     
             foreach($query_no as $row_tidak_ada){
     
-                $array_first_item[] = [
-                    'id'           => $row_tidak_ada->id, 
-                    'date'         => $row_tidak_ada ? date('d/m/Y', strtotime($row_tidak_ada->date)) : null,
-                    'last_nominal' => $row_tidak_ada ? number_format($row_tidak_ada->total_final, 2, ',', '.') : 0,
-                    'item'         => $row_tidak_ada->item->name,
-                    'satuan'       => $row_tidak_ada->item->uomUnit->code,
-                    'kode'         => $row_tidak_ada->item->code,
-                    'last_qty'     => $row_tidak_ada ? number_format($row_tidak_ada->qty_final, 2, ',', '.') : 0,
-                ]; 
+                if($row_tidak_ada->qty_final > 0){
+                    $array_first_item[] = [
+                        'perlu'        => 1,
+                        'item_id'      => $row_tidak_ada->item->id,
+                        'id'           => $row_tidak_ada->id, 
+                        'date'         => $row_tidak_ada ? date('d/m/Y', strtotime($row_tidak_ada->date)) : null,
+                        'last_nominal' => $row_tidak_ada ? number_format($row_tidak_ada->total_final, 2, ',', '.') : 0,
+                        'item'         => $row_tidak_ada->item->name,
+                        'satuan'       => $row_tidak_ada->item->uomUnit->code,
+                        'kode'         => $row_tidak_ada->item->code,
+                        'last_qty'     => $row_tidak_ada ? number_format($row_tidak_ada->qty_final, 2, ',', '.') : 0,
+                    ]; 
+                } 
             }
         }
+        $combinedArray = [];
+        // Merge $array_filter into $combinedArray
+        foreach ($array_filter as $item) {
+            $combinedArray[] = $item;
+        }
+
+        // Merge $array_last_item into $combinedArray
+        foreach ($array_last_item as $item) {
+            $combinedArray[] = $item;
+        }
+
+        // Merge $array_first_item into $combinedArray
+        foreach ($array_first_item as $item) {
+            $combinedArray[] = $item;
+        }
+        usort($combinedArray, function ($a, $b) {
+            // First, sort by 'kode' in ascending order
+            $kodeComparison = strcmp($a['kode'], $b['kode']);
+            
+            if ($kodeComparison !== 0) {
+                return $kodeComparison;
+            }
+
+            // If 'kode' is the same, prioritize 'perlu' in descending order
+            return $b['perlu'] - $a['perlu'];
+        });
         $end_time = microtime(true);
         $execution_time = ($end_time - $start_time);
         $response =[
             'status'=>200,
-            'message'  =>$array_filter,
+            'message'  =>$combinedArray,
             'latest'        => $array_last_item,
             'first'         => $array_first_item,
             'uomunit'  =>$uom_unit,

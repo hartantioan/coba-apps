@@ -245,63 +245,41 @@
                                 <th class="center-align">Mutasi</th>
                                 <th class="center-align">Balance</th>
                             </tr>`);
-                            $.each(response.first, function(j, vals) {
-                                            
-                            $('#movement_body').append(`
-                                <tr>
-                                    <td class="center-align"></td>
-                                    <td class="center-align"></td>
-                                    <td class="center-align"></td>
-                                    <td class="center-align"></td>
-                                    <td class="center-align">` + response.first[j]['kode'] + `</td>
-                                    <td class="right-align">` + response.first[j]['item'] + `</td>
-                                    <td class="center-align">` + response.first[j]['satuan'] + `</td>
-                                    <td class="center-align">Saldo Awal</td>
-                                    <td class="center-align"></td>
-                                    <td class="right-align">` + response.first[j]['last_qty'] + `</td>
-                                </tr>`
-                            );
-                            
-                        });
+                        
+                        var itung = 0;
                         $.each(response.message, function(i, val) {
-                            if(response.perlu == 1){
-                                if (!processedItems.includes(val.item)) {
-                                    processedItems.push(val.item);
-
-                                    $.each(response.latest, function(j, vals) {
-                                        if (vals.item == val.item) {
-                                            $('#movement_body').append(`
-                                                <tr>
-                                                    <td class="center-align"></td>
-                                                    <td class="center-align"></td>
-                                                    <td class="center-align"></td>
-                                                    <td class="center-align"></td>
-                                                    <td class="">` + response.latest[j]['kode'] + `</td>
-                                                    <td class="">` + response.latest[j]['item'] + `</td>
-                                                    <td class="">` + response.latest[j]['satuan'] + `</td>
-                                                    <td>Saldo Awal</td>
-                                                    <td class="right-align"></td>
-                                                    <td class="right-align">` + response.latest[j]['last_qty'] + `</td>
-                                                </tr>`
-                                            );
-                                        }
-                                    });
-                                }
-                            }         
-                            $('#movement_body').append(`
-                                <tr>
-                                    <td class="center-align">`+(i+1)+`</td>
-                                    <td >`+val.date+`</td>
-                                    <td >`+val.plant+`</td>
-                                    <td >`+val.warehouse+`</td>
-                                    <td >`+val.kode+`</td>
-                                    <td >`+val.item+`</td>
-                                    <td >`+val.satuan+`</td>
-                                    <td>`+val.document+`</td>
-                                    <td class="right-align">`+val.qty+`</td>
-                                    <td class="right-align">`+val.cum_qty+`</td>
-                                </tr>
-                            `);
+                            if(val.perlu == 1){
+                                $('#movement_body').append(`
+                                    <tr>
+                                        <td class="center-align">`+(itung+1)+`</td>
+                                        <td class="center-align"></td>
+                                        <td class="center-align"></td>
+                                        <td class="center-align"></td>
+                                        <td class="">` + val.kode + `</td>
+                                        <td class="">` + val.kode + `</td>
+                                        <td class="">` + val.item + `</td>
+                                        <td>Saldo Awal</td>
+                                        <td class="right-align"></td>
+                                        <td class="right-align">` + val.last_qty +  `</td>
+                                    </tr>`
+                                );
+                                itung++;
+                            }else{
+                                $('#movement_body').append(`
+                                    <tr>
+                                        <td class="center-align"></td>
+                                        <td >`+val.date+`</td>
+                                        <td >`+val.plant+`</td>
+                                        <td >`+val.warehouse+`</td>
+                                        <td >`+val.kode+`</td>
+                                        <td >`+val.item+`</td>
+                                        <td >`+val.satuan+`</td>
+                                        <td>`+val.document+`</td>
+                                        <td class="right-align">`+val.qty+`</td>
+                                        <td class="right-align">`+val.cum_qty+`</td>
+                                    </tr>
+                                `);
+                            }
                         });
                     } 
                     

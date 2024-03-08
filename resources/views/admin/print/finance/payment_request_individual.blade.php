@@ -199,7 +199,7 @@
                 <div class="card-content invoice-print-area ">
                     <table border="0" width="100%">
                         <tr>
-                            <td width="33%" class="left-align" class="tbl-info">
+                            <td width="33%" class="left-align" class="tbl-info" valign="top">
                                 <table border="0" width="100%">
                                     <tr>
                                         <td width="40%">
@@ -208,6 +208,56 @@
                                         <td width="1%">:</td>
                                         <td width="60%">
                                             {{ $data->account->name }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="40%">
+                                            Tgl. Posting
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="60%">
+                                            {{ $data->post_date }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="40%">
+                                            Tgl. Req. Date
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="60%">
+                                            {{ $data->pay_date }}
+                                        </td>
+                                    </tr>
+                                   
+                                    <tr>
+                                        <td width="60%">
+                                            Tgl Outgoing Payment
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="40%">
+                                            
+                                            @if($data->outgoingPayment)
+                                                {{ $data->outgoing_payment->pay_date ?? '' }}
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    <tr><td></td></tr>
+                                    <tr><td></td></tr>
+                                    
+                                </table>
+                            </td>
+                            <td width="33%" class="left-align" class="tbl-info" valign="top">
+                                <table border="0" width="100%">
+                                    <tr>
+                                        <td width="40%">
+                                           Sumber Dana
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="60%">
+                                            @if($data->coaSource()->exists())
+                                                {{ $data->coaSource->code.'-'. $data->coaSource->name }}
+                                            @endif
+                                           
                                         </td>
                                     </tr>
                                     <tr>
@@ -247,46 +297,10 @@
                                             {{ $data->account_name }}
                                         </td>
                                     </tr>
-                                    
-                                </table>
-                            </td>
-                            <td width="33%" class="left-align" class="tbl-info">
-                                <table border="0" width="100%">
-                                    <tr>
-                                        <td width="40%">
-                                            Tgl. Posting
-                                        </td>
-                                        <td width="1%">:</td>
-                                        <td width="60%">
-                                            {{ $data->post_date }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="40%">
-                                            Tgl. Req. Date
-                                        </td>
-                                        <td width="1%">:</td>
-                                        <td width="60%">
-                                            {{ $data->pay_date }}
-                                        </td>
-                                    </tr>
-                                   
-                                    <tr>
-                                        <td width="60%">
-                                            Tgl Outgoing Payment
-                                        </td>
-                                        <td width="1%">:</td>
-                                        <td width="40%">
-                                            
-                                            @if($data->outgoingPayment)
-                                                {{ $row->outgoing_payment->pay_date ?? '' }}
-                                            @endif
-                                        </td>
-                                    </tr>
                                    
                                 </table>
                             </td>
-                            <td width="33%" class="left-align">
+                            <td width="33%" class="left-align" valign="top">
                                 <table border="0" width="100%">
                                     <tr>
                                         <td align="center">

@@ -4260,7 +4260,11 @@ class CustomHelper {
 		$arr = explode('.',strval($qty));
 		$value = 0;
 		if(count($arr) > 1){
-			$value = number_format(floatval($arr[0].'.'.$arr[1]),3,',','.');
+			if(floatval($arr[1]) > 0){
+				$value = number_format(floatval($arr[0].'.'.$arr[1]),3,',','.');
+			}else{
+				$value = number_format(floatval($arr[0]),0,',','.');
+			}
 		}else{
 			$value = number_format(floatval($arr[0]),0,',','.');
 		}

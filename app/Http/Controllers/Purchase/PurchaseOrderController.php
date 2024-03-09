@@ -1002,11 +1002,12 @@ class PurchaseOrderController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="18">Daftar Item</th>
+                                <th class="center-align" colspan="19">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Item/Coa Biaya</th>
+                                <th class="center-align">Grup Item</th>
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
                                 <th class="center-align">Harga</th>
@@ -1041,6 +1042,7 @@ class PurchaseOrderController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.($row->item_id ? $row->item->code.' - '.$row->item->name : $row->coa->name).'</td>
+                <td class="center-align">'.($row->item_id ? $row->item->itemGroup->name : '-').'</td>
                 <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.($row->item_id ? $row->itemUnit->unit->code : '-').'</td>
                 <td class="right-align">'.number_format($row->price,2,',','.').'</td>
@@ -1061,7 +1063,7 @@ class PurchaseOrderController extends Controller
             </tr>';
         }
         $string .= '<tr>
-                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2"> Total </td>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="3"> Total </td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqty, 3, ',', '.') . '</td>
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2">  </td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totaldiskon1, 2, ',', '.') . '</td>

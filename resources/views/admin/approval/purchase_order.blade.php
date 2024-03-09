@@ -252,6 +252,7 @@
                     <tr>
                         <th class="center-align">No.</th>
                         <th class="center-align">Item/Jasa</th>
+                        <th class="center-align">Grup Item</th>
                         <th class="center-align">Qty</th>
                         <th class="center-align">Satuan</th>
                         <th class="center-align">Harga</th>
@@ -266,6 +267,7 @@
                     <tr>
                         <td class="center-align" rowspan="3">{{ ($key + 1) }}</td>
                         <td class="center-align">{{ $row->item_id ? $row->item->code.' - '.$row->item->name : $row->coa->code.' - '.$row->coa->name }}</td>
+                        <td class="center-align">{{ $row->item_id ? $row->item->itemGroup->name : '-' }}</td>
                         <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                         <td class="center-align">{{ $row->item_id ? $row->itemUnit->unit->code : '-' }}</td>
                         <td class="right-align">{{ number_format($row->price,2,',','.') }}</td>
@@ -275,14 +277,14 @@
                         <td class="right-align">{{ number_format($row->subtotal,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td colspan="8">Keterangan 1: {{ $row->note }}</td>
+                        <td colspan="10">Keterangan 1: {{ $row->note }}</td>
                     </tr>
                     <tr>
-                        <td colspan="8">Keterangan 2: {{ $row->note2 }}</td>
+                        <td colspan="10">Keterangan 2: {{ $row->note2 }}</td>
                     </tr>
                     @endforeach
                     <tr>
-                        <td colspan="6" rowspan="7">
+                        <td colspan="7" rowspan="7">
                             Rekening :
                             {{ $data->supplier->defaultBank() ? $data->supplier->defaultBank() : ' - ' }}
                             <div class="mt-3">

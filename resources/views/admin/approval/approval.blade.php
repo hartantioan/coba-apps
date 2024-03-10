@@ -268,7 +268,7 @@
     });
 
     function multiApprove(){
-        $('#modal2').modal('open');
+        /* $('#modal2').modal('open'); */
     }
 
     function countSelected(){

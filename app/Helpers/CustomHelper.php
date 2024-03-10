@@ -1429,9 +1429,10 @@ class CustomHelper {
 						]);
 					}
 				}
-	
+
+				$coa = Coa::where('code','100.01.03.03.02')->where('company_id',$pr->company_id)->first();
+
 				foreach($pr->paymentRequestCross as $row){
-					$coa = Coa::where('code','100.01.03.03.02')->where('company_id',$pr->company_id)->first();
 					JournalDetail::create([
 						'journal_id'                    => $query->id,
 						'coa_id'                        => $coa->id,
@@ -2879,6 +2880,117 @@ class CustomHelper {
 			}
 
 		}elseif($table_name == 'close_bills'){
+
+			$cb = CloseBill::find($table_id);
+			
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'company_id'	=> $cb->company_id,
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
+				'currency_id'	=> isset($data->currency_id) ? $data->currency_id : NULL,
+				'currency_rate'	=> isset($data->currency_rate) ? $data->currency_rate : NULL,
+				'post_date'		=> $data->post_date,
+				'note'			=> $data->note,
+				'status'		=> '3'
+			]);
+
+			$coapiutangbs = Coa::where('code','100.01.03.03.02')->where('company_id',$cb->company_id)->first();
+
+			foreach($cb->closeBillDetail as $row){
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coapiutangbs->id,
+					'account_id'	=> $coapiutangbs->bp_journal ? $row->outgoingPayment->account_id : NULL,
+					'type'			=> '2',
+					'nominal'		=> $row->nominal * $cb->currency_rate,
+					'nominal_fc'	=> $cb->currency->type == '1' || $cb->currency->type == '1' == '' ? $row->nominal * $cb->currency_rate : $row->nominal,
+					'note'			=> $row->note,
+				]);
+			}
+
+			foreach($cb->closeBillCost as $row){
+				if($row->cost_distribution_id){
+					$total = $row->grandtotal;
+					$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
+					$accumulation = 0;
+					foreach($row->costDistribution->costDistributionDetail as $key => $rowcost){
+						if($key == $lastIndex){
+							$nominal = $total - $accumulation;
+						}else{
+							$nominal = round(($rowcost->percentage / 100) * $total);
+							$accumulation += $nominal;
+						}
+						JournalDetail::create([
+							'journal_id'                    => $query->id,
+							'cost_distribution_detail_id'   => $rowcost->id,
+							'coa_id'                        => $row->coa_id,
+							'place_id'                      => $rowcost->place_id ? $rowcost->place_id : NULL,
+							'line_id'                       => $rowcost->line_id ? $rowcost->line_id : NULL,
+							'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : NULL,
+							'department_id'                 => $rowcost->department_id ? $rowcost->department_id : NULL,
+							'project_id'					=> $row->project_id ? $row->project_id : NULL,
+							'type'                          => '1',
+							'nominal'                       => floatval($nominal * $cb->currency_rate),
+							'nominal_fc'					=> $cb->currency->type == '1' ? floatval($nominal * $cb->currency_rate) : floatval($nominal),
+							'note'							=> $row->note,
+							'note2'							=> $row->note2,
+						]);
+					}
+				}else{
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->coa_id,
+						'place_id'		=> $row->place_id,
+						'line_id'		=> $row->line_id ? $row->line_id : NULL,
+						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+						'department_id'	=> $row->division_id,
+						'project_id'	=> $row->project_id ? $row->project_id : NULL,
+						'type'			=> '1',
+						'nominal'		=> $row->grandtotal * $cb->currency_rate,
+						'nominal_fc'	=> $cb->currency->type == '1' || $cb->currency->type == '1' == '' ? $row->grandtotal * $cb->currency_rate : $row->grandtotal,
+						'note'			=> $row->note,
+						'note2'			=> $row->note2,
+					]);
+				}
+
+				/* if($row->tax_id){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->taxMaster->coa_purchase_id,
+						'place_id'		=> $row->place_id ? $row->place_id : NULL,
+						'line_id'		=> $row->line_id ? $row->line_id : NULL,
+						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+						'account_id'	=> $row->taxMaster->coaPurchase->bp_journal ? $account_id : NULL,
+						'department_id'	=> $row->department_id ? $row->department_id : NULL,
+						'project_id'	=> $row->project_id ? $row->project_id : NULL,
+						'type'			=> '1',
+						'nominal'		=> $row->tax * $cb->currency_rate,
+						'nominal_fc'	=> $cb->currency->type == '1' ? $row->tax * $row->currency_rate : $row->tax,
+						'note'			=> $row->purchaseInvoice->tax_no ? $row->purchaseInvoice->tax_no : '',
+						'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
+					]);
+				}
+
+				if($row->wtax_id){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->wTaxMaster->coa_purchase_id,
+						'place_id'		=> $row->place_id ? $row->place_id : NULL,
+						'line_id'		=> $row->line_id ? $row->line_id : NULL,
+						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+						'account_id'	=> $row->wTaxMaster->coaPurchase->bp_journal ? $account_id : NULL,
+						'department_id'	=> $row->department_id ? $row->department_id : NULL,
+						'project_id'	=> $row->project_id ? $row->project_id : NULL,
+						'type'			=> '2',
+						'nominal'		=> $row->wtax * $pod->purchaseOrder->currency_rate,
+						'nominal_fc'	=> $pod->purchaseOrder->currency->type == '1' ? $row->wtax * $pod->purchaseOrder->currency_rate : $row->wtax,
+						'note'			=> $row->purchaseInvoice->tax_cut_no ? $row->purchaseInvoice->tax_cut_no : '',
+						'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
+					]);
+				} */
+			}
 			
 		}elseif($table_name == 'marketing_order_invoices'){
 
@@ -3226,6 +3338,8 @@ class CustomHelper {
 						'type'			=> '1',
 						'nominal'		=> $row->total,
 						'nominal_fc'	=> $row->total,
+						'note'			=> $row->note,
+						'note2'			=> $row->note2,
 					]);
 
 					$grandtotal += $row->grandtotal;
@@ -3280,6 +3394,8 @@ class CustomHelper {
 						'type'			=> '2',
 						'nominal'		=> $row->grandtotal,
 						'nominal_fc'	=> $row->grandtotal,
+						'note'			=> $row->note,
+						'note2'			=> $row->note2,
 					]);
 
 				}elseif($row->lookable_type == 'purchase_order_details'){
@@ -3299,6 +3415,8 @@ class CustomHelper {
 						'type'			=> '1',
 						'nominal'		=> $pod->getArrayTotal()['total'] * $pod->purchaseOrder->currency_rate,
 						'nominal_fc'	=> $type == '1' || $type == '' ? $pod->getArrayTotal()['total'] * $pod->purchaseOrder->currency_rate : $pod->getArrayTotal()['total'],
+						'note'			=> $row->note,
+						'note2'			=> $row->note2,
 					]);
 
 					$grandtotal += $row->grandtotal * $pod->purchaseOrder->currency_rate;
@@ -3354,6 +3472,8 @@ class CustomHelper {
 						'type'			=> '2',
 						'nominal'		=> $row->grandtotal * $pod->purchaseOrder->currency_rate,
 						'nominal_fc'	=> $pod->purchaseOrder->currency->type == '1' ? $row->grandtotal * $pod->purchaseOrder->currency_rate : $row->grandtotal,
+						'note'			=> $row->note,
+						'note2'			=> $row->note2,
 					]);
 
 					if(self::checkArrayRaw($arrNote,$pod->purchaseOrder->code) < 0){
@@ -3410,6 +3530,8 @@ class CustomHelper {
 						'type'			=> '2',
 						'nominal'		=> $row->grandtotal * $row->lookable->landedCost->currency_rate,
 						'nominal_fc'	=> $row->lookable->landedCost->currency->type == '1' ? $row->grandtotal * $row->lookable->landedCost->currency_rate : $row->grandtotal,
+						'note'			=> $row->note,
+						'note2'			=> $row->note2,
 					]);
 
 					if(self::checkArrayRaw($arrNote,$row->lookable->landedCost->code) < 0){
@@ -3429,6 +3551,8 @@ class CustomHelper {
 						'type'			=> '1',
 						'nominal'		=> $row->total * $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate,
 						'nominal_fc'	=> $row->lookable->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? $row->total * $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate : $row->total,
+						'note'			=> $row->note,
+						'note2'			=> $row->note2,
 					]);
 
 					$grandtotal += $row->grandtotal * $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
@@ -3484,6 +3608,8 @@ class CustomHelper {
 						'type'			=> '2',
 						'nominal'		=> $row->grandtotal * $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate,
 						'nominal_fc'	=> $row->lookable->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? $row->grandtotal * $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate : $row->grandtotal,
+						'note'			=> $row->note,
+						'note2'			=> $row->note2,
 					]);
 
 					if(self::checkArrayRaw($arrNote,$row->lookable->goodReceipt->code) < 0){

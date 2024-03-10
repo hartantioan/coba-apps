@@ -2908,6 +2908,7 @@ class CustomHelper {
 					'nominal_fc'	=> $cb->currency->type == '1' || $cb->currency->type == '' ? $row->nominal * $cb->currency_rate : $row->nominal,
 					'note'			=> $row->note,
 				]);
+				CustomHelper::removeCountLimitCredit($row->outgoingPayment->account_id,floatval($row->nominal * $cb->currency_rate));
 			}
 
 			foreach($cb->closeBillCost as $row){

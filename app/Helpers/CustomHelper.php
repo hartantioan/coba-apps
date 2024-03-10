@@ -2905,7 +2905,7 @@ class CustomHelper {
 					'account_id'	=> $coapiutangbs->bp_journal ? $row->outgoingPayment->account_id : NULL,
 					'type'			=> '2',
 					'nominal'		=> $row->nominal * $cb->currency_rate,
-					'nominal_fc'	=> $cb->currency->type == '1' || $cb->currency->type == '1' == '' ? $row->nominal * $cb->currency_rate : $row->nominal,
+					'nominal_fc'	=> $cb->currency->type == '1' || $cb->currency->type == '' ? $row->nominal * $cb->currency_rate : $row->nominal,
 					'note'			=> $row->note,
 				]);
 			}

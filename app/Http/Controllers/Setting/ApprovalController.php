@@ -607,6 +607,22 @@ class ApprovalController extends Controller
                         }
                     }
                 }
+                if($query->approvalSource->lookable_type == 'material_requests'){
+                    $materialrequest = $query->approvalSource->lookable;
+                    if($materialrequest){
+                        $materialrequest->MaterialRequestDetail()->update([
+                            'status'    => '1'
+                        ]);
+                    }
+                }
+                if($query->approvalSource->lookable_type == 'good_issue_requests'){
+                    $goodissuerequest = $query->approvalSource->lookable;
+                    if($goodissuerequest){
+                        $goodissuerequest->goodIssueRequestDetail()->update([
+                            'status'    => '1'
+                        ]);
+                    }
+                }
                 if($work_orders_rp == 0){
                     if($query) {
     

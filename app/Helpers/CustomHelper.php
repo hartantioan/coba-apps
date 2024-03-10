@@ -2933,7 +2933,7 @@ class CustomHelper {
 							'project_id'					=> $row->project_id ? $row->project_id : NULL,
 							'type'                          => '1',
 							'nominal'                       => floatval($nominal * $cb->currency_rate),
-							'nominal_fc'					=> $cb->currency->type == '1' ? floatval($nominal * $cb->currency_rate) : floatval($nominal),
+							'nominal_fc'					=> $cb->currency->type == '1' || $cb->currency->type == '' ? floatval($nominal * $cb->currency_rate) : floatval($nominal),
 							'note'							=> $row->note,
 							'note2'							=> $row->note2,
 						]);
@@ -2949,7 +2949,7 @@ class CustomHelper {
 						'project_id'	=> $row->project_id ? $row->project_id : NULL,
 						'type'			=> '1',
 						'nominal'		=> $row->grandtotal * $cb->currency_rate,
-						'nominal_fc'	=> $cb->currency->type == '1' || $cb->currency->type == '1' == '' ? $row->grandtotal * $cb->currency_rate : $row->grandtotal,
+						'nominal_fc'	=> $cb->currency->type == '1' || $cb->currency->type == '' ? $row->grandtotal * $cb->currency_rate : $row->grandtotal,
 						'note'			=> $row->note,
 						'note2'			=> $row->note2,
 					]);

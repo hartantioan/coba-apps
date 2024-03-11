@@ -366,7 +366,7 @@
                                                 </div>
                                             </div>
                                         </li>
-                                        <li id="cost-tab" class="step19">
+                                        {{-- <li id="cost-tab" class="step19">
                                             <div class="collapsible-header purple darken-1 text-white" style="color:white;" onclick="changeMode();"><i class="material-icons">library_books</i>Tutup BS dengan Coa Biaya (REKONSILIASI)</div>
                                             <div class="collapsible-body">
                                                 <p class="mt-2 mb-2">
@@ -400,7 +400,7 @@
                                                     </div>
                                                 </p>
                                             </div>
-                                        </li>
+                                        </li> --}}
                                     </ul>
                                 </div>
                                 <div class="col m12 s12 step20">

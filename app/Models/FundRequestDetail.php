@@ -101,6 +101,22 @@ class FundRequestDetail extends Model
         return $this->belongsTo('App\Models\Tax','wtax_id','id')->withTrashed();
     }
 
+    public function hasPaymentRequestDetail(){
+        return $this->hasMany('App\Models\PaymentRequestDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('paymentRequest',function($query){
+            $query->whereIn('status',['1','2','3']);
+        });
+    }
+
+    public function balancePaymentRequest(){
+        $total = $this->grandtotal;
+
+        foreach($this->hasPaymentRequestDetail as $row){
+            $total -= $row->nominal;
+        }
+
+        return $total;
+    }
+
     public function fundRequest()
     {
         return $this->belongsTo('App\Models\FundRequest', 'fund_request_id', 'id')->withTrashed();

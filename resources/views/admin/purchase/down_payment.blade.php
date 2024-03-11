@@ -295,8 +295,8 @@
                             <div class="col m12 s12 step13">
                                 <p class="mt-2 mb-2">
                                     <h6>Detail Purchase Order / Req. Dana (Centang jika ada)</h6>
-                                    <div style="overflow:auto;">
-                                        <table class="bordered" id="table-detail">
+                                    <div style="overflow:auto;width:100% !important;">
+                                        <table class="bordered" id="table-detail" style="min-width:1800px !important;">
                                             <thead>
                                                 <tr>
                                                     <th class="center">
@@ -339,7 +339,7 @@
                                         <h6>Checklist Lampiran</h6>
                                         @foreach ($menu->checklistDocument as $row)
                                             <label style="margin: 0 5px 0 0;">
-                                                <input class="validate" required="" type="checkbox" name="arr_checklist_box[]" value="{{ $row->id }}">
+                                                <input class="validate" required="" type="checkbox" name="arr_checklist_box[]" value="{{ $row->id }}" data-checklist="{{ $row->title }}">
                                                 <span>{{ $row->title.' '.$row->type() }}</span>
                                                 @if($row->is_other)
                                                     <input type="text" name="arr_checklist_note[]" style="width: 200px;height:1.5rem;">
@@ -1325,7 +1325,15 @@
                 }
             });
         }else{
-
+            $('#body-purchase').empty().append(`
+                <tr id="empty-purchase">
+                    <td colspan="8" class="center">
+                        Pilih supplier untuk memulai...
+                    </td>
+                </tr>
+            `);
+            $('#grandtotal,#total,#tax,#wtax').text('0,00');
+            $('#subtotal').val('0,00');
         }
     }
 
@@ -1400,7 +1408,19 @@
                                         </td>
                                     </tr>
                                 `);
+
+                                if(val.checklist.length > 0){
+                                    $.each(val.checklist, function(i, value) {
+                                        $('input[name^="arr_checklist_box[]"]').each(function(index){
+                                            if(value.title == $(this).data('checklist')){
+                                                $(this).prop( "checked", true);
+                                                $('input[name^="arr_checklist_note[]"]').eq(index).val(value.note);
+                                            }
+                                        });
+                                    });
+                                }
                             });
+                            M.updateTextFields();
                             countRow();
                         }else{
                             $('#supplier_id').empty();

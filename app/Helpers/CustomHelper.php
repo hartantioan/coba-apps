@@ -1493,8 +1493,14 @@ class CustomHelper {
 				}elseif($row->lookable_type == 'fund_requests'){
 					$mustpay = $row->nominal;
 					$balanceReal = $row->nominal * $row->lookable->currency_rate;
-					if($row->lookable->type == '1' && $row->document_status == '3'){
+					if($row->lookable->type == '1' && $row->lookable->document_status == '3'){
 						CustomHelper::addCountLimitCredit($row->lookable->account_id,$balanceReal);
+					}
+				}elseif($row->lookable_type == 'fund_request_details'){
+					$mustpay = $row->nominal;
+					$balanceReal = $row->nominal * $row->lookable->fundRequest->currency_rate;
+					if($row->lookable->fundRequest->type == '1' && $row->lookable->fundRequest->document_status == '3'){
+						CustomHelper::addCountLimitCredit($row->lookable->fundRequest->account_id,$balanceReal);
 					}
 				}elseif($row->lookable_type == 'coas'){
 					$mustpay = $row->nominal;

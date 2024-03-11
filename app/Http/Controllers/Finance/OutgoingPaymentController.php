@@ -303,7 +303,7 @@ class OutgoingPaymentController extends Controller
             $totalnominal+=$row->nominal;
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$row->lookable->code.'</td>
+                <td class="center-align">'.$row->getCode().'</td>
                 <td class="center-align">'.$row->type().'</td>
                 <td class="center-align">'.$row->note.'</td>
                 <td class="center-align">'.($row->cost_distribution_id ? $row->costDistribution->code.' - '.$row->costDistribution->name : '-').'</td>

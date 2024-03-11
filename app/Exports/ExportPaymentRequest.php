@@ -113,7 +113,7 @@ class ExportPaymentRequest implements FromCollection, WithTitle, WithHeadings, S
                     'mesin'                 => $row_detail->machine()->exists() ? $row_detail->machine->name : '',
                     'Departmen'             => $row_detail->department()->exists() ? $row_detail->department->name : '',
                     'proyek'                => $row_detail->project()->exists() ? $row_detail->project->name : '',
-                    'basedon'               => $row_detail->lookable->code.' - '.$row_detail->paymentRequest->getPaymentCrossCode(),
+                    'basedon'               => $row_detail->getCode().' - '.$row_detail->paymentRequest->getPaymentCrossCode(),
                 ];
             }
             

@@ -225,8 +225,8 @@
                                         <option value="1">Tunai</option>
                                         <option value="3">Cek</option>
                                         <option value="4">BG</option>
-                                        <option value="5">Rekonsiliasi Tanpa Dokumen</option>
-                                        <option value="6">Rekonsiliasi Dengan Dokumen</option>
+                                        {{-- <option value="5">Rekonsiliasi Tanpa Dokumen</option>
+                                        <option value="6">Rekonsiliasi Dengan Dokumen</option> --}}
                                     </select>
                                     <label class="" for="payment_type">Tipe Pembayaran</label>
                                 </div>
@@ -364,9 +364,12 @@
                                                         </tbody>
                                                     </table>
                                                 </div>
+                                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addCoa()" href="javascript:void(0);">
+                                                    <i class="material-icons left">add</i> Tambah Coa
+                                                </a>
                                             </div>
                                         </li>
-                                        <li id="cost-tab" class="step19">
+                                        {{-- <li id="cost-tab" class="step19">
                                             <div class="collapsible-header purple darken-1 text-white" style="color:white;" onclick="changeMode();"><i class="material-icons">library_books</i>Tutup BS dengan Coa Biaya (REKONSILIASI)</div>
                                             <div class="collapsible-body">
                                                 <p class="mt-2 mb-2">
@@ -400,7 +403,7 @@
                                                     </div>
                                                 </p>
                                             </div>
-                                        </li>
+                                        </li> --}}
                                     </ul>
                                 </div>
                                 <div class="col m12 s12 step20">
@@ -1324,30 +1327,66 @@
     }
 
     function addCoa(){
-        var count = makeid(10);
-        $('#last-row-coa').before(`
-            <tr class="row_detail_coa">
-                <td class="center">
-                    <select class="browser-default" id="arr_coa_cost` + count + `" name="arr_coa_cost[]" data-id="` + count + `"></select>
-                </td>
-                <td class="center">
-                    <select class="browser-default" id="arr_cost_distribution_cost` + count + `" name="arr_cost_distribution_cost[]" onchange="applyCoa('` + count + `');"></select> 
+        alert('coming soon!');
+        /* var count = makeid(10);
+        $('#body-detail').append(`
+            <tr class="row_detail" data-code="` + val.rawcode + `" data-account="` + val.account_code + `">
+                <input type="hidden" name="arr_id[]" value="" data-id="` + count + `">
+                <input type="hidden" name="arr_type[]" value="" data-id="` + count + `">
+                <input type="hidden" name="arr_account_bank[]" value="" data-id="` + count + `">
+                <input type="hidden" name="arr_account_no[]" value="" data-id="` + count + `">
+                <input type="hidden" name="arr_account_name[]" value="" data-id="` + count + `">
+                <td class="center-align">
+                    <label>
+                        <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.code + `" onclick="countAll();" data-id="` + count + `" checked>
+                        <span>Pilih</span>
+                    </label>
                 </td>
                 <td>
-                    <input type="text" id="arr_note_cost` + count + `" name="arr_note_cost[]" placeholder="Keterangan ..." data-id="` + count + `">
+                    -
                 </td>
                 <td class="center">
-                    <input type="text" id="arr_nominal` + count + `" name="arr_nominal[]" onfocus="emptyThis(this);" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                    -
                 </td>
-                <td>
+                <td class="center">
+                    -
+                </td>
+                <td class="right-align">
+                    -
+                </td>
+                <td class="right-align">
+                    -
+                </td>
+                <td class="right-align" id="row_wtax` + count + `">
+                    -
+                </td>
+                <td class="right-align" id="row_grandtotal` + count + `">
+                    -
+                </td>
+                <td class="right-align" id="row_memo` + count + `">
+                    -
+                </td>
+                <td class="center">
+                    <input id="arr_pay` + count + `" name="arr_pay[]" onfocus="emptyThis(this);" data-grandtotal="` + val.balance + `" class="browser-default" type="text" value="`+ val.balance_duplicate + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
+                </td>
+                <td class="center">
+                    <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:150px;" value="` + val.note + `">
+                </td>
+                <td class="center">
+                    <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="applyCoa('` + count + `');"></select>
+                </td>
+                <td class="center">
+                    <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" required style="width: 100%"></select>
+                </td>
+                <td class="center">
                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:200px !important;">
                         <option value="">--Kosong--</option>
                         @foreach ($place as $row)
                             <option value="{{ $row->id }}">{{ $row->code }}</option>
                         @endforeach
-                    </select>    
+                    </select>
                 </td>
-                <td>
+                <td class="center">
                     <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" style="width:200px !important;" onchange="changePlace(this);">
                         <option value="">--Kosong--</option>
                         @foreach ($line as $rowline)
@@ -1355,7 +1394,7 @@
                         @endforeach
                     </select>
                 </td>
-                <td>
+                <td class="center">
                     <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" style="width:200px !important;" onchange="changeLine(this);">
                         <option value="">--Kosong--</option>
                         @foreach ($machine as $row)
@@ -1363,7 +1402,7 @@
                         @endforeach    
                     </select>
                 </td>
-                <td>
+                <td class="center">
                     <select class="browser-default" id="arr_department` + count + `" name="arr_department[]" style="width:200px !important;">
                         <option value="">--Kosong--</option>
                         @foreach ($department as $row)
@@ -1371,19 +1410,26 @@
                         @endforeach
                     </select>
                 </td>
-                <td>
+                <td class="center">
                     <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
                 </td>
+                <td>
+                    -   
+                </td>
                 <td class="center">
-                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" href="javascript:void(0);">
+                    <input id="arr_remark` + count + `" name="arr_remark[]" class="browser-default" type="text" style="width:150px;">
+                </td>
+                <td class="center">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
                     </a>
                 </td>
             </tr>
         `);
-        select2ServerSide('#arr_cost_distribution_cost' + count, '{{ url("admin/select2/cost_distribution") }}');
-        select2ServerSide('#arr_coa_cost' + count, '{{ url("admin/select2/coa") }}');
-        select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
+        
+        select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+        select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
+        select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}'); */
     }
 
     function getRekening(){
@@ -1523,7 +1569,7 @@
                                         ` + val.note + `
                                     </td>
                                     <td class="center-align">
-                                        ` + (val.type_fr == '1' && val.document_status == '2' ?  `<input name="arr_qty_duplicate[]" id="arr_qty_duplicate` + val.id + `" onfocus="emptyThis(this);" value="1" min="1" type="number">` : '-') + `
+                                        -
                                     </td>
                                 </tr>
                             `);
@@ -1654,7 +1700,8 @@
                                 `);
                                 $('#body-detail').append(`
                                     <tr class="row_detail" data-code="` + val.rawcode + `" data-account="` + val.account_code + `">
-                                        <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_id[]" value="` + val.detail_id + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_type[]" value="` + val.detail_type + `" data-id="` + count + `">
                                         <input type="hidden" name="arr_account_bank[]" value="` + val.bank_account + `" data-id="` + count + `">
                                         <input type="hidden" name="arr_account_no[]" value="` + val.no_account + `" data-id="` + count + `">
                                         <input type="hidden" name="arr_account_name[]" value="` + val.name_account + `" data-id="` + count + `">
@@ -1772,8 +1819,6 @@
                                     select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
                                     select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
                                 }
-                                
-                                
 
                                 if(!$('#temp').val()){
                                     $('#currency_id').val(val.currency_id).formSelect();
@@ -2229,6 +2274,7 @@
                 formData.delete("arr_cd_payment[]");
                 formData.delete("arr_payment[]");
                 formData.delete("arr_type[]");
+                formData.delete("arr_id[]");
                 formData.delete("arr_pay[]");
                 formData.delete("arr_note[]");
                 formData.delete("arr_cost_distribution[]");
@@ -2251,7 +2297,8 @@
                         $('input[name^="arr_code"]').each(function(){
                             if($(this).is(':checked')){
                                 formData.append('arr_code[]',$(this).val());
-                                formData.append('arr_type[]',$('input[name^="arr_type"][data-id="' + $(this).data('id') + '"]').val());
+                                formData.append('arr_type[]',$('input[name^="arr_type[]"][data-id="' + $(this).data('id') + '"]').val());
+                                formData.append('arr_id[]',$('input[name^="arr_id[]"][data-id="' + $(this).data('id') + '"]').val());
                                 formData.append('arr_pay[]',$('#arr_pay' + $(this).data('id')).val());
                                 formData.append('arr_note[]',$('#arr_note' + $(this).data('id')).val());
                                 if($('#arr_remark' + $(this).data('id')).length > 0){
@@ -2620,11 +2667,12 @@
                             var count = makeid(10);
                             $('#body-detail').append(`
                                 <tr class="row_detail" data-code="` + val.rawcode + `" data-account="` + val.account_code + `">
+                                    <input type="hidden" name="arr_id[]" value="` + val.detail_id + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_account_bank[]" value="` + val.bank_account + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_account_no[]" value="` + val.no_account + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_account_name[]" value="` + val.name_account + `" data-id="` + count + `">
-                                    ` + ( val.type !== 'fund_requests' ? `<input type="hidden" id="arr_coa` + count + `" name="arr_coa[]" value="` + val.coa_id + `" data-id="` + count + `">` : `` ) + `
+                                    ` + ( !['fund_requests','fund_request_details'].includes(val.type) ? `<input type="hidden" id="arr_coa` + count + `" name="arr_coa[]" value="` + val.coa_id + `" data-id="` + count + `">` : `` ) + `
                                     <td class="center-align">
                                         <label>
                                             <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.code + `" onclick="countAll();" data-id="` + count + `" checked>

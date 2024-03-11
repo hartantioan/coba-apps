@@ -338,7 +338,7 @@
                                 @endphp
                                 @foreach($data->paymentRequestDetail as $row)
                                 <tr>
-                                    <td>{{ $row->lookable->code }}</td>
+                                    <td>{{ $row->getCode() }}</td>
                                     <td align="center">{{ $row->type() }}</td>
                                     <td align="center">{{ $row->purchaseInvoice() ? date('d/m/Y',strtotime($row->lookable->due_date)) : '-' }}</td>
                                     <td>{{ $row->note }}</td>

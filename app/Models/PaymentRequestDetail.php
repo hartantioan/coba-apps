@@ -121,6 +121,15 @@ class PaymentRequestDetail extends Model
         }
     }
 
+    public function fundRequestDetail()
+    {
+        if($this->lookable_type == 'fund_request_details'){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public function marketingOrderMemo()
     {
         if($this->lookable_type == 'marketing_order_memos'){
@@ -133,6 +142,7 @@ class PaymentRequestDetail extends Model
     public function type(){
         $type = match ($this->lookable_type) {
             'fund_requests'             => 'Permohonan Dana',
+            'fund_request_details'      => 'Permohonan Dana',
             'purchase_invoices'         => 'A/P Invoice',
             'purchase_down_payments'    => 'AP Down Payment',
             'coas'                      => 'Coa Biaya',
@@ -150,6 +160,15 @@ class PaymentRequestDetail extends Model
             'purchase_down_payments'    => $this->lookable->supplier->employee_no,
             'marketing_order_memos'     => $this->lookable->account->employee_no,
             default                     => '',
+          };
+  
+          return $code;
+    }
+
+    public function getCode(){
+        $code = match ($this->lookable_type) {
+            'fund_request_details'      => $this->lookable->fundRequest->code,
+            default                     => $this->lookable->code,
           };
   
           return $code;

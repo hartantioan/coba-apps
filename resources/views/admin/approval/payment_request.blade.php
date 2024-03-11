@@ -244,7 +244,7 @@
                     @endphp
                     @foreach($data->paymentRequestDetail as $row)
                     <tr>
-                        <td>{{ $row->lookable->code }}</td>
+                        <td>{{ $row->getCode() }}</td>
                         <td class="center-align">{{ $row->type() }}</td>
                         <td>{{ $row->note }}</td>
                         <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>

@@ -108,7 +108,7 @@ class PurchaseDownPaymentController extends Controller
                 $item_code = $rowdetail->item()->exists() ? $rowdetail->item->code : ($rowdetail->coa()->exists() ? $rowdetail->coa->code : '');
                 $item_name = $rowdetail->item()->exists() ? $rowdetail->item->name : ($rowdetail->coa()->exists() ? $rowdetail->coa->name : '');
                 $item_unit = $rowdetail->item()->exists() ? $rowdetail->itemUnit->unit->code : '-';
-                $list_items .= '<li>'.$item_code.' - '.$item_name.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit.'</li>';
+                $list_items .= '<li>'.$item_code.' - '.$item_name.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit.' Total '.number_format($rowdetail->subtotal,2,',','.').' PPN '.number_format($rowdetail->tax,2,',','.').' PPh '.number_format($rowdetail->wtax,2,',','.').' Grandtotal '.number_format($rowdetail->grandtotal,2,',','.').'</li>';
             }
 
             $list_items .= '</ol>';
@@ -134,7 +134,7 @@ class PurchaseDownPaymentController extends Controller
 
             foreach($row->fundRequestDetail as $key => $rowdetail){
                 $item_unit = $rowdetail->unit->code;
-                $list_items .= '<li>'.$rowdetail->note.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit.'</li>';
+                $list_items .= '<li>'.$rowdetail->note.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit.' Total '.number_format($rowdetail->total,2,',','.').' PPN '.number_format($rowdetail->tax,2,',','.').' PPh '.number_format($rowdetail->wtax,2,',','.').' Grandtotal '.number_format($rowdetail->grandtotal,2,',','.').' 1231312321321312312312312312</li>';
             }
 
             $list_items .= '</ol>';
@@ -165,13 +165,16 @@ class PurchaseDownPaymentController extends Controller
             foreach($request->arr_type as $key => $row){
                 if($row == 'purchase_orders'){
                     $data = PurchaseOrder::find($request->arr_id[$key]);
+
+                    $arrChecklist = [];
+
                     $list_items = '<ol>';
 
                     foreach($data->purchaseOrderDetail as $key => $rowdetail){
                         $item_code = $rowdetail->item()->exists() ? $rowdetail->item->code : ($rowdetail->coa()->exists() ? $rowdetail->coa->code : '');
                         $item_name = $rowdetail->item()->exists() ? $rowdetail->item->name : ($rowdetail->coa()->exists() ? $rowdetail->coa->name : '');
                         $item_unit = $rowdetail->item()->exists() ? $rowdetail->itemUnit->unit->code : '-';
-                        $list_items .= '<li>'.$item_code.' - '.$item_name.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit.'</li>';
+                        $list_items .= '<li>'.$item_code.' - '.$item_name.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit.' Total '.number_format($rowdetail->subtotal,2,',','.').' PPN '.number_format($rowdetail->tax,2,',','.').' PPh '.number_format($rowdetail->wtax,2,',','.').' Grandtotal '.number_format($rowdetail->grandtotal,2,',','.').'</li>';
                     }
 
                     $list_items .= '</ol>';
@@ -189,14 +192,25 @@ class PurchaseDownPaymentController extends Controller
                         'total'         => number_format($data->total,2,',','.'),
                         'tax'           => number_format($data->tax,2,',','.'),
                         'wtax'          => number_format($data->wtax,2,',','.'),
+                        'checklist'     => $arrChecklist,
                     ];
                 }elseif($row == 'fund_requests'){
                     $data = FundRequest::find($request->arr_id[$key]);
                     $list_items = '<ol>';
 
+                    $arrChecklist = [];
+
+                    foreach($data->checklistDocumentList as $row){
+                        $arrChecklist[] = [
+                            'id'    => $row->checklist_document_id,
+                            'title' => $row->checklistDocument->title,
+                            'note'  => $row->note ? $row->note : '',
+                        ];
+                    }
+
                     foreach($data->fundRequestDetail as $key => $rowdetail){
                         $item_unit = $rowdetail->unit->code;
-                        $list_items .= '<li>'.$rowdetail->note.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit.'</li>';
+                        $list_items .= '<li>'.$rowdetail->note.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit.' Total '.number_format($rowdetail->total,2,',','.').' PPN '.number_format($rowdetail->tax,2,',','.').' PPh '.number_format($rowdetail->wtax,2,',','.').' Grandtotal '.number_format($rowdetail->grandtotal,2,',','.').'</li>';
                     }
 
                     $list_items .= '</ol>';
@@ -214,6 +228,7 @@ class PurchaseDownPaymentController extends Controller
                         'total'         => number_format($data->total,2,',','.'),
                         'tax'           => number_format($data->tax,2,',','.'),
                         'wtax'          => number_format($data->wtax,2,',','.'),
+                        'checklist'     => $arrChecklist,
                     ];
                 }
             }

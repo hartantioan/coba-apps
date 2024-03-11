@@ -164,6 +164,13 @@ class FundRequest extends Model
         })->get() as $rowpayment){
             $list[] = $rowpayment->paymentRequest->payment_no;
         }
+        foreach($this->fundRequestDetail as $rowdetail){
+            foreach($rowdetail->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+                $query->whereHas('outgoingPayment');
+            })->get() as $rowpayment){
+                $list[] = $rowpayment->paymentRequest->payment_no;
+            }
+        }
         if(count($list) > 0){
             return implode(', ',$list);
         }else{
@@ -179,6 +186,13 @@ class FundRequest extends Model
             })->get() as $row){
                 $total += $row->nominal;
             }
+            foreach($this->fundRequestDetail as $rowdetail){
+                foreach($rowdetail->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+                    $query->whereHas('outgoingPayment');
+                })->get() as $row){
+                    $total += $row->nominal;
+                }
+            }
         }
         return $total;
     }
@@ -193,6 +207,15 @@ class FundRequest extends Model
             })->get() as $row){
                 $total += $row->nominal;
             }
+            foreach($this->fundRequestDetail as $rowdetail){
+                foreach($rowdetail->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query)use($date){
+                    $query->whereHas('outgoingPayment',function($query)use($date){
+                        $query->whereDate('pay_date','<=',$date);
+                    });
+                })->get() as $row){
+                    $total += $row->nominal;
+                }
+            }
         }
         return $total;
     }
@@ -205,6 +228,13 @@ class FundRequest extends Model
             })->get() as $row){
                 $total += $row->totalOutgoingUsedWeight() + $row->totalIncomingUsedWeight();
             }
+            foreach($this->fundRequestDetail as $rowdetail){
+                foreach($rowdetail->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+                    $query->whereHas('outgoingPayment');
+                })->get() as $row){
+                    $total += $row->totalOutgoingUsedWeight() + $row->totalIncomingUsedWeight();
+                }
+            }
         }
         return $total;
     }
@@ -216,6 +246,13 @@ class FundRequest extends Model
                 $query->whereHas('outgoingPayment');
             })->where('id','<>',$prd)->get() as $row){
                 $total += $row->totalOutgoingUsedWeight() + $row->totalIncomingUsedWeight();
+            }
+            foreach($this->fundRequestDetail as $rowdetail){
+                foreach($rowdetail->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+                    $query->whereHas('outgoingPayment');
+                })->where('id','<>',$prd)->get() as $row){
+                    $total += $row->totalOutgoingUsedWeight() + $row->totalIncomingUsedWeight();
+                }
             }
         }
         return $total;
@@ -250,6 +287,12 @@ class FundRequest extends Model
             $total -= ($row->nominal + $row->totalWeightAdmin() + $row->totalWeightRounding());
         }
 
+        foreach($this->fundRequestDetail as $rowdetail){
+            foreach($rowdetail->hasPaymentRequestDetail as $row){
+                $total -= ($row->nominal + $row->totalWeightAdmin() + $row->totalWeightRounding());
+            }
+        }
+
         return ceil($total);
     }
 
@@ -262,6 +305,14 @@ class FundRequest extends Model
             $total += $row->nominal;
         }
 
+        foreach($this->fundRequestDetail as $rowdetail){
+            foreach($rowdetail->hasPaymentRequestDetail()->whereHas('paymentRequest', function($query){
+                $query->whereDoesntHave('outgoingPayment');
+            })->get() as $row){
+                $total += $row->nominal;
+            }
+        }
+
         return $total;
     }
 
@@ -272,6 +323,14 @@ class FundRequest extends Model
             $query->whereHas('outgoingPayment');
         })->get() as $row){
             $total += $row->nominal;
+        }
+
+        foreach($this->fundRequestDetail as $rowdetail){
+            foreach($rowdetail->hasPaymentRequestDetail()->whereHas('paymentRequest', function($query){
+                $query->whereHas('outgoingPayment');
+            })->get() as $row){
+                $total += $row->nominal;
+            }
         }
 
         return $total;
@@ -294,6 +353,12 @@ class FundRequest extends Model
             $arr_coa[] = $row->coa->code.' - '.$row->coa->name;
         }
 
+        foreach($this->fundRequestDetail as $rowdetail){
+            foreach($rowdetail->hasPaymentRequestDetail as $row){
+                $arr_coa[] = $row->coa->code.' - '.$row->coa->name;
+            }
+        }
+
         return implode(',',$arr_coa);
     }
 
@@ -301,6 +366,11 @@ class FundRequest extends Model
         $coa_id = 0;
         foreach($this->hasPaymentRequestDetail as $row){
             $coa_id = $row->coa_id;
+        }
+        foreach($this->fundRequestDetail as $rowdetail){
+            foreach($rowdetail->hasPaymentRequestDetail as $row){
+                $coa_id = $row->coa_id;
+            }
         }
         return $coa_id;
     }

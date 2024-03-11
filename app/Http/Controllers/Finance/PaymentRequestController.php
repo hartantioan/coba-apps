@@ -543,7 +543,7 @@ class PaymentRequestController extends Controller
         $details = [];
         $payments = [];
 
-        if($request->arr_op_id){
+        /* if($request->arr_op_id){
             foreach($request->arr_op_id as $key => $row){
                 $op = OutgoingPayment::find(intval($row));
                 if($op){
@@ -568,7 +568,7 @@ class PaymentRequestController extends Controller
                     }
                 }
             }
-        }
+        } */
 
         $user['payments'] = $payments;
 
@@ -586,22 +586,23 @@ class PaymentRequestController extends Controller
                                 $coa = Coa::where('code','100.01.03.03.01')->where('company_id',$data->place->company_id)->first();
                             }
                             $total = $data->balancePaymentRequest();
-                            $balanceduplicate = round($total / intval($request->arr_qty_duplicate[$key]),2);
-                            for($i = 1;$i <= intval($request->arr_qty_duplicate[$key]); $i++){
+                            foreach($data->fundRequestDetail as $row){
                                 $details[] = [
                                     'id'            => $data->id,
-                                    'type'          => 'fund_requests',
+                                    'detail_id'     => $row->id,
+                                    'detail_type'   => $row->getTable(),
+                                    'type'          => $data->getTable(),
                                     'code'          => CustomHelper::encrypt($data->code),
                                     'rawcode'       => $data->code,
                                     'rawdate'       => $data->post_date,
                                     'post_date'     => date('d/m/Y',strtotime($data->post_date)),
                                     'due_date'      => date('d/m/Y',strtotime($data->required_date)),
-                                    'total'         => number_format($data->total,2,',','.'),
-                                    'tax'           => number_format($data->tax,2,',','.'),
-                                    'wtax'          => number_format($data->wtax,2,',','.'),
-                                    'grandtotal'    => number_format($data->grandtotal,2,',','.'),
-                                    'balance'       => number_format($total,2,',','.'),
-                                    'balance_duplicate' => number_format($balanceduplicate,2,',','.'),
+                                    'total'         => number_format($row->total,2,',','.'),
+                                    'tax'           => number_format($row->tax,2,',','.'),
+                                    'wtax'          => number_format($row->wtax,2,',','.'),
+                                    'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                                    'balance'       => number_format($row->balancePaymentRequest(),2,',','.'),
+                                    'balance_duplicate' => number_format($row->balancePaymentRequest(),2,',','.'),
                                     'coa_id'        => $data->type == '1' ? ($data->document_status == '3' ? ($coa ? $coa->id : '') : '') : $coa->id,
                                     'coa_name'      => $data->type == '1' ? ($data->document_status == '3' ? ($coa ? $coa->code.' - '.$coa->name : '') : '') : $coa->code.' - '.$coa->name,
                                     'memo'          => number_format(0,2,',','.'),
@@ -611,10 +612,10 @@ class PaymentRequestController extends Controller
                                     'name_account'  => $data->name_account,
                                     'no_account'    => $data->no_account,
                                     'bank_account'  => $data->bank_account,
-                                    'place_id'      => $data->place_id,
-                                    'department_id' => $data->department_id,
+                                    'place_id'      => $row->place_id,
+                                    'department_id' => $row->division_id,
                                     'account_code'  => $data->account->employee_no,
-                                    'remark'        => $data->note
+                                    'remark'        => $row->note
                                 ];
                             }
                         }
@@ -629,6 +630,8 @@ class PaymentRequestController extends Controller
                             $total = $data->balancePaymentRequest();
                             $details[] = [
                                 'id'            => $data->id,
+                                'detail_id'     => $data->id,
+                                'detail_type'   => 'purchase_down_payments',
                                 'type'          => 'purchase_down_payments',
                                 'code'          => CustomHelper::encrypt($data->code),
                                 'rawcode'       => $data->code,
@@ -667,6 +670,8 @@ class PaymentRequestController extends Controller
                             $total = $data->balancePaymentRequest();
                             $details[] = [
                                 'id'            => $data->id,
+                                'detail_id'     => $data->id,
+                                'detail_type'   => 'purchase_invoices',
                                 'type'          => 'purchase_invoices',
                                 'code'          => CustomHelper::encrypt($data->code),
                                 'rawcode'       => $data->code,
@@ -705,6 +710,8 @@ class PaymentRequestController extends Controller
                             $total = $data->balancePaymentRequest();
                             $details[] = [
                                 'id'            => $data->id,
+                                'detail_id'     => $data->id,
+                                'detail_type'   => 'marketing_order_memos',
                                 'type'          => 'marketing_order_memos',
                                 'code'          => CustomHelper::encrypt($data->code),
                                 'rawcode'       => $data->code,
@@ -995,6 +1002,8 @@ class PaymentRequestController extends Controller
 
                             if($row == 'fund_requests'){
                                 $idDetail = FundRequest::where('code',$code)->first()->id;
+                            }elseif($row == 'fund_request_details'){
+                                $idDetail = FundRequestDetail::find($request->arr_id[$key])->id;
                             }elseif($row == 'purchase_down_payments'){
                                 $idDetail = PurchaseDownPayment::where('code',$code)->first()->id;
                             }elseif($row == 'purchase_invoices'){
@@ -1106,7 +1115,7 @@ class PaymentRequestController extends Controller
             $totalbayar+=$row->nominal;
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$row->lookable->code.'</td>
+                <td class="center-align">'.$row->getCode().'</td>
                 <td class="center-align">'.$row->type().'</td>
                 <td class="center-align">'.$row->note.'</td>
                 <td class="center-align">'.$row->remark.'</td>
@@ -1252,14 +1261,16 @@ class PaymentRequestController extends Controller
             $is_cost = $row->lookable_type == 'coas' ? 1 : 0;
             $code = CustomHelper::encrypt($row->lookable->code);
             $arr[] = [
-                'id'            => $row->lookable_id,
+                'id'            => $row->lookable_type == 'fund_request_details' ? $row->lookable->fundRequest->id : $row->lookable_id,
+                'detail_id'     => $row->lookable_id,
+                'detail_type'   => $row->lookable_type,
                 'type'          => $row->lookable_type,
-                'type_document' => $row->lookable_type == 'fund_requests' ? $row->lookable->document_status : '',
-                'type_fr'       => $row->lookable_type == 'fund_requests' ? $row->lookable->type : '',
+                'type_document' => $row->lookable_type == 'fund_requests' ? $row->lookable->document_status : ($row->lookable_type == 'fund_request_details' ? $row->lookable->fundRequest->document_status : ''),
+                'type_fr'       => $row->lookable_type == 'fund_requests' ? $row->lookable->type : ($row->lookable_type == 'fund_request_details' ? $row->lookable->fundRequest->type : ''),
                 'code'          => $code,
-                'rawcode'       => $row->lookable->code,
-                'post_date'     => $row->lookable->post_date,
-                'due_date'      => isset($row->lookable->due_date) ? $row->lookable->due_date : $row->lookable->post_date,
+                'rawcode'       => $row->getCode(),
+                'post_date'     => $row->lookable_type == 'fund_request_details' ? $row->lookable->fundRequest->post_date : $row->lookable->post_date,
+                'due_date'      => isset($row->lookable->due_date) ? $row->lookable->due_date : ($row->lookable_type == 'fund_request_details' ? $row->lookable->fundRequest->post_date : $row->lookable->post_date),
                 'total'         => number_format($row->lookable->total,3,',','.'),
                 'tax'           => number_format($row->lookable->tax,3,',','.'),
                 'wtax'          => number_format($row->lookable->wtax,3,',','.'),
@@ -1273,9 +1284,9 @@ class PaymentRequestController extends Controller
                 'coa_id'        => $row->coa_id,
                 'coa_name'      => $row->coa->code.' - '.$row->coa->name,
                 'memo'          => number_format($row->getMemo(),2,',','.'),
-                'name_account'  => $row->fundRequest() ? ($row->lookable->name_account ? $row->lookable->name_account : '') : '',
-                'no_account'    => $row->fundRequest() ? ($row->lookable->no_account ? $row->lookable->no_account : '') : '',
-                'bank_account'  => $row->fundRequest() ? ($row->lookable->bank_account ? $row->lookable->bank_account : '') : '',
+                'name_account'  => $row->fundRequest() ? ($row->lookable->name_account ? $row->lookable->name_account : '') : ($row->fundRequestDetail() ? $row->lookable->fundRequest->name_account : ''),
+                'no_account'    => $row->fundRequest() ? ($row->lookable->no_account ? $row->lookable->no_account : '') : ($row->fundRequestDetail() ? $row->lookable->fundRequest->no_account : ''),
+                'bank_account'  => $row->fundRequest() ? ($row->lookable->bank_account ? $row->lookable->bank_account : '') : ($row->fundRequestDetail() ? $row->lookable->fundRequest->bank_account : ''),
                 'place_id'      => $row->place()->exists() ? $row->place->id : '',
                 'line_id'       => $row->line()->exists() ? $row->line->id : '',
                 'machine_id'    => $row->machine()->exists() ? $row->machine->id : '',
@@ -1846,7 +1857,7 @@ class PaymentRequestController extends Controller
                     
                     $html .= '<tr>
                         <td class="center-align">'.($key + 1).'</td>
-                        <td class="center-align">'.$row->lookable->code.'</td>
+                        <td class="center-align">'.$row->getCode().'</td>
                         <td class="center-align">'.$row->type().'</td>
                         <td class="center-align">'.$row->note.'</td>
                         <td class="center-align">'.$row->remark.'</td>

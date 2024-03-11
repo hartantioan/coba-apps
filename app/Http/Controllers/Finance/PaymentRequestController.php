@@ -359,7 +359,7 @@ class PaymentRequestController extends Controller
 
         $payments = [];
 
-        if($data->type == '1'){
+        /* if($data->type == '1'){
             $op = OutgoingPayment::where('account_id',$data->id)
             ->whereIn('status',['2','3'])
             ->whereHas('paymentRequest',function($query){
@@ -404,7 +404,7 @@ class PaymentRequestController extends Controller
                     ];
                 }
             }
-        }
+        } */
 
         $data['payments'] = $payments;
 

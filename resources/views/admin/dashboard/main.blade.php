@@ -32,7 +32,7 @@
                             
                             <div class="card padding-2 animate fadeLeft row">
                                  <div class="col s4 m6 l4">
-                                    <h6 class="pl-2 pt-1">Absensi {{$start_date}} - {{$end_date}}</h6>
+                                    <h6 class="pl-2 pt-1">Absensi {{$start_date}} - {{$end_date}} {{ env('DB_DATABASE') }}</h6>
                                  </div>
                                  <div class="col s4 m6 l4">
                                  </div>

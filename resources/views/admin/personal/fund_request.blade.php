@@ -594,6 +594,7 @@
 
     function getRekening(){
         if($('#user_bank_id').val()){
+            alert($('#user_bank_id').select2('data')[0].bank);
             $('#bank_account').val($('#user_bank_id').select2('data')[0].bank);
             $('#no_account').val($('#user_bank_id').select2('data')[0].no);
             $('#name_account').val($('#user_bank_id').select2('data')[0].name);
@@ -916,14 +917,14 @@
                             formatRupiahIni($('#account_id').select2('data')[0].balance_limit.toString().replace('.',','))
                         );
                         if(response.banks.length > 0){
-                            $('#user_bank_id').append(`
+                            /* $('#user_bank_id').append(`
                                 <option value="">--Pilih dari daftar-</option>
                             `);
                             $.each(response.banks, function(i, val) {
                                 $('#user_bank_id').append(`
                                     <option value="` + val.id + `" data-name="` + val.name + `" data-bank="` + val.bank + `" data-no="` + val.no + `">` + val.bank + ` - ` + val.no + ` - ` + val.name + `</option>
                                 `);
-                            });                        
+                            }); */                        
                         }else{
                             $('#user_bank_id').append(`
                                 <option value="">--Pilih Partner Bisnis-</option>

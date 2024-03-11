@@ -157,6 +157,12 @@ class FundRequest extends Model
         });
     }
 
+    public function purchaseDownPaymentDetail(){
+        return $this->hasMany('App\Models\PurchaseDownPaymentDetail','fund_request_id','id')->whereHas('purchaseDownPayment',function($query){
+            $query->whereIn('status',['1','2','3']);
+        });
+    }
+
     public function listCekBG(){
         $list = [];
         foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
@@ -503,6 +509,19 @@ class FundRequest extends Model
         $hasRelation = false;
 
         if($this->hasPaymentRequestDetail()->exists()){
+            $hasRelation = true;
+        }
+
+        foreach($this->fundRequestDetail as $row){
+            if($row->hasPaymentRequestDetail()->exists()){
+                $hasRelation = true;
+            }
+            if($row->purchaseInvoiceDetail()->exists()){
+                $hasRelation = true;
+            }
+        }
+
+        if($this->purchaseDownPaymentDetail()->exists()){
             $hasRelation = true;
         }
 

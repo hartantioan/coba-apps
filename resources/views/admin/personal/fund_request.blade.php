@@ -325,10 +325,10 @@
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan</th>
                                                     <th class="center">Harga Satuan</th>
+                                                    <th class="center">Subtotal</th>
                                                     <th class="center">PPN</th>
                                                     <th class="center">Incl.PPN</th>
                                                     <th class="center">PPh</th>
-                                                    <th class="center">Subtotal</th>
                                                     <th class="center">Plant</th>
                                                     <th class="center">Line</th>
                                                     <th class="center">Mesin</th>
@@ -661,6 +661,9 @@
                 <td class="center">
                     <input type="text" id="arr_price` + count + `" name="arr_price[]" onfocus="emptyThis(this);" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;">
                 </td>
+                <td class="center">
+                    <input type="text" id="arr_total` + count + `" name="arr_total[]" onfocus="emptyThis(this);" value="0,00" onkeyup="formatRupiah(this);" readonly style="text-align:right;">
+                </td>
                 <td>
                     <select class="browser-default" id="arr_tax_id` + count + `" name="arr_tax_id[]" onchange="count();">
                         <option value="0" data-value="0">-- Pilih ini jika non-PPN --</option>
@@ -682,9 +685,6 @@
                         <option value="{{ $row->id }}" {{ $row->is_default_pph ? 'selected' : '' }} data-value="{{ $row->percentage }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
                         @endforeach
                     </select>
-                </td>
-                <td class="center">
-                    <input type="text" id="arr_total` + count + `" name="arr_total[]" onfocus="emptyThis(this);" value="0,00" onkeyup="formatRupiah(this);" readonly style="text-align:right;">
                 </td>
                 <td>
                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
@@ -1248,6 +1248,9 @@
                                 <td class="center">
                                     <input type="text" id="arr_price` + count + `" name="arr_price[]" onfocus="emptyThis(this);" value="` + val.price + `" onkeyup="formatRupiah(this);count();" style="text-align:right;">
                                 </td>
+                                <td class="center">
+                                    <input type="text" id="arr_total` + count + `" name="arr_total[]" onfocus="emptyThis(this);" value="` + val.total + `" onkeyup="formatRupiah(this);" readonly style="text-align:right;">
+                                </td>
                                 <td>
                                     <select class="browser-default" id="arr_tax_id` + count + `" name="arr_tax_id[]" onchange="count();">
                                         <option value="0" data-value="0">-- Pilih ini jika non-PPN --</option>
@@ -1269,9 +1272,6 @@
                                         <option value="{{ $row->id }}" {{ $row->is_default_pph ? 'selected' : '' }} data-value="{{ $row->percentage }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
                                         @endforeach
                                     </select>
-                                </td>
-                                <td class="center">
-                                    <input type="text" id="arr_total` + count + `" name="arr_total[]" onfocus="emptyThis(this);" value="` + val.total + `" onkeyup="formatRupiah(this);" readonly style="text-align:right;">
                                 </td>
                                 <td>
                                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">

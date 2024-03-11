@@ -3175,7 +3175,7 @@ class FundRequestController extends Controller
     public function updateDocumentStatus(Request $request){
         $data = FundRequest::where('code',CustomHelper::decrypt($request->code))->first();
         if($data){
-            if(!$data->hasPaymentRequestDetail()->exists()){
+            if(!$data->hasChildDocument()){
                 $data->update([
                     'document_status'   => $request->status ? $request->status : NULL,
                 ]);
@@ -3190,7 +3190,7 @@ class FundRequestController extends Controller
             }else{
                 $response = [
                     'status'  => 422,
-                    'message' => 'Maaf, data sudah dijadikan payment request.',
+                    'message' => 'Maaf, data sudah terpakai di dokumen lainnya.',
                     'value'   => $data->document_status,
                 ];
             }

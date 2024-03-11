@@ -2913,7 +2913,7 @@ class CustomHelper {
 
 			foreach($cb->closeBillCost as $row){
 				if($row->cost_distribution_id){
-					$total = $row->grandtotal;
+					$total = $row->total;
 					$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
 					$accumulation = 0;
 					foreach($row->costDistribution->costDistributionDetail as $key => $rowcost){
@@ -2949,28 +2949,21 @@ class CustomHelper {
 						'department_id'	=> $row->division_id,
 						'project_id'	=> $row->project_id ? $row->project_id : NULL,
 						'type'			=> '1',
-						'nominal'		=> $row->grandtotal * $cb->currency_rate,
-						'nominal_fc'	=> $cb->currency->type == '1' || $cb->currency->type == '' ? $row->grandtotal * $cb->currency_rate : $row->grandtotal,
+						'nominal'		=> $row->total * $cb->currency_rate,
+						'nominal_fc'	=> $cb->currency->type == '1' || $cb->currency->type == '' ? $row->total * $cb->currency_rate : $row->grandtotal,
 						'note'			=> $row->note,
 						'note2'			=> $row->note2,
 					]);
 				}
 
-				/* if($row->tax_id){
+				if($row->tax_id){
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $row->taxMaster->coa_purchase_id,
 						'place_id'		=> $row->place_id ? $row->place_id : NULL,
-						'line_id'		=> $row->line_id ? $row->line_id : NULL,
-						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
-						'account_id'	=> $row->taxMaster->coaPurchase->bp_journal ? $account_id : NULL,
-						'department_id'	=> $row->department_id ? $row->department_id : NULL,
-						'project_id'	=> $row->project_id ? $row->project_id : NULL,
 						'type'			=> '1',
 						'nominal'		=> $row->tax * $cb->currency_rate,
-						'nominal_fc'	=> $cb->currency->type == '1' ? $row->tax * $row->currency_rate : $row->tax,
-						'note'			=> $row->purchaseInvoice->tax_no ? $row->purchaseInvoice->tax_no : '',
-						'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
+						'nominal_fc'	=> $cb->currency->type == '1' || $cb->currency->type == '' ? $row->tax * $cb->currency_rate : $row->tax,
 					]);
 				}
 
@@ -2979,19 +2972,16 @@ class CustomHelper {
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $row->wTaxMaster->coa_purchase_id,
 						'place_id'		=> $row->place_id ? $row->place_id : NULL,
-						'line_id'		=> $row->line_id ? $row->line_id : NULL,
-						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
-						'account_id'	=> $row->wTaxMaster->coaPurchase->bp_journal ? $account_id : NULL,
-						'department_id'	=> $row->department_id ? $row->department_id : NULL,
-						'project_id'	=> $row->project_id ? $row->project_id : NULL,
 						'type'			=> '2',
-						'nominal'		=> $row->wtax * $pod->purchaseOrder->currency_rate,
-						'nominal_fc'	=> $pod->purchaseOrder->currency->type == '1' ? $row->wtax * $pod->purchaseOrder->currency_rate : $row->wtax,
-						'note'			=> $row->purchaseInvoice->tax_cut_no ? $row->purchaseInvoice->tax_cut_no : '',
-						'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
+						'nominal'		=> $row->wtax * $cb->currency_rate,
+						'nominal_fc'	=> $cb->currency->type == '1' || $cb->currency->type == '' ? $row->wtax * $cb->currency_rate : $row->wtax,
 					]);
-				} */
+				}
 			}
+
+			$cb->update([
+				'status'	=> '3'
+			]);
 			
 		}elseif($table_name == 'marketing_order_invoices'){
 

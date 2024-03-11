@@ -7,37 +7,46 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
-class FundRequestDetail extends Model
+class CloseBillCost extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'fund_request_details';
+    protected $table = 'close_bill_costs';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
-        'fund_request_id',
-        'note',
-        'qty',
-        'unit_id',
-        'price',
-        'tax_id',
-        'percent_tax',
-        'is_include_tax',
-        'wtax_id',
-        'percent_wtax',
-        'total',
-        'tax',
-        'wtax',
-        'grandtotal',
+        'close_bill_id',
+        'cost_distribution_id',
+        'coa_id',
         'place_id',
         'line_id',
         'machine_id',
         'division_id',
         'project_id',
+        'total',
+        'tax_id',
+        'percent_tax',
+        'is_include_tax',
+        'wtax_id',
+        'percent_wtax',
+        'tax',
+        'wtax',
+        'grandtotal',
+        'note',
+        'note2',
     ];
+
+    public function costDistribution()
+    {
+        return $this->belongsTo('App\Models\CostDistribution', 'cost_distribution_id', 'id')->withTrashed();
+    }
 
     public function place(){
         return $this->belongsTo('App\Models\Place','place_id','id')->withTrashed();
+    }
+
+    public function coa(){
+        return $this->belongsTo('App\Models\Coa','coa_id','id')->withTrashed();
     }
 
     public function line(){
@@ -54,33 +63,6 @@ class FundRequestDetail extends Model
 
     public function project(){
         return $this->belongsTo('App\Models\Project','project_id','id')->withTrashed();
-    }
-
-    public function purchaseInvoiceDetail()
-    {
-        return $this->hasMany('App\Models\PurchaseInvoiceDetail')->whereHas('purchaseInvoice',function($query){
-            $query->whereIn('status',['1','2','3']);
-        });
-    }
-
-    public function balanceInvoice(){
-        $total = round($this->grandtotal,2);
-
-        foreach($this->purchaseInvoiceDetail as $row){
-            $total -= $row->grandtotal;
-        }
-
-        return $total;
-    }
-
-    public function totalInvoice(){
-        $total = 0;
-
-        foreach($this->purchaseInvoiceDetail as $row){
-            $total += $row->grandtotal;
-        }
-
-        return $total;
     }
 
     public function isIncludeTax(){
@@ -101,13 +83,11 @@ class FundRequestDetail extends Model
         return $this->belongsTo('App\Models\Tax','wtax_id','id')->withTrashed();
     }
 
-    public function fundRequest()
-    {
-        return $this->belongsTo('App\Models\FundRequest', 'fund_request_id', 'id')->withTrashed();
+    public function closeBill(){
+        return $this->belongsTo('App\Models\CloseBill', 'close_bill_id', 'id')->withTrashed();
     }
 
-    public function unit()
-    {
-        return $this->belongsTo('App\Models\Unit', 'unit_id', 'id')->withTrashed();
+    public function fundRequest(){
+        return $this->belongsTo('App\Models\FundRequest', 'fund_request_id', 'id')->withTrashed();
     }
 }

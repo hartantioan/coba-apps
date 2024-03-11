@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Finance;
 use App\Http\Controllers\Controller;
 use App\Models\ApprovalMatrix;
 use App\Models\ApprovalSource;
+use App\Models\ChecklistDocumentList;
 use App\Models\Currency;
-use App\Models\GoodIssueRequest;
 use App\Models\GoodReceipt;
 use App\Models\Menu;
 use App\Models\GoodReturnPO;
@@ -43,17 +43,21 @@ use App\Helpers\CustomHelper;
 use App\Exports\ExportFundRequest;
 use App\Exports\ExportOutstandingFundRequest;
 use App\Models\Division;
+use App\Models\GoodIssueRequest;
+use App\Models\Line;
+use App\Models\Machine;
 use App\Models\MenuUser;
 
 class FundRequestController extends Controller
 {
-    protected $dataplaces, $datauser, $dataplacecode;
+    protected $dataplaces, $datauser, $dataplacecode, $menu;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
         $this->datauser = $user;
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
         $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
+        $this->menu = Menu::where('url', 'fund_request')->first();
     }
 
     public function index(Request $request)
@@ -98,6 +102,14 @@ class FundRequestController extends Controller
             'note',
             'termin_note',
             'payment_type',
+            'document_no',
+            'document_date',
+            'tax_no',
+            'tax_cut_no',
+            'cut_date',
+            'spk_no',
+            'invoice_no',
+            'is_reimburse',
             'name_account',
             'no_account',
             'bank_account',
@@ -150,17 +162,7 @@ class FundRequestController extends Controller
                 }
 
                 if(!$request->modedata){
-                    
-                    if(session('bo_postion_id') == ''){
-                        $query->where('user_id',session('bo_id'));
-                    }else{
-                        $query->whereHas('user', function ($subquery) {
-                            $subquery->whereHas('position', function($subquery1) {
-                                $subquery1->where('division_id',session('bo_division_id'));
-                            });
-                        });
-                    }
-                    
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
@@ -200,17 +202,7 @@ class FundRequestController extends Controller
                 }
 
                 if(!$request->modedata){
-                    
-                    if(session('bo_postion_id') == ''){
-                        $query->where('user_id',session('bo_id'));
-                    }else{
-                        $query->whereHas('user', function ($subquery) {
-                            $subquery->whereHas('position', function($subquery1) {
-                                $subquery1->where('division_id',session('bo_division_id'));
-                            });
-                        });
-                    }
-                    
+                    $query->where('user_id',session('bo_id'));
                 }
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
@@ -238,6 +230,14 @@ class FundRequestController extends Controller
                     $val->note,
                     $val->termin_note,
                     $val->paymentType(),
+                    $val->document_no,
+                    $val->document_date ? date('d/m/Y',strtotime($val->document_date)) : '',
+                    $val->tax_no,
+                    $val->tax_cut_no,
+                    $val->cut_date ? date('d/m/Y',strtotime($val->cut_date)) : '',
+                    $val->spk_no,
+                    $val->invoice_no,
+                    $val->isReimburse(),
                     $val->name_account,
                     $val->no_account,
                     $val->bank_account,
@@ -287,7 +287,7 @@ class FundRequestController extends Controller
     public function rowDetail(Request $request){
         $data   = FundRequest::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12">
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">
                     <table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
@@ -303,6 +303,11 @@ class FundRequestController extends Controller
                                 <th class="right-align">PPN</th>
                                 <th class="right-align">PPh</th>
                                 <th class="right-align">Grandtotal</th>
+                                <th class="center-align">Plant</th>
+                                <th class="center-align">Line</th>
+                                <th class="center-align">Mesin</th>
+                                <th class="center-align">Divisi</th>
+                                <th class="center-align">Proyek</th>
                             </tr>
                         </thead><tbody>';
         $totalqty=0;
@@ -328,6 +333,11 @@ class FundRequestController extends Controller
                 <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->wtax,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->grandtotal,2,',','.').'</td>
+                <td class="">'.($row->place()->exists() ? $row->place->code : '-').'</td>
+                <td class="">'.($row->line()->exists() ? $row->line->code : '-').'</td>
+                <td class="">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
+                <td class="">'.($row->division()->exists() ? $row->division->name : '-').'</td>
+                <td class="">'.($row->project()->exists() ? $row->project->name : '-').'</td>
             </tr>';
         }
         $string .= '<tr>
@@ -338,7 +348,8 @@ class FundRequestController extends Controller
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalsubtotal, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalppn, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalpph, 2, ',', '.') . '</td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalgrandtotal, 2, ',', '.') . '</td>      
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalgrandtotal, 2, ',', '.') . '</td>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="5"></td>    
             </tr>  
         ';
         
@@ -347,6 +358,7 @@ class FundRequestController extends Controller
                             <tr>
                                 <th class="right-align" colspan="8">Total</th>
                                 <th class="right-align">'.number_format($data->grandtotal,2,',','.').'</th>
+                                <th class="right-align" colspan="5"></th>
                             </tr>
                         </tfoot>
                         </table></div>';
@@ -790,13 +802,15 @@ class FundRequestController extends Controller
     {
         $url = 'fund_request';
         $cekDate = $this->datauser->cekMinMaxPostDate($url);
-        $menu = Menu::where('url', $url)->first();
+        $menu = $this->menu;
 
         $data = [
             'title'         => 'Pengajuan Permohonan Dana - Pengguna',
             'content'       => 'admin.personal.fund_request',
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'division'      => Division::where('status','1')->get(),
+            'line'          => Line::where('status','1')->get(),
+            'machine'       => Machine::where('status','1')->get(),
             'currency'      => Currency::where('status','1')->get(),
             'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
             'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
@@ -804,6 +818,7 @@ class FundRequestController extends Controller
             'maxDate'       => $cekDate ? date('Y-m-d', strtotime(date('Y-m-d'). ' + '.$cekDate->userDate->count_futuredate.' days')) : date('Y-m-d'),
             'newcode'       => $menu->document_code.date('y'),
             'menucode'      => $menu->document_code,
+            'menu'          => $menu,
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -824,6 +839,14 @@ class FundRequestController extends Controller
             'note',
             'termin_note',
             'payment_type',
+            'document_no',
+            'document_date',
+            'tax_no',
+            'tax_cut_no',
+            'cut_date',
+            'spk_no',
+            'invoice_no',
+            'is_reimburse',
             'name_account',
             'no_account',
             'bank_account',
@@ -907,6 +930,14 @@ class FundRequestController extends Controller
                     $val->note,
                     $val->termin_note,
                     $val->paymentType(),
+                    $val->document_no,
+                    $val->document_date ? date('d/m/Y',strtotime($val->document_date)) : '',
+                    $val->tax_no,
+                    $val->tax_cut_no,
+                    $val->cut_date ? date('d/m/Y',strtotime($val->cut_date)) : '',
+                    $val->spk_no,
+                    $val->invoice_no,
+                    $val->isReimburse(),
                     $val->name_account,
                     $val->no_account,
                     $val->bank_account,
@@ -974,6 +1005,7 @@ class FundRequestController extends Controller
             /* 'code'			            => $request->temp ? ['required', Rule::unique('fund_requests', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:fund_requests,code',
              */'account_id'                => 'required',
             'type'                      => 'required',
+            'is_reimburse'              => 'required',
 			'post_date' 				=> 'required',
 			'required_date'		        => 'required',
             'place_id'                  => 'required',
@@ -987,11 +1019,13 @@ class FundRequestController extends Controller
             'arr_unit'                  => 'required|array',
             'arr_price'                 => 'required|array',
             'arr_total'                 => 'required|array',
+            'arr_place'                 => 'required|array',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
             'code_place_id.required'            => 'Plant Tidak boleh kosong',
             'account_id.required'               => 'Target Partner Bisnis tidak boleh kosong',
             'type.required'                     => 'Tipe tidak boleh kosong',
+            'is_reimburse.required'             => 'Reimburse tidak boleh kosong',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
 			'required_date.required' 			=> 'Tanggal request pembayaran tidak boleh kosong.',
             'place_id.required'                 => 'Penempatan lokasi tidak boleh kosong.',
@@ -1010,6 +1044,8 @@ class FundRequestController extends Controller
             'arr_price.array'                   => 'Harga harus dalam bentuk array.',
             'arr_total.required'                => 'Harga total tidak boleh kosong.',
             'arr_total.array'                   => 'Harga total harus dalam bentuk array.',
+            'arr_place.required'                => 'Dist. Biaya Plant tidak boleh kosong.',
+            'arr_place.array'                   => 'Dist. Biaya Plant total harus dalam bentuk array.',
 		]);
 
         if($validation->fails()) {
@@ -1073,6 +1109,14 @@ class FundRequestController extends Controller
                         $query->note = $request->note;
                         $query->termin_note = $request->termin_note;
                         $query->payment_type = $request->payment_type;
+                        $query->document_no = $request->document_no;
+                        $query->document_date = $request->document_date;
+                        $query->tax_no = $request->tax_no;
+                        $query->tax_cut_no = $request->tax_cut_no;
+                        $query->cut_date = $request->cut_date;
+                        $query->spk_no = $request->spk_no;
+                        $query->invoice_no = $request->invoice_no;
+                        $query->is_reimburse = $request->is_reimburse;
                         $query->name_account = $request->name_account;
                         $query->no_account = $request->no_account;
                         $query->bank_account = $request->bank_account;
@@ -1121,6 +1165,14 @@ class FundRequestController extends Controller
                         'note'          => $request->note,
                         'termin_note'   => $request->termin_note,
                         'payment_type'  => $request->payment_type,
+                        'document_no'   => $request->document_no,
+                        'document_date' => $request->document_date,
+                        'tax_no'        => $request->tax_no,
+                        'tax_cut_no'    => $request->tax_cut_no,
+                        'cut_date'      => $request->cut_date,
+                        'spk_no'        => $request->spk_no,
+                        'invoice_no'    => $request->invoice_no,
+                        'is_reimburse'  => $request->is_reimburse,
                         'name_account'  => $request->name_account,
                         'no_account'    => $request->no_account,
                         'bank_account'  => $request->bank_account,
@@ -1158,7 +1210,24 @@ class FundRequestController extends Controller
                             'tax'                   => $request->arr_tax[$key],
                             'wtax'                  => $request->arr_wtax[$key],
                             'grandtotal'            => round($request->arr_grandtotal[$key],2),
+                            'place_id'              => $request->arr_place[$key] ?? NULL,
+                            'line_id'               => $request->arr_line[$key] ?? NULL,
+                            'machine_id'            => $request->arr_machine[$key] ?? NULL,
+                            'division_id'           => $request->arr_division[$key] ?? NULL,
+                            'project_id'            => $request->arr_project[$key] ?? NULL,
                         ]);
+                    }
+
+                    if($request->arr_checklist_box){
+                        foreach($request->arr_checklist_box as $key => $row){
+                            ChecklistDocumentList::create([
+                                'checklist_document_id'         => $row,
+                                'lookable_type'                 => $query->getTable(),
+                                'lookable_id'                   => $query->id,
+                                'value'                         => '1',
+                                'note'                          => $request->arr_checklist_note[$key],
+                            ]);
+                        }
                     }
                     DB::commit();
                 }catch(\Exception $e){
@@ -1228,6 +1297,7 @@ class FundRequestController extends Controller
 
     public function userRowDetail(Request $request){
         $data   = FundRequest::where('code',CustomHelper::decrypt($request->id))->first();
+        $menu = $this->menu;
         
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">
                     <table style="min-width:100%;max-width:100%;">
@@ -1245,6 +1315,11 @@ class FundRequestController extends Controller
                                 <th class="right-align">PPN</th>
                                 <th class="right-align">PPh</th>
                                 <th class="right-align">Grandtotal</th>
+                                <th class="center-align">Plant</th>
+                                <th class="center-align">Line</th>
+                                <th class="center-align">Mesin</th>
+                                <th class="center-align">Divisi</th>
+                                <th class="center-align">Proyek</th>
                             </tr>
                         </thead><tbody>';
         
@@ -1259,6 +1334,11 @@ class FundRequestController extends Controller
                 <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->wtax,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->grandtotal,2,',','.').'</td>
+                <td class="">'.($row->place()->exists() ? $row->place->code : '-').'</td>
+                <td class="">'.($row->line()->exists() ? $row->line->code : '-').'</td>
+                <td class="">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
+                <td class="">'.($row->division()->exists() ? $row->division->name : '-').'</td>
+                <td class="">'.($row->project()->exists() ? $row->project->name : '-').'</td>
             </tr>';
         }
         
@@ -1269,7 +1349,18 @@ class FundRequestController extends Controller
                                 <th class="right-align">'.number_format($data->grandtotal,2,',','.').'</th>
                             </tr>
                         </tfoot>
-                        </table></div>';
+                        </table></div><div class="col s12 mt-2"><h6>Daftar Lampiran</h6>';
+
+        foreach($menu->checklistDocument as $row){
+            $rowceklist = $row->checkDocument($data->getTable(),$data->id);
+            $string .= '<label style="margin: 0 5px 0 0;">
+            <input class="validate" required="" type="checkbox" value="{{ $row->id }}" '.($rowceklist ? 'checked' : '').'>
+            <span>'.$row->title.' ('.$row->type().')'.'</span>
+            '.($rowceklist ? $rowceklist->note : '').'
+            </label>';
+        }
+
+        $string .= '</div>';
 
         $string .= '<div class="col s12 mt-1"><table style="max-width:800px;">
                         <thead>
@@ -1338,6 +1429,14 @@ class FundRequestController extends Controller
         $fr['grandtotal'] = number_format($fr->grandtotal,2,',','.');
 
         $arr = [];
+        $arrChecklist = [];
+
+        foreach($fr->checklistDocumentList as $row){
+            $arrChecklist[] = [
+                'id'    => $row->checklist_document_id,
+                'note'  => $row->note ? $row->note : '',
+            ];
+        }
 
         foreach($fr->fundRequestDetail as $row){
             $arr[] = [
@@ -1355,10 +1454,17 @@ class FundRequestController extends Controller
                 'tax_id'            => $row->tax_id,
                 'wtax_id'           => $row->wtax_id,
                 'is_include_tax'    => $row->is_include_tax,
+                'place_id'          => $row->place_id,
+                'line_id'           => $row->line_id,
+                'machine_id'        => $row->machine_id,
+                'division_id'       => $row->division_id,
+                'project_id'        => $row->project_id ?? '',
+                'project_name'      => $row->project()->exists() ? $row->project->name : '',
             ];
         }
 
         $fr['details'] = $arr;
+        $fr['checklist'] = $arrChecklist;
         				
 		return response()->json($fr);
     }
@@ -1473,7 +1579,7 @@ class FundRequestController extends Controller
         $data_id_pr=[];
         $data_id_memo=[];
         $data_id_pyrcs=[];
-        $data_id_gir = [];
+        $data_id_gir=[];
 
         $data_id_mo=[];
         $data_id_mo_delivery = [];
@@ -2570,25 +2676,6 @@ class FundRequestController extends Controller
                                 }
                             }
                             
-                            if($data_detail_good_issue->goodIssueRequestDetail()){
-                                $good_issue_request_tempura = [
-                                    "key" => $data_detail_good_issue->lookable->goodIssueRequest->code,
-                                    "name" => $data_detail_good_issue->lookable->goodIssueRequest->code,
-                                    'properties'=> [
-                                        ['name'=> "Tanggal :".$data_detail_good_issue->lookable->goodIssueRequest->post_date],
-                                        ['name'=> "Nominal : Rp.:".number_format($data_detail_good_issue->lookable->goodIssueRequest->grandtotal,2,',','.')],
-                                    ],
-                                    'url'=>request()->root()."/admin/inventory/good_issue_request?code=".CustomHelper::encrypt($data_detail_good_issue->lookable->goodIssueRequest->code),
-                                ];
-
-                                $data_go_chart[]=$good_issue_request_tempura;
-                                $data_link[]=[
-                                    'from'=>$data_detail_good_issue->lookable->goodIssueRequest->code,
-                                    'to'=>$query_good_issue->code,
-                                    'string_link'=>$data_detail_good_issue->lookable->goodIssueRequest->code.$query_good_issue->code,
-                                ];
-                                $data_id_gir[] = $data_detail_good_issue->lookable->goodIssueRequest->id;  
-                            }
                         }
                     }
                 }

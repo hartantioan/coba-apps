@@ -294,7 +294,7 @@
                             </div>
                             <div class="col m12 s12 step13">
                                 <p class="mt-2 mb-2">
-                                    <h6>Detail Purchase Order (Centang jika ada)</h6>
+                                    <h6>Detail Purchase Order / Req. Dana (Centang jika ada)</h6>
                                     <div style="overflow:auto;">
                                         <table class="bordered" id="table-detail">
                                             <thead>
@@ -305,10 +305,10 @@
                                                             <span>Semua</span>
                                                         </label>
                                                     </th>
-                                                    <th class="center">PO No.</th>
+                                                    <th class="center">Dokumen No.</th>
                                                     <th class="center">Daftar Item</th>
                                                     <th class="center">Tgl.Post</th>
-                                                    <th class="center">Tgl.Kirim</th>
+                                                    <th class="center">Tgl.Kirim/Tgl.Dipakai</th>
                                                     <th class="center">Keterangan</th>
                                                     <th class="center">Total</th>
                                                     <th class="center">Uang Muka</th>
@@ -594,6 +594,42 @@
     </div>
 </div>
 
+<div id="modal6" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-header ml-2">
+        <h5>Daftar Tunggakan Dokumen <b id="account_name"></b></h5>
+    </div>
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <div class="row">
+                    <div class="col s12 mt-2">
+                        <div id="datatable_buttons_multi"></div>
+                        <i class="right">Gunakan *pilih semua* untuk memilih seluruh data yang anda inginkan. Atau pilih baris untuk memilih data yang ingin dipindahkan.</i>
+                        <table id="table_multi" class="display" width="100%">
+                            <thead>
+                                <tr>
+                                    <th class="center-align">Kode Dokumen</th>
+                                    <th class="center-align">Tgl.Post</th>
+                                    <th class="center-align">Total</th>
+                                    <th class="center-align">PPN</th>
+                                    <th class="center-align">PPh</th>
+                                    <th class="center-align">Grandtotal</th>
+                                    <th class="center-align">Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-detail-multi"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1" onclick="resetBp();">Close</a>
+        <button class="btn waves-effect waves-light purple right submit" onclick="applyDocuments();">Gunakan <i class="material-icons right">forward</i></button>
+    </div>
+</div>
+
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
@@ -621,6 +657,62 @@
         loadDataTable();
 
         window.table.search('{{ $code }}').draw();
+
+        $('#modal6').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) {
+                table_multi = $('#table_multi').DataTable({
+                    "ordering": false,
+                    scrollY: '50vh',
+                    scrollCollapse: true,
+                    "iDisplayInLength": 10,
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    "language": {
+                        "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Data tidak ditemukan / kosong",
+                        "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
+                        "infoEmpty": "Data tidak ditemukan / kosong",
+                        "infoFiltered": "(disaring dari _MAX_ total data)",
+                        "search": "Cari",
+                        "paginate": {
+                            first:      "<<",
+                            previous:   "<",
+                            next:       ">",
+                            last:       ">>"
+                        },
+                        "buttons": {
+                            selectAll: "Pilih semua",
+                            selectNone: "Hapus pilihan"
+                        },
+                        "select": {
+                            rows: "%d baris terpilih"
+                        }
+                    },
+                    select: {
+                        style: 'multi'
+                    }
+                });
+                $('#table_multi_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi');
+                $('select[name="table_multi_length"]').addClass('browser-default');
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#body-detail-multi').empty();
+                $('#account_name').text('');
+                $('#preview_data').html('');
+                $('#table_multi').DataTable().clear().destroy();
+            }
+        });
+
+        $('#table_multi').on('click', 'input', function(event) {
+            event.stopPropagation();
+        });
 
         $('#modal1').modal({
             dismissible: false,
@@ -1085,7 +1177,7 @@
         });
     }
 
-    function getPurchaseOrder(val){
+    /* function getPurchaseOrder(val){
         if(val){
             $.ajax({
                 url: '{{ Request::url() }}/get_purchase_order',
@@ -1110,6 +1202,7 @@
                             var count = makeid(10);
                             $('#body-purchase').append(`
                                 <tr class="row_purchase">
+                                    <input type="hidden" name="arr_type[]" value="` + val.type + `" id="arr_type` + count + `">
                                     <td class="center-align">
                                         <label>
                                             <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.po_code + `" onclick="checkAll()" data-id="` + count + `">
@@ -1168,6 +1261,172 @@
                 $(this).remove();
             });
         }
+    } */
+
+    function getPurchaseOrder(val){
+        if(val){
+            $.ajax({
+                url: '{{ Request::url() }}/get_purchase_order',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    supplier: val
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+                    $('#modal6').modal('open');
+                    if(response.length > 0){
+                        $.each(response, function(i, val) {
+                            $('#body-detail-multi').append(`
+                                <tr data-type="` + val.type + `" data-id="` + val.id + `">
+                                    <td class="center">
+                                        ` + val.po_no + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.post_date + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.total + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.tax + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.wtax + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.grandtotal + `
+                                    </td>
+                                    <td class="center-align">
+                                        ` + val.note + `
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }
+                    
+                    $('.modal-content').scrollTop(0);
+                    M.updateTextFields();
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('.modal-content');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }else{
+
+        }
+    }
+
+    function applyDocuments(){
+        swal({
+            title: "Apakah anda yakin?",
+            text: "Jika sudah ada di dalam tabel detail form, maka akan tergantikan dengan pilihan baru anda saat ini.",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                let arr_id = [], arr_type = [];
+                $.map(table_multi.rows('.selected').nodes(), function (item) {
+                    arr_id.push($(item).data('id'));
+                    arr_type.push($(item).data('type'));
+                });
+
+                $.ajax({
+                    url: '{{ Request::url() }}/get_account_data',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        arr_id: arr_id,
+                        arr_type: arr_type,
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+                        $('#empty-purchase').remove();
+                        $('.row_purchase').remove();
+                        if(response.details.length > 0){
+                            $.each(response.details, function(i, val) {
+                                var count = makeid(10);
+                                $('#body-purchase').append(`
+                                    <tr class="row_purchase">
+                                        <input type="hidden" name="arr_type[]" value="` + val.type + `" id="arr_type` + count + `">
+                                        <td class="center-align">
+                                            <label>
+                                                <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.po_code + `" onclick="checkAll()" data-id="` + count + `" checked>
+                                                <span>Pilih</span>
+                                            </label>
+                                        </td>
+                                        <td>
+                                            ` + val.po_no + `
+                                        </td>
+                                        <td>
+                                            ` + val.list_items + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.post_date + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.delivery_date + `
+                                        </td>
+                                        <td class="center">
+                                            <input name="arr_note[]" class="browser-default" type="text" value="` + val.note + `" style="width:100%;" id="rowNote` + count + `">
+                                        </td>
+                                        <td class="center">
+                                            ` + val.grandtotal + `
+                                        </td>
+                                        <td class="center">
+                                            <input name="arr_nominal[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.grandtotal + `" onkeyup="formatRupiah(this);countRow()" style="text-align:right;width:100%;" id="rowNominal` + count + `">
+                                        </td>
+                                    </tr>
+                                `);
+                            });
+                            countRow();
+                        }else{
+                            $('#supplier_id').empty();
+                        }
+                        
+                        $('.modal-content').scrollTop(0);
+                        M.updateTextFields();
+
+                        $('#modal6').modal('close');
+                    }, 
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('.modal-content');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    function resetBp(){
+        $('#supplier_id').empty();
     }
 
     function countRow(){
@@ -1406,6 +1665,7 @@
                 formData.delete("arr_code[]");
                 formData.delete("arr_nominal[]");
                 formData.delete("arr_note[]");
+                formData.delete("arr_type[]");
                 formData.delete("arr_checklist_box[]");
                 formData.delete("arr_checklist_note[]");
                 formData.append('tax_id',$('#tax_id').find(':selected').data('id'));
@@ -1418,6 +1678,7 @@
                         formData.append('arr_code[]',$(this).val());
                         formData.append('arr_nominal[]',$('#rowNominal' + $(this).data('id')).val());
                         formData.append('arr_note[]',$('#rowNote' + $(this).data('id')).val());
+                        formData.append('arr_type[]',$('#arr_type' + $(this).data('id')).val());
                     }
                 });
 
@@ -1600,6 +1861,7 @@
                         var count = makeid(10);
                         $('#body-purchase').append(`
                             <tr class="row_purchase">
+                                <input type="hidden" name="arr_type[]" value="` + val.type + `" id="arr_type` + count + `">
                                 <td class="center-align">
                                     <label>
                                         <input type="checkbox" checked id="check` + count + `" name="arr_code[]" value="` + val.purchase_order_encrypt + `" onclick="checkAll()" data-id="` + count + `">

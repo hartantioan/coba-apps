@@ -8,10 +8,24 @@
             <th>Tgl.Post</th>
             <th>Keterangan</th>
             <th>Status</th>
+            <th>Coa</th>
+            <th>Total</th>
+            <th>PPN</th>
+            <th>PPh</th>
+            <th>Grandtotal</th>
+            <th>Dist.Biaya</th>
+            <th>Plant</th>
+            <th>Line</th>
+            <th>Mesin</th>
+            <th>Divisi</th>
+            <th>Proyek</th>
+            <th>Ket.1</th>
+            <th>Ket.2</th>
         </tr>
     </thead>
     <tbody>
-        @foreach($data as $key => $row)
+        @foreach($data as $row)
+            @foreach($row->closeBillCost as $key => $rowdetail)
             <tr align="center">
                 <td>{{ $key+1 }}</td>
                 <td>{{ $row->user->name }}</td>
@@ -20,23 +34,19 @@
                 <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                 <td>{{ $row->note }}</td>
                 <td>{!! $row->status() !!}</td>
-            </tr>
-            <tr align="center">
-                <th></th>
-                <th>No. FR</th>
-                <th>Partner Bisnis</th>
-                <th>Coa</th>
-                <th>Keterangan</th>
-                <th>Nominal</th>
-            </tr>
-            @foreach($row->closeBillDetail as $rowdetail)
-            <tr>
-                <td></td>
-                <td>{{ $rowdetail->fundRequest->code }}</td>
-                <td>{{ $rowdetail->fundRequest->account->name }}</td>
                 <td>{{ $rowdetail->coa->code.' - '.$rowdetail->coa->name }}</td>
+                <td>{{ number_format($rowdetail->total,2,',','.') }}</td>
+                <td>{{ number_format($rowdetail->tax,2,',','.') }}</td>
+                <td>{{ number_format($rowdetail->wtax,2,',','.') }}</td>
+                <td>{{ number_format($rowdetail->grandtotal,2,',','.') }}</td>
+                <td>{{ ($rowdetail->costDistribution()->exists() ? $rowdetail->costDistribution->code.' - '.$rowdetail->costDistribution->name : '-') }}</td>
+                <td>{{ ($rowdetail->place()->exists() ? $rowdetail->place->code : '-') }}</td>
+                <td>{{ ($rowdetail->line()->exists() ? $rowdetail->line->code : '-') }}</td>
+                <td>{{ ($rowdetail->machine()->exists() ? $rowdetail->machine->name : '-') }}</td>
+                <td>{{ ($rowdetail->division()->exists() ? $rowdetail->division->code : '-') }}</td>
+                <td>{{ ($rowdetail->project()->exists() ? $rowdetail->project->name : '-') }}</td>
                 <td>{{ $rowdetail->note }}</td>
-                <td align="right">{{ round($rowdetail->nominal,2) }}</td>
+                <td>{{ $rowdetail->note2 }}</td>
             </tr>
             @endforeach
         @endforeach

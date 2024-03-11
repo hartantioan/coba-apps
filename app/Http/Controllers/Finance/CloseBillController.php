@@ -31,19 +31,33 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Currency;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportCloseBill;
+use App\Models\CloseBillCost;
+use App\Models\Division;
+use App\Models\Line;
+use App\Models\Machine;
+use App\Models\Menu;
+use App\Models\MenuUser;
+use App\Models\OutgoingPayment;
+use App\Models\Place;
+use Illuminate\Database\Eloquent\Builder;
 
 class CloseBillController extends Controller
 {
 
-    protected $dataplaces;
+    protected $dataplaces, $dataplacecode, $datawarehouse;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
+        $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
+        $this->datawarehouse = $user ? $user->userWarehouseArray() : [];
     }
     public function index(Request $request)
     {
+        $lastSegment = request()->segment(count(request()->segments()));
+        $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
             'title'         => 'Penutupan BS Karyawan',
             'content'       => 'admin.finance.close_bill',
@@ -54,7 +68,14 @@ class CloseBillController extends Controller
             'distribution'  => CostDistribution::where('status','1')->get(),
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-        
+            'newcode'       => $menu->document_code.date('y'),
+            'menucode'      => $menu->document_code,
+            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+            'line'          => Line::where('status','1')->get(),
+            'machine'       => Machine::where('status','1')->get(),
+            'division'      => Division::where('status','1')->get(),
+            'modedata'      => $menuUser->mode ? $menuUser->mode : '',
+            'currency'      => Currency::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -68,6 +89,12 @@ class CloseBillController extends Controller
             'company_id',
             'post_date',
             'note',
+            'currency_id',
+            'currency_rate',
+            'total',
+            'tax',
+            'wtax',
+            'grandtotal'
         ];
 
         $start  = $request->start;
@@ -154,11 +181,18 @@ class CloseBillController extends Controller
                     $val->company->name,
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
+                    $val->currency->name,
+                    number_format($val->currency_rate,2,',','.'),
+                    number_format($val->total,2,',','.'),
+                    number_format($val->tax,2,',','.'),
+                    number_format($val->wtax,2,',','.'),
+                    number_format($val->grandtotal,2,',','.'),
                     $val->status(),
                     '
-                    <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small" data-popup="tooltip" title="Journal" onclick="viewJournal(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">note</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat cyan darken-4 white-text btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
@@ -182,31 +216,135 @@ class CloseBillController extends Controller
         return response()->json($response);
     }
 
-    public function getFundRequest(Request $request){
-        $data = FundRequest::find($request->id);
-
-        /* if($data->used()->exists()){
-            $data['status'] = '500';
-            $data['message'] = 'Permohonan dana no. '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
-        }else{ */
-            $balance = $data->balanceCloseBill();
-            if($balance > 0){
-                if(!$data->used()->exists()) CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Penutupan BS / Close Bill');
-                $data['rawcode'] = $data->code;
-                $data['code'] = CustomHelper::encrypt($data->code);
-                $data['grandtotal'] = number_format($data->grandtotal,'2',',','.');
-                $data['balance'] = number_format($balance,'2',',','.');
-                $data['post_date'] = date('d/m/Y',strtotime($data->post_date));
-                $data['required_date'] = date('d/m/Y',strtotime($data->required_date));
-                $data['bp_name'] = $data->account->employee_no.' - '.$data->account->name;
-                $data['coa_list'] = $data->getCoaPaymentRequestAll();
-            }else{
-                $data['status'] = '500';
-                $data['message'] = 'Seluruh nominal pada penutupan bs '.$data->code.' telah dimasukkan ke form ini.';
+    public function viewJournal(Request $request,$id){
+        $total_debit_asli = 0;
+        $total_debit_konversi = 0;
+        $total_kredit_asli = 0;
+        $total_kredit_konversi = 0;
+        $query = CloseBill::where('code',CustomHelper::decrypt($id))->first();
+        if($query->journal()->exists()){
+            $response = [
+                'title'     => 'Journal',
+                'status'    => 200,
+                'message'   => $query->journal,
+                'user'      => $query->user->name,
+                'reference' => $query->code,
+                'company'   => $query->company()->exists() ? $query->company->name : '-',
+                'code'      => $query->journal->code,
+                'note'      => $query->note,
+                'post_date' => date('d/m/Y',strtotime($query->post_date)),
+            ];
+            $string='';
+            foreach($query->journal->journalDetail()->where(function($query){
+            $query->whereHas('coa',function($query){
+                $query->orderBy('code');
+            })
+            ->orderBy('type');
+        })->get() as $key => $row){
+                $string .= '<tr>
+                    <td class="center-align">'.($key + 1).'</td>
+                    <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
+                    <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
+                    <td class="center-align">'.($row->place()->exists() ? $row->place->code : '-').'</td>
+                    <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
+                    <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
+                    <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
+                    <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
+                    <td class="center-align">'.($row->project_id ? $row->project->name : '-').'</td>
+                    <td class="center-align">'.($row->note ? $row->note : '').'</td>
+                    <td class="center-align">'.($row->note2 ? $row->note2 : '').'</td>
+                    <td class="right-align">'.($row->type == '1' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
+                    <td class="right-align">'.($row->type == '2' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
+                    <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
+                    <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
+                </tr>';
             }
-        /* } */
+            $response["tbody"] = $string; 
+        }else{
+            $response = [
+                'status'  => 500,
+                'message' => 'Data masih belum di approve.'
+            ]; 
+        }
+        return response()->json($response);
+    }
+
+    public function getAccountData(Request $request){
+        $details = [];
+
+        if($request->arr_type){
+            foreach($request->arr_type as $key => $row){
+                if($row == 'outgoing_payments'){
+                    $op = OutgoingPayment::whereDoesntHave('used')->where('id',$request->arr_id[$key])->first();
+                    if($op){
+                        CustomHelper::sendUsedData($op->getTable(),$op->id,'Form Tutupan BS');
+                        $balance = $op->balancePaymentCross();
+                        if($balance > 0){
+                            $details[] = [
+                                'type'      => $op->getTable(),
+                                'id'        => $op->id,
+                                'code'      => $op->code,
+                                'bp'        => $op->account->employee_no.' - '.$op->account->name,
+                                'post_date' => $op->pay_date,
+                                'total'     => number_format($op->balance,2,',','.'),
+                                'used'      => number_format($op->totalUsedCross(),2,',','.'),
+                                'balance'   => number_format($balance,2,',','.'),
+                                'note'      => $op->note,
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+
+        $data['details'] = $details;
 
         return response()->json($data);
+    }
+
+    public function getData(Request $request){
+        $details = [];
+        $data = OutgoingPayment::whereHas('account',function($query){
+            $query->where('type','1');
+        })
+        ->whereIn('status',['2','3'])
+        ->whereHas('paymentRequest',function($query){
+            $query->whereHas('paymentRequestDetail',function($query){
+                $query->whereHasMorph('lookable',
+                [FundRequest::class],
+                function (Builder $query){
+                    $query->where('type','1')->where('document_status','3');
+                });
+            });
+        })
+        ->whereDoesntHave('used')
+        ->get();
+
+        foreach($data as $row){
+            $balance = $row->balancePaymentIncoming();
+            if(!$row->used()->exists() && $balance > 0){
+                $details[] = [
+                    'id'                    => $row->id,
+                    'type'                  => $row->getTable(),
+                    'code'                  => $row->code,
+                    'name'                  => $row->account->employee_no.' - '.$row->account->name,
+                    'post_date'             => date('d/m/Y',strtotime($row->post_date)),
+                    'total'                 => number_format($row->total,2,',','.'),
+                    'tax'                   => number_format($row->tax,2,',','.'),
+                    'wtax'                  => number_format($row->wtax,2,',','.'),
+                    'grandtotal'            => number_format($row->grandtotal,2,',','.'),
+                    'used'                  => number_format($row->totalUsedCross(),2,',','.'),
+                    'balance'               => number_format($balance,2,',','.'),
+                    'note'                  => $row->note,
+                ];
+            }
+        }
+
+        return response()->json([
+            'status'    => 200,
+            'data'      => $details,
+            'message'   => 'Data tidak ditemukan.' 
+        ]);
     }
 
     public function rowDetail(Request $request){
@@ -216,36 +354,68 @@ class CloseBillController extends Controller
                     <table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="6">Daftar Permohonan Dana (BS)</th>
+                                <th class="center-align" colspan="6">Daftar Outgoing Payment (BS)</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
-                                <th class="center-align">FR No.</th>
+                                <th class="center-align">OP No.</th>
                                 <th class="center-align">Partner Bisnis</th>
-                                <th class="center-align">Coa</th>
+                                <th class="center-align">Tgl.Bayar</th>
                                 <th class="center-align">Keterangan</th>
-                                <th class="center-align">Total</th>
-                                <th class="center-align">PPN</th>
-                                <th class="center-align">PPh</th>
-                                <th class="center-align">Grandtotal</th>
-                                <th class="center-align">Dibayarkan</th>
-                                <th class="center-align">Balance</th>
+                                <th class="center-align">Nominal Terpakai</th>
                             </tr>
                         </thead><tbody>';
         
         foreach($data->closeBillDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$row->fundRequest->code.'</td>
-                <td class="center-align">'.$row->fundRequest->account->name.'</td>
-                <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
+                <td class="center-align">'.$row->outgoingPayment->code.'</td>
+                <td class="center-align">'.$row->outgoingPayment->account->employee_no.' - '.$row->outgoingPayment->account->name.'</td>
+                <td class="center-align">'.date('d/m/Y',strtotime($row->outgoingPayment->pay_date)).'</td>
                 <td class="">'.$row->note.'</td>
-                <td class="right-align">'.number_format($row->total,3,',','.').'</td>
-                <td class="right-align">'.number_format($row->tax,3,',','.').'</td>
-                <td class="right-align">'.number_format($row->wtax,3,',','.').'</td>
-                <td class="right-align">'.number_format($row->grandtotal,3,',','.').'</td>
-                <td class="right-align">'.number_format($row->nominal,3,',','.').'</td>
-                <td class="right-align">'.number_format($row->balance,3,',','.').'</td>
+                <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
+            </tr>';
+        }
+        
+        $string .= '</tbody></table></div>';
+
+        $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="13">Daftar Biaya</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">Coa</th>
+                                <th class="center-align">Total</th>
+                                <th class="center-align">Total PPN</th>
+                                <th class="center-align">Total PPh</th>
+                                <th class="center-align">Grandtotal</th>
+                                <th class="center-align">Dist.Biaya</th>
+                                <th class="center-align">Plant</th>
+                                <th class="center-align">Line</th>
+                                <th class="center-align">Mesin</th>
+                                <th class="center-align">Divisi</th>
+                                <th class="center-align">Proyek</th>
+                                <th class="center-align">Ket.1</th>
+                                <th class="center-align">Ket.2</th>
+                            </tr>
+                        </thead><tbody>';
+
+        foreach($data->closeBillCost as $key => $row){
+            $string .= '<tr>
+                <td class="">'.$row->coa->code.' - '.$row->coa->name.'</td>
+                <td class="right-align">'.number_format($row->total,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->wtax,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->grandtotal,2,',','.').'</td>
+                <td class="">'.($row->costDistribution()->exists() ? $row->costDistribution->code.' - '.$row->costDistribution->name : '-').'</td>
+                <td class="">'.($row->place()->exists() ? $row->place->code : '-').'</td>
+                <td class="">'.($row->line()->exists() ? $row->line->code : '-').'</td>
+                <td class="">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
+                <td class="">'.($row->division()->exists() ? $row->division->code : '-').'</td>
+                <td class="">'.($row->project()->exists() ? $row->project->name : '-').'</td>
+                <td class="">'.$row->note.'</td>
+                <td class="">'.$row->note2.'</td>
             </tr>';
         }
         
@@ -306,7 +476,7 @@ class CloseBillController extends Controller
     }
 
     public function removeUsedData(Request $request){
-        CustomHelper::removeUsedData('fund_requests',$request->id);
+        CustomHelper::removeUsedData($request->type,$request->id);
         return response()->json([
             'status'    => 200,
             'message'   => ''
@@ -319,7 +489,7 @@ class CloseBillController extends Controller
                 
         if($pr){
             $data = [
-                'title'     => 'Print Penutupan BS Karyawan',
+                'title'     => 'Approval Tutupan BS',
                 'data'      => $pr
             ];
 
@@ -331,46 +501,99 @@ class CloseBillController extends Controller
 
     public function show(Request $request){
         $cb = CloseBill::where('code',CustomHelper::decrypt($request->id))->first();
+        $total_op = $cb->totalOp();
+        $cb['balance'] = number_format($total_op - $cb->grandtotal,2,',','.');
+        $cb['total_op'] = number_format($total_op,2,',','.');
+        $cb['total'] = number_format($cb->total,2,',','.');
+        $cb['tax'] = number_format($cb->tax,2,',','.');
+        $cb['wtax'] = number_format($cb->wtax,2,',','.');
+        $cb['grandtotal'] = number_format($cb->grandtotal,2,',','.');
+        $cb['currency_rate'] = number_format($cb->currency_rate,2,',','.');
 
-        $arr = [];
+        $details = [];
+        $costs = [];
 
         foreach($cb->closeBillDetail as $row){
-            $arr[] = [
-                'id'                => $row->fund_request_id,
-                'rawcode'           => $row->fundRequest->code,
-                'code'              => CustomHelper::encrypt($row->fundRequest->code),
-                'grandtotal'        => number_format($row->fundRequest->grandtotal,'2',',','.'),
-                'balance'           => number_format($row->nominal,'2',',','.'),
-                'post_date'         => date('d/m/Y',strtotime($row->fundRequest->post_date)),
-                'required_date'     => date('d/m/Y',strtotime($row->fundRequest->required_date)),
-                'bp_name'           => $row->fundRequest->account->employee_no.' - '.$row->fundRequest->account->name,
-                'coa_list'          => $row->fundRequest->getCoaPaymentRequestAll(),
-                'coa_name'          => $row->coa->code.' - '.$row->coa->name,
-                'coa_id'            => $row->coa_id,
+            $balance = $row->outgoingPayment->balancePaymentCross();
+            $details[] = [
+                'type'      => $row->outgoingPayment->getTable(),
+                'id'        => $row->outgoing_payment_id,
+                'code'      => $row->outgoingPayment->code,
+                'bp'        => $row->outgoingPayment->account->employee_no.' - '.$row->outgoingPayment->account->name,
+                'post_date' => $row->outgoingPayment->pay_date,
+                'total'     => number_format($row->outgoingPayment->balance,2,',','.'),
+                'used'      => number_format($row->outgoingPayment->totalUsedCross(),2,',','.'),
+                'balance'   => number_format($balance + $row->nominal,2,',','.'),
+                'nominal'   => number_format($row->nominal,2,',','.'),
+                'note'      => $row->note,
             ];
         }
 
-        $cb['details'] = $arr;
+        foreach($cb->closeBillCost as $row){
+            $costs[] = [
+                'coa_id'                => $row->coa_id,
+                'coa_name'              => $row->coa->code.' - '.$row->coa->name,
+                'total'                 => number_format($row->total,2,',','.'),
+                'percent_tax'           => $row->percent_tax,
+                'percent_wtax'          => $row->percent_wtax,
+                'include_tax'           => $row->is_include_tax,
+                'tax'                   => number_format($row->tax,2,',','.'),
+                'wtax'                  => number_format($row->wtax,2,',','.'),
+                'grandtotal'            => number_format($row->grandtotal,2,',','.'),
+                'cost_distribution_id'  => $row->cost_distribution_id ?? '',
+                'cost_distribution_name'=> $row->cost_distribution_id ? $row->costDistribution->code.' - '.$row->costDistribution->name : '',
+                'place_id'              => $row->place_id ?? '',
+                'line_id'               => $row->line_id ?? '',
+                'machine_id'            => $row->machine_id ?? '',
+                'division_id'           => $row->division_id ?? '',
+                'project_id'            => $row->project_id ?? '',
+                'project_name'          => $row->project_id ? $row->project->code.' - '.$row->project->name : '',
+                'note'                  => $row->note,
+                'note2'                 => $row->note2,
+            ];
+        }
+
+        $cb['details'] = $details;
+        $cb['costs'] = $costs;
         				
 		return response()->json($cb);
     }
 
+    public function getCode(Request $request){
+        $code = CloseBill::generateCode($request->val);
+        				
+		return response()->json($code);
+    }
+
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
+            'code'                  => 'required',
+            'code_place_id'         => 'required',
             'company_id'            => 'required',
             'post_date'             => 'required',
-            'arr_fund_request'      => 'required|array',
+            'arr_type'              => 'required|array',
+            'arr_id'                => 'required|array',
             'arr_coa'               => 'required|array',
             'arr_nominal'           => 'required|array',
+            'arr_total'             => 'required|array',
+            'arr_grandtotal'        => 'required|array',
 		], [
+            'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code_place_id.required'            => 'Plant Tidak boleh kosong',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'post_date.required'                => 'Tanggal posting tidak boleh kosong.',
-            'arr_fund_request.required'         => 'Fund request tidak boleh kosong.',
-            'arr_fund_request.array'            => 'Fund request harus array.',
+            'arr_type.required'                 => 'OP tidak boleh kosong.',
+            'arr_type.array'                    => 'OP harus array.',
             'arr_coa.required'                  => 'Coa tidak boleh kosong.',
             'arr_coa.array'                     => 'Coa harus array.',
-            'arr_nominal.required'              => 'Nominal tidak boleh kosong.',
-            'arr_nominal.array'                 => 'Nominal harus array.',
+            'arr_id.required'                   => 'ID tidak boleh kosong.',
+            'arr_id.array'                      => 'ID harus array.',
+            'arr_nominal.required'              => 'Nominal OP tidak boleh kosong.',
+            'arr_nominal.array'                 => 'Nominal OP harus array.',
+            'arr_total.required'                => 'Total tidak boleh kosong.',
+            'arr_total.array'                   => 'Total harus array.',
+            'arr_grandtotal.required'           => 'Grandtotal tidak boleh kosong.',
+            'arr_grandtotal.array'              => 'Grandtotal harus array.',
 		]);
 
         if($validation->fails()) {
@@ -379,10 +602,42 @@ class CloseBillController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-            
-			if($request->temp){
-                DB::beginTransaction();
-                try {
+
+            DB::beginTransaction();
+            try {
+
+                $total = 0;
+                $tax = 0;
+                $wtax = 0;
+                $grandtotal = 0;
+                $op = 0;
+
+                if($request->arr_nominal){
+                    foreach($request->arr_nominal as $key => $row){
+                        $op += str_replace(',','.',str_replace('.','',$row));
+                    }
+                }
+
+                if($request->arr_total){
+                    foreach($request->arr_total as $key => $row){
+                        $total += str_replace(',','.',str_replace('.','',$row));
+                        $tax += str_replace(',','.',str_replace('.','',$request->arr_tax[$key]));
+                        $wtax += str_replace(',','.',str_replace('.','',$request->arr_wtax[$key]));
+                        $grandtotal += str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key]));
+                    }
+                }
+
+                $balance = $op - $grandtotal;
+
+                if($balance > 0 || $balance < 0){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Nominal selisih tutupan BS harus 0.'
+                    ]);
+                }
+                
+                if($request->temp){
+                    
                     $query = CloseBill::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     $approved = false;
@@ -405,7 +660,7 @@ class CloseBillController extends Controller
                     if($approved && !$revised){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Purchase Request telah diapprove, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Tutupan BS telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
 
@@ -414,81 +669,108 @@ class CloseBillController extends Controller
                         $query->user_id = session('bo_id');
                         $query->company_id = $request->company_id;
                         $query->post_date = $request->post_date;
+                        $query->currency_id = $request->currency_id;
+                        $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                         $query->note = $request->note;
                         $query->status = '1';
+                        $query->total = $total;
+                        $query->tax = $tax;
+                        $query->wtax = $wtax;
+                        $query->grandtotal = $grandtotal;
 
                         $query->save();
 
                         $query->closeBillDetail()->delete();
+                        $query->closeBillCost()->delete();
 
-                        DB::commit();
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Penutupan BS Karyawan sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Penutupan BS Karyawan sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                }catch(\Exception $e){
-                    DB::rollback();
-                }
-			}else{
-                DB::beginTransaction();
-                try {
+                }else{
+                    $lastSegment = $request->lastsegment;
+                    $menu = Menu::where('url', $lastSegment)->first();
+                    $newCode=CloseBill::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
+
                     $query = CloseBill::create([
-                        'code'			            => CloseBill::generateCode($request->post_date),
+                        'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $request->company_id,
                         'post_date'                 => $request->post_date,
                         'note'                      => $request->note,
                         'status'                    => '1',
+                        'currency_id'               => $request->currency_id,
+                        'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
+                        'total'                     => $total,
+                        'tax'                       => $tax,
+                        'wtax'                      => $wtax,
+                        'grandtotal'                => $grandtotal,
                     ]);
-
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
                 }
-			}
-			
-			if($query) {
-
-                DB::beginTransaction();
-                try {
-                    foreach($request->arr_fund_request as $key => $row){
-                        $fr = FundRequest::where('code',CustomHelper::decrypt($row))->first();
-                        CloseBillDetail::create([
-                            'close_bill_id'         => $query->id,
-                            'fund_request_id'       => $fr->id,
-                            'coa_id'                => $request->arr_coa[$key],
-                            'nominal'               => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
-                            'note'                  => $request->arr_note[$key],
-                        ]);
-                        CustomHelper::removeUsedData('fund_requests',$fr->id);
+                
+                if($query) {
+                    foreach($request->arr_type as $key => $row){
+                        if($row == 'outgoing_payments'){
+                            $op = OutgoingPayment::find($request->arr_id[$key]);
+                            CloseBillDetail::create([
+                                'close_bill_id'         => $query->id,
+                                'outgoing_payment_id'   => $op->id,
+                                'nominal'               => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
+                                'note'                  => $request->arr_note_source[$key],
+                            ]);
+                            CustomHelper::removeUsedData($row,$request->arr_id[$key]);
+                        }
                     }
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
+                    foreach($request->arr_coa as $key => $row){
+                        CloseBillCost::create([
+                            'close_bill_id'                 => $query->id,
+                            'cost_distribution_id'          => $request->arr_cost_distribution_cost[$key] ?? NULL,
+                            'coa_id'                        => $request->arr_coa[$key],
+                            'place_id'                      => $request->arr_place[$key] ?? NULL,
+                            'line_id'                       => $request->arr_line[$key] ?? NULL,
+                            'machine_id'                    => $request->arr_machine[$key] ?? NULL,
+                            'division_id'                   => $request->arr_division[$key] ?? NULL,
+                            'project_id'                    => $request->arr_project[$key] ?? NULL,
+                            'total'                         => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
+                            'tax_id'                        => $request->arr_tax_id[$key] ?? NULL,
+                            'percent_tax'                   => $request->arr_percent_tax[$key] ?? NULL,
+                            'is_include_tax'                => $request->arr_include_tax[$key] ?? NULL,
+                            'wtax_id'                       => $request->arr_wtax_id[$key] ?? NULL,
+                            'percent_wtax'                  => $request->arr_percent_wtax[$key] ?? NULL,
+                            'tax'                           => str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),
+                            'wtax'                          => str_replace(',','.',str_replace('.','',$request->arr_wtax[$key])),
+                            'grandtotal'                    => str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key])),
+                            'note'                          => $request->arr_note[$key] ?? NULL,
+                            'note2'                         => $request->arr_note2[$key] ?? NULL,
+                        ]);
+                    }
+
+                    CustomHelper::sendApproval('close_bills',$query->id,$query->note);
+                    CustomHelper::sendNotification('close_bills',$query->id,'Penutupan BS Karyawan No. '.$query->code,$query->note,session('bo_id'));
+
+                    activity()
+                        ->performedOn(new CloseBill())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Add / edit close bill out.');
+
+                    $response = [
+                        'status'    => 200,
+                        'message'   => 'Data successfully saved.',
+                    ];
+                } else {
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data failed to save.'
+                    ];
                 }
 
-                CustomHelper::sendApproval('close_bills',$query->id,$query->note);
-                CustomHelper::sendNotification('close_bills',$query->id,'Penutupan BS Karyawan No. '.$query->code,$query->note,session('bo_id'));
-
-                activity()
-                    ->performedOn(new CloseBill())
-                    ->causedBy(session('bo_id'))
-                    ->withProperties($query)
-                    ->log('Add / edit close bill out.');
-
-				$response = [
-					'status'    => 200,
-					'message'   => 'Data successfully saved.',
-				];
-			} else {
-				$response = [
-					'status'  => 500,
-					'message' => 'Data failed to save.'
-				];
-			}
-            
+                DB::commit();
+            }catch(\Exception $e){
+                DB::rollback();
+            }
 		}
 		
 		return response()->json($response);
@@ -498,12 +780,27 @@ class CloseBillController extends Controller
         $query = CloseBill::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
+
+            if(!CustomHelper::checkLockAcc($query->post_date)){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
+                ]);
+            }
+
             if(in_array($query->status,['4','5'])){
                 $response = [
                     'status'  => 500,
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
                 ];
             }else{
+                if($query->journal()->exists()){
+                    CustomHelper::removeJournal($query->getTable(),$query->id);
+                    foreach($query->closeBillDetail as $row){
+                        CustomHelper::addCountLimitCredit($row->outgoingPayment->account_id,floatval($row->nominal * $query->currency_rate));
+                    }
+                }
+
                 $query->update([
                     'status'    => '5',
                     'void_id'   => session('bo_id'),
@@ -572,7 +869,13 @@ class CloseBillController extends Controller
         
         if($query->delete()) {
 
+            $query->update([
+                'delete_id'     => session('bo_id'),
+                'delete_note'   => $request->msg,
+            ]);
+
             $query->closeBillDetail()->delete();
+            $query->closeBillCost()->delete();
 
             CustomHelper::removeApproval('close_bills',$query->id);
 
@@ -627,7 +930,7 @@ class CloseBillController extends Controller
                     $img_base_64 = base64_encode($image_temp);
                     $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                     $data["image"]=$path_img;
-                    $pdf = Pdf::loadView('admin.print.inventory.close_bill_individual', $data)->setPaper('a5', 'landscape');
+                    $pdf = Pdf::loadView('admin.print.finance.close_bill_individual', $data)->setPaper('a5', 'landscape');
                     $pdf->render();
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                     $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -725,7 +1028,7 @@ class CloseBillController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.inventory.close_bill_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.finance.close_bill_individual', $data)->setPaper('a5', 'landscape');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -800,7 +1103,7 @@ class CloseBillController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.inventory.close_bill_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.finance.close_bill_individual', $data)->setPaper('a5', 'landscape');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -866,7 +1169,7 @@ class CloseBillController extends Controller
             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
             $data["image"]=$path_img;
              
-            $pdf = Pdf::loadView('admin.print.inventory.close_bill_individual', $data)->setPaper('a5', 'landscape');
+            $pdf = Pdf::loadView('admin.print.finance.close_bill_individual', $data)->setPaper('a5', 'landscape');
             $pdf->render();
     
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
@@ -896,7 +1199,8 @@ class CloseBillController extends Controller
     public function export(Request $request){
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
-		return Excel::download(new ExportCloseBill($post_date,$end_date), 'close_bill_'.uniqid().'.xlsx');
+        $mode = $request->mode ? $request->mode : '';
+		return Excel::download(new ExportCloseBill($post_date,$end_date,$mode), 'close_bill_'.uniqid().'.xlsx');
     }
 
     public function viewStructureTree(Request $request){

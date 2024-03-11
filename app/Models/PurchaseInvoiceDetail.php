@@ -18,6 +18,7 @@ class PurchaseInvoiceDetail extends Model
         'purchase_invoice_id',
         'lookable_type',
         'lookable_id',
+        'fund_request_detail_id',
         'qty',
         'price',
         'total',
@@ -128,6 +129,10 @@ class PurchaseInvoiceDetail extends Model
         }else{
             return false;
         }
+    }
+
+    public function fundRequestDetail(){
+        return $this->belongsTo('App\Models\FundRequestDetail', 'fund_request_detail_id', 'id')->withTrashed();
     }
 
     public function getCode(){

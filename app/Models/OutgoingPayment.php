@@ -99,6 +99,12 @@ class OutgoingPayment extends Model
         });
     }
 
+    public function closeBillDetail(){
+        return $this->hasMany('App\Models\CloseBillDetail')->whereHas('closeBill',function($query){
+            $query->whereIn('status',['1','2','3']);
+        });
+    }
+
     public function incomingPaymentDetail(){
         return $this->hasMany('App\Models\IncomingPaymentDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('incomingPayment',function($query){
             $query->whereIn('status',['2','3']);
@@ -108,6 +114,9 @@ class OutgoingPayment extends Model
     public function balancePaymentCross(){
         $total = $this->getTotalPiutangKaryawan();
         foreach($this->paymentRequestCross as $row){
+            $total -= $row->nominal;
+        }
+        foreach($this->closeBillDetail as $row){
             $total -= $row->nominal;
         }
         return $total;
@@ -124,6 +133,9 @@ class OutgoingPayment extends Model
     public function totalUsedCross(){
         $total = 0;
         foreach($this->paymentRequestCross as $row){
+            $total += $row->nominal;
+        }
+        foreach($this->closeBillDetail as $row){
             $total += $row->nominal;
         }
         return $total;

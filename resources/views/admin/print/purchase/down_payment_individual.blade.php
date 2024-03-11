@@ -289,13 +289,13 @@
                                 <table border="1" style="border-collapse:collapse" width="100%">
                                     <thead>
                                         <tr>
-                                            <th class="center-align">PO No.</th>
+                                            <th class="center-align">PO/FR No.</th>
                                             
                                             <th class="center-align">PR No.</th>
                                             
                                             <th class="center-align">Tgl.Post</th>
                                             
-                                            <th class="center-align">Tgl.Kirim</th>
+                                            <th class="center-align">Tgl.Kirim/Tgl.Pakai</th>
                                             <th class="center-align">Keterangan</th>
                                             <th class="center-align">Total</th>
                                             <th class="center-align">DP Total</th>
@@ -304,15 +304,13 @@
                                         
                                     </thead>
                                 @foreach($data->purchaseDownPaymentDetail as $key => $row)
-                                @php
-                                $arr_pr=[];
-                                    foreach ($row->purchaseOrder->purchaseOrderDetail as $key => $row_detail_po) {
-                                        $arr_pr[]=$row_detail_po->purchaseRequestDetail->purchaseRequest->code;
-                                    }
-                                    
-                                @endphp
-                                    
-                                        
+                                    @if($row->purchaseOrder()->exists())
+                                        @php
+                                        $arr_pr=[];
+                                            foreach ($row->purchaseOrder->purchaseOrderDetail as $key => $row_detail_po) {
+                                                $arr_pr[]=$row_detail_po->purchaseRequestDetail->purchaseRequest->code;
+                                            }
+                                        @endphp
                                         <tbody>
                                             <tr>
                                                 <td class="center-align">{{ $row->purchaseOrder->code }}</td>
@@ -324,8 +322,21 @@
                                                 <td class="center-align" style="text-align: right">{{ number_format($row->nominal,2,',','.') }}</td>
                                             </tr>
                                         </tbody>
-                                    </table>
+                                    @elseif($row->fundRequest()->exists())
+                                        <tbody>
+                                            <tr>
+                                                <td class="center-align">{{ $row->fundRequest->code }}</td>
+                                                <td class="center-align">-</td>
+                                                <td class="center-align">{{ date('d/m/Y',strtotime($row->fundRequest->post_date)) }}</td>
+                                                <td class="center-align">{{ date('d/m/Y',strtotime($row->fundRequest->required_date)) }}</td>
+                                                <td class="center-align">{{ $row->note }}</td>                                             
+                                                <td class="center-align" style="text-align: right">{{ number_format($row->fundRequest->grandtotal,2,',','.') }}</td>
+                                                <td class="center-align" style="text-align: right">{{ number_format($row->nominal,2,',','.') }}</td>
+                                            </tr>
+                                        </tbody>
+                                    @endif
                                 @endforeach
+                                </table>
                             @endif
                         </div>
                     @endif
@@ -546,15 +557,13 @@
                                         
                                     </thead>
                                 @foreach($data->purchaseDownPaymentDetail as $key => $row)
-                                @php
-                                $arr_pr=[];
-                                    foreach ($row->purchaseOrder->purchaseOrderDetail as $key => $row_detail_po) {
-                                        $arr_pr[]=$row_detail_po->purchaseRequestDetail->purchaseRequest->code;
-                                    }
-                                    
-                                @endphp
-                                    
-                                        
+                                    @if($row->purchaseOrder()->exists())
+                                        @php
+                                        $arr_pr=[];
+                                            foreach ($row->purchaseOrder->purchaseOrderDetail as $key => $row_detail_po) {
+                                                $arr_pr[]=$row_detail_po->purchaseRequestDetail->purchaseRequest->code;
+                                            }
+                                        @endphp
                                         <tbody>
                                             <tr>
                                                 <td class="center-align">{{ $row->purchaseOrder->code }}</td>
@@ -566,8 +575,21 @@
                                                 <td class="center-align" style="text-align: right">{{ number_format($row->nominal,2,',','.') }}</td>
                                             </tr>
                                         </tbody>
-                                    </table>
+                                    @elseif($row->fundRequest()->exists())
+                                        <tbody>
+                                            <tr>
+                                                <td class="center-align">{{ $row->fundRequest->code }}</td>
+                                                <td class="center-align">-</td>
+                                                <td class="center-align">{{ date('d/m/Y',strtotime($row->fundRequest->post_date)) }}</td>
+                                                <td class="center-align">{{ date('d/m/Y',strtotime($row->fundRequest->required_date)) }}</td>
+                                                <td class="center-align">{{ $row->note }}</td>                                             
+                                                <td class="center-align" style="text-align: right">{{ number_format($row->fundRequest->grandtotal,2,',','.') }}</td>
+                                                <td class="center-align" style="text-align: right">{{ number_format($row->nominal,2,',','.') }}</td>
+                                            </tr>
+                                        </tbody>
+                                    @endif
                                 @endforeach
+                                </table>
                             @endif
                         </div>
                     @endif

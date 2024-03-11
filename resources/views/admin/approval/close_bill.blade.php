@@ -159,7 +159,7 @@
                                 Posisi
                             </td>
                             <td width="60%">
-                                {{ $data->user->position_id ? $data->user->position->Level->name : '-' }}
+                                {{ $data->user->position_id ? $data->user->position->name : '-' }}
                             </td>
                         </tr>
                         <tr>
@@ -200,21 +200,67 @@
         <table class="bordered">
             <thead>
                 <tr>
-                    <th class="center">No. FR</th>
-                    <th class="center">Partner Bisnis</th>
-                    <th class="center">Coa</th>
-                    <th class="center">Keterangan</th>
-                    <th class="center">Nominal</th>
+                    <th class="center-align" colspan="6">Daftar Outgoing Payment (BS)</th>
+                </tr>
+                <tr>
+                    <th class="center-align">No.</th>
+                    <th class="center-align">OP No.</th>
+                    <th class="center-align">Partner Bisnis</th>
+                    <th class="center-align">Tgl.Bayar</th>
+                    <th class="center-align">Keterangan</th>
+                    <th class="center-align">Nominal Terpakai</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($data->closeBillDetail as $row)
+                @foreach($data->closeBillDetail as $key => $row)
                 <tr>
-                    <td class="center-align">{{ $row->fundRequest->code }}</td>
-                    <td class="center-align">{{ $row->fundRequest->account->name }}</td>
-                    <td class="center-align">{{ $row->coa->code.' - '.$row->coa->name }}</td>
-                    <td>{{ $row->note }}</td>
-                    <td class="right-align">{{ number_format($row->nominal,3,',','.') }}</td>
+                    <td class="center-align">{{ ($key + 1) }}</td>
+                    <td class="center-align">{{ $row->outgoingPayment->code }}</td>
+                    <td class="center-align">{{ $row->outgoingPayment->account->employee_no.' - '.$row->outgoingPayment->account->name }}</td>
+                    <td class="center-align">{{ date('d/m/Y',strtotime($row->outgoingPayment->pay_date)) }}</td>
+                    <td class="">{{ $row->note }}</td>
+                    <td class="right-align">{{ number_format($row->nominal,2,',','.') }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+        <table class="bordered mt-1 mb-1">
+            <thead>
+                <tr>
+                    <th class="center-align" colspan="6">Daftar Outgoing Payment (BS)</th>
+                </tr>
+                <tr>
+                    <th class="center-align">Coa</th>
+                    <th class="center-align">Total</th>
+                    <th class="center-align">Total PPN</th>
+                    <th class="center-align">Total PPh</th>
+                    <th class="center-align">Grandtotal</th>
+                    <th class="center-align">Dist.Biaya</th>
+                    <th class="center-align">Plant</th>
+                    <th class="center-align">Line</th>
+                    <th class="center-align">Mesin</th>
+                    <th class="center-align">Divisi</th>
+                    <th class="center-align">Proyek</th>
+                    <th class="center-align">Ket.1</th>
+                    <th class="center-align">Ket.2</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($data->closeBillCost as $key => $row)
+                <tr>
+                    <td class="">{{ $row->coa->code.' - '.$row->coa->name }}</td>
+                    <td class="right-align">{{ number_format($row->total,2,',','.') }}</td>
+                    <td class="right-align">{{ number_format($row->tax,2,',','.') }}</td>
+                    <td class="right-align">{{ number_format($row->wtax,2,',','.') }}</td>
+                    <td class="right-align">{{ number_format($row->grandtotal,2,',','.') }}</td>
+                    <td class="">{{ ($row->costDistribution()->exists() ? $row->costDistribution->code.' - '.$row->costDistribution->name : '-') }}</td>
+                    <td class="">{{ ($row->place()->exists() ? $row->place->code : '-') }}</td>
+                    <td class="">{{ ($row->line()->exists() ? $row->line->code : '-') }}</td>
+                    <td class="">{{ ($row->machine()->exists() ? $row->machine->name : '-') }}</td>
+                    <td class="">{{ ($row->division()->exists() ? $row->division->code : '-') }}</td>
+                    <td class="">{{ ($row->project()->exists() ? $row->project->name : '-') }}</td>
+                    <td class="">{{ $row->note }}</td>
+                    <td class="">{{ $row->note2 }}</td>
                 </tr>
                 @endforeach
             </tbody>

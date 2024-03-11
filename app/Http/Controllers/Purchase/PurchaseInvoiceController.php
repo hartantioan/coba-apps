@@ -49,6 +49,7 @@ use App\Helpers\CustomHelper;
 use App\Exports\ExportPurchaseInvoice;
 use App\Exports\ExportTemplatePurchaseInvoice;
 use App\Models\Division;
+use App\Models\FundRequest;
 use App\Models\LandedCostFeeDetail;
 use App\Models\MenuUser;
 use App\Models\Project;
@@ -319,6 +320,25 @@ class PurchaseInvoiceController extends Controller
                 ];
             }
         }
+
+        $datafr = FundRequest::where('account_id',$request->id)->whereIn('status',['2','3'])->where('document_status','2')->where('type','1')->get();
+
+        foreach($datafr as $row){
+            $balanceInvoice = $row->balanceInvoice();
+            if($balanceInvoice > 0){
+                $details[] = [
+                    'type'          => 'fund_requests',
+                    'id'            => $row->id,
+                    'code'          => $row->code,
+                    'post_date'     => date('d/m/Y',strtotime($row->post_date)),
+                    'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                    'invoice'       => number_format($row->totalInvoice(),2,',','.'),
+                    'balance'       => $row->currency->symbol.' '.number_format($balanceInvoice,2,',','.'),
+                    'info'          => $row->note,
+                    'list_item'     => $row->getListItem(),
+                ];
+            }
+        }
         
         $datapo = PurchaseOrder::whereIn('status',['2','3'])->where('inventory_type','2')->where('account_id',$request->id)->get();
 
@@ -453,6 +473,61 @@ class PurchaseInvoiceController extends Controller
                             'spk_no'        => $datapo->spk_no ?? '',
                             'invoice_no'    => $datapo->invoice_no ?? '',
                             'header_note'   => $datapo->note,
+                        ];
+                    }
+                }
+            }elseif($row == 'fund_requests'){
+                $datafr = FundRequest::find(intval($request->arr_id[$key]));
+                foreach($datafr->fundRequestDetail as $rowdetail){
+                    if($rowdetail->balanceInvoice() > 0 || $rowdetail->balanceInvoice() < 0){
+                        $details[] = [
+                            'type'          => 'fund_request_details',
+                            'id'            => $rowdetail->id,
+                            'name'          => $rowdetail->note,
+                            'qty_received'  => number_format($rowdetail->qty,3,',','.'),
+                            'qty_returned'  => 0,
+                            'qty_balance'   => number_format($rowdetail->qty,3,',','.'),
+                            'price'         => number_format($rowdetail->price,2,',','.'),
+                            'buy_unit'      => '-',
+                            'rawcode'       => $datafr->code,
+                            'post_date'     => date('d/m/Y',strtotime($datafr->post_date)),
+                            'total'         => number_format($rowdetail->total,2,',','.'),
+                            'tax'           => number_format($rowdetail->tax,2,',','.'),
+                            'wtax'          => number_format($rowdetail->wtax,2,',','.'),
+                            'grandtotal'    => number_format($rowdetail->grandtotal,2,',','.'),
+                            'info'          => $rowdetail->note ? $rowdetail->note : '',
+                            'note'          => $rowdetail->note ? $rowdetail->note : '',
+                            'note2'         => $rowdetail->note ? $rowdetail->note : '',
+                            'top'           => 0,
+                            'delivery_no'   => '-',
+                            'purchase_no'   => $datafr->code,
+                            'percent_tax'   => $rowdetail->percent_tax,
+                            'percent_wtax'  => $rowdetail->percent_wtax,
+                            'include_tax'   => $rowdetail->is_include_tax,
+                            'place_id'      => $rowdetail->place_id ? $rowdetail->place_id : '',
+                            'line_id'       => $rowdetail->line_id ? $rowdetail->line_id : '',
+                            'machine_id'    => $rowdetail->machine_id ? $rowdetail->machine_id : '',
+                            'department_id' => $rowdetail->division_id ? $rowdetail->division_id : '',
+                            'warehouse_id'  => '',
+                            'project_id'    => $rowdetail->project_id ? $rowdetail->project_id : '',
+                            'place_name'    => $rowdetail->place_id ? $rowdetail->place->code : '-',
+                            'line_name'     => $rowdetail->line_id ? $rowdetail->line->name : '-',
+                            'machine_name'  => $rowdetail->machine_id ? $rowdetail->machine->name : '-',
+                            'department_name' => $rowdetail->division_id ? $rowdetail->division->name : '-',
+                            'warehouse_name'=> '-',
+                            'project_name'  => $rowdetail->project_id ? $rowdetail->project->name : '-',
+                            'qty_stock'     => number_format($rowdetail->qty,3,',','.'),
+                            'unit_stock'    => '-',
+                            'qty_conversion'=> 1,
+                            'received_date' => '',
+                            'due_date'      => $datafr->required_date ?? '',
+                            'document_date' => $datafr->document_date ?? '',
+                            'tax_no'        => $datafr->tax_no ?? '',
+                            'tax_cut_no'    => $datafr->tax_cut_no ?? '',
+                            'cut_date'      => $datafr->cut_date ?? '',
+                            'spk_no'        => $datafr->spk_no ?? '',
+                            'invoice_no'    => $datafr->invoice_no ?? '',
+                            'header_note'   => $datafr->note,
                         ];
                     }
                 }
@@ -1086,6 +1161,7 @@ class PurchaseInvoiceController extends Controller
                                     'purchase_invoice_id'   => $query->id,
                                     'lookable_type'         => $row,
                                     'lookable_id'           => $request->arr_code[$key],
+                                    'fund_request_detail_id'=> $request->arr_frd_id[$key] ?? NULL, 
                                     'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                                     'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
                                     'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
@@ -1584,6 +1660,7 @@ class PurchaseInvoiceController extends Controller
                 'qty_stock'     => number_format($row->getQtyStock(),3,',','.'),
                 'unit_stock'    => $row->getUnitStock(),
                 'qty_conversion'=> $row->getQtyConversion(),
+                'frd_id'        => $row->fund_request_detail_id ?? '',
             ];
         }
 

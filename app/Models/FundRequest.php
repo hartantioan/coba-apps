@@ -29,6 +29,14 @@ class FundRequest extends Model
         'note',
         'termin_note',
         'payment_type',
+        'document_no',
+        'document_date',
+        'tax_no',
+        'tax_cut_no',
+        'cut_date',
+        'spk_no',
+        'invoice_no',
+        'is_reimburse',
         'name_account',
         'no_account',
         'bank_account',
@@ -45,6 +53,60 @@ class FundRequest extends Model
         'delete_id',
         'delete_note'
     ];
+
+    public function hasBalanceInvoice(){
+        if($this->balanceInvoice() > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public function balanceInvoice(){
+        $total = round($this->grandtotal,2);
+
+        foreach($this->fundRequestDetail as $row){
+            foreach($row->purchaseInvoiceDetail as $rowinvoice){
+                $total -= $rowinvoice->grandtotal;
+            }
+        }
+
+        return $total;
+    }
+
+    public function totalInvoice(){
+        $total = 0;
+
+        foreach($this->fundRequestDetail as $row){
+            foreach($row->purchaseInvoiceDetail as $rowinvoice){
+                $total += $rowinvoice->grandtotal;
+            }
+        }
+
+        return $total;
+    }
+
+    public function getListItem(){
+        $html = '<ol>';
+
+        foreach($this->fundRequestDetail as $row){
+            $html .= '<li>'.$row->note.' Qty. '.$row->qty.' '.$row->unit->code.'</li>';
+        }
+
+        $html .= '</ol>';
+
+        return $html;
+    }
+
+    public function isReimburse(){
+        $reimburse = match ($this->is_reimburse) {
+            '1' => 'Ya',
+            '2' => 'Tidak',
+            default => 'Invalid',
+        };
+
+        return $reimburse;
+    }
 
     public function user()
     {
@@ -245,7 +307,7 @@ class FundRequest extends Model
 
     public function type(){
         $type = match ($this->type) {
-          '1' => 'BS',
+          '1' => 'Pembayaran',
           '2' => 'Pinjaman',
           default => 'Invalid',
         };
@@ -311,10 +373,11 @@ class FundRequest extends Model
 
     public function paymentType(){
         $type = match ($this->payment_type) {
-          '1' => 'Tunai',
-          '2' => 'Transfer',
-          '3' => 'CEK',
-          '4' => 'BG',
+          '1'   => 'Tunai',
+          '2'   => 'Transfer',
+          '3'   => 'CEK',
+          '4'   => 'BG',
+          '5'   => 'Credit',
           default => 'Invalid',
         };
 
@@ -385,5 +448,9 @@ class FundRequest extends Model
         $user = User::find($this->account_id);
         $user->count_limit_credit = $user->count_limit_credit - $nominal;
         $user->save();
+    }
+
+    public function checklistDocumentList(){
+        return $this->hasMany('App\Models\ChecklistDocumentList','lookable_id','id')->where('lookable_type',$this->table);
     }
 }

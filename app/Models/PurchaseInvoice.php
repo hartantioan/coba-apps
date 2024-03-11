@@ -100,6 +100,8 @@ class PurchaseInvoice extends Model
                 $currency = $row->lookable->purchaseOrder->currency;
             }elseif($row->lookable_type == 'landed_cost_fee_details'){
                 $currency = $row->lookable->landedCost->currency;
+            }elseif($row->lookable_type == 'fund_request_details'){
+                $currency = $row->lookable->fundRequest->currency;
             }else{
                 $currency = $row->lookable->purchaseOrderDetail->purchaseOrder->currency;
             }
@@ -117,6 +119,8 @@ class PurchaseInvoice extends Model
                 $rate = $row->lookable->purchaseOrder->currency_rate;
             }elseif($row->lookable_type == 'landed_cost_fee_details'){
                 $rate = $row->lookable->landedCost->currency_rate;
+            }elseif($row->lookable_type == 'fund_request_details'){
+                $rate = $row->lookable->fundRequest->currency_rate;
             }else{
                 $rate = $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
             }
@@ -467,6 +471,12 @@ class PurchaseInvoice extends Model
                     'status'    => '2'
                 ]);
             }
+
+            if($row->fundRequestDetail()->exists()){
+                $row->fundRequestDetail->fundRequest->update([
+                    'status'    => '2'
+                ]);
+            }
         }
     }
 
@@ -491,6 +501,14 @@ class PurchaseInvoice extends Model
             if($row->landedCostFeeDetail()){
                 if(!$row->lookable->landedCost->hasBalanceInvoice()){
                     $row->lookable->landedCost->update([
+                        'status'    => '3'
+                    ]);
+                }
+            }
+
+            if($row->fundRequestDetail()->exists()){
+                if(!$row->fundRequestDetail->fundRequest->hasBalanceInvoice()){
+                    $row->fundRequestDetail->fundRequest->update([
                         'status'    => '3'
                     ]);
                 }

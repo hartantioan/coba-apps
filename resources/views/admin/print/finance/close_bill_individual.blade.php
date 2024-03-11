@@ -164,21 +164,15 @@
         <header>
             <table border="0" width="100%" style="font-size:1em" class="tb-header">
                 <tr>
-                    <td width="83%" class="left-align" >
+                    <td width="33%" class="left-align" >
                         <tr>
                             <td>
-                                <span class="invoice-number mr-1">Penutupan BS # {{ $data->code }}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="margin-top: -2px;">
-                                <small style="font-size:1em"> <small>Diajukan:</small>
-                                <span>{{ date('d/m/Y',strtotime($data->post_date)) }}</span></small>
+                                <span class="invoice-number mr-1">Tutupan BS # {{ $data->code }}</span>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <h5 class="indigo-text">Penutupan BS</h5>
+                                <h2 class="indigo-text">Tutupan BS</h2>
                             </td>
                         </tr>
                                 
@@ -190,9 +184,9 @@
                    
                     </td>
                     
-                    <td width="34%" class="right-align">
+                    <td width="34%" align="right">
                         
-                            <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
+                            <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%;right:0;">
                        
                     </td>
                 </tr>
@@ -205,7 +199,7 @@
                 <div class="card-content invoice-print-area ">
                     <table border="0" width="100%">
                         <tr>
-                            <td width="33%" class="left-align">
+                            <td width="66%" class="left-align">
                                 <table border="0" width="50%" class="tbl-info">
                                     <tr>
                                         <td width="40%">
@@ -216,25 +210,21 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="50%">
+                                        <td width="40%">
                                             Posisi
                                         </td>
-                                        <td width="50%">
-                                            {{ $data->user->position_id ? $data->user->position->Level->name : '-' }}
+                                        <td width="60%">
+                                            {{ $data->user->position_id ? $data->user->position->name : '-' }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="50%">
+                                        <td width="40%">
                                             Depart.
                                         </td>
-                                        <td width="50%">
+                                        <td width="60%">
                                             {{ $data->user->position_id ? $data->user->position->division->name : '-' }}
                                         </td>
                                     </tr>
-                                </table>
-                            </td>
-                            <td width="33%" class="left-align">
-                                <table border="0" width="100%">
                                     <tr>
                                         <td width="40%">
                                             Perusahaan
@@ -282,25 +272,72 @@
                         <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
                             <thead>
                                 <tr>
-                                    <th class="center">No. FR</th>
-                                    <th class="center">Partner Bisnis</th>
-                                    <th class="center">Coa</th>
-                                    <th class="center">Keterangan</th>
-                                    <th class="center">Nominal</th>
+                                    <th align="center" colspan="6">Daftar Outgoing Payment (BS)</th>
+                                </tr>
+                                <tr>
+                                    <th align="center">No.</th>
+                                    <th align="center">OP No.</th>
+                                    <th align="center">Partner Bisnis</th>
+                                    <th align="center">Tgl.Bayar</th>
+                                    <th align="center">Keterangan</th>
+                                    <th align="center">Nominal Terpakai</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($data->closeBillDetail as $row)
+                                @foreach($data->closeBillDetail as $key => $row)
                                 <tr>
-                                    <td class="center-align">{{ $row->fundRequest->code }}</td>
-                                    <td class="center-align">{{ $row->fundRequest->account->name }}</td>
-                                    <td class="center-align">{{ $row->coa->code.' - '.$row->coa->name }}</td>
+                                    <td align="center">{{ ($key + 1) }}</td>
+                                    <td align="center">{{ $row->outgoingPayment->code }}</td>
+                                    <td align="center">{{ $row->outgoingPayment->account->employee_no.' - '.$row->outgoingPayment->account->name }}</td>
+                                    <td align="center">{{ date('d/m/Y',strtotime($row->outgoingPayment->pay_date)) }}</td>
                                     <td>{{ $row->note }}</td>
-                                    <td class="right-align">{{ number_format($row->nominal,3,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->nominal,2,',','.') }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>
-                            
+                        </table>
+                        <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
+                            <thead>
+                                <tr>
+                                    <th align="center" colspan="11">Daftar Biaya</th>
+                                </tr>
+                                <tr>
+                                    <th align="center">Coa</th>
+                                    <th align="center">Total</th>
+                                    <th align="center">Total PPN</th>
+                                    <th align="center">Total PPh</th>
+                                    <th align="center">Grandtotal</th>
+                                    <th align="center">Dist.Biaya</th>
+                                    <th align="center">Plant</th>
+                                    <th align="center">Line</th>
+                                    <th align="center">Mesin</th>
+                                    <th align="center">Divisi</th>
+                                    <th align="center">Proyek</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($data->closeBillCost as $key => $row)
+                                <tr>
+                                    <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
+                                    <td align="right">{{ number_format($row->total,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->tax,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->wtax,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->grandtotal,2,',','.') }}</td>
+                                    <td>{{ ($row->costDistribution()->exists() ? $row->costDistribution->code.' - '.$row->costDistribution->name : '-') }}</td>
+                                    <td>{{ ($row->place()->exists() ? $row->place->code : '-') }}</td>
+                                    <td>{{ ($row->line()->exists() ? $row->line->code : '-') }}</td>
+                                    <td>{{ ($row->machine()->exists() ? $row->machine->name : '-') }}</td>
+                                    <td>{{ ($row->division()->exists() ? $row->division->code : '-') }}</td>
+                                    <td>{{ ($row->project()->exists() ? $row->project->name : '-') }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="11">Ket 1 : {{ $row->note }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="11">Ket 2 : {{ $row->note2 }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
                         </table>
                     </div>
                     <!-- invoice subtotal -->
@@ -324,7 +361,7 @@
                         </div>
                         <table class="table-bot1" width="100%" border="0">
                             <tr>
-                                <td class="center-align">
+                                <td align="center">
                                     {!! ucwords(strtolower($data->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
                                     <br>
                                     Dibuat oleh,
@@ -337,7 +374,7 @@
                                 @if($data->approval())
                                     @foreach ($data->approval() as $detail)
                                         @foreach ($detail->approvalMatrix()->where('status','2')->get() as $row)
-                                            <td class="center-align">
+                                            <td align="center">
                                                 {{ $row->approvalTemplateStage->approvalStage->approval->document_text }}
                                                 @if($row->user->signature)
                                                     <div>{!! $row->user->signature() !!}</div>

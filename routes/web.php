@@ -1383,6 +1383,7 @@ Route::prefix('admin')->group(function () {
 
                 Route::prefix('purchase_down_payment')->middleware(['operation.access:purchase_down_payment,view','lockacc'])->group(function () {
                     Route::get('/',[PurchaseDownPaymentController::class, 'index']);
+                    Route::post('get_account_data', [PurchaseDownPaymentController::class, 'getAccountData']);
                     Route::post('get_purchase_order', [PurchaseDownPaymentController::class, 'getPurchaseOrder']);
                     Route::get('datatable',[PurchaseDownPaymentController::class, 'datatable']);
                     Route::get('row_detail',[PurchaseDownPaymentController::class, 'rowDetail']);
@@ -2314,6 +2315,8 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[CloseBillController::class, 'rowDetail']);
                     Route::get('view_journal/{id}',[CloseBillController::class, 'viewJournal'])->middleware('operation.access:close_bill,journal');
                     Route::post('show', [CloseBillController::class, 'show']);
+                    Route::post('get_data', [CloseBillController::class, 'getData']);
+                    Route::post('get_code', [CloseBillController::class, 'getCode']);
                     Route::post('print',[CloseBillController::class, 'print']);
                     Route::post('print_by_range',[CloseBillController::class, 'printByRange']);
                     Route::get('print_individual/{id}',[CloseBillController::class, 'printIndividual'])->withoutMiddleware('direct.access');
@@ -2324,7 +2327,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('void_status', [CloseBillController::class, 'voidStatus'])->middleware('operation.access:close_bill,void');
                     Route::get('approval/{id}',[CloseBillController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('destroy', [CloseBillController::class, 'destroy'])->middleware('operation.access:close_bill,delete');
-                    Route::post('get_fund_request', [CloseBillController::class, 'getFundRequest']);
+                    Route::post('get_account_data', [CloseBillController::class, 'getAccountData']);
                 });
 
             });

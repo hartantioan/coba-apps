@@ -38,6 +38,7 @@ class AppServiceProvider extends ServiceProvider
             'capitalizations'                       => 'App\Models\Capitalization',
             'retirements'                           => 'App\Models\Retirement',
             'fund_requests'                         => 'App\Models\FundRequest',
+            'fund_request_details'                  => 'App\Models\FundRequestDetail',
             'payment_requests'                      => 'App\Models\PaymentRequest',
             'outgoing_payments'                     => 'App\Models\OutgoingPayment',
             'good_receives'                         => 'App\Models\GoodReceive',

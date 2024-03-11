@@ -116,6 +116,14 @@
                                                         <th rowspan="2">Keterangan</th>
                                                         <th rowspan="2">Termin</th>
                                                         <th rowspan="2">Tipe Pembayaran</th>
+                                                        <th rowspan="2">No.Dokumen</th>
+                                                        <th rowspan="2">Tgl.Dokumen</th>
+                                                        <th rowspan="2">No.Faktur Pajak</th>
+                                                        <th rowspan="2">No.Bukti Potong</th>
+                                                        <th rowspan="2">Tgl.Bukti Potong</th>
+                                                        <th rowspan="2">No.SPK</th>
+                                                        <th rowspan="2">No.Invoice</th>
+                                                        <th rowspan="2">Reimburse</th>
                                                         <th rowspan="2">Rekening Penerima</th>
                                                         <th rowspan="2">No.Rek</th>
                                                         <th rowspan="2">Bank</th>
@@ -423,6 +431,14 @@
                 { name: 'note', className: 'center-align' },
                 { name: 'termin_note', className: 'center-align' },
                 { name: 'payment_type', className: 'center-align' },
+                { name: 'document_no', className: '' },
+                { name: 'document_date', className: '' },
+                { name: 'tax_no', className: '' },
+                { name: 'tax_cut_no', className: '' },
+                { name: 'cut_date', className: '' },
+                { name: 'spk_no', className: '' },
+                { name: 'invoice_no', className: '' },
+                { name: 'is_reimburse', className: '' },
                 { name: 'name_account', className: 'center-align' },
                 { name: 'no_account', className: 'center-align' },
                 { name: 'bank_account', className: 'center-align' },

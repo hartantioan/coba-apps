@@ -45,6 +45,7 @@ use App\Models\PurchaseDownPaymentDetail;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportPurchaseDownPayment;
 use App\Models\ChecklistDocumentList;
+use App\Models\FundRequest;
 use App\Models\MenuUser;
 use App\Models\User;
 use App\Models\Tax;
@@ -95,7 +96,8 @@ class PurchaseDownPaymentController extends Controller
     }
 
     public function getPurchaseOrder(Request $request){
-        $data = PurchaseOrder::where('account_id',$request->supplier)->whereIn('status',['2','3'])->get();
+        $data = PurchaseOrder::where('account_id',$request->supplier)->whereIn('status',['2'])->get();
+        $data2 = FundRequest::where('account_id',$request->supplier)->whereIn('status',['2'])->where('document_status','3')->where('type','1')->get();
 
         $details = [];
 
@@ -112,6 +114,7 @@ class PurchaseDownPaymentController extends Controller
             $list_items .= '</ol>';
 
             $details[] = [
+                'id'            => $row->id,
                 'po_code'       => CustomHelper::encrypt($row->code),
                 'po_no'         => $row->code,
                 'post_date'     => date('d/m/Y',strtotime($row->post_date)),
@@ -119,10 +122,106 @@ class PurchaseDownPaymentController extends Controller
                 'grandtotal'    => number_format($row->grandtotal,2,',','.'),
                 'list_items'    => $list_items,
                 'note'          => $row->note ? $row->note : '',
+                'type'          => $row->getTable(),
+                'total'         => number_format($row->total,2,',','.'),
+                'tax'           => number_format($row->tax,2,',','.'),
+                'wtax'          => number_format($row->wtax,2,',','.'),
+            ];
+        }
+
+        foreach($data2 as $row){
+            $list_items = '<ol>';
+
+            foreach($row->fundRequestDetail as $key => $rowdetail){
+                $item_unit = $rowdetail->unit->code;
+                $list_items .= '<li>'.$rowdetail->note.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit.'</li>';
+            }
+
+            $list_items .= '</ol>';
+
+            $details[] = [
+                'id'            => $row->id,
+                'po_code'       => CustomHelper::encrypt($row->code),
+                'po_no'         => $row->code,
+                'post_date'     => date('d/m/Y',strtotime($row->post_date)),
+                'delivery_date' => date('d/m/Y',strtotime($row->required_date)),
+                'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                'list_items'    => $list_items,
+                'note'          => $row->note ? $row->note : '',
+                'type'          => $row->getTable(),
+                'total'         => number_format($row->total,2,',','.'),
+                'tax'           => number_format($row->tax,2,',','.'),
+                'wtax'          => number_format($row->wtax,2,',','.'),
             ];
         }
 
         return response()->json($details);
+    }
+
+    public function getAccountData(Request $request){
+        $details = [];
+
+        if($request->arr_type){
+            foreach($request->arr_type as $key => $row){
+                if($row == 'purchase_orders'){
+                    $data = PurchaseOrder::find($request->arr_id[$key]);
+                    $list_items = '<ol>';
+
+                    foreach($data->purchaseOrderDetail as $key => $rowdetail){
+                        $item_code = $rowdetail->item()->exists() ? $rowdetail->item->code : ($rowdetail->coa()->exists() ? $rowdetail->coa->code : '');
+                        $item_name = $rowdetail->item()->exists() ? $rowdetail->item->name : ($rowdetail->coa()->exists() ? $rowdetail->coa->name : '');
+                        $item_unit = $rowdetail->item()->exists() ? $rowdetail->itemUnit->unit->code : '-';
+                        $list_items .= '<li>'.$item_code.' - '.$item_name.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit.'</li>';
+                    }
+
+                    $list_items .= '</ol>';
+
+                    $details[] = [
+                        'id'            => $data->id,
+                        'po_code'       => CustomHelper::encrypt($data->code),
+                        'po_no'         => $data->code,
+                        'post_date'     => date('d/m/Y',strtotime($data->post_date)),
+                        'delivery_date' => date('d/m/Y',strtotime($data->delivery_date)),
+                        'grandtotal'    => number_format($data->grandtotal,2,',','.'),
+                        'list_items'    => $list_items,
+                        'note'          => $data->note ? $data->note : '',
+                        'type'          => $data->getTable(),
+                        'total'         => number_format($data->total,2,',','.'),
+                        'tax'           => number_format($data->tax,2,',','.'),
+                        'wtax'          => number_format($data->wtax,2,',','.'),
+                    ];
+                }elseif($row == 'fund_requests'){
+                    $data = FundRequest::find($request->arr_id[$key]);
+                    $list_items = '<ol>';
+
+                    foreach($data->fundRequestDetail as $key => $rowdetail){
+                        $item_unit = $rowdetail->unit->code;
+                        $list_items .= '<li>'.$rowdetail->note.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit.'</li>';
+                    }
+
+                    $list_items .= '</ol>';
+
+                    $details[] = [
+                        'id'            => $data->id,
+                        'po_code'       => CustomHelper::encrypt($data->code),
+                        'po_no'         => $data->code,
+                        'post_date'     => date('d/m/Y',strtotime($data->post_date)),
+                        'delivery_date' => date('d/m/Y',strtotime($data->required_date)),
+                        'grandtotal'    => number_format($data->grandtotal,2,',','.'),
+                        'list_items'    => $list_items,
+                        'note'          => $data->note ? $data->note : '',
+                        'type'          => $data->getTable(),
+                        'total'         => number_format($data->total,2,',','.'),
+                        'tax'           => number_format($data->tax,2,',','.'),
+                        'wtax'          => number_format($data->wtax,2,',','.'),
+                    ];
+                }
+            }
+        }
+        
+        $response['details'] = $details;
+
+        return response()->json($response);
     }
 
     public function datatable(Request $request){
@@ -596,7 +695,8 @@ class PurchaseDownPaymentController extends Controller
                         foreach($request->arr_code as $key => $row){
                             PurchaseDownPaymentDetail::create([
                                 'purchase_down_payment_id'      => $query->id,
-                                'purchase_order_id'             => PurchaseOrder::where('code',CustomHelper::decrypt($row))->first()->id,
+                                'purchase_order_id'             => $request->arr_type[$key] == 'purchase_orders' ? PurchaseOrder::where('code',CustomHelper::decrypt($row))->first()->id : NULL,
+                                'fund_request_id'               => $request->arr_type[$key] == 'fund_requests' ? FundRequest::where('code',CustomHelper::decrypt($row))->first()->id : NULL,
                                 'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
                                 'note'                          => $request->arr_note[$key]
                             ]);
@@ -656,9 +756,9 @@ class PurchaseDownPaymentController extends Controller
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
-                                <th class="center-align">PO No.</th>
+                                <th class="center-align">PO/FR No.</th>
                                 <th class="center-align">Tgl.Post</th>
-                                <th class="center-align">Tgl.Kirim</th>
+                                <th class="center-align">Tgl.Kirim/Tgl.Dipakai</th>
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Total</th>
                                 <th class="center-align">Total DP</th>
@@ -668,17 +768,32 @@ class PurchaseDownPaymentController extends Controller
         $totalnominal=0;
         if(count($data->purchaseDownPaymentDetail) > 0){
             foreach($data->purchaseDownPaymentDetail as $key => $row){
-                $totals+=$row->purchaseOrder->grandtotal;
-                $totalnominal+=$row->nominal;
-                $string .= '<tr>
-                    <td class="center-align">'.($key + 1).'</td>
-                    <td class="center-align">'.$row->purchaseOrder->code.'</td>
-                    <td class="center-align">'.date('d/m/Y',strtotime($row->purchaseOrder->post_date)).'</td>
-                    <td class="center-align">'.date('d/m/Y',strtotime($row->purchaseOrder->delivery_date)).'</td>
-                    <td class="center-align">'.$row->note.'</td>
-                    <td class="right-align">'.number_format($row->purchaseOrder->grandtotal,2,',','.').'</td>
-                    <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
-                </tr>';
+                if($row->purchaseOrder()->exists()){
+                    $totals+=$row->purchaseOrder->grandtotal;
+                    $totalnominal+=$row->nominal;
+                    $string .= '<tr>
+                        <td class="center-align">'.($key + 1).'</td>
+                        <td class="center-align">'.$row->purchaseOrder->code.'</td>
+                        <td class="center-align">'.date('d/m/Y',strtotime($row->purchaseOrder->post_date)).'</td>
+                        <td class="center-align">'.date('d/m/Y',strtotime($row->purchaseOrder->delivery_date)).'</td>
+                        <td class="center-align">'.$row->note.'</td>
+                        <td class="right-align">'.number_format($row->purchaseOrder->grandtotal,2,',','.').'</td>
+                        <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
+                    </tr>';
+                }
+                if($row->fundRequest()->exists()){
+                    $totals+=$row->fundRequest->grandtotal;
+                    $totalnominal+=$row->nominal;
+                    $string .= '<tr>
+                        <td class="center-align">'.($key + 1).'</td>
+                        <td class="center-align">'.$row->fundRequest->code.'</td>
+                        <td class="center-align">'.date('d/m/Y',strtotime($row->fundRequest->post_date)).'</td>
+                        <td class="center-align">'.date('d/m/Y',strtotime($row->fundRequest->required_date)).'</td>
+                        <td class="center-align">'.$row->note.'</td>
+                        <td class="right-align">'.number_format($row->fundRequest->grandtotal,2,',','.').'</td>
+                        <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
+                    </tr>';
+                }
             }
             $string .= '<tr>
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="5"> Total </td>
@@ -786,6 +901,7 @@ class PurchaseDownPaymentController extends Controller
         $pdp['wtax'] = number_format($pdp->wtax,2,',','.');
         $pdp['grandtotal'] = number_format($pdp->grandtotal,2,',','.');
         $pdp['is_include_tax'] = $pdp->is_include_tax ? $pdp->is_include_tax : '0';
+        $pdp['currency_rate'] = number_format($pdp->currency_rate,2,',','.');
 
         $arr = [];
         $arrChecklist = [];
@@ -801,23 +917,31 @@ class PurchaseDownPaymentController extends Controller
 
             $list_items = '<ol>';
 
-            foreach($row->purchaseOrder->purchaseOrderDetail as $key => $rowdetail){
-                $item_code = $rowdetail->item()->exists() ? $rowdetail->item->code : ($rowdetail->coa()->exists() ? $rowdetail->coa->code : '');
-                $item_name = $rowdetail->item()->exists() ? $rowdetail->item->name : ($rowdetail->coa()->exists() ? $rowdetail->coa->name : '');
-                $item_unit = $rowdetail->item()->exists() ? $rowdetail->itemUnit->unit->code : '-';
-                $list_items .= '<li>'.$item_code.' - '.$item_name.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit.'</li>';
+            if($row->purchaseOrder()->exists()){
+                foreach($row->purchaseOrder->purchaseOrderDetail as $key => $rowdetail){
+                    $item_code = $rowdetail->item()->exists() ? $rowdetail->item->code : ($rowdetail->coa()->exists() ? $rowdetail->coa->code : '');
+                    $item_name = $rowdetail->item()->exists() ? $rowdetail->item->name : ($rowdetail->coa()->exists() ? $rowdetail->coa->name : '');
+                    $item_unit = $rowdetail->item()->exists() ? $rowdetail->itemUnit->unit->code : '-';
+                    $list_items .= '<li>'.$item_code.' - '.$item_name.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit.'</li>';
+                }
+            }elseif($row->fundRequest()->exists()){
+                foreach($row->fundRequest->fundRequestDetail as $key => $rowdetail){
+                    $item_unit = $rowdetail->unit->code;
+                    $list_items .= '<li>'.$rowdetail->note.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit.'</li>';
+                }
             }
 
             $list_items .= '</ol>';
 
             $arr[] = [
-                'purchase_order_id'         => $row->purchase_order_id,
-                'purchase_order_code'       => $row->purchaseOrder->code,
-                'purchase_order_encrypt'    => CustomHelper::encrypt($row->purchaseOrder->code),
-                'post_date'                 => date('d/m/Y',strtotime($row->purchaseOrder->post_date)),
-                'delivery_date'             => date('d/m/Y',strtotime($row->purchaseOrder->delivery_date)),
+                'type'                      => $row->purchase_order_id ? $row->purchaseOrder->getTable() : $row->fundRequest->getTable(),
+                'purchase_order_id'         => $row->purchase_order_id ?? $row->fund_request_id,
+                'purchase_order_code'       => $row->purchaseOrder()->exists() ? $row->purchaseOrder->code : $row->fundRequest->code,
+                'purchase_order_encrypt'    => $row->purchaseOrder()->exists() ? CustomHelper::encrypt($row->purchaseOrder->code) : CustomHelper::encrypt($row->fundRequest->code),
+                'post_date'                 => $row->purchaseOrder()->exists() ? date('d/m/Y',strtotime($row->purchaseOrder->post_date)) : date('d/m/Y',strtotime($row->fundRequest->post_date)),
+                'delivery_date'             => $row->purchaseOrder()->exists() ? date('d/m/Y',strtotime($row->purchaseOrder->delivery_date)) : date('d/m/Y',strtotime($row->fundRequest->required_date)),
                 'note'                      => $row->note ? $row->note : '',
-                'total'                     => number_format($row->purchaseOrder->grandtotal,2,',','.'),
+                'total'                     => $row->purchaseOrder()->exists() ? number_format($row->purchaseOrder->grandtotal,2,',','.') : number_format($row->fundRequest->grandtotal,2,',','.'),
                 'total_dp'                  => number_format($row->nominal,2,',','.'),
                 'list_items'                => $list_items,
             ];

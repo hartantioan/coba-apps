@@ -22,16 +22,33 @@ class CloseBill extends Model
         'post_date',
         'note',
         'status',
-        'nominal',
+        'currency_id',
+        'currency_rate',
         'total',
         'tax',
         'wtax',
         'grandtotal',
-        'balance',
         'void_id',
         'void_note',
-        'void_date'
+        'void_date',
+        'delete_id',
+        'delete_note',
     ];
+
+    public function totalOp(){
+        $total = $this->closeBillDetail()->sum('nominal');
+        return $total;
+    }
+
+    public function currency()
+    {
+        return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
+    }
+
+    public function deleteUser()
+    {
+        return $this->belongsTo('App\Models\User', 'delete_id', 'id')->withTrashed();
+    }
 
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
@@ -55,6 +72,11 @@ class CloseBill extends Model
     public function closeBillDetail()
     {
         return $this->hasMany('App\Models\CloseBillDetail');
+    }
+
+    public function closeBillCost()
+    {
+        return $this->hasMany('App\Models\CloseBillCost');
     }
 
     public function status(){
@@ -85,9 +107,11 @@ class CloseBill extends Model
         return $status;
     }
 
-    public static function generateCode($post_date)
+    public static function generateCode($prefix)
     {
-        $query = CloseBill::selectRaw('RIGHT(code, 9) as code')
+        $cek = substr($prefix,0,7);
+        $query = CloseBill::selectRaw('RIGHT(code, 8) as code')
+            ->whereRaw("code LIKE '$cek%'")
             ->withTrashed()
             ->orderByDesc('id')
             ->limit(1)
@@ -96,14 +120,12 @@ class CloseBill extends Model
         if($query->count() > 0) {
             $code = (int)$query[0]->code + 1;
         } else {
-            $code = '000000001';
+            $code = '00000001';
         }
 
-        $no = str_pad($code, 9, 0, STR_PAD_LEFT);
+        $no = str_pad($code, 8, 0, STR_PAD_LEFT);
 
-        $pre = 'CB-'.date('ymd',strtotime($post_date)).'-';
-
-        return $pre.$no;
+        return substr($prefix,0,9).'-'.$no;
     }
 
     public function approval(){
@@ -127,8 +149,6 @@ class CloseBill extends Model
 
         return $ada;
     }
-
-    
 
     public function journal(){
         return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);

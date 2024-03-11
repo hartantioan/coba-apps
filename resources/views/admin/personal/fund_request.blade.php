@@ -466,6 +466,7 @@
             onOpenStart: function(modal,trigger) {
                 $('#post_date').attr('min','{{ $minDate }}');
                 $('#post_date').attr('max','{{ $maxDate }}');
+                $('#required_date').attr('min','{{ date("Y-m-d") }}');
             },
             onOpenEnd: function(modal, trigger) {
                 $('#name').focus();
@@ -793,6 +794,7 @@
 
     function changeDateMinimum(val){
         if(val){
+            $('#required_date').attr("min",val);
             $('input[name^="arr_required_date"]').each(function(){
                 $(this).attr("min",val);
             });
@@ -1354,6 +1356,7 @@
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
                 M.updateTextFields();
+                $('#post_date').trigger('change');
                 /* count(); */
             },
             error: function() {

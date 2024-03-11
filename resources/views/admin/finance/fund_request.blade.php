@@ -393,13 +393,17 @@
             "order": [[0, 'desc']],
             ajax: {
                 url: '{{ Request::url() }}/datatable',
-                type: 'GET',
+                type: 'POST',
+                dataType: 'JSON',
                 data: {
-                    /* 'status[]' : $('#filter_status').val(),
+                    'status[]' : $('#filter_status').val(),
                     document : $('#filter_document').val(),
                     start_date : $('#start_date').val(),
                     finish_date : $('#finish_date').val(),
-                    'modedata' : '{{ $modedata }}', */
+                    'modedata' : '{{ $modedata }}',
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 beforeSend: function() {
                     loadingOpen('#datatable_serverside');

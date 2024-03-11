@@ -2213,7 +2213,7 @@ Route::prefix('admin')->group(function () {
             Route::prefix('finance')->middleware('direct.access')->group(function () {
                 Route::prefix('fund_request')->middleware(['operation.access:fund_request,view','lockacc'])->group(function () {
                     Route::get('/',[FundRequestController::class, 'index']);
-                    Route::get('datatable',[FundRequestController::class, 'datatable']);
+                    Route::post('datatable',[FundRequestController::class, 'datatable']);
                     Route::get('row_detail',[FundRequestController::class, 'rowDetail']);
                     Route::post('show', [FundRequestController::class, 'show']);
                     Route::post('print',[FundRequestController::class, 'print']);

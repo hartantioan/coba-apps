@@ -225,8 +225,8 @@
                                         <option value="1">Tunai</option>
                                         <option value="3">Cek</option>
                                         <option value="4">BG</option>
-                                        {{-- <option value="5">Rekonsiliasi Tanpa Dokumen</option>
-                                        <option value="6">Rekonsiliasi Dengan Dokumen</option> --}}
+                                        <option value="5">Rekonsiliasi Tanpa Dokumen</option>
+                                        <option value="6">Rekonsiliasi Dengan Dokumen</option>
                                     </select>
                                     <label class="" for="payment_type">Tipe Pembayaran</label>
                                 </div>

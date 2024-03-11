@@ -594,7 +594,6 @@
 
     function getRekening(){
         if($('#user_bank_id').val()){
-            alert($('#user_bank_id').select2('data')[0].bank);
             $('#bank_account').val($('#user_bank_id').select2('data')[0].bank);
             $('#no_account').val($('#user_bank_id').select2('data')[0].no);
             $('#name_account').val($('#user_bank_id').select2('data')[0].name);

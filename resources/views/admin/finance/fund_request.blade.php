@@ -395,11 +395,11 @@
                 url: '{{ Request::url() }}/datatable',
                 type: 'GET',
                 data: {
-                    'status[]' : $('#filter_status').val(),
+                    /* 'status[]' : $('#filter_status').val(),
                     document : $('#filter_document').val(),
                     start_date : $('#start_date').val(),
                     finish_date : $('#finish_date').val(),
-                    'modedata' : '{{ $modedata }}',
+                    'modedata' : '{{ $modedata }}', */
                 },
                 beforeSend: function() {
                     loadingOpen('#datatable_serverside');

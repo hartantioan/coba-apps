@@ -794,7 +794,6 @@
 
     function changeDateMinimum(val){
         if(val){
-            $('#required_date').attr("min",val);
             $('input[name^="arr_required_date"]').each(function(){
                 $(this).attr("min",val);
             });

@@ -182,7 +182,7 @@
                                     <label class="active" for="post_date">Tgl. Posting</label>
                                 </div>
                                 <div class="input-field col m3 s12">
-                                    <input id="required_date" name="required_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d', strtotime('12/31')) }}" type="date" placeholder="Tgl. posting">
+                                    <input id="required_date" name="required_date" max="{{ date('Y-m-d', strtotime('12/31')) }}" type="date" placeholder="Tgl. posting">
                                     <label class="active" for="required_date">Tgl. Request Pembayaran</label>
                                 </div>
                                 <div class="file-field input-field col m3 s12">

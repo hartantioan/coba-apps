@@ -478,7 +478,7 @@
                                         <tbody id="body-item">
                                             <tr id="last-row-item">
                                                 <td colspan="23">
-                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
+                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" id="button-add-item" onclick="addItem()" href="javascript:void(0);">
                                                         <i class="material-icons left">add</i> New Item
                                                     </a>
                                                 </td>
@@ -813,6 +813,7 @@
                 };
                 mode = '';
                 $('.other-type').hide();
+                $('#button-add-item').show();
             }
         });
 
@@ -1673,6 +1674,7 @@
                     }
                     M.updateTextFields();
                     $('#purchase_request_id,#good_issue_id,#marketing_order_delivery_process_id').empty();
+                    $('#button-add-item').hide();
                 },
                 error: function() {
                     $('.modal-content').scrollTop(0);
@@ -2028,7 +2030,7 @@
                 countAll();
                 if($('.row_item').length == 0){
                     mode = '';
-                    $('#pr-show,#gi-show,#sj-show').show();
+                    $('#pr-show,#gi-show,#button-add-item').show();
                 }
             },
             error: function() {
@@ -2459,7 +2461,11 @@
                     $('.row_item').each(function(){
                         $(this).remove();
                     });
-
+                    if(response.inventory_type == '1'){
+                        $('#button-add-item').hide();
+                    }else if(response.inventory_type == '2'){
+                        $('#button-add-item').show();
+                    }
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
                         if(response.inventory_type == '1'){

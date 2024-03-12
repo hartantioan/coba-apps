@@ -231,10 +231,6 @@
                 </tr>
                 <tr>
                     <th class="center-align">Coa</th>
-                    <th class="center-align">Total</th>
-                    <th class="center-align">Total PPN</th>
-                    <th class="center-align">Total PPh</th>
-                    <th class="center-align">Grandtotal</th>
                     <th class="center-align">Dist.Biaya</th>
                     <th class="center-align">Plant</th>
                     <th class="center-align">Line</th>
@@ -243,16 +239,16 @@
                     <th class="center-align">Proyek</th>
                     <th class="center-align">Ket.1</th>
                     <th class="center-align">Ket.2</th>
+                    <th class="center-align">Debit FC</th>
+                    <th class="center-align">Kredit FC</th>
+                    <th class="center-align">Debit Rp</th>
+                    <th class="center-align">Kredit Rp</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($data->closeBillCost as $key => $row)
                 <tr>
                     <td class="">{{ $row->coa->code.' - '.$row->coa->name }}</td>
-                    <td class="right-align">{{ number_format($row->total,2,',','.') }}</td>
-                    <td class="right-align">{{ number_format($row->tax,2,',','.') }}</td>
-                    <td class="right-align">{{ number_format($row->wtax,2,',','.') }}</td>
-                    <td class="right-align">{{ number_format($row->grandtotal,2,',','.') }}</td>
                     <td class="">{{ ($row->costDistribution()->exists() ? $row->costDistribution->code.' - '.$row->costDistribution->name : '-') }}</td>
                     <td class="">{{ ($row->place()->exists() ? $row->place->code : '-') }}</td>
                     <td class="">{{ ($row->line()->exists() ? $row->line->code : '-') }}</td>
@@ -261,6 +257,10 @@
                     <td class="">{{ ($row->project()->exists() ? $row->project->name : '-') }}</td>
                     <td class="">{{ $row->note }}</td>
                     <td class="">{{ $row->note2 }}</td>
+                    <td class="right-align">{{ number_format($row->nominal_debit_fc,2,',','.') }}</td>
+                    <td class="right-align">{{ number_format($row->nominal_credit_fc,2,',','.') }}</td>
+                    <td class="right-align">{{ number_format($row->nominal_debit,2,',','.') }}</td>
+                    <td class="right-align">{{ number_format($row->nominal_credit,2,',','.') }}</td>
                 </tr>
                 @endforeach
             </tbody>

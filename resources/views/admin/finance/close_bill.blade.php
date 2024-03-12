@@ -1096,6 +1096,7 @@
                 </td>
                 <td class="center">
                     <select class="browser-default" id="arr_division` + count + `" name="arr_division[]">
+                        <option value="">--Kosong--</option>
                         @foreach ($division as $row)
                             <option value="{{ $row->id }}">{{ $row->name }}</option>
                         @endforeach
@@ -1157,7 +1158,6 @@
                 (conversion >= 0 ? '' : '-') + formatRupiahIni(conversion.toFixed(2).toString().replace('.',','))
             );
             grandtotal += rowtotal;
-            balance -= rowtotal;
         });
 
         $('input[name^="arr_nominal_credit_fc[]"]').each(function(index){
@@ -1167,8 +1167,9 @@
                 (conversion >= 0 ? '' : '-') + formatRupiahIni(conversion.toFixed(2).toString().replace('.',','))
             );
             grandtotal -= rowtotal;
-            balance -= rowtotal;
         });
+
+        balance = balance - grandtotal;
 
         $('#grandtotal').text(
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
@@ -1290,6 +1291,8 @@
                 }else{
                     $('#modal1').modal('open');
                     $('#temp').val(id);
+                    $('#code').val(response.code);
+                    $('#code_place_id').val(response.code_place_id).formSelect();
                     $('#company_id').val(response.company_id).formSelect();
                     $('#post_date').val(response.post_date);
                     $('#note').val(response.note);
@@ -1346,40 +1349,6 @@
                                         <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                                     </td>
                                     <td class="center">
-                                        <input class="browser-default" type="text" name="arr_total[]" onfocus="emptyThis(this);" value="` + val.total + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
-                                    </td>
-                                    <td class="center">
-                                        <select class="browser-default" id="arr_percent_tax` + count + `" name="arr_percent_tax[]" data-id="` + count + `" onchange="countAll();">
-                                            <option value="0.00000" data-id="">-- Non-PPN --</option>
-                                            @foreach ($tax as $row1)
-                                                <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td class="center">
-                                        <select class="browser-default" id="arr_include_tax` + count + `" name="arr_include_tax[]" data-id="` + count + `" onchange="countAll();">
-                                            <option value="0">Tidak</option>
-                                            <option value="1">Ya</option>
-                                        </select>
-                                    </td>
-                                    <td class="center">
-                                        <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
-                                            <option value="0.00000" data-id="">-- Non-PPh --</option>
-                                            @foreach ($wtax as $row2)
-                                                <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td class="right-align">
-                                        <input class="browser-default" type="text" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `" onkeyup="formatRupiah(this);" readonly>
-                                    </td>
-                                    <td class="right-align">
-                                        <input class="browser-default" type="text" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `" onkeyup="formatRupiah(this);" readonly>
-                                    </td>
-                                    <td class="right-align">
-                                        <input class="browser-default" type="text" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `" onkeyup="formatRupiah(this);" readonly>
-                                    </td>
-                                    <td class="center">
                                         <select class="browser-default" id="arr_cost_distribution_cost` + count + `" name="arr_cost_distribution_cost[]"></select> 
                                     </td>
                                     <td class="center">
@@ -1407,6 +1376,7 @@
                                     </td>
                                     <td class="center">
                                         <select class="browser-default" id="arr_division` + count + `" name="arr_division[]">
+                                            <option value="">--Kosong--</option>
                                             @foreach ($division as $row)
                                                 <option value="{{ $row->id }}">{{ $row->name }}</option>
                                             @endforeach
@@ -1420,6 +1390,18 @@
                                     </td>
                                     <td>
                                         <input type="text" name="arr_note2[]" placeholder="Keterangan 2..." value="` + val.note2 + `" data-id="` + count + `">
+                                    </td>
+                                    <td class="center">
+                                        <input class="browser-default" type="text" name="arr_nominal_debit_fc[]" value="` + val.nominal_debit_fc + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                                    </td>
+                                    <td class="right-align">
+                                        <input class="browser-default" type="text" name="arr_nominal_credit_fc[]" value="` + val.nominal_credit_fc + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                                    </td>
+                                    <td class="right-align">
+                                        <input class="browser-default" type="text" name="arr_nominal_debit[]" value="` + val.nominal_debit + `" data-id="` + count + `" onkeyup="formatRupiah(this);" readonly>
+                                    </td>
+                                    <td class="right-align">
+                                        <input class="browser-default" type="text" name="arr_nominal_credit[]" value="` + val.nominal_credit + `" data-id="` + count + `" onkeyup="formatRupiah(this);" readonly>
                                     </td>
                                     <td class="center">
                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
@@ -1456,9 +1438,6 @@
                         });
                     }
 
-                    $('#total').text(response.total);
-                    $('#tax').text(response.tax);
-                    $('#wtax').text(response.wtax);
                     $('#grandtotal').text(response.grandtotal);
                     $('#total_op').text(response.total_op);
                     $('#balance').text(response.balance);
@@ -1503,13 +1482,11 @@
                 formData.delete("arr_cost_distribution_cost[]");
                 formData.delete("arr_project[]");
                 let passed = true;
-                $('select[name^="arr_percent_tax[]"]').each(function(index){
-                    if(!$('select[name^="arr_coa[]"]').eq(index).val() || !$('input[name^="arr_total[]"]').eq(index).val() || !$('input[name^="arr_grandtotal[]"]').eq(index).val()){
+                $('select[name^="arr_coa[]"]').each(function(index){
+                    if(!$(this).val() || !$('input[name^="arr_nominal_debit_fc[]"]').eq(index).val() || !$('input[name^="arr_nominal_credit_fc[]"]').eq(index).val()){
                         passed = false;
                     }
-                    formData.append('arr_coa[]',$('select[name^="arr_coa[]"]').eq(index).val());
-                    formData.append('arr_tax_id[]',$(this).find(':selected').data('id'));
-                    formData.append('arr_wtax_id[]',$('select[name^="arr_percent_wtax[]"]').eq(index).find(':selected').data('id'));
+                    formData.append('arr_coa[]',$(this).val());
                     formData.append('arr_project[]',($('select[name^="arr_project[]"]').eq(index).val() ? $('select[name^="arr_project[]"]').eq(index).val() : ''));
                     formData.append('arr_cost_distribution_cost[]',($('select[name^="arr_cost_distribution_cost[]"]').eq(index).val() ? $('select[name^="arr_cost_distribution_cost[]"]').eq(index).val() : ''));
                 });

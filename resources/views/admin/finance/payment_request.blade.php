@@ -554,8 +554,20 @@
                             </div>
                             <div class="input-field col m3 s12">
                                 <input type="hidden" id="tempPay" name="tempPay">
-                                <input id="pay_date_pay" name="pay_date_pay" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. bayar" onchange="changeDateMinimumPay(this.value);">
+                                <input id="pay_date_pay" name="pay_date_pay" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. bayar">
                                 <label class="active" for="pay_date_pay">Tgl. Bayar</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <select class="form-control" id="currency_id_pay" name="currency_id_pay">
+                                    @foreach ($currency as $row)
+                                        <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
+                                    @endforeach
+                                </select>
+                                <label class="" for="currency_id_pay">Mata Uang</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="currency_rate_pay" name="currency_rate_pay" type="text" value="1" onkeyup="formatRupiah(this);convertBalance();">
+                                <label class="active" for="currency_rate_pay">Konversi</label>
                             </div>
                             <div class="file-field input-field col m3 s12">
                                 <div class="btn">
@@ -1221,6 +1233,15 @@
     String.prototype.replaceAt = function(index, replacement) {
         return this.substring(0, index) + replacement + this.substring(index + replacement.length);
     };
+
+    function convertBalance(){
+        let currency_rate = parseFloat($('#currency_rate_pay').val().replaceAll(".", "").replaceAll(",","."));
+        let realBalance = parseFloat($('#real-balance').text().replaceAll(".", "").replaceAll(",","."));
+        let convertBalance = currency_rate * realBalance;
+        $('#convert-balance').text(
+            (convertBalance >= 0 ? '' : '-') + formatRupiahIni(convertBalance.toFixed(2).toString().replace('.',','))
+        );
+    }
 
     function getCode(val){
         if(val){
@@ -3171,6 +3192,8 @@
                     $('#modal3').modal('open');
                     $('#tempPay').val(code);
                     $('#pay_date_pay').val(response.data.pay_date);
+                    $('#currency_id_pay').val(response.data.currency_id).formSelect();
+                    $('#currency_rate_pay').val(response.data.currency_rate);
                     $('#notePay').val(response.data.note);
                     $('.modal-content').scrollTop(0);
                     M.updateTextFields();

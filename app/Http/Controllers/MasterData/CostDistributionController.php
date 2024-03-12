@@ -13,6 +13,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use App\Models\CostDistribution;
 use App\Models\CostDistributionDetail;
+use App\Models\Division;
 use Illuminate\Support\Facades\DB;
 
 class CostDistributionController extends Controller
@@ -24,7 +25,7 @@ class CostDistributionController extends Controller
             'content'       => 'admin.master_data.cost_distribution',
             'place'         => Place::where('status','1')->get(),
             'line'          => Line::where('status','1')->get(),
-            'department'    => Department::where('status','1')->get(),
+            'department'    => Division::where('status','1')->get(),
             'machine'       => Machine::where('status','1')->get(),
         ];
 

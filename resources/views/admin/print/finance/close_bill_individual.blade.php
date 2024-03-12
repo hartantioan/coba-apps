@@ -303,32 +303,32 @@
                                 </tr>
                                 <tr>
                                     <th align="center">Coa</th>
-                                    <th align="center">Total</th>
-                                    <th align="center">Total PPN</th>
-                                    <th align="center">Total PPh</th>
-                                    <th align="center">Grandtotal</th>
                                     <th align="center">Dist.Biaya</th>
                                     <th align="center">Plant</th>
                                     <th align="center">Line</th>
                                     <th align="center">Mesin</th>
                                     <th align="center">Divisi</th>
                                     <th align="center">Proyek</th>
+                                    <th align="center">Debit FC</th>
+                                    <th align="center">Kredit FC</th>
+                                    <th align="center">Debit Rp</th>
+                                    <th align="center">Kredit Rp</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($data->closeBillCost as $key => $row)
                                 <tr>
                                     <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
-                                    <td align="right">{{ number_format($row->total,2,',','.') }}</td>
-                                    <td align="right">{{ number_format($row->tax,2,',','.') }}</td>
-                                    <td align="right">{{ number_format($row->wtax,2,',','.') }}</td>
-                                    <td align="right">{{ number_format($row->grandtotal,2,',','.') }}</td>
                                     <td>{{ ($row->costDistribution()->exists() ? $row->costDistribution->code.' - '.$row->costDistribution->name : '-') }}</td>
                                     <td>{{ ($row->place()->exists() ? $row->place->code : '-') }}</td>
                                     <td>{{ ($row->line()->exists() ? $row->line->code : '-') }}</td>
                                     <td>{{ ($row->machine()->exists() ? $row->machine->name : '-') }}</td>
                                     <td>{{ ($row->division()->exists() ? $row->division->code : '-') }}</td>
                                     <td>{{ ($row->project()->exists() ? $row->project->name : '-') }}</td>
+                                    <td align="right">{{ number_format($row->nominal_debit_fc,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->nominal_credit_fc,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->nominal_debit,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->nominal_credit,2,',','.') }}</td>
                                 </tr>
                                 <tr>
                                     <td colspan="11">Ket 1 : {{ $row->note }}</td>

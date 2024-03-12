@@ -47,7 +47,7 @@ class GoodReturnPODetail extends Model
 
     public function getRowTotal(){
         $total = 0;
-        $rowprice = round($this->goodReceiptDetail->total / $this->goodReceiptDetail->qty,2);
+        $rowprice = $this->goodReceiptDetail->total / $this->goodReceiptDetail->qty;
 
         $total = $rowprice * $this->qty;
 

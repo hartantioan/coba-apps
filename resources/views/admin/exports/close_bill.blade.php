@@ -9,10 +9,6 @@
             <th>Keterangan</th>
             <th>Status</th>
             <th>Coa</th>
-            <th>Total</th>
-            <th>PPN</th>
-            <th>PPh</th>
-            <th>Grandtotal</th>
             <th>Dist.Biaya</th>
             <th>Plant</th>
             <th>Line</th>
@@ -21,6 +17,10 @@
             <th>Proyek</th>
             <th>Ket.1</th>
             <th>Ket.2</th>
+            <th>Debit FC</th>
+            <th>Kredit FC</th>
+            <th>Debit Rp</th>
+            <th>Kredit Rp</th>
         </tr>
     </thead>
     <tbody>
@@ -35,10 +35,6 @@
                 <td>{{ $row->note }}</td>
                 <td>{!! $row->status() !!}</td>
                 <td>{{ $rowdetail->coa->code.' - '.$rowdetail->coa->name }}</td>
-                <td>{{ number_format($rowdetail->total,2,',','.') }}</td>
-                <td>{{ number_format($rowdetail->tax,2,',','.') }}</td>
-                <td>{{ number_format($rowdetail->wtax,2,',','.') }}</td>
-                <td>{{ number_format($rowdetail->grandtotal,2,',','.') }}</td>
                 <td>{{ ($rowdetail->costDistribution()->exists() ? $rowdetail->costDistribution->code.' - '.$rowdetail->costDistribution->name : '-') }}</td>
                 <td>{{ ($rowdetail->place()->exists() ? $rowdetail->place->code : '-') }}</td>
                 <td>{{ ($rowdetail->line()->exists() ? $rowdetail->line->code : '-') }}</td>
@@ -47,6 +43,10 @@
                 <td>{{ ($rowdetail->project()->exists() ? $rowdetail->project->name : '-') }}</td>
                 <td>{{ $rowdetail->note }}</td>
                 <td>{{ $rowdetail->note2 }}</td>
+                <td>{{ number_format($rowdetail->nominal_debit_fc,2,',','.') }}</td>
+                <td>{{ number_format($rowdetail->nominal_credit_fc,2,',','.') }}</td>
+                <td>{{ number_format($rowdetail->nominal_debit,2,',','.') }}</td>
+                <td>{{ number_format($rowdetail->nominal_credit,2,',','.') }}</td>
             </tr>
             @endforeach
         @endforeach

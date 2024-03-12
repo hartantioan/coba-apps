@@ -391,10 +391,6 @@ class CloseBillController extends Controller
                             </tr>
                             <tr>
                                 <th class="center-align">Coa</th>
-                                <th class="center-align">Total</th>
-                                <th class="center-align">Total PPN</th>
-                                <th class="center-align">Total PPh</th>
-                                <th class="center-align">Grandtotal</th>
                                 <th class="center-align">Dist.Biaya</th>
                                 <th class="center-align">Plant</th>
                                 <th class="center-align">Line</th>
@@ -403,16 +399,16 @@ class CloseBillController extends Controller
                                 <th class="center-align">Proyek</th>
                                 <th class="center-align">Ket.1</th>
                                 <th class="center-align">Ket.2</th>
+                                <th class="center-align">Debit FC</th>
+                                <th class="center-align">Kredit FC</th>
+                                <th class="center-align">Debit Rp</th>
+                                <th class="center-align">Kredit Rp</th>
                             </tr>
                         </thead><tbody>';
 
         foreach($data->closeBillCost as $key => $row){
             $string .= '<tr>
                 <td class="">'.$row->coa->code.' - '.$row->coa->name.'</td>
-                <td class="right-align">'.number_format($row->total,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->wtax,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->grandtotal,2,',','.').'</td>
                 <td class="">'.($row->costDistribution()->exists() ? $row->costDistribution->code.' - '.$row->costDistribution->name : '-').'</td>
                 <td class="">'.($row->place()->exists() ? $row->place->code : '-').'</td>
                 <td class="">'.($row->line()->exists() ? $row->line->code : '-').'</td>
@@ -421,6 +417,10 @@ class CloseBillController extends Controller
                 <td class="">'.($row->project()->exists() ? $row->project->name : '-').'</td>
                 <td class="">'.$row->note.'</td>
                 <td class="">'.$row->note2.'</td>
+                <td class="right-align">'.number_format($row->nominal_debit_fc,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->nominal_credit_fc,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->nominal_debit,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->nominal_credit,2,',','.').'</td>
             </tr>';
         }
         
@@ -507,11 +507,9 @@ class CloseBillController extends Controller
     public function show(Request $request){
         $cb = CloseBill::where('code',CustomHelper::decrypt($request->id))->first();
         $total_op = $cb->totalOp();
+        $cb['code_place_id'] = substr($cb->code,7,2);
         $cb['balance'] = number_format($total_op - $cb->grandtotal,2,',','.');
         $cb['total_op'] = number_format($total_op,2,',','.');
-        $cb['total'] = number_format($cb->total,2,',','.');
-        $cb['tax'] = number_format($cb->tax,2,',','.');
-        $cb['wtax'] = number_format($cb->wtax,2,',','.');
         $cb['grandtotal'] = number_format($cb->grandtotal,2,',','.');
         $cb['currency_rate'] = number_format($cb->currency_rate,2,',','.');
 
@@ -538,13 +536,6 @@ class CloseBillController extends Controller
             $costs[] = [
                 'coa_id'                => $row->coa_id,
                 'coa_name'              => $row->coa->code.' - '.$row->coa->name,
-                'total'                 => number_format($row->total,2,',','.'),
-                'percent_tax'           => $row->percent_tax,
-                'percent_wtax'          => $row->percent_wtax,
-                'include_tax'           => $row->is_include_tax,
-                'tax'                   => number_format($row->tax,2,',','.'),
-                'wtax'                  => number_format($row->wtax,2,',','.'),
-                'grandtotal'            => number_format($row->grandtotal,2,',','.'),
                 'cost_distribution_id'  => $row->cost_distribution_id ?? '',
                 'cost_distribution_name'=> $row->cost_distribution_id ? $row->costDistribution->code.' - '.$row->costDistribution->name : '',
                 'place_id'              => $row->place_id ?? '',
@@ -553,8 +544,12 @@ class CloseBillController extends Controller
                 'division_id'           => $row->division_id ?? '',
                 'project_id'            => $row->project_id ?? '',
                 'project_name'          => $row->project_id ? $row->project->code.' - '.$row->project->name : '',
-                'note'                  => $row->note,
-                'note2'                 => $row->note2,
+                'nominal_debit'         => number_format($row->nominal_debit,2,',','.'),
+                'nominal_credit'        => number_format($row->nominal_credit,2,',','.'),
+                'nominal_debit_fc'      => number_format($row->nominal_debit_fc,2,',','.'),
+                'nominal_credit_fc'     => number_format($row->nominal_credit_fc,2,',','.'),
+                'note'                  => $row->note ? $row->note : '',
+                'note2'                 => $row->note2 ? $row->note2 : '',
             ];
         }
 
@@ -580,8 +575,6 @@ class CloseBillController extends Controller
             'arr_id'                => 'required|array',
             'arr_coa'               => 'required|array',
             'arr_nominal'           => 'required|array',
-            'arr_total'             => 'required|array',
-            'arr_grandtotal'        => 'required|array',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
             'code_place_id.required'            => 'Plant Tidak boleh kosong',
@@ -595,10 +588,6 @@ class CloseBillController extends Controller
             'arr_id.array'                      => 'ID harus array.',
             'arr_nominal.required'              => 'Nominal OP tidak boleh kosong.',
             'arr_nominal.array'                 => 'Nominal OP harus array.',
-            'arr_total.required'                => 'Total tidak boleh kosong.',
-            'arr_total.array'                   => 'Total harus array.',
-            'arr_grandtotal.required'           => 'Grandtotal tidak boleh kosong.',
-            'arr_grandtotal.array'              => 'Grandtotal harus array.',
 		]);
 
         if($validation->fails()) {
@@ -611,9 +600,6 @@ class CloseBillController extends Controller
             DB::beginTransaction();
             try {
 
-                $total = 0;
-                $tax = 0;
-                $wtax = 0;
                 $grandtotal = 0;
                 $op = 0;
 
@@ -623,12 +609,12 @@ class CloseBillController extends Controller
                     }
                 }
 
-                if($request->arr_total){
-                    foreach($request->arr_total as $key => $row){
-                        $total += str_replace(',','.',str_replace('.','',$row));
-                        $tax += str_replace(',','.',str_replace('.','',$request->arr_tax[$key]));
-                        $wtax += str_replace(',','.',str_replace('.','',$request->arr_wtax[$key]));
-                        $grandtotal += str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key]));
+                if($request->arr_nominal_debit_fc){
+                    foreach($request->arr_nominal_debit_fc as $key => $row){
+                        $grandtotal += str_replace(',','.',str_replace('.','',$request->arr_nominal_debit_fc[$key]));
+                    }
+                    foreach($request->arr_nominal_credit_fc as $key => $row){
+                        $grandtotal -= str_replace(',','.',str_replace('.','',$request->arr_nominal_credit_fc[$key]));
                     }
                 }
 
@@ -678,10 +664,7 @@ class CloseBillController extends Controller
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                         $query->note = $request->note;
                         $query->status = '1';
-                        $query->total = $total;
-                        $query->tax = $tax;
-                        $query->wtax = $wtax;
-                        $query->grandtotal = $grandtotal;
+                        $query->grandtotal = $op;
 
                         $query->save();
 
@@ -708,10 +691,7 @@ class CloseBillController extends Controller
                         'status'                    => '1',
                         'currency_id'               => $request->currency_id,
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
-                        'total'                     => $total,
-                        'tax'                       => $tax,
-                        'wtax'                      => $wtax,
-                        'grandtotal'                => $grandtotal,
+                        'grandtotal'                => $op,
                     ]);
                 }
                 
@@ -738,15 +718,12 @@ class CloseBillController extends Controller
                             'machine_id'                    => $request->arr_machine[$key] ?? NULL,
                             'division_id'                   => $request->arr_division[$key] ?? NULL,
                             'project_id'                    => $request->arr_project[$key] ?? NULL,
-                            'total'                         => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
-                            'tax_id'                        => $request->arr_tax_id[$key] ?? NULL,
-                            'percent_tax'                   => $request->arr_percent_tax[$key] ?? NULL,
-                            'is_include_tax'                => $request->arr_include_tax[$key] ?? NULL,
-                            'wtax_id'                       => $request->arr_wtax_id[$key] ?? NULL,
-                            'percent_wtax'                  => $request->arr_percent_wtax[$key] ?? NULL,
-                            'tax'                           => str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),
-                            'wtax'                          => str_replace(',','.',str_replace('.','',$request->arr_wtax[$key])),
-                            'grandtotal'                    => str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key])),
+                            'nominal_debit'                 => str_replace(',','.',str_replace('.','',$request->arr_nominal_debit[$key])),
+                            'nominal_credit'                => str_replace(',','.',str_replace('.','',$request->arr_nominal_credit[$key])),
+                            'nominal_debit_fc'              => str_replace(',','.',str_replace('.','',$request->arr_nominal_debit_fc
+                            [$key])),
+                            'nominal_credit_fc'             => str_replace(',','.',str_replace('.','',$request->arr_nominal_credit_fc
+                            [$key])),
                             'note'                          => $request->arr_note[$key] ?? NULL,
                             'note2'                         => $request->arr_note2[$key] ?? NULL,
                         ]);

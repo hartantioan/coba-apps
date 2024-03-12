@@ -359,7 +359,7 @@ class PaymentRequestController extends Controller
 
         $payments = [];
 
-        /* if($data->type == '1'){
+        if($data->type == '1'){
             $op = OutgoingPayment::where('account_id',$data->id)
             ->whereIn('status',['2','3'])
             ->whereHas('paymentRequest',function($query){
@@ -404,7 +404,7 @@ class PaymentRequestController extends Controller
                     ];
                 }
             }
-        } */
+        }
 
         $data['payments'] = $payments;
 
@@ -543,7 +543,7 @@ class PaymentRequestController extends Controller
         $details = [];
         $payments = [];
 
-        /* if($request->arr_op_id){
+        if($request->arr_op_id){
             foreach($request->arr_op_id as $key => $row){
                 $op = OutgoingPayment::find(intval($row));
                 if($op){
@@ -568,7 +568,7 @@ class PaymentRequestController extends Controller
                     }
                 }
             }
-        } */
+        }
 
         $user['payments'] = $payments;
 
@@ -1826,12 +1826,16 @@ class PaymentRequestController extends Controller
 
         if($data){
             if(!$data->used()->exists() && !$data->outgoingPayment()->exists()){
+                $currency_rate = $data->currency_rate;
+
+                $data['currency_rate'] = number_format($data->currency_rate,2,',','.');
+
                 CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Payment Request (Payment Request)');
 
                 $html = '<div class="row pt-1 pb-1"><div class="col s12"><table>
                         <thead>
                             <tr>
-                                <th class="" colspan="13"><h6>Mata Uang : '.$data->currency->code.', Konversi = '.number_format($data->currency_rate,2,',','.').', Bayar dengan <b>'.$data->coaSource->name.'</b>, Sisa Tagihan <b>'.$data->currency->symbol.' '.number_format($data->balance,2,',','.').'</b></h6></th>
+                                <th class="" colspan="13"><h6>Mata Uang : '.$data->currency->code.', Konversi = '.$data->currency_rate.', Bayar dengan <b>'.$data->coaSource->name.'</b>, Sisa Tagihan <b>'.$data->currency->symbol.' <b id="real-balance">'.number_format($data->balance,2,',','.').'</b></b> Tagihan dalam Rupiah = <b id="convert-balance">'.number_format($data->balance * $currency_rate,2,',','.').'</b></h6></th>
                             </tr>
                             <tr>
                                 <th class="center-align" colspan="13">Daftar Item</th>
@@ -1979,12 +1983,16 @@ class PaymentRequestController extends Controller
         $validation = Validator::make($request->all(), [
             'codePay'			        => 'required|string|min:18|unique:outgoing_payments,code',
             'pay_date_pay'              => 'required',
+            'currency_id_pay'           => 'required',
+            'currency_rate_pay'         => 'required',
 		], [
             'codePay.required' 	        => 'Kode tidak boleh kosong.',
             'codePay.string'            => 'Kode harus dalam bentuk string.',
             'codePay.min'               => 'Kode harus minimal 18 karakter.',
             'codePay.unique'            => 'Kode telah dipakai.',
             'pay_date_pay.required'     => 'Tanggal bayar tidak boleh kosong.',
+            'currency_id_pay.required'  => 'Mata uang tidak boleh kosong.',
+            'currency_rate_pay.required'=> 'Konversi mata uang tidak boleh kosong.',
 		]);
 
         if($validation->fails()) {
@@ -2008,8 +2016,8 @@ class PaymentRequestController extends Controller
                         'coa_source_id'             => $cek->coa_source_id,
                         'post_date'                 => date('Y-m-d'),
                         'pay_date'                  => $request->pay_date_pay,
-                        'currency_id'               => $cek->currency_id,
-                        'currency_rate'             => $cek->currency_rate,
+                        'currency_id'               => $request->currency_id_pay,
+                        'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate_pay)),
                         'cost_distribution_id'      => $cek->cost_distribution_id ? $cek->cost_distribution_id : NULL,
                         'total'                     => $cek->total,
                         'rounding'                  => $cek->rounding,

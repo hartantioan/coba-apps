@@ -2919,7 +2919,7 @@ class CustomHelper {
 
 			foreach($cb->closeBillCost as $row){
 				if($row->cost_distribution_id){
-					$total = $row->total;
+					$total = $row->nominal_debit_fc > 0 ? $row->nominal_debit_fc : $row->nominal_credit_fc;
 					$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
 					$accumulation = 0;
 					foreach($row->costDistribution->costDistributionDetail as $key => $rowcost){
@@ -2933,13 +2933,13 @@ class CustomHelper {
 							'journal_id'                    => $query->id,
 							'cost_distribution_detail_id'   => $rowcost->id,
 							'coa_id'                        => $row->coa_id,
-							'place_id'                      => $rowcost->place_id ? $rowcost->place_id : NULL,
-							'line_id'                       => $rowcost->line_id ? $rowcost->line_id : NULL,
-							'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : NULL,
-							'department_id'                 => $rowcost->department_id ? $rowcost->department_id : NULL,
+							'place_id'                      => $rowcost->place_id ? $rowcost->place_id : $row->place_id,
+							'line_id'                       => $rowcost->line_id ? $rowcost->line_id : $row->line_id,
+							'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : $row->machine_id,
+							'department_id'                 => $rowcost->department_id ? $rowcost->department_id : $row->division_id,
 							'project_id'					=> $row->project_id ? $row->project_id : NULL,
-							'type'                          => '1',
-							'nominal'                       => floatval($nominal * $cb->currency_rate),
+							'type'                          => $row->nominal_debit_fc > 0 ? '1' : '2',
+							'nominal'                       => floatval($nominal),
 							'nominal_fc'					=> $cb->currency->type == '1' || $cb->currency->type == '' ? floatval($nominal * $cb->currency_rate) : floatval($nominal),
 							'note'							=> $row->note,
 							'note2'							=> $row->note2,
@@ -2952,35 +2952,13 @@ class CustomHelper {
 						'place_id'		=> $row->place_id,
 						'line_id'		=> $row->line_id ? $row->line_id : NULL,
 						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
-						'department_id'	=> $row->division_id,
+						'department_id'	=> $row->division_id ? $row->division_id : NULL,
 						'project_id'	=> $row->project_id ? $row->project_id : NULL,
-						'type'			=> '1',
-						'nominal'		=> $row->total * $cb->currency_rate,
-						'nominal_fc'	=> $cb->currency->type == '1' || $cb->currency->type == '' ? $row->total * $cb->currency_rate : $row->grandtotal,
+						'type'			=> $row->nominal_debit_fc > 0 ? '1' : '2',
+						'nominal'		=> $row->nominal_debit > 0 ? $row->nominal_debit : $row->nominal_credit,
+						'nominal_fc'	=> $row->nominal_debit_fc > 0 ? $row->nominal_debit_fc : $row->nominal_credit_fc,
 						'note'			=> $row->note,
 						'note2'			=> $row->note2,
-					]);
-				}
-
-				if($row->tax_id){
-					JournalDetail::create([
-						'journal_id'	=> $query->id,
-						'coa_id'		=> $row->taxMaster->coa_purchase_id,
-						'place_id'		=> $row->place_id ? $row->place_id : NULL,
-						'type'			=> '1',
-						'nominal'		=> $row->tax * $cb->currency_rate,
-						'nominal_fc'	=> $cb->currency->type == '1' || $cb->currency->type == '' ? $row->tax * $cb->currency_rate : $row->tax,
-					]);
-				}
-
-				if($row->wtax_id){
-					JournalDetail::create([
-						'journal_id'	=> $query->id,
-						'coa_id'		=> $row->wTaxMaster->coa_purchase_id,
-						'place_id'		=> $row->place_id ? $row->place_id : NULL,
-						'type'			=> '2',
-						'nominal'		=> $row->wtax * $cb->currency_rate,
-						'nominal_fc'	=> $cb->currency->type == '1' || $cb->currency->type == '' ? $row->wtax * $cb->currency_rate : $row->wtax,
 					]);
 				}
 			}

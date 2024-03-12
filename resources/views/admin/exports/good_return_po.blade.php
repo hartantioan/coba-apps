@@ -30,7 +30,7 @@
             <th>Divisi</th>
             <th>Gudang</th>
             <th>Based On</th>
-
+            <th>Nominal</th>
         </tr>
     </thead>
     <tbody>
@@ -68,6 +68,7 @@
                 <td align="center">{{ $rowdetail->goodReceiptDetail->department()->exists() ? $rowdetail->goodReceiptDetail->department->name : ' - '  }}</td>
                 <td align="center">{{ $rowdetail->goodReceiptDetail->warehouse()->exists() ?  $rowdetail->goodReceiptDetail->warehouse->name : '-'}}</td>
                 <td>{{ $rowdetail->goodReceiptDetail->goodReceipt->code }}</td>
+                <td align="right">{{ number_format($rowdetail->getRowTotal(),2,',','.') }}</td>
             </tr>
             @php
                 $no++;
@@ -76,7 +77,7 @@
         @endforeach
         @if(count($data) == 0)
             <tr>
-                <td colspan="17" align="center">
+                <td colspan="29" align="center">
                     Data tidak ditemukan
                 </td>
             </tr>

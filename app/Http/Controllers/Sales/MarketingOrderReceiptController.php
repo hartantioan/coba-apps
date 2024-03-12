@@ -1058,6 +1058,9 @@ class MarketingOrderReceiptController extends Controller
         $data_id_memo=[];
         $data_id_pyrcs=[];
         $data_id_gir = [];
+        $data_id_cb  =[];
+        $data_id_frs  =[];
+        $data_id_op=[];
 
         $data_id_mo=[];
         $data_id_mo_delivery = [];

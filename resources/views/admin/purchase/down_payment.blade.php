@@ -846,7 +846,7 @@
 
     function resetTerm(){
         if(tempTerm > 0){
-            $('#type').val('2').formSelect();
+            $('#type').val('5').formSelect();
             $('#top').val(tempTerm);
         }else{
             $('#type').val('1').formSelect();
@@ -1411,6 +1411,11 @@
                                         </td>
                                     </tr>
                                 `);
+
+                                if(val.payment_type){
+                                    $('#type').val(val.payment_type).formSelect();
+                                    alert(val.payment_type);
+                                }
 
                                 if(val.checklist.length > 0){
                                     $.each(val.checklist, function(i, value) {

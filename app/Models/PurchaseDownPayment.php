@@ -132,7 +132,7 @@ class PurchaseDownPayment extends Model
     }
 
     public function type(){
-        $type = match ($this->payment_type) {
+        $type = match ($this->type) {
             '1'   => 'Tunai',
             '2'   => 'Transfer',
             '3'   => 'CEK',

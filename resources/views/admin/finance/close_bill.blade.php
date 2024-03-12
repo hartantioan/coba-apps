@@ -247,13 +247,6 @@
                                             <thead>
                                                 <tr>
                                                     <th class="center">Coa</th>
-                                                    <th class="center">Total</th>
-                                                    <th class="center">PPN</th>
-                                                    <th class="center">Incl.PPN</th>
-                                                    <th class="center">PPh</th>
-                                                    <th class="center">Total PPN</th>
-                                                    <th class="center">Total PPh</th>
-                                                    <th class="center">Grandtotal</th>
                                                     <th class="center">Dist.Biaya</th>
                                                     <th class="center">Plant</th>
                                                     <th class="center">Line</th>
@@ -262,12 +255,16 @@
                                                     <th class="center">Proyek</th>
                                                     <th class="center">Ket.1</th>
                                                     <th class="center">Ket.2</th>
+                                                    <th class="center">Debit FC</th>
+                                                    <th class="center">Kredit FC</th>
+                                                    <th class="center">Debit Rp</th>
+                                                    <th class="center">Kredit Rp</th>
                                                     <th class="center">Hapus</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-detail">
                                                 <tr id="last-row-detail">
-                                                    <td colspan="17">
+                                                    <td colspan="14">
                                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> Tambah Detail
                                                         </a>
@@ -290,19 +287,7 @@
                                             <td class="right-align gradient-45deg-red-pink"><span id="total_op">0,00</span></td>
                                         </tr>
                                         <tr>
-                                            <td>Total</td>
-                                            <td class="right-align gradient-45deg-teal-cyan"><span id="total">0,00</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>PPN</td>
-                                            <td class="right-align gradient-45deg-teal-cyan"><span id="tax">0,00</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>PPh</td>
-                                            <td class="right-align gradient-45deg-teal-cyan"><span id="wtax">0,00</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Grandtotal</td>
+                                            <td>Total Terpakai</td>
                                             <td class="right-align gradient-45deg-teal-cyan"><span id="grandtotal">0,00</span></td>
                                         </tr>
                                         <tr>
@@ -1084,40 +1069,6 @@
                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                 </td>
                 <td class="center">
-                    <input class="browser-default" type="text" name="arr_total[]" onfocus="emptyThis(this);" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
-                </td>
-                <td class="center">
-                    <select class="browser-default" id="arr_percent_tax` + count + `" name="arr_percent_tax[]" data-id="` + count + `" onchange="countAll();">
-                        <option value="0.00000" data-id="">-- Non-PPN --</option>
-                        @foreach ($tax as $row1)
-                            <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
-                        @endforeach
-                    </select>
-                </td>
-                <td class="center">
-                    <select class="browser-default" id="arr_include_tax` + count + `" name="arr_include_tax[]" data-id="` + count + `" onchange="countAll();">
-                        <option value="0">Tidak</option>
-                        <option value="1">Ya</option>
-                    </select>
-                </td>
-                <td class="center">
-                    <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
-                        <option value="0.00000" data-id="">-- Non-PPh --</option>
-                        @foreach ($wtax as $row2)
-                            <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
-                        @endforeach
-                    </select>
-                </td>
-                <td class="right-align">
-                    <input class="browser-default" type="text" name="arr_tax[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);" readonly>
-                </td>
-                <td class="right-align">
-                    <input class="browser-default" type="text" name="arr_wtax[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);" readonly>
-                </td>
-                <td class="right-align">
-                    <input class="browser-default" type="text" name="arr_grandtotal[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);" readonly>
-                </td>
-                <td class="center">
                     <select class="browser-default" id="arr_cost_distribution_cost` + count + `" name="arr_cost_distribution_cost[]"></select> 
                 </td>
                 <td class="center">
@@ -1160,6 +1111,18 @@
                     <input type="text" name="arr_note2[]" placeholder="Keterangan 2..." data-id="` + count + `">
                 </td>
                 <td class="center">
+                    <input class="browser-default" type="text" name="arr_nominal_debit_fc[]" value="0,00" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                </td>
+                <td class="right-align">
+                    <input class="browser-default" type="text" name="arr_nominal_credit_fc[]" value="0,00" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                </td>
+                <td class="right-align">
+                    <input class="browser-default" type="text" name="arr_nominal_debit[]" value="0,00" data-id="` + count + `" onkeyup="formatRupiah(this);" readonly>
+                </td>
+                <td class="right-align">
+                    <input class="browser-default" type="text" name="arr_nominal_credit[]" value="0,00" data-id="` + count + `" onkeyup="formatRupiah(this);" readonly>
+                </td>
+                <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
                     </a>
@@ -1179,7 +1142,7 @@
     }
 
     function countAll(){
-        var total_op = total = 0, tax = 0, grandtotal = 0, balance = 0, wtax = 0, pay = 0;
+        var total_op = 0, grandtotal = 0, balance = 0, currency_rate = parseFloat($('#currency_rate').val().replaceAll(".", "").replaceAll(",","."));
 
         $('input[name^="arr_nominal[]"]').each(function(index){
             total_op += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
@@ -1187,44 +1150,26 @@
 
         balance = total_op;
 
-        $('input[name^="arr_total[]"]').each(function(index){
+        $('input[name^="arr_nominal_debit_fc[]"]').each(function(index){
             let rowtotal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-            let percent_tax = parseFloat($('select[name^="arr_percent_tax[]"]').eq(index).val());
-            if(percent_tax > 0 && $('select[name^="arr_include_tax[]"]').eq(index).val() == '1'){
-                rowtotal = Math.ceil(rowtotal / (1 + (percent_tax / 100)));
-                $(this).val(
-                    (rowtotal >= 0 ? '' : '-') + formatRupiahIni(rowtotal.toFixed(2).toString().replace('.',','))
-                );
-            }
-            let percent_wtax = parseFloat($('select[name^="arr_percent_wtax[]"]').eq(index).val());
-            let rowtax = Math.floor((percent_tax / 100) * rowtotal);
-            let rowwtax = Math.floor((percent_wtax / 100) * rowtotal);
-            let rowgrandtotal = rowtotal + rowtax - rowwtax;
-            $('input[name^="arr_tax[]"]').eq(index).val(
-                (rowtax >= 0 ? '' : '-') + formatRupiahIni(rowtax.toFixed(2).toString().replace('.',','))
+            let conversion = rowtotal * currency_rate;
+            $('input[name^="arr_nominal_debit[]"]').eq(index).val(
+                (conversion >= 0 ? '' : '-') + formatRupiahIni(conversion.toFixed(2).toString().replace('.',','))
             );
-            $('input[name^="arr_wtax[]"]').eq(index).val(
-                (rowwtax >= 0 ? '' : '-') + formatRupiahIni(rowwtax.toFixed(2).toString().replace('.',','))
-            );
-            $('input[name^="arr_grandtotal[]"]').eq(index).val(
-                (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(rowgrandtotal.toFixed(2).toString().replace('.',','))
-            );
-            balance -= rowgrandtotal;
-            total += rowtotal;
-            tax += rowtax;
-            wtax += rowwtax;
-            grandtotal += rowgrandtotal;
+            grandtotal += rowtotal;
+            balance -= rowtotal;
         });
-        
-        $('#total').text(
-            (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
-        );
-        $('#tax').text(
-            (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(2).toString().replace('.',','))
-        );
-        $('#wtax').text(
-            (wtax >= 0 ? '' : '-') + formatRupiahIni(wtax.toFixed(2).toString().replace('.',','))
-        );
+
+        $('input[name^="arr_nominal_credit_fc[]"]').each(function(index){
+            let rowtotal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+            let conversion = rowtotal * currency_rate;
+            $('input[name^="arr_nominal_credit[]"]').eq(index).val(
+                (conversion >= 0 ? '' : '-') + formatRupiahIni(conversion.toFixed(2).toString().replace('.',','))
+            );
+            grandtotal -= rowtotal;
+            balance -= rowtotal;
+        });
+
         $('#grandtotal').text(
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
         );

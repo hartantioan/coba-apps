@@ -1414,7 +1414,6 @@
 
                                 if(val.payment_type){
                                     $('#type').val(val.payment_type).formSelect();
-                                    alert(val.payment_type);
                                 }
 
                                 if(val.checklist.length > 0){

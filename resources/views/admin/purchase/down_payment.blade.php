@@ -333,10 +333,10 @@
                                     <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                     <label class="active" for="note">Keterangan</label>
                                 </div>
-                                <div class="input-field col m6 s12 step15">
+                                {{-- <div class="input-field col m6 s12 step15">
                                     <textarea class="materialize-textarea preserveLines" id="note_external" name="note_external" placeholder="Keterangan Tambahan" rows="3"></textarea>
                                     <label class="active" for="note_external">Keterangan Tambahan (muncul pada printout)</label>
-                                </div>
+                                </div> --}}
                                 <div class="col m12 s12 step16">
                                     <p class="mt-2 mb-2">
                                         <h6>Checklist Lampiran</h6>
@@ -1874,8 +1874,8 @@
                 $('#tax_id,#wtax_id').formSelect();
                 
                 $('#note').val(response.note);
-                $('#note_external').val(response.note_external);
-                M.textareaAutoResize($('#note_external'));
+                /* $('#note_external').val(response.note_external);
+                M.textareaAutoResize($('#note_external')); */
                 $('#grandtotal').text(response.grandtotal);
                 $('#total').text(response.total);
                 $('#tax').text(response.tax);

@@ -605,9 +605,9 @@
                                         <div class="mt-3">
                                             Catatan : {{ $data->note }}
                                         </div>
-                                        <div class="preserveLines" style="text-align:left !important;">
+                                        {{-- <div class="preserveLines" style="text-align:left !important;">
                                             {{ $data->note_external }}
-                                        </div>
+                                        </div> --}}
                                         Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.$data->currency->document_text }}
                                     </td>
                                     

@@ -1740,7 +1740,7 @@
                                             <input id="arr_pay` + count + `" name="arr_pay[]" onfocus="emptyThis(this);" data-grandtotal="` + val.balance + `" class="browser-default" type="text" value="`+ val.balance_duplicate + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
                                         </td>
                                         <td class="center">
-                                            <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:350px;" value="` + val.note + `">
+                                            <input id="arr_note` + count + `" name="arr_note[]" class="" type="text" style="width:350px;" value="` + val.note + `">
                                         </td>
                                         <td class="center">
                                             ` + ( val.coa_id ? `-` : `<select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="applyCoa('` + count + `');"></select>` ) + `
@@ -1802,7 +1802,7 @@
                                             ` + val.bank_account + ` ` + val.no_account + ` ` + val.name_account + `    
                                         </td>
                                         <td class="center">
-                                            <input id="arr_remark` + count + `" name="arr_remark[]" class="browser-default" type="text" style="width:150px;" value="` + val.remark + `">
+                                            <input id="arr_remark` + count + `" name="arr_remark[]" class="" type="text" style="width:150px;" value="` + val.remark + `">
                                         </td>
                                         <td class="center">
                                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">

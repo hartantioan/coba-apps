@@ -321,7 +321,7 @@
                                 <div class="col m12 s12">
                                     <ul class="collapsible">
                                         <li class="active step18" id="main-tab">
-                                            <div class="collapsible-header purple darken-1 text-white" style="color:white;" onclick="changeMode();"><i class="material-icons">library_books</i>Pembayaran BS / AP DP / AP Invoice / AR Memo</div>
+                                            <div class="collapsible-header purple darken-1 text-white" style="color:white;" onclick="changeMode();"><i class="material-icons">library_books</i>Pembayaran BS / AP DP / AP Invoice / AR Memo / Manual</div>
                                             <div class="collapsible-body" style="display:block;">
                                                 <div class="mt-2 mb-2" style="overflow:scroll;width:100% !important;">
                                                     <table class="bordered" style="min-width:3250px !important;" id="table-detail">
@@ -1740,7 +1740,7 @@
                                             <input id="arr_pay` + count + `" name="arr_pay[]" onfocus="emptyThis(this);" data-grandtotal="` + val.balance + `" class="browser-default" type="text" value="`+ val.balance_duplicate + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
                                         </td>
                                         <td class="center">
-                                            <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:150px;" value="` + val.note + `">
+                                            <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:250px;" value="` + val.note + `">
                                         </td>
                                         <td class="center">
                                             ` + ( val.coa_id ? `-` : `<select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="applyCoa('` + count + `');"></select>` ) + `

@@ -1740,7 +1740,7 @@
                                             <input id="arr_pay` + count + `" name="arr_pay[]" onfocus="emptyThis(this);" data-grandtotal="` + val.balance + `" class="browser-default" type="text" value="`+ val.balance_duplicate + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
                                         </td>
                                         <td class="center">
-                                            <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:250px;" value="` + val.note + `">
+                                            <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:350px;" value="` + val.note + `">
                                         </td>
                                         <td class="center">
                                             ` + ( val.coa_id ? `-` : `<select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="applyCoa('` + count + `');"></select>` ) + `
@@ -2707,7 +2707,7 @@
                                         <input id="arr_pay` + count + `" name="arr_pay[]" data-grandtotal="` + val.balance + `" onfocus="emptyThis(this);" class="browser-default" type="text" value=" `+ val.nominal + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
                                     </td>
                                     <td class="center">
-                                        <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:150px;" value="` + val.note + `">
+                                        <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:350px;" value="` + val.note + `">
                                     </td>
                                     <td class="center">
                                         ` + ( (val.type_fr == '1' && val.type_document == '2') || val.type_fr == '2' ? `<select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="applyCoa('` + count + `');"></select>` : `-` ) + `

@@ -226,15 +226,51 @@
             <table class="bordered">
                 <thead>
                     <tr>
+                        <th colspan="9" align="center">Daftar Biaya</th>
+                    </tr>
+                    <tr>
+                        <th class="center-align">No.</th>
+                        <th class="center-align">Coa</th>
+                        <th class="center-align">Plant</th>
+                        <th class="center-align">Line</th>
+                        <th class="center-align">Mesin</th>
+                        <th class="center-align">Divisi</th>
+                        <th class="center-align">Proyek</th>
+                        <th class="center-align">Debit</th>
+                        <th class="center-align">Kredit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($data->paymentRequestCost as $key => $row)
+                    <tr>
+                        <td class="center-align">{{ ($key + 1) }}</td>
+                        <td class="">{{ $row->coa->code.' - '.$row->coa->name }}</td>
+                        <td class="center-align">{{ ($row->place()->exists() ? $row->place->code : '-') }}</td>
+                        <td class="center-align">{{ ($row->line()->exists() ? $row->line->code : '-') }}</td>
+                        <td class="center-align">{{ ($row->machine()->exists() ? $row->machine->name : '-') }}</td>
+                        <td class="center-align">{{ ($row->division()->exists() ? $row->division->name : '-') }}</td>
+                        <td class="center-align">{{ ($row->project()->exists() ? $row->project->name : '-') }}</td>
+                        <td class="right-align">{{ number_format($row->nominal_debit_fc,2,',','.') }}</td>
+                        <td class="right-align">{{ number_format($row->nominal_credit_fc,2,',','.') }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="9">Ket.1 : {{ $row->note }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="9">Ket.2 : {{ $row->note2 }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+            <table class="bordered">
+                <thead>
+                    <tr>
+                        <th class="center" colspan="4">Dokumen Terpakai</th>
+                    </tr>
+                    <tr>
                         <th class="center">Referensi</th>
                         <th class="center">Tipe</th>
                         <th class="center">Keterangan</th>
-                        <th class="center">Coa</th>
-                        <th class="center">Plant</th>
-                        <th class="center">Line</th>
-                        <th class="center">Mesin</th>
-                        <th class="center">Divisi</th>
-                        <th class="center">Proyek</th>
                         <th class="center">Bayar</th>
                     </tr>
                 </thead>
@@ -247,41 +283,32 @@
                         <td>{{ $row->getCode() }}</td>
                         <td class="center-align">{{ $row->type() }}</td>
                         <td>{{ $row->note }}</td>
-                        <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
-                        <td>{{ $row->place()->exists() ? $row->place->code : '-' }}</td>
-                        <td>{{ $row->line()->exists() ? $row->line->code : '-' }}</td>
-                        <td>{{ $row->machine()->exists() ? $row->machine->code : '-' }}</td>
-                        <td>{{ $row->department()->exists() ? $row->department->code : '-' }}</td>
-                        <td>{{ $row->project()->exists() ? $row->project->name : '-' }}</td>
                         <td class="right-align">{{ number_format($row->nominal,2,',','.') }}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="10">Remark : {{ $row->remark }}</td>
                     </tr>
                     @php
                         $total += $row->nominal;
                     @endphp
                     @endforeach
                     <tr>
-                        <td colspan="9" class="right-align">Total</td>
+                        <td colspan="3" class="right-align">Total</td>
                         <td class="right-align">{{ number_format($data->total,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td colspan="9" class="right-align">Pembulatan</td>
+                        <td colspan="3" class="right-align">Pembulatan</td>
                         <td class="right-align">{{ number_format($data->rounding,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td colspan="9" class="right-align">Admin</td>
+                        <td colspan="3" class="right-align">Admin</td>
                         <td class="right-align">{{ number_format($data->admin,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td colspan="9" class="right-align">Grandtotal</td>
+                        <td colspan="3" class="right-align">Grandtotal</td>
                         <td class="right-align">{{ number_format($data->grandtotal,2,',','.') }}</td>
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="10">Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords($data->currency->document_text) }}</i></th>
+                        <th colspan="4">Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords($data->currency->document_text) }}</i></th>
                     </tr>
                 </tfoot>
             </table>

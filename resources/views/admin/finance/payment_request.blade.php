@@ -224,9 +224,9 @@
                                         <option value="2">Transfer</option>
                                         <option value="1">Tunai</option>
                                         <option value="3">Cek/BG</option>
-                                        {{-- <option value="4">BG</option>
-                                        <option value="5">Rekonsiliasi Tanpa Dokumen</option>
-                                        <option value="6">Rekonsiliasi Dengan Dokumen</option> --}}
+                                        {{-- <option value="4">BG</option> --}}
+                                        <option value="5">Rekonsiliasi Hutang</option>
+                                        {{-- <option value="6">Rekonsiliasi Dengan Dokumen</option> --}}
                                     </select>
                                     <label class="" for="payment_type">Tipe Pembayaran</label>
                                 </div>
@@ -1441,17 +1441,9 @@
             $('#cost_distribution_id').attr('disabled', true);
             $('#admin').prop("readonly", true);
             $('#payment_type').val('5').formSelect();
-            $('.op-element').hide();
-            $('#main-tab .collapsible-body').hide();
-            $('#main-tab').removeClass('active');
         }else{
             $('#admin').prop("readonly", false);
-            $('.op-element').show();
-            $('#main-tab .collapsible-body').show();
-            $('#main-tab').addClass('active');
         }
-
-        $('.collapsible').collapsible();
     }
 
     function changeReimburse(){
@@ -1619,6 +1611,7 @@
             if($('.data-used').length > 0){
                 $('.data-used').trigger('click');
             }
+            $('#rekening-element').show();
             countAll();
         }
     }
@@ -2505,6 +2498,7 @@
                 $('#company_id').val(response.company_id).formSelect();
                 $('#payment_no').val(response.payment_no);
                 $('#currency_id').val(response.currency_id).formSelect();
+                $('#payment_type').val(response.payment_type).formSelect();
                 $('#currency_rate').val(response.currency_rate);
                 $('#post_date').val(response.post_date);
                 $('#pay_date').val(response.pay_date);                

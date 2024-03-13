@@ -322,13 +322,13 @@
                         <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
                             <thead>
                                 <tr>
+                                    <th class="center" colspan="5">Dokumen Terpakai</th>
+                                </tr>
+                                <tr>
                                     <th class="center">Referensi</th>
                                     <th class="center">Tipe</th>
                                     <th class="center">Tgl.Tenggat</th>
                                     <th class="center">Keterangan</th>
-                                    <th class="center">Coa</th>
-
-                                    <th class="center">Proyek</th>
                                     <th class="center">Bayar</th>
                                 </tr>
                             </thead>
@@ -342,13 +342,52 @@
                                     <td align="center">{{ $row->type() }}</td>
                                     <td align="center">{{ $row->purchaseInvoice() ? date('d/m/Y',strtotime($row->lookable->due_date)) : '-' }}</td>
                                     <td>{{ $row->note }}</td>
-                                    <td>{{ $row->coa->name }}</td>
-                                    <td>{{ $row->project()->exists() ? $row->project->name : '-' }}</td>
                                     <td align="right">{{ number_format($row->nominal,2,',','.') }}</td>
                                 </tr>
                                 @php
                                     $total += $row->nominal;
                                 @endphp
+                                @endforeach
+                            </tbody>
+                            
+                        </table>
+
+                        <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
+                            <thead>
+                                <tr>
+                                    <th colspan="9" align="center">Daftar Biaya</th>
+                                </tr>
+                                <tr>
+                                    <th class="center-align">No.</th>
+                                    <th class="center-align">Coa</th>
+                                    <th class="center-align">Plant</th>
+                                    <th class="center-align">Line</th>
+                                    <th class="center-align">Mesin</th>
+                                    <th class="center-align">Divisi</th>
+                                    <th class="center-align">Proyek</th>
+                                    <th class="center-align">Debit</th>
+                                    <th class="center-align">Kredit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($data->paymentRequestCost as $key => $row)
+                                <tr>
+                                    <td class="center-align">{{ ($key + 1) }}</td>
+                                    <td class="">{{ $row->coa->code.' - '.$row->coa->name }}</td>
+                                    <td class="center-align">{{ ($row->place()->exists() ? $row->place->code : '-') }}</td>
+                                    <td class="center-align">{{ ($row->line()->exists() ? $row->line->code : '-') }}</td>
+                                    <td class="center-align">{{ ($row->machine()->exists() ? $row->machine->name : '-') }}</td>
+                                    <td class="center-align">{{ ($row->division()->exists() ? $row->division->name : '-') }}</td>
+                                    <td class="center-align">{{ ($row->project()->exists() ? $row->project->name : '-') }}</td>
+                                    <td class="right-align">{{ number_format($row->nominal_debit_fc,2,',','.') }}</td>
+                                    <td class="right-align">{{ number_format($row->nominal_credit_fc,2,',','.') }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="9">Ket.1 : {{ $row->note }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="9">Ket.2 : {{ $row->note2 }}</td>
+                                </tr>
                                 @endforeach
                             </tbody>
                             

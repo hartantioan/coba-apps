@@ -444,6 +444,7 @@ class PaymentRequestController extends Controller
                         'note'              => $row->note ? $row->note : '',
                         'type_fr'           => $row->type,
                         'document_status'   => $row->document_status,
+                        'status_document'   => $row->document_status == '2' ? 'LENGKAP' : 'TIDAK LENGKAP',
                     ];
                 }
             }
@@ -471,7 +472,8 @@ class PaymentRequestController extends Controller
                         'final'             => $row->currency->symbol.' '.number_format($final,2,',','.'),
                         'note'              => $row->note ? $row->note : '',
                         'type_fr'           => '',
-                        'document_status'   => '',
+                        'document_status'   => '2',
+                        'status_document'   => 'LENGKAP',
                     ];
                 }
             }
@@ -498,7 +500,8 @@ class PaymentRequestController extends Controller
                         'memo'              => number_format($memo,2,',','.'),
                         'final'             => $row->currency()->symbol.' '.number_format($final,2,',','.'),
                         'type_fr'           => '',
-                        'document_status'   => '',
+                        'document_status'   => '2',
+                        'status_document'   => 'LENGKAP',
                     ];
                 }
             }
@@ -526,7 +529,8 @@ class PaymentRequestController extends Controller
                         'final'             => 'IDR '.number_format($final,2,',','.'),
                         'note'              => $row->note ? $row->note : '',
                         'type_fr'           => '',
-                        'document_status'   => '',
+                        'document_status'   => '2',
+                        'status_document'   => 'LENGKAP',
                     ];
                 }
             }
@@ -1329,7 +1333,6 @@ class PaymentRequestController extends Controller
         }
 
         foreach($pr->paymentRequestDetail as $row){
-            $is_cost = $row->lookable_type == 'coas' ? 1 : 0;
             $code = CustomHelper::encrypt($row->lookable->code);
             $arr[] = [
                 'id'            => $row->lookable_type == 'fund_request_details' ? $row->lookable->fundRequest->id : $row->lookable_id,
@@ -1350,8 +1353,8 @@ class PaymentRequestController extends Controller
                 'remark'        => $row->remark ? $row->remark : '',
                 'cost_distribution_id'        => $row->cost_distribution_id ? $row->cost_distribution_id : '',
                 'cost_distribution_name'      => $row->cost_distribution_id ? $row->costDistribution->code.' - '.$row->costDistribution->name : '',
-                'coa_id'        => $row->coa_id,
-                'coa_name'      => $row->coa->code.' - '.$row->coa->name,
+                'coa_id'        => $row->coa_id ?? '',
+                'coa_name'      => $row->coa()->exists() ? $row->coa->code.' - '.$row->coa->name : '',
                 'memo'          => number_format($row->getMemo(),2,',','.'),
                 'name_account'  => $row->fundRequest() ? ($row->lookable->name_account ? $row->lookable->name_account : '') : ($row->fundRequestDetail() ? $row->lookable->fundRequest->name_account : ''),
                 'no_account'    => $row->fundRequest() ? ($row->lookable->no_account ? $row->lookable->no_account : '') : ($row->fundRequestDetail() ? $row->lookable->fundRequest->no_account : ''),
@@ -1368,20 +1371,22 @@ class PaymentRequestController extends Controller
 
         foreach($pr->paymentRequestCost as $row){
             $costs[] = [
-                'note'              => $row->note,
-                'coa_id'            => $row->coa_id,
-                'coa_name'          => $row->coa->code.' - '.$row->coa->name,
-                'place_id'          => $row->place_id ?? '',
-                'line_id'           => $row->line_id ?? '',
-                'machine_id'        => $row->machine_id ?? '',
-                'division_id'       => $row->division_id ?? '',
-                'project_id'        => $row->project_id ?? '',
-                'project_name'      => $row->project()->exists() ? $row->project->name : '',
-                'nominal_debit_fc'  => number_format($row->nominal_debit_fc,2,',','.'),
-                'nominal_credit_fc' => number_format($row->nominal_credit_fc,2,',','.'),
-                'nominal_debit'     => number_format($row->nominal_debit,2,',','.'),
-                'nominal_credit'    => number_format($row->nominal_credit,2,',','.'),
-                'note2'             => $row->note2,
+                'note'                  => $row->note,
+                'cost_distribution_id'  => $row->cost_distribution_id ?? '',
+                'cost_distribution_name'=> $row->costDistribution()->exists() ? $row->costDistribution->name : '',
+                'coa_id'                => $row->coa_id,
+                'coa_name'              => $row->coa->code.' - '.$row->coa->name,
+                'place_id'              => $row->place_id ?? '',
+                'line_id'               => $row->line_id ?? '',
+                'machine_id'            => $row->machine_id ?? '',
+                'division_id'           => $row->division_id ?? '',
+                'project_id'            => $row->project_id ?? '',
+                'project_name'          => $row->project()->exists() ? $row->project->name : '',
+                'nominal_debit_fc'      => number_format($row->nominal_debit_fc,2,',','.'),
+                'nominal_credit_fc'     => number_format($row->nominal_credit_fc,2,',','.'),
+                'nominal_debit'         => number_format($row->nominal_debit,2,',','.'),
+                'nominal_credit'        => number_format($row->nominal_credit,2,',','.'),
+                'note2'                 => $row->note2,
             ];
         }
 
@@ -1407,7 +1412,6 @@ class PaymentRequestController extends Controller
         $pr['banks'] = $banks;
         $pr['costs'] = $costs;
         $pr['payments'] = $payments;
-        $pr['is_cost'] =  $is_cost;
         				
 		return response()->json($pr);
     }

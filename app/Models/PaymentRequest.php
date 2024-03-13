@@ -95,6 +95,11 @@ class PaymentRequest extends Model
         return $this->hasMany('App\Models\PaymentRequestDetail');
     }
 
+    public function paymentRequestCost()
+    {
+        return $this->hasMany('App\Models\PaymentRequestCost');
+    }
+
     public function paymentRequestCross()
     {
         return $this->hasMany('App\Models\PaymentRequestCross');
@@ -163,7 +168,7 @@ class PaymentRequest extends Model
         $payment_type = match ($this->payment_type) {
           '1'   => 'Tunai',
           '2'   => 'Transfer',
-          '3'   => 'Cek',
+          '3'   => 'Cek/BG',
           '4'   => 'BG',
           '5'   => 'Rekonsiliasi Tanpa Dokumen',
           '6'   => 'Rekonsiliasi Dengan Dokumen',

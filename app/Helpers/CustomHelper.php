@@ -1475,97 +1475,195 @@ class CustomHelper {
 
 			foreach($op->paymentRequest->paymentRequestDetail as $row){
 
-				if(self::checkArrayRaw($arrNote,$row->note) < 0){
-					$arrNote[] = $row->note;
-				}
+				if($row->coa_id){
+					if(self::checkArrayRaw($arrNote,$row->note) < 0){
+						$arrNote[] = $row->note;
+					}
 
-				$mustpay = 0;
-				$balanceReal = 0;
+					$mustpay = 0;
+					$balanceReal = 0;
 
-				if($row->lookable_type == 'purchase_invoices'){
-					$mustpay = $row->lookable->getTotalPaidExcept($row->id);
-					$balanceReal = $row->nominal * $row->lookable->currencyRate();
-					if($row->lookable->getTotalPaid() <= 0){
-						$row->lookable->update([
-							'status'	=> '3'
-						]);
-					}
-				}elseif($row->lookable_type == 'fund_requests'){
-					$mustpay = $row->nominal;
-					$balanceReal = $row->nominal * $row->lookable->currency_rate;
-					if($row->lookable->type == '1' && $row->lookable->document_status == '3'){
-						CustomHelper::addCountLimitCredit($row->lookable->account_id,$balanceReal);
-					}
-				}elseif($row->lookable_type == 'fund_request_details'){
-					$mustpay = $row->nominal;
-					$balanceReal = $row->nominal * $row->lookable->fundRequest->currency_rate;
-					if($row->lookable->fundRequest->type == '1' && $row->lookable->fundRequest->document_status == '3'){
-						CustomHelper::addCountLimitCredit($row->lookable->fundRequest->account_id,$balanceReal);
-					}
-				}elseif($row->lookable_type == 'coas'){
-					$mustpay = $row->nominal;
-					$balanceReal = $row->nominal * $op->currency_rate;
-				}elseif($row->lookable_type == 'purchase_down_payments'){
-					$mustpay = $row->lookable->balancePaidExcept($row->id);
-					$balanceReal = $row->lookable->balancePaidExcept($row->id) * $row->lookable->currency_rate;
-					if($row->lookable->getTotalPaid() <= 0){
-						$row->lookable->update([
-							'status'	=> '3'
-						]);
-					}
-				}elseif($row->lookable_type == 'marketing_order_memos'){
-					$rowtotal = $row->lookable->balance();
-					$mustpay = $rowtotal;
-					$balanceReal = $rowtotal;
-				}
-				
-				$totalMustPay += $mustpay;
-				$totalReal += $balanceReal;
-
-				if($row->cost_distribution_id){
-					$total = $balanceReal;
-					$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
-					$accumulation = 0;
-					foreach($row->costDistribution->costDistributionDetail as $key => $rowcost){
-						if($key == $lastIndex){
-							$nominal = $total - $accumulation;
-						}else{
-							$nominal = round(($rowcost->percentage / 100) * $total);
-							$accumulation += $nominal;
+					if($row->lookable_type == 'purchase_invoices'){
+						$mustpay = $row->lookable->getTotalPaidExcept($row->id);
+						$balanceReal = $row->nominal * $row->lookable->currencyRate();
+						if($row->lookable->getTotalPaid() <= 0){
+							$row->lookable->update([
+								'status'	=> '3'
+							]);
 						}
+					}elseif($row->lookable_type == 'fund_requests'){
+						$mustpay = $row->nominal;
+						$balanceReal = $row->nominal * $row->lookable->currency_rate;
+						if($row->lookable->type == '1' && $row->lookable->document_status == '3'){
+							CustomHelper::addCountLimitCredit($row->lookable->account_id,$balanceReal);
+						}
+					}elseif($row->lookable_type == 'fund_request_details'){
+						$mustpay = $row->nominal;
+						$balanceReal = $row->nominal * $row->lookable->fundRequest->currency_rate;
+						if($row->lookable->fundRequest->type == '1' && $row->lookable->fundRequest->document_status == '3'){
+							CustomHelper::addCountLimitCredit($row->lookable->fundRequest->account_id,$balanceReal);
+						}
+					}elseif($row->lookable_type == 'coas'){
+						$mustpay = $row->nominal;
+						$balanceReal = $row->nominal * $op->currency_rate;
+					}elseif($row->lookable_type == 'purchase_down_payments'){
+						$mustpay = $row->lookable->balancePaidExcept($row->id);
+						$balanceReal = $row->lookable->balancePaidExcept($row->id) * $row->lookable->currency_rate;
+						if($row->lookable->getTotalPaid() <= 0){
+							$row->lookable->update([
+								'status'	=> '3'
+							]);
+						}
+					}elseif($row->lookable_type == 'marketing_order_memos'){
+						$rowtotal = $row->lookable->balance();
+						$mustpay = $rowtotal;
+						$balanceReal = $rowtotal;
+					}
+					
+					$totalMustPay += $mustpay;
+					$totalReal += $balanceReal;
+
+					if($row->cost_distribution_id){
+						$total = $balanceReal;
+						$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
+						$accumulation = 0;
+						foreach($row->costDistribution->costDistributionDetail as $key => $rowcost){
+							if($key == $lastIndex){
+								$nominal = $total - $accumulation;
+							}else{
+								$nominal = round(($rowcost->percentage / 100) * $total);
+								$accumulation += $nominal;
+							}
+							JournalDetail::create([
+								'journal_id'                    => $query->id,
+								'cost_distribution_detail_id'   => $rowcost->id,
+								'coa_id'                        => $row->coa_id,
+								'place_id'                      => $rowcost->place_id ? $rowcost->place_id : NULL,
+								'line_id'                       => $rowcost->line_id ? $rowcost->line_id : NULL,
+								'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : NULL,
+								'account_id'                    => $row->coa->bp_journal ? $op->account_id : NULL,
+								'department_id'                 => $rowcost->department_id ? $rowcost->department_id : NULL,
+								'project_id'					=> $row->project_id ? $row->project_id : NULL,
+								'type'                          => '1',
+								'nominal'                       => floatval($nominal * $op->currency_rate),
+								'nominal_fc'					=> $op->currency->type == '1' ? floatval($nominal * $op->currency_rate) : floatval($nominal),
+							]);
+						}
+					}else{
 						JournalDetail::create([
-							'journal_id'                    => $query->id,
-							'cost_distribution_detail_id'   => $rowcost->id,
-							'coa_id'                        => $row->coa_id,
-							'place_id'                      => $rowcost->place_id ? $rowcost->place_id : NULL,
-							'line_id'                       => $rowcost->line_id ? $rowcost->line_id : NULL,
-							'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : NULL,
-							'account_id'                    => $row->coa->bp_journal ? $op->account_id : NULL,
-							'department_id'                 => $rowcost->department_id ? $rowcost->department_id : NULL,
-							'warehouse_id'                  => $rowcost->warehouse_id ? $rowcost->warehouse_id : NULL,
-							'project_id'					=> $row->project_id ? $row->project_id : NULL,
-							'type'                          => '1',
-							'nominal'                       => floatval($nominal * $op->currency_rate),
-							'nominal_fc'					=> $op->currency->type == '1' ? floatval($nominal * $op->currency_rate) : floatval($nominal),
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->coa_id,
+							'account_id'	=> $row->coa->bp_journal ? $op->account_id : NULL,
+							'line_id'		=> $row->line_id ? $row->line_id : NULL,
+							'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+							'place_id'		=> $row->place_id ? $row->place_id : NULL,
+							'department_id'	=> $row->department_id ? $row->department_id : NULL,
+							'project_id'	=> $row->project_id ? $row->project_id : NULL,
+							'type'			=> '1',
+							'nominal'		=> floatval($balanceReal),
+							'nominal_fc'	=> $op->currency->type == '1' ? floatval(round($balanceReal * $op->currency_rate,2)) : floatval(round($balanceReal,2)), #benerin
+						]);
+						if($row->lookable_type == 'marketing_order_memos'){
+							CustomHelper::addCountLimitCredit($op->account_id,$balanceReal);
+						}
+					}
+				}
+			}
+
+			foreach($op->paymentRequest->paymentRequestCost as $row){
+				if($row->nominal_debit_fc > 0){
+					if($row->cost_distribution_id){
+						$total = $row->nominal_debit_fc;
+						$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
+						$accumulation = 0;
+						foreach($row->costDistribution->costDistributionDetail as $key => $rowcost){
+							if($key == $lastIndex){
+								$nominal = $total - $accumulation;
+							}else{
+								$nominal = round(($rowcost->percentage / 100) * $total);
+								$accumulation += $nominal;
+							}
+							JournalDetail::create([
+								'journal_id'                    => $query->id,
+								'cost_distribution_detail_id'   => $rowcost->id,
+								'coa_id'                        => $row->coa_id,
+								'place_id'                      => $rowcost->place_id ? $rowcost->place_id : $row->place_id,
+								'line_id'                       => $rowcost->line_id ? $rowcost->line_id : $row->line_id,
+								'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : $row->machine_id,
+								'account_id'                    => $row->coa->bp_journal ? $op->account_id : NULL,
+								'department_id'                 => $rowcost->department_id ? $rowcost->department_id : $row->division_id,
+								'project_id'					=> $row->project_id ? $row->project_id : NULL,
+								'type'                          => '1',
+								'nominal'                       => floatval($nominal * $op->currency_rate),
+								'nominal_fc'					=> floatval($nominal),
+								'note'							=> $row->note,
+								'note2'							=> $row->note2,
+							]);
+						}
+					}else{
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->coa_id,
+							'account_id'	=> $row->coa->bp_journal ? $op->account_id : NULL,
+							'line_id'		=> $row->line_id ? $row->line_id : NULL,
+							'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+							'place_id'		=> $row->place_id ? $row->place_id : NULL,
+							'department_id'	=> $row->department_id ? $row->department_id : NULL,
+							'project_id'	=> $row->project_id ? $row->project_id : NULL,
+							'type'			=> '1',
+							'nominal'		=> floatval($row->nominal_debit_fc * $op->currency_rate),
+							'nominal_fc'	=> floatval($row->nominal_debit_fc),
+							'note'			=> $row->note,
+							'note2'			=> $row->note2,
 						]);
 					}
-				}else{
-					JournalDetail::create([
-						'journal_id'	=> $query->id,
-						'coa_id'		=> $row->coa_id,
-						'account_id'	=> $row->coa->bp_journal ? $op->account_id : NULL,
-						'line_id'		=> $row->line_id ? $row->line_id : NULL,
-						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
-						'place_id'		=> $row->place_id ? $row->place_id : NULL,
-						'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
-						'department_id'	=> $row->department_id ? $row->department_id : NULL,
-						'project_id'	=> $row->project_id ? $row->project_id : NULL,
-						'type'			=> '1',
-						'nominal'		=> floatval($balanceReal),
-						'nominal_fc'	=> $op->currency->type == '1' ? floatval(round($balanceReal * $op->currency_rate,2)) : floatval(round($balanceReal,2)), #benerin
-					]);
-					if($row->lookable_type == 'marketing_order_memos'){
-						CustomHelper::addCountLimitCredit($op->account_id,$balanceReal);
+				}
+
+				if($row->nominal_credit_fc > 0){
+					if($row->cost_distribution_id){
+						$total = $row->nominal_credit_fc;
+						$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
+						$accumulation = 0;
+						foreach($row->costDistribution->costDistributionDetail as $key => $rowcost){
+							if($key == $lastIndex){
+								$nominal = $total - $accumulation;
+							}else{
+								$nominal = round(($rowcost->percentage / 100) * $total);
+								$accumulation += $nominal;
+							}
+							JournalDetail::create([
+								'journal_id'                    => $query->id,
+								'cost_distribution_detail_id'   => $rowcost->id,
+								'coa_id'                        => $row->coa_id,
+								'place_id'                      => $rowcost->place_id ? $rowcost->place_id : $row->place_id,
+								'line_id'                       => $rowcost->line_id ? $rowcost->line_id : $row->line_id,
+								'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : $row->machine_id,
+								'account_id'                    => $row->coa->bp_journal ? $op->account_id : NULL,
+								'department_id'                 => $rowcost->department_id ? $rowcost->department_id : $row->division_id,
+								'project_id'					=> $row->project_id ? $row->project_id : NULL,
+								'type'                          => '2',
+								'nominal'                       => floatval($nominal * $op->currency_rate),
+								'nominal_fc'					=> floatval($nominal),
+								'note'							=> $row->note,
+								'note2'							=> $row->note2,
+							]);
+						}
+					}else{
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->coa_id,
+							'account_id'	=> $row->coa->bp_journal ? $op->account_id : NULL,
+							'line_id'		=> $row->line_id ? $row->line_id : NULL,
+							'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+							'place_id'		=> $row->place_id ? $row->place_id : NULL,
+							'department_id'	=> $row->department_id ? $row->department_id : NULL,
+							'project_id'	=> $row->project_id ? $row->project_id : NULL,
+							'type'			=> '2',
+							'nominal'		=> floatval($row->nominal_credit_fc * $op->currency_rate),
+							'nominal_fc'	=> floatval($row->nominal_credit_fc),
+							'note'			=> $row->note,
+							'note2'			=> $row->note2,
+						]);
 					}
 				}
 			}

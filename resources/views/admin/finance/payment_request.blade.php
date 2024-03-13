@@ -223,9 +223,9 @@
                                     <select class="form-control" id="payment_type" name="payment_type" onchange="showRekening();">
                                         <option value="2">Transfer</option>
                                         <option value="1">Tunai</option>
-                                        <option value="3">Cek</option>
-                                        <option value="4">BG</option>
-                                        {{-- <option value="5">Rekonsiliasi Tanpa Dokumen</option>
+                                        <option value="3">Cek/BG</option>
+                                        {{-- <option value="4">BG</option>
+                                        <option value="5">Rekonsiliasi Tanpa Dokumen</option>
                                         <option value="6">Rekonsiliasi Dengan Dokumen</option> --}}
                                     </select>
                                     <label class="" for="payment_type">Tipe Pembayaran</label>
@@ -972,6 +972,10 @@
                     return null;
                 };
 
+                if(!$('#cost-tab').hasClass('hide')){
+                    $('#cost-tab').addClass('hide');
+                }
+
                 $('#body-detail-cost').empty().append(`
                     <tr id="last-row-detail-cost">
                         <td colspan="14">
@@ -1158,7 +1162,7 @@
             countAll();
         });
 
-        $('#body-detail-coa').on('click', '.delete-data-coa', function() {
+        $('#body-detail-cost').on('click', '.delete-data-detail', function() {
             $(this).closest('tr').remove();
             countAll();
         });
@@ -1335,7 +1339,80 @@
     }
 
     function addCoa(){
-        
+        var countdetail = makeid(10);
+        if($('#last-row-detail-cost').length > 0){
+            $('#last-row-detail-cost').remove();
+        }
+        $('#body-detail-cost').append(`
+            <tr class="row_detail">
+                <td class="">
+                    <select class="browser-default" id="arr_coa_cost` + countdetail + `" name="arr_coa_cost[]"></select>
+                </td>
+                <td class="center">
+                    <select class="browser-default" id="arr_cost_distribution_cost` + countdetail + `" name="arr_cost_distribution_cost[]"></select> 
+                </td>
+                <td class="center">
+                    <select class="browser-default" id="arr_place` + countdetail + `" name="arr_place[]">
+                        @foreach ($place as $rowplace)
+                            <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                        @endforeach
+                    </select>
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_line` + countdetail + `" name="arr_line[]" onchange="changePlace(this);">
+                        <option value="">--Kosong--</option>
+                        @foreach ($line as $rowline)
+                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
+                        @endforeach
+                    </select>    
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_machine` + countdetail + `" name="arr_machine[]" onchange="changeLine(this);">
+                        <option value="">--Kosong--</option>
+                        @foreach ($machine as $rowmachine)
+                            <option value="{{ $rowmachine->id }}" data-line="{{ $rowmachine->line_id }}">{{ $rowmachine->name }}</option>
+                        @endforeach
+                    </select>    
+                </td>
+                <td class="center">
+                    <select class="browser-default" id="arr_division` + countdetail + `" name="arr_division[]">
+                        <option value="">--Kosong--</option>
+                        @foreach ($department as $row)
+                            <option value="{{ $row->id }}">{{ $row->name }}</option>
+                        @endforeach
+                    </select>
+                </td>
+                <td class="center">
+                    <select class="browser-default" id="arr_project` + countdetail + `" name="arr_project[]"></select>
+                </td>
+                <td>
+                    <input type="text" name="arr_note_cost[]" placeholder="Keterangan 1..." value="" data-id="` + countdetail + `">
+                </td>
+                <td>
+                    <input type="text" name="arr_note_cost2[]" placeholder="Keterangan 2..." value="" data-id="` + countdetail + `">
+                </td>
+                <td class="center">
+                    <input class="browser-default" type="text" name="arr_nominal_debit_fc[]" value="0,00" data-id="` + countdetail + `" onkeyup="formatRupiah(this);countAll();">
+                </td>
+                <td class="right-align">
+                    <input class="browser-default" type="text" name="arr_nominal_credit_fc[]" value="0,00" data-id="` + countdetail + `" onkeyup="formatRupiah(this);countAll();">
+                </td>
+                <td class="right-align">
+                    <input class="browser-default" type="text" name="arr_nominal_debit[]" value="0,00" data-id="` + countdetail + `" onkeyup="formatRupiah(this);" readonly>
+                </td>
+                <td class="right-align">
+                    <input class="browser-default" type="text" name="arr_nominal_credit[]" value="0,00" data-id="` + countdetail + `" onkeyup="formatRupiah(this);" readonly>
+                </td>
+                <td class="center">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
+            </tr>
+        `);
+        select2ServerSide('#arr_coa_cost' + countdetail, '{{ url("admin/select2/coa") }}');
+        select2ServerSide('#arr_project' + countdetail, '{{ url("admin/select2/project") }}');
+        select2ServerSide('#arr_cost_distribution_cost' + countdetail, '{{ url("admin/select2/cost_distribution") }}');
     }
 
     function getRekening(){
@@ -1602,8 +1679,8 @@
                                 `);
                                 $('#body-detail').append(`
                                     <tr class="row_detail" data-code="` + val.rawcode + `" data-account="` + val.account_code + `">
-                                        <input type="hidden" name="arr_id[]" value="` + val.detail_id + `" data-id="` + count + `">
-                                        <input type="hidden" name="arr_type[]" value="` + val.detail_type + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_id[]" value="` + val.id + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
                                         <input type="hidden" name="arr_account_bank[]" value="` + val.bank_account + `" data-id="` + count + `">
                                         <input type="hidden" name="arr_account_no[]" value="` + val.no_account + `" data-id="` + count + `">
                                         <input type="hidden" name="arr_account_name[]" value="` + val.name_account + `" data-id="` + count + `">
@@ -1925,7 +2002,6 @@
                 $('input[name^="arr_nominal_debit[]"]').eq(index).val(
                     (nominalConvert >= 0 ? '' : '-') + formatRupiahIni(nominalConvert.toFixed(2).toString().replace('.',','))
                 );
-                payment += nominal;
             });
             $('input[name^="arr_nominal_credit_fc[]"]').each(function(index){
                 let nominal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
@@ -1933,7 +2009,6 @@
                 $('input[name^="arr_nominal_credit[]"]').eq(index).val(
                     (nominalConvert >= 0 ? '' : '-') + formatRupiahIni(nominalConvert.toFixed(2).toString().replace('.',','))
                 );
-                payment -= nominal;
             });
         }
 
@@ -2205,7 +2280,7 @@
         }).then(function (willDelete) {
             if (willDelete) {
 
-                let passedCoaCost = true;
+                let passedCoaCost = true, passedCostWithBs = true;
 
                 $('select[name^="arr_coa_cost[]"]').each(function(index){
                     if(!$(this).val()){
@@ -2213,92 +2288,126 @@
                     }
                 });
 
-                if(passedCoaCost){
-                    var formData = new FormData($('#form_data')[0]);
-
-                    formData.delete("arr_cost_distribution_cost[]");
-
-                    $('select[name^="arr_cost_distribution_cost[]"]').each(function(index){
-                        formData.append("arr_cost_distribution_cost[]",($(this).val() ? $(this).val() : ''));
+                if(!$('#cost-tab').hasClass('hide')){
+                    let grandtotal = parseFloat($('#grandtotal').val().replaceAll(".", "").replaceAll(",","."));
+                    $('input[name^="arr_nominal_debit_fc[]"]').each(function(index){
+                        let nominal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+                        grandtotal -= nominal;
                     });
+                    $('input[name^="arr_nominal_credit_fc[]"]').each(function(index){
+                        let nominal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+                        grandtotal += nominal;
+                    });
+                    if(grandtotal !== 0){
+                        passedCostWithBs = false;
+                    }
+                }
 
-                    var path = window.location.pathname;
-                    path = path.replace(/^\/|\/$/g, '');
+                if(passedCoaCost){
+                    if(passedCostWithBs){
+                        var formData = new FormData($('#form_data')[0]);
+
+                        formData.delete("arr_cost_distribution_cost[]");
+                        formData.delete("arr_line[]");
+                        formData.delete("arr_machine[]");
+                        formData.delete("arr_division[]");
+                        formData.delete("arr_project[]");
+
+                        $('select[name^="arr_cost_distribution_cost[]"]').each(function(index){
+                            formData.append("arr_cost_distribution_cost[]",($(this).val() ? $(this).val() : ''));
+                            formData.append("arr_line[]",($('select[name^="arr_line[]"]').eq(index).val() ? $('select[name^="arr_line[]"]').eq(index).val() : ''));
+                            formData.append("arr_machine[]",($('select[name^="arr_machine[]"]').eq(index).val() ? $('select[name^="arr_machine[]"]').eq(index).val() : ''));
+                            formData.append("arr_division[]",($('select[name^="arr_division[]"]').eq(index).val() ? $('select[name^="arr_division[]"]').eq(index).val() : ''));
+                        });
+
+                        $('select[name^="arr_project[]"]').each(function(index){
+                            formData.append("arr_project[]",($(this).val() ? $(this).val() : ''));
+                        });
+
+                        var path = window.location.pathname;
+                        path = path.replace(/^\/|\/$/g, '');
+                        
+                        var segments = path.split('/');
+                        var lastSegment = segments[segments.length - 1];
                     
-                    var segments = path.split('/');
-                    var lastSegment = segments[segments.length - 1];
-                
-                    formData.append('lastsegment',lastSegment);
-                    
-                    $.ajax({
-                        url: '{{ Request::url() }}/create',
-                        type: 'POST',
-                        dataType: 'JSON',
-                        data: formData,
-                        contentType: false,
-                        processData: false,
-                        cache: true,
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        beforeSend: function() {
-                            $('#validation_alert').hide();
-                            $('#validation_alert').html('');
-                            loadingOpen('#modal1');
-                        },
-                        success: function(response) {
-                            loadingClose('#modal1');
-                            $('input').css('border', 'none');
-                            $('input').css('border-bottom', '0.5px solid black');
-                            if(response.status == 200) {
-                                success();
-                                M.toast({
-                                    html: response.message
-                                });
-                            } else if(response.status == 422) {
-                                $('#validation_alert').show();
-                                $('.modal-content').scrollTop(0);
-                                
-                                swal({
-                                    title: 'Ups! Validation',
-                                    text: 'Check your form.',
-                                    icon: 'warning'
-                                });
-                                $.each(response.error, function(field, errorMessage) {
-                                    $('#' + field).addClass('error-input');
-                                    $('#' + field).css('border', '1px solid red');
-                                    
-                                });
-                                $.each(response.error, function(i, val) {
-                                    $.each(val, function(i, val) {
-                                        $('#validation_alert').append(`
-                                            <div class="card-alert card red">
-                                                <div class="card-content white-text">
-                                                    <p>` + val + `</p>
-                                                </div>
-                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                    <span aria-hidden="true">×</span>
-                                                </button>
-                                            </div>
-                                        `);
+                        formData.append('lastsegment',lastSegment);
+                        
+                        $.ajax({
+                            url: '{{ Request::url() }}/create',
+                            type: 'POST',
+                            dataType: 'JSON',
+                            data: formData,
+                            contentType: false,
+                            processData: false,
+                            cache: true,
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            beforeSend: function() {
+                                $('#validation_alert').hide();
+                                $('#validation_alert').html('');
+                                loadingOpen('#modal1');
+                            },
+                            success: function(response) {
+                                loadingClose('#modal1');
+                                $('input').css('border', 'none');
+                                $('input').css('border-bottom', '0.5px solid black');
+                                if(response.status == 200) {
+                                    success();
+                                    M.toast({
+                                        html: response.message
                                     });
-                                });
-                            } else {
-                                M.toast({
-                                    html: response.message
+                                } else if(response.status == 422) {
+                                    $('#validation_alert').show();
+                                    $('.modal-content').scrollTop(0);
+                                    
+                                    swal({
+                                        title: 'Ups! Validation',
+                                        text: 'Check your form.',
+                                        icon: 'warning'
+                                    });
+                                    $.each(response.error, function(field, errorMessage) {
+                                        $('#' + field).addClass('error-input');
+                                        $('#' + field).css('border', '1px solid red');
+                                        
+                                    });
+                                    $.each(response.error, function(i, val) {
+                                        $.each(val, function(i, val) {
+                                            $('#validation_alert').append(`
+                                                <div class="card-alert card red">
+                                                    <div class="card-content white-text">
+                                                        <p>` + val + `</p>
+                                                    </div>
+                                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                        <span aria-hidden="true">×</span>
+                                                    </button>
+                                                </div>
+                                            `);
+                                        });
+                                    });
+                                } else {
+                                    M.toast({
+                                        html: response.message
+                                    });
+                                }
+                            },
+                            error: function() {
+                                $('.modal-content').scrollTop(0);
+                                loadingClose('#modal1');
+                                swal({
+                                    title: 'Ups!',
+                                    text: 'Check your internet connection.',
+                                    icon: 'error'
                                 });
                             }
-                        },
-                        error: function() {
-                            $('.modal-content').scrollTop(0);
-                            loadingClose('#modal1');
-                            swal({
-                                title: 'Ups!',
-                                text: 'Check your internet connection.',
-                                icon: 'error'
-                            });
-                        }
-                    });
+                        });
+                    }else{
+                        swal({
+                            title: 'Ups! hayo',
+                            text: 'Terdapat selisih antara daftar biaya dengan nominal dokumen terpakai.',
+                            icon: 'warning'
+                        });
+                    }
                 }else{
                     swal({
                         title: 'Ups! hayo',
@@ -2499,6 +2608,13 @@
                             </td>
                         </tr>
                     `);
+                }
+
+                if(response.costs.length > 0){
+                    $('#body-detail-cost').empty();
+                    $.each(response.costs, function(i, val) {
+                        
+                    });
                 }
 
                 $('#user_bank_id').empty();

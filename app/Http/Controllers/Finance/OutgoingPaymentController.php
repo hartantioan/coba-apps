@@ -288,15 +288,13 @@ class OutgoingPaymentController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="7">Daftar Pembayaran</th>
+                                <th class="center-align" colspan="5">Daftar Pembayaran</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Referensi</th>
                                 <th class="center-align">Tipe</th>
                                 <th class="center-align">Keterangan</th>
-                                <th class="center-align">Dist.Biaya</th>
-                                <th class="center-align">Coa</th>
                                 <th class="center-align">Bayar</th>
                             </tr>
                         </thead><tbody>';
@@ -308,17 +306,60 @@ class OutgoingPaymentController extends Controller
                 <td class="center-align">'.$row->getCode().'</td>
                 <td class="center-align">'.$row->type().'</td>
                 <td class="center-align">'.$row->note.'</td>
-                <td class="center-align">'.($row->cost_distribution_id ? $row->costDistribution->code.' - '.$row->costDistribution->name : '-').'</td>
-                <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
                 <td class="right-align">'.number_format($row->nominal,3,',','.').'</td>
             </tr>';
         }
         $string .= '<tr>
-                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="6"> Total </td>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="4"> Total </td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalnominal, 3, ',', '.') . '</td>
             </tr>  
         ';
         
+        $string .= '</tbody></table></div>';
+
+        $string .= '<div class="col s12"><table>
+        <thead>
+            <tr>
+                <th class="center-align" colspan="14">Daftar Biaya</th>
+            </tr>
+            <tr>
+                <th class="center-align">No.</th>
+                <th class="center-align">Coa</th>
+                <th class="center-align">Dist.Biaya</th>
+                <th class="center-align">Plant</th>
+                <th class="center-align">Line</th>
+                <th class="center-align">Mesin</th>
+                <th class="center-align">Divisi</th>
+                <th class="center-align">Proyek</th>
+                <th class="center-align">Ket.1</th>
+                <th class="center-align">Ket.2</th>
+                <th class="center-align">Debit FC</th>
+                <th class="center-align">Kredit FC</th>
+                <th class="center-align">Debit Rp</th>
+                <th class="center-align">Kredit Rp</th>
+            </tr>
+        </thead><tbody>';
+
+        foreach($data->paymentRequest->paymentRequestCost as $key => $row){
+            
+            $string .= '<tr>
+                <td class="center-align">'.($key + 1).'</td>
+                <td class="">'.$row->coa->code.' - '.$row->coa->name.'</td>
+                <td class="center-align">'.($row->costDistribution()->exists() ? $row->costDistribution->name : '-').'</td>
+                <td class="center-align">'.($row->place()->exists() ? $row->place->code : '-').'</td>
+                <td class="center-align">'.($row->line()->exists() ? $row->line->code : '-').'</td>
+                <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
+                <td class="center-align">'.($row->division()->exists() ? $row->division->name : '-').'</td>
+                <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
+                <td class="">'.$row->note.'</td>
+                <td class="">'.$row->note2.'</td>
+                <td class="right-align">'.number_format($row->nominal_debit_fc,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->nominal_credit_fc,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->nominal_debit,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->nominal_credit,2,',','.').'</td>
+            </tr>';
+        }
+
         $string .= '</tbody></table></div>';
 
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
@@ -650,6 +691,9 @@ class OutgoingPaymentController extends Controller
             }else{
                 if($query->journal()->exists()){
                     CustomHelper::removeJournal($query->getTable(),$query->id);
+                    $query->paymentRequest->update([
+                        'status'    => '2',
+                    ]);
                 }
 
                 $query->update([

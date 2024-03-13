@@ -686,8 +686,6 @@ class PaymentRequestController extends Controller
                             $total = $data->balancePaymentRequest();
                             $details[] = [
                                 'id'            => $data->id,
-                                'detail_id'     => $data->id,
-                                'detail_type'   => 'purchase_down_payments',
                                 'type'          => 'purchase_down_payments',
                                 'code'          => CustomHelper::encrypt($data->code),
                                 'rawcode'       => $data->code,
@@ -728,8 +726,6 @@ class PaymentRequestController extends Controller
                             $total = $data->balancePaymentRequest();
                             $details[] = [
                                 'id'            => $data->id,
-                                'detail_id'     => $data->id,
-                                'detail_type'   => 'purchase_invoices',
                                 'type'          => 'purchase_invoices',
                                 'code'          => CustomHelper::encrypt($data->code),
                                 'rawcode'       => $data->code,
@@ -770,8 +766,6 @@ class PaymentRequestController extends Controller
                             $total = $data->balancePaymentRequest();
                             $details[] = [
                                 'id'            => $data->id,
-                                'detail_id'     => $data->id,
-                                'detail_type'   => 'marketing_order_memos',
                                 'type'          => 'marketing_order_memos',
                                 'code'          => CustomHelper::encrypt($data->code),
                                 'rawcode'       => $data->code,
@@ -1042,7 +1036,7 @@ class PaymentRequestController extends Controller
                                 'place_id'                      => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
                                 'line_id'                       => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
                                 'machine_id'                    => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
-                                'department_id'                 => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
+                                'department_id'                 => $request->arr_division[$key] ? $request->arr_division[$key] : NULL,
                                 'project_id'                    => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
                                 'nominal_debit'                 => str_replace(',','.',str_replace('.','',$request->arr_nominal_debit[$key])),
                                 'nominal_credit'                => str_replace(',','.',str_replace('.','',$request->arr_nominal_credit[$key])),
@@ -1059,22 +1053,19 @@ class PaymentRequestController extends Controller
                             $code = CustomHelper::decrypt($request->arr_code[$key]);
 
                             if($row == 'fund_requests'){
-                                $idDetail = FundRequest::where('code',$code)->first()->id;
-                            }elseif($row == 'fund_request_details'){
-                                $idDetail = FundRequestDetail::find($request->arr_id[$key])->id;
+                                $idDetail = FundRequest::find($request->arr_id[$key])->id;
                             }elseif($row == 'purchase_down_payments'){
-                                $idDetail = PurchaseDownPayment::where('code',$code)->first()->id;
+                                $idDetail = PurchaseDownPayment::find($request->arr_id[$key])->id;
                             }elseif($row == 'purchase_invoices'){
-                                $idDetail = PurchaseInvoice::where('code',$code)->first()->id;
+                                $idDetail = PurchaseInvoice::find($request->arr_id[$key])->id;
                             }elseif($row == 'marketing_order_memos'){
-                                $idDetail = MarketingOrderMemo::where('code',$code)->first()->id;
+                                $idDetail = MarketingOrderMemo::find($request->arr_id[$key])->id;
                             }
                             
                             $prd = PaymentRequestDetail::create([
                                 'payment_request_id'            => $query->id,
                                 'lookable_type'                 => $row,
                                 'lookable_id'                   => $idDetail,
-                                'cost_distribution_id'          => $request->arr_cost_distribution[$key] ? $request->arr_cost_distribution[$key] : NULL,
                                 'coa_id'                        => $request->arr_coa[$key] ? $request->arr_coa[$key] : NULL,
                                 'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_pay[$key])),
                                 'note'                          => $request->arr_note[$key],
@@ -1142,21 +1133,13 @@ class PaymentRequestController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="14">Daftar Pembayaran</th>
+                                <th class="center-align" colspan="5">Daftar Pembayaran</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Referensi</th>
                                 <th class="center-align">Tipe</th>
                                 <th class="center-align">Keterangan</th>
-                                <th class="center-align">Remark</th>
-                                <th class="center-align">Dist.Biaya</th>
-                                <th class="center-align">Coa</th>
-                                <th class="center-align">Plant</th>
-                                <th class="center-align">Line</th>
-                                <th class="center-align">Mesin</th>
-                                <th class="center-align">Divisi</th>
-                                <th class="center-align">Proyek</th>
                                 <th class="center-align">Bayar</th>
                             </tr>
                         </thead><tbody>';
@@ -1168,23 +1151,60 @@ class PaymentRequestController extends Controller
                 <td class="center-align">'.$row->getCode().'</td>
                 <td class="center-align">'.$row->type().'</td>
                 <td class="center-align">'.$row->note.'</td>
-                <td class="center-align">'.$row->remark.'</td>
-                <td class="center-align">'.($row->cost_distribution_id ? $row->costDistribution->code.' - '.$row->costDistribution->name : '-').'</td>
-                <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
-                <td class="center-align">'.($row->place()->exists() ? $row->place->code : '-').'</td>
-                <td class="center-align">'.($row->line()->exists() ? $row->line->code : '-').'</td>
-                <td class="center-align">'.($row->machine()->exists() ? $row->machine->code : '-').'</td>
-                <td class="center-align">'.($row->department()->exists() ? $row->department->code : '-').'</td>
-                <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
                 <td class="right-align">'.number_format($row->nominal,3,',','.').'</td>
             </tr>';
         }
         $string .= '<tr>
-                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="12"> Total </td>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="4"> Total </td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalbayar, 3, ',', '.') . '</td>
             </tr>  
         ';
         
+        $string .= '</tbody></table></div>';
+
+        $string .= '<div class="col s12"><table>
+        <thead>
+            <tr>
+                <th class="center-align" colspan="14">Daftar Biaya</th>
+            </tr>
+            <tr>
+                <th class="center-align">No.</th>
+                <th class="center-align">Coa</th>
+                <th class="center-align">Dist.Biaya</th>
+                <th class="center-align">Plant</th>
+                <th class="center-align">Line</th>
+                <th class="center-align">Mesin</th>
+                <th class="center-align">Divisi</th>
+                <th class="center-align">Proyek</th>
+                <th class="center-align">Ket.1</th>
+                <th class="center-align">Ket.2</th>
+                <th class="center-align">Debit FC</th>
+                <th class="center-align">Kredit FC</th>
+                <th class="center-align">Debit Rp</th>
+                <th class="center-align">Kredit Rp</th>
+            </tr>
+        </thead><tbody>';
+
+        foreach($data->paymentRequestCost as $key => $row){
+            
+            $string .= '<tr>
+                <td class="center-align">'.($key + 1).'</td>
+                <td class="">'.$row->coa->code.' - '.$row->coa->name.'</td>
+                <td class="center-align">'.($row->costDistribution()->exists() ? $row->costDistribution->name : '-').'</td>
+                <td class="center-align">'.($row->place()->exists() ? $row->place->code : '-').'</td>
+                <td class="center-align">'.($row->line()->exists() ? $row->line->code : '-').'</td>
+                <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
+                <td class="center-align">'.($row->division()->exists() ? $row->division->name : '-').'</td>
+                <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
+                <td class="">'.$row->note.'</td>
+                <td class="">'.$row->note2.'</td>
+                <td class="right-align">'.number_format($row->nominal_debit_fc,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->nominal_credit_fc,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->nominal_debit,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->nominal_credit,2,',','.').'</td>
+            </tr>';
+        }
+
         $string .= '</tbody></table></div>';
 
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
@@ -1293,6 +1313,7 @@ class PaymentRequestController extends Controller
         $arr = [];
         $banks = [];
         $payments = [];
+        $costs = [];
 
         $is_cost = 0;
 
@@ -1312,8 +1333,6 @@ class PaymentRequestController extends Controller
             $code = CustomHelper::encrypt($row->lookable->code);
             $arr[] = [
                 'id'            => $row->lookable_type == 'fund_request_details' ? $row->lookable->fundRequest->id : $row->lookable_id,
-                'detail_id'     => $row->lookable_id,
-                'detail_type'   => $row->lookable_type,
                 'type'          => $row->lookable_type,
                 'type_document' => $row->lookable_type == 'fund_requests' ? $row->lookable->document_status : ($row->lookable_type == 'fund_request_details' ? $row->lookable->fundRequest->document_status : ''),
                 'type_fr'       => $row->lookable_type == 'fund_requests' ? $row->lookable->type : ($row->lookable_type == 'fund_request_details' ? $row->lookable->fundRequest->type : ''),
@@ -1347,6 +1366,25 @@ class PaymentRequestController extends Controller
             ];
         }
 
+        foreach($pr->paymentRequestCost as $row){
+            $costs[] = [
+                'note'              => $row->note,
+                'coa_id'            => $row->coa_id,
+                'coa_name'          => $row->coa->code.' - '.$row->coa->name,
+                'place_id'          => $row->place_id ?? '',
+                'line_id'           => $row->line_id ?? '',
+                'machine_id'        => $row->machine_id ?? '',
+                'division_id'       => $row->division_id ?? '',
+                'project_id'        => $row->project_id ?? '',
+                'project_name'      => $row->project()->exists() ? $row->project->name : '',
+                'nominal_debit_fc'  => number_format($row->nominal_debit_fc,2,',','.'),
+                'nominal_credit_fc' => number_format($row->nominal_credit_fc,2,',','.'),
+                'nominal_debit'     => number_format($row->nominal_debit,2,',','.'),
+                'nominal_credit'    => number_format($row->nominal_credit,2,',','.'),
+                'note2'             => $row->note2,
+            ];
+        }
+
         foreach($pr->paymentRequestCross as $row){
             $balance = $row->lookable->balancePaymentCross();
             $payments[] = [
@@ -1367,6 +1405,7 @@ class PaymentRequestController extends Controller
 
         $pr['details'] = $arr;
         $pr['banks'] = $banks;
+        $pr['costs'] = $costs;
         $pr['payments'] = $payments;
         $pr['is_cost'] =  $is_cost;
         				
@@ -1888,21 +1927,13 @@ class PaymentRequestController extends Controller
                                 <th class="" colspan="13"><h6>Mata Uang : '.$data->currency->code.', Konversi = '.$data->currency_rate.', Bayar dengan <b>'.$data->coaSource->name.'</b>, Sisa Tagihan <b>'.$data->currency->symbol.' <b id="real-balance">'.number_format($data->balance,2,',','.').'</b></b> Tagihan dalam Rupiah = <b id="convert-balance">'.number_format($data->balance * $currency_rate,2,',','.').'</b></h6></th>
                             </tr>
                             <tr>
-                                <th class="center-align" colspan="13">Daftar Item</th>
+                                <th class="center-align" colspan="5">Daftar Dokumen</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Referensi</th>
                                 <th class="center-align">Tipe</th>
                                 <th class="center-align">Keterangan</th>
-                                <th class="center-align">Remark</th>
-                                <th class="center-align">Dist.Biaya</th>
-                                <th class="center-align">Coa</th>
-                                <th class="center-align">Plant</th>
-                                <th class="center-align">Line</th>
-                                <th class="center-align">Mesin</th>
-                                <th class="center-align">Departemen</th>
-                                <th class="center-align">Proyek</th>
                                 <th class="center-align">Bayar</th>
                             </tr>
                         </thead><tbody>';
@@ -1914,15 +1945,52 @@ class PaymentRequestController extends Controller
                         <td class="center-align">'.$row->getCode().'</td>
                         <td class="center-align">'.$row->type().'</td>
                         <td class="center-align">'.$row->note.'</td>
-                        <td class="center-align">'.$row->remark.'</td>
-                        <td class="center-align">'.($row->cost_distribution_id ? $row->costDistribution->code.' - '.$row->costDistribution->name : '-').'</td>
-                        <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
-                        <td class="center-align">'.($row->place()->exists() ? $row->place->code : '').'</td>
-                        <td class="center-align">'.($row->line()->exists() ? $row->line->name : '').'</td>
-                        <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '').'</td>
-                        <td class="center-align">'.($row->department()->exists() ? $row->department->name : '').'</td>
-                        <td class="center-align">'.($row->project()->exists() ? $row->project->name : '').'</td>
                         <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
+                    </tr>';
+                }
+
+                $html .= '</tbody></table></div>';
+
+                $html .= '<div class="col s12"><table>
+                <thead>
+                    <tr>
+                        <th class="center-align" colspan="14">Daftar Biaya</th>
+                    </tr>
+                    <tr>
+                        <th class="center-align">No.</th>
+                        <th class="center-align">Coa</th>
+                        <th class="center-align">Dist.Biaya</th>
+                        <th class="center-align">Plant</th>
+                        <th class="center-align">Line</th>
+                        <th class="center-align">Mesin</th>
+                        <th class="center-align">Divisi</th>
+                        <th class="center-align">Proyek</th>
+                        <th class="center-align">Ket.1</th>
+                        <th class="center-align">Ket.2</th>
+                        <th class="center-align">Debit FC</th>
+                        <th class="center-align">Kredit FC</th>
+                        <th class="center-align">Debit Rp</th>
+                        <th class="center-align">Kredit Rp</th>
+                    </tr>
+                </thead><tbody>';
+
+                foreach($data->paymentRequestCost as $key => $row){
+                    
+                    $html .= '<tr>
+                        <td class="center-align">'.($key + 1).'</td>
+                        <td class="">'.$row->coa->code.' - '.$row->coa->name.'</td>
+                        <td class="center-align">'.($row->costDistribution()->exists() ? $row->costDistribution->name : '-').'</td>
+                        <td class="center-align">'.($row->place()->exists() ? $row->place->code : '-').'</td>
+                        <td class="center-align">'.($row->line()->exists() ? $row->line->code : '-').'</td>
+                        <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
+                        <td class="center-align">'.($row->division()->exists() ? $row->division->name : '-').'</td>
+                        <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
+                        <td class="">'.$row->note.'</td>
+                        <td class="">'.$row->note2.'</td>
+                        <td class="right-align">'.number_format($row->nominal_debit_fc,2,',','.').'</td>
+                        <td class="right-align">'.number_format($row->nominal_credit_fc,2,',','.').'</td>
+                        <td class="right-align">'.number_format($row->nominal_debit,2,',','.').'</td>
+                        <td class="right-align">'.number_format($row->nominal_credit,2,',','.').'</td>
                     </tr>';
                 }
 

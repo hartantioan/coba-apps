@@ -85,14 +85,11 @@
                                                     <tr>
                                                         <th rowspan="2">#</th>
                                                         <th rowspan="2">Code</th>
-                                                        <th rowspan="2">Plant</th>
-                                                        <th rowspan="2">Divisi</th>
                                                         <th rowspan="2">Partner Bisnis</th>
                                                         <th rowspan="2">Tipe</th>
                                                         <th colspan="2" class="center-align">Tanggal</th>
                                                         <th colspan="2" class="center-align">Mata Uang</th>
                                                         <th rowspan="2">Keterangan</th>
-                                                        <th rowspan="2">Termin</th>
                                                         <th rowspan="2">Tipe Pembayaran</th>
                                                         <th rowspan="2">No.Dokumen</th>
                                                         <th rowspan="2">Tgl.Dokumen</th>
@@ -165,6 +162,14 @@
                                     </select>
                                 </div>
                                 <div class="input-field col m3 s12">
+                                    <select class="form-control" id="company_id" name="company_id">
+                                        @foreach ($company as $rowcompany)
+                                            <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="" for="company_id">Perusahaan</label>
+                                </div>
+                                <div class="input-field col m3 s12">
                                     <select class="form-control" id="type" name="type" onchange="applyBpList();">
                                         <option value="1">Pembayaran</option>
                                         <option value="2">Pinjaman</option>
@@ -195,36 +200,10 @@
                                     </div>
                                 </div>
                                 <div class="input-field col m3 s12">
-                                    <select class="form-control" id="place_id" name="place_id">
-                                        @foreach ($place as $rowplace)
-                                            <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                                        @endforeach
-                                    </select>
-                                    <label class="" for="place_id">Plant</label>
-                                </div>
-                                <div class="input-field col m3 s12">
-                                    <select class="form-control" id="division_id" name="division_id">
-                                        @foreach ($division as $row)
-                                            <option value="{{ $row->id }}" {{ $row->id == session('bo_division_id') ? 'selected' : '' }}>{{ $row->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    <label class="" for="division_id">Divisi</label>
-                                </div>
-                                <div class="input-field col m3 s12">
-                                    <textarea id="note" name="note" class="materialize-textarea" placeholder="Ulasan singkat produk..."></textarea>
-                                    <label class="active" for="note">Keterangan</label>
-                                </div>
-                                <div class="input-field col m3 s12">
-                                    <textarea id="termin_note" name="termin_note" class="materialize-textarea" placeholder="Informasi termin pembayaran..."></textarea>
-                                    <label class="active" for="termin_note">Termin</label>
-                                </div>
-                                <div class="input-field col m3 s12">
                                     <select class="form-control" id="payment_type" name="payment_type">
                                         <option value="2">Transfer</option>
                                         <option value="1">Tunai</option>
-                                        <option value="3">Cek</option>
-                                        <option value="4">BG</option>
-                                        <option value="5">Credit</option>
+                                        <option value="3">Cek/BG</option>
                                     </select>
                                     <label class="" for="payment_type">Tipe Pembayaran</label>
                                 </div>
@@ -256,6 +235,10 @@
                                     <input id="invoice_no" name="invoice_no" type="text" placeholder="Nomor Invoice dari Suppplier/Vendor">
                                     <label class="active" for="invoice_no">No. Invoice (Opsional)</label>
                                 </div>
+                                <div class="input-field col m3 s12">
+                                    <textarea id="note" name="note" class="materialize-textarea" placeholder="Ulasan singkat produk..."></textarea>
+                                    <label class="active" for="note">Keterangan</label>
+                                </div>
                                 <div class="input-field col m3 s12 right-align">
                                     <h6>Limit BS : <b><span id="limit">0,00</span></b></h6>
                                 </div>
@@ -274,6 +257,8 @@
                                         </select>
                                         <label class="" for="is_reimburse">Apakah Reimburse?</label>
                                     </div>
+                                </div>
+                                <div class="col m12">
                                     <div class="input-field col m3 s12">
                                         <select class="browser-default" id="user_bank_id" name="user_bank_id" onchange="getRekening()">
                                             <option value="">--Pilih Partner Bisnis-</option>
@@ -329,6 +314,7 @@
                                                     <th class="center">PPN</th>
                                                     <th class="center">Incl.PPN</th>
                                                     <th class="center">PPh</th>
+                                                    <th class="center">Total</th>
                                                     <th class="center">Plant</th>
                                                     <th class="center">Line</th>
                                                     <th class="center">Mesin</th>
@@ -339,7 +325,7 @@
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
-                                                    <td colspan="14">
+                                                    <td colspan="15">
                                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> Tambah Detail
                                                         </a>
@@ -628,6 +614,7 @@
             $('input[name^="arr_tax"]').eq(index).val(row_tax);
             $('input[name^="arr_wtax"]').eq(index).val(row_wtax);
             $('input[name^="arr_total"]').eq(index).val(formatRupiahIni(row_total.toFixed(2).toString().replace('.',',')));
+            $('.rowgrandtotal').eq(index).text(formatRupiahIni(row_grandtotal.toFixed(2).toString().replace('.',',')));
             $('input[name^="arr_grandtotal"]').eq(index).val(row_grandtotal);
             totalall += row_total;
             taxall += row_tax;
@@ -685,6 +672,9 @@
                         <option value="{{ $row->id }}" {{ $row->is_default_pph ? 'selected' : '' }} data-value="{{ $row->percentage }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
                         @endforeach
                     </select>
+                </td>
+                <td class="right-align rowgrandtotal">
+                    0,00
                 </td>
                 <td>
                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
@@ -849,8 +839,6 @@
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
-                { name: 'place_id', className: 'center-align' },
-                { name: 'division_id', className: 'center-align' },
                 { name: 'account_id', className: 'center-align' },
                 { name: 'type', className: 'center-align' },
                 { name: 'date_post', className: 'center-align' },
@@ -858,7 +846,6 @@
                 { name: 'currency_id', className: 'center-align' },
                 { name: 'currency_rate', className: 'center-align' },
                 { name: 'note', className: '' },
-                { name: 'termin_note', className: 'center-align' },
                 { name: 'payment_type', className: 'center-align' },
                 { name: 'document_no', className: '' },
                 { name: 'document_date', className: '' },
@@ -1195,9 +1182,7 @@
                 $('#post_date').val(response.post_date);
                 $('#required_date').val(response.required_date);
                 $('#required_date').removeAttr('min');
-                $('#place_id').val(response.place_id).formSelect();
-                $('#division_id').val(response.division_id).formSelect();
-                $('#termin_note').val(response.termin_note);
+                $('#company_id').val(response.company_id).formSelect();
                 $('#payment_type').val(response.payment_type).formSelect();
                 $('#is_reimburse').val(response.is_reimburse).formSelect();
                 $('#document_no').val(response.document_no);
@@ -1272,6 +1257,9 @@
                                         <option value="{{ $row->id }}" {{ $row->is_default_pph ? 'selected' : '' }} data-value="{{ $row->percentage }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
                                         @endforeach
                                     </select>
+                                </td>
+                                <td class="right-align rowgrandtotal">
+                                    ` + val.format_grandtotal + `
                                 </td>
                                 <td>
                                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">

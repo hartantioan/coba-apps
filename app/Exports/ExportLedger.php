@@ -54,7 +54,7 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
             }
         })
         ->where('company_id',intval($this->company_id))
-        ->whereDoesntHave('childSub')
+        ->where('level','5')
         ->where('status', 1)
         ->get();
 

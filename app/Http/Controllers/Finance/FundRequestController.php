@@ -43,6 +43,7 @@ use App\Models\Department;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportFundRequest;
 use App\Exports\ExportOutstandingFundRequest;
+use App\Models\Company;
 use App\Models\Division;
 use App\Models\GoodIssueRequest;
 use App\Models\Line;
@@ -92,8 +93,6 @@ class FundRequestController extends Controller
             'id',
             'user_id',
             'code',
-            'place_id',
-            'division_id',
             'account_id',
             'type',
             'post_date',
@@ -101,7 +100,6 @@ class FundRequestController extends Controller
             'currency_id',
             'currency_rate',
             'note',
-            'termin_note',
             'payment_type',
             'document_no',
             'document_date',
@@ -220,8 +218,6 @@ class FundRequestController extends Controller
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->user->name,
-                    $val->place->code,
-                    $val->division()->exists() ? $val->division->name : '',
                     $val->account->name,
                     $val->type(),
                     date('d/m/Y',strtotime($val->post_date)),
@@ -229,7 +225,6 @@ class FundRequestController extends Controller
                     $val->currency->code,
                     number_format($val->currency_rate,2,',','.'),
                     $val->note,
-                    $val->termin_note,
                     $val->paymentType(),
                     $val->document_no,
                     $val->document_date ? date('d/m/Y',strtotime($val->document_date)) : '',
@@ -809,6 +804,7 @@ class FundRequestController extends Controller
             'title'         => 'Pengajuan Permohonan Dana - Pengguna',
             'content'       => 'admin.personal.fund_request',
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+            'company'       => Company::where('status','1')->get(),
             'division'      => Division::where('status','1')->get(),
             'line'          => Line::where('status','1')->get(),
             'machine'       => Machine::where('status','1')->get(),
@@ -829,8 +825,6 @@ class FundRequestController extends Controller
         $column = [
             'id',
             'code',
-            'place_id',
-            'division_id',
             'account_id',
             'type',
             'post_date',
@@ -838,7 +832,6 @@ class FundRequestController extends Controller
             'currency_id',
             'currency_rate',
             'note',
-            'termin_note',
             'payment_type',
             'document_no',
             'document_date',
@@ -920,8 +913,6 @@ class FundRequestController extends Controller
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
-                    $val->place->code,
-                    $val->division()->exists() ? $val->division->name : '',
                     $val->account->name,
                     $val->type(),
                     date('d/m/Y',strtotime($val->post_date)),
@@ -929,7 +920,6 @@ class FundRequestController extends Controller
                     $val->currency->code,
                     number_format($val->currency_rate,2,',','.'),
                     $val->note,
-                    $val->termin_note,
                     $val->paymentType(),
                     $val->document_no,
                     $val->document_date ? date('d/m/Y',strtotime($val->document_date)) : '',
@@ -1005,12 +995,11 @@ class FundRequestController extends Controller
             'code_place_id'             => 'required',
             /* 'code'			            => $request->temp ? ['required', Rule::unique('fund_requests', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:fund_requests,code',
              */'account_id'                => 'required',
+            'company_id'                => 'required',
             'type'                      => 'required',
             'is_reimburse'              => 'required',
 			'post_date' 				=> 'required',
 			'required_date'		        => 'required',
-            'place_id'                  => 'required',
-            'division_id'               => 'required',
             'note'		                => 'required',
             'payment_type'		        => 'required',
             'currency_id'		        => 'required',
@@ -1025,12 +1014,11 @@ class FundRequestController extends Controller
             'code.required' 	                => 'Kode tidak boleh kosong.',
             'code_place_id.required'            => 'Plant Tidak boleh kosong',
             'account_id.required'               => 'Target Partner Bisnis tidak boleh kosong',
+            'company_id.required'               => 'Perusahaan tidak boleh kosong',
             'type.required'                     => 'Tipe tidak boleh kosong',
             'is_reimburse.required'             => 'Reimburse tidak boleh kosong',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
 			'required_date.required' 			=> 'Tanggal request pembayaran tidak boleh kosong.',
-            'place_id.required'                 => 'Penempatan lokasi tidak boleh kosong.',
-            'division_id.required'              => 'Divisi tidak boleh kosong.',
 			'note.required'				        => 'Keterangan tidak boleh kosong',
             'payment_type.required'				=> 'Tipe pembayaran tidak boleh kosong',
             'currency_id.required'				=> 'Mata uang tidak boleh kosong',
@@ -1099,16 +1087,14 @@ class FundRequestController extends Controller
                         
                         $query->code = $request->code;
                         $query->user_id = session('bo_id');
-                        $query->place_id = $request->place_id;
-                        $query->division_id = $request->division_id;
                         $query->account_id = $request->account_id;
+                        $query->company_id = $request->company_id;
                         $query->type = $request->type;
                         $query->post_date = $request->post_date;
                         $query->required_date = $request->required_date;
                         $query->currency_id = $request->currency_id;
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                         $query->note = $request->note;
-                        $query->termin_note = $request->termin_note;
                         $query->payment_type = $request->payment_type;
                         $query->document_no = $request->document_no;
                         $query->document_date = $request->document_date;
@@ -1155,16 +1141,14 @@ class FundRequestController extends Controller
                     $query = FundRequest::create([
                         'code'			=> $newCode,
                         'user_id'		=> session('bo_id'),
-                        'place_id'      => $request->place_id,
-                        'division_id'	=> $request->division_id,
                         'account_id'    => $request->account_id,
+                        'company_id'    => $request->company_id,
                         'type'          => $request->type,
                         'post_date'     => $request->post_date,
                         'required_date' => $request->required_date,
                         'currency_id'   => $request->currency_id,
                         'currency_rate' => str_replace(',','.',str_replace('.','',$request->currency_rate)),
                         'note'          => $request->note,
-                        'termin_note'   => $request->termin_note,
                         'payment_type'  => $request->payment_type,
                         'document_no'   => $request->document_no,
                         'document_date' => $request->document_date,
@@ -1452,6 +1436,7 @@ class FundRequestController extends Controller
                 'tax'               => $row->tax,
                 'wtax'              => $row->wtax,
                 'grandtotal'        => $row->grandtotal,
+                'format_grandtotal' => number_format($row->grandtotal,2,',','.'),
                 'tax_id'            => $row->tax_id,
                 'wtax_id'           => $row->wtax_id,
                 'is_include_tax'    => $row->is_include_tax,

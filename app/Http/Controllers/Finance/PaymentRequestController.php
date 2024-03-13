@@ -54,6 +54,7 @@ use App\Models\Menu;
 use App\Models\MarketingOrderMemo;
 use App\Models\MenuUser;
 use App\Models\OutgoingPayment;
+use App\Models\PaymentRequestCost;
 use App\Models\Warehouse;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -422,26 +423,27 @@ class PaymentRequestController extends Controller
                 if(!$row->used()->exists() && $row->balancePaymentRequest() > 0 && $row->document_status !== '1' && $row->status == '2' && $data->type == '1'){
                     $memo = 0;
                     $final = $row->balancePaymentRequest() - $memo;
+
                     $details[] = [
-                        'id'            => $row->id,
-                        'type'          => 'fund_requests',
-                        'code'          => CustomHelper::encrypt($row->code),
-                        'rawcode'       => $row->code,
-                        'rawdate'       => $row->post_date,
-                        'post_date'     => date('d/m/Y',strtotime($row->post_date)),
-                        'due_date'      => date('d/m/Y',strtotime($row->required_date)),
-                        'total'         => number_format($row->total,2,',','.'),
-                        'tax'           => number_format($row->tax,2,',','.'),
-                        'wtax'          => number_format($row->wtax,2,',','.'),
-                        'grandtotal'    => number_format($row->grandtotal,2,',','.'),
-                        'downpayment'   => number_format(0,2,',','.'),
-                        'rounding'      => number_format(0,2,',','.'),
-                        'balance'       => number_format($row->balancePaymentRequest(),2,',','.'),
-                        'memo'          => number_format($memo,2,',','.'),
-                        'final'         => $row->currency->symbol.' '.number_format($final,2,',','.'),
-                        'note'          => $row->note ? $row->note : '',
-                        'type_fr'       => $row->type,
-                        'document_status'=> $row->document_status,
+                        'id'                => $row->id,
+                        'type'              => 'fund_requests',
+                        'code'              => CustomHelper::encrypt($row->code),
+                        'rawcode'           => $row->code,
+                        'rawdate'           => $row->post_date,
+                        'post_date'         => date('d/m/Y',strtotime($row->post_date)),
+                        'due_date'          => date('d/m/Y',strtotime($row->required_date)),
+                        'total'             => number_format($row->total,2,',','.'),
+                        'tax'               => number_format($row->tax,2,',','.'),
+                        'wtax'              => number_format($row->wtax,2,',','.'),
+                        'grandtotal'        => number_format($row->grandtotal,2,',','.'),
+                        'downpayment'       => number_format(0,2,',','.'),
+                        'rounding'          => number_format(0,2,',','.'),
+                        'balance'           => number_format($row->balancePaymentRequest(),2,',','.'),
+                        'memo'              => number_format($memo,2,',','.'),
+                        'final'             => $row->currency->symbol.' '.number_format($final,2,',','.'),
+                        'note'              => $row->note ? $row->note : '',
+                        'type_fr'           => $row->type,
+                        'document_status'   => $row->document_status,
                     ];
                 }
             }
@@ -451,25 +453,25 @@ class PaymentRequestController extends Controller
                     $memo = 0;
                     $final = $row->grandtotal - $memo;
                     $details[] = [
-                        'id'            => $row->id,
-                        'type'          => 'purchase_down_payments',
-                        'code'          => CustomHelper::encrypt($row->code),
-                        'rawcode'       => $row->code,
-                        'rawdate'       => $row->post_date,
-                        'post_date'     => date('d/m/Y',strtotime($row->post_date)),
-                        'due_date'      => date('d/m/Y',strtotime($row->due_date)),
-                        'total'         => number_format($row->total,2,',','.'),
-                        'tax'           => number_format($row->tax,2,',','.'),
-                        'wtax'          => number_format($row->wtax,2,',','.'),
-                        'grandtotal'    => number_format($row->grandtotal,2,',','.'),
-                        'downpayment'   => number_format(0,2,',','.'),
-                        'rounding'      => number_format(0,2,',','.'),
-                        'balance'       => number_format($row->grandtotal,2,',','.'),
-                        'memo'          => number_format($memo,2,',','.'),
-                        'final'         => $row->currency->symbol.' '.number_format($final,2,',','.'),
-                        'note'          => $row->note ? $row->note : '',
-                        'type_fr'       => '',
-                        'document_status'=> '',
+                        'id'                => $row->id,
+                        'type'              => 'purchase_down_payments',
+                        'code'              => CustomHelper::encrypt($row->code),
+                        'rawcode'           => $row->code,
+                        'rawdate'           => $row->post_date,
+                        'post_date'         => date('d/m/Y',strtotime($row->post_date)),
+                        'due_date'          => date('d/m/Y',strtotime($row->due_date)),
+                        'total'             => number_format($row->total,2,',','.'),
+                        'tax'               => number_format($row->tax,2,',','.'),
+                        'wtax'              => number_format($row->wtax,2,',','.'),
+                        'grandtotal'        => number_format($row->grandtotal,2,',','.'),
+                        'downpayment'       => number_format(0,2,',','.'),
+                        'rounding'          => number_format(0,2,',','.'),
+                        'balance'           => number_format($row->grandtotal,2,',','.'),
+                        'memo'              => number_format($memo,2,',','.'),
+                        'final'             => $row->currency->symbol.' '.number_format($final,2,',','.'),
+                        'note'              => $row->note ? $row->note : '',
+                        'type_fr'           => '',
+                        'document_status'   => '',
                     ];
                 }
             }
@@ -479,24 +481,24 @@ class PaymentRequestController extends Controller
                     $memo = $row->totalMemo();
                     $final = $row->balance - $memo;
                     $details[] = [
-                        'id'            => $row->id,
-                        'type'          => 'purchase_invoices',
-                        'code'          => CustomHelper::encrypt($row->code),
-                        'rawcode'       => $row->code,
-                        'rawdate'       => $row->post_date,
-                        'post_date'     => date('d/m/Y',strtotime($row->post_date)),
-                        'due_date'      => date('d/m/Y',strtotime($row->due_date)),
-                        'total'         => number_format($row->total,2,',','.'),
-                        'tax'           => number_format($row->tax,2,',','.'),
-                        'wtax'          => number_format($row->wtax,2,',','.'),
-                        'grandtotal'    => number_format($row->grandtotal,2,',','.'),
-                        'downpayment'   => number_format($row->downpayment,2,',','.'),
-                        'rounding'      => number_format($row->rounding,2,',','.'),
-                        'balance'       => number_format($row->balance,2,',','.'),
-                        'memo'          => number_format($memo,2,',','.'),
-                        'final'         => $row->currency()->symbol.' '.number_format($final,2,',','.'),
-                        'type_fr'       => '',
-                        'document_status'=> '',
+                        'id'                => $row->id,
+                        'type'              => 'purchase_invoices',
+                        'code'              => CustomHelper::encrypt($row->code),
+                        'rawcode'           => $row->code,
+                        'rawdate'           => $row->post_date,
+                        'post_date'         => date('d/m/Y',strtotime($row->post_date)),
+                        'due_date'          => date('d/m/Y',strtotime($row->due_date)),
+                        'total'             => number_format($row->total,2,',','.'),
+                        'tax'               => number_format($row->tax,2,',','.'),
+                        'wtax'              => number_format($row->wtax,2,',','.'),
+                        'grandtotal'        => number_format($row->grandtotal,2,',','.'),
+                        'downpayment'       => number_format($row->downpayment,2,',','.'),
+                        'rounding'          => number_format($row->rounding,2,',','.'),
+                        'balance'           => number_format($row->balance,2,',','.'),
+                        'memo'              => number_format($memo,2,',','.'),
+                        'final'             => $row->currency()->symbol.' '.number_format($final,2,',','.'),
+                        'type_fr'           => '',
+                        'document_status'   => '',
                     ];
                 }
             }
@@ -506,25 +508,25 @@ class PaymentRequestController extends Controller
                     $memo = $row->totalUsed();
                     $final = $row->grandtotal - $memo;
                     $details[] = [
-                        'id'            => $row->id,
-                        'type'          => 'marketing_order_memos',
-                        'code'          => CustomHelper::encrypt($row->code),
-                        'rawcode'       => $row->code,
-                        'rawdate'       => $row->post_date,
-                        'post_date'     => date('d/m/Y',strtotime($row->post_date)),
-                        'due_date'      => date('d/m/Y',strtotime($row->post_date)),
-                        'total'         => number_format($row->total,2,',','.'),
-                        'tax'           => number_format($row->tax,2,',','.'),
-                        'wtax'          => number_format(0,2,',','.'),
-                        'grandtotal'    => number_format($row->grandtotal,2,',','.'),
-                        'downpayment'   => number_format(0,2,',','.'),
-                        'rounding'      => number_format(0,2,',','.'),
-                        'balance'       => number_format($row->grandtotal,2,',','.'),
-                        'memo'          => number_format($memo,2,',','.'),
-                        'final'         => 'IDR '.number_format($final,2,',','.'),
-                        'note'          => $row->note ? $row->note : '',
-                        'type_fr'       => '',
-                        'document_status'=> '',
+                        'id'                => $row->id,
+                        'type'              => 'marketing_order_memos',
+                        'code'              => CustomHelper::encrypt($row->code),
+                        'rawcode'           => $row->code,
+                        'rawdate'           => $row->post_date,
+                        'post_date'         => date('d/m/Y',strtotime($row->post_date)),
+                        'due_date'          => date('d/m/Y',strtotime($row->post_date)),
+                        'total'             => number_format($row->total,2,',','.'),
+                        'tax'               => number_format($row->tax,2,',','.'),
+                        'wtax'              => number_format(0,2,',','.'),
+                        'grandtotal'        => number_format($row->grandtotal,2,',','.'),
+                        'downpayment'       => number_format(0,2,',','.'),
+                        'rounding'          => number_format(0,2,',','.'),
+                        'balance'           => number_format($row->grandtotal,2,',','.'),
+                        'memo'              => number_format($memo,2,',','.'),
+                        'final'             => 'IDR '.number_format($final,2,',','.'),
+                        'note'              => $row->note ? $row->note : '',
+                        'type_fr'           => '',
+                        'document_status'   => '',
                     ];
                 }
             }
@@ -581,43 +583,97 @@ class PaymentRequestController extends Controller
                         if(!$data->used()->exists() && $data->balancePaymentRequest() > 0 && $data->document_status !== '1'){
                             CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Payment Request');
                             if($data->type == '1'){
-                                $coa = Coa::where('code','100.01.03.03.02')->where('company_id',$data->place->company_id)->first();
+                                $coa = Coa::where('code','100.01.03.03.02')->where('company_id',$data->company_id)->first();
                             }elseif($data->type == '2'){
-                                $coa = Coa::where('code','100.01.03.03.01')->where('company_id',$data->place->company_id)->first();
+                                $coa = Coa::where('code','100.01.03.03.01')->where('company_id',$data->company_id)->first();
                             }
                             $total = $data->balancePaymentRequest();
-                            foreach($data->fundRequestDetail as $row){
-                                $details[] = [
-                                    'id'            => $data->id,
-                                    'detail_id'     => $row->id,
-                                    'detail_type'   => $row->getTable(),
-                                    'type'          => $data->getTable(),
-                                    'code'          => CustomHelper::encrypt($data->code),
-                                    'rawcode'       => $data->code,
-                                    'rawdate'       => $data->post_date,
-                                    'post_date'     => date('d/m/Y',strtotime($data->post_date)),
-                                    'due_date'      => date('d/m/Y',strtotime($data->required_date)),
-                                    'total'         => number_format($row->total,2,',','.'),
-                                    'tax'           => number_format($row->tax,2,',','.'),
-                                    'wtax'          => number_format($row->wtax,2,',','.'),
-                                    'grandtotal'    => number_format($row->grandtotal,2,',','.'),
-                                    'balance'       => number_format($row->balancePaymentRequest(),2,',','.'),
-                                    'balance_duplicate' => number_format($row->balancePaymentRequest(),2,',','.'),
-                                    'coa_id'        => $data->type == '1' ? ($data->document_status == '3' ? ($coa ? $coa->id : '') : '') : $coa->id,
-                                    'coa_name'      => $data->type == '1' ? ($data->document_status == '3' ? ($coa ? $coa->code.' - '.$coa->name : '') : '') : $coa->code.' - '.$coa->name,
-                                    'memo'          => number_format(0,2,',','.'),
-                                    'currency_id'   => $data->currency_id,
-                                    'currency_rate' => number_format($data->currency_rate,2,',','.'),
-                                    'note'          => $data->note ? $data->note : '',
-                                    'name_account'  => $data->name_account ?? '',
-                                    'no_account'    => $data->no_account ?? '' ,
-                                    'bank_account'  => $data->bank_account ?? '',
-                                    'place_id'      => $row->place_id,
-                                    'department_id' => $row->division_id,
-                                    'account_code'  => $data->account->employee_no,
-                                    'remark'        => $row->note
-                                ];
+                            $balanceduplicate = round($total / intval($request->arr_qty_duplicate[$key]),2);
+
+                            $listDetails = [];
+
+                            if($data->document_status == '2'){
+                                foreach($data->fundRequestDetail as $rowdetail){
+                                    if($rowdetail->total > 0){
+                                        $listDetails[] = [
+                                            'note'          => $rowdetail->note,
+                                            'nominal'       => number_format($rowdetail->total,2,',','.'),
+                                            'type'          => '1',
+                                            'coa_id'        => '',
+                                            'coa_name'      => '',
+                                            'place_id'      => $rowdetail->place_id ?? '',
+                                            'line_id'       => $rowdetail->line_id ?? '',
+                                            'machine_id'    => $rowdetail->machine_id ?? '',
+                                            'division_id'   => $rowdetail->division_id ?? '',
+                                            'project_id'    => $rowdetail->project_id ?? '',
+                                            'project_name'  => $rowdetail->project()->exists() ? $rowdetail->project->name : '',
+                                        ];
+                                    }
+
+                                    if($rowdetail->tax > 0){
+                                        $listDetails[] = [
+                                            'note'          => $rowdetail->note,
+                                            'nominal'       => number_format($rowdetail->tax,2,',','.'),
+                                            'type'          => '1',
+                                            'coa_id'        => $rowdetail->taxMaster()->exists() ? $rowdetail->taxMaster->coa_purchase_id : '',
+                                            'coa_name'      => $rowdetail->taxMaster()->exists() ? $rowdetail->taxMaster->coaPurchase->code.' - '.$rowdetail->taxMaster->coaPurchase->name : '',
+                                            'place_id'      => $rowdetail->place_id ?? '',
+                                            'line_id'       => '',
+                                            'machine_id'    => '',
+                                            'division_id'   => '',
+                                            'project_id'    => '',
+                                            'project_name'  => '',
+                                        ];
+                                    }
+
+                                    if($rowdetail->wtax > 0){
+                                        $listDetails[] = [
+                                            'note'          => $rowdetail->note,
+                                            'nominal'       => number_format($rowdetail->wtax,2,',','.'),
+                                            'type'          => '2',
+                                            'coa_id'        => $rowdetail->wtaxMaster()->exists() ? $rowdetail->wtaxMaster->coa_purchase_id : '',
+                                            'coa_name'      => $rowdetail->wtaxMaster()->exists() ? $rowdetail->wtaxMaster->coaPurchase->code.' - '.$rowdetail->wtaxMaster->coaPurchase->name : '',
+                                            'place_id'      => $rowdetail->place_id ?? '',
+                                            'line_id'       => '',
+                                            'machine_id'    => '',
+                                            'division_id'   => '',
+                                            'project_id'    => '',
+                                            'project_name'  => '',
+                                        ];
+                                    }
+                                }
                             }
+
+                            $details[] = [
+                                'id'            => $data->id,
+                                'type'          => 'fund_requests',
+                                'code'          => CustomHelper::encrypt($data->code),
+                                'rawcode'       => $data->code,
+                                'rawdate'       => $data->post_date,
+                                'post_date'     => date('d/m/Y',strtotime($data->post_date)),
+                                'due_date'      => date('d/m/Y',strtotime($data->required_date)),
+                                'total'         => number_format($data->total,2,',','.'),
+                                'tax'           => number_format($data->tax,2,',','.'),
+                                'wtax'          => number_format($data->wtax,2,',','.'),
+                                'grandtotal'    => number_format($data->grandtotal,2,',','.'),
+                                'balance'       => number_format($total,2,',','.'),
+                                'balance_duplicate' => number_format($balanceduplicate,2,',','.'),
+                                'coa_id'        => $data->type == '1' ? ($data->document_status == '3' ? ($coa ? $coa->id : '') : '') : $coa->id,
+                                'coa_name'      => $data->type == '1' ? ($data->document_status == '3' ? ($coa ? $coa->code.' - '.$coa->name : '') : '') : $coa->code.' - '.$coa->name,
+                                'memo'          => number_format(0,2,',','.'),
+                                'currency_id'   => $data->currency_id,
+                                'currency_rate' => number_format($data->currency_rate,2,',','.'),
+                                'note'          => $data->note ? $data->note : '',
+                                'name_account'  => $data->name_account ?? '',
+                                'no_account'    => $data->no_account ?? '',
+                                'bank_account'  => $data->bank_account ?? '',
+                                'place_id'      => $data->place_id,
+                                'department_id' => $data->department_id,
+                                'account_code'  => $data->account->employee_no,
+                                'remark'        => $data->note,
+                                'list_details'  => $listDetails,
+                                'document_status' => $data->document_status,
+                            ];
                         }
                     }
                 }elseif($row == 'purchase_down_payments'){
@@ -656,7 +712,9 @@ class PaymentRequestController extends Controller
                                 'place_id'      => '',
                                 'department_id' => '',
                                 'account_code'  => $data->supplier->employee_no,
-                                'remark'        => $data->note
+                                'remark'        => $data->note,
+                                'list_details'  => [],
+                                'document_status' => '',
                             ];
                         }
                     }
@@ -696,7 +754,9 @@ class PaymentRequestController extends Controller
                                 'place_id'      => '',
                                 'department_id' => '',
                                 'account_code'  => $data->account->employee_no,
-                                'remark'        => $data->note
+                                'remark'        => $data->note,
+                                'list_details'  => [],
+                                'document_status' => '',
                             ];
                         }
                     }
@@ -736,7 +796,9 @@ class PaymentRequestController extends Controller
                                 'place_id'      => '',
                                 'department_id' => '',
                                 'account_code'  => $data->account->employee_no,
-                                'remark'        => $data->note
+                                'remark'        => $data->note,
+                                'list_details'  => [],
+                                'document_status' => '',
                             ];
                         }
                     }
@@ -770,8 +832,6 @@ class PaymentRequestController extends Controller
             'arr_code'              => $request->arr_type ? 'required|array' : '',
             'arr_pay'               => $request->arr_type ? 'required|array' : '',
             'arr_coa'               => $request->arr_type ? 'required|array' : '',
-            'arr_coa_cost'          => $request->arr_coa_cost ? 'required|array' : '',
-            'arr_note_cost'         => $request->arr_coa_cost ? 'required|array' : '',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
             'code_place_id.required'            => 'Plant Tidak boleh kosong',
@@ -794,10 +854,6 @@ class PaymentRequestController extends Controller
             'arr_pay.array'                     => 'Baris bayar harus dalam bentuk array.',
             'arr_coa.required'                  => 'Baris coa tidak boleh kosong.',
             'arr_coa.array'                     => 'Baris coa harus dalam bentuk array.',
-            'arr_coa_cost.required'             => 'Coa rekonsiliasi tidak boleh kosong.',
-            'arr_coa_cost.array'                => 'Coa rekonsiliasi harus dalam bentuk array.',
-            'arr_note_cost.required'            => 'Keterangan rekonsiliasi tidak boleh kosong.',
-            'arr_note_cost.array'               => 'Keterangan rekonsiliasi harus dalam bentuk array.',
 		]);
 
         if($validation->fails()) {
@@ -979,19 +1035,21 @@ class PaymentRequestController extends Controller
 
                     if($request->arr_coa_cost){
                         foreach($request->arr_coa_cost as $key => $row){
-                            PaymentRequestDetail::create([
+                            PaymentRequestCost::create([
                                 'payment_request_id'            => $query->id,
-                                'lookable_type'                 => 'coas',
-                                'lookable_id'                   => intval($row),
                                 'cost_distribution_id'          => $request->arr_cost_distribution_cost[$key] ? intval($request->arr_cost_distribution_cost[$key]) : NULL,
                                 'coa_id'                        => intval($row),
-                                'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
-                                'note'                          => $request->arr_note_cost[$key],
                                 'place_id'                      => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
                                 'line_id'                       => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
                                 'machine_id'                    => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
                                 'department_id'                 => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
                                 'project_id'                    => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
+                                'nominal_debit'                 => str_replace(',','.',str_replace('.','',$request->arr_nominal_debit[$key])),
+                                'nominal_credit'                => str_replace(',','.',str_replace('.','',$request->arr_nominal_credit[$key])),
+                                'nominal_debit_fc'              => str_replace(',','.',str_replace('.','',$request->arr_nominal_debit_fc[$key])),
+                                'nominal_credit_fc'             => str_replace(',','.',str_replace('.','',$request->arr_nominal_credit_fc[$key])),
+                                'note'                          => $request->arr_note_cost[$key],
+                                'note2'                         => $request->arr_note_cost2[$key],
                             ]);
                         }
                     }
@@ -1017,15 +1075,9 @@ class PaymentRequestController extends Controller
                                 'lookable_type'                 => $row,
                                 'lookable_id'                   => $idDetail,
                                 'cost_distribution_id'          => $request->arr_cost_distribution[$key] ? $request->arr_cost_distribution[$key] : NULL,
-                                'coa_id'                        => $request->arr_coa[$key],
+                                'coa_id'                        => $request->arr_coa[$key] ? $request->arr_coa[$key] : NULL,
                                 'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_pay[$key])),
                                 'note'                          => $request->arr_note[$key],
-                                'remark'                        => $request->arr_remark[$key],
-                                'place_id'                      => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
-                                'line_id'                       => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
-                                'machine_id'                    => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
-                                'department_id'                 => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
-                                'project_id'                    => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
                             ]);
 
                             if($row == 'fund_requests'){
@@ -1044,8 +1096,6 @@ class PaymentRequestController extends Controller
                                 'lookable_id'                   => intval($row),
                                 'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_payment[$key])),
                             ]);
-
-                            /* $prc->removeLimitCreditEmployee(); */
                         }
                     }
 

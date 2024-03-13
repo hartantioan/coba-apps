@@ -400,6 +400,7 @@
             if (willApprove) {
                 var formData = new FormData($('#form_data')[0]), passed = true, countChecked = 0;
                 if($('input[name^="arr_status_material_request[]"]').length > 0){
+                    formData.delete("arr_status_material_request[]");
                     $('input[name^="arr_status_material_request[]"]').each(function(index){
                         if($(this).is(':checked')){
                             formData.append('arr_status_material_request[]',$(this).val());
@@ -411,6 +412,7 @@
                     }
                 }
                 if($('input[name^="arr_status_good_issue_request[]"]').length > 0){
+                    formData.delete("arr_status_good_issue_request[]");
                     $('input[name^="arr_status_good_issue_request[]"]').each(function(index){
                         if($(this).is(':checked')){
                             formData.append('arr_status_good_issue_request[]',$(this).val());

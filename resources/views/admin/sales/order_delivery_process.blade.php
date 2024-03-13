@@ -684,12 +684,12 @@ document.addEventListener('focusin', function (event) {
             document.body.classList.add('tab-active');
         }
         
-        // Remove highlighting from previous Select2 input
+        
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
 
-        // Add highlighting to the new Select2 input
+        
         if (select2Container) {
             select2Container.classList.add('tab-active');
         }

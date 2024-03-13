@@ -18,7 +18,7 @@ class FundRequest extends Model
     protected $fillable = [
         'code',
         'user_id',
-        'place_id',
+        'company_id',
         'division_id',
         'account_id',
         'type',
@@ -132,9 +132,9 @@ class FundRequest extends Model
         return $this->belongsTo('App\Models\User', 'delete_id', 'id')->withTrashed();
     }
 
-    public function place()
+    public function company()
     {
-        return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
     public function division()
@@ -451,9 +451,7 @@ class FundRequest extends Model
         $type = match ($this->payment_type) {
           '1'   => 'Tunai',
           '2'   => 'Transfer',
-          '3'   => 'CEK',
-          '4'   => 'BG',
-          '5'   => 'Credit',
+          '3'   => 'Cek/BG',
           default => 'Invalid',
         };
 

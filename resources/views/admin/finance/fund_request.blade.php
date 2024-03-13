@@ -117,14 +117,11 @@
                                                         <th rowspan="2">#</th>
                                                         <th rowspan="2">Code</th>
                                                         <th rowspan="2">Pengguna</th>
-                                                        <th rowspan="2">Plant</th>
-                                                        <th rowspan="2">Divisi</th>
                                                         <th rowspan="2">Partner Bisnis</th>
                                                         <th rowspan="2">Tipe</th>
                                                         <th colspan="2" class="center-align">Tanggal</th>
                                                         <th colspan="2" class="center-align">Mata Uang</th>
                                                         <th rowspan="2">Keterangan</th>
-                                                        <th rowspan="2">Termin</th>
                                                         <th rowspan="2">Tipe Pembayaran</th>
                                                         <th rowspan="2">No.Dokumen</th>
                                                         <th rowspan="2">Tgl.Dokumen</th>
@@ -322,12 +319,12 @@
             document.body.classList.add('tab-active');
         }
         
-        // Remove highlighting from previous Select2 input
+        
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
 
-        // Add highlighting to the new Select2 input
+        
         if (select2Container) {
             select2Container.classList.add('tab-active');
         }
@@ -459,8 +456,6 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'user_id', className: 'center-align' },
-                { name: 'place_id', className: 'center-align' },
-                { name: 'department_id', className: 'center-align' },
                 { name: 'account_id', className: 'center-align' },
                 { name: 'type', className: 'center-align' },
                 { name: 'date_post', className: 'center-align' },
@@ -468,7 +463,6 @@
                 { name: 'currency_id', className: 'center-align' },
                 { name: 'currency_rate', className: 'center-align' },
                 { name: 'note', className: 'center-align' },
-                { name: 'termin_note', className: 'center-align' },
                 { name: 'payment_type', className: 'center-align' },
                 { name: 'document_no', className: '' },
                 { name: 'document_date', className: '' },

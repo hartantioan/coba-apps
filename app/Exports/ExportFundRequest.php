@@ -93,7 +93,7 @@ class ExportFundRequest implements FromCollection, WithTitle, WithHeadings, With
                     'bussiness_partner'  => $row->account->name,
                     'type'          => $row->type(),
                     'division'      => $row->division()->exists() ? $row->division->name : '',
-                    'place_id'      => $row->place->code,
+                    'company_id'    => $row->company->name,
                     'note'          => $row->note,
                     'termin_note'   => $row->termin_note,
                     'payment_type'  => $row->paymentType(),

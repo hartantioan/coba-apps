@@ -40,7 +40,7 @@ class LedgerController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = Coa::where('status','1')->whereDoesntHave('childSub')->count();
+        $total_data = Coa::where('status','1')->where('level','5')->count();
         
         $query_data = Coa::where(function($query) use ($search, $request) {
                     if($search) {
@@ -55,7 +55,7 @@ class LedgerController extends Controller
                     }
                 })
                 ->where('company_id',$request->company)
-                ->whereDoesntHave('childSub')
+                ->where('level','5')
                 ->where('status', 1)
                 ->offset($start)
                 ->limit($length)
@@ -75,7 +75,7 @@ class LedgerController extends Controller
                     }
                 })
                 ->where('company_id',$request->company)
-                ->whereDoesntHave('childSub')
+                ->where('level','5')
                 ->where('status', 1)
                 ->count();
 

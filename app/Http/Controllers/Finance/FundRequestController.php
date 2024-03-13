@@ -740,7 +740,8 @@ class FundRequestController extends Controller
             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
             $data["image"]=$path_img;
              
-            $pdf = Pdf::loadView('admin.print.finance.fund_request_individual', $data)->setPaper('a5', 'landscape');
+/*             $pdf = Pdf::loadView('admin.print.finance.fund_request_individual', $data)->setPaper('a5', 'landscape'); */
+            $pdf = Pdf::loadView('admin.print.finance.fund_request_individual', $data)->setPaper('a4', 'potrait');
             $pdf->render();
     
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
@@ -752,7 +753,7 @@ class FundRequestController extends Controller
             $temp_pdf[]=$content;
 
             #surat penjara
-            $pdfjail = Pdf::loadView('admin.print.finance.jail_letter', $data)->setPaper('a5', 'landscape');
+           /*  $pdfjail = Pdf::loadView('admin.print.finance.jail_letter', $data)->setPaper('a5', 'landscape');
             $pdfjail->render();
 
             $font = $pdfjail->getFontMetrics()->get_font("helvetica", "bold");
@@ -768,13 +769,13 @@ class FundRequestController extends Controller
                 $merger->addRaw($pdfContent);
             }
 
-            $result = $merger->merge();
+            $result = $merger->merge(); */
             
             $randomString = Str::random(10); 
          
             $filePath = 'public/pdf/' . $randomString . '.pdf';
             
-            Storage::put($filePath, $result);
+            Storage::put($filePath, $content);
             
             $document_po = asset(Storage::url($filePath));
             $var_link=$document_po;

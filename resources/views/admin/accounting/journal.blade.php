@@ -7,6 +7,16 @@
         font-size: 13px !important;
     }
 
+    body.tab-active input:focus {
+        outline: 2px solid green !important; /* Adjust the color and style as needed */
+        border-radius: 5px !important;
+    }
+
+    .modal-content .select2.tab-active {
+        outline: 2px solid green !important; /* Adjust the color and style as needed */
+        border-radius: 5px !important;
+    }
+
     table.bordered th {
         padding: 5px !important;
     }

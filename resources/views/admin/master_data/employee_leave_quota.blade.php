@@ -1,4 +1,15 @@
 <!-- BEGIN: Page Main-->
+<style>
+    body.tab-active input:focus {
+        outline: 2px solid green !important; /* Adjust the color and style as needed */
+        border-radius: 5px !important;
+    }
+
+    .modal-content .select2.tab-active {
+        outline: 2px solid green !important; /* Adjust the color and style as needed */
+        border-radius: 5px !important;
+    }
+</style>
 <div id="main">
     <div class="row">
         <div class="pt-3 pb-1" id="breadcrumbs-wrapper">
@@ -181,6 +192,31 @@
 
 <!-- END: Page Main-->
 <script>
+    document.addEventListener('focusin', function (event) {
+        const select2Container = event.target.closest('.modal-content .select2');
+        const activeSelect2 = document.querySelector('.modal-content .select2.tab-active');
+        if (event.target.closest('.modal-content')) {
+            document.body.classList.add('tab-active');
+        }
+        
+        // Remove highlighting from previous Select2 input
+        if (activeSelect2 && !select2Container) {
+            activeSelect2.classList.remove('tab-active');
+        }
+
+        // Add highlighting to the new Select2 input
+        if (select2Container) {
+            select2Container.classList.add('tab-active');
+        }
+    });
+
+    document.addEventListener('mousedown', function () {
+        const activeSelect2 = document.querySelector('.modal-content .select2.tab-active');
+        document.body.classList.remove('tab-active');
+        if (activeSelect2) {
+            activeSelect2.classList.remove('tab-active');
+        }
+    });
     $(function() {
         
         select2ServerSide('#user_id', '{{ url("admin/select2/employee") }}');

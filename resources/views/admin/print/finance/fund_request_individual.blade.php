@@ -420,6 +420,111 @@
                     
                 </div>
             </div>
+            
+            <div class="part2" style="margin-top:20%">
+                <table border="0" width="100%" style="font-size:1em" class="tb-header">
+                    <tr>
+                        <td width="83%" class="left-align" >
+                            <img src="{{ $image }}" width="50%" style=" width:35%">
+                        </td>
+                        <td width="33%" class="right-align">
+                        </td>
+                        <td width="34%" class="right-align">
+                            SERAH TERIMA
+                            <br>CEK / TUNAI
+                        </td>
+                    </tr>
+                    
+                </table>
+                <hr style="border-top: 3px solid black; margin-top:20px">
+            
+                <div class="card">
+                    <div class="card-content invoice-print-area ">
+                        <table border="0" width="100%">
+                            <tr>
+                                <td class="left-align">
+                                    Pada hari ini, <b>{{ CustomHelper::hariIndo(date('l',strtotime($data->post_date))) }}</b> Tanggal <b>{{ date('d/m/Y',strtotime($data->post_date)) }}</b>, telah diterima dari <b>{{ $data->place->company->name }}</b>.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="left-align" style="padding-left: 30px;">
+                                    <table border="0" width="100%" class="tbl-info">
+                                        <tr>
+                                            <td width="25%">
+                                                Nama
+                                            </td>
+                                            <td width="75%">
+                                                : {{ strtoupper($data->user->name) }}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Jabatan
+                                            </td>
+                                            <td>
+                                                : {{ $data->user->position()->exists() ? strtoupper($data->user->position->name) : '-' }}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Uang Tunai / Cek Bank
+                                            </td>
+                                            <td>
+                                                : {{ strtoupper($data->listCekBG()) }}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Sebesar
+                                            </td>
+                                            <td>
+                                                : {{ strtoupper($data->currency->symbol.' '.number_format($data->grandtotal,2,',','.')) }}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Terbilang
+                                            </td>
+                                            <td>
+                                                : {{ strtoupper(CustomHelper::terbilangWithKoma($data->grandtotal).' '.$data->currency->document_text) }}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Keperluan
+                                            </td>
+                                            <td>
+                                                : {{ strtoupper($data->note) }}
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                        <div class="invoice-subtotal break-row">
+                            <table class="table-bot1" width="100%" border="0" style="margin-top:50px;">
+                                <tr>
+                                    <td class="center-align" width="50%">
+                                        Dibuat oleh,
+                                        <br><br><br><br>
+                                        (......................................)
+                                    </td>
+                                    <td class="center-align">
+                                        Diterima oleh,
+                                        <br><br><br><br>
+                                        (......................................)
+                                    </td>
+                                </tr>
+                            </table>
+                            <p style="font-size:13px !important;">
+                                Note:
+                                <br>&nbsp;&nbsp;&nbsp;Dana yang diterima hanya untuk dipergunakan sesuai keperluan tercantum
+                                <br>&nbsp;&nbsp;&nbsp;Pelaku penggelapan dalam jabatan diancam pidana penjara maksimal 5 (lima) tahun sesuai Pasal 374 KUHP
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
     </body>
 </html>

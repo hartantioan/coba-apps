@@ -46,6 +46,8 @@ class OutStandingAPController extends Controller
         $totalAll = 0;
         if($query_data /* || $query_data2 */){
             foreach($query_data as $row_invoice){
+                $totalPayed = $row_invoice->getTotalPaidDate($request->date);
+                $balance = $row_invoice->balance - $totalPayed;
                 $data_tempura = [
                     'code'      => $row_invoice->code,
                     'vendor'    => $row_invoice->account->name,
@@ -57,11 +59,11 @@ class OutStandingAPController extends Controller
                     'tax'       =>number_format($row_invoice->tax,2,',','.'),
                     'wtax'      =>number_format($row_invoice->wtax,2,',','.'),
                     'grandtotal'=>number_format($row_invoice->balance,2,',','.'),
-                    'payed'     =>number_format($row_invoice->getTotalPaidDate($request->date),2,',','.'),
-                    'sisa'      =>number_format($row_invoice->getTotalPaidByDate($request->date),2,',','.'),
+                    'payed'     =>number_format($totalPayed,2,',','.'),
+                    'sisa'      =>number_format($balance,2,',','.'),
                 ];
                 
-                if($data_tempura['sisa'] != number_format(0,2,',','.')){
+                if($balance > 0){
                     $totalAll += str_replace(',','.',str_replace('.','',$data_tempura['sisa']));
                     $array_filter[] = $data_tempura;
                 }

@@ -215,6 +215,17 @@
                                         </td>
                                     </tr>
                                 </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="5" class="right-align">
+                                            TOTAL
+                                        </th>
+                                        <th class="right-align" id="total">
+                                            0,00
+                                        </th>
+                                        <th></th>
+                                    </tr>
+                                </tfoot>
                             </table>
                         </div>
                         <div class="col s12 mt-3">
@@ -468,6 +479,7 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
+                $('#total').text('0,00');
             }
         });
 
@@ -525,6 +537,7 @@
 
         $('#body-detail').on('click', '.delete-data-detail', function() {
             $(this).closest('tr').remove();
+            countAll();
         });
     });
 
@@ -642,7 +655,7 @@
                                         ` + val.method_name + `
                                     </td>
                                     <td class="center">
-                                        <input type="text" id="arr_total` + count + `" name="arr_total[]" onfocus="emptyThis(this);" value="` + val.nominal + `" onkeyup="formatRupiah(this);" readonly>
+                                        <input type="text" id="arr_total` + count + `" name="arr_total[]" onfocus="emptyThis(this);" value="` + val.nominal + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right !important;" readonly>
                                     </td>
                                     <td class="center">
                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
@@ -652,6 +665,8 @@
                                 </tr>
                             `);
                         });
+
+                        countAll();
                     }else{
                         resetDetailForm();
                     }
@@ -677,6 +692,16 @@
                 icon: 'error'
             });
         }
+    }
+
+    function countAll(){
+        let total = 0;
+        $('input[name^="arr_total[]"]').each(function(index){
+            total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+        });
+        $('#total').text(
+            (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
+        );
     }
 
     function rowDetail(data) {
@@ -941,7 +966,7 @@
                                 ` + val.method_name + `
                             </td>
                             <td class="center">
-                                <input type="text" id="arr_total` + count + `" name="arr_total[]" onfocus="emptyThis(this);" value="` + val.nominal + `" onkeyup="formatRupiah(this);" readonly>
+                                <input type="text" id="arr_total` + count + `" name="arr_total[]" onfocus="emptyThis(this);" value="` + val.nominal + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right !important;" readonly>
                             </td>
                             <td class="center">
                                 <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
@@ -951,6 +976,8 @@
                         </tr>
                     `);
                 });
+
+                countAll();
 
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();

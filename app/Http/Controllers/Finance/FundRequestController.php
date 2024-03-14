@@ -1219,8 +1219,8 @@ class FundRequestController extends Controller
 			}
 			
 			if($query) {
-                DB::beginTransaction();
-                try {
+                /* DB::beginTransaction();
+                try { */
                     foreach($request->arr_item as $key => $row){
                         FundRequestDetail::create([
                             'fund_request_id'       => $query->id,
@@ -1256,10 +1256,10 @@ class FundRequestController extends Controller
                             ]);
                         }
                     }
-                    DB::commit();
+                    /* DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
-                }
+                } */
 
                 CustomHelper::sendApproval('fund_requests',$query->id,$query->note);
                 CustomHelper::sendNotification('fund_requests',$query->id,'Pengajuan Permohonan Dana No. '.$query->code,$query->note,session('bo_id'));

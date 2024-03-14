@@ -677,6 +677,7 @@ class PaymentRequestController extends Controller
                                 'remark'        => $data->note,
                                 'list_details'  => $listDetails,
                                 'document_status' => $data->document_status,
+                                'is_reimburse'  => ''
                             ];
                         }
                     }
@@ -688,6 +689,20 @@ class PaymentRequestController extends Controller
                             CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Payment Request');
                             $coa = Coa::where('code','200.01.03.01.01')->where('company_id',$data->company_id)->first();
                             $total = $data->balancePaymentRequest();
+                            $is_reimburse = '';
+                            $name_account = '';
+                            $bank_account = '';
+                            $no_account = '';
+                            $required_date = $data->post_date;
+                            foreach($data->purchaseDownPaymentDetail as $row){
+                                if($row->fundRequestDetail()->exists()){
+                                    $is_reimburse = $row->fundRequestDetail->fundRequest->is_reimburse ?? '';
+                                    $name_account = $row->fundRequestDetail->fundRequest->name_account ?? '';
+                                    $bank_account = $row->fundRequestDetail->fundRequest->bank_account ?? '';
+                                    $no_account = $row->fundRequestDetail->fundRequest->no_account ?? '';
+                                    $required_date = $row->fundRequestDetail->fundRequest->required_date ?? '';
+                                }
+                            }
                             $details[] = [
                                 'id'            => $data->id,
                                 'type'          => 'purchase_down_payments',
@@ -695,7 +710,7 @@ class PaymentRequestController extends Controller
                                 'rawcode'       => $data->code,
                                 'rawdate'       => $data->post_date,
                                 'post_date'     => date('d/m/Y',strtotime($data->post_date)),
-                                'due_date'      => date('d/m/Y',strtotime($data->due_date)),
+                                'due_date'      => date('d/m/Y',strtotime($required_date)),
                                 'total'         => number_format($data->total,2,',','.'),
                                 'tax'           => number_format($data->tax,2,',','.'),
                                 'wtax'          => number_format($data->wtax,2,',','.'),
@@ -708,15 +723,16 @@ class PaymentRequestController extends Controller
                                 'currency_id'   => $data->currency_id,
                                 'currency_rate' => number_format($data->currency_rate,2,',','.'),
                                 'note'          => $data->note ? $data->note : '',
-                                'name_account'  => '',
-                                'no_account'    => '',
-                                'bank_account'  => '',
+                                'name_account'  => $name_account,
+                                'no_account'    => $no_account,
+                                'bank_account'  => $bank_account,
                                 'place_id'      => '',
                                 'department_id' => '',
                                 'account_code'  => $data->supplier->employee_no,
                                 'remark'        => $data->note,
                                 'list_details'  => [],
                                 'document_status' => '',
+                                'is_reimburse'  => $is_reimburse
                             ];
                         }
                     }
@@ -757,6 +773,7 @@ class PaymentRequestController extends Controller
                                 'remark'        => $data->note,
                                 'list_details'  => [],
                                 'document_status' => '',
+                                'is_reimburse'  => '',
                             ];
                         }
                     }
@@ -797,6 +814,7 @@ class PaymentRequestController extends Controller
                                 'remark'        => $data->note,
                                 'list_details'  => [],
                                 'document_status' => '',
+                                'is_reimburse'  => ''
                             ];
                         }
                     }

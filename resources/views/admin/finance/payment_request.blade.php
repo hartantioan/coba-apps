@@ -1849,6 +1849,10 @@
                                         $('#account_bank').val(val.bank_account);
                                         $('#account_name').val(val.name_account);
                                         $('#note').val(val.remark);
+                                        if(val.is_reimburse){
+                                            $('#is_reimburse').val(val.is_reimburse).formSelect();
+                                            $('#pay_date').val(val.due_date);
+                                        }
                                     }
                                 });
                                 

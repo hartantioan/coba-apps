@@ -2042,8 +2042,8 @@ class PaymentRequestController extends Controller
                                     <th class="right-align">'.number_format($data->rounding,2,',','.').'</th>
                                 </tr>
                                 <tr>
-                                    <th>BIAYA ADMIN</th>
-                                    <th class="right-align">DIST.BIAYA : '.($data->cost_distribution_id ? $data->costDistribution->code.' - '.$data->costDistribution->name : '0,00').'</th>
+                                    <th>BIAYA ADMIN '.($data->cost_distribution_id ? $data->costDistribution->code : '').'</th>
+                                    <th class="right-align">'.number_format($data->admin,2,',','.').'</th>
                                 </tr>
                                 <tr>
                                     <th>GRANDTOTAL</th>

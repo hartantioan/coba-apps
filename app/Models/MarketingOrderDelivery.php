@@ -212,4 +212,9 @@ class MarketingOrderDelivery extends Model
             'grandtotal'    => $this->getGrandtotal(),
         ]);
     }
+
+    public function printCounter()
+    {
+        return $this->hasMany('App\Models\PrintCounter','lookable_id','id')->where('lookable_type',$this->table);
+    }
 }

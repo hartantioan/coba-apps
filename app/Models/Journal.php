@@ -138,4 +138,9 @@ class Journal extends Model
 
         return substr($prefix,0,9).'-'.$no;
     }
+
+    public function printCounter()
+    {
+        return $this->hasMany('App\Models\PrintCounter','lookable_id','id')->where('lookable_type',$this->table);
+    }
 }

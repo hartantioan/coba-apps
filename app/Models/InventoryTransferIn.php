@@ -198,4 +198,9 @@ class InventoryTransferIn extends Model
     {
         return $this->hasMany('App\Models\InventoryTransferOutDetail','inventory_transfer_out_id','inventory_transfer_out_id');
     }
+
+    public function printCounter()
+    {
+        return $this->hasMany('App\Models\PrintCounter','lookable_id','id')->where('lookable_type',$this->table);
+    }
 }

@@ -382,4 +382,8 @@ class LandedCost extends Model
         }
         return implode(', ',$code);
     }
+    public function printCounter()
+    {
+        return $this->hasMany('App\Models\PrintCounter','lookable_id','id')->where('lookable_type',$this->table);
+    }
 }

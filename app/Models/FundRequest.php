@@ -535,4 +535,9 @@ class FundRequest extends Model
     public function checklistDocumentList(){
         return $this->hasMany('App\Models\ChecklistDocumentList','lookable_id','id')->where('lookable_type',$this->table);
     }
+
+    public function printCounter()
+    {
+        return $this->hasMany('App\Models\PrintCounter','lookable_id','id')->where('lookable_type',$this->table);
+    }
 }

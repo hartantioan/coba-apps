@@ -455,4 +455,9 @@ class PurchaseDownPayment extends Model
         }
         return $totalAfterMemo;
     }
+
+    public function printCounter()
+    {
+        return $this->hasMany('App\Models\PrintCounter','lookable_id','id')->where('lookable_type',$this->table);
+    }
 }

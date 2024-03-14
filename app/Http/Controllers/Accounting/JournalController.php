@@ -832,6 +832,7 @@ class JournalController extends Controller
                         'title'     => 'Journal',
                         'data'      => $pr
                     ];
+                    CustomHelper::addNewPrinterCounter($pr->getTable(),$pr->id);
                     $img_path = 'website/logo_web_fix.png';
                     $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
                     $image_temp = file_get_contents($img_path);
@@ -927,8 +928,9 @@ class JournalController extends Controller
                         if($query){
                             $data = [
                                 'title'     => 'Print Journal',
-                                'data'      => $query
+                                    'data'      => $query
                             ];
+                            CustomHelper::addNewPrinterCounter($query->getTable(),$query->id);
                             $img_path = 'website/logo_web_fix.png';
                             $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
                             $image_temp = file_get_contents($img_path);
@@ -1003,8 +1005,9 @@ class JournalController extends Controller
                         if($query){
                             $data = [
                                 'title'     => 'Print Journal',
-                                'data'      => $query
+                                    'data'      => $query
                             ];
+                            CustomHelper::addNewPrinterCounter($query->getTable(),$query->id);
                             $img_path = 'website/logo_web_fix.png';
                             $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
                             $image_temp = file_get_contents($img_path);
@@ -1075,6 +1078,7 @@ class JournalController extends Controller
                 "verify_peer_name"=>false,
                 ),
             );
+            CustomHelper::addNewPrinterCounter($pr->getTable(),$pr->id);
             $img_path = 'website/logo_web_fix.png';
             $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
             $image_temp = file_get_contents($img_path, false, stream_context_create($opciones_ssl));

@@ -10,6 +10,7 @@ use App\Models\ApprovalSource;
 use App\Models\OvertimeRequest;
 use App\Models\ApprovalTemplate;
 use App\Models\ApprovalTemplateMenu;
+use App\Models\PrintCounter;
 use App\Models\Asset;
 use App\Models\Capitalization;
 use App\Models\CloseBill;
@@ -4517,5 +4518,13 @@ class CustomHelper {
 		}
 
 		return $value;
+	}
+
+	public static function addNewPrinterCounter($table_name = null,$table_id = null){
+		PrintCounter::create([
+			'user_id'		=> session('bo_id'),
+			'lookable_type'	=> $table_name,
+			'lookable_id'	=> $table_id
+		]);
 	}
 }

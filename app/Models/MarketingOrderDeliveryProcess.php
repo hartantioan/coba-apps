@@ -520,4 +520,9 @@ class MarketingOrderDeliveryProcess extends Model
 
         return $status;
     }
+
+    public function printCounter()
+    {
+        return $this->hasMany('App\Models\PrintCounter','lookable_id','id')->where('lookable_type',$this->table);
+    }
 }

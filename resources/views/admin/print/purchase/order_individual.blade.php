@@ -308,23 +308,40 @@
                             
                             <tbody id="bodybros">
                                 @foreach($data->purchaseOrderDetail as $key => $row)
-                                <tr>
-                                    <td align="center" rowspan="3">{{ ($key + 1) }}</td>
-                                    <td align="left">{{ $row->item_id ? $row->item->code.' - '.$row->item->name : $row->coa->name }}</td>
-                                    <td align="center">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
-                                    <td align="center">{{ $row->item_id ? $row->itemUnit->unit->code : '-' }}</td>
-                                    <td align="right">{{ number_format($row->price,2,',','.') }}</td>
-                                    <td align="center">{{ number_format($row->percent_discount_1,2,',','.') }}</td>
-                                    <td align="center">{{ number_format($row->percent_discount_2,2,',','.') }}</td>
-                                    <td align="right">{{ number_format($row->discount_3,2,',','.') }}</td>
-                                    <td align="right">{{ number_format($row->subtotal,2,',','.') }}</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="8">Keterangan 1: {{ $row->note }}</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="8">Keterangan 2: {{ $row->note2 }}</td>
-                                </tr>
+                                    @if($row->item()->exists())
+                                        <tr>
+                                            <td align="center" rowspan="3">{{ ($key + 1) }}</td>
+                                            <td align="left">{{ $row->item->code.' - '.$row->item->name }}</td>
+                                            <td align="center">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
+                                            <td align="center">{{ $row->itemUnit->unit->code }}</td>
+                                            <td align="right">{{ number_format($row->price,2,',','.') }}</td>
+                                            <td align="center">{{ number_format($row->percent_discount_1,2,',','.') }}</td>
+                                            <td align="center">{{ number_format($row->percent_discount_2,2,',','.') }}</td>
+                                            <td align="right">{{ number_format($row->discount_3,2,',','.') }}</td>
+                                            <td align="right">{{ number_format($row->subtotal,2,',','.') }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="8">Keterangan 1: {{ $row->note }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="8">Keterangan 2: {{ $row->note2 }}</td>
+                                        </tr>
+                                    @elseif($row->coa()->exists())
+                                        <tr>
+                                            <td align="center" rowspan="2">{{ ($key + 1) }}</td>
+                                            <td align="left">{{ $row->note }}</td>
+                                            <td align="center">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
+                                            <td align="center">{{ $row->item_id ? $row->itemUnit->unit->code : '-' }}</td>
+                                            <td align="right">{{ number_format($row->price,2,',','.') }}</td>
+                                            <td align="center">{{ number_format($row->percent_discount_1,2,',','.') }}</td>
+                                            <td align="center">{{ number_format($row->percent_discount_2,2,',','.') }}</td>
+                                            <td align="right">{{ number_format($row->discount_3,2,',','.') }}</td>
+                                            <td align="right">{{ number_format($row->subtotal,2,',','.') }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="8">Keterangan : {{ $row->note2 }}</td>
+                                        </tr>
+                                    @endif
                                 @endforeach
                             </tbody>
                         </table>

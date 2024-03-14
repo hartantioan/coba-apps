@@ -194,7 +194,7 @@
                                                         <th colspan="2" class="center">Mata Uang</th>
                                                         <th colspan="2" class="center">Tanggal</th>
                                                         <th colspan="3" class="center">Penerima</th>
-                                                        <th colspan="8" class="center">Opsional</th>
+                                                        <th rowspan="2">Tgl.Diterima</th>
                                                         <th rowspan="2">Keterangan</th>
                                                         <th rowspan="2">Subtotal</th>
                                                         <th rowspan="2">Diskon</th>
@@ -217,14 +217,6 @@
                                                         <th>Nama</th>
                                                         <th>Alamat</th>
                                                         <th>Telepon</th>
-                                                        <th>Tgl.Diterima</th>
-                                                        <th>Tgl.Jatuh Tempo</th>
-                                                        <th>Tgl.Dokumen</th>
-                                                        <th>No.FP</th>
-                                                        <th>NO.BP</th>
-                                                        <th>Tgl.Potong</th>
-                                                        <th>No.SPK</th>
-                                                        <th>No.Invoice</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -311,37 +303,9 @@
                                 <input id="payment_term" name="payment_term" type="number" value="0" min="0" step="1" onchange="addDays();">
                                 <label class="active" for="payment_term">Termin Pembayaran (hari)</label>
                             </div>
-                            <div class="input-field col m3 s12 other-type" style="display:none;">
+                            <div class="input-field col m3 s12">
                                 <input id="received_date" name="received_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Terima" value="{{ date('Y-m-d') }}" onchange="addDays();">
                                 <label class="active" for="received_date">Tgl. Terima (Opsional)</label>
-                            </div>
-                            <div class="input-field col m3 s12 other-type" style="display:none;">
-                                <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Jatuh Tempo">
-                                <label class="active" for="due_date">Tgl. Jatuh Tempo (Opsional)</label>
-                            </div>
-                            <div class="input-field col m3 s12 other-type" style="display:none;">
-                                <input id="document_date" name="document_date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. dokumen">
-                                <label class="active" for="document_date">Tgl. Dokumen (Opsional)</label>
-                            </div>
-                            <div class="input-field col m3 s12 other-type" style="display:none;">
-                                <input id="tax_no" name="tax_no" type="text" placeholder="Nomor faktur pajak...">
-                                <label class="active" for="tax_no">No. Faktur Pajak (Opsional)</label>
-                            </div>
-                            <div class="input-field col m3 s12 other-type" style="display:none;">
-                                <input id="tax_cut_no" name="tax_cut_no" type="text" placeholder="Nomor bukti potong...">
-                                <label class="active" for="tax_cut_no">No. Bukti Potong (Opsional)</label>
-                            </div>
-                            <div class="input-field col m3 s12 other-type" style="display:none;">
-                                <input id="cut_date" name="cut_date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Bukti potong">
-                                <label class="active" for="cut_date">Tgl. Bukti Potong (Opsional)</label>
-                            </div>
-                            <div class="input-field col m3 s12 other-type" style="display:none;">
-                                <input id="spk_no" name="spk_no" type="text" placeholder="Nomor SPK...">
-                                <label class="active" for="spk_no">No. SPK (Opsional)</label>
-                            </div>
-                            <div class="input-field col m3 s12 other-type" style="display:none;">
-                                <input id="invoice_no" name="invoice_no" type="text" placeholder="Nomor Invoice dari Suppplier/Vendor">
-                                <label class="active" for="invoice_no">No. Invoice (Opsional)</label>
                             </div>
                             <div class="input-field col m3 s12 step11">
                                 <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();refreshTotal();">
@@ -447,6 +411,8 @@
                                             <tr>
                                                 <th>Hapus</th>
                                                 <th>Item / Coa Jasa</th>
+                                                <th>Keterangan 1</th>
+                                                <th>Keterangan 2</th>
                                                 <th width="100px">Qty PO</th>
                                                 <th width="100px">Satuan PO</th>
                                                 <th width="100px">Qty Stok</th>
@@ -471,8 +437,6 @@
                                                 <th>Disc2(%)</th>
                                                 <th>Disc3(Rp)</th>
                                                 <th>Subtotal</th>
-                                                <th>Keterangan 1</th>
-                                                <th>Keterangan 2</th>
                                                 <th>Plant</th>
                                                 <th>Line</th>
                                                 <th>Mesin</th>
@@ -846,7 +810,6 @@
                     return null;
                 };
                 mode = '';
-                $('.other-type').hide();
                 $('#button-add-item').show();
             }
         });
@@ -1311,11 +1274,9 @@
     function applyType(){
         if($('#inventory_type').val() == '1'){
             $('#due_date').val('');
-            $('.other-type').hide();
             $('#gi-show,#pr-show').show();
             $('#sj-show').hide();
         }else if($('#inventory_type').val() == '2'){
-            $('.other-type').show();
             addDays();
             $('#sj-show').show();
             $('#gi-show,#pr-show').hide();
@@ -1443,6 +1404,12 @@
                                                 <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                                             </td>
                                             <td>
+                                                <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 1...">
+                                            </td>
+                                            <td>
+                                                <input name="arr_note2[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 2...">
+                                            </td>
+                                            <td>
                                                 <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;width:100px;" id="rowQty`+ count +`">
                                             </td>
                                             <td class="center">
@@ -1490,12 +1457,6 @@
                                             </td>
                                             <td class="center">
                                                 <span id="arr_subtotal` + count + `" class="arr_subtotal">0</span>
-                                            </td>
-                                            <td>
-                                                <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 1...">
-                                            </td>
-                                            <td>
-                                                <input name="arr_note2[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 2...">
                                             </td>
                                             <td>
                                                 <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
@@ -1554,6 +1515,12 @@
                                                 <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                                             </td>
                                             <td>
+                                                <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 1..." value="` + val.note + `">
+                                            </td>
+                                            <td>
+                                                <input name="arr_note2[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 2..." value="` + val.note2 + `">
+                                            </td>
+                                            <td>
                                                 <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `');" data-qty="` + val.qty + `" data-stockqty="` + val.qty + `" style="text-align:right;width:100px;" id="rowQty`+ count +`">
                                             </td>
                                             <td class="center">
@@ -1604,12 +1571,6 @@
                                             </td>
                                             <td class="center">
                                                 <span id="arr_subtotal` + count + `" class="arr_subtotal">0</span>
-                                            </td>
-                                            <td>
-                                                <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 1..." value="` + val.note + `">
-                                            </td>
-                                            <td>
-                                                <input name="arr_note2[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 2..." value="` + val.note2 + `">
                                             </td>
                                             <td>
                                                 <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
@@ -1752,6 +1713,12 @@
                         <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                     </td>
                     <td>
+                        <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 1...">
+                    </td>
+                    <td>
+                        <input name="arr_note2[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 2...">
+                    </td>
+                    <td>
                         <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;width:100px;" id="rowQty`+ count +`">
                     </td>
                     <td class="center">
@@ -1802,12 +1769,6 @@
                     </td>
                     <td class="center">
                         <span id="arr_subtotal` + count + `" class="arr_subtotal">0</span>
-                    </td>
-                    <td>
-                        <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 1...">
-                    </td>
-                    <td>
-                        <input name="arr_note2[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 2...">
                     </td>
                     <td>
                         <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
@@ -1870,6 +1831,12 @@
                         <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                     </td>
                     <td>
+                        <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 1...">
+                    </td>
+                    <td>
+                        <input name="arr_note2[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 2...">
+                    </td>
+                    <td>
                         <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;width:100px;" id="rowQty`+ count +`">
                     </td>
                     <td class="center">
@@ -1917,12 +1884,6 @@
                     </td>
                     <td class="center">
                         <span id="arr_subtotal` + count + `" class="arr_subtotal">0</span>
-                    </td>
-                    <td>
-                        <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 1...">
-                    </td>
-                    <td>
-                        <input name="arr_note2[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 2...">
                     </td>
                     <td>
                         <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
@@ -2175,13 +2136,6 @@
                 { name: 'receiver_address', className: 'center-align' },
                 { name: 'receiver_phone', className: 'center-align' },
                 { name: 'received_date', className: '' },
-                { name: 'due_date', className: '' },
-                { name: 'document_date', className: '' },
-                { name: 'tax_no', className: '' },
-                { name: 'tax_cut_no', className: '' },
-                { name: 'cut_date', className: '' },
-                { name: 'spk_no', className: '' },
-                { name: 'invoice_no', className: '' },
                 { name: 'note', className: '' },
                 { name: 'subtotal', className: 'right-align' },
                 { name: 'discount', className: 'right-align' },
@@ -2440,11 +2394,6 @@
                     <option value="` + response.account_id + `">` + response.supplier_name + `</option>
                 `);
                 $('#inventory_type').val(response.inventory_type).formSelect();
-                if(response.inventory_type == '2'){
-                    $('.other-type').show();
-                }else{
-                    $('.other-type').hide();
-                }
                 $('#shipping_type').val(response.shipping_type).formSelect(); 
                 $('#company_id').val(response.company_id).formSelect();
                 $('#document_no').val(response.document_no);
@@ -2455,13 +2404,6 @@
                 $('#post_date').val(response.post_date);
                 $('#delivery_date').val(response.delivery_date);
                 $('#received_date').val(response.received_date);
-                $('#due_date').val(response.due_date);
-                $('#document_date').val(response.document_date);
-                $('#tax_no').val(response.tax_no);
-                $('#tax_cut_no').val(response.tax_cut_no);
-                $('#cut_date').val(response.cut_date);
-                $('#spk_no').val(response.spk_no);
-                $('#invoice_no').val(response.invoice_no);
                 $('#percent_tax').val(response.percent_tax);
                 $('#receiver_name').val(response.receiver_name);
                 $('#receiver_address').val(response.receiver_address);
@@ -2516,6 +2458,12 @@
                                         <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                                     </td>
                                     <td>
+                                        <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 1..." value="` + val.note + `">
+                                    </td>
+                                    <td>
+                                        <input name="arr_note2[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 2..." value="` + val.note2 + `">
+                                    </td>
+                                    <td>
                                         <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="` + val.qty + `" style="text-align:right;width:100px;" id="rowQty`+ count +`">
                                     </td>
                                     <td class="center">
@@ -2565,12 +2513,6 @@
                                     </td>
                                     <td class="center">
                                         <span id="arr_subtotal` + count + `" class="arr_subtotal">` + val.subtotal + `</span>
-                                    </td>
-                                    <td>
-                                        <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 1..." value="` + val.note + `">
-                                    </td>
-                                    <td>
-                                        <input name="arr_note2[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 2..." value="` + val.note2 + `">
                                     </td>
                                     <td>
                                         <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
@@ -2655,6 +2597,12 @@
                                         <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                                     </td>
                                     <td>
+                                        <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 1..." value="` + val.note + `">
+                                    </td>
+                                    <td>
+                                        <input name="arr_note2[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 2..." value="` + val.note2 + `">
+                                    </td>
+                                    <td>
                                         <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="` + val.qty + `" style="text-align:right;width:100px;" id="rowQty`+ count +`">
                                     </td>
                                     <td class="center">
@@ -2702,12 +2650,6 @@
                                     </td>
                                     <td class="center">
                                         <span id="arr_subtotal` + count + `" class="arr_subtotal">` + val.subtotal + `</span>
-                                    </td>
-                                    <td>
-                                        <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 1..." value="` + val.note + `">
-                                    </td>
-                                    <td>
-                                        <input name="arr_note2[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 2..." value="` + val.note2 + `">
                                     </td>
                                     <td>
                                         <select class="form-control" id="arr_place` + count + `" name="arr_place[]">

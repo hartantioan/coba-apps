@@ -121,13 +121,6 @@ class PurchaseOrderController extends Controller
             'receiver_address',
             'receiver_phone',
             'received_date',
-            'due_date',
-            'document_date',
-            'tax_no',
-            'tax_cut_no',
-            'cut_date',
-            'spk_no',
-            'invoice_no',
             'note',
             'subtotal',
             'discount',
@@ -379,13 +372,6 @@ class PurchaseOrderController extends Controller
                     $val->receiver_address,
                     $val->receiver_phone,
                     $val->received_date ? date('d/m/Y',strtotime($val->received_date)) : '-',
-                    $val->due_date ? date('d/m/Y',strtotime($val->due_date)) : '-',
-                    $val->document_date ? date('d/m/Y',strtotime($val->document_date)) : '-',
-                    $val->tax_no ?? '-',
-                    $val->tax_cut_no ?? '-',
-                    $val->cut_date ? date('d/m/Y',strtotime($val->cut_date)) : '-',
-                    $val->spk_no,
-                    $val->invoice_no,
                     $val->note,
                     number_format($val->subtotal,2,',','.'),
                     number_format($val->discount,2,',','.'),
@@ -747,13 +733,6 @@ class PurchaseOrderController extends Controller
                         $query->post_date = $request->post_date;
                         $query->delivery_date = $request->delivery_date;
                         $query->received_date = $request->received_date;
-                        $query->due_date = $request->due_date;
-                        $query->document_date = $request->document_date;
-                        $query->tax_no = $request->tax_no;
-                        $query->tax_cut_no = $request->tax_cut_no;
-                        $query->cut_date = $request->cut_date;
-                        $query->spk_no = $request->spk_no;
-                        $query->invoice_no = $request->invoice_no;
                         $query->note = $request->note;
                         $query->note_external = $request->note_external;
                         $query->subtotal = str_replace(',','.',str_replace('.','',$request->savesubtotal));
@@ -817,13 +796,6 @@ class PurchaseOrderController extends Controller
                         'post_date'                 => $request->post_date,
                         'delivery_date'             => $request->delivery_date,
                         'received_date'             => $request->received_date,
-                        'due_date'                  => $request->due_date,
-                        'document_date'             => $request->document_date,
-                        'tax_no'                    => $request->tax_no,
-                        'tax_cut_no'                => $request->tax_cut_no,
-                        'cut_date'                  => $request->cut_date,
-                        'spk_no'                    => $request->spk_no,
-                        'invoice_no'                => $request->invoice_no,
                         'note'                      => $request->note,
                         'note_external'             => $request->note_external,
                         'subtotal'                  => str_replace(',','.',str_replace('.','',$request->savesubtotal)),

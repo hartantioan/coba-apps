@@ -170,7 +170,7 @@ class UserController extends Controller
                     $val->username,
                     $val->employee_no,
                     $val->type(),
-                    $val->group()->exists() ? $val->group->code.' - '.$val->group->name : '-',
+                    $val->group()->exists() ? $val->group->name : '-',
                     $position,
                     $val->status(),
                     $btn

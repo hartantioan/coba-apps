@@ -482,11 +482,9 @@
             document.body.classList.add('tab-active');
         }
         
-        
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
-
         
         if (select2Container) {
             select2Container.classList.add('tab-active');

@@ -975,6 +975,7 @@ class PaymentRequestController extends Controller
 
                         $query->paymentRequestDetail()->delete();
                         $query->paymentRequestCross()->delete();
+                        $query->paymentRequestCost()->delete();
 
                         DB::commit();
                     }else{

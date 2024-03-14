@@ -17,7 +17,7 @@ class PurchaseDownPaymentDetail extends Model
     protected $fillable = [
         'purchase_down_payment_id',
         'purchase_order_id',
-        'fund_request_id',
+        'fund_request_detail_id',
         'nominal',
         'note'
     ];
@@ -31,7 +31,7 @@ class PurchaseDownPaymentDetail extends Model
         return $this->belongsTo('App\Models\PurchaseOrder','purchase_order_id','id')->withTrashed();
     }
 
-    public function fundRequest(){
-        return $this->belongsTo('App\Models\FundRequest','fund_request_id','id')->withTrashed();
+    public function fundRequestDetail(){
+        return $this->belongsTo('App\Models\FundRequestDetail','fund_request_detail_id','id')->withTrashed();
     }
 }

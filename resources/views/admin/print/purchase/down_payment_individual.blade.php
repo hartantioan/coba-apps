@@ -290,18 +290,13 @@
                                     <thead>
                                         <tr>
                                             <th class="center-align">PO/FR No.</th>
-                                            
                                             <th class="center-align">PR No.</th>
-                                            
                                             <th class="center-align">Tgl.Post</th>
-                                            
                                             <th class="center-align">Tgl.Kirim/Tgl.Pakai</th>
                                             <th class="center-align">Keterangan</th>
                                             <th class="center-align">Total</th>
                                             <th class="center-align">DP Total</th>
-                                           
                                         </tr>
-                                        
                                     </thead>
                                 @foreach($data->purchaseDownPaymentDetail as $key => $row)
                                     @if($row->purchaseOrder()->exists())
@@ -322,15 +317,15 @@
                                                 <td class="center-align" style="text-align: right">{{ number_format($row->nominal,2,',','.') }}</td>
                                             </tr>
                                         </tbody>
-                                    @elseif($row->fundRequest()->exists())
+                                    @elseif($row->fundRequestDetail()->exists())
                                         <tbody>
                                             <tr>
-                                                <td class="center-align">{{ $row->fundRequest->code }}</td>
+                                                <td class="center-align">{{ $row->fundRequestDetail->fundRequest->code }}</td>
                                                 <td class="center-align">-</td>
-                                                <td class="center-align">{{ date('d/m/Y',strtotime($row->fundRequest->post_date)) }}</td>
-                                                <td class="center-align">{{ date('d/m/Y',strtotime($row->fundRequest->required_date)) }}</td>
+                                                <td class="center-align">{{ date('d/m/Y',strtotime($row->fundRequestDetail->fundRequest->post_date)) }}</td>
+                                                <td class="center-align">{{ date('d/m/Y',strtotime($row->fundRequestDetail->fundRequest->required_date)) }}</td>
                                                 <td class="center-align">{{ $row->note }}</td>                                             
-                                                <td class="center-align" style="text-align: right">{{ number_format($row->fundRequest->grandtotal,2,',','.') }}</td>
+                                                <td class="center-align" style="text-align: right">{{ number_format($row->fundRequestDetail->fundRequest->grandtotal,2,',','.') }}</td>
                                                 <td class="center-align" style="text-align: right">{{ number_format($row->nominal,2,',','.') }}</td>
                                             </tr>
                                         </tbody>
@@ -542,12 +537,9 @@
                                 <table border="1" style="border-collapse:collapse" width="100%">
                                     <thead>
                                         <tr>
-                                            <th class="center-align">PO No.</th>
-                                            
+                                            <th class="center-align">PO/FR No.</th>
                                             <th class="center-align">PR No.</th>
-                                            
                                             <th class="center-align">Tgl.Post</th>
-                                            
                                             <th class="center-align">Tgl.Kirim</th>
                                             <th class="center-align">Keterangan</th>
                                             <th class="center-align">Total</th>
@@ -575,15 +567,15 @@
                                                 <td class="center-align" style="text-align: right">{{ number_format($row->nominal,2,',','.') }}</td>
                                             </tr>
                                         </tbody>
-                                    @elseif($row->fundRequest()->exists())
+                                    @elseif($row->fundRequestDetail()->exists())
                                         <tbody>
                                             <tr>
-                                                <td class="center-align">{{ $row->fundRequest->code }}</td>
+                                                <td class="center-align">{{ $row->fundRequestDetail->fundRequest->code }}</td>
                                                 <td class="center-align">-</td>
-                                                <td class="center-align">{{ date('d/m/Y',strtotime($row->fundRequest->post_date)) }}</td>
-                                                <td class="center-align">{{ date('d/m/Y',strtotime($row->fundRequest->required_date)) }}</td>
+                                                <td class="center-align">{{ date('d/m/Y',strtotime($row->fundRequestDetail->fundRequest->post_date)) }}</td>
+                                                <td class="center-align">{{ date('d/m/Y',strtotime($row->fundRequestDetail->fundRequest->required_date)) }}</td>
                                                 <td class="center-align">{{ $row->note }}</td>                                             
-                                                <td class="center-align" style="text-align: right">{{ number_format($row->fundRequest->grandtotal,2,',','.') }}</td>
+                                                <td class="center-align" style="text-align: right">{{ number_format($row->fundRequestDetail->fundRequest->grandtotal,2,',','.') }}</td>
                                                 <td class="center-align" style="text-align: right">{{ number_format($row->nominal,2,',','.') }}</td>
                                             </tr>
                                         </tbody>

@@ -47,6 +47,7 @@ use App\Helpers\CustomHelper;
 use App\Exports\ExportPurchaseDownPayment;
 use App\Models\ChecklistDocumentList;
 use App\Models\FundRequest;
+use App\Models\FundRequestDetail;
 use App\Models\MenuUser;
 use App\Models\User;
 use App\Models\Tax;
@@ -212,27 +213,23 @@ class PurchaseDownPaymentController extends Controller
 
                     foreach($data->fundRequestDetail as $key => $rowdetail){
                         $item_unit = $rowdetail->unit->code;
-                        $list_items .= '<li>'.$rowdetail->note.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit.' Total '.number_format($rowdetail->total,2,',','.').' PPN '.number_format($rowdetail->tax,2,',','.').' PPh '.number_format($rowdetail->wtax,2,',','.').' Grandtotal '.number_format($rowdetail->grandtotal,2,',','.').'</li>';
+                        $details[] = [
+                            'id'            => $rowdetail->id,
+                            'po_code'       => CustomHelper::encrypt($data->code),
+                            'po_no'         => $data->code,
+                            'post_date'     => date('d/m/Y',strtotime($data->post_date)),
+                            'delivery_date' => date('d/m/Y',strtotime($data->required_date)),
+                            'grandtotal'    => number_format($rowdetail->grandtotal,2,',','.'),
+                            'list_items'    => $rowdetail->note.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit,
+                            'note'          => $rowdetail->note ? $rowdetail->note : '',
+                            'type'          => $rowdetail->getTable(),
+                            'total'         => number_format($rowdetail->total,2,',','.'),
+                            'tax'           => number_format($rowdetail->tax,2,',','.'),
+                            'wtax'          => number_format($rowdetail->wtax,2,',','.'),
+                            'checklist'     => $arrChecklist,
+                            'payment_type'  => $data->payment_type,
+                        ];
                     }
-
-                    $list_items .= '</ol>';
-
-                    $details[] = [
-                        'id'            => $data->id,
-                        'po_code'       => CustomHelper::encrypt($data->code),
-                        'po_no'         => $data->code,
-                        'post_date'     => date('d/m/Y',strtotime($data->post_date)),
-                        'delivery_date' => date('d/m/Y',strtotime($data->required_date)),
-                        'grandtotal'    => number_format($data->grandtotal,2,',','.'),
-                        'list_items'    => $list_items,
-                        'note'          => $data->note ? $data->note : '',
-                        'type'          => $data->getTable(),
-                        'total'         => number_format($data->total,2,',','.'),
-                        'tax'           => number_format($data->tax,2,',','.'),
-                        'wtax'          => number_format($data->wtax,2,',','.'),
-                        'checklist'     => $arrChecklist,
-                        'payment_type'  => $data->payment_type,
-                    ];
                 }
             }
         }
@@ -251,11 +248,6 @@ class PurchaseDownPaymentController extends Controller
             'company_id',
             'type',
             'document',
-            'tax_id',
-            'is_include_tax',
-            'percent_tax',
-            'wtax_id',
-            'percent_wtax',
             'post_date',
             'top',
             'currency_id',
@@ -465,11 +457,6 @@ class PurchaseDownPaymentController extends Controller
                     $val->company->name,
                     $val->type(),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
-                    $val->taxModel()->exists() ? $val->taxModel->code : '-',
-                    $val->isIncludeTax(),
-                    number_format($val->percent_tax,2,',','.'),
-                    $val->wtaxModel()->exists() ? $val->wtaxModel->code : '-',
-                    number_format($val->percent_wtax,2,',','.'),  
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->top,
                     $val->currency->code,
@@ -551,26 +538,29 @@ class PurchaseDownPaymentController extends Controller
             $tax = 0;
             $wtax = 0;
             $grandtotal = 0;
+
+            if($request->arr_code){
+                foreach($request->arr_code as $key => $row){
+                    if($request->arr_type[$key] == 'purchase_orders'){
+                        $po = PurchaseOrder::find($row);
+                        $bobot = str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])) / $po->grandtotal;
+                        $total += $bobot * $po->total;
+                        $tax += $bobot * $po->tax;
+                        $wtax += $bobot * $po->wtax;
+                    }elseif($request->arr_type[$key] == 'fund_request_details'){
+                        $fr = FundRequestDetail::find($row);
+                        $bobot = str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])) / $fr->grandtotal;
+                        $total += $bobot * $fr->total;
+                        $tax += $bobot * $fr->tax;
+                        $wtax += $bobot * $fr->wtax;
+                    }
+                }
+            }
+
             $subtotal = str_replace(',','.',str_replace('.','',$request->subtotal));
             $discount = str_replace(',','.',str_replace('.','',$request->discount));
 
-            $total = $subtotal - $discount;
-
-            if($request->percent_tax > 0){
-                if($request->is_include_tax == '1'){
-                    $total = round($total / (1 + ($request->percent_tax / 100)),2);
-                }
-                $tax = $total * ($request->percent_tax / 100);
-            }
-    
-            if($request->percent_wtax > 0){
-                $wtax = $total * ($request->percent_wtax / 100);
-            }
-
-            $tax = floor($tax);
-            $wtax = floor($wtax);
-
-            $grandtotal = $total + $tax - $wtax;
+            $grandtotal = $subtotal - $discount;
 
             if($grandtotal <= 0){
                 return response()->json([
@@ -628,12 +618,6 @@ class PurchaseDownPaymentController extends Controller
                         $query->account_id = $request->supplier_id;
                         $query->type = $request->type;
                         $query->company_id = $request->company_id;
-                        $query->tax_id = $request->tax_id;
-                        $query->is_tax = $request->tax_id > 0 ? '1' : NULL;
-                        $query->is_include_tax = $request->is_incude_tax;
-                        $query->percent_tax = $request->percent_tax;
-                        $query->wtax_id = $request->wtax_id;
-                        $query->percent_wtax = $request->percent_wtax;
                         $query->document = $document;
                         $query->currency_id = $request->currency_id;
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
@@ -679,12 +663,6 @@ class PurchaseDownPaymentController extends Controller
                         'account_id'                => $request->supplier_id,
                         'type'	                    => $request->type,
                         'company_id'                => $request->company_id,
-                        'tax_id'                    => $request->tax_id,
-                        'is_tax'                    => $request->tax_id > 0 ? '1' : NULL,
-                        'is_include_tax'            => $request->is_incude_tax,
-                        'percent_tax'               => $request->percent_tax,
-                        'wtax_id'                   => $request->wtax_id,
-                        'percent_wtax'              => $request->percent_wtax,
                         'document'                  => $request->file('document') ? $request->file('document')->store('public/purchase_down_payments') : NULL,
                         'currency_id'               => $request->currency_id,
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
@@ -713,8 +691,8 @@ class PurchaseDownPaymentController extends Controller
                         foreach($request->arr_code as $key => $row){
                             PurchaseDownPaymentDetail::create([
                                 'purchase_down_payment_id'      => $query->id,
-                                'purchase_order_id'             => $request->arr_type[$key] == 'purchase_orders' ? PurchaseOrder::where('code',CustomHelper::decrypt($row))->first()->id : NULL,
-                                'fund_request_id'               => $request->arr_type[$key] == 'fund_requests' ? FundRequest::where('code',CustomHelper::decrypt($row))->first()->id : NULL,
+                                'purchase_order_id'             => $request->arr_type[$key] == 'purchase_orders' ? $row : NULL,
+                                'fund_request_detail_id'        => $request->arr_type[$key] == 'fund_request_details' ? $row : NULL,
                                 'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
                                 'note'                          => $request->arr_note[$key]
                             ]);
@@ -799,16 +777,16 @@ class PurchaseDownPaymentController extends Controller
                         <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
                     </tr>';
                 }
-                if($row->fundRequest()->exists()){
-                    $totals+=$row->fundRequest->grandtotal;
+                if($row->fundRequestDetail()->exists()){
+                    $totals+=$row->fundRequestDetail->grandtotal;
                     $totalnominal+=$row->nominal;
                     $string .= '<tr>
                         <td class="center-align">'.($key + 1).'</td>
-                        <td class="center-align">'.$row->fundRequest->code.'</td>
-                        <td class="center-align">'.date('d/m/Y',strtotime($row->fundRequest->post_date)).'</td>
-                        <td class="center-align">'.date('d/m/Y',strtotime($row->fundRequest->required_date)).'</td>
+                        <td class="center-align">'.$row->fundRequestDetail->fundRequest->code.'</td>
+                        <td class="center-align">'.date('d/m/Y',strtotime($row->fundRequestDetail->fundRequest->post_date)).'</td>
+                        <td class="center-align">'.date('d/m/Y',strtotime($row->fundRequestDetail->fundRequest->required_date)).'</td>
                         <td class="center-align">'.$row->note.'</td>
-                        <td class="right-align">'.number_format($row->fundRequest->grandtotal,2,',','.').'</td>
+                        <td class="right-align">'.number_format($row->fundRequestDetail->grandtotal,2,',','.').'</td>
                         <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
                     </tr>';
                 }
@@ -942,24 +920,25 @@ class PurchaseDownPaymentController extends Controller
                     $item_unit = $rowdetail->item()->exists() ? $rowdetail->itemUnit->unit->code : '-';
                     $list_items .= '<li>'.$item_code.' - '.$item_name.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit.' Total '.number_format($rowdetail->subtotal,2,',','.').' PPN '.number_format($rowdetail->tax,2,',','.').' PPh '.number_format($rowdetail->wtax,2,',','.').' Grandtotal '.number_format($rowdetail->grandtotal,2,',','.').'</li>';
                 }
-            }elseif($row->fundRequest()->exists()){
-                foreach($row->fundRequest->fundRequestDetail as $key => $rowdetail){
-                    $item_unit = $rowdetail->unit->code;
-                    $list_items .= '<li>'.$rowdetail->note.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit.' Total '.number_format($rowdetail->total,2,',','.').' PPN '.number_format($rowdetail->tax,2,',','.').' PPh '.number_format($rowdetail->wtax,2,',','.').' Grandtotal '.number_format($rowdetail->grandtotal,2,',','.').'</li>';
-                }
+            }elseif($row->fundRequestDetail()->exists()){
+                
             }
 
             $list_items .= '</ol>';
 
             $arr[] = [
-                'type'                      => $row->purchase_order_id ? $row->purchaseOrder->getTable() : $row->fundRequest->getTable(),
-                'purchase_order_id'         => $row->purchase_order_id ?? $row->fund_request_id,
-                'purchase_order_code'       => $row->purchaseOrder()->exists() ? $row->purchaseOrder->code : $row->fundRequest->code,
-                'purchase_order_encrypt'    => $row->purchaseOrder()->exists() ? CustomHelper::encrypt($row->purchaseOrder->code) : CustomHelper::encrypt($row->fundRequest->code),
-                'post_date'                 => $row->purchaseOrder()->exists() ? date('d/m/Y',strtotime($row->purchaseOrder->post_date)) : date('d/m/Y',strtotime($row->fundRequest->post_date)),
-                'delivery_date'             => $row->purchaseOrder()->exists() ? date('d/m/Y',strtotime($row->purchaseOrder->delivery_date)) : date('d/m/Y',strtotime($row->fundRequest->required_date)),
+                'id'                        => $row->purchase_order_id ?? $row->fund_request_detail_id,
+                'type'                      => $row->purchase_order_id ? $row->purchaseOrder->getTable() : $row->fundRequestDetail->getTable(),
+                'purchase_order_id'         => $row->purchase_order_id ?? $row->fund_request_detail_id,
+                'purchase_order_code'       => $row->purchaseOrder()->exists() ? $row->purchaseOrder->code : $row->fundRequestDetail->fundRequest->code,
+                'purchase_order_encrypt'    => $row->purchaseOrder()->exists() ? CustomHelper::encrypt($row->purchaseOrder->code) : CustomHelper::encrypt($row->fundRequestDetail->fundRequest->code),
+                'post_date'                 => $row->purchaseOrder()->exists() ? date('d/m/Y',strtotime($row->purchaseOrder->post_date)) : date('d/m/Y',strtotime($row->fundRequestDetail->fundRequest->post_date)),
+                'delivery_date'             => $row->purchaseOrder()->exists() ? date('d/m/Y',strtotime($row->purchaseOrder->delivery_date)) : date('d/m/Y',strtotime($row->fundRequestDetail->fundRequest->required_date)),
                 'note'                      => $row->note ? $row->note : '',
-                'total'                     => $row->purchaseOrder()->exists() ? number_format($row->purchaseOrder->grandtotal,2,',','.') : number_format($row->fundRequest->grandtotal,2,',','.'),
+                'total'                     => $row->purchaseOrder()->exists() ? number_format($row->purchaseOrder->grandtotal,2,',','.') : number_format($row->fundRequestDetail->grandtotal,2,',','.'),
+                'tax'                       => $row->purchaseOrder()->exists() ? number_format($row->purchaseOrder->tax,2,',','.') : number_format($row->fundRequestDetail->tax,2,',','.'),
+                'wtax'                      => $row->purchaseOrder()->exists() ? number_format($row->purchaseOrder->wtax,2,',','.') : number_format($row->fundRequestDetail->wtax,2,',','.'),
+                'grandtotal'                => $row->purchaseOrder()->exists() ? number_format($row->purchaseOrder->grandtotal,2,',','.') : number_format($row->fundRequestDetail->grandtotal,2,',','.'),
                 'total_dp'                  => number_format($row->nominal,2,',','.'),
                 'list_items'                => $list_items,
             ];

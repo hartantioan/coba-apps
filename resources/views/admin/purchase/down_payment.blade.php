@@ -165,7 +165,6 @@
                                                         <th rowspan="2">Perusahaan</th>
                                                         <th rowspan="2">Tipe</th>
                                                         <th rowspan="2">Dokumen</th>
-                                                        <th colspan="5" class="center-align">Pajak</th>
                                                         <th colspan="2" class="center-align">Tanggal</th>
                                                         <th colspan="2" class="center-align">Mata Uang</th>
                                                         <th rowspan="2">Keterangan</th>
@@ -179,11 +178,6 @@
                                                         <th rowspan="2">Action</th>
                                                     </tr>
                                                     <tr>
-                                                        <th>PPN</th>
-                                                        <th>Termasuk</th>
-                                                        <th>Prosentase</th>
-                                                        <th>PPh</th>
-                                                        <th>Prosentase</th>
                                                         <th>Post</th>
                                                         <th>TOP</th>
                                                         <th>Kode</th>
@@ -237,9 +231,7 @@
                                 <select class="form-control" id="type" name="type">
                                     <option value="2">Transfer</option>
                                     <option value="1">Tunai</option>
-                                    <option value="3">Cek</option>
-                                    <option value="4">BG</option>
-                                    <option value="5">Credit</option>
+                                    <option value="3">Cek/BG</option>
                                 </select>
                                 <label class="" for="type">Tipe</label>
                             </div>
@@ -280,31 +272,6 @@
                                 <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                                 <label class="active" for="currency_rate">Konversi</label>
                             </div>
-                            <div class="input-field col m3 s12 step11">
-                                <select id="tax_id" name="tax_id" onchange="countAll();">
-                                    <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
-                                    @foreach ($tax as $row)
-                                        <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="tax_id">PPN</label>
-                            </div>
-                            <div class="input-field col m3 s12 step12">
-                                <select id="is_include_tax" name="is_include_tax" onchange="countAll();">
-                                    <option value="0">--Tidak--</option>
-                                    <option value="1">--Ya--</option>
-                                </select>
-                                <label class="" for="is_include_tax">Termasuk PPN</label>
-                            </div>
-                            <div class="input-field col m3 s12 step12">
-                                <select id="wtax_id" name="wtax_id" onchange="countAll();">
-                                    <option value="0" data-id="0">-- Pilih ini jika non-PPh --</option>
-                                    @foreach ($wtax as $row)
-                                        <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="wtax_id">PPh</label>
-                            </div>
                             <div class="col m12 s12 step13">
                                 <p class="mt-2 mb-2">
                                     <h6>Detail Purchase Order / Req. Dana (Centang jika ada)</h6>
@@ -319,17 +286,20 @@
                                                         </label>
                                                     </th>
                                                     <th class="center">Dokumen No.</th>
-                                                    <th class="center">Daftar Item</th>
+                                                    <th class="center">Item</th>
                                                     <th class="center">Tgl.Post</th>
                                                     <th class="center">Tgl.Kirim/Tgl.Dipakai</th>
                                                     <th class="center">Keterangan</th>
                                                     <th class="center">Total</th>
+                                                    <th class="center">PPN</th>
+                                                    <th class="center">PPh</th>
+                                                    <th class="center">Grandtotal</th>
                                                     <th class="center">Uang Muka</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-purchase">
                                                 <tr id="empty-purchase">
-                                                    <td colspan="8" class="center">
+                                                    <td colspan="11" class="center">
                                                         Pilih supplier untuk memulai...
                                                     </td>
                                                 </tr>
@@ -379,18 +349,6 @@
                                             <td class="right-align">
                                                 <input class="browser-default" id="discount" name="discount" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
                                             </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Total</td>
-                                            <td class="right-align"><h6><span id="total">0,00</span></h6></td>
-                                        </tr>
-                                        <tr>
-                                            <td>PPN</td>
-                                            <td class="right-align"><h6><span id="tax">0,00</span></h6></td>
-                                        </tr>
-                                        <tr>
-                                            <td>PPh</td>
-                                            <td class="right-align"><h6><span id="wtax">0,00</span></h6></td>
                                         </tr>
                                         <tr>
                                             <td><h6>Grandtotal</h6></td>
@@ -785,7 +743,7 @@
                 M.updateTextFields();
                 $('#body-purchase').empty().append(`
                     <tr id="empty-purchase">
-                        <td colspan="8" class="center">
+                        <td colspan="11" class="center">
                             Pilih supplier untuk memulai...
                         </td>
                     </tr>
@@ -1290,7 +1248,7 @@
             $('#empty-purchase').remove();
             $('#body-purchase').append(`
                 <tr id="empty-purchase">
-                    <td colspan="8" class="center">
+                    <td colspan="11" class="center">
                         Pilih supplier untuk memulai...
                     </td>
                 </tr>
@@ -1365,7 +1323,7 @@
         }else{
             $('#body-purchase').empty().append(`
                 <tr id="empty-purchase">
-                    <td colspan="8" class="center">
+                    <td colspan="11" class="center">
                         Pilih supplier untuk memulai...
                     </td>
                 </tr>
@@ -1419,7 +1377,7 @@
                                         <input type="hidden" name="arr_type[]" value="` + val.type + `" id="arr_type` + count + `">
                                         <td class="center-align">
                                             <label>
-                                                <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.po_code + `" onclick="checkAll()" data-id="` + count + `" checked>
+                                                <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.id + `" onclick="checkAll()" data-id="` + count + `" checked>
                                                 <span>Pilih</span>
                                             </label>
                                         </td>
@@ -1438,7 +1396,16 @@
                                         <td class="center">
                                             <input name="arr_note[]" class="browser-default" type="text" value="` + val.note + `" style="width:100%;" id="rowNote` + count + `">
                                         </td>
-                                        <td class="center">
+                                        <td class="right-align">
+                                            ` + val.total + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.tax + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.wtax + `
+                                        </td>
+                                        <td class="right-align">
                                             ` + val.grandtotal + `
                                         </td>
                                         <td class="center">
@@ -1521,38 +1488,9 @@
 
     function countAll(){
 
-        let subtotal = parseFloat($('#subtotal').val().replaceAll(".", "").replaceAll(",",".")), discount = 0, total = 0, grandtotal = 0, tax = 0, wtax = 0, percent_tax = $('#tax_id').val(), percent_wtax = $('#wtax_id').val();
+        let subtotal = parseFloat($('#subtotal').val().replaceAll(".", "").replaceAll(",",".")), discount = 0, grandtotal = 0;
 
-        total = subtotal - parseFloat($('#discount').val().replaceAll(".", "").replaceAll(",","."));
-
-        if(percent_tax > 0){
-            if($('#is_include_tax').val() == '1'){
-                total = Math.round(((total / (1 + (percent_tax / 100))) * 100) / 100);
-            }
-            tax = total * (percent_tax / 100);
-        }
-
-        if(percent_wtax > 0){
-            wtax = total * (percent_wtax / 100);
-        }
-
-        tax = Math.floor(tax);
-        wtax = Math.floor(wtax);
-        total = total;
-
-        $('#total').text(
-            (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
-        );
-
-        $('#tax').text(
-            (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(2).toString().replace('.',','))
-        );
-
-        $('#wtax').text(
-            (wtax >= 0 ? '' : '-') + formatRupiahIni(wtax.toFixed(2).toString().replace('.',','))
-        );
-
-        grandtotal = total + tax - wtax;
+        grandtotal = subtotal - parseFloat($('#discount').val().replaceAll(".", "").replaceAll(",","."));
 
         $('#grandtotal').text(
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
@@ -1658,11 +1596,6 @@
                 { name: 'company_id', className: 'center-align' },
                 { name: 'type', className: 'center-align' },
                 { name: 'document', className: 'center-align' },
-                { name: 'tax_id', className: 'center-align' },
-                { name: 'is_include', className: 'center-align' },
-                { name: 'percent_tax', className: 'center-align' },
-                { name: 'wtax_id', className: 'center-align' },
-                { name: 'percent_wtax', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'top', className: 'center-align' },
                 { name: 'currency_id', className: 'center-align' },
@@ -1926,7 +1859,7 @@
                                 <input type="hidden" name="arr_type[]" value="` + val.type + `" id="arr_type` + count + `">
                                 <td class="center-align">
                                     <label>
-                                        <input type="checkbox" checked id="check` + count + `" name="arr_code[]" value="` + val.purchase_order_encrypt + `" onclick="checkAll()" data-id="` + count + `">
+                                        <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.id + `" onclick="checkAll()" data-id="` + count + `" checked>
                                         <span>Pilih</span>
                                     </label>
                                 </td>
@@ -1945,11 +1878,20 @@
                                 <td class="center">
                                     <input name="arr_note[]" class="browser-default" type="text" value="` + val.note + `" style="width:100%;" id="rowNote` + count + `">
                                 </td>
-                                <td class="center">
+                                <td class="right-align">
                                     ` + val.total + `
                                 </td>
+                                <td class="right-align">
+                                    ` + val.tax + `
+                                </td>
+                                <td class="right-align">
+                                    ` + val.wtax + `
+                                </td>
+                                <td class="right-align">
+                                    ` + val.grandtotal + `
+                                </td>
                                 <td class="center">
-                                    <input name="arr_nominal[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.total_dp + `" onkeyup="formatRupiah(this);countAll()" style="text-align:right;width:100%;" id="rowNominal` + count + `">
+                                    <input name="arr_nominal[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.total_dp + `" onkeyup="formatRupiah(this);countRow()" style="text-align:right;width:100%;" id="rowNominal` + count + `">
                                 </td>
                             </tr>
                         `);

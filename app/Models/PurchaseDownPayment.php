@@ -135,9 +135,7 @@ class PurchaseDownPayment extends Model
         $type = match ($this->type) {
             '1'   => 'Tunai',
             '2'   => 'Transfer',
-            '3'   => 'CEK',
-            '4'   => 'BG',
-            '5'   => 'Credit',
+            '3'   => 'Cek/BG',
             default => 'Invalid',
         };
   

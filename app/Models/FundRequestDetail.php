@@ -126,4 +126,10 @@ class FundRequestDetail extends Model
     {
         return $this->belongsTo('App\Models\Unit', 'unit_id', 'id')->withTrashed();
     }
+
+    public function purchaseDownPaymentDetail(){
+        return $this->hasMany('App\Models\PurchaseDownPaymentDetail','fund_request_detail_id','id')->whereHas('purchaseDownPayment',function($query){
+            $query->whereIn('status',['1','2','3']);
+        });
+    }
 }

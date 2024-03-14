@@ -222,87 +222,54 @@
         <!-- product details table-->
         <div class="invoice-product-details">
             @if(count($data->purchaseDownPaymentDetail) > 0)
-                <h6 class="center mt-3">Referensi Order Pembelian</h6>
+                <table border="1" style="border-collapse:collapse" width="100%">
+                    <thead>
+                        <tr>
+                            <th class="center-align">PO/FR No.</th>
+                            <th class="center-align">PR No.</th>
+                            <th class="center-align">Tgl.Post</th>
+                            <th class="center-align">Tgl.Kirim</th>
+                            <th class="center-align">Keterangan</th>
+                            <th class="center-align">Total</th>
+                            <th class="center-align">DP Total</th>
+                            
+                        </tr>
+                        
+                    </thead>
                 @foreach($data->purchaseDownPaymentDetail as $key => $row)
-                    @if ($row->purchaseOrder()->exists())
+                    @if($row->purchaseOrder()->exists())
                         @php
                         $arr_pr=[];
                             foreach ($row->purchaseOrder->purchaseOrderDetail as $key => $row_detail_po) {
                                 $arr_pr[]=$row_detail_po->purchaseRequestDetail->purchaseRequest->code;
                             }
-                            
                         @endphp
-                        <table class="bordered mt-3 purple lighten-5">
-                            <thead>
-                                <tr>
-                                    <th class="center-align">PO No.</th>
-                                    <th class="center-align">{{ $row->purchaseOrder->code }}</th>
-                                    <th class="center-align">PR No.</th>
-                                    <th class="center-align">{{ implode(', ',$arr_pr) }}</th>
-                                    <th class="center-align">Tgl.Post</th>
-                                    <th class="center-align">{{ date('d/m/Y',strtotime($row->purchaseOrder->post_date)) }}</th>
-                                    <th class="center-align">Tgl.Kirim</th>
-                                    <th class="center-align">{{ date('d/m/Y',strtotime($row->purchaseOrder->delivery_date)) }}</th>
-                                </tr>
-                                <tr>
-                                    <th class="center-align">Keterangan</th>
-                                    <th class="center-align">{{ $row->note }}</th>
-                                    <th class="center-align">Total</th>
-                                    <th class="center-align">{{ number_format($row->purchaseOrder->grandtotal,2,',','.') }}</th>
-                                    <th class="center-align">DP Total</th>
-                                    <th class="center-align">{{ number_format($row->nominal,2,',','.') }}</th>
-                                    <th class="center-align"></th>
-                                    <th class="center-align"></th>
-                                </tr>
-                                <tr>
-                                    <th class="center-align">Daftar Item</th>
-                                    <th colspan="7">
-                                        <ol>
-                                        @if($row->purchaseOrder()->exists())
-                                            @foreach ($row->purchaseOrder->purchaseOrderDetail as $rowdetail)
-                                                <li>{{ ($rowdetail->item_id ? $rowdetail->item->code.' - '.$rowdetail->item->name : $rowdetail->coa->code.' - '.$rowdetail->coa->name).' Qty : '.number_format($rowdetail->qty,3,',','.').' Sat. '.($rowdetail->item_id ? $rowdetail->itemUnit->unit->code : '-') }}</li>
-                                            @endforeach
-                                        @endif
-                                        </ol>
-                                    </th>
-                                </tr>
-                            </thead>
-                        </table>
-                    @elseif ($row->fundRequest()->exists())
-                        <table class="bordered mt-3 purple lighten-5">
-                            <thead>
-                                <tr>
-                                    <th class="center-align">FR No.</th>
-                                    <th class="center-align">{{ $row->fundRequest->code }}</th>
-                                    <th class="center-align">Tgl.Post</th>
-                                    <th class="center-align">{{ date('d/m/Y',strtotime($row->fundRequest->post_date)) }}</th>
-                                    <th class="center-align">Tgl.Kirim</th>
-                                    <th class="center-align">{{ date('d/m/Y',strtotime($row->fundRequest->delivery_date)) }}</th>
-                                </tr>
-                                <tr>
-                                    <th class="center-align">Keterangan</th>
-                                    <th class="center-align">{{ $row->note }}</th>
-                                    <th class="center-align">Total</th>
-                                    <th class="center-align">{{ number_format($row->fundRequest->grandtotal,2,',','.') }}</th>
-                                    <th class="center-align">DP Total</th>
-                                    <th class="center-align">{{ number_format($row->nominal,2,',','.') }}</th>
-                                </tr>
-                                <tr>
-                                    <th class="center-align">Daftar Item</th>
-                                    <th colspan="7">
-                                        <ol>
-                                        @if($row->fundRequest()->exists())
-                                            @foreach ($row->fundRequest->fundRequestDetail as $rowdetail)
-                                                <li>{{ $rowdetail->note.' Qty : '.number_format($rowdetail->qty,3,',','.').' Sat. '.$rowdetail->unit->code }}</li>
-                                            @endforeach
-                                        @endif
-                                        </ol>
-                                    </th>
-                                </tr>
-                            </thead>
-                        </table>
+                        <tbody>
+                            <tr>
+                                <td class="center-align">{{ $row->purchaseOrder->code }}</td>
+                                <td class="center-align">{{ implode(', ',$arr_pr) }}</td>
+                                <td class="center-align">{{ date('d/m/Y',strtotime($row->purchaseOrder->post_date)) }}</td>
+                                <td class="center-align">{{ date('d/m/Y',strtotime($row->purchaseOrder->delivery_date)) }}</td>
+                                <td class="center-align">{{ $row->note }}</td>                                             
+                                <td class="center-align" style="text-align: right">{{ number_format($row->purchaseOrder->grandtotal,2,',','.') }}</td>
+                                <td class="center-align" style="text-align: right">{{ number_format($row->nominal,2,',','.') }}</td>
+                            </tr>
+                        </tbody>
+                    @elseif($row->fundRequestDetail()->exists())
+                        <tbody>
+                            <tr>
+                                <td class="center-align">{{ $row->fundRequestDetail->fundRequest->code }}</td>
+                                <td class="center-align">-</td>
+                                <td class="center-align">{{ date('d/m/Y',strtotime($row->fundRequestDetail->fundRequest->post_date)) }}</td>
+                                <td class="center-align">{{ date('d/m/Y',strtotime($row->fundRequestDetail->fundRequest->required_date)) }}</td>
+                                <td class="center-align">{{ $row->note }}</td>                                             
+                                <td class="center-align" style="text-align: right">{{ number_format($row->fundRequestDetail->fundRequest->grandtotal,2,',','.') }}</td>
+                                <td class="center-align" style="text-align: right">{{ number_format($row->nominal,2,',','.') }}</td>
+                            </tr>
+                        </tbody>
                     @endif
                 @endforeach
+                </table>
             @endif
             <table class="bordered mt-3">
                 <tbody>

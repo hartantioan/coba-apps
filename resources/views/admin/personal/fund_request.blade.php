@@ -881,7 +881,7 @@
 
     function getAccountInfo(){
         if($('#account_id').val()){
-            if((parseFloat($('#account_id').select2('data')[0].balance_limit) > 0 && $('#account_id').select2('data')[0].type == '1') || ['2','3','4'].includes($('#account_id').select2('data')[0].type)){
+            if((parseFloat($('#account_id').select2('data')[0].balance_limit) > 0 && $('#account_id').select2('data')[0].type == '1') || $('#type').val() == '2' || ['2','3','4'].includes($('#account_id').select2('data')[0].type)){
                 $.ajax({
                     url: '{{ Request::url() }}/get_account_info',
                     type: 'POST',
@@ -994,9 +994,9 @@
                 
                 var formData = new FormData($('#form_data')[0]), passedLimit = true, limit = parseFloat($('#tempLimit').val()), grandtotal = parseFloat($('#grandtotal').val().replaceAll(".", "").replaceAll(",","."));
 
-                if(grandtotal > limit && $('#type').val() == '1'){
+                /* if(grandtotal > limit && $('#type').val() == '1'){
                     passedLimit = false;
-                }
+                } */
 
                 if(passedLimit){
                     var path = window.location.pathname;

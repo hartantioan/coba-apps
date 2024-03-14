@@ -677,7 +677,8 @@ class PaymentRequestController extends Controller
                                 'remark'        => $data->note,
                                 'list_details'  => $listDetails,
                                 'document_status' => $data->document_status,
-                                'is_reimburse'  => ''
+                                'is_reimburse'  => '',
+                                'raw_due_date'  => '',
                             ];
                         }
                     }
@@ -710,7 +711,7 @@ class PaymentRequestController extends Controller
                                 'rawcode'       => $data->code,
                                 'rawdate'       => $data->post_date,
                                 'post_date'     => date('d/m/Y',strtotime($data->post_date)),
-                                'due_date'      => date('d/m/Y',strtotime($required_date)),
+                                'due_date'      => '-',
                                 'total'         => number_format($data->total,2,',','.'),
                                 'tax'           => number_format($data->tax,2,',','.'),
                                 'wtax'          => number_format($data->wtax,2,',','.'),
@@ -732,7 +733,8 @@ class PaymentRequestController extends Controller
                                 'remark'        => $data->note,
                                 'list_details'  => [],
                                 'document_status' => '',
-                                'is_reimburse'  => $is_reimburse
+                                'is_reimburse'  => $is_reimburse,
+                                'raw_due_date'  => $required_date,
                             ];
                         }
                     }
@@ -774,6 +776,7 @@ class PaymentRequestController extends Controller
                                 'list_details'  => [],
                                 'document_status' => '',
                                 'is_reimburse'  => '',
+                                'raw_due_date'  => '',
                             ];
                         }
                     }
@@ -814,7 +817,8 @@ class PaymentRequestController extends Controller
                                 'remark'        => $data->note,
                                 'list_details'  => [],
                                 'document_status' => '',
-                                'is_reimburse'  => ''
+                                'is_reimburse'  => '',
+                                'raw_due_date'  => '',
                             ];
                         }
                     }

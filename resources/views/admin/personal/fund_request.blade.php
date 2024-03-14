@@ -220,7 +220,7 @@
                                     <label class="active" for="tax_cut_no">No. Bukti Potong (Opsional)</label>
                                 </div>
                                 <div class="input-field col m3 s12">
-                                    <input id="cut_date" name="cut_date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Bukti potong">
+                                    <input id="cut_date" name="cut_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Bukti potong">
                                     <label class="active" for="cut_date">Tgl. Bukti Potong (Opsional)</label>
                                 </div>
                                 <div class="input-field col m3 s12">

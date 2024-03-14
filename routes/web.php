@@ -1289,6 +1289,27 @@ Route::prefix('admin')->group(function () {
             });
 
             Route::prefix('purchase')->middleware('direct.access')->group(function () {
+                Route::prefix('material_request')->middleware(['operation.access:material_request,view','lockacc'])->group(function () {
+                    Route::get('/',[MaterialRequestController::class, 'index']);
+                    Route::get('datatable',[MaterialRequestController::class, 'datatable']);
+                    Route::get('row_detail',[MaterialRequestController::class, 'rowDetail']);
+                    Route::post('show', [MaterialRequestController::class, 'show']);
+                    Route::post('get_items', [MaterialRequestController::class, 'getItems']);
+                    Route::post('get_code', [MaterialRequestController::class, 'getCode']);
+                    Route::get('get_outstanding', [MaterialRequestController::class, 'getOutstanding']);
+                    Route::post('get_items_from_stock', [MaterialRequestController::class, 'getItemFromStock']);
+                    Route::post('print',[MaterialRequestController::class, 'print']);
+                    Route::get('export',[MaterialRequestController::class, 'export']);
+                    Route::post('print_by_range',[MaterialRequestController::class, 'printByRange']);
+                    Route::get('print_individual/{id}',[MaterialRequestController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::get('viewstructuretree',[MaterialRequestController::class, 'viewStructureTree']);
+                    Route::post('create',[MaterialRequestController::class, 'create'])->middleware('operation.access:material_request,update');
+                    Route::post('create_done',[MaterialRequestController::class, 'createDone'])->middleware('operation.access:material_request,update');
+                    Route::post('void_status', [MaterialRequestController::class, 'voidStatus'])->middleware('operation.access:material_request,void');
+                    Route::get('approval/{id}',[MaterialRequestController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('destroy', [MaterialRequestController::class, 'destroy'])->middleware('operation.access:material_request,delete');
+                });
+
                 Route::prefix('purchase_request')->middleware(['operation.access:purchase_request,view','lockacc'])->group(function () {
                     Route::get('/',[PurchaseRequestController::class, 'index']);
                     Route::get('datatable',[PurchaseRequestController::class, 'datatable']);
@@ -1762,27 +1783,6 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[InventoryRevaluationController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [InventoryRevaluationController::class, 'voidStatus'])->middleware('operation.access:revaluation,void');
                     Route::post('destroy', [InventoryRevaluationController::class, 'destroy'])->middleware('operation.access:revaluation,delete');
-                });
-
-                Route::prefix('material_request')->middleware(['operation.access:material_request,view','lockacc'])->group(function () {
-                    Route::get('/',[MaterialRequestController::class, 'index']);
-                    Route::get('datatable',[MaterialRequestController::class, 'datatable']);
-                    Route::get('row_detail',[MaterialRequestController::class, 'rowDetail']);
-                    Route::post('show', [MaterialRequestController::class, 'show']);
-                    Route::post('get_items', [MaterialRequestController::class, 'getItems']);
-                    Route::post('get_code', [MaterialRequestController::class, 'getCode']);
-                    Route::get('get_outstanding', [MaterialRequestController::class, 'getOutstanding']);
-                    Route::post('get_items_from_stock', [MaterialRequestController::class, 'getItemFromStock']);
-                    Route::post('print',[MaterialRequestController::class, 'print']);
-                    Route::get('export',[MaterialRequestController::class, 'export']);
-                    Route::post('print_by_range',[MaterialRequestController::class, 'printByRange']);
-                    Route::get('print_individual/{id}',[MaterialRequestController::class, 'printIndividual'])->withoutMiddleware('direct.access');
-                    Route::get('viewstructuretree',[MaterialRequestController::class, 'viewStructureTree']);
-                    Route::post('create',[MaterialRequestController::class, 'create'])->middleware('operation.access:material_request,update');
-                    Route::post('create_done',[MaterialRequestController::class, 'createDone'])->middleware('operation.access:material_request,update');
-                    Route::post('void_status', [MaterialRequestController::class, 'voidStatus'])->middleware('operation.access:material_request,void');
-                    Route::get('approval/{id}',[MaterialRequestController::class, 'approval'])->withoutMiddleware('direct.access');
-                    Route::post('destroy', [MaterialRequestController::class, 'destroy'])->middleware('operation.access:material_request,delete');
                 });
 
                 Route::prefix('inventory_report')->middleware('direct.access')->group(function () {

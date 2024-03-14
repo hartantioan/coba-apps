@@ -46,6 +46,8 @@ class FundRequest extends Model
         'wtax',
         'grandtotal',
         'document_status',
+        'additional_note',
+        'additional_note_pic',
         'status',
         'void_id',
         'void_note',

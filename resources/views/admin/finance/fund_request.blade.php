@@ -145,6 +145,8 @@
                                                         <th rowspan="2">Total OP</th>
                                                         <th rowspan="2">Lampiran</th>
                                                         <th rowspan="2">Dokumen</th>
+                                                        <th rowspan="2">Note</th>
+                                                        <th rowspan="2">PIC</th>
                                                         <th rowspan="2">Status</th>
                                                         <th rowspan="2">Action</th>
                                                     </tr>
@@ -340,7 +342,7 @@
     $(function() {
         var previous = '';
 
-        $('#datatable_serverside').on('click', 'button, select', function(event) {
+        $('#datatable_serverside').on('click', 'button, select, input', function(event) {
             event.stopPropagation();
             
         });
@@ -406,6 +408,45 @@
             }
         });
     });
+
+    var changeInterval = null;
+
+    function updateAdditionalNote(element,type){
+        clearInterval(changeInterval);
+        changeInterval = setInterval(function() {
+            $.ajax({
+                url: '{{ Request::url() }}/update_additional_note',
+                type: 'POST',
+                dataType: 'JSON',
+                data: { 
+                    id : $(element).data('id'), 
+                    val : $(element).val(), 
+                    type : type 
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('#datatable_serverside');
+                },
+                success: function(response) {
+                    loadingClose('#datatable_serverside');
+                    M.toast({
+                        html: response.message
+                    });
+                },
+                error: function() {
+                    loadingClose('#datatable_serverside');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+            clearInterval(changeInterval);
+        }, 2000);
+    }
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
@@ -486,6 +527,8 @@
                 { name: 'total_op', searchable: false, orderable: false, className: 'right-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'document_status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'additional_note', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'additional_note_pic', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],

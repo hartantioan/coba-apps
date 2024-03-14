@@ -254,6 +254,12 @@ class FundRequestController extends Controller
                             <option value="3" '.($val->document_status == '3' ? 'selected' : '').'>TIDAK LENGKAP</option>
                         </select>
                     ',
+                    '
+                        <input style="width:250px;" type="text" data-id="'.CustomHelper::encrypt($val->code).'" value="'.$val->additional_note.'" onkeyup="updateAdditionalNote(this,`1`);">
+                    ',
+                    '
+                        <input style="width:250px;" type="text" data-id="'.CustomHelper::encrypt($val->code).'" value="'.$val->additional_note_pic.'" onkeyup="updateAdditionalNote(this,`2`);">
+                    ',
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
@@ -278,6 +284,26 @@ class FundRequestController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function updateAdditionalNote(Request $request){
+        $type = $request->type;
+        $fr = FundRequest::where('code',CustomHelper::decrypt($request->id))->first();
+        if($fr){
+            if($type == '1'){
+                $fr->update([
+                    'additional_note'   => $request->val,
+                ]);
+            }elseif($type == '2'){
+                $fr->update([
+                    'additional_note_pic'   => $request->val,
+                ]);
+            }
+            return response()->json([
+                'status'    => 200,
+                'message'   => 'Tambahan catatan berhasil disimpan.',
+            ]);
+        }
     }
 
     public function rowDetail(Request $request){

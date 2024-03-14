@@ -2216,6 +2216,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('datatable',[FundRequestController::class, 'datatable']);
                     Route::get('row_detail',[FundRequestController::class, 'rowDetail']);
                     Route::post('show', [FundRequestController::class, 'show']);
+                    Route::post('update_additional_note',[FundRequestController::class, 'updateAdditionalNote'])->middleware('operation.access:fund_request,update');
                     Route::post('print',[FundRequestController::class, 'print']);
                     Route::get('get_outstanding', [FundRequestController::class, 'getOutstanding']);
                     Route::post('print_by_range',[FundRequestController::class, 'printByRange']);

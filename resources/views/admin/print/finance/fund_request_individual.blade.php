@@ -443,7 +443,7 @@
                         <table border="0" width="100%">
                             <tr>
                                 <td class="left-align">
-                                    Pada hari ini, <b>{{ CustomHelper::hariIndo(date('l',strtotime($data->post_date))) }}</b> Tanggal <b>{{ date('d/m/Y',strtotime($data->post_date)) }}</b>, telah diterima dari <b>{{ $data->place->company->name }}</b>.
+                                    Pada hari ini, <b>{{ CustomHelper::hariIndo(date('l',strtotime($data->post_date))) }}</b> Tanggal <b>{{ date('d/m/Y',strtotime($data->post_date)) }}</b>, telah diterima dari <b>{{ $data->company->name }}</b>.
                                 </td>
                             </tr>
                             <tr>
@@ -454,7 +454,7 @@
                                                 Nama
                                             </td>
                                             <td width="75%">
-                                                : {{ strtoupper($data->user->name) }}
+                                                : {{ strtoupper($data->account->name) }}
                                             </td>
                                         </tr>
                                         <tr>
@@ -462,7 +462,7 @@
                                                 Jabatan
                                             </td>
                                             <td>
-                                                : {{ $data->user->position()->exists() ? strtoupper($data->user->position->name) : '-' }}
+                                                : {{ $data->account->position()->exists() ? strtoupper($data->account->position->name) : '-' }}
                                             </td>
                                         </tr>
                                         <tr>

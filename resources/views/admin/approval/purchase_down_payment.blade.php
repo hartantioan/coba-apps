@@ -263,7 +263,7 @@
                                 <td class="center-align">{{ date('d/m/Y',strtotime($row->fundRequestDetail->fundRequest->post_date)) }}</td>
                                 <td class="center-align">{{ date('d/m/Y',strtotime($row->fundRequestDetail->fundRequest->required_date)) }}</td>
                                 <td class="center-align">{{ $row->note }}</td>                                             
-                                <td class="center-align" style="text-align: right">{{ number_format($row->fundRequestDetail->fundRequest->grandtotal,2,',','.') }}</td>
+                                <td class="center-align" style="text-align: right">{{ number_format($row->fundRequestDetail->grandtotal,2,',','.') }}</td>
                                 <td class="center-align" style="text-align: right">{{ number_format($row->nominal,2,',','.') }}</td>
                             </tr>
                         </tbody>

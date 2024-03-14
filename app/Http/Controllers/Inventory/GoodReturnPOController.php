@@ -1593,6 +1593,30 @@ class GoodReturnPOController extends Controller
                                     $data_go_chart[]=$data_memo;
                                 }
                             }
+
+                            if($row->fundRequestDetail()->exists()){
+                                $fr=[
+                                    "name"=>$row->fundRequestDetail->fundRequest->code,
+                                    "key" => $row->fundRequestDetail->fundRequest->code,
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :".$row->fundRequestDetail->fundRequest->post_date],
+                                        ['name'=> "User :".$row->fundRequestDetail->fundRequest->account->name],
+                                        ['name'=> "Nominal : Rp.:".number_format($row->fundRequestDetail->fundRequest->grandtotal,2,',','.')],
+                                    ],
+                                    'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row->fundRequestDetail->fundRequest->code),
+                                ];
+                            
+                                $data_go_chart[]=$fr;
+                                $data_link[]=[
+                                    'from'=>$row->fundRequestDetail->fundRequest->code,
+                                    'to'=>$query_invoice->code,
+                                    'string_link'=>$row->fundRequestDetail->fundRequest->code.$query_invoice->code,
+                                ];
+                                if(!in_array($row->fundRequestDetail->fundRequest->id, $data_id_frs)){
+                                    $data_id_frs[] = $row->fundRequestDetail->fundRequest->id;
+                                    $added = true; 
+                                } 
+                            }
                             
                         }
                         if($query_invoice->purchaseInvoiceDp()->exists()){

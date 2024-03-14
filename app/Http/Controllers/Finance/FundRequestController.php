@@ -1627,84 +1627,81 @@ class FundRequestController extends Controller
         if($query) {
 
             //Pengambilan Main Branch beserta id terkait
-            if($query->hasPaymentRequestDetail()->exists()){
-                foreach($query->fundRequestDetail as $row_fr_detail){
-                    if($row_fr_detail->hasPaymentRequestDetail()->exists()){
-                        foreach($row_fr_detail->hasPaymentRequestDetail as $row_pyr_detail){
-                            $data_pyr_tempura=[
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
-                                    ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
-                                ],
-                                "key" => $row_pyr_detail->paymentRequest->code,
-                                "name" => $row_pyr_detail->paymentRequest->code,
-                                'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
-                            ];
-                            $data_go_chart[]=$data_pyr_tempura;
-                            $data_link[]=[
-                                'from'=>$query->code,
-                                'to'=>$row_pyr_detail->paymentRequest->code,
-                                'string_link'=>$query->code.$row_pyr_detail->paymentRequest->code,
-                            ];
-                            if(!in_array($row_pyr_detail->paymentRequest->id,$data_id_pyrs)){
-                                $data_id_pyrs[] = $row_pyr_detail->paymentRequest->id;
-                                $added = true;
-                            } 
-                           
-                        }
-                    }
-                    
-                    if($row_fr_detail->purchaseInvoiceDetail()->exists()){
-                        foreach($row_fr_detail->purchaseInvoiceDetail as $row_invoice_detail){
-                            $data_invoices_tempura = [
-                                'key'   => $row_invoice_detail->purchaseInvoice->code,
-                                "name"  => $row_invoice_detail->purchaseInvoice->code,
-                            
-                                'properties'=> [
-                                    ['name'=> "Tanggal: ".$row_invoice_detail->purchaseInvoice->post_date],
-                                
-                                ],
-                                'url'   =>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($row_invoice_detail->purchaseInvoice->code),
-                            ];
-                            $data_go_chart[]=$data_invoices_tempura;
-                            $data_link[]=[
-                                'from'  =>  $query->code,
-                                'to'    =>  $row_invoice_detail->purchaseInvoice->code,
-                                'string_link'=>$query->code.$row_invoice_detail->purchaseInvoice->code
-                            ];
-                            if(!in_array($row_invoice_detail->purchaseInvoice->id,$data_id_invoice)){
-                                $data_id_invoice[]=$row_invoice_detail->purchaseInvoice->id;
-                                $added = true;
-                            }
-                        }
-                    }
-
-                    if($row_fr_detail->purchaseDownPaymentDetail()->exists()){
-                        foreach($row_fr_detail->purchaseDownPaymentDetail as $row_dp_detail){
-                            $data_apdp_tempura = [
-                                'key'   => $row_dp_detail->purchaseDownPayment->code,
-                                "name"  => $row_dp_detail->purchaseDownPayment->code,
-                            
-                                'properties'=> [
-                                    ['name'=> "Tanggal: ".$row_dp_detail->purchaseDownPayment->post_date],
-                                    ['name'=> "Vendor  : ".$row_dp_detail->purchaseDownPayment->name],
-                                ],
-                                'url'   =>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_dp_detail->purchaseDownPayment->code),
-                            ];
-                            $data_go_chart[]=$data_apdp_tempura;
-                            $data_link[]=[
-                                'from'  =>  $query->code,
-                                'to'    =>  $row_dp_detail->purchaseDownPayment->code,
-                                'string_link'=>$query->code.$row_dp_detail->purchaseDownPayment->code,
-                            ];
-                            if(!in_array($row_dp_detail->purchaseDownPayment->id,$data_id_dp)){
-                                $data_id_dp[]=$row_dp_detail->purchaseDownPayment->id;
-                                $added = true;
-                            } 
-                        }
+            foreach($query->fundRequestDetail as $row_fr_detail){
+                if($row_fr_detail->hasPaymentRequestDetail()->exists()){
+                    foreach($row_fr_detail->hasPaymentRequestDetail as $row_pyr_detail){
+                        $data_pyr_tempura=[
+                            'properties'=> [
+                                ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
+                                ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
+                            ],
+                            "key" => $row_pyr_detail->paymentRequest->code,
+                            "name" => $row_pyr_detail->paymentRequest->code,
+                            'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
+                        ];
+                        $data_go_chart[]=$data_pyr_tempura;
+                        $data_link[]=[
+                            'from'=>$query->code,
+                            'to'=>$row_pyr_detail->paymentRequest->code,
+                            'string_link'=>$query->code.$row_pyr_detail->paymentRequest->code,
+                        ];
+                        if(!in_array($row_pyr_detail->paymentRequest->id,$data_id_pyrs)){
+                            $data_id_pyrs[] = $row_pyr_detail->paymentRequest->id;
+                            $added = true;
+                        } 
+                       
                     }
                 }
                 
+                if($row_fr_detail->purchaseInvoiceDetail()->exists()){
+                    foreach($row_fr_detail->purchaseInvoiceDetail as $row_invoice_detail){
+                        $data_invoices_tempura = [
+                            'key'   => $row_invoice_detail->purchaseInvoice->code,
+                            "name"  => $row_invoice_detail->purchaseInvoice->code,
+                        
+                            'properties'=> [
+                                ['name'=> "Tanggal: ".$row_invoice_detail->purchaseInvoice->post_date],
+                            
+                            ],
+                            'url'   =>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($row_invoice_detail->purchaseInvoice->code),
+                        ];
+                        $data_go_chart[]=$data_invoices_tempura;
+                        $data_link[]=[
+                            'from'  =>  $query->code,
+                            'to'    =>  $row_invoice_detail->purchaseInvoice->code,
+                            'string_link'=>$query->code.$row_invoice_detail->purchaseInvoice->code
+                        ];
+                        if(!in_array($row_invoice_detail->purchaseInvoice->id,$data_id_invoice)){
+                            $data_id_invoice[]=$row_invoice_detail->purchaseInvoice->id;
+                            $added = true;
+                        }
+                    }
+                }
+
+                if($row_fr_detail->purchaseDownPaymentDetail()->exists()){
+                    foreach($row_fr_detail->purchaseDownPaymentDetail as $row_dp_detail){
+                        $data_apdp_tempura = [
+                            'key'   => $row_dp_detail->purchaseDownPayment->code,
+                            "name"  => $row_dp_detail->purchaseDownPayment->code,
+                        
+                            'properties'=> [
+                                ['name'=> "Tanggal: ".$row_dp_detail->purchaseDownPayment->post_date],
+                                ['name'=> "Vendor  : ".$row_dp_detail->purchaseDownPayment->name],
+                            ],
+                            'url'   =>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_dp_detail->purchaseDownPayment->code),
+                        ];
+                        $data_go_chart[]=$data_apdp_tempura;
+                        $data_link[]=[
+                            'from'  =>  $query->code,
+                            'to'    =>  $row_dp_detail->purchaseDownPayment->code,
+                            'string_link'=>$query->code.$row_dp_detail->purchaseDownPayment->code,
+                        ];
+                        if(!in_array($row_dp_detail->purchaseDownPayment->id,$data_id_dp)){
+                            $data_id_dp[]=$row_dp_detail->purchaseDownPayment->id;
+                            $added = true;
+                        } 
+                    }
+                }
             }
 
             $finished_data_id_gr=[];
@@ -2087,6 +2084,30 @@ class FundRequestController extends Controller
                                     $data_id_memo[]=$purchase_memodetail->purchaseMemo->id;
                                     $data_go_chart[]=$data_memo;
                                 }
+                            }
+
+                            if($row->fundRequestDetail()->exists()){
+                                $fr=[
+                                    "name"=>$row->fundRequestDetail->fundRequest->code,
+                                    "key" => $row->fundRequestDetail->fundRequest->code,
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :".$row->fundRequestDetail->fundRequest->post_date],
+                                        ['name'=> "User :".$row->fundRequestDetail->fundRequest->account->name],
+                                        ['name'=> "Nominal : Rp.:".number_format($row->fundRequestDetail->fundRequest->grandtotal,2,',','.')],
+                                    ],
+                                    'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row->fundRequestDetail->fundRequest->code),
+                                ];
+                            
+                                $data_go_chart[]=$fr;
+                                $data_link[]=[
+                                    'from'=>$row->fundRequestDetail->fundRequest->code,
+                                    'to'=>$query_invoice->code,
+                                    'string_link'=>$row->fundRequestDetail->fundRequest->code.$query_invoice->code,
+                                ];
+                                if(!in_array($row->fundRequestDetail->fundRequest->id, $data_id_frs)){
+                                    $data_id_frs[] = $row->fundRequestDetail->fundRequest->id;
+                                    $added = true; 
+                                } 
                             }
                             
                         }

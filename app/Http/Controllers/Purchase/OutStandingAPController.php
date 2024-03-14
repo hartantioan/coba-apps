@@ -36,15 +36,15 @@ class OutStandingAPController extends Controller
             })
             ->whereIn('status',['2','3'])
             ->get();
-        $query_data2 = PurchaseDownPayment::where(function($query) use ( $request) {
+        /* $query_data2 = PurchaseDownPayment::where(function($query) use ( $request) {
                 if($request->date) {
                     $query->whereDate('post_date', '<=', $request->date);
                 }
             })
             ->whereIn('status',['2','3'])
-            ->get();
+            ->get(); */
         $totalAll = 0;
-        if($query_data || $query_data2){
+        if($query_data /* || $query_data2 */){
             foreach($query_data as $row_invoice){
                 $data_tempura = [
                     'code'      => $row_invoice->code,
@@ -67,7 +67,7 @@ class OutStandingAPController extends Controller
                 }
             }
 
-            foreach($query_data2 as $row_dp){
+            /* foreach($query_data2 as $row_dp){
                 $total = $row_dp->balancePaymentRequestByDate($request->date);
                 $due_date = $row_dp->due_date ? $row_dp->due_date : date('Y-m-d', strtotime($row_dp->post_date. ' + '.$row_dp->top.' day'));
                 $data_tempura = [
@@ -89,7 +89,7 @@ class OutStandingAPController extends Controller
                     $totalAll += $total;
                     $array_filter[] = $data_tempura;
                 }
-            }
+            } */
 
             $response =[
                 'status'=>200,

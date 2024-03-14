@@ -994,9 +994,9 @@
                 
                 var formData = new FormData($('#form_data')[0]), passedLimit = true, limit = parseFloat($('#tempLimit').val()), grandtotal = parseFloat($('#grandtotal').val().replaceAll(".", "").replaceAll(",","."));
 
-                /* if(grandtotal > limit && $('#type').val() == '1'){
+                if(grandtotal > limit && $('#type').val() == '1'){
                     passedLimit = false;
-                } */
+                }
 
                 if(passedLimit){
                     var path = window.location.pathname;

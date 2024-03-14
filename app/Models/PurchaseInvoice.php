@@ -42,6 +42,7 @@ class PurchaseInvoice extends Model
         'void_date',
         'delete_id',
         'delete_note',
+        'document_no',
         'tax_no',
         'tax_cut_no',
         'cut_date',

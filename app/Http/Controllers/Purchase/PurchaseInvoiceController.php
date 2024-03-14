@@ -468,6 +468,7 @@ class PurchaseInvoiceController extends Controller
                             'received_date' => $datapo->received_date ?? '',
                             'due_date'      => $datapo->due_date ?? '',
                             'document_date' => $datapo->document_date ?? '',
+                            'document_no'   => $datapo->document_no ?? '',
                             'tax_no'        => $datapo->tax_no ?? '',
                             'tax_cut_no'    => $datapo->tax_cut_no ?? '',
                             'cut_date'      => $datapo->cut_date ?? '',
@@ -523,6 +524,7 @@ class PurchaseInvoiceController extends Controller
                             'received_date' => '',
                             'due_date'      => $datafr->required_date ?? '',
                             'document_date' => $datafr->document_date ?? '',
+                            'document_no'   => $datafr->document_no ?? '',
                             'tax_no'        => $datafr->tax_no ?? '',
                             'tax_cut_no'    => $datafr->tax_cut_no ?? '',
                             'cut_date'      => $datafr->cut_date ?? '',
@@ -587,6 +589,7 @@ class PurchaseInvoiceController extends Controller
                             'qty_conversion'=> $rowdetail->qty_conversion,
                             'received_date' => '',
                             'document_date' => '',
+                            'document_no'   => '',
                             'tax_no'        => '',
                             'tax_cut_no'    => '',
                             'cut_date'      => '',
@@ -643,6 +646,7 @@ class PurchaseInvoiceController extends Controller
                             'qty_conversion'=> 1,
                             'received_date' => '',
                             'document_date' => '',
+                            'document_no'   => '',
                             'tax_no'        => '',
                             'tax_cut_no'    => '',
                             'cut_date'      => '',
@@ -1084,6 +1088,7 @@ class PurchaseInvoiceController extends Controller
                         $query->balance = round($balance,2);
                         $query->document = $document;
                         $query->note = $request->note;
+                        $query->document_no = $request->document_no;
                         $query->tax_no = $request->tax_no;
                         $query->tax_cut_no = $request->tax_cut_no;
                         $query->cut_date = $request->cut_date;
@@ -1138,6 +1143,7 @@ class PurchaseInvoiceController extends Controller
                         'note'                      => $request->note,
                         'document'                  => $request->file('document') ? $request->file('document')->store('public/purchase_invoices') : NULL,
                         'status'                    => '1',
+                        'document_no'               => $request->document_no,
                         'tax_no'                    => $request->tax_no,
                         'tax_cut_no'                => $request->tax_cut_no,
                         'cut_date'                  => $request->cut_date,

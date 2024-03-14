@@ -300,6 +300,10 @@
                                     <input id="spk_no" name="spk_no" type="text" placeholder="Nomor SPK...">
                                     <label class="active" for="spk_no">No. SPK</label>
                                 </div>
+                                <div class="input-field col m3 s12">
+                                    <input id="document_no" name="document_no" type="text" placeholder="Nomor Dokumen...">
+                                    <label class="active" for="document_no">No. Dokumen</label>
+                                </div>
                                 <div class="input-field col m3 s12 step16">
                                     <input id="invoice_no" name="invoice_no" type="text" placeholder="Nomor Invoice dari Suppplier/Vendor">
                                     <label class="active" for="invoice_no">No. Invoice</label>
@@ -2140,6 +2144,7 @@
                                         $('#received_date').val(val.received_date);
                                         $('#due_date').val(val.due_date);
                                         $('#document_date').val(val.document_date);
+                                        $('#document_no').val(val.document_no);
                                         $('#tax_no').val(val.tax_no);
                                         $('#tax_cut_no').val(val.tax_cut_no);
                                         $('#cut_date').val(val.cut_date);
@@ -3255,6 +3260,7 @@
                 $('#cut_date').val(response.cut_date);
                 $('#spk_no').val(response.spk_no);
                 $('#invoice_no').val(response.invoice_no);
+                $('#document_no').val(response.document_no);
                 $('#downpayment').val(response.downpayment);
                 $('#rounding').val(response.rounding);
                 

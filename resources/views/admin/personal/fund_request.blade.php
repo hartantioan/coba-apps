@@ -208,10 +208,6 @@
                                     <label class="" for="payment_type">Tipe Pembayaran</label>
                                 </div>
                                 <div class="input-field col m3 s12">
-                                    <input id="document_no" name="document_no" type="text" placeholder="No. Dokumen">
-                                    <label class="active" for="document_no">No. Dokumen (Opsional)</label>
-                                </div>
-                                <div class="input-field col m3 s12">
                                     <input id="document_date" name="document_date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. dokumen">
                                     <label class="active" for="document_date">Tgl. Dokumen (Opsional)</label>
                                 </div>
@@ -230,6 +226,10 @@
                                 <div class="input-field col m3 s12">
                                     <input id="spk_no" name="spk_no" type="text" placeholder="Nomor SPK...">
                                     <label class="active" for="spk_no">No. SPK (Opsional)</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <input id="document_no" name="document_no" type="text" placeholder="No. Dokumen">
+                                    <label class="active" for="document_no">No. Dokumen (Opsional)</label>
                                 </div>
                                 <div class="input-field col m3 s12">
                                     <input id="invoice_no" name="invoice_no" type="text" placeholder="Nomor Invoice dari Suppplier/Vendor">

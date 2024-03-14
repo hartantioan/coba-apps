@@ -66,6 +66,7 @@
                 <td align="center">{{ $rowdetail->goodReceiptDetail->line()->exists() ?$rowdetail->goodReceiptDetail->line->name : ' - '}}</td>
                 <td align="center">{{ $rowdetail->goodReceiptDetail->machine()->exists() ? $rowdetail->goodReceiptDetail->machine->name :'-'}}</td>
                 <td align="center">{{ $rowdetail->goodReceiptDetail->department()->exists() ? $rowdetail->goodReceiptDetail->department->name : ' - '  }}</td>
+                <td align="center">{{ $rowdetail->goodReceiptDetail->machine()->exists() ? $rowdetail->goodReceiptDetail->machine->name : ' - '  }}</td>
                 <td align="center">{{ $rowdetail->goodReceiptDetail->warehouse()->exists() ?  $rowdetail->goodReceiptDetail->warehouse->name : '-'}}</td>
                 <td>{{ $rowdetail->goodReceiptDetail->goodReceipt->code }}</td>
                 <td align="right">{{ number_format($rowdetail->getRowTotal(),2,',','.') }}</td>

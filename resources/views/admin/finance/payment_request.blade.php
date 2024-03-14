@@ -2311,7 +2311,7 @@
                 });
 
                 if(!$('#cost-tab').hasClass('hide')){
-                    let grandtotal = parseFloat($('#grandtotal').val().replaceAll(".", "").replaceAll(",","."));
+                    let grandtotal = parseFloat($('#total').val().replaceAll(".", "").replaceAll(",","."));
                     $('input[name^="arr_nominal_debit_fc[]"]').each(function(index){
                         let nominal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
                         grandtotal -= nominal;

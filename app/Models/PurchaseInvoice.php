@@ -78,9 +78,10 @@ class PurchaseInvoice extends Model
 
     public function type(){
         $type = match ($this->type) {
-          '1' => 'Cash',
-          '2' => 'Credit',
-          default => 'Invalid',
+            '1'   => 'Tunai',
+            '2'   => 'Transfer',
+            '3'   => 'Cek/BG',
+            default => 'Invalid',
         };
 
         return $type;

@@ -250,8 +250,9 @@
                                 </div>
                                 <div class="input-field col m3 s12 step5">
                                     <select class="form-control" id="type" name="type">
-                                        <option value="1">Cash</option>
-                                        <option value="2">Credit</option>
+                                        <option value="1">Tunai</option>
+                                        <option value="2">Transfer</option>
+                                        <option value="3">Cek/BG</option>
                                     </select>
                                     <label class="" for="type">Tipe</label>
                                 </div>

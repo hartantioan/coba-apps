@@ -105,6 +105,11 @@
                                     </h4>
                                     <div class="row mt-2">
                                         <div class="col s12">
+                                            <div class="card-alert card green">
+                                                <div class="card-content white-text">
+                                                    <p>Info : Untuk mengisi NOTE dan keterangan PIC setelah mengetik silahkan tunggu 2 detik untuk proses simpan dan pastikan muncul notifikasi sukses simpan.</p>
+                                                </div>
+                                            </div>
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>

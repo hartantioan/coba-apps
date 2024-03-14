@@ -2424,7 +2424,7 @@ class GoodReturnPOController extends Controller
                                     
                                         'properties'=> [
                                             ['name'=> "Tanggal: ".$row_invoice_detail->purchaseInvoice->post_date],
-                                        
+                                            ['name'=> "Nominal : Rp.".number_format($row_invoice_detail->purchaseInvoice->grandtotal,2,',','.')]
                                         ],
                                         'url'   =>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($row_invoice_detail->purchaseInvoice->code),
                                     ];
@@ -2517,7 +2517,7 @@ class GoodReturnPOController extends Controller
                                     
                                         'properties'=> [
                                             ['name'=> "Tanggal: ".$row_invoice_detail->purchaseInvoice->post_date],
-                                        
+                                            ['name'=> "Nominal : Rp.".number_format($row_invoice_detail->purchaseInvoice->grandtotal,2,',','.')]
                                         ],
                                         'url'   =>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($row_invoice_detail->purchaseInvoice->code),
                                     ];

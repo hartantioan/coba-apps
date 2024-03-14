@@ -3414,17 +3414,25 @@ class FundRequestController extends Controller
         $data = FundRequest::where('code',CustomHelper::decrypt($request->code))->first();
         if($data){
             if(!$data->hasChildDocument()){
-                $data->update([
-                    'document_status'   => $request->status ? $request->status : NULL,
-                ]);
-
-                CustomHelper::sendNotification('fund_requests',$data->id,'Status Dokumen Permohonan Dana No. '.$data->code.' telah diupdate','Status dokumen anda telah dinyatakan '.$data->documentStatus().'.',session('bo_id'));
-
-                $response = [
-                    'status'  => 200,
-                    'message' => 'Status berhasil dirubah.',
-                    'value'   => $data->document_status,
-                ];
+                if($data->status == '2'){
+                    $data->update([
+                        'document_status'   => $request->status ? $request->status : NULL,
+                    ]);
+    
+                    CustomHelper::sendNotification('fund_requests',$data->id,'Status Dokumen Permohonan Dana No. '.$data->code.' telah diupdate','Status dokumen anda telah dinyatakan '.$data->documentStatus().'.',session('bo_id'));
+    
+                    $response = [
+                        'status'  => 200,
+                        'message' => 'Status berhasil dirubah.',
+                        'value'   => $data->document_status,
+                    ];
+                }else{
+                    $response = [
+                        'status'  => 422,
+                        'message' => 'Maaf, status dokumen bukan PROSES, jadi tidak bisa dirubah ya.',
+                        'value'   => $data->document_status,
+                    ];
+                }
             }else{
                 $response = [
                     'status'  => 422,

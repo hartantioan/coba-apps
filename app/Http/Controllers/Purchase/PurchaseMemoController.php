@@ -1876,7 +1876,7 @@ class PurchaseMemoController extends Controller
                         $query_dp = PurchaseDownPayment::find($downpayment_id);
                        
                         foreach($query_dp->purchaseDownPaymentDetail as $row){
-                            if($row->purchaseOrder->exists()){
+                            if($row->purchaseOrder()->exists()){
                                 $po=[
                                     "name"=>$row->purchaseOrder->code,
                                     "key" => $row->purchaseOrder->code,

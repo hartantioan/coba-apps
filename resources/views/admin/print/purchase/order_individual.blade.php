@@ -383,6 +383,9 @@
                         </div>
                         <table width="100%" border="0" style="margin-top:50px;">
                             <tr>
+                                {{-- <td style="vertical-align:top;" width="25%">
+                                    Jumlah Print, {{ $data->printCounter()->count() }}
+                                </td> --}}
                                 <td style="vertical-align:top;" width="25%">
                                     Dibuat oleh, {{ $data->user->name }}
                                 </td>

@@ -401,4 +401,9 @@ class MarketingOrder extends Model
 
         return $total;
     }
+
+    public function printCounter()
+    {
+        return $this->hasMany('App\Models\PrintCounter','lookable_id','id')->where('lookable_type',$this->table);
+    }
 }

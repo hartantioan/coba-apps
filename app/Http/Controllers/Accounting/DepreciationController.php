@@ -584,6 +584,7 @@ class DepreciationController extends Controller
                         'title'     => 'Depreciation',
                         'data'      => $pr
                     ];
+                    CustomHelper::addNewPrinterCounter($pr->getTable(),$pr->id);
                     $img_path = 'website/logo_web_fix.png';
                     $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
                     $image_temp = file_get_contents($img_path);
@@ -593,6 +594,7 @@ class DepreciationController extends Controller
                     $pdf = Pdf::loadView('admin.print.accounting.depreciation_individual', $data)->setPaper('a5', 'landscape');
                     $pdf->render();
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
+                    $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
                     $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
                     $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                     $content = $pdf->download()->getOriginalContent();
@@ -677,8 +679,9 @@ class DepreciationController extends Controller
                         if($query){
                             $data = [
                                 'title'     => 'Depreciation',
-                                'data'      => $query
+                                    'data'      => $query
                             ];
+                            CustomHelper::addNewPrinterCounter($query->getTable(),$query->id);
                             $img_path = 'website/logo_web_fix.png';
                             $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
                             $image_temp = file_get_contents($img_path);
@@ -688,6 +691,7 @@ class DepreciationController extends Controller
                             $pdf = Pdf::loadView('admin.print.accounting.depreciation_individual', $data)->setPaper('a5', 'landscape');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
+                            $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
                             $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
@@ -753,8 +757,9 @@ class DepreciationController extends Controller
                         if($query){
                             $data = [
                                 'title'     => 'Depreciation',
-                                'data'      => $query
+                                    'data'      => $query
                             ];
+                            CustomHelper::addNewPrinterCounter($query->getTable(),$query->id);
                             $img_path = 'website/logo_web_fix.png';
                             $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
                             $image_temp = file_get_contents($img_path);
@@ -764,6 +769,7 @@ class DepreciationController extends Controller
                             $pdf = Pdf::loadView('admin.print.accounting.deprecitation_individual', $data)->setPaper('a5', 'landscape');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
+                            $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
                             $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
@@ -841,6 +847,7 @@ class DepreciationController extends Controller
                 "verify_peer_name"=>false,
                 ),
             );
+            CustomHelper::addNewPrinterCounter($pr->getTable(),$pr->id);
             $img_path = 'website/logo_web_fix.png';
             $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
             $image_temp = file_get_contents($img_path, false, stream_context_create($opciones_ssl));

@@ -158,4 +158,8 @@ class GoodReceive extends Model
     public function journal(){
         return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
     }
+    public function printCounter()
+    {
+        return $this->hasMany('App\Models\PrintCounter','lookable_id','id')->where('lookable_type',$this->table);
+    }
 }

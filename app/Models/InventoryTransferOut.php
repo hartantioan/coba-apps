@@ -219,4 +219,8 @@ class InventoryTransferOut extends Model
 
         return $hasRelation;
     }
+    public function printCounter()
+    {
+        return $this->hasMany('App\Models\PrintCounter','lookable_id','id')->where('lookable_type',$this->table);
+    }
 }

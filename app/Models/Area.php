@@ -57,4 +57,9 @@ class Area extends Model
     public function workOrder(){
         return $this->hasMany('App\Models\WorkOrder')->whereIn('status',['2','3']);
     }
+
+    public function printCounter()
+    {
+        return $this->hasMany('App\Models\PrintCounter','lookable_id','id')->where('lookable_type',$this->table);
+    }
 }

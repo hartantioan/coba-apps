@@ -340,6 +340,9 @@
                         </div>
                         <table class="table-bot1" width="100%" border="0">
                             <tr>
+                                <td style="vertical-align:top;" width="25%">
+                                    Jumlah Print, {{ $data->printCounter()->count() }}
+                                </td>
                                 <td class="center-align">
                                     {!! ucwords(strtolower($data->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
                                     <br>

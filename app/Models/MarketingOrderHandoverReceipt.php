@@ -194,4 +194,9 @@ class MarketingOrderHandoverReceipt extends Model
         }
         return number_format($total,2,',','.');
     }
+
+    public function printCounter()
+    {
+        return $this->hasMany('App\Models\PrintCounter','lookable_id','id')->where('lookable_type',$this->table);
+    }
 }

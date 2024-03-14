@@ -377,4 +377,9 @@ class MarketingOrderInvoice extends Model
         $percent = $total > 0 ? round(($this->totalPay() / $total) * 100) : 0;
         return $percent;
     }
+
+    public function printCounter()
+    {
+        return $this->hasMany('App\Models\PrintCounter','lookable_id','id')->where('lookable_type',$this->table);
+    }
 }

@@ -167,7 +167,7 @@ class PaymentRequestDetail extends Model
 
     public function getCode(){
         $code = match ($this->lookable_type) {
-            'fund_request_details'      => $this->lookable->fundRequest->code,
+            'fund_requests'             => $this->lookable->code,
             default                     => $this->lookable->code,
           };
   

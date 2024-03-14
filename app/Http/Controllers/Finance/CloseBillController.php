@@ -2090,10 +2090,6 @@ class CloseBillController extends Controller
                                 
                                 $data_id_po []=$row->purchaseOrder->id; 
                                     
-                                
-                            
-                                
-                                
                                 /* mendapatkan request po */
                                 foreach($row->purchaseOrder->purchaseOrderDetail as $po_detail){
 
@@ -2152,26 +2148,26 @@ class CloseBillController extends Controller
             
                             }
                             
-                            if($row->fundRequest()->exists()){
+                            if($row->fundRequestDetail()->exists()){
                                 $fr=[
-                                    "name"=>$row->fundRequest->code,
-                                    "key" => $row->fundRequest->code,
+                                    "name"=>$row->fundRequestDetail->fundRequest->code,
+                                    "key" => $row->fundRequestDetail->fundRequest->code,
                                     'properties'=> [
-                                        ['name'=> "Tanggal :".$row->fundRequest->post_date],
-                                        ['name'=> "User :".$row->fundRequest->account->name],
-                                        ['name'=> "Nominal : Rp.:".number_format($row->fundRequest->grandtotal,2,',','.')],
+                                        ['name'=> "Tanggal :".$row->fundRequestDetail->fundRequest->post_date],
+                                        ['name'=> "User :".$row->fundRequestDetail->fundRequest->account->name],
+                                        ['name'=> "Nominal : Rp.:".number_format($row->fundRequestDetail->fundRequest->grandtotal,2,',','.')],
                                     ],
-                                    'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row->fundRequest->code),
+                                    'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row->fundRequestDetail->fundRequest->code),
                                 ];
                             
                                 $data_go_chart[]=$fr;
                                 $data_link[]=[
-                                    'from'=>$row->fundRequest->code,
+                                    'from'=>$row->fundRequestDetail->fundRequest->code,
                                     'to'=>$query_dp->code,
-                                    'string_link'=>$row->fundRequest->code.$query_dp->code,
+                                    'string_link'=>$row->fundRequestDetail->fundRequest->code.$query_dp->code,
                                 ];
-                                if(!in_array($row->fundRequest->id, $data_id_frs)){
-                                    $data_id_frs[] = $row->fundRequest->id;
+                                if(!in_array($row->fundRequestDetail->fundRequest->id, $data_id_frs)){
+                                    $data_id_frs[] = $row->fundRequestDetail->fundRequest->id;
                                     $added = true; 
                                 } 
                             }
@@ -2535,7 +2531,7 @@ class CloseBillController extends Controller
                                     $data_link[]=[
                                         'from'=>$query_fr->code,
                                         'to'=>$row_pyr_detail->paymentRequest->code,
-                                        'string_link'=>$row_pi->purchaseDownPayment->code.$row_pyr_detail->paymentRequest->code,
+                                        'string_link'=>$query_fr->code.$row_pyr_detail->paymentRequest->code,
                                     ];
                                     if(!in_array($row_pyr_detail->paymentRequest->id,$data_id_pyrs)){
                                         $data_id_pyrs[] = $row_pyr_detail->paymentRequest->id;
@@ -2569,30 +2565,30 @@ class CloseBillController extends Controller
                                     }
                                 }
                             }
-                        }
 
-                        if($query_fr->purchaseDownPaymentDetail()->exists()){
-                            foreach($query_fr->purchaseDownPaymentDetail as $row_dp_detail){
-                                $data_apdp_tempura = [
-                                    'key'   => $row_dp_detail->purchaseDownPayment->code,
-                                    "name"  => $row_dp_detail->purchaseDownPayment->code,
-                                
-                                    'properties'=> [
-                                        ['name'=> "Tanggal: ".$row_dp_detail->purchaseDownPayment->post_date],
-                                        ['name'=> "Vendor  : ".$row_dp_detail->purchaseDownPayment->name],
-                                    ],
-                                    'url'   =>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_dp_detail->purchaseDownPayment->code),
-                                ];
-                                $data_go_chart[]=$data_apdp_tempura;
-                                $data_link[]=[
-                                    'from'  =>  $query_fr->code,
-                                    'to'    =>  $row_dp_detail->purchaseDownPayment->code,
-                                    'string_link'=>$query_fr->code.$row_dp_detail->purchaseDownPayment->code,
-                                ];
-                                if(!in_array($row_dp_detail->purchaseDownPayment->id,$data_id_dp)){
-                                    $data_id_dp[]=$row_dp_detail->purchaseDownPayment->id;
-                                    $added = true;
-                                } 
+                            if($row_fr_detail->purchaseDownPaymentDetail()->exists()){
+                                foreach($row_fr_detail->purchaseDownPaymentDetail as $row_dp_detail){
+                                    $data_apdp_tempura = [
+                                        'key'   => $row_dp_detail->purchaseDownPayment->code,
+                                        "name"  => $row_dp_detail->purchaseDownPayment->code,
+                                    
+                                        'properties'=> [
+                                            ['name'=> "Tanggal: ".$row_dp_detail->purchaseDownPayment->post_date],
+                                            ['name'=> "Vendor  : ".$row_dp_detail->purchaseDownPayment->name],
+                                        ],
+                                        'url'   =>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_dp_detail->purchaseDownPayment->code),
+                                    ];
+                                    $data_go_chart[]=$data_apdp_tempura;
+                                    $data_link[]=[
+                                        'from'  =>  $query_fr->code,
+                                        'to'    =>  $row_dp_detail->purchaseDownPayment->code,
+                                        'string_link'=>$query_fr->code.$row_dp_detail->purchaseDownPayment->code,
+                                    ];
+                                    if(!in_array($row_dp_detail->purchaseDownPayment->id,$data_id_dp)){
+                                        $data_id_dp[]=$row_dp_detail->purchaseDownPayment->id;
+                                        $added = true;
+                                    } 
+                                }
                             }
                         }
 
@@ -2918,7 +2914,7 @@ class CloseBillController extends Controller
                         }
                     }
                 }
-            }    
+            }     
             function unique_key($array,$keyname){
 
                 $new_array = array();

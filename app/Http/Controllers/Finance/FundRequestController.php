@@ -1225,7 +1225,7 @@ class FundRequestController extends Controller
                         FundRequestDetail::create([
                             'fund_request_id'       => $query->id,
                             'note'                  => $row,
-                            'qty'                   => $request->arr_qty[$key],
+                            'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'unit_id'               => $request->arr_unit[$key],
                             'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
                             'tax_id'                => $request->arr_tax_id[$key],

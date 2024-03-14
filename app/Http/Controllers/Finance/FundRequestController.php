@@ -299,6 +299,13 @@ class FundRequestController extends Controller
                     'additional_note_pic'   => $request->val,
                 ]);
             }
+            
+            activity()
+                    ->performedOn(new FundRequest())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($fr)
+                    ->log('Add / edit fund request additional note / pic note.');
+
             return response()->json([
                 'status'    => 200,
                 'message'   => 'Tambahan catatan berhasil disimpan.',

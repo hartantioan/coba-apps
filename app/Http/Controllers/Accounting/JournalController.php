@@ -391,11 +391,11 @@ class JournalController extends Controller
                         ]);
                     }
 
-                    if(in_array($query->status,['1','6'])){
+                    if(in_array($query->status,['1','2','3','6'])){
 
                         $query->code = $request->code;
-                        $query->lookable_type = $request->journal_id ? 'journals' : NULL;
-                        $query->lookable_id = $request->journal_id ? $request->journal_id : NULL;
+                        $query->lookable_type = $query->lookable_type ?? NULL;
+                        $query->lookable_id = $query->lookable_id ?? NULL;
                         $query->user_id = session('bo_id');
                         $query->company_id = $request->company_id;
                         $query->currency_id = $request->currency_id;
@@ -422,8 +422,6 @@ class JournalController extends Controller
                     $newCode=Journal::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                     $query = Journal::create([
                         'code'			            => $newCode,
-                        'lookable_type'             => $request->journal_id ? 'journals' : NULL,
-                        'lookable_id'               => $request->journal_id ? $request->journal_id : NULL,
                         'user_id'		            => session('bo_id'),
                         'currency_id'               => $request->currency_id,
                         'company_id'                => $request->company_id,

@@ -203,10 +203,6 @@
                                         <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this);" onchange="convertThis();">
                                         <label class="active" for="currency_rate">Konversi</label>
                                     </div>
-                                    {{-- <div class="input-field col m3 s12">
-                                        <select class="browser-default" id="journal_id" name="journal_id"></select>
-                                        <label class="active" for="journal_id">Journal Referensi (Opsional : Pinjaman Karyawan)</label>
-                                    </div> --}}
                                     <div class="col s12">
                                         <h5>Tambah dari Distribusi (Opsional)</h5>
                                         <div class="input-field col s3">
@@ -596,7 +592,6 @@
         });
 
         select2ServerSide('#cost_distribution_id', '{{ url("admin/select2/cost_distribution") }}');
-        select2ServerSide('#journal_id', '{{ url("admin/select2/journal") }}');
     });
 
     String.prototype.replaceAt = function(index, replacement) {
@@ -1600,13 +1595,6 @@
                 $('#post_date').val(response.post_date);
                 $('#currency_id').val(response.currency_id).formSelect();
                 $('#currency_rate').val(response.currency_rate);
-                $('#journal_id').empty();
-
-                if(response.journal_id){
-                    $('#journal_id').append(`
-                        <option value="` + response.journal_id + `">` + response.journal_name + `</option>
-                    `);
-                }
 
                 $('.row_coa').remove();
 
@@ -1615,7 +1603,7 @@
                     $('#last-row-coa').before(`
                         <tr class="row_coa">
                             <input type="hidden" name="arr_type[]" value="` + val.type + `">
-                            <input type="hidden" name="arr_cost_distribution_detail[]" value="` + val.cost_distribution_detail_id + `">
+                            <input type="hidden" name="arr_cost_distribution_detail[]" value="">
                             <td>
                                 <select class="browser-default" id="arr_account` + count + `" name="arr_account[]"></select>    
                             </td>
@@ -1732,7 +1720,6 @@
                 $('#code').focus();
                 M.updateTextFields();
                 countAll();
-                convertThis();
             },
             error: function() {
                 $('.modal-content').scrollTop(0);

@@ -513,7 +513,7 @@ class FundRequest extends Model
             if($row->purchaseInvoiceDetail()->exists()){
                 $hasRelation = true;
             }
-            if($this->purchaseDownPaymentDetail()->exists()){
+            if($row->purchaseDownPaymentDetail()->exists()){
                 $hasRelation = true;
             }
         }

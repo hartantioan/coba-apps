@@ -1381,27 +1381,6 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [PurchaseOrderController::class, 'destroy'])->middleware('operation.access:purchase_order,delete');
                 });
 
-                Route::prefix('purchase_down_payment')->middleware(['operation.access:purchase_down_payment,view','lockacc'])->group(function () {
-                    Route::get('/',[PurchaseDownPaymentController::class, 'index']);
-                    Route::post('get_account_data', [PurchaseDownPaymentController::class, 'getAccountData']);
-                    Route::post('get_purchase_order', [PurchaseDownPaymentController::class, 'getPurchaseOrder']);
-                    Route::get('datatable',[PurchaseDownPaymentController::class, 'datatable']);
-                    Route::get('row_detail',[PurchaseDownPaymentController::class, 'rowDetail']);
-                    Route::post('show', [PurchaseDownPaymentController::class, 'show']);
-                    Route::post('get_code', [PurchaseDownPaymentController::class, 'getCode']);
-                    Route::post('print',[PurchaseDownPaymentController::class, 'print']);
-                    Route::post('print_by_range',[PurchaseDownPaymentController::class, 'printByRange']);
-                    Route::get('print_individual/{id}',[PurchaseDownPaymentController::class, 'printIndividual'])->withoutMiddleware('direct.access');
-                    Route::get('viewstructuretree',[PurchaseDownPaymentController::class, 'viewStructureTree']);
-                    Route::get('view_journal/{id}',[PurchaseDownPaymentController::class, 'viewJournal'])->middleware('operation.access:purchase_down_payment,journal');
-                    Route::get('export',[PurchaseDownPaymentController::class, 'export']);
-                    Route::get('get_outstanding', [PurchaseDownPaymentController::class, 'getOutstanding']);
-                    Route::post('create',[PurchaseDownPaymentController::class, 'create'])->middleware('operation.access:purchase_down_payment,update');
-                    Route::post('void_status', [PurchaseDownPaymentController::class, 'voidStatus'])->middleware('operation.access:purchase_down_payment,void');
-                    Route::get('approval/{id}',[PurchaseDownPaymentController::class, 'approval'])->withoutMiddleware('direct.access');
-                    Route::post('destroy', [PurchaseDownPaymentController::class, 'destroy'])->middleware('operation.access:purchase_down_payment,delete');
-                });
-
                 Route::prefix('landed_cost')->middleware(['operation.access:landed_cost,view','lockacc'])->group(function () {
                     Route::get('/',[LandedCostController::class, 'index']);
                     Route::get('get_outstanding', [LandedCostController::class, 'getOutstanding']);
@@ -1425,52 +1404,6 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [LandedCostController::class, 'destroy'])->middleware('operation.access:landed_cost,delete');
                     Route::get('test',[LandedCostController::class, 'test'])->withoutMiddleware('direct.access');
                 });
-
-                Route::prefix('purchase_invoice')->middleware(['operation.access:purchase_invoice,view','lockacc'])->group(function () {
-                    Route::get('/',[PurchaseInvoiceController::class, 'index']);
-                    Route::get('get_outstanding', [PurchaseInvoiceController::class, 'getOutstanding']);
-                    Route::post('get_gr_lc', [PurchaseInvoiceController::class, 'getGoodReceiptLandedCost']);
-                    Route::post('get_account_data', [PurchaseInvoiceController::class, 'getAccountData']);
-                    Route::get('datatable',[PurchaseInvoiceController::class, 'datatable']);
-                    Route::get('row_detail',[PurchaseInvoiceController::class, 'rowDetail']);
-                    Route::post('show', [PurchaseInvoiceController::class, 'show']);
-                    Route::post('get_code', [PurchaseInvoiceController::class, 'getCode']);
-                    Route::post('get_scan_barcode', [PurchaseInvoiceController::class, 'getScanBarcode']);
-                    Route::post('print',[PurchaseInvoiceController::class, 'print']);
-                    Route::post('print_by_range',[PurchaseInvoiceController::class, 'printByRange']);
-                    Route::get('print_individual/{id}',[PurchaseInvoiceController::class, 'printIndividual'])->withoutMiddleware('direct.access');
-                    Route::get('export',[PurchaseInvoiceController::class, 'export']);
-                    Route::get('get_import_excel',[PurchaseInvoiceController::class, 'getImportExcel']);
-                    Route::get('view_journal/{id}',[PurchaseInvoiceController::class, 'viewJournal'])->middleware('operation.access:purchase_invoice,journal');
-                    Route::get('viewstructuretree',[PurchaseInvoiceController::class, 'viewStructureTree']);
-                    Route::post('create',[PurchaseInvoiceController::class, 'create'])->middleware('operation.access:purchase_invoice,update');
-                    Route::post('create_multi',[PurchaseInvoiceController::class, 'createMulti'])->middleware('operation.access:purchase_invoice,update');
-                    Route::post('void_status', [PurchaseInvoiceController::class, 'voidStatus'])->middleware('operation.access:purchase_invoice,void');
-                    Route::get('approval/{id}',[PurchaseInvoiceController::class, 'approval'])->withoutMiddleware('direct.access');
-                    Route::post('destroy', [PurchaseInvoiceController::class, 'destroy'])->middleware('operation.access:purchase_invoice,delete');
-                });
-                
-                Route::prefix('purchase_memo')->middleware(['operation.access:purchase_memo,view','lockacc'])->group(function () {
-                    Route::get('/',[PurchaseMemoController::class, 'index']);
-                    Route::get('datatable',[PurchaseMemoController::class, 'datatable']);
-                    Route::get('row_detail',[PurchaseMemoController::class, 'rowDetail']);
-                    Route::post('show', [PurchaseMemoController::class, 'show']);
-                    Route::post('get_code', [PurchaseMemoController::class, 'getCode']);
-                    Route::post('print',[PurchaseMemoController::class, 'print']);
-                    Route::get('export',[PurchaseMemoController::class, 'export']);
-                    Route::post('print_by_range',[PurchaseMemoController::class, 'printByRange']);
-                    Route::post('get_details', [PurchaseMemoController::class, 'getDetails']);
-                    Route::get('view_journal/{id}',[PurchaseMemoController::class, 'viewJournal'])->middleware('operation.access:purchase_memo,journal');
-                    Route::get('viewstructuretree',[PurchaseMemoController::class, 'viewStructureTree']);
-                    Route::get('print_individual/{id}',[PurchaseMemoController::class, 'printIndividual'])->withoutMiddleware('direct.access');
-                    Route::post('remove_used_data', [PurchaseMemoController::class, 'removeUsedData']);
-                    Route::post('create',[PurchaseMemoController::class, 'create'])->middleware('operation.access:purchase_memo,update');
-                    Route::post('void_status', [PurchaseMemoController::class, 'voidStatus'])->middleware('operation.access:purchase_memo,void');
-                    Route::get('approval/{id}',[PurchaseMemoController::class, 'approval'])->withoutMiddleware('direct.access');
-                    Route::post('destroy', [PurchaseMemoController::class, 'destroy'])->middleware('operation.access:purchase_memo,delete');
-                });
-
-                
 
             });
 
@@ -2211,6 +2144,71 @@ Route::prefix('admin')->group(function () {
             });
 
             Route::prefix('finance')->middleware('direct.access')->group(function () {
+                Route::prefix('purchase_down_payment')->middleware(['operation.access:purchase_down_payment,view','lockacc'])->group(function () {
+                    Route::get('/',[PurchaseDownPaymentController::class, 'index']);
+                    Route::post('get_account_data', [PurchaseDownPaymentController::class, 'getAccountData']);
+                    Route::post('get_purchase_order', [PurchaseDownPaymentController::class, 'getPurchaseOrder']);
+                    Route::get('datatable',[PurchaseDownPaymentController::class, 'datatable']);
+                    Route::get('row_detail',[PurchaseDownPaymentController::class, 'rowDetail']);
+                    Route::post('show', [PurchaseDownPaymentController::class, 'show']);
+                    Route::post('get_code', [PurchaseDownPaymentController::class, 'getCode']);
+                    Route::post('print',[PurchaseDownPaymentController::class, 'print']);
+                    Route::post('print_by_range',[PurchaseDownPaymentController::class, 'printByRange']);
+                    Route::get('print_individual/{id}',[PurchaseDownPaymentController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::get('viewstructuretree',[PurchaseDownPaymentController::class, 'viewStructureTree']);
+                    Route::get('view_journal/{id}',[PurchaseDownPaymentController::class, 'viewJournal'])->middleware('operation.access:purchase_down_payment,journal');
+                    Route::get('export',[PurchaseDownPaymentController::class, 'export']);
+                    Route::get('get_outstanding', [PurchaseDownPaymentController::class, 'getOutstanding']);
+                    Route::post('create',[PurchaseDownPaymentController::class, 'create'])->middleware('operation.access:purchase_down_payment,update');
+                    Route::post('void_status', [PurchaseDownPaymentController::class, 'voidStatus'])->middleware('operation.access:purchase_down_payment,void');
+                    Route::get('approval/{id}',[PurchaseDownPaymentController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('destroy', [PurchaseDownPaymentController::class, 'destroy'])->middleware('operation.access:purchase_down_payment,delete');
+                });
+
+                Route::prefix('purchase_invoice')->middleware(['operation.access:purchase_invoice,view','lockacc'])->group(function () {
+                    Route::get('/',[PurchaseInvoiceController::class, 'index']);
+                    Route::get('get_outstanding', [PurchaseInvoiceController::class, 'getOutstanding']);
+                    Route::post('get_gr_lc', [PurchaseInvoiceController::class, 'getGoodReceiptLandedCost']);
+                    Route::post('get_account_data', [PurchaseInvoiceController::class, 'getAccountData']);
+                    Route::get('datatable',[PurchaseInvoiceController::class, 'datatable']);
+                    Route::get('row_detail',[PurchaseInvoiceController::class, 'rowDetail']);
+                    Route::post('show', [PurchaseInvoiceController::class, 'show']);
+                    Route::post('get_code', [PurchaseInvoiceController::class, 'getCode']);
+                    Route::post('get_scan_barcode', [PurchaseInvoiceController::class, 'getScanBarcode']);
+                    Route::post('print',[PurchaseInvoiceController::class, 'print']);
+                    Route::post('print_by_range',[PurchaseInvoiceController::class, 'printByRange']);
+                    Route::get('print_individual/{id}',[PurchaseInvoiceController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::get('export',[PurchaseInvoiceController::class, 'export']);
+                    Route::get('get_import_excel',[PurchaseInvoiceController::class, 'getImportExcel']);
+                    Route::get('view_journal/{id}',[PurchaseInvoiceController::class, 'viewJournal'])->middleware('operation.access:purchase_invoice,journal');
+                    Route::get('viewstructuretree',[PurchaseInvoiceController::class, 'viewStructureTree']);
+                    Route::post('create',[PurchaseInvoiceController::class, 'create'])->middleware('operation.access:purchase_invoice,update');
+                    Route::post('create_multi',[PurchaseInvoiceController::class, 'createMulti'])->middleware('operation.access:purchase_invoice,update');
+                    Route::post('void_status', [PurchaseInvoiceController::class, 'voidStatus'])->middleware('operation.access:purchase_invoice,void');
+                    Route::get('approval/{id}',[PurchaseInvoiceController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('destroy', [PurchaseInvoiceController::class, 'destroy'])->middleware('operation.access:purchase_invoice,delete');
+                });
+                
+                Route::prefix('purchase_memo')->middleware(['operation.access:purchase_memo,view','lockacc'])->group(function () {
+                    Route::get('/',[PurchaseMemoController::class, 'index']);
+                    Route::get('datatable',[PurchaseMemoController::class, 'datatable']);
+                    Route::get('row_detail',[PurchaseMemoController::class, 'rowDetail']);
+                    Route::post('show', [PurchaseMemoController::class, 'show']);
+                    Route::post('get_code', [PurchaseMemoController::class, 'getCode']);
+                    Route::post('print',[PurchaseMemoController::class, 'print']);
+                    Route::get('export',[PurchaseMemoController::class, 'export']);
+                    Route::post('print_by_range',[PurchaseMemoController::class, 'printByRange']);
+                    Route::post('get_details', [PurchaseMemoController::class, 'getDetails']);
+                    Route::get('view_journal/{id}',[PurchaseMemoController::class, 'viewJournal'])->middleware('operation.access:purchase_memo,journal');
+                    Route::get('viewstructuretree',[PurchaseMemoController::class, 'viewStructureTree']);
+                    Route::get('print_individual/{id}',[PurchaseMemoController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('remove_used_data', [PurchaseMemoController::class, 'removeUsedData']);
+                    Route::post('create',[PurchaseMemoController::class, 'create'])->middleware('operation.access:purchase_memo,update');
+                    Route::post('void_status', [PurchaseMemoController::class, 'voidStatus'])->middleware('operation.access:purchase_memo,void');
+                    Route::get('approval/{id}',[PurchaseMemoController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('destroy', [PurchaseMemoController::class, 'destroy'])->middleware('operation.access:purchase_memo,delete');
+                });
+
                 Route::prefix('fund_request')->middleware(['operation.access:fund_request,view','lockacc'])->group(function () {
                     Route::get('/',[FundRequestController::class, 'index']);
                     Route::post('datatable',[FundRequestController::class, 'datatable']);

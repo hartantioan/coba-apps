@@ -1326,6 +1326,7 @@
                                 <option value="` + val.project_id + `">` + val.project_name + `</option>
                             `);
                         }
+                        select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
                     });
                 }
 

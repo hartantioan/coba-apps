@@ -337,13 +337,12 @@
                                                                 <th class="center">Potongan/Memo</th>
                                                                 <th class="center">Bayar</th>
                                                                 <th class="center">Keterangan</th>
-                                                                <th class="center">Rekening</th>
                                                                 <th class="center">Hapus</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody id="body-detail">
                                                             <tr id="empty-detail">
-                                                                <td colspan="12">
+                                                                <td colspan="11">
                                                                     Pilih partner bisnis untuk memulai...
                                                                 </td>
                                                             </tr>
@@ -951,7 +950,7 @@
                 M.updateTextFields();
                 $('#body-detail').empty().append(`
                     <tr id="empty-detail">
-                        <td colspan="12">
+                        <td colspan="11">
                             Pilih partner bisnis untuk memulai...
                         </td>
                     </tr>
@@ -1720,9 +1719,6 @@
                                             <td class="center">
                                                 <input id="arr_note` + count + `" name="arr_note[]" class="" type="text" style="width:350px;" value="` + val.note + `">
                                             </td>
-                                            <td>
-                                                ` + val.bank_account + ` ` + val.no_account + ` ` + val.name_account + `    
-                                            </td>
                                             <td class="center">
                                                 <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
                                                     <i class="material-icons">delete</i>
@@ -1861,7 +1857,7 @@
                             }else{
                                 $('#body-detail').empty().append(`
                                     <tr id="empty-detail">
-                                        <td colspan="12">
+                                        <td colspan="11">
                                             Pilih partner bisnis untuk memulai...
                                         </td>
                                     </tr>
@@ -2108,7 +2104,7 @@
                 if($('.row_detail').length == 0){
                     $('#body-detail').empty().append(`
                         <tr id="empty-detail">
-                            <td colspan="12">
+                            <td colspan="11">
                                 Pilih partner bisnis untuk memulai...
                             </td>
                         </tr>
@@ -2562,9 +2558,6 @@
                                 </td>
                                 <td class="center">
                                     <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:350px;" value="` + val.note + `">
-                                </td>
-                                <td>
-                                    ` + val.bank_account + ` ` + val.no_account + ` ` + val.name_account + `    
                                 </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">

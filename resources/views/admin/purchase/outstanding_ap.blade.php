@@ -76,7 +76,7 @@
                                 </h4>
                                 <div class="row">
                                     <div class="col s12 m12" style="overflow: auto">
-                                        <div class="result" style="width:2500px;">
+                                        <div class="result" style="width:100%;">
                                             <table class="bordered" style="font-size:10px;">
                                                 <thead>
                                                     <tr>

@@ -405,7 +405,7 @@ class PurchaseInvoice extends Model
         $total = 0;
         foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query) use ($date){
             $query->whereHas('outgoingPayment',function ($query) use ($date){
-                $query->whereDate('post_date','<=',$date);
+                $query->whereDate('pay_date','<=',$date);
             });
 
         })->get() as $rowpayment){
@@ -433,7 +433,7 @@ class PurchaseInvoice extends Model
         $totalAfterMemo = $total - $this->totalMemoByDate($date);
         foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query) use ($date){
             $query->whereHas('outgoingPayment',function ($query) use ($date){
-                $query->whereDate('post_date','<=',$date);
+                $query->whereDate('pay_date','<=',$date);
             });
 
         })->get() as $rowpayment){

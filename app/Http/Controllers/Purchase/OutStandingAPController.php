@@ -283,7 +283,7 @@ class OutStandingAPController extends Controller
                     'total'     => number_format($row->total,2,',','.'),
                     'tax'       => number_format($row->tax,2,',','.'),
                     'wtax'      => number_format($row->wtax,2,',','.'),
-                    'grandtotal'=> number_format($row->grandtotal,2,',','.'),
+                    'grandtotal'=> number_format($row->grandtotal * $row->currency_rate,2,',','.'),
                     'payed'     => number_format($totalPayed,2,',','.'),
                     'sisa'      => number_format($balance,2,',','.'),
                 ];

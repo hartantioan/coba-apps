@@ -326,7 +326,7 @@ class CloseBillController extends Controller
         ->get();
 
         foreach($data as $row){
-            $balance = $row->balancePaymentIncoming();
+            $balance = $row->balancePaymentCross();
             if(!$row->used()->exists() && $balance > 0){
                 $details[] = [
                     'id'                    => $row->id,
@@ -335,9 +335,6 @@ class CloseBillController extends Controller
                     'name'                  => $row->account->employee_no.' - '.$row->account->name,
                     'post_date'             => date('d/m/Y',strtotime($row->post_date)),
                     'total'                 => number_format($row->total,2,',','.'),
-                    'tax'                   => number_format($row->tax,2,',','.'),
-                    'wtax'                  => number_format($row->wtax,2,',','.'),
-                    'grandtotal'            => number_format($row->grandtotal,2,',','.'),
                     'used'                  => number_format($row->totalUsedCross(),2,',','.'),
                     'balance'               => number_format($balance,2,',','.'),
                     'note'                  => $row->note,

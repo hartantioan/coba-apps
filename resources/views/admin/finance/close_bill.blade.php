@@ -383,9 +383,6 @@
                                     <th class="center-align">Partner Bisnis</th>
                                     <th class="center-align">Tgl.Post</th>
                                     <th class="center-align">Total</th>
-                                    <th class="center-align">PPN</th>
-                                    <th class="center-align">PPh</th>
-                                    <th class="center-align">Grandtotal</th>
                                     <th class="center-align">Terpakai</th>
                                     <th class="center-align">Sisa</th>
                                     <th class="center-align">Keterangan</th>
@@ -952,15 +949,6 @@
                                     </td>
                                     <td class="right-align">
                                         ` + val.total + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.tax + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.wtax + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.grandtotal + `
                                     </td>
                                     <td class="right-align">
                                         ` + val.used + `

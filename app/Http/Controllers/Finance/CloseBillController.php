@@ -291,7 +291,7 @@ class CloseBillController extends Controller
                                 'code'      => $op->code,
                                 'bp'        => $op->account->employee_no.' - '.$op->account->name,
                                 'post_date' => $op->pay_date,
-                                'total'     => number_format($op->balance,2,',','.'),
+                                'total'     => number_format($op->total,2,',','.'),
                                 'used'      => number_format($op->totalUsedCross(),2,',','.'),
                                 'balance'   => number_format($balance,2,',','.'),
                                 'note'      => $op->note,

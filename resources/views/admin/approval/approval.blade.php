@@ -386,6 +386,36 @@
         return false;
     }
 
+    function chooseAll(element){
+        if($(element).is(':checked')){
+            if($('input[name^="arr_status_good_issue_request[]"]').length > 0){
+                $('input[name^="arr_status_good_issue_request[]"]').each(function(){
+                    if(!$(this).is(':checked')){
+                        $(this).prop( "checked", true);
+                    }
+                });
+            }
+            if($('input[name^="arr_status_material_request[]"]').length > 0){
+                $('input[name^="arr_status_material_request[]"]').each(function(){
+                    if(!$(this).is(':checked')){
+                        $(this).prop( "checked", true);
+                    }
+                });
+            }
+        }else{
+            if($('input[name^="arr_status_good_issue_request[]"]').length > 0){
+                $('input[name^="arr_status_good_issue_request[]"]').each(function(){
+                    $(this).prop( "checked", false);
+                });
+            }
+            if($('input[name^="arr_status_material_request[]"]').length > 0){
+                $('input[name^="arr_status_material_request[]"]').each(function(){
+                    $(this).prop( "checked", false);
+                });
+            }
+        }
+    }
+
     function approve(){
         swal({
             title: "Apakah anda yakin?",

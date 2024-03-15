@@ -187,6 +187,12 @@
         <div class="divider mb-3 mt-3"></div>
         <!-- product details table-->
         <div class="invoice-product-details" style="min-width: 100%;overflow:auto;">
+            <div class="ml-2 mb-1">
+                <label>
+                    <input type="checkbox" onclick="chooseAll(this)">
+                    <span>Pilih Semua</span>
+                </label>
+            </div>
             <table class="bordered" style="width:1800px;">
                 <thead>
                     <tr>

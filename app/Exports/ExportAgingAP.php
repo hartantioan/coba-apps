@@ -260,7 +260,7 @@ class ExportAgingAP implements FromView , WithEvents
             }
     
             foreach($results2 as $row){
-                $balance = $row->grandtotal - $row->total_payment - $row->total_memo;
+                $balance = ($row->grandtotal * $row->currency_rate) - $row->total_payment - $row->total_memo;
                 if($balance > 0){
                     $totalAll += $balance;
                     $daysDiff = $this->dateDiffInDays($row->due_date,$this->date);
@@ -348,7 +348,7 @@ class ExportAgingAP implements FromView , WithEvents
             }
     
             foreach($results2 as $row){
-                $balance = $row->grandtotal - $row->total_payment - $row->total_memo;
+                $balance = ($row->grandtotal * $row->currency_rate) - $row->total_payment - $row->total_memo;
                 if($balance > 0){
                     $daysDiff = $this->dateDiffInDays($row->due_date,$this->date);
                     $arrDetail = [];

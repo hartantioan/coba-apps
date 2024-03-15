@@ -58,7 +58,7 @@ class OutStandingAPController extends Controller
                     WHERE 
                         prd.lookable_id = pi.id 
                         AND prd.lookable_type = 'purchase_invoices'
-                        AND op.post_date <= :date1
+                        AND op.pay_date <= :date1
                         AND op.status IN ('2','3')
                         AND prd.deleted_at IS NULL
                 ),0) AS total_payment,
@@ -141,7 +141,7 @@ class OutStandingAPController extends Controller
                     WHERE 
                         prd.lookable_id = pi.id 
                         AND prd.lookable_type = 'purchase_down_payments'
-                        AND op.post_date <= :date1
+                        AND op.pay_date <= :date1
                         AND op.status IN ('2','3')
                         AND prd.deleted_at IS NULL
                 ),0) AS total_payment,

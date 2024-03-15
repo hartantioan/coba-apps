@@ -179,7 +179,8 @@ class OutStandingAPController extends Controller
                 pi.total,
                 pi.tax,
                 pi.wtax,
-                pi.grandtotal
+                pi.grandtotal,
+                pi.currency_rate
                 FROM purchase_down_payments pi
                 LEFT JOIN users u
                     ON u.id = pi.account_id
@@ -272,7 +273,7 @@ class OutStandingAPController extends Controller
 
             foreach($results2 as $row){
                 $totalPayed = $row->total_payment + $row->total_memo + $row->total_reconcile;
-                $balance = $row->grandtotal - $totalPayed;
+                $balance = ($row->grandtotal * $row->currency_rate) - $totalPayed;
                 $data_tempura = [
                     'code'      => $row->code,
                     'vendor'    => $row->account_name,

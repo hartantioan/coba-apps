@@ -1276,10 +1276,12 @@
             $('#due_date').val('');
             $('#gi-show,#pr-show').show();
             $('#sj-show').hide();
+            $('#button-add-item').hide();
         }else if($('#inventory_type').val() == '2'){
             addDays();
             $('#sj-show').show();
             $('#gi-show,#pr-show').hide();
+            $('#button-add-item').show();
         }
     }
 

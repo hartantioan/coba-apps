@@ -612,6 +612,7 @@ class PurchaseOrderController extends Controller
         } else {
 
             $passedZero = true;
+            $passedMustPr = true;
             if($request->arr_price){
                 foreach($request->arr_price as $row){
                     if(floatval(str_replace(',','.',str_replace('.','',$row))) == 0){
@@ -659,6 +660,18 @@ class PurchaseOrderController extends Controller
                         'message' => 'Mohon maaf PO tidak bisa memiliki lebih dari 1 macam group item. Daftarnya : '.implode(', ',$arrError),
                     ]);
                 }
+                foreach($request->arr_type as $key => $row){
+                    if(!$row){
+                        $passedMustPr = false;
+                    }
+                }
+            }
+
+            if(!$passedMustPr){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Mohon maaf PO tipe Persediaan harus menarik data Purchase Request.',
+                ]);
             }
 
             if($request->inventory_type == '2'){

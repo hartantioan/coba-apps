@@ -310,6 +310,8 @@ class OutStandingAPController extends Controller
     }
 
     public function export(Request $request){
+        ob_end_clean(); // this
+        ob_start(); // and this
 		return Excel::download(new ExportOutstandingAP($request->date), 'outstanding_ap_'.uniqid().'.xlsx');
     }
 }

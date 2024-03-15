@@ -334,23 +334,12 @@ class DocumentTaxController extends Controller
         }
 
         $existingRecord = DB::table('document_taxes')
-            ->where('code', $xmlObject->nomorFaktur)
-            ->where('replace', $xmlObject->fgPengganti)
-            ->where('transaction_code', $xmlObject->kdJenisTransaksi)
-            ->withTrashed()
-            ->first();
-        // $validator = Validator::make(['code' => $xmlObject->kdJenisTransaksi.$xmlObject->fgPengganti.$xmlObject->nomorFaktur],[
-        //     'code' => [
-        //         'required',
-        //         Rule::unique('document_taxes', 'code')->where(function ($query) use ($xmlObject) {
-        //             return $query->where('transaction_code', $xmlObject->transaction_code)
-        //                           ->where('replace', $xmlObject->replace);
-        //         })->whereNull('deleted_at'),]
-        //     ],
-        //     [
-        //     'code.required'=> 'Kode tidak boleh kosong.',
-        //     'code.unique'  => 'Kode telah dipakai',
-        //     ]);
+        ->where('code', $xmlObject->nomorFaktur)
+        ->where('replace', $xmlObject->fgPengganti)
+        ->where('transaction_code', $xmlObject->kdJenisTransaksi)
+        ->whereNull('deleted_at') 
+        ->exists();
+        
         
         if ($existingRecord) {
             $response = [

@@ -213,7 +213,7 @@ class ExportAgingAP implements FromView , WithEvents
 
         if($this->type == 1){
             foreach($results as $row){
-                $balance = $row->balance - $row->total_payment - $row->total_memo;
+                $balance = $row->balance - $row->total_payment - $row->total_memo - $row->total_reconcile - $row->total_journal;
                 if($balance > 0){
                     $totalAll += $balance;
                     $daysDiff = $this->dateDiffInDays($row->due_date,$this->date);
@@ -260,7 +260,7 @@ class ExportAgingAP implements FromView , WithEvents
             }
     
             foreach($results2 as $row){
-                $balance = ($row->grandtotal * $row->currency_rate) - $row->total_payment - $row->total_memo;
+                $balance = ($row->grandtotal * $row->currency_rate) - $row->total_payment - $row->total_memo - $row->total_reconcile;
                 if($balance > 0){
                     $totalAll += $balance;
                     $daysDiff = $this->dateDiffInDays($row->due_date,$this->date);
@@ -314,7 +314,7 @@ class ExportAgingAP implements FromView , WithEvents
             ]);
         }else{
             foreach($results as $row){
-                $balance = $row->balance - $row->total_payment - $row->total_memo;
+                $balance = $row->balance - $row->total_payment - $row->total_memo - $row->total_reconcile - $row->total_journal;
                 if($balance > 0){
                     $daysDiff = $this->dateDiffInDays($row->due_date,$this->date);
                     $arrDetail = [];
@@ -348,7 +348,7 @@ class ExportAgingAP implements FromView , WithEvents
             }
     
             foreach($results2 as $row){
-                $balance = ($row->grandtotal * $row->currency_rate) - $row->total_payment - $row->total_memo;
+                $balance = ($row->grandtotal * $row->currency_rate) - $row->total_payment - $row->total_memo - $row->total_reconcile;
                 if($balance > 0){
                     $daysDiff = $this->dateDiffInDays($row->due_date,$this->date);
                     $arrDetail = [];

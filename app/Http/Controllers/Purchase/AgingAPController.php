@@ -716,7 +716,7 @@ class AgingAPController extends Controller
                         'rec_date'      => '-',
                         'due_date'      => $due_date,
                         'due_days'      => $this->dateDiffInDays($due_date,$date),
-                        'grandtotal'    => number_format($dp->grandtotal,2,',','.'),
+                        'grandtotal'    => number_format($dp->grandtotal * $dp->currency_rate,2,',','.'),
                         'memo'          => number_format($memo,2,',','.'),
                         'paid'          => number_format($paid,2,',','.'),
                         'balance'       => number_format($balance,2,',','.'),

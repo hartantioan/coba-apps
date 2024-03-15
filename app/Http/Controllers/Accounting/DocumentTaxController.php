@@ -337,6 +337,7 @@ class DocumentTaxController extends Controller
             ->where('code', $xmlObject->nomorFaktur)
             ->where('replace', $xmlObject->fgPengganti)
             ->where('transaction_code', $xmlObject->kdJenisTransaksi)
+            ->withTrashed()
             ->first();
         // $validator = Validator::make(['code' => $xmlObject->kdJenisTransaksi.$xmlObject->fgPengganti.$xmlObject->nomorFaktur],[
         //     'code' => [

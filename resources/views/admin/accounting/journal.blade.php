@@ -203,8 +203,8 @@
                                         <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this);" onchange="convertThis();">
                                         <label class="active" for="currency_rate">Konversi</label>
                                     </div>
-                                    <div class="col s12">
-                                        <h5>Tambah dari Distribusi (Opsional)</h5>
+                                    {{-- <div class="col s12">
+                                        <h6>Tambah dari Distribusi (Opsional)</h6>
                                         <div class="input-field col s3">
                                             <select class="browser-default" id="cost_distribution_id" name="cost_distribution_id"></select>
                                             <label class="active" for="cost_distribution_id">Distribusi Biaya</label>
@@ -225,13 +225,14 @@
                                                 <i class="material-icons left">add</i> Tambah
                                             </a>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                     <div class="col s12 mt-2">
                                         <h5>Detail Coa</h5>
                                         <div class="detail-table-fixed">
                                             <table class="bordered" style="min-width:2800px;position: relative;" id="table-detail">
                                                 <thead style="position:sticky;top: 0px !important;background-color:rgb(176, 212, 212) !important;z-index:10;position: -webkit-sticky;">
                                                     <tr>
+                                                        <th class="center" rowspan="2" width="75px">Hapus</th>
                                                         <th class="center" rowspan="2">BP</th>
                                                         <th class="center" rowspan="2">Coa</th>
                                                         <th class="center" rowspan="2">Plant</th>
@@ -243,7 +244,6 @@
                                                         <th class="center" rowspan="2">Keterangan 2</th>
                                                         <th class="center" colspan="2">Mata Uang Asli</th>
                                                         <th class="center" colspan="2">Mata Uang Konversi</th>
-                                                        <th class="center" rowspan="2" width="75px">Hapus</th>
                                                     </tr>
                                                     <tr>
                                                         <th class="center-align" width="200px">Debit</th>
@@ -263,12 +263,12 @@
                                         </div>
                                     </div>
                                     <div class="col s12 mt-1 right">
-                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addCoa('1')" href="javascript:void(0);">
-                                            <i class="material-icons left">add</i> Tambah Debit
+                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addCoa()" href="javascript:void(0);">
+                                            <i class="material-icons left">add</i> Tambah Coa
                                         </a>
-                                        <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addCoa('2')" href="javascript:void(0);">
+                                        {{-- <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addCoa()" href="javascript:void(0);">
                                             <i class="material-icons left">add</i> Tambah Kredit
-                                        </a>
+                                        </a> --}}
                                     </div>
                                     <div class="col s6 mt-1 center"><h5>Total Debit : <b id="totalDebit">0,000</b></h5></div>
                                     <div class="col s6 mt-1 center"><h5>Total Credit : <b id="totalCredit">0,000</b></h5></div>
@@ -659,7 +659,7 @@
         });
     }
 
-    function addCostDistribution(){
+    /* function addCostDistribution(){
         if($('#cost_distribution_id').val() && $('#nominal').val() && parseFloat($('#nominal').val().replaceAll(".", "").replaceAll(",",".")) > 0){
             var total = parseFloat($('#nominal').val().replaceAll(".", "").replaceAll(",",".")), type = $('#type').val();
             $.each($('#cost_distribution_id').select2('data')[0].details, function (i, val) {
@@ -746,15 +746,19 @@
         $('#cost_distribution_id').empty();
         $('#nominal').val('0');
         $('#type').val('1').formSelect();
-    }
+    } */
 
-    function addCoa(type){
+    function addCoa(){
         var count = makeid(10);
 
         $('#last-row-coa').before(`
             <tr class="row_coa">
-                <input type="hidden" name="arr_type[]" value="` + type + `">
                 <input type="hidden" name="arr_cost_distribution_detail[]" value="">
+                <td class="center">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
                 <td>
                     <select class="browser-default" id="arr_account` + count + `" name="arr_account[]"></select>    
                 </td>
@@ -803,21 +807,16 @@
                     <input name="arr_note2[]" type="text" placeholder="Keterangan 2...">
                 </td>
                 <td>
-                    ` + (type == '1' ? `<input name="arr_nominal_fc[]" onfocus="emptyThis(this);" type="text" value="0" style="width:175px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">` : `-`) + `
+                    <input name="arr_nominal_debit_fc[]" type="text" value="0" style="width:175px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">
                 </td>
                 <td>
-                    ` + (type == '2' ? `<input name="arr_nominal_fc[]" onfocus="emptyThis(this);" type="text" value="0" style="width:175px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">` : `-`) + `
+                    <input name="arr_nominal_credit_fc[]" type="text" value="0" style="width:175px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">
                 </td>
                 <td>
-                    ` + (type == '1' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="0" style="width:175px !important;" onkeyup="formatRupiah(this);" readonly>` : `-`) + `
+                    <input name="arr_nominal_debit[]" type="text" value="0" style="width:175px !important;" onkeyup="formatRupiah(this);" readonly>
                 </td>
                 <td>
-                    ` + (type == '2' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="0" style="width:175px !important;" onkeyup="formatRupiah(this);" readonly>` : `-`) + `
-                </td>
-                <td class="center">
-                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" href="javascript:void(0);">
-                        <i class="material-icons">delete</i>
-                    </a>
+                    <input name="arr_nominal_credit[]" type="text" value="0" style="width:175px !important;" onkeyup="formatRupiah(this);" readonly>
                 </td>
             </tr>
         `);
@@ -854,20 +853,22 @@
     }
 
     function convertThis(){
-        $('input[name^="arr_nominal"]').each(function(index){
-            if($(this).attr('name') == 'arr_nominal_fc[]'){
-                let val = parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")), currency_rate = parseFloat($('#currency_rate').val().replaceAll(".", "").replaceAll(",","."));
-                let newVal = val * currency_rate;
-                $(this).closest("tr").find('input[name="arr_nominal[]"]').val(
-                    formatRupiahIni(newVal.toString().replace('.',','))
-                );
-            }else if($(this).attr('name') == 'arr_nominal[]'){
-                let val = parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")), currency_rate = parseFloat($('#currency_rate').val().replaceAll(".", "").replaceAll(",","."));
-                let newVal = val / currency_rate;
-                $(this).closest("tr").find('input[name="arr_nominal_fc[]"]').val(
-                    formatRupiahIni(newVal.toString().replace('.',','))
-                );
-            }
+        let currency_rate = parseFloat($('#currency_rate').val().replaceAll(".", "").replaceAll(",","."));
+
+        $('input[name^="arr_nominal_debit_fc[]"]').each(function(index){
+            let rowtotal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+            let conversion = rowtotal * currency_rate;
+            $('input[name^="arr_nominal_debit[]"]').eq(index).val(
+                (conversion >= 0 ? '' : '-') + formatRupiahIni(conversion.toFixed(2).toString().replace('.',','))
+            );
+        });
+
+        $('input[name^="arr_nominal_credit_fc[]"]').each(function(index){
+            let rowtotal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+            let conversion = rowtotal * currency_rate;
+            $('input[name^="arr_nominal_credit[]"]').eq(index).val(
+                (conversion >= 0 ? '' : '-') + formatRupiahIni(conversion.toFixed(2).toString().replace('.',','))
+            );
         });
         
         countAll();
@@ -1131,13 +1132,14 @@
     function countAll(){
         let totalDebit = 0, totalCredit = 0;
 
-        $('input[name^="arr_nominal[]"]').each(function(index){
+        $('input[name^="arr_nominal_debit[]"]').each(function(index){
             let nominal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-            if($('input[name^="arr_type[]"]').eq(index).val() == '1'){
-                totalDebit += nominal;
-            }else{
-                totalCredit += nominal;
-            }
+            totalDebit += nominal;
+        });
+
+        $('input[name^="arr_nominal_credit[]"]').each(function(index){
+            let nominal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+            totalCredit += nominal;
         });
 
         $('#totalDebit').text(formatRupiahIni(totalDebit.toFixed(2).toString().replace('.',',')));
@@ -1292,41 +1294,32 @@
                 if (willDelete) {
                     var formData = new FormData($('#form_data')[0]);
 
-                    formData.delete("arr_type[]");
                     formData.delete("arr_cost_distribution_detail[]");
                     formData.delete("arr_coa[]");
                     formData.delete("arr_place[]");
                     formData.delete("arr_line[]");
                     formData.delete("arr_machine[]");
                     formData.delete("arr_account[]");
-                    formData.delete("arr_item[]");
                     formData.delete("arr_department[]");
                     formData.delete("arr_project[]");
                     formData.delete("arr_note[]");
                     formData.delete("arr_note2[]");
-                    formData.delete("arr_nominal[]");
-                    formData.delete("arr_nominal_fc[]");
 
-                    $('input[name^="arr_type"]').each(function(index){
-                        formData.append('arr_type[]',$(this).val());
-                        formData.append('arr_coa[]',($('select[name^="arr_coa"]').eq(index).val() ? $('select[name^="arr_coa"]').eq(index).val() : 'NULL'));
+                    $('select[name^="arr_coa[]"]').each(function(index){
+                        formData.append('arr_coa[]',($(this).val() ? $(this).val() : 'NULL'));
                         formData.append('arr_cost_distribution_detail[]',($('input[name^="arr_cost_distribution_detail"]').eq(index).val() ? $('input[name^="arr_cost_distribution_detail"]').eq(index).val() : 'NULL'));
                         formData.append('arr_place[]',($('select[name^="arr_place"]').eq(index).val() ? $('select[name^="arr_place"]').eq(index).val() : 'NULL'));
                         formData.append('arr_line[]',($('select[name^="arr_line"]').eq(index).val() ? $('select[name^="arr_line"]').eq(index).val() : 'NULL'));
                         formData.append('arr_machine[]',($('select[name^="arr_machine"]').eq(index).val() ? $('select[name^="arr_machine"]').eq(index).val() : 'NULL'));
                         formData.append('arr_account[]',($('select[name^="arr_account"]').eq(index).val() ? $('select[name^="arr_account"]').eq(index).val() : 'NULL'));
-                        formData.append('arr_item[]',($('select[name^="arr_item"]').eq(index).val() ? $('select[name^="arr_item"]').eq(index).val() : 'NULL'));
                         formData.append('arr_department[]',$('select[name^="arr_department"]').eq(index).val());
                         formData.append('arr_project[]',($('select[name^="arr_project[]"]').eq(index).val() ? $('select[name^="arr_project[]"]').eq(index).val() : 'NULL'));
                         formData.append('arr_note[]',($('input[name^="arr_note[]"]').eq(index).val() ? $('input[name^="arr_note[]"]').eq(index).val() : ''));
                         formData.append('arr_note2[]',($('input[name^="arr_note2[]"]').eq(index).val() ? $('input[name^="arr_note2[]"]').eq(index).val() : ''));
-                        formData.append('arr_nominal[]',($('input[name^="arr_nominal[]"]').eq(index).val() ? $('input[name^="arr_nominal[]"]').eq(index).val() : '0'));
-                        formData.append('arr_nominal_fc[]',($('input[name^="arr_nominal_fc[]"]').eq(index).val() ? $('input[name^="arr_nominal_fc[]"]').eq(index).val() : '0'));
                     });
 
                     var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
-
                     
                     var segments = path.split('/');
                     var lastSegment = segments[segments.length - 1];
@@ -1602,8 +1595,12 @@
                     let count = makeid(10);
                     $('#last-row-coa').before(`
                         <tr class="row_coa">
-                            <input type="hidden" name="arr_type[]" value="` + val.type + `">
                             <input type="hidden" name="arr_cost_distribution_detail[]" value="">
+                            <td class="center">
+                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" href="javascript:void(0);">
+                                    <i class="material-icons">delete</i>
+                                </a>
+                            </td>
                             <td>
                                 <select class="browser-default" id="arr_account` + count + `" name="arr_account[]"></select>    
                             </td>
@@ -1652,21 +1649,16 @@
                                 <input name="arr_note2[]" type="text" placeholder="Keterangan 2..." value="` + val.note2 + `">
                             </td>
                             <td>
-                                ` + (val.type == '1' ? `<input name="arr_nominal_fc[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal_fc + `" style="width:175px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">` : `-`) + `
+                                <input name="arr_nominal_debit_fc[]" type="text" value="` + (val.type == '1' ? val.nominal_fc : '0,00' ) + `" style="width:175px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">
                             </td>
                             <td>
-                                ` + (val.type == '2' ? `<input name="arr_nominal_fc[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal_fc + `" style="width:175px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">` : `-`) + `
+                                <input name="arr_nominal_credit_fc[]" type="text" value="` + (val.type == '2' ? val.nominal_fc : '0,00' ) + `" style="width:175px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">
                             </td>
                             <td>
-                                ` + (val.type == '1' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal + `" style="width:175px !important;" onkeyup="formatRupiah(this);" readonly>` : `-`) + `
+                                <input name="arr_nominal_debit[]" type="text" value="` + (val.type == '1' ? val.nominal : '0,00' ) + `" style="width:175px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">
                             </td>
                             <td>
-                                ` + (val.type == '2' ? `<input name="arr_nominal[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal + `" style="width:175px !important;" onkeyup="formatRupiah(this);" readonly>` : `-`) + `
-                            </td>
-                            <td class="center">
-                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" href="javascript:void(0);">
-                                    <i class="material-icons">delete</i>
-                                </a>
+                                <input name="arr_nominal_credit[]" type="text" value="` + (val.type == '2' ? val.nominal : '0,00' ) + `" style="width:175px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">
                             </td>
                         </tr>
                     `);

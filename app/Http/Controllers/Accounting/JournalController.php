@@ -318,10 +318,8 @@ class JournalController extends Controller
                 'post_date'                 => 'required',
                 'currency_id'               => 'required',
                 'currency_rate'             => 'required',
-                'arr_type'                  => 'required|array',
                 'arr_place'                 => 'required|array',
                 'arr_department'            => 'required|array',
-                'arr_nominal'               => 'required|array',
             ], [
                 'code.required' 				    => 'Kode/No tidak boleh kosong.',
                 'code_place_id.required'            => 'Plant Tidak boleh kosong',
@@ -330,14 +328,10 @@ class JournalController extends Controller
                 'post_date.required'                => 'Tgl post tidak boleh kosong.',
                 'currency_rate.required'            => 'Konversi tidak boleh kosong.',
                 'currency_id.required'              => 'Mata uang tidak boleh kosong.',
-                'arr_type.required'                 => 'Tipe tidak boleh kosong.',
-                'arr_type.array'                    => 'Tipe harus dalam bentuk array.',
                 'arr_place.required'                => 'Penempatan tidak boleh kosong.',
                 'arr_place.array'                   => 'Penempatan harus dalam bentuk array.',
                 'arr_department.required'           => 'Departemen tidak boleh kosong.',
                 'arr_department.array'              => 'Departemen harus dalam bentuk array.',
-                'arr_nominal.required'              => 'Nominal tidak boleh kosong.',
-                'arr_nominal.array'                 => 'Nominal harus dalam bentuk array.',
             ]);
 
             if($validation->fails()) {
@@ -349,12 +343,11 @@ class JournalController extends Controller
                 
                 $totalDebit = 0; 
                 $totalCredit = 0;
-                foreach($request->arr_nominal as $key => $row){
-                    if($request->arr_type[$key] == '1'){
-                        $totalDebit += str_replace(',','.',str_replace('.','',$row));
-                    }elseif($request->arr_type[$key] == '2'){
-                        $totalCredit += str_replace(',','.',str_replace('.','',$row));
-                    }
+                foreach($request->arr_nominal_debit as $key => $row){
+                    $totalDebit += str_replace(',','.',str_replace('.','',$row));
+                }
+                foreach($request->arr_nominal_credit as $key => $row){
+                    $totalCredit += str_replace(',','.',str_replace('.','',$row));
                 }
 
                 if($totalDebit - $totalCredit > 0 || $totalDebit - $totalCredit < 0){
@@ -434,25 +427,45 @@ class JournalController extends Controller
                 
                 if($query) {
                     
-                    if($request->arr_type){
-                        foreach($request->arr_type as $key => $row){
-                           
-                            JournalDetail::create([
-                                'journal_id'                    => $query->id,
-                                'cost_distribution_detail_id'   => $request->arr_cost_distribution_detail[$key] == 'NULL' ? NULL : $request->arr_cost_distribution_detail[$key],
-                                'coa_id'                        => $request->arr_coa[$key] == 'NULL' ? NULL : $request->arr_coa[$key],
-                                'place_id'                      => $request->arr_place[$key] == 'NULL' ? NULL : $request->arr_place[$key],
-                                'line_id'                       => $request->arr_line[$key] == 'NULL' ? NULL : $request->arr_line[$key],
-                                'machine_id'                    => $request->arr_machine[$key] == 'NULL' ? NULL : $request->arr_machine[$key],
-                                'account_id'                    => $request->arr_account[$key] == 'NULL' ? NULL : $request->arr_account[$key],
-                                'department_id'                 => $request->arr_department[$key],
-                                'project_id'                    => $request->arr_project[$key] == 'NULL' ? NULL : $request->arr_project[$key],
-                                'note'                          => $request->arr_note[$key] == '' ? NULL : $request->arr_note[$key],
-                                'note2'                         => $request->arr_note2[$key] == '' ? NULL : $request->arr_note2[$key],
-                                'type'                          => $row,
-                                'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
-                                'nominal_fc'                    => str_replace(',','.',str_replace('.','',$request->arr_nominal_fc[$key])),
-                            ]);
+                    if($request->arr_coa){
+                        foreach($request->arr_coa as $key => $row){
+                            if(str_replace(',','.',str_replace('.','',$request->arr_nominal_debit_fc[$key])) > 0){
+                                JournalDetail::create([
+                                    'journal_id'                    => $query->id,
+                                    'cost_distribution_detail_id'   => $request->arr_cost_distribution_detail[$key] == 'NULL' ? NULL : $request->arr_cost_distribution_detail[$key],
+                                    'coa_id'                        => $row ?? NULL,
+                                    'place_id'                      => $request->arr_place[$key] == 'NULL' ? NULL : $request->arr_place[$key],
+                                    'line_id'                       => $request->arr_line[$key] == 'NULL' ? NULL : $request->arr_line[$key],
+                                    'machine_id'                    => $request->arr_machine[$key] == 'NULL' ? NULL : $request->arr_machine[$key],
+                                    'account_id'                    => $request->arr_account[$key] == 'NULL' ? NULL : $request->arr_account[$key],
+                                    'department_id'                 => $request->arr_department[$key],
+                                    'project_id'                    => $request->arr_project[$key] == 'NULL' ? NULL : $request->arr_project[$key],
+                                    'note'                          => $request->arr_note[$key] == '' ? NULL : $request->arr_note[$key],
+                                    'note2'                         => $request->arr_note2[$key] == '' ? NULL : $request->arr_note2[$key],
+                                    'type'                          => '1',
+                                    'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal_debit[$key])),
+                                    'nominal_fc'                    => str_replace(',','.',str_replace('.','',$request->arr_nominal_debit_fc[$key])),
+                                ]);
+                            }
+
+                            if(str_replace(',','.',str_replace('.','',$request->arr_nominal_credit_fc[$key])) > 0){
+                                JournalDetail::create([
+                                    'journal_id'                    => $query->id,
+                                    'cost_distribution_detail_id'   => $request->arr_cost_distribution_detail[$key] == 'NULL' ? NULL : $request->arr_cost_distribution_detail[$key],
+                                    'coa_id'                        => $row ?? NULL,
+                                    'place_id'                      => $request->arr_place[$key] == 'NULL' ? NULL : $request->arr_place[$key],
+                                    'line_id'                       => $request->arr_line[$key] == 'NULL' ? NULL : $request->arr_line[$key],
+                                    'machine_id'                    => $request->arr_machine[$key] == 'NULL' ? NULL : $request->arr_machine[$key],
+                                    'account_id'                    => $request->arr_account[$key] == 'NULL' ? NULL : $request->arr_account[$key],
+                                    'department_id'                 => $request->arr_department[$key],
+                                    'project_id'                    => $request->arr_project[$key] == 'NULL' ? NULL : $request->arr_project[$key],
+                                    'note'                          => $request->arr_note[$key] == '' ? NULL : $request->arr_note[$key],
+                                    'note2'                         => $request->arr_note2[$key] == '' ? NULL : $request->arr_note2[$key],
+                                    'type'                          => '2',
+                                    'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal_credit[$key])),
+                                    'nominal_fc'                    => str_replace(',','.',str_replace('.','',$request->arr_nominal_credit_fc[$key])),
+                                ]);
+                            }
                         }
                     }
 
@@ -661,7 +674,7 @@ class JournalController extends Controller
     public function show(Request $request){
         $jou = Journal::where('code',CustomHelper::decrypt($request->id))->first();
         $jou['currency_rate'] = number_format($jou->currency_rate,2,',','.');
-        $jou['code_place_id'] = substr($jou->code,7,2);
+        $jou['code_place_id'] = substr($jou->code,7,2) == '00' ? '' : substr($jou->code,7,2);
         $jou['journal_id'] = $jou->lookable_type == 'journals' ? $jou->lookable_id : '';
         $jou['journal_name'] = $jou->lookable_id ? $jou->lookable->code.' - '.$jou->lookable->note : '';
 

@@ -707,7 +707,7 @@ class AgingAPController extends Controller
                 if($dp){
                     $memo = $dp->totalMemoByDate($date);
                     $paid = $dp->totalPaidByDate($date);
-                    $balance = $dp->grandtotal - $memo - $paid;
+                    $balance = ($dp->grandtotal * $dp->currency_rate) - $memo - $paid;
                     $due_date = $dp->due_date ? $dp->due_date : date('Y-m-d', strtotime($dp->post_date. ' + '.$dp->top.' day'));
                     $results[] = [
                         'code'          => $dp->code,

@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Item;
 use App\Models\ItemGroup;
 use App\Models\ItemShading;
+use App\Models\ItemStock;
+use App\Models\ItemUnit;
 use App\Models\Unit;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
@@ -17,7 +19,7 @@ use Maatwebsite\Excel\Concerns\OnEachRow;
 use Maatwebsite\Excel\Row;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
-class ImportItem implements OnEachRow, WithHeadingRow, WithValidation, WithBatchInserts,WithMultipleSheets
+class ImportItem implements OnEachRow, WithHeadingRow, WithBatchInserts,WithMultipleSheets
 {
     public function sheets(): array
     {
@@ -29,90 +31,49 @@ class ImportItem implements OnEachRow, WithHeadingRow, WithValidation, WithBatch
     {
         $row = $row->toArray();
       
-        $item_group_code = explode('#',$row['item_group_id'])[0];
-        $item_group_id=ItemGroup::where('code',$item_group_code)->first();
-        
-        $item_unit_code = explode('#',$row['uom_unit'])[0];
-        $item_unit_id=Unit::where('code',$item_unit_code)->first();
-        
-        $query = Item::create([
-            'code' => $row['code'],
-            'name' => $row['name'],
-            'other_name' => $row['other_name'],
-            'item_group_id' =>$item_group_id->id,
-            'uom_unit' => $item_unit_id->id,
-            'tolerance_gr' => $row['tolerance_gr'],
-            'is_inventory_item' => $row['is_inventory_item'],
-            'is_sales_item' => $row['is_sales_item'],
-            'is_purchase_item' => $row['is_purchase_item'],
-            'is_service' => $row['is_service'],
-            'note' => $row['note'],
-            'status' => '1',
-            'shading' => $row['shading'],
-        ]);
+        if($row['code']){
+            $item_group_code = explode('#',$row['item_group_id'])[0];
+            $item_group_id = ItemGroup::where('code',$item_group_code)->first();
+            
+            $item_unit_code = explode('#',$row['uom_unit'])[0];
+            $item_unit_id= Unit::where('code',$item_unit_code)->first();
+            
+            $query = Item::create([
+                'code' => $row['code'],
+                'name' => $row['name'],
+                'item_group_id' =>$item_group_id->id,
+                'uom_unit' => $item_unit_id->id,
+                'tolerance_gr' => $row['tolerance_gr'],
+                'is_inventory_item' => $row['is_inventory_item'],
+                'is_sales_item' => $row['is_sales_item'],
+                'is_purchase_item' => $row['is_purchase_item'],
+                'is_service' => $row['is_service'],
+                'note' => $row['note'],
+                'status' => '1',
+            ]);
 
-        if($row['shading']){
-            $arrShading = explode('|',$row['shading']);
-            foreach($arrShading as $rowshading){
-                ItemShading::create([
-                    'item_id'   => $query->id,
-                    'code'      => $rowshading,
+            foreach($query->itemGroup->itemGroupWarehouse as $row){
+                ItemStock::create([
+                    'place_id'      => 1,
+                    'warehouse_id'  => $row->warehouse_id,
+                    'item_id'       => $query->id,
+                    'qty'           => 0
                 ]);
             }
+            
+            ItemUnit::create([
+                'item_id'       => $query->id,
+                'unit_id'       => $item_unit_id->id,
+                'conversion'    => 1,
+                'is_sell_unit'  => '1',
+                'is_buy_unit'   => '1',
+                'is_default'    => '1',
+            ]);
         }
-    }
-
-    public function rules(): array
-    {
-      
-        return [
-            '*.code' => 'required|unique:items,code',
-            '*.name' => 'required|string',
-            '*.other_name' => 'nullable',
-            '*.item_group_id' => 'required',
-            '*.uom_unit' => 'required',
-            '*.tolerance_gr' => 'nullable',
-            '*.is_inventory_item' => 'nullable',
-            '*.is_sales_item' => 'nullable',
-            '*.is_purchase_item' => 'nullable',
-            '*.is_service' => 'nullable',
-            '*.note' => 'nullable',
-            '*.min_stock' => 'nullable|required_with:max_stock', // Allow empty, but if min_stock is present, max_stock must also be present
-            '*.max_stock' => 'nullable|required_with:min_stock', // Allow empty, but if max_stock is present, min_stock must also be present
-            '*.shading'   => 'nullable',
-        ];
-    }
-
-    public function onFailure(Failure ...$failures)
-    {
-        $errors = [];
-
-        foreach ($failures as $failure) {
-            $errors[] = [
-                'row' => $failure->row(),
-                'attribute' => $failure->attribute(),
-                'errors' => $failure->errors(),
-                'values' => $failure->values(),
-            ];
-        }
-
-        throw new ValidationException(null, null, $errors);
     }
 
     public function batchSize(): int
     {
         return 1000;
-    }
-
-    public function onSheetStart(int $sheetIndex)
-    {
-        // Check if the current sheet is the target sheet
-        $sheetName = $row->getDelegate()->getActiveSheet()->getTitle();
-
-        if ($sheetName !== $this->targetSheetName) {
-            return false; // Skip this sheet
-        }
-
-        return true; // Process rows for the target sheet
     }
 }

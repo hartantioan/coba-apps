@@ -76,11 +76,11 @@
                             <span class="hide-on-small-onl">Excel</span>
                             <i class="material-icons right">view_list</i>
                         </a>
-                        {{-- <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3 modal-trigger" href="#modal2">
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3 modal-trigger" href="#modal2">
                             <i class="material-icons hide-on-med-and-up">file_download</i>
                             <span class="hide-on-small-onl">Import</span>
                             <i class="material-icons right">file_download</i>
-                        </a> --}}
+                        </a>
                     </div>
                 </div>
             </div>
@@ -683,7 +683,7 @@
                         $('#validation_alertImport').show();
                         $('.modal-content').scrollTop(0);
                         
-                        /* $.each(response.error, function(i, val) {
+                        $.each(response.error, function(i, val) {
                             $('#validation_alertImport').append(`
                                     <div class="card-alert card red">
                                         <div class="card-content white-text">
@@ -694,21 +694,9 @@
                                         </button>
                                     </div>
                                 `);
-                        }); */
+                        });
                     } else {
                         console.log(response);
-                       /*  $.each(response.error, function(i, val) {
-                            $('#validation_alertImport').append(`
-                                    <div class="card-alert card red">
-                                        <div class="card-content white-text">
-                                            <p> ` +val+`</p>
-                                        </div>
-                                        <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                            <span aria-hidden="true">×</span>
-                                        </button>
-                                    </div>
-                                `);
-                        }); */
                     }
                     loadingClose('.modal-content');
                 },

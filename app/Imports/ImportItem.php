@@ -32,43 +32,47 @@ class ImportItem implements OnEachRow, WithHeadingRow, WithBatchInserts,WithMult
         $row = $row->toArray();
       
         if($row['code']){
-            $item_group_code = explode('#',$row['item_group_id'])[0];
-            $item_group_id = ItemGroup::where('code',$item_group_code)->first();
+            $check = Item::where('code',$row['code'])->first();
             
-            $item_unit_code = explode('#',$row['uom_unit'])[0];
-            $item_unit_id= Unit::where('code',$item_unit_code)->first();
-            
-            $query = Item::create([
-                'code' => $row['code'],
-                'name' => $row['name'],
-                'item_group_id' =>$item_group_id->id,
-                'uom_unit' => $item_unit_id->id,
-                'tolerance_gr' => $row['tolerance_gr'],
-                'is_inventory_item' => $row['is_inventory_item'],
-                'is_sales_item' => $row['is_sales_item'],
-                'is_purchase_item' => $row['is_purchase_item'],
-                'is_service' => $row['is_service'],
-                'note' => $row['note'],
-                'status' => '1',
-            ]);
+            if(!$check){
+                $item_group_code = explode('#',$row['item_group_id'])[0];
+                $item_group_id = ItemGroup::where('code',$item_group_code)->first();
+                
+                $item_unit_code = explode('#',$row['uom_unit'])[0];
+                $item_unit_id= Unit::where('code',$item_unit_code)->first();
+                
+                $query = Item::create([
+                    'code' => $row['code'],
+                    'name' => $row['name'],
+                    'item_group_id' =>$item_group_id->id,
+                    'uom_unit' => $item_unit_id->id,
+                    'tolerance_gr' => $row['tolerance_gr'],
+                    'is_inventory_item' => $row['is_inventory_item'],
+                    'is_sales_item' => $row['is_sales_item'],
+                    'is_purchase_item' => $row['is_purchase_item'],
+                    'is_service' => $row['is_service'],
+                    'note' => $row['note'],
+                    'status' => '1',
+                ]);
 
-            foreach($query->itemGroup->itemGroupWarehouse as $row){
-                ItemStock::create([
-                    'place_id'      => 1,
-                    'warehouse_id'  => $row->warehouse_id,
+                foreach($query->itemGroup->itemGroupWarehouse as $row){
+                    ItemStock::create([
+                        'place_id'      => 1,
+                        'warehouse_id'  => $row->warehouse_id,
+                        'item_id'       => $query->id,
+                        'qty'           => 0
+                    ]);
+                }
+                
+                ItemUnit::create([
                     'item_id'       => $query->id,
-                    'qty'           => 0
+                    'unit_id'       => $item_unit_id->id,
+                    'conversion'    => 1,
+                    'is_sell_unit'  => '1',
+                    'is_buy_unit'   => '1',
+                    'is_default'    => '1',
                 ]);
             }
-            
-            ItemUnit::create([
-                'item_id'       => $query->id,
-                'unit_id'       => $item_unit_id->id,
-                'conversion'    => 1,
-                'is_sell_unit'  => '1',
-                'is_buy_unit'   => '1',
-                'is_default'    => '1',
-            ]);
         }
     }
 

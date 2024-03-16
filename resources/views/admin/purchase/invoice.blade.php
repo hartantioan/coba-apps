@@ -167,6 +167,7 @@
                                                         <th rowspan="2">Sup/Ven</th>
                                                         <th rowspan="2">Perusahaan</th>
                                                         <th colspan="4" class="center-align">Tanggal</th>
+                                                        <th colspan="2" class="center-align">Konversi</th>
                                                         <th rowspan="2">Tipe</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Keterangan</th>
@@ -192,6 +193,8 @@
                                                         <th>Terima</th>
                                                         <th>Tenggat</th>
                                                         <th>Dokumen</th>
+                                                        <th>Mata Uang</th>
+                                                        <th>Konversi</th>
                                                         <th>Prosentase</th>
                                                         <th>Nominal</th>
                                                     </tr>
@@ -217,7 +220,7 @@
             <div class="col s12">
                 
                     <h4 class="mt-2">Tambah/Edit {{ $title }}</h4>
-                    <i>Silahkan pilih supplier / vendor untuk mengambil data dokumen GRPO, PO Jasa, LC, atau PO DP.</i>
+                    <i>Silahkan pilih supplier / vendor untuk mengambil data dokumen GRPO, PO Lain-lain, Landed Cost, atau AP DP.</i>
                     <form class="row" id="form_data" onsubmit="return false;">
                         <div class="col s12">
                             <div id="validation_alert" style="display:none;"></div>
@@ -245,7 +248,7 @@
                                 </div>
                                 <div class="input-field col m3 s12 step4">
                                     <input type="hidden" id="temp" name="temp">
-                                    <select class="browser-default" id="account_id" name="account_id" onchange="getAccountData(this.value);"></select>
+                                    <select class="browser-default" id="account_id" name="account_id" onchange="getAccountData('1');"></select>
                                     <label class="active" for="account_id">Supplier / Vendor</label>
                                 </div>
                                 <div class="input-field col m3 s12 step5">
@@ -265,7 +268,7 @@
                                     <label class="" for="company_id">Perusahaan</label>
                                 </div>
                                 <div class="input-field col m3 s12 step7">
-                                    <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
+                                    <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);loadCurrency();">
                                     <label class="active" for="post_date">Tgl. Posting</label>
                                 </div>
                                 <div class="input-field col m3 s12 step8">
@@ -307,6 +310,18 @@
                                 <div class="input-field col m3 s12 step16">
                                     <input id="invoice_no" name="invoice_no" type="text" placeholder="Nomor Invoice dari Suppplier/Vendor">
                                     <label class="active" for="invoice_no">No. Invoice</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();countAll();">
+                                        @foreach ($currency as $row)
+                                            <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="" for="currency_id">Mata Uang</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this);countAll();">
+                                    <label class="active" for="currency_rate">Konversi</label>
                                 </div>
                                 <div class="file-field input-field col m3 s12 step17">
                                     <div class="btn">
@@ -434,11 +449,17 @@
                                 </div>
                                 <div class="col m12 s12 step21">
                                     <p class="mt-2 mb-2">
-                                        <h5>Detail Down Payment Partner Bisnis</h5>
+                                        <h5>
+                                            Detail Down Payment Partner Bisnis
+                                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="getAccountData('2');" href="javascript:void(0);">
+                                                <i class="material-icons left">add</i> Ambil Data
+                                            </a>
+                                        </h5>
                                         <div style="overflow:auto;">
                                             <table class="bordered">
                                                 <thead>
                                                     <tr>
+                                                        <th class="center">Hapus</th>
                                                         <th class="center">Purchase DP No.</th>
                                                         <th class="center">Tgl.Post</th>
                                                         <th class="center">Nominal</th>
@@ -448,7 +469,7 @@
                                                 </thead>
                                                 <tbody id="body-detail-dp">
                                                     <tr id="empty-detail-dp">
-                                                        <td colspan="5" class="center">
+                                                        <td colspan="6" class="center">
                                                             Pilih supplier/vendor untuk memulai...
                                                         </td>
                                                     </tr>
@@ -457,45 +478,53 @@
                                         </div>
                                     </p>
                                 </div>
-                                <div class="input-field col m4 s12 step22">
+                                <div class="input-field col m6 s12 step22">
                                     <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                     <label class="active" for="note">Keterangan</label>
                                 </div>
-                                <div class="input-field col m4 s12">
-
-                                </div>
-                                <div class="input-field col m4 s12 step23">
+                                <div class="input-field col m6 s12 step23">
                                     <table width="100%" class="bordered">
                                         <thead>
                                             <tr>
+                                                <td width="33%"></td>
+                                                <td width="33%" class="center-align">Mata Uang Asli</td>
+                                                <td width="33%" class="center-align">Mata Uang Konversi</td>
+                                            </tr>
+                                            <tr>
                                                 <td>Total</td>
                                                 <td class="right-align"><span id="total">0,00</span></td>
+                                                <td class="right-align"><span id="total_convert">0,00</span></td>
                                             </tr>
                                             <tr>
                                                 <td>PPN</td>
                                                 <td class="right-align"><span id="tax">0,00</span></td>
+                                                <td class="right-align"><span id="tax_convert">0,00</span></td>
                                             </tr>
                                             <tr>
                                                 <td>PPh</td>
                                                 <td class="right-align">
                                                     <input class="browser-default" id="wtax" name="wtax" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countGrandtotal();" style="text-align:right;width:100%;">
                                                 </td>
+                                                <td class="right-align"><span id="wtax_convert">0,00</span></td>
                                             </tr>
                                             <tr>
                                                 <td>Pembulatan</td>
                                                 <td class="right-align">
                                                     <input class="browser-default" id="rounding" name="rounding" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countGrandtotal();" style="text-align:right;width:100%;">
-                                                </td> 
+                                                </td>
+                                                <td class="right-align"><span id="rounding_convert">0,00</span></td>
                                             </tr>
                                             <tr>
                                                 <td>Uang Muka</td>
                                                 <td class="right-align">
                                                     <input class="browser-default" id="downpayment" name="downpayment" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" readonly>
                                                 </td>
+                                                <td class="right-align"><span id="downpayment_convert">0,00</span></td>
                                             </tr>
                                             <tr>
                                                 <td>Grandtotal</td>
                                                 <td class="right-align"><span id="balance">0,00</span></td>
+                                                <td class="right-align"><span id="balance_convert">0,00</span></td>
                                             </tr>
                                         </thead>
                                     </table>
@@ -583,6 +612,26 @@
                                     </table>
                                 </div>
                             </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">Close</a>
+        <button class="btn waves-effect waves-light purple right submit" onclick="applyDocuments('main');">Gunakan <i class="material-icons right">forward</i></button>
+    </div>
+</div>
+
+<div id="modal7" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <h5>Daftar AP Down Payment <b id="account_name_dp"></b></h5>
+                <div class="row">
+                    <div class="col s12 mt-2">
+                        <ul class="collapsible">
                             <li class="active">
                                 <div class="collapsible-header cyan white-text">
                                     <i class="material-icons">more</i> Purchase Down Payment
@@ -610,7 +659,7 @@
     </div>
     <div class="modal-footer">
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">Close</a>
-        <button class="btn waves-effect waves-light purple right submit" onclick="applyDocuments();">Gunakan <i class="material-icons right">forward</i></button>
+        <button class="btn waves-effect waves-light purple right submit" onclick="applyDocuments('dp');">Gunakan <i class="material-icons right">forward</i></button>
     </div>
 </div>
 
@@ -814,7 +863,6 @@
 
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
-            
         });
 
         loadDataTable();
@@ -836,6 +884,7 @@
                 window.onbeforeunload = function() {
                     return 'You will lose all changes made since your last save';
                 };
+                loadCurrency();
                 $('.tabs').tabs();
             },
             onCloseEnd: function(modal, trigger){
@@ -930,6 +979,24 @@
                         style: 'multi'
                     }
                 });
+                
+                $('#table_multi_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi');
+                $('select[name="table_multi_length"]').addClass('browser-default');
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#body-detail-multi').empty();
+                $('#account_name').text('');
+                $('#table_multi').DataTable().clear().destroy();
+            }
+        });
+
+        $('#modal7').modal({
+            onOpenStart: function(modal,trigger) {
+                $('.collapsible').collapsible({
+                    accordion:false
+                });
+            },
+            onOpenEnd: function(modal, trigger) {
                 table_multi_dp = $('#table_multi_dp').DataTable({
                     "responsive": true,
                     scrollY: '50vh',
@@ -966,17 +1033,14 @@
                         style: 'multi'
                     }
                 });
-                $('#table_multi_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi');
-                $('select[name="table_multi_length"]').addClass('browser-default');
 
                 $('#table_multi_dp_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi_dp');
                 $('select[name="table_multi_dp_length"]').addClass('browser-default');
             },
             onCloseEnd: function(modal, trigger){
-                $('#body-detail-multi,#body-detail-dp-multi').empty();
-                $('#account_name').text('');
-                $('#preview_data').html('');
-                $('#table_multi,#table_multi_dp').DataTable().clear().destroy();
+                $('#body-detail-dp-multi').empty();
+                $('#account_name_dp').text('');
+                $('#table_multi_dp').DataTable().clear().destroy();
             }
         });
 
@@ -1031,6 +1095,11 @@
         });
 
         $('#body-detail').on('click', '.delete-data-detail', function() {
+            $(this).closest('tr').remove();
+            countAll();
+        });
+
+        $('#body-detail-dp').on('click', '.delete-data-detail-dp', function() {
             $(this).closest('tr').remove();
             countAll();
         });
@@ -1535,7 +1604,7 @@
     }
 
     function countAllMulti(){
-        let total = 0, ppn = 0, pph = 0, grandtotal = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",",".")), downpayment = parseFloat($('#downpayment').val().replaceAll(".", "").replaceAll(",",".")), balance = 0;
+        let total = 0, ppn = 0, pph = 0, grandtotal = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",",".")), downpayment = parseFloat($('#downpayment').val().replaceAll(".", "").replaceAll(",",".")), balance = 0, currency_rate = parseFloat($('#currency_rate').val().replaceAll(".", "").replaceAll(",","."));
 
         $('input[name^="arr_multi_total"]').each(function(index){
             total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
@@ -1557,17 +1626,31 @@
 
         balance = grandtotal - downpayment + rounding;
 
+        let total_convert = total * currency_rate, tax_convert = tax * currency_rate, wtax_convert = wtax * currency_rate, rounding_convert = rounding * currency_rate, downpayment_convert = downpayment * currency_rate, balance_convert = balance * currency_rate;
+
         $('#total').text(
             formatRupiahIni(total.toFixed(2).toString().replace('.',','))
+        );
+        $('#total_convert').text(
+            (total_convert >= 0 ? '' : '-') + formatRupiahIni(total_convert.toFixed(2).toString().replace('.',','))
         );
         $('#tax').text(
             formatRupiahIni(ppn.toFixed(2).toString().replace('.',','))
         );
+        $('#tax_convert').text(
+            (tax_convert >= 0 ? '' : '-') + formatRupiahIni(tax_convert.toFixed(2).toString().replace('.',','))
+        );
         $('#wtax').val(
             formatRupiahIni(pph.toFixed(2).toString().replace('.',','))
         );
+        $('#wtax_convert').text(
+            (wtax_convert >= 0 ? '' : '-') + formatRupiahIni(wtax_convert.toFixed(2).toString().replace('.',','))
+        );
         $('#balance').text(
             formatRupiahIni(balance.toFixed(2).toString().replace('.',','))
+        );
+        $('#balance_convert').text(
+            (balance_convert >= 0 ? '' : '-') + formatRupiahIni(balance_convert.toFixed(2).toString().replace('.',','))
         );
     }
 
@@ -1795,7 +1878,7 @@
         
     }
 
-    function applyDocuments(){
+    function applyDocuments(type){
         swal({
             title: "Apakah anda yakin?",
             text: "Jika sudah ada di dalam tabel detail form, maka akan tergantikan dengan pilihan baru anda saat ini.",
@@ -1807,17 +1890,21 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                let passed = false, arr_id = [], arr_type = [], sametype = true;
-                $.map(table_multi.rows('.selected').nodes(), function (item) {
-                    passed = true;
-                    arr_id.push($(item).data('id'));
-                    arr_type.push($(item).data('type'));
-                });
+                let passed = true, arr_id = [], arr_type = [], sametype = true;
 
-                $.map(table_multi_dp.rows('.selected').nodes(), function (item) {
-                    arr_id.push($(item).data('id'));
-                    arr_type.push($(item).data('type'));
-                });
+                if(type == 'main'){
+                    $.map(table_multi.rows('.selected').nodes(), function (item) {
+                        arr_id.push($(item).data('id'));
+                        arr_type.push($(item).data('type'));
+                    });
+                }
+
+                if(type == 'dp'){
+                    $.map(table_multi_dp.rows('.selected').nodes(), function (item) {
+                        arr_id.push($(item).data('id'));
+                        arr_type.push($(item).data('type'));
+                    });
+                }
                 
                 if(arr_type.length > 0){
                     let arrResult = arr_type.filter((element, index) => {
@@ -1850,347 +1937,360 @@
                             },
                             success: function(response) {
                                 loadingClose('.modal-content');
-                                $('.row_detail').remove();
-                                $('#body-detail-dp').empty();
-                                if(response.details.length > 0){
-                                    $.each(response.details, function(i, val) {
-                                        var count = makeid(10);
-                                        if(val.type == 'fund_request_details'){
-                                            $('#last-row-detail').before(`
-                                                <tr class="row_detail">
-                                                    <input type="hidden" name="arr_code[]" value="" data-id="` + count + `">
-                                                    <input type="hidden" name="arr_frd_id[]" value="` + val.id + `" data-id="` + count + `">
-                                                    <input type="hidden" name="arr_type[]" value="coas" data-id="` + count + `">
-                                                    <input type="hidden" name="arr_total[]" value="0" data-id="` + count + `">
-                                                    <input type="hidden" name="arr_tax[]" value="0" data-id="` + count + `">
-                                                    <input type="hidden" name="arr_wtax[]" value="0" data-id="` + count + `">
-                                                    <input type="hidden" name="arr_grandtotal[]" value="0" data-id="` + count + `">
-                                                    <input type="hidden" name="arr_temp_qty[]" value="` + val.qty_balance + `" data-id="` + count + `">
-                                                    <td class="center">
-                                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
-                                                            <i class="material-icons">delete</i>
-                                                        </a>
-                                                    </td>
-                                                    <td class="center">
-                                                        <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
-                                                    </td>
-                                                    <td class="center">
-                                                        ` + val.rawcode + `
-                                                    </td>
-                                                    <td class="center">
-                                                        -
-                                                    </td>
-                                                    <td class="center">
-                                                        -
-                                                    </td>
-                                                    <td class="center">
-                                                        -
-                                                    </td>
-                                                    <td class="center">
-                                                        -
-                                                    </td>
-                                                    <td class="center">
-                                                        -
-                                                    </td>
-                                                    <td class="center">
-                                                        <input class="browser-default" type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
-                                                    </td>
-                                                    <td class="center">
-                                                        -
-                                                    </td>
-                                                    <td class="center">
-                                                        -
-                                                    </td>
-                                                    <td class="center">
-                                                        <input class="browser-default" type="text" name="arr_price[]" onfocus="emptyThis(this);" value="` + val.price + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
-                                                    </td>
-                                                    <td class="center">
-                                                        -
-                                                    </td>
-                                                    <td class="center">
-                                                        -
-                                                    </td>
-                                                    <td class="right-align row_total" id="row_total` + count + `">
-                                                        ` + val.total + `
-                                                    </td>
-                                                    <td class="center">
-                                                        <select class="browser-default" id="arr_percent_tax` + count + `" name="arr_percent_tax[]" data-id="` + count + `" onchange="countAll();">
-                                                            <option value="0.00000" data-id="">-- Non-PPN --</option>
-                                                            @foreach ($tax as $row1)
-                                                                <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </td>
-                                                    <td class="center">
-                                                        <select class="browser-default" id="arr_include_tax` + count + `" name="arr_include_tax[]" data-id="` + count + `" onchange="countAll();">
-                                                            <option value="0">Tidak</option>
-                                                            <option value="1">Ya</option>
-                                                        </select>
-                                                    </td>
-                                                    <td class="right-align" id="row_tax` + count + `">
-                                                        <input class="browser-default" type="text" name="arr_tax[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);" readonly>
-                                                    </td>
-                                                    <td class="center">
-                                                        <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
-                                                            <option value="0.00000" data-id="">-- Non-PPh --</option>
-                                                            @foreach ($wtax as $row2)
-                                                                <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </td>
-                                                    <td class="right-align" id="row_wtax` + count + `">
-                                                        <input class="browser-default" type="text" name="arr_wtax[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);" readonly>
-                                                    </td>
-                                                    <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
-                                                        ` + val.grandtotal + `
-                                                    </td>
-                                                    <td>
-                                                        <input type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
-                                                    </td>
-                                                    <td>
-                                                        <input type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
-                                                    </td>
-                                                    <td class="center">
-                                                        <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
-                                                            @foreach ($place as $rowplace)
-                                                                <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </td>
-                                                    <td>
-                                                        <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
-                                                            <option value="">--Kosong--</option>
-                                                            @foreach ($line as $rowline)
-                                                                <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
-                                                            @endforeach
-                                                        </select>    
-                                                    </td>
-                                                    <td>
-                                                        <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
-                                                            <option value="">--Kosong--</option>
-                                                            @foreach ($machine as $rowmachine)
-                                                                <option value="{{ $rowmachine->id }}" data-line="{{ $rowmachine->line_id }}">{{ $rowmachine->name }}</option>
-                                                            @endforeach
-                                                        </select>    
-                                                    </td>
-                                                    <td class="center">
-                                                        <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
-                                                            @foreach ($department as $rowdept)
-                                                                <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </td>
-                                                    <td class="center">
-                                                        <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                                                            <option value="">--Kosong--</option>
-                                                            @foreach ($warehouse as $row)
-                                                                <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </td>
-                                                    <td class="center">
-                                                        <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
-                                                    </td>
-                                                </tr>
-                                            `);
-                                            select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
-                                            select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
-                                            if(val.place_id){
-                                                $('#arr_place' + count).val(val.place_id);
-                                            }
-                                            if(val.line_id){
-                                                $('#arr_line' + count).val(val.line_id);
-                                            }
-                                            if(val.machine_id){
-                                                $('#arr_machine' + count).val(val.machine_id);
-                                            }
-                                            if(val.department_id){
-                                                $('#arr_department' + count).val(val.department_id);
-                                            }
-                                            if(val.project_id){
-                                                $('#arr_project' + count).append(`
-                                                    <option value="` + val.project_id + `">` + val.project_name + `</value>
+                                if(type == 'main'){
+                                    $('.row_detail').remove();
+                                    if(response.details.length > 0){
+                                        $.each(response.details, function(i, val) {
+                                            var count = makeid(10);
+                                            if(val.type == 'fund_request_details'){
+                                                $('#last-row-detail').before(`
+                                                    <tr class="row_detail">
+                                                        <input type="hidden" name="arr_code[]" value="" data-id="` + count + `">
+                                                        <input type="hidden" name="arr_frd_id[]" value="` + val.id + `" data-id="` + count + `">
+                                                        <input type="hidden" name="arr_type[]" value="coas" data-id="` + count + `">
+                                                        <input type="hidden" name="arr_total[]" value="0" data-id="` + count + `">
+                                                        <input type="hidden" name="arr_tax[]" value="0" data-id="` + count + `">
+                                                        <input type="hidden" name="arr_wtax[]" value="0" data-id="` + count + `">
+                                                        <input type="hidden" name="arr_grandtotal[]" value="0" data-id="` + count + `">
+                                                        <input type="hidden" name="arr_temp_qty[]" value="` + val.qty_balance + `" data-id="` + count + `">
+                                                        <td class="center">
+                                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                                                <i class="material-icons">delete</i>
+                                                            </a>
+                                                        </td>
+                                                        <td class="center">
+                                                            <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.rawcode + `
+                                                        </td>
+                                                        <td class="center">
+                                                            -
+                                                        </td>
+                                                        <td class="center">
+                                                            -
+                                                        </td>
+                                                        <td class="center">
+                                                            -
+                                                        </td>
+                                                        <td class="center">
+                                                            -
+                                                        </td>
+                                                        <td class="center">
+                                                            -
+                                                        </td>
+                                                        <td class="center">
+                                                            <input class="browser-default" type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                                                        </td>
+                                                        <td class="center">
+                                                            -
+                                                        </td>
+                                                        <td class="center">
+                                                            -
+                                                        </td>
+                                                        <td class="center">
+                                                            <input class="browser-default" type="text" name="arr_price[]" onfocus="emptyThis(this);" value="` + val.price + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                                                        </td>
+                                                        <td class="center">
+                                                            -
+                                                        </td>
+                                                        <td class="center">
+                                                            -
+                                                        </td>
+                                                        <td class="right-align row_total" id="row_total` + count + `">
+                                                            ` + val.total + `
+                                                        </td>
+                                                        <td class="center">
+                                                            <select class="browser-default" id="arr_percent_tax` + count + `" name="arr_percent_tax[]" data-id="` + count + `" onchange="countAll();">
+                                                                <option value="0.00000" data-id="">-- Non-PPN --</option>
+                                                                @foreach ($tax as $row1)
+                                                                    <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </td>
+                                                        <td class="center">
+                                                            <select class="browser-default" id="arr_include_tax` + count + `" name="arr_include_tax[]" data-id="` + count + `" onchange="countAll();">
+                                                                <option value="0">Tidak</option>
+                                                                <option value="1">Ya</option>
+                                                            </select>
+                                                        </td>
+                                                        <td class="right-align" id="row_tax` + count + `">
+                                                            <input class="browser-default" type="text" name="arr_tax[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);" readonly>
+                                                        </td>
+                                                        <td class="center">
+                                                            <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
+                                                                <option value="0.00000" data-id="">-- Non-PPh --</option>
+                                                                @foreach ($wtax as $row2)
+                                                                    <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </td>
+                                                        <td class="right-align" id="row_wtax` + count + `">
+                                                            <input class="browser-default" type="text" name="arr_wtax[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);" readonly>
+                                                        </td>
+                                                        <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
+                                                            ` + val.grandtotal + `
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
+                                                        </td>
+                                                        <td class="center">
+                                                            <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                                                                @foreach ($place as $rowplace)
+                                                                    <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
+                                                                <option value="">--Kosong--</option>
+                                                                @foreach ($line as $rowline)
+                                                                    <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
+                                                                @endforeach
+                                                            </select>    
+                                                        </td>
+                                                        <td>
+                                                            <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                                                                <option value="">--Kosong--</option>
+                                                                @foreach ($machine as $rowmachine)
+                                                                    <option value="{{ $rowmachine->id }}" data-line="{{ $rowmachine->line_id }}">{{ $rowmachine->name }}</option>
+                                                                @endforeach
+                                                            </select>    
+                                                        </td>
+                                                        <td class="center">
+                                                            <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
+                                                                @foreach ($department as $rowdept)
+                                                                    <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </td>
+                                                        <td class="center">
+                                                            <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                                                                <option value="">--Kosong--</option>
+                                                                @foreach ($warehouse as $row)
+                                                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </td>
+                                                        <td class="center">
+                                                            <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                                                        </td>
+                                                    </tr>
+                                                `);
+                                                select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+                                                select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
+                                                if(val.place_id){
+                                                    $('#arr_place' + count).val(val.place_id);
+                                                }
+                                                if(val.line_id){
+                                                    $('#arr_line' + count).val(val.line_id);
+                                                }
+                                                if(val.machine_id){
+                                                    $('#arr_machine' + count).val(val.machine_id);
+                                                }
+                                                if(val.department_id){
+                                                    $('#arr_department' + count).val(val.department_id);
+                                                }
+                                                if(val.project_id){
+                                                    $('#arr_project' + count).append(`
+                                                        <option value="` + val.project_id + `">` + val.project_name + `</value>
+                                                    `);
+                                                }
+                                            }else{
+                                                $('#last-row-detail').before(`
+                                                    <tr class="row_detail">
+                                                        <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
+                                                        <input type="hidden" name="arr_price[]" value="` + val.price + `" data-id="` + count + `">
+                                                        <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
+                                                        <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `">
+                                                        <input type="hidden" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `">
+                                                        <input type="hidden" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `">
+                                                        <input type="hidden" id="arr_place` + count + `" name="arr_place[]" value="` + val.place_id + `" data-id="` + count + `">
+                                                        <input type="hidden" id="arr_line` + count + `" name="arr_line[]" value="` + val.line_id + `" data-id="` + count + `">
+                                                        <input type="hidden" id="arr_machine` + count + `" name="arr_machine[]" value="` + val.machine_id + `" data-id="` + count + `">
+                                                        <input type="hidden" id="arr_department` + count + `" name="arr_department[]" value="` + val.department_id + `" data-id="` + count + `">
+                                                        <input type="hidden" id="arr_warehouse` + count + `" name="arr_warehouse[]" value="` + val.warehouse_id + `" data-id="` + count + `">
+                                                        <input type="hidden" id="arr_project` + count + `" name="arr_project[]" value="` + val.project_id + `" data-id="` + count + `">
+                                                        <input type="hidden" name="arr_code[]" value="` + val.id + `" data-id="` + count + `">
+                                                        <input type="hidden" name="arr_temp_qty[]" value="` + val.qty_balance + `" data-id="` + count + `">
+                                                        <td class="center">
+                                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                                                <i class="material-icons">delete</i>
+                                                            </a>
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.rawcode + `
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.purchase_no + `
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.delivery_no + `
+                                                        </td>
+                                                        <td class="">
+                                                            ` + val.name + `
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.buy_unit + `
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.qty_received + `
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.qty_returned + `
+                                                        </td>
+                                                        <td class="center">
+                                                            <input class="browser-default" type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();countStock(this);" data-conversion="` + val.qty_conversion + `">
+                                                        </td>
+                                                        <td class="center" id="qty_stock` + count + `">
+                                                            ` + val.qty_stock + `
+                                                        </td>
+                                                        <td class="center" id="unit_stock` + count + `">
+                                                            ` + val.unit_stock + `
+                                                        </td>
+                                                        <td class="right-align">
+                                                            ` + val.price + `
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.post_date + `
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.due_date + `
+                                                        </td>
+                                                        <td class="right-align row_total" id="row_total` + count + `">
+                                                            ` + val.total + `
+                                                        </td>
+                                                        <td class="center">
+                                                            <select class="browser-default" id="arr_percent_tax` + count + `" name="arr_percent_tax[]" data-id="` + count + `" onchange="countAll();">
+                                                                <option value="0.00000" data-id="">-- Non-PPN --</option>
+                                                                @foreach ($tax as $row1)
+                                                                    <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </td>
+                                                        <td class="center">
+                                                            <select class="browser-default" id="arr_include_tax` + count + `" name="arr_include_tax[]" data-id="` + count + `" onchange="countAll();">
+                                                                <option value="0">Tidak</option>
+                                                                <option value="1">Ya</option>
+                                                            </select>
+                                                        </td>
+                                                        <td class="right-align" id="row_tax` + count + `">
+                                                            ` + val.tax + `
+                                                        </td>
+                                                        <td class="center">
+                                                            <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
+                                                                <option value="0.00000" data-id="">-- Non-PPh --</option>
+                                                                @foreach ($wtax as $row2)
+                                                                    <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </td>
+                                                        <td class="right-align" id="row_wtax` + count + `">
+                                                            ` + val.wtax + `    
+                                                        </td>
+                                                        <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
+                                                            ` + val.grandtotal + `
+                                                        </td>
+                                                        <td>
+                                                            <input class="browser-default" type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
+                                                        </td>
+                                                        <td>
+                                                            <input class="browser-default" type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.place_name + `
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.line_name + `
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.machine_name + `
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.department_name + `
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.warehouse_name + `
+                                                        </td>
+                                                        <td class="center">
+                                                            ` + val.project_name + `
+                                                        </td>
+                                                    </tr>
                                                 `);
                                             }
-                                        }else{
-                                            $('#last-row-detail').before(`
-                                                <tr class="row_detail">
-                                                    <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
-                                                    <input type="hidden" name="arr_price[]" value="` + val.price + `" data-id="` + count + `">
-                                                    <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
-                                                    <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `">
-                                                    <input type="hidden" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `">
-                                                    <input type="hidden" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `">
-                                                    <input type="hidden" id="arr_place` + count + `" name="arr_place[]" value="` + val.place_id + `" data-id="` + count + `">
-                                                    <input type="hidden" id="arr_line` + count + `" name="arr_line[]" value="` + val.line_id + `" data-id="` + count + `">
-                                                    <input type="hidden" id="arr_machine` + count + `" name="arr_machine[]" value="` + val.machine_id + `" data-id="` + count + `">
-                                                    <input type="hidden" id="arr_department` + count + `" name="arr_department[]" value="` + val.department_id + `" data-id="` + count + `">
-                                                    <input type="hidden" id="arr_warehouse` + count + `" name="arr_warehouse[]" value="` + val.warehouse_id + `" data-id="` + count + `">
-                                                    <input type="hidden" id="arr_project` + count + `" name="arr_project[]" value="` + val.project_id + `" data-id="` + count + `">
-                                                    <input type="hidden" name="arr_code[]" value="` + val.id + `" data-id="` + count + `">
-                                                    <input type="hidden" name="arr_temp_qty[]" value="` + val.qty_balance + `" data-id="` + count + `">
+
+                                            $('#arr_percent_tax' + count).val(val.percent_tax);
+                                            $('#arr_percent_wtax' + count).val(val.percent_wtax);
+                                            $('#arr_include_tax' + count).val(val.include_tax);
+
+                                            $('#top').val(val.top);
+
+                                            $('#received_date').val(val.received_date);
+                                            $('#due_date').val(val.due_date);
+                                            $('#document_date').val(val.document_date);
+                                            $('#document_no').val(val.document_no);
+                                            $('#tax_no').val(val.tax_no);
+                                            $('#tax_cut_no').val(val.tax_cut_no);
+                                            $('#cut_date').val(val.cut_date);
+                                            $('#spk_no').val(val.spk_no);
+                                            $('#invoice_no').val(val.invoice_no);
+                                            $('#note').val(val.header_note);
+                                            $('#currency_rate').val(val.currency_rate);
+                                            $('#currency_id').val(val.currency_id).formSelect();
+                                        });                        
+                                    }else{
+                                        $('.row_detail').remove();
+                                        $('#total,#tax,#balance').text('0,00');
+                                    }
+                                }
+
+                                if(type == 'dp'){
+                                    $('#body-detail-dp').empty();
+                                    if(response.downpayments.length > 0){
+                                        $.each(response.downpayments, function(i, val) {
+                                            var count = makeid(10);
+                                            $('#body-detail-dp').append(`
+                                                <tr class="row_detail_dp">
+                                                    <input type="hidden" name="arr_dp_code[]" value="` + val.code + `" data-id="` + count + `">
                                                     <td class="center">
-                                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail-dp" href="javascript:void(0);">
                                                             <i class="material-icons">delete</i>
                                                         </a>
                                                     </td>
                                                     <td class="center">
                                                         ` + val.rawcode + `
-                                                    </td>
-                                                    <td class="center">
-                                                        ` + val.purchase_no + `
-                                                    </td>
-                                                    <td class="center">
-                                                        ` + val.delivery_no + `
-                                                    </td>
-                                                    <td class="">
-                                                        ` + val.name + `
-                                                    </td>
-                                                    <td class="center">
-                                                        ` + val.buy_unit + `
-                                                    </td>
-                                                    <td class="center">
-                                                        ` + val.qty_received + `
-                                                    </td>
-                                                    <td class="center">
-                                                        ` + val.qty_returned + `
-                                                    </td>
-                                                    <td class="center">
-                                                        <input class="browser-default" type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();countStock(this);" data-conversion="` + val.qty_conversion + `">
-                                                    </td>
-                                                    <td class="center" id="qty_stock` + count + `">
-                                                        ` + val.qty_stock + `
-                                                    </td>
-                                                    <td class="center" id="unit_stock` + count + `">
-                                                        ` + val.unit_stock + `
-                                                    </td>
-                                                    <td class="right-align">
-                                                        ` + val.price + `
                                                     </td>
                                                     <td class="center">
                                                         ` + val.post_date + `
                                                     </td>
                                                     <td class="center">
-                                                        ` + val.due_date + `
-                                                    </td>
-                                                    <td class="right-align row_total" id="row_total` + count + `">
-                                                        ` + val.total + `
-                                                    </td>
-                                                    <td class="center">
-                                                        <select class="browser-default" id="arr_percent_tax` + count + `" name="arr_percent_tax[]" data-id="` + count + `" onchange="countAll();">
-                                                            <option value="0.00000" data-id="">-- Non-PPN --</option>
-                                                            @foreach ($tax as $row1)
-                                                                <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </td>
-                                                    <td class="center">
-                                                        <select class="browser-default" id="arr_include_tax` + count + `" name="arr_include_tax[]" data-id="` + count + `" onchange="countAll();">
-                                                            <option value="0">Tidak</option>
-                                                            <option value="1">Ya</option>
-                                                        </select>
-                                                    </td>
-                                                    <td class="right-align" id="row_tax` + count + `">
-                                                        ` + val.tax + `
-                                                    </td>
-                                                    <td class="center">
-                                                        <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
-                                                            <option value="0.00000" data-id="">-- Non-PPh --</option>
-                                                            @foreach ($wtax as $row2)
-                                                                <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </td>
-                                                    <td class="right-align" id="row_wtax` + count + `">
-                                                        ` + val.wtax + `    
-                                                    </td>
-                                                    <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
                                                         ` + val.grandtotal + `
                                                     </td>
-                                                    <td>
-                                                        <input class="browser-default" type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
-                                                    </td>
-                                                    <td>
-                                                        <input class="browser-default" type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
+                                                    <td class="center">
+                                                        ` + val.balance + `
                                                     </td>
                                                     <td class="center">
-                                                        ` + val.place_name + `
-                                                    </td>
-                                                    <td class="center">
-                                                        ` + val.line_name + `
-                                                    </td>
-                                                    <td class="center">
-                                                        ` + val.machine_name + `
-                                                    </td>
-                                                    <td class="center">
-                                                        ` + val.department_name + `
-                                                    </td>
-                                                    <td class="center">
-                                                        ` + val.warehouse_name + `
-                                                    </td>
-                                                    <td class="center">
-                                                        ` + val.project_name + `
+                                                        <input name="arr_nominal[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.balance + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="rowNominal`+ count +`">
                                                     </td>
                                                 </tr>
                                             `);
-                                        }
-
-                                        $('#arr_percent_tax' + count).val(val.percent_tax);
-                                        $('#arr_percent_wtax' + count).val(val.percent_wtax);
-                                        $('#arr_include_tax' + count).val(val.include_tax);
-
-                                        $('#top').val(val.top);
-
-                                        $('#received_date').val(val.received_date);
-                                        $('#due_date').val(val.due_date);
-                                        $('#document_date').val(val.document_date);
-                                        $('#document_no').val(val.document_no);
-                                        $('#tax_no').val(val.tax_no);
-                                        $('#tax_cut_no').val(val.tax_cut_no);
-                                        $('#cut_date').val(val.cut_date);
-                                        $('#spk_no').val(val.spk_no);
-                                        $('#invoice_no').val(val.invoice_no);
-                                        $('#note').val(val.header_note);
-                                    });                        
-                                }else{
-                                    $('.row_detail').remove();
-                                    $('#total,#tax,#balance').text('0,00');
-                                }
-
-                                if(response.downpayments.length > 0){
-                                    $.each(response.downpayments, function(i, val) {
-                                        var count = makeid(10);
-                                        $('#body-detail-dp').append(`
-                                            <tr class="row_detail_dp">
-                                                <input type="hidden" name="arr_dp_code[]" value="` + val.code + `" data-id="` + count + `">
-                                                <td class="center">
-                                                    ` + val.rawcode + `
-                                                </td>
-                                                <td class="center">
-                                                    ` + val.post_date + `
-                                                </td>
-                                                <td class="center">
-                                                    ` + val.grandtotal + `
-                                                </td>
-                                                <td class="center">
-                                                    ` + val.balance + `
-                                                </td>
-                                                <td class="center">
-                                                    <input name="arr_nominal[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.balance + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="rowNominal`+ count +`">
+                                            $('#currency_rate').val(val.currency_rate);
+                                            $('#currency_id').val(val.currency_id).formSelect();
+                                        });                        
+                                    }else{
+                                        $('#body-detail-dp').empty().append(`
+                                            <tr id="empty-detail-dp">
+                                                <td colspan="6" class="center">
+                                                    Pilih supplier/vendor untuk memulai...
                                                 </td>
                                             </tr>
                                         `);
-                                    });                        
-                                }else{
-                                    $('#body-detail-dp').empty().append(`
-                                        <tr id="empty-detail-dp">
-                                            <td colspan="6" class="center">
-                                                Pilih supplier/vendor untuk memulai...
-                                            </td>
-                                        </tr>
-                                    `);
 
-                                    $('#downpayment').val('0,00');
+                                        $('#downpayment').val('0,00');
+                                    }
                                 }
 
                                 if(!$('#received_date').val()){
@@ -2216,7 +2316,12 @@
                                 });
                             }
                         });
-                        $('#modal4').modal('close');
+                        if(type == 'main'){
+                            $('#modal4').modal('close');
+                        }
+                        if(type == 'dp'){
+                            $('#modal7').modal('close');
+                        }
                     }else{
                         swal({
                             title: 'Ups!',
@@ -2274,14 +2379,14 @@
         });
     }
 
-    function getAccountData(val){
-        if(val && $('#type_detail').val() == '1'){
+    function getAccountData(kind){
+        if($('#account_id').val() && $('#type_detail').val() == '1'){
             $.ajax({
                 url: '{{ Request::url() }}/get_account_data',
                 type: 'POST',
                 dataType: 'JSON',
                 data: {
-                    id: val
+                    id: $('#account_id').val()
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -2291,59 +2396,64 @@
                 },
                 success: function(response) {
                     loadingClose('.modal-content');
-                    $('#modal4').modal('open');
-                    $('#account_name').text($('#account_id').select2('data')[0].text);
 
-                    if(response.details.length > 0){
-                        $.each(response.details, function(i, val) {
-                            $('#body-detail-multi').append(`
-                                <tr data-type="` + val.type + `" data-id="` + val.id + `">
-                                    <td>
-                                        ` + val.code + `
-                                    </td>
-                                    <td>
-                                        ` + val.list_item + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.post_date + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.grandtotal + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.invoice + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.balance + `
-                                    </td>
-                                    <td class="center-align">
-                                        ` + val.info + `
-                                    </td>
-                                </tr>
-                            `);
-                        });
-                    }
+                    if(kind == '1'){
+                        $('#modal4').modal('open');
+                        $('#account_name').text($('#account_id').select2('data')[0].text);
 
-                    if(response.downpayments.length > 0){
-                        $.each(response.downpayments, function(i, val) {
-                            var count = makeid(10);
-                            $('#body-detail-dp-multi').append(`
-                                <tr data-type="` + val.type + `" data-id="` + val.id + `">
-                                    <td>
-                                        ` + val.rawcode + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.post_date + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.grandtotal + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.balance + `
-                                    </td>
-                                </tr>
-                            `);
-                        });                        
+                        if(response.details.length > 0){
+                            $.each(response.details, function(i, val) {
+                                $('#body-detail-multi').append(`
+                                    <tr data-type="` + val.type + `" data-id="` + val.id + `">
+                                        <td>
+                                            ` + val.code + `
+                                        </td>
+                                        <td>
+                                            ` + val.list_item + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.post_date + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.grandtotal + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.invoice + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.balance + `
+                                        </td>
+                                        <td class="center-align">
+                                            ` + val.info + `
+                                        </td>
+                                    </tr>
+                                `);
+                            });
+                        }
+                    }else if(kind == '2'){
+                        $('#modal7').modal('open');
+                        $('#account_name_dp').text($('#account_id').select2('data')[0].text);
+                        if(response.downpayments.length > 0){
+                            $.each(response.downpayments, function(i, val) {
+                                var count = makeid(10);
+                                $('#body-detail-dp-multi').append(`
+                                    <tr data-type="` + val.type + `" data-id="` + val.id + `">
+                                        <td>
+                                            ` + val.rawcode + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.post_date + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.grandtotal + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.balance + `
+                                        </td>
+                                    </tr>
+                                `);
+                            });                        
+                        }
                     }
                     
                     $('.modal-content').scrollTop(0);
@@ -2360,8 +2470,17 @@
                 }
             });
         }else{
-            $('#body-detail-dp').empty();
-            $('.row_detail').remove();
+            if(kind == '1'){
+                $('.row_detail').remove();
+            }else{
+                $('#body-detail-dp').empty().append(`
+                    <tr id="empty-detail-dp">
+                        <td colspan="6" class="center">
+                            Pilih supplier/vendor untuk memulai...
+                        </td>
+                    </tr>
+                `);
+            }
             countAll();
         }
     }
@@ -2529,7 +2648,7 @@
 
     function countAll(){
         if($('#type_detail').val() == '1'){
-            var total = 0, tax = 0, grandtotal = 0, balance = 0, wtax = 0, downpayment = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",","."));
+            var total = 0, tax = 0, grandtotal = 0, balance = 0, wtax = 0, downpayment = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",",".")), currency_rate = parseFloat($('#currency_rate').val().replaceAll(".", "").replaceAll(",","."));
             
             $('input[name^="arr_code"]').each(function(){
                 let element = $(this);
@@ -2578,20 +2697,37 @@
 
             balance = grandtotal - downpayment;
 
+            let total_convert = total * currency_rate, tax_convert = tax * currency_rate, wtax_convert = wtax * currency_rate, rounding_convert = rounding * currency_rate, downpayment_convert = downpayment * currency_rate, balance_convert = balance * currency_rate;
+
             $('#downpayment').val(
                 (downpayment >= 0 ? '' : '-') + formatRupiahIni(downpayment.toFixed(2).replace('.',','))
+            );
+            $('#downpayment_convert').text(
+                (downpayment_convert >= 0 ? '' : '-') + formatRupiahIni(downpayment_convert.toFixed(2).replace('.',','))
             );
             $('#total').text(
                 (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
             );
+            $('#total_convert').text(
+                (total_convert >= 0 ? '' : '-') + formatRupiahIni(total_convert.toFixed(2).toString().replace('.',','))
+            );
             $('#tax').text(
                 (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(2).toString().replace('.',','))
+            );
+            $('#tax_convert').text(
+                (tax_convert >= 0 ? '' : '-') + formatRupiahIni(tax_convert.toFixed(2).toString().replace('.',','))
             );
             $('#wtax').val(
                 (wtax >= 0 ? '' : '-') + formatRupiahIni(wtax.toFixed(2).toString().replace('.',','))
             );
+            $('#wtax_convert').text(
+                (wtax_convert >= 0 ? '' : '-') + formatRupiahIni(wtax_convert.toFixed(2).toString().replace('.',','))
+            );
             $('#balance').text(
                 (balance >= 0 ? '' : '-') + formatRupiahIni(balance.toFixed(2).toString().replace('.',','))
+            );
+            $('#balance_convert').text(
+                (balance_convert >= 0 ? '' : '-') + formatRupiahIni(balance_convert.toFixed(2).toString().replace('.',','))
             );
         }else if($('#type_detail').val() == '2'){
             countAllMulti();
@@ -2600,7 +2736,7 @@
 
     function countGrandtotal(){
         if($('#type_detail').val() == '1'){
-            let total = parseFloat($('#total').text().replaceAll(".", "").replaceAll(",",".")), tax = parseFloat($('#tax').text().replaceAll(".", "").replaceAll(",",".")), wtax = parseFloat($('#wtax').val().replaceAll(".", "").replaceAll(",",".")), downpayment = 0, balance = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",","."));
+            let total = parseFloat($('#total').text().replaceAll(".", "").replaceAll(",",".")), tax = parseFloat($('#tax').text().replaceAll(".", "").replaceAll(",",".")), wtax = parseFloat($('#wtax').val().replaceAll(".", "").replaceAll(",",".")), downpayment = 0, balance = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",",".")), currency_rate = parseFloat($('#currency_rate').val().replaceAll(".", "").replaceAll(",","."));
             
             let grandtotal = total + tax - wtax + rounding;
 
@@ -2610,8 +2746,14 @@
 
             balance = grandtotal - downpayment;
 
+            let balance_convert = balance * currency_rate;
+
             $('#balance').text(
                 (balance >= 0 ? '' : '-') + formatRupiahIni(balance.toFixed(2).toString().replace('.',','))
+            );
+
+            $('#balance_convert').text(
+                (balance_convert >= 0 ? '' : '-') + formatRupiahIni(balance_convert.toFixed(2).toString().replace('.',','))
             );
 
             $('input[name^="arr_wtax[]"]').each(function(index){
@@ -2765,6 +2907,8 @@
                 { name: 'received_date', className: 'center-align' },
                 { name: 'due_date', className: 'center-align' },
                 { name: 'document_date', className: 'center-align' },
+                { name: 'currency_id', className: 'center-align' },
+                { name: 'currency_rate', className: 'center-align' },
                 { name: 'type', className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'note', className: 'center-align' },
@@ -3263,6 +3407,8 @@
                 $('#document_no').val(response.document_no);
                 $('#downpayment').val(response.downpayment);
                 $('#rounding').val(response.rounding);
+                $('#currency_rate').val(response.currency_rate);
+                $('#currency_id').val(response.currency_id).formSelect();
                 
                 if(response.details.length > 0){
                     $('.row_detail').remove();
@@ -3560,6 +3706,11 @@
                         $('#body-detail-dp').append(`
                             <tr class="row_detail_dp">
                                 <input type="hidden" name="arr_dp_code[]" value="` + val.code + `" data-id="` + count + `">
+                                <td class="center">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail-dp" href="javascript:void(0);">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
                                 <td class="center">
                                     ` + val.rawcode + `
                                 </td>

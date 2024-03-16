@@ -52,20 +52,18 @@ class ExportStockInQty implements FromView,ShouldAutoSize
         $array_filter = [];
        
         foreach($query_data as $row){
-            
-            $data_tempura = [
-                'plant' => $row->place->code,
-                'gudang' => $row->warehouse->name ?? '',
-                'kode' => $row->item->code,
-                'item' => $row->item->name,
-                'final'=>number_format($row->qty,3,',','.'),
-                'satuan'=>$row->item->uomUnit->code,
-                'perlu' =>1,
-            ];
-        
-            $array_filter[]=$data_tempura;
-            
-            
+            if($row->item()->exists()){
+                $data_tempura = [
+                    'plant' => $row->place->code,
+                    'gudang' => $row->warehouse->name ?? '',
+                    'kode' => $row->item->code,
+                    'item' => $row->item->name,
+                    'final'=>number_format($row->qty,3,',','.'),
+                    'satuan'=>$row->item->uomUnit->code,
+                    'perlu' =>1,
+                ];
+                $array_filter[]=$data_tempura;
+            }
         }
       
         return view('admin.exports.stock_in_qty', [

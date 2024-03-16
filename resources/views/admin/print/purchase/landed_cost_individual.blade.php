@@ -307,7 +307,7 @@
                             <table style="width:100%" class="table-bot">
                                 <tr class="break-row">
                                     <td>
-                                        Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.$data->currency->document_text }}
+                                        Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords(strtolower($data->currency->document_text)) }}
                                     </td>
                                     
                                 </tr>

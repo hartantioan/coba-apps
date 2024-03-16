@@ -405,7 +405,7 @@
                                             </div>
                                             <br>
                                             <br>
-                                            Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.$data->currency->document_text }}
+                                            Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords(strtolower($data->currency->document_text)) }}
                                         </td>
                                         
                                     </tr>

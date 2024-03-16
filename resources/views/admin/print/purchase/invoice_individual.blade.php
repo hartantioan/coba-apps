@@ -354,7 +354,7 @@
                                     </div>
                                     <br>
                                     <br>
-                                    Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->balance).' '.$data->currency->name }}
+                                    Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->balance).' '.$data->currency->document_text }}
                                 </td>
                                 
                             </tr>

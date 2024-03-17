@@ -52,6 +52,7 @@ use App\Models\Coa;
 use App\Models\Division;
 use App\Models\ItemUnit;
 use App\Models\MenuUser;
+use App\Models\Unit;
 use Milon\Barcode\DNS2D;
 use Milon\Barcode\Facades\DNS2DFacade;
 
@@ -925,6 +926,7 @@ class PurchaseOrderController extends Controller
                                     'marketing_order_delivery_process_id'   => $request->arr_type[$key] == 'sj' ? $request->arr_data[$key] : NULL,
                                     'coa_id'                                => $row,
                                     'qty'                                   => $qty,
+                                    'coa_unit_id'                           => $request->arr_unit[$key],
                                     'price'                                 => $price,
                                     'percent_discount_1'                    => $disc1,
                                     'percent_discount_2'                    => $disc2,
@@ -1031,7 +1033,7 @@ class PurchaseOrderController extends Controller
                 <td class="center-align">'.($row->item_id ? $row->item->code.' - '.$row->item->name : $row->coa->name).'</td>
                 <td class="center-align">'.($row->item_id ? $row->item->itemGroup->name : '-').'</td>
                 <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
-                <td class="center-align">'.($row->item_id ? $row->itemUnit->unit->code : '-').'</td>
+                <td class="center-align">'.($row->itemUnit()->exists() ? $row->itemUnit->unit->code : ($row->coaUnit()->exists() ? $row->coaUnit->code : '-')).'</td>
                 <td class="right-align">'.number_format($row->price,2,',','.').'</td>
                 <td class="center-align">'.number_format($row->percent_discount_1,2,',','.').'</td>
                 <td class="center-align">'.number_format($row->percent_discount_2,2,',','.').'</td>
@@ -1154,7 +1156,10 @@ class PurchaseOrderController extends Controller
                 'qty'                               => number_format($row->qty,3,',','.'),
                 'qty_stock'                         => $row->item_id ? number_format($row->qty * $row->qty_conversion,3,',','.') : '-',
                 'unit_stock'                        => $row->item_id ? $row->item->uomUnit->code : '-',
-                'item_unit_id'                      => $row->item_id ? $row->item_unit_id : '-',
+                'item_unit_id'                      => $row->itemUnit()->exists() ? $row->item_unit_id : '',
+                'item_unit_name'                    => $row->itemUnit()->exists() ? $row->itemUnit->unit->code.' - '.$row->itemUnit->unit->name : '',
+                'coa_unit_id'                       => $row->coaUnit()->exists() ? $row->coa_unit_id : '',
+                'coa_unit_name'                     => $row->coaUnit()->exists() ? $row->coaUnit->code.' - '.$row->coaUnit->name : '',
                 'note'                              => $row->note ? $row->note : '',
                 'note2'                             => $row->note2 ? $row->note2 : '',
                 'price'                             => number_format($row->price,2,',','.'),

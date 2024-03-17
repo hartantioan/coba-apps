@@ -161,7 +161,7 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Sh
                     'note'              => $row->note,
                     'note2'             => $row->note2,
                     'qty'               => 1,
-                    'unit'              => '-',
+                    'unit'              => $row->itemUnit()->exists() ? $row->itemUnit->unit->code : ($row->coaUnit()->exists() ? $row->coaUnit->code : '-'),
                     'qty_stock'         => 1,
                     'unit_stock'        => '-',
                     'line'              => $row->line()->exists() ? $row->line->code : '',

@@ -1415,7 +1415,9 @@
                                                 <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;width:100px;" id="rowQty`+ count +`">
                                             </td>
                                             <td class="center">
-                                                <span id="arr_unit` + count + `">-</span>
+                                                <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" required>
+                                                    <option value="">--Silahkan pilih item--</option>    
+                                                </select>
                                             </td>
                                             <td class="center" id="qty_stock` + count + `">
                                                 -
@@ -1503,6 +1505,7 @@
                                         </tr>
                                     `);
                                     select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+                                    select2ServerSide('#arr_unit' + count, '{{ url("admin/select2/unit") }}');
                                 }else{
                                     $('#last-row-item').before(`
                                         <tr class="row_item" data-id="` + response.id + `">
@@ -1842,7 +1845,9 @@
                         <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;width:100px;" id="rowQty`+ count +`">
                     </td>
                     <td class="center">
-                        <span id="arr_unit` + count + `">-</span>
+                        <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" required>
+                            <option value="">--Silahkan pilih item--</option>    
+                        </select>
                     </td>
                     <td class="center" id="qty_stock` + count + `">
                         -
@@ -1929,6 +1934,7 @@
                     </td>
                 </tr>
             `);
+            select2ServerSide('#arr_unit' + count, '{{ url("admin/select2/unit") }}');
             select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
         }
         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
@@ -2608,7 +2614,9 @@
                                         <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="` + val.qty + `" style="text-align:right;width:100px;" id="rowQty`+ count +`">
                                     </td>
                                     <td class="center">
-                                        <span id="arr_unit` + count + `">` + val.item_unit_id + `</span>
+                                        <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" required>
+                                            <option value="">--Silahkan pilih item--</option>    
+                                        </select>
                                     </td>
                                     <td class="center" id="qty_stock` + count + `">
                                         -
@@ -2703,6 +2711,12 @@
                                 <option value="` + val.coa_id + `">` + val.coa_name + `</option>
                             `);
                             select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+                            if(val.item_unit_id){
+                                $('#arr_unit' + count).append(`
+                                    <option value="` + val.item_unit_id + `">` + val.item_unit_name + `</option>
+                                `);
+                            }
+                            select2ServerSide('#arr_unit' + count, '{{ url("admin/select2/unit") }}');
                             $('#arr_place' + count).val(val.place_id);
                             $('#arr_department' + count).val(val.department_id);
                             $('#arr_line' + count).val(val.line_id);

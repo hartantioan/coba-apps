@@ -313,7 +313,7 @@
                                             <td align="center" rowspan="3">{{ ($key + 1) }}</td>
                                             <td align="left">{{ $row->item->code.' - '.$row->item->name }}</td>
                                             <td align="center">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
-                                            <td align="center">{{ $row->itemUnit->unit->code }}</td>
+                                            <td align="center">{{ $row->itemUnit()->exists() ? $row->itemUnit->unit->code : '-' }}</td>
                                             <td align="right">{{ number_format($row->price,2,',','.') }}</td>
                                             <td align="center">{{ number_format($row->percent_discount_1,2,',','.') }}</td>
                                             <td align="center">{{ number_format($row->percent_discount_2,2,',','.') }}</td>
@@ -331,7 +331,7 @@
                                             <td align="center" rowspan="2">{{ ($key + 1) }}</td>
                                             <td align="left">{{ $row->note }}</td>
                                             <td align="center">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
-                                            <td align="center">{{ $row->item_id ? $row->itemUnit->unit->code : '-' }}</td>
+                                            <td align="center">{{ $row->coaUnit()->exists() ? $row->coaUnit->code : '-' }}</td>
                                             <td align="right">{{ number_format($row->price,2,',','.') }}</td>
                                             <td align="center">{{ number_format($row->percent_discount_1,2,',','.') }}</td>
                                             <td align="center">{{ number_format($row->percent_discount_2,2,',','.') }}</td>

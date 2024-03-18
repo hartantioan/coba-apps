@@ -201,6 +201,7 @@
                                                         <th rowspan="2">Total</th>
                                                         <th rowspan="2">PPN</th>
                                                         <th rowspan="2">PPh</th>
+                                                        <th rowspan="2">Pembulatan</th>
                                                         <th rowspan="2">Grandtotal</th>
                                                         <th rowspan="2">Status</th>
                                                         <th rowspan="2">Action</th>
@@ -316,7 +317,7 @@
                                 <label class="" for="currency_id">Mata Uang</label>
                             </div>
                             <div class="input-field col m3 s12 step12">
-                                <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
+                                <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this);countAll();">
                                 <label class="active" for="currency_rate">Konversi</label>
                             </div>
                             <div class="input-field col m3 s12 step13">
@@ -504,6 +505,13 @@
                                             <td class="right-align">
                                                 <input class="browser-default" onfocus="emptyThis(this);" id="wtax" name="wtax" type="text" value="0,00" onkeyup="formatRupiah(this);countGrandtotal(this.value);" style="text-align:right;width:100%;">
                                                 <td class="right-align"><span id="wtax-convert">0,00</span></td>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Pembulatan</td>
+                                            <td class="right-align">
+                                                <input class="browser-default" id="rounding" name="rounding" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
+                                                <td class="right-align"><span id="rounding-convert">0,00</span></td>
                                             </td>
                                         </tr>
                                         <tr>
@@ -801,7 +809,7 @@
                     $(this).remove();
                 });
                 M.updateTextFields();
-                $('#subtotal,#total,#tax,#grandtotal,#subtotal-convert,#discount-convert,#total-convert,#tax-convert,#wtax-convert,#grandtotal-convert').text('0,00');
+                $('#subtotal,#total,#tax,#grandtotal,#subtotal-convert,#discount-convert,#total-convert,#tax-convert,#wtax-convert,#grandtotal-convert,#rounding-convert').text('0,00');
                 $('#purchase_request_id,#good_issue_id,#marketing_order_delivery_process_id').empty();
                 if($('.data-used').length > 0){
                     $('.data-used').trigger('click');
@@ -2142,6 +2150,7 @@
                 { name: 'total', className: 'right-align' },
                 { name: 'tax', className: 'right-align' },
                 { name: 'wtax', className: 'right-align' },
+                { name: 'rounding', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'right-align' },
@@ -2423,12 +2432,14 @@
                 $('#savewtax').val(response.wtax);
                 $('#grandtotal').text(response.grandtotal);
                 $('#savegrandtotal').val(response.grandtotal);
+                $('#rounding').val(response.rounding);
 
                 $('#subtotal-convert').text(response.subtotal_convert);
                 $('#discount-convert').text(response.discount_convert);
                 $('#total-convert').text(response.total_convert);
                 $('#tax-convert').text(response.tax_convert);
                 $('#wtax-convert').text(response.wtax_convert);
+                $('#rounding-convert').text(response.rounding_convert);
                 $('#grandtotal-convert').text(response.grandtotal_convert);
 
                 tempTerm = response.top_master;
@@ -2889,7 +2900,7 @@
     }
 
     function countAll(){
-        var subtotal = 0, tax = 0, discount = parseFloat($('#discount').val().replaceAll(".", "").replaceAll(",",".")), total = 0, grandtotal = 0, wtax = 0, currency_rate = parseFloat($('#currency_rate').val().replaceAll(".", "").replaceAll(",",".")), subtotalconvert = 0, taxconvert = 0, discountconvert = 0, totalconvert = 0, grandtotalconvert = 0, wtaxconvert = 0;
+        var subtotal = 0, tax = 0, discount = parseFloat($('#discount').val().replaceAll(".", "").replaceAll(",",".")), total = 0, grandtotal = 0, wtax = 0, currency_rate = parseFloat($('#currency_rate').val().replaceAll(".", "").replaceAll(",",".")), subtotalconvert = 0, taxconvert = 0, discountconvert = 0, totalconvert = 0, grandtotalconvert = 0, wtaxconvert = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",",".")), roundingconvert = 0;
 
         discountconvert = discount * currency_rate;
 
@@ -2926,13 +2937,14 @@
         tax = Math.floor(tax);
         wtax = Math.floor(wtax);
 
-        grandtotal = total + tax - wtax;
+        grandtotal = total + tax - wtax + rounding;
 
         subtotalconvert = subtotal * currency_rate;
         totalconvert = total * currency_rate;
         taxconvert = tax * currency_rate;
         wtaxconvert = wtax * currency_rate;
         grandtotalconvert = grandtotal * currency_rate;
+        roundingconvert = rounding * currency_rate;
 
         $('#subtotal').text(
             (subtotal >= 0 ? '' : '-') + formatRupiahIni(subtotal.toFixed(2).toString().replace('.',','))
@@ -2970,8 +2982,11 @@
         $('#savewtax').val(
             (wtax >= 0 ? '' : '-') + formatRupiahIni(wtax.toFixed(2).toString().replace('.',','))
         );
-        $('#wtax-convert').val(
+        $('#wtax-convert').text(
             (wtaxconvert >= 0 ? '' : '-') + formatRupiahIni(wtaxconvert.toFixed(2).toString().replace('.',','))
+        );
+        $('#rounding-convert').text(
+            (roundingconvert >= 0 ? '' : '-') + formatRupiahIni(roundingconvert.toFixed(2).toString().replace('.',','))
         );
         $('#grandtotal').text(
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))

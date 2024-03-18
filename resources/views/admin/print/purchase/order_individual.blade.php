@@ -391,6 +391,12 @@
                                     <td class="right-align">PPh</td>
                                     <td class="right-align" align="right" style="border:0.6px solid black;">{{ number_format($data->wtax,2,',','.') }}</td>
                                 </tr>
+                                @if($data->rounding > 0 || $data->rounding < 0)
+                                <tr class="break-row">
+                                    <td class="right-align">Pembulatan</td>
+                                    <td class="right-align" align="right" style="border:0.6px solid black;">{{ number_format($data->rounding,2,',','.') }}</td>
+                                </tr>
+                                @endif
                                 <tr class="break-row">
                                     <td class="right-align">Grandtotal</td>
                                     <td class="right-align" align="right" style="border:0.6px solid black;">{{ number_format($data->grandtotal,2,',','.') }}</td>

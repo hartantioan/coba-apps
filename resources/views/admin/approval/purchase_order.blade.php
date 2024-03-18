@@ -313,6 +313,10 @@
                         <td class="right-align">{{ number_format($data->wtax,2,',','.') }}</td>
                     </tr>
                     <tr>
+                        <td class="right-align" colspan="2">Pembulatan</td>
+                        <td class="right-align">{{ number_format($data->rounding,2,',','.') }}</td>
+                    </tr>
+                    <tr>
                         <td class="right-align" colspan="2"><h6>Grandtotal</h6></td>
                         <td class="right-align"><h6>{{ number_format($data->grandtotal,2,',','.') }}</h6></td>
                     </tr>

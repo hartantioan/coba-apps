@@ -134,6 +134,7 @@ class PurchaseOrderController extends Controller
             'discount',
             'total',
             'tax',
+            'rounding',
             'grandtotal',
             'status'
         ];
@@ -386,6 +387,7 @@ class PurchaseOrderController extends Controller
                     number_format($val->total,2,',','.'),
                     number_format($val->tax,2,',','.'),
                     number_format($val->wtax,2,',','.'),
+                    number_format($val->rounding,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
                     $val->status(),
                     $btn_close.$btn_print.'
@@ -535,6 +537,7 @@ class PurchaseOrderController extends Controller
                 'arr_place'                 => 'required|array',
                 'arr_warehouse'             => 'required|array',
                 'discount'                  => 'required',
+                'rounding'                  => 'required',
             ], [
                 'code.required' 	                => 'Kode tidak boleh kosong.',
                 'code_place_id.required'            => 'Plant Tidak boleh kosong',
@@ -563,7 +566,8 @@ class PurchaseOrderController extends Controller
                 'arr_place.array'                   => 'Plant harus array.',
                 'arr_warehouse.required'            => 'Gudang tidak boleh kosong.',
                 'arr_warehouse.array'               => 'Gudang harus array.',
-                'discount.required'                 => 'Diskon akhir tidak boleh kosong.'
+                'discount.required'                 => 'Diskon akhir tidak boleh kosong.',
+                'rounding.required'                 => 'Pembulatan tidak boleh kosong.'
             ]);
         }elseif($request->inventory_type == '2'){
             $validation = Validator::make($request->all(), [
@@ -585,6 +589,7 @@ class PurchaseOrderController extends Controller
                 'arr_disc2'                 => 'required|array',
                 'arr_disc3'                 => 'required|array',
                 'discount'                  => 'required',
+                'rounding'                  => 'required',
             ], [
                 'code.required' 	                => 'Kode tidak boleh kosong.',
                 'code_place_id.required'            => 'Plant Tidak boleh kosong',
@@ -609,7 +614,8 @@ class PurchaseOrderController extends Controller
                 'arr_disc2.array'                   => 'Diskon 2 harus array.',
                 'arr_disc3.required'                => 'Diskon 3 tidak boleh kosong.',
                 'arr_disc3.array'                   => 'Diskon 3 harus array.',
-                'discount.required'                 => 'Diskon akhir tidak boleh kosong.'
+                'discount.required'                 => 'Diskon akhir tidak boleh kosong.',
+                'rounding.required'                 => 'Pembulatan tidak boleh kosong.'
             ]);
         }
 
@@ -769,6 +775,7 @@ class PurchaseOrderController extends Controller
                         $query->total = str_replace(',','.',str_replace('.','',$request->savetotal));
                         $query->tax = str_replace(',','.',str_replace('.','',$request->savetax));
                         $query->wtax = str_replace(',','.',str_replace('.','',$request->savewtax));
+                        $query->rounding = str_replace(',','.',str_replace('.','',$request->rounding));
                         $query->grandtotal = str_replace(',','.',str_replace('.','',$request->savegrandtotal));
                         $query->receiver_name = $request->receiver_name;
                         $query->receiver_address = $request->receiver_address;
@@ -839,6 +846,7 @@ class PurchaseOrderController extends Controller
                         'total'                     => str_replace(',','.',str_replace('.','',$request->savetotal)),
                         'tax'                       => str_replace(',','.',str_replace('.','',$request->savetax)),
                         'wtax'                      => str_replace(',','.',str_replace('.','',$request->savewtax)),
+                        'rounding'                  => str_replace(',','.',str_replace('.','',$request->rounding)),
                         'grandtotal'                => str_replace(',','.',str_replace('.','',$request->savegrandtotal)),
                         'status'                    => '1',
                         'receiver_name'             => $request->receiver_name,
@@ -1150,6 +1158,7 @@ class PurchaseOrderController extends Controller
         $tax_convert = $po->tax * $po->currency_rate;
         $wtax_convert = $po->wtax * $po->currency_rate;
         $grandtotal_convert = $po->grandtotal * $po->currency_rate;
+        $rounding = $po->rounding * $po->currency_rate;
         $po['currency_rate'] = number_format($po->currency_rate,2,',','.');
         $po['subtotal'] = number_format($po->subtotal,2,',','.');
         $po['discount'] = number_format($po->discount,2,',','.');
@@ -1157,6 +1166,7 @@ class PurchaseOrderController extends Controller
         $po['tax'] = number_format($po->tax,2,',','.');
         $po['wtax'] = number_format($po->wtax,2,',','.');
         $po['grandtotal'] = number_format($po->grandtotal,2,',','.');
+        $po['rounding'] = number_format($po->rounding,2,',','.');
 
         $po['subtotal_convert'] = number_format($subtotal_convert,2,',','.');
         $po['discount_convert'] = number_format($discount_convert,2,',','.');
@@ -1164,6 +1174,7 @@ class PurchaseOrderController extends Controller
         $po['tax_convert'] = number_format($tax_convert,2,',','.');
         $po['wtax_convert'] = number_format($wtax_convert,2,',','.');
         $po['grandtotal_convert'] = number_format($grandtotal_convert,2,',','.');
+        $po['rounding_convert'] = number_format($rounding,2,',','.');
 
         $arr = [];
         

@@ -211,7 +211,7 @@
                                     </tr>
                                     <tr>
                                         <td >
-                                            Depart. {{ $data->user->position->division->name}}
+                                            Depart. {{ $data->user->position()->exists() ? $data->user->position->division->name : ''}}
                                         </td>
                                         
                                     </tr>

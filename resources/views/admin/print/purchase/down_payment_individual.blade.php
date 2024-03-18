@@ -303,7 +303,9 @@
                                         @php
                                         $arr_pr=[];
                                             foreach ($row->purchaseOrder->purchaseOrderDetail as $key => $row_detail_po) {
-                                                $arr_pr[]=$row_detail_po->purchaseRequestDetail->purchaseRequest->code;
+                                                if($row_detail_po->purchaseRequestDetail()->exists()){
+                                                    $arr_pr[]=$row_detail_po->purchaseRequestDetail->purchaseRequest->code;
+                                                }
                                             }
                                         @endphp
                                         <tbody>

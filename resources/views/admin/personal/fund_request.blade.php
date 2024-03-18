@@ -611,20 +611,36 @@
             row_grandtotal = row_total + row_tax - row_wtax;
             $('input[name^="arr_percent_tax"]').eq(index).val(row_percent_tax);
             $('input[name^="arr_percent_wtax"]').eq(index).val(row_percent_wtax);
-            $('input[name^="arr_tax"]').eq(index).val(row_tax);
-            $('input[name^="arr_wtax"]').eq(index).val(row_wtax);
-            $('input[name^="arr_total"]').eq(index).val(formatRupiahIni(row_total.toFixed(2).toString().replace('.',',')));
-            $('.rowgrandtotal').eq(index).text(formatRupiahIni(row_grandtotal.toFixed(2).toString().replace('.',',')));
+            $('input[name^="arr_tax"]').eq(index).val(
+                (row_tax >= 0 ? '' : '-') + formatRupiahIni(row_tax.toFixed(2).toString().replace('.',','))
+            );
+            $('input[name^="arr_wtax"]').eq(index).val(
+                (row_wtax >= 0 ? '' : '-') + formatRupiahIni(row_wtax.toFixed(2).toString().replace('.',','))
+            );
+            $('input[name^="arr_total"]').eq(index).val(
+                (row_total >= 0 ? '' : '-') + formatRupiahIni(row_total.toFixed(2).toString().replace('.',','))
+            );
+            $('.rowgrandtotal').eq(index).text(
+                (row_grandtotal >= 0 ? '' : '-') + formatRupiahIni(row_grandtotal.toFixed(2).toString().replace('.',','))
+            );
             $('input[name^="arr_grandtotal"]').eq(index).val(row_grandtotal);
             totalall += row_total;
             taxall += row_tax;
             wtaxall += row_wtax;
             grandtotalall += row_grandtotal;
         });
-        $('#total').val(formatRupiahIni(totalall.toFixed(2).toString().replace('.',',')));
-        $('#tax').val(formatRupiahIni(taxall.toString().replace('.',',')));
-        $('#wtax').val(formatRupiahIni(wtaxall.toString().replace('.',',')));
-        $('#grandtotal').val(formatRupiahIni(grandtotalall.toFixed(2).toString().replace('.',',')));
+        $('#total').val(
+            (totalall >= 0 ? '' : '-') + formatRupiahIni(totalall.toFixed(2).toString().replace('.',','))
+        );
+        $('#tax').val(
+            (taxall >= 0 ? '' : '-') + formatRupiahIni(taxall.toFixed(2).toString().replace('.',','))
+        );
+        $('#wtax').val(
+            (wtaxall >= 0 ? '' : '-') + formatRupiahIni(wtaxall.toFixed(2).toString().replace('.',','))
+        );
+        $('#grandtotal').val(
+            (grandtotalall >= 0 ? '' : '-') + formatRupiahIni(grandtotalall.toFixed(2).toString().replace('.',','))
+        );
     }
 
     function addItem(){

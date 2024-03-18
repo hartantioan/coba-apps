@@ -311,7 +311,7 @@
                                     <th colspan="3" style="border: none !important" border="0">Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords($data->currency->document_text) }}</i></th>
                                 </tr>
                                 <tr>
-                                    <th colspan="3" style="border: none !important" border="0">Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal * $data->currency_rate).' Rupiah' }}</i></th>
+                                    <th colspan="3" style="border: none !important" border="0">Terbilang Rupiah : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal * $data->currency_rate).' Rupiah' }}</i></th>
                                 </tr>
                             </tfoot>
                             

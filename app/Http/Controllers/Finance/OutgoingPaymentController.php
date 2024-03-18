@@ -1199,7 +1199,7 @@ class OutgoingPaymentController extends Controller
                                 ],
                                 "key" => $row_pyrd->lookable->code,
                                 "name" => $row_pyrd->lookable->code,
-                                'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pyrd->lookable->code),  
+                                'url'=>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_pyrd->lookable->code),  
                             ];
 
                             $data_go_chart[]=$data_downp_tempura;

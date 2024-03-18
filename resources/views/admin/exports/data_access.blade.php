@@ -49,22 +49,16 @@
                                     <td>
                                         - - - - - - {{ $msub2->name }}
                                     </td>
-                                    @foreach ($user as $row)
-                                    <td align="center">
-                                        {{ $row->checkMenu($msub2->id,'view') ? 'V' : '-' }}
-                                    </td>
-                                    <td align="center">
-                                        {{ $row->checkMenu($msub2->id,'update') ? 'V' : '-' }}
-                                    </td>
-                                    <td align="center">
-                                        {{ $row->checkMenu($msub2->id,'delete') ? 'V' : '-' }}
-                                    </td>
-                                    <td align="center">
-                                        {{ $row->checkMenu($msub2->id,'void') ? 'V' : '-' }}
-                                    </td>
-                                    <td align="center">
-                                        {{ $row->checkMenu($msub2->id,'journal') ? 'V' : '-' }}
-                                    </td>
+                                    @foreach ($menu_user as $row_menu_user)
+                                        @if ($row_menu_user['name'] == $msub2->name)
+                                            @foreach ($row_menu_user['permissions'] as $permission)
+                                                <td align="center">{{$permission['view']}}</td>
+                                                <td align="center">{{$permission['update']}}</td>
+                                                <td align="center">{{$permission['delete']}}</td>
+                                                <td align="center">{{$permission['void']}}</td>
+                                                <td align="center">{{$permission['journal']}}</td>
+                                            @endforeach
+                                        @endif
                                     @endforeach
                                 </tr>
                             @endif
@@ -74,22 +68,16 @@
                             <td>
                                 - - - {{ $msub->name }}
                             </td>
-                            @foreach ($user as $row)
-                            <td align="center">
-                                {{ $row->checkMenu($msub->id,'view') ? 'V' : '-' }}
-                            </td>
-                            <td align="center">
-                                {{ $row->checkMenu($msub->id,'update') ? 'V' : '-' }}
-                            </td>
-                            <td align="center">
-                                {{ $row->checkMenu($msub->id,'delete') ? 'V' : '-' }}
-                            </td>
-                            <td align="center">
-                                {{ $row->checkMenu($msub->id,'void') ? 'V' : '-' }}
-                            </td>
-                            <td align="center">
-                                {{ $row->checkMenu($msub->id,'journal') ? 'V' : '-' }}
-                            </td>
+                            @foreach ($menu_user as $row_menu_user)
+                                @if ($row_menu_user['name'] == $msub->name)
+                                    @foreach ($row_menu_user['permissions'] as $permission)
+                                    <td align="center">{{$permission['view']}}</td>
+                                    <td align="center">{{$permission['update']}}</td>
+                                    <td align="center">{{$permission['delete']}}</td>
+                                    <td align="center">{{$permission['void']}}</td>
+                                    <td align="center">{{$permission['journal']}}</td>
+                                    @endforeach
+                                @endif
                             @endforeach
                         </tr>
                     @endif
@@ -99,22 +87,16 @@
                     <td>
                         {!! $m->name !!}
                     </td>
-                    @foreach ($user as $row)
-                    <td align="center">
-                        {{ $row->checkMenu($m->id,'view') ? 'V' : '-' }}
-                    </td>
-                    <td align="center">
-                        {{ $row->checkMenu($m->id,'update') ? 'V' : '-' }}
-                    </td>
-                    <td align="center">
-                        {{ $row->checkMenu($m->id,'delete') ? 'V' : '-' }}
-                    </td>
-                    <td align="center">
-                        {{ $row->checkMenu($m->id,'void') ? 'V' : '-' }}
-                    </td>
-                    <td align="center">
-                        {{ $row->checkMenu($m->id,'journal') ? 'V' : '-' }}
-                    </td>
+                    @foreach ($menu_user as $row_menu_user)
+                        @if ($row_menu_user['name'] == $m->name)
+                            @foreach ($row_menu_user['permissions'] as $permission)
+                                <td align="center">{{$permission['view']}}</td>
+                                <td align="center">{{$permission['update']}}</td>
+                                <td align="center">{{$permission['delete']}}</td>
+                                <td align="center">{{$permission['void']}}</td>
+                                <td align="center">{{$permission['journal']}}</td>
+                            @endforeach
+                        @endif
                     @endforeach
                 </tr>
             @endif

@@ -1664,7 +1664,7 @@ class FundRequestController extends Controller
                                 ['name'=> "Tanggal: ".$row_invoice_detail->purchaseInvoice->post_date],
                                 ['name'=> "Nominal : Rp.".number_format($row_invoice_detail->purchaseInvoice->grandtotal,2,',','.')]
                             ],
-                            'url'   =>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($row_invoice_detail->purchaseInvoice->code),
+                            'url'   =>request()->root()."/admin/finance/purchase_invoice?code=".CustomHelper::encrypt($row_invoice_detail->purchaseInvoice->code),
                         ];
                         $data_go_chart[]=$data_invoices_tempura;
                         $data_link[]=[
@@ -1689,7 +1689,7 @@ class FundRequestController extends Controller
                                 ['name'=> "Tanggal: ".$row_dp_detail->purchaseDownPayment->post_date],
                                 ['name'=> "Vendor  : ".$row_dp_detail->purchaseDownPayment->name],
                             ],
-                            'url'   =>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_dp_detail->purchaseDownPayment->code),
+                            'url'   =>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_dp_detail->purchaseDownPayment->code),
                         ];
                         $data_go_chart[]=$data_apdp_tempura;
                         $data_link[]=[

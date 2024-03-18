@@ -1650,7 +1650,7 @@ class PurchaseOrderController extends Controller
                                 ['name'=> "Tanggal: ".$purchase_invoice_detail->purchaseInvoice->post_date],
                             
                             ],
-                            'url'   =>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($purchase_invoice_detail->purchaseInvoice->code),
+                            'url'   =>request()->root()."/admin/finance/purchase_invoice?code=".CustomHelper::encrypt($purchase_invoice_detail->purchaseInvoice->code),
                         ];
                         $data_go_chart[]=$data_invoices_tempura;
                         $data_link[]=[
@@ -1675,7 +1675,7 @@ class PurchaseOrderController extends Controller
                             ['name'=> "Tanggal: ".$po_detail->marketingOrderDeliveryProcess->post_date],
                         
                         ],
-                        'url'   =>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($po_detail->marketingOrderDeliveryProcess->code),
+                        'url'   =>request()->root()."/admin/finance/purchase_invoice?code=".CustomHelper::encrypt($po_detail->marketingOrderDeliveryProcess->code),
                     ];
                     $data_go_chart[]=$data_marketing_order_delivery_process;
                     $data_link[]=[
@@ -1702,7 +1702,7 @@ class PurchaseOrderController extends Controller
                             ['name'=> "Tanggal: ".$row_dp_detail->purchaseDownPayment->post_date],
                             ['name'=> "Vendor  : ".$row_dp_detail->purchaseDownPayment->name],
                         ],
-                        'url'   =>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_dp_detail->purchaseDownPayment->code),
+                        'url'   =>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_dp_detail->purchaseDownPayment->code),
                     ];
                     $data_go_chart[]=$data_apdp_tempura;
                     $data_link[]=[

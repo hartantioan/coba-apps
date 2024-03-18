@@ -1605,7 +1605,7 @@ class LandedCostController extends Controller
                                 ['name'=> "Tanggal :".$row_invoice_detail_atas->purchaseInvoice->code],
                                 ['name'=> "Nominal : Rp.:".number_format($row_invoice_detail_atas->purchaseInvoice->grandtotal,2,',','.')],
                             ],
-                            'url'=>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($row_invoice_detail_atas->purchaseInvoice->code),
+                            'url'=>request()->root()."/admin/finance/purchase_invoice?code=".CustomHelper::encrypt($row_invoice_detail_atas->purchaseInvoice->code),
                         ];
                         $data_go_chart[]=$invoice;
                         $data_link[]=[

@@ -2312,7 +2312,7 @@ class PaymentRequestController extends Controller
                         ],
                         "key" => $row_pyr_detail->lookable->code,
                         "name" => $row_pyr_detail->lookable->code,
-                        'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
+                        'url'=>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
                     ];
                         
                     $data_go_chart[]=$data_downp_tempura;
@@ -2335,7 +2335,7 @@ class PaymentRequestController extends Controller
                         ],
                         "key" => $row_pyr_detail->lookable->code,
                         "name" => $row_pyr_detail->lookable->code,
-                        'url'=>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
+                        'url'=>request()->root()."/admin/finance/purchase_invoice?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
                     ];
 
                     $data_go_chart[]=$data_invoices_tempura;

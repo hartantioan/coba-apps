@@ -35,10 +35,10 @@ class ExportOutstandingMaterialRequest implements FromView,ShouldAutoSize
             $entry["ket1"] = $row->note;
             $entry["ket2"] = $row->note2;
             $entry["satuan"] =$row->itemUnit->unit->code;
-            $entry["qty"] = CustomHelper::formatConditionalQty($row->qty,3,',','.');
-            $entry["qty_pr"] = CustomHelper::formatConditionalQty($row->totalPr(),3,',','.');
-            $entry["qty_gi"] = CustomHelper::formatConditionalQty($row->totalGi(),3,',','.');
-            $entry["qty_balance"] = CustomHelper::formatConditionalQty($row->balancePrGi(),3,',','.');
+            $entry["qty"] = CustomHelper::formatConditionalQty($row->qty);
+            $entry["qty_pr"] = CustomHelper::formatConditionalQty($row->totalPr());
+            $entry["qty_gi"] = CustomHelper::formatConditionalQty($row->totalGi());
+            $entry["qty_balance"] = CustomHelper::formatConditionalQty($row->balancePrGi());
             $entry["required_date"] =$row->required_date;
             $entry["warehouse"] =$row->warehouse->name;
             $entry["line"] =$row->line->name ?? '-';

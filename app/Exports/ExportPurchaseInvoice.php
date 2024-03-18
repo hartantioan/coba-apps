@@ -123,7 +123,7 @@ class ExportPurchaseInvoice implements FromCollection, WithTitle, WithHeadings, 
                 'item_code'         => $row->getCodeExport(),
                 'item_name'         => $row->getNameExport(),
                 /* 'plant'             => $row->place->code, */
-                'qty'               => CustomHelper::formatConditionalQty($row->qty,3,',','.'),
+                'qty'               => CustomHelper::formatConditionalQty($row->qty),
                 'unit'              => $row->getUnitConversion(),
                 'line'              => $row->line()->exists() ? $row->line->code : '',
                 'machine'           => $row->machine()->exists() ? $row->machine->name : '',

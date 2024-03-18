@@ -27,9 +27,9 @@ class ExportOutstandingGRPO implements FromView,ShouldAutoSize
             $entry["item_code"] = $row->item->code;
             $entry["item_name"] = $row->item->name;
             $entry["satuan"] =$row->itemUnit->unit->code;
-            $entry["qty"] = CustomHelper::formatConditionalQty($row->qty,3,',','.');
-            $entry["qty_gr"] = CustomHelper::formatConditionalQty($row->qtyInvoice(),3,',','.');
-            $entry["qty_balance"] = CustomHelper::formatConditionalQty($row->balanceQtyInvoice(),3,',','.');
+            $entry["qty"] = CustomHelper::formatConditionalQty($row->qty);
+            $entry["qty_gr"] = CustomHelper::formatConditionalQty($row->qtyInvoice());
+            $entry["qty_balance"] = CustomHelper::formatConditionalQty($row->balanceQtyInvoice());
             if($row->balanceQtyInvoice()> 0){
                 $array[] = $entry;
             }

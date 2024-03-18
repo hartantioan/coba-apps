@@ -49,6 +49,7 @@ class PurchaseOrder extends Model
         'total',
         'tax',
         'wtax',
+        'rounding',
         'grandtotal',
         'status',
         'void_id',

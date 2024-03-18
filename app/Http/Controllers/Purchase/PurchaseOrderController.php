@@ -356,7 +356,7 @@ class PurchaseOrderController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-                $btn_close = $val->inventory_type == '1' ? '<button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>' : '';
+                $btn_close = /* $val->inventory_type == '1' ? '<button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>' :  */'';
                 $btn_print = in_array($val->status,['2','3']) ? ' <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) .'`,`'.$val->code.'`)"><i class="material-icons dp48">local_printshop</i></button>' : ' ';
 				

@@ -298,20 +298,22 @@
                                 <tr>
                                     <th class="center">Nominal PR</th>
                                     <th class="center">Biaya Admin</th>
-                                    <th class="center">Total Bayar</th>
+                                    <th class="center">Total Bayar FC</th>
+                                    <th class="center">Total Bayar Rp</th>
                                 </tr>
                                 <tr>
                                     <th class="right-align" style="font-weight: !important;font-size:1em !important">{{ number_format($data->total,2,',','.') }}</th>
                                     <th class="right-align" style="font-weight: !important;font-size:1em !important">{{ number_format($data->admin,2,',','.') }}</th>
                                     <th class="right-align" style="font-weight:normal !important;font-size:1em !important">{{ number_format($data->grandtotal,2,',','.') }}</th>
+                                    <th class="right-align" style="font-weight:normal !important;font-size:1em !important">{{ number_format($data->grandtotal * $data->currency_rate,2,',','.') }}</th>
                                 </tr>
                             </thead>
                             <tfoot>
                                 <tr>
-                                    <th colspan="3" style="border: none !important" border="0">Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords($data->currency->document_text) }}</i></th>
+                                    <th colspan="4" style="border: none !important" border="0">Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords($data->currency->document_text) }}</i></th>
                                 </tr>
                                 <tr>
-                                    <th colspan="3" style="border: none !important" border="0">Terbilang Rupiah : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal * $data->currency_rate).' Rupiah' }}</i></th>
+                                    <th colspan="4" style="border: none !important" border="0">Terbilang Rupiah : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal * $data->currency_rate).' Rupiah' }}</i></th>
                                 </tr>
                             </tfoot>
                             

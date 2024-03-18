@@ -19,6 +19,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportPlace;
 use App\Models\Company;
 use App\Models\Region;
+use App\Helpers\CustomHelper;
 
 class PlaceController extends Controller
 {
@@ -123,7 +124,7 @@ class PlaceController extends Controller
                     $val->city->name,
                     $val->district->name??'',
                     $val->subdistrict->name,
-                    number_format($val->capacity,3,',','.'),
+                    CustomHelper::formatConditionalQty($val->capacity),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -253,7 +254,7 @@ class PlaceController extends Controller
         $plant['city_name'] = $plant->city->code.' - '.$plant->city->name;
         $plant['district_name'] = $plant->district->code.' - '.$plant->district->name;
         $plant['subdistrict_name'] = $plant->subdistrict->code.' - '.$plant->subdistrict->name;
-        $plant['capacity'] = number_format($plant->capacity,3,',','.');
+        $plant['capacity'] = CustomHelper::formatConditionalQty($plant->capacity);
         				
 		return response()->json($plant);
     }

@@ -71,8 +71,8 @@
                 <td>{{ $rowdetail->area()->exists() ? $rowdetail->area->name : '-' }}</td>
                 <td>{{ $rowdetail->itemShading()->exists() ? $rowdetail->itemShading->code : '-' }}</td>
                 <td>{{ $rowdetail->project()->exists() ? $rowdetail->project->name : '-' }}</td>
-                <td align="right">{{ number_format($rowdetail->price,3,',','.') }}</td>
-                <td align="right">{{ number_format($rowdetail->total,3,',','.') }}</td>
+                <td align="right">{{ number_format($rowdetail->price,2,',','.') }}</td>
+                <td align="right">{{ number_format($rowdetail->total,2,',','.') }}</td>
 
             </tr>
             @php

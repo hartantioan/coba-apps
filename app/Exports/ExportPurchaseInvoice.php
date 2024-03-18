@@ -10,7 +10,7 @@ use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithTitle;
-
+use App\Helpers\CustomHelper;
 class ExportPurchaseInvoice implements FromCollection, WithTitle, WithHeadings, ShouldAutoSize
 {
     /**
@@ -119,7 +119,7 @@ class ExportPurchaseInvoice implements FromCollection, WithTitle, WithHeadings, 
                 'item_code'         => $row->getCodeExport(),
                 'item_name'         => $row->getNameExport(),
                 /* 'plant'             => $row->place->code, */
-                'qty'               => number_format($row->qty,3,',','.'),
+                'qty'               => CustomHelper::formatConditionalQty($row->qty,3,',','.'),
                 'unit'              => $row->getUnitConversion(),
                 'line'              => $row->line()->exists() ? $row->line->code : '',
                 'machine'           => $row->machine()->exists() ? $row->machine->name : '',

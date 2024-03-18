@@ -204,7 +204,8 @@ class CapitalizationController extends Controller
                     $val->note,
                     $val->status(),
                     '
-                    <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         '.$btn_jurnal.'
@@ -521,11 +522,11 @@ class CapitalizationController extends Controller
                 'project_name'          => $row->project()->exists() ? $row->project->name : '',
                 'cost_distribution_id'  => $row->costDistribution()->exists() ? $row->cost_distribution_id : '',
                 'cost_distribution_name'=> $row->costDistribution()->exists() ? $row->costDistribution->code.' - '.$row->costDistribution->name : '',
-                'qty'                   => $row->qty,
+                'qty'                   => CustomHelper::formatConditionalQty($row->qty),
                 'unit_id'               => $row->unit_id,
                 'unit_name'             => $row->unit->name,
-                'price'                 => number_format($row->price,3,',','.'),
-                'total'                 => number_format($row->total,3,',','.'),
+                'price'                 => number_format($row->price,2,',','.'),
+                'total'                 => number_format($row->total,2,',','.'),
                 'note'                  => $row->note ? $row->note : '',
             ];
         }
@@ -1058,6 +1059,37 @@ class CapitalizationController extends Controller
             ]; 
         }
         return response()->json($response);
+    }
+
+    public function done(Request $request){
+        $query_done = Capitalization::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query_done){
+
+            if(in_array($query_done->status,['1','2'])){
+                $query_done->update([
+                    'status'    => '3'
+                ]);
+    
+                activity()
+                        ->performedOn(new Capitalization())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query_done)
+                        ->log('Done the Capitalization data');
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data updated successfully.'
+                ];
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+                ];
+            }
+
+            return response()->json($response);
+        }
     }
 
 }

@@ -150,7 +150,7 @@
                             <td>{{ $row->company->name }}</td>
                             <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                             <td>{{ $row->currency->code }}</td>
-                            <td>{{ number_format($row->currency_rate,3,',','.') }}</td>
+                            <td>{{ number_format($row->currency_rate,2,',','.') }}</td>
                             <td>{{ $row->note }}</td>
                             <td><a href="{{ $row->attachment() }}">File</a></td>
                             <td>{!! $row->status() !!}</td>
@@ -178,8 +178,8 @@
                                             <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name }}</td>
                                             <td>{{ CustomHelper::formatConditionalQty($rowdetail->qty) }}</td>
                                             <td>{{ $rowdetail->item->uomUnit->code }}</td>
-                                            <td align="right">{{ number_format($rowdetail->price,3,',','.') }}</td>
-                                            <td align="right">{{ number_format($rowdetail->total,3,',','.') }}</td>
+                                            <td align="right">{{ number_format($rowdetail->price,2,',','.') }}</td>
+                                            <td align="right">{{ number_format($rowdetail->total,2,',','.') }}</td>
                                             <td>{{ $rowdetail->note }}</td>
                                             <td>{{ $rowdetail->coa->code.' - '.$rowdetail->coa->name }}</td>
 											<td>{{ $rowdetail->place->code.' - '.$rowdetail->place->company->name }}</td>

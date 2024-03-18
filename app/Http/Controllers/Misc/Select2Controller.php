@@ -663,8 +663,8 @@ class Select2Controller extends Controller {
                 'name'                  => $d->name,
                 'unit_name'             => $capital ? $capital->unit->name : '',
                 'unit_id'               => $capital ? $capital->unit_id : '',
-                'nominal'               => $d->nominal > 0 ? number_format($d->nominal,3,',','.') : '0,000',
-                'price'                 => $capital ? number_format($capital->price,3,',','.') : '0,000',
+                'nominal'               => $d->nominal > 0 ? number_format($d->nominal,2,',','.') : '0,000',
+                'price'                 => $capital ? number_format($capital->price,2,',','.') : '0,000',
                 'place_id'              => $d->place_id,
                 'place_name'            => $d->place->name,
                 'place_code'            => $d->place->code,
@@ -697,8 +697,8 @@ class Select2Controller extends Controller {
                 'name'                  => $d->name,
                 'unit_name'             => $capital ? $capital->unit->name : '',
                 'unit_id'               => $capital ? $capital->unit_id : '',
-                'nominal'               => $d->nominal > 0 ? number_format($d->nominal,3,',','.') : '0,00',
-                'price'                 => $capital ? number_format($capital->price,3,',','.') : '0,00',
+                'nominal'               => $d->nominal > 0 ? number_format($d->nominal,2,',','.') : '0,00',
+                'price'                 => $capital ? number_format($capital->price,2,',','.') : '0,00',
                 'place_id'              => $d->place_id,
                 'place_name'            => $d->place->name,
                 'place_code'            => $d->place->code,
@@ -731,8 +731,8 @@ class Select2Controller extends Controller {
                 'name'                  => $d->name,
                 'unit_name'             => $capital ? $capital->unit->name : '',
                 'unit_id'               => $capital ? $capital->unit_id : '',
-                'nominal'               => $d->nominal > 0 ? number_format($d->nominal,3,',','.') : '0,000',
-                'price'                 => $capital ? number_format($capital->price,3,',','.') : '0,000',
+                'nominal'               => $d->nominal > 0 ? number_format($d->nominal,2,',','.') : '0,000',
+                'price'                 => $capital ? number_format($capital->price,2,',','.') : '0,000',
                 'place_id'              => $d->place_id,
                 'place_name'            => $d->place->name,
                 'book_balance'          => $d->book_balance,
@@ -1441,8 +1441,8 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> $d->code.' - '.$d->note,
-                'admin'         => number_format($d->admin,3,',','.'),
-                'grandtotal'    => number_format($d->grandtotal,3,',','.'),
+                'admin'         => number_format($d->admin,2,',','.'),
+                'grandtotal'    => number_format($d->grandtotal,2,',','.'),
                 'code'          => $d->code
             ];
         }
@@ -2115,7 +2115,7 @@ class Select2Controller extends Controller {
                     $details[] = [
                         'name'          => $row->item->code.' - '.$row->item->name,
                         'origin'        => $row->itemStock->place->code.' - '.$row->itemStock->warehouse->name.' - '.($row->itemStock->area()->exists() ? $row->itemStock->area->name : '').' - Shading : '.($row->itemStock->itemShading()->exists() ? $row->itemStock->itemShading->code : '-'),
-                        'qty'           => number_format($row->qty,3,',','.'),
+                        'qty'           => CustomHelper::formatConditionalQty($row->qty),
                         'unit'          => $row->item->uomUnit->code,
                         'note'          => $row->note ? $row->note : '',
                         'area'          => $row->area()->exists() ? $row->area->name : '-',
@@ -2151,7 +2151,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			    => $d->id,
-                'text' 			    => $d->place->code.' - '.$d->warehouse->code.' - '.($d->area()->exists() ? $d->area->name : '').' Item '.$d->item->name.' Qty. '.number_format($d->qty,3,',','.').' '.$d->item->uomUnit->code,
+                'text' 			    => $d->place->code.' - '.$d->warehouse->code.' - '.($d->area()->exists() ? $d->area->name : '').' Item '.$d->item->name.' Qty. '.number_format($d->qty).' '.$d->item->uomUnit->code,
                 'qty'               => $d->qty,
             ];
         }
@@ -2200,7 +2200,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			    => $d->id,
-                'text' 			    => $d->place->code.' - '.$d->warehouse->code.' - '.($d->area()->exists() ? $d->area->name : '').' Item '.$d->item->name.' Qty. '.number_format($d->qty,3,',','.').' '.$d->item->uomUnit->code,
+                'text' 			    => $d->place->code.' - '.$d->warehouse->code.' - '.($d->area()->exists() ? $d->area->name : '').' Item '.$d->item->name.' Qty. '.number_format($d->qty).' '.$d->item->uomUnit->code,
                 'qty'               => $d->qty,
             ];
         }
@@ -2226,8 +2226,8 @@ class Select2Controller extends Controller {
             if($d->getBalanceReceipt() > 0){
                 $response[] = [
                     'id'   			    => $d->id,
-                    'text' 			    => $d->purchaseOrder->supplier->name.' - '.$d->purchaseOrder->code.' - '.$d->place->code.' - '.$d->warehouse->code.' Qty. '.number_format($d->getBalanceReceipt(),3,',','.').' '.$d->item->uomUnit->code,
-                    'qty'               => number_format($d->getBalanceReceipt(),3,',','.'),
+                    'text' 			    => $d->purchaseOrder->supplier->name.' - '.$d->purchaseOrder->code.' - '.$d->place->code.' - '.$d->warehouse->code.' Qty. '.CustomHelper::formatConditionalQty($d->getBalanceReceipt()).' '.$d->item->uomUnit->code,
+                    'qty'               => CustomHelper::formatConditionalQty($d->getBalanceReceipt()),
                 ];
             }
         }
@@ -2527,7 +2527,7 @@ class Select2Controller extends Controller {
                         'item_warehouse'    => $row->item->warehouseList(),
                         'unit'              => $row->item->sellUnit->code,
                         'code'              => $d->code,
-                        'qty_sent'          => number_format($row->getBalanceQtySentMinusReturn(),3,',','.'),
+                        'qty_sent'          => CustomHelper::formatConditionalQty($row->getBalanceQtySentMinusReturn()),
                         'place_id'          => $row->place_id,
                         'warehouse_id'      => $row->warehouse_id,
                         'tax_id'            => $row->marketingOrderDetail->tax_id,
@@ -2538,8 +2538,8 @@ class Select2Controller extends Controller {
                         'grandtotal'        => number_format($grandtotal,2,',','.'),
                         'lookable_type'     => $row->getTable(),
                         'lookable_id'       => $row->id,
-                        'qty_do'            => number_format($row->qty,3,',','.'),
-                        'qty_return'        => number_format($row->qtyReturn(),3,',','.'),
+                        'qty_do'            => CustomHelper::formatConditionalQty($row->qty),
+                        'qty_return'        => CustomHelper::formatConditionalQty($row->qtyReturn()),
                         'price'             => number_format($price,2,',','.'),
                         'note'              => $row->note ? $row->note : '',
                     ];
@@ -2710,7 +2710,7 @@ class Select2Controller extends Controller {
                         'code'              => $d->code,
                         'type'              => $row->getTable(),
                         'name'              => $row->lookable->item->name,
-                        'qty'               => number_format($row->lookable->qty,3,',','.'),
+                        'qty'               => CustomHelper::formatConditionalQty($row->lookable->qty),
                         'unit'              => $row->lookable->item->sellUnit->code,
                         'is_include_tax'    => $row->is_include_tax,
                         'percent_tax'       => $row->percent_tax,
@@ -2887,10 +2887,10 @@ class Select2Controller extends Controller {
                         'item_id'           => $row->item_id,
                         'item_code'         => $row->item->code,
                         'item_name'         => $row->item->name,
-                        'qty_in_sell'       => number_format($row->qty,3,',','.'),
-                        'qty_in_uom'        => number_format($row->qty * $row->item->sell_convert,3,',','.'),
-                        'qty_in_production' => number_format(($row->qty * $row->item->sell_convert) / $row->item->production_convert,3,',','.'),
-                        'qty_in_pallet'     => number_format($row->qty / $row->item->pallet_convert,3,',','.'),
+                        'qty_in_sell'       => CustomHelper::formatConditionalQty($row->qty),
+                        'qty_in_uom'        => CustomHelper::formatConditionalQty($row->qty * $row->item->sell_convert),
+                        'qty_in_production' => CustomHelper::formatConditionalQty(($row->qty * $row->item->sell_convert) / $row->item->production_convert),
+                        'qty_in_pallet'     => CustomHelper::formatConditionalQty($row->qty / $row->item->pallet_convert),
                         'unit_sell'         => $row->item->sellUnit->code,
                         'unit_uom'          => $row->item->uomUnit->code,
                         'unit_production'   => $row->item->productionUnit->code,
@@ -3099,8 +3099,8 @@ class Select2Controller extends Controller {
                             'lookable_code' => $rowdetail->lookable->code,
                             'lookable_name' => $rowdetail->lookable->name,
                             'warehouse'     => $rowdetail->item()->exists() ? $rowdetail->item->getStockWarehousePlaceArea($d->productionSchedule->place_id) : '-',
-                            'stock'         => $rowdetail->item()->exists() ? number_format($rowdetail->item->getStockPlace($d->productionSchedule->place_id) / $rowdetail->item->production_convert,3,',','.').' '.$rowdetail->item->productionUnit->code : '-',
-                            'qty'           => $rowdetail->item()->exists() ? number_format($bobot * $rowdetail->qty,3,',','.') : '0,000',
+                            'stock'         => $rowdetail->item()->exists() ? CustomHelper::formatConditionalQty($rowdetail->item->getStockPlace($d->productionSchedule->place_id) / $rowdetail->item->production_convert).' '.$rowdetail->item->productionUnit->code : '-',
+                            'qty'           => $rowdetail->item()->exists() ? CustomHelper::formatConditionalQty($bobot * $rowdetail->qty) : '0,000',
                             'unit'          => $rowdetail->item()->exists() ? $rowdetail->item->productionUnit->code : '-',
                             'nominal'       => $rowdetail->coa()->exists() ? number_format($bobot * $rowdetail->nominal,2,',','.') : '0,00',
                             'total'         => $rowdetail->coa()->exists() ? number_format($bobot * $rowdetail->total,2,',','.') : '0,00',
@@ -3115,7 +3115,7 @@ class Select2Controller extends Controller {
                 'text' 			=> $d->item->code.' - '.$d->item->name,
                 'warehouses'    => $d->item->warehouseList(),
                 'details'       => $details,
-                'qty'           => number_format($d->qty,3,',','.').' '.$d->item->productionUnit->code,
+                'qty'           => CustomHelper::formatConditionalQty($d->qty).' '.$d->item->productionUnit->code,
                 'shift'         => date('d/m/Y',strtotime($d->production_date)).' - '.$d->shift->code.' - '.$d->shift->name,
                 'group'         => $d->group,
                 'line'          => $d->line->code,
@@ -3263,7 +3263,7 @@ class Select2Controller extends Controller {
                             'id'            => $row->id,
                             'item_id'       => $row->item_id,
                             'item_name'     => $row->item->code.' - '.$row->item->name,
-                            'qty'           => number_format($row->qty,3,',','.'),
+                            'qty'           => CustomHelper::formatConditionalQty($row->qty),
                             'item_unit_id'  => $row->item_unit_id,
                             'note'          => $row->note ? $row->note : '',
                             'note2'         => $row->note2 ? $row->note2 : '',
@@ -3276,12 +3276,12 @@ class Select2Controller extends Controller {
                             'project_id'    => $row->project()->exists() ? $row->project->id : '',
                             'project_name'  => $row->project()->exists() ? $row->project->name : '',
                             'requester'     => $row->requester ? $row->requester : '',
-                            'qty_balance'   => number_format($row->balancePr(),3,',','.'),
+                            'qty_balance'   => CustomHelper::formatConditionalQty($row->balancePr()),
                             'type'          => $row->getTable(),
                             'list_warehouse'=> $row->item->warehouseList(),
                             'buy_units'     => $row->item->arrBuyUnits(),
                             'unit_stock'    => $row->item->uomUnit->code,
-                            'qty_stock'     => number_format($row->getStockNow($row->qty_conversion),3,',','.'),
+                            'qty_stock'     => CustomHelper::formatConditionalQty($row->getStockNow($row->qty_conversion)),
                         ];
                     }
                 }
@@ -3332,7 +3332,7 @@ class Select2Controller extends Controller {
                             'id'            => $row->id,
                             'item_id'       => $row->item_id,
                             'item_name'     => $row->item->code.' - '.$row->item->name,
-                            'qty'           => number_format($row->qty * $row->qty_conversion,3,',','.'),
+                            'qty'           => CustomHelper::formatConditionalQty($row->qty * $row->qty_conversion),
                             'unit'          => $row->item->uomUnit->code,
                             'note'          => $row->note ? $row->note : '',
                             'date'          => $row->required_date,
@@ -3344,7 +3344,7 @@ class Select2Controller extends Controller {
                             'machine_id'    => $row->machine_id,
                             'department_id' => $row->department_id,
                             'requester'     => $row->requester ? $row->requester : '',
-                            'qty_balance'   => number_format($row->balanceGi() * $row->qty_conversion,3,',','.'),
+                            'qty_balance'   => CustomHelper::formatConditionalQty($row->balanceGi() * $row->qty_conversion),
                             'type'          => $row->getTable(),
                             'project_id'    => $row->project()->exists() ? $row->project->id : '',
                             'project_name'  => $row->project()->exists() ? $row->project->name : '',
@@ -3400,7 +3400,7 @@ class Select2Controller extends Controller {
                             'id'            => $row->id,
                             'item_id'       => $row->item_id,
                             'item_name'     => $row->item->code.' - '.$row->item->name,
-                            'qty'           => number_format($row->qty * $row->qty_conversion,3,',','.'),
+                            'qty'           => CustomHelper::formatConditionalQty($row->qty * $row->qty_conversion),
                             'unit'          => $row->item->uomUnit->code,
                             'note'          => $row->note ? $row->note : '',
                             'note2'         => $row->note2 ? $row->note2 : '',
@@ -3413,7 +3413,7 @@ class Select2Controller extends Controller {
                             'machine_id'    => $row->machine_id,
                             'department_id' => $row->department_id,
                             'requester'     => $row->requester ? $row->requester : '',
-                            'qty_balance'   => number_format($row->balanceGi() * $row->qty_conversion,3,',','.'),
+                            'qty_balance'   => CustomHelper::formatConditionalQty($row->balanceGi() * $row->qty_conversion),
                             'type'          => $row->getTable(),
                             'project_id'    => $row->project()->exists() ? $row->project->id : '',
                             'project_name'  => $row->project()->exists() ? $row->project->name : '',
@@ -3494,7 +3494,7 @@ class Select2Controller extends Controller {
                         'item_warehouse'    => $row->item->warehouseList(),
                         'unit'              => $row->item->sellUnit->code,
                         'code'              => $d->code,
-                        'qty_sent'          => number_format($row->getBalanceQtySentMinusReturn(),3,',','.'),
+                        'qty_sent'          => CustomHelper::formatConditionalQty($row->getBalanceQtySentMinusReturn()),
                         'place_id'          => $row->place_id,
                         'warehouse_id'      => $row->warehouse_id,
                         'tax_id'            => $row->marketingOrderDetail->tax_id,
@@ -3505,8 +3505,8 @@ class Select2Controller extends Controller {
                         'grandtotal'        => number_format($grandtotal,2,',','.'),
                         'lookable_type'     => $row->getTable(),
                         'lookable_id'       => $row->id,
-                        'qty_do'            => number_format($row->qty,3,',','.'),
-                        'qty_return'        => number_format($row->qtyReturn(),3,',','.'),
+                        'qty_do'            => CustomHelper::formatConditionalQty($row->qty),
+                        'qty_return'        => CustomHelper::formatConditionalQty($row->qtyReturn()),
                         'price'             => number_format($price,2,',','.'),
                         'note'              => $row->note ? $row->note : '',
                     ];
@@ -3621,7 +3621,7 @@ class Select2Controller extends Controller {
                     'lookable_name'         => $row->lookable->name,
                     'lookable_unit'         => $row->item()->exists() ? $row->item->productionUnit->code : '-',
                     'list_stock'            => $row->item()->exists() ? $row->item->currentStockPerPlace($d->productionSchedule->place_id) : [],
-                    'qty'                   => number_format($row->qty,3,',','.'),
+                    'qty'                   => CustomHelper::formatConditionalQty($row->qty),
                     'nominal'               => number_format($row->nominal,2,',','.'),
                     'total'                 => number_format($row->total,2,',','.'),
                 ];
@@ -3639,7 +3639,7 @@ class Select2Controller extends Controller {
                 'item_receive_unit_uom'         => $d->productionScheduleDetail->item->uomUnit->code,
                 'item_receive_unit_sell'        => $d->productionScheduleDetail->item->sellUnit->code,
                 'item_receive_unit_pallet'      => $d->productionScheduleDetail->item->palletUnit->code,
-                'item_receive_qty'              => number_format($d->productionScheduleDetail->qty,3,',','.'),
+                'item_receive_qty'              => CustomHelper::formatConditionalQty($d->productionScheduleDetail->qty),
                 'production_convert'            => $d->productionScheduleDetail->item->production_convert,
                 'sell_convert'                  => $d->productionScheduleDetail->item->sell_convert,
                 'pallet_convert'                => $d->productionScheduleDetail->item->pallet_convert,

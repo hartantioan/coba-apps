@@ -280,7 +280,7 @@
                                 <td align="center">{{ $row->marketingOrderPlanDetail->marketingOrderPlan->code }}</td>
                                 <td align="">{{ $row->marketingOrderPlanDetail->item->name }}</td>
                                 <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
-                                <td align="right">{{ number_format($row->marketingOrderPlanDetail->qty * $row->marketingOrderPlanDetail->item->sell_convert,3,',','.') }}</td>
+                                <td align="right">{{ CustomHelper::formatConditionalQty($row->marketingOrderPlanDetail->qty * $row->marketingOrderPlanDetail->item->sell_convert) }}</td>
                                 <td align="center">{{ $row->marketingOrderPlanDetail->item->uomUnit->code }}</td>
                                 <td align="center">{{ date('d/m/Y',strtotime($row->marketingOrderPlanDetail->request_date)) }}</td>
                             </tr>

@@ -182,7 +182,7 @@ class ProductionOrderController extends Controller
                     $val->note,
                     $val->productionSchedule->code,
                     $val->productionScheduleDetail->item->code.' - '.$val->productionScheduleDetail->item->name,
-                    number_format($val->productionScheduleDetail->qty,3,',','.'),
+                    CustomHelper::formatConditionalQty($val->productionScheduleDetail->qty),
                     $val->productionScheduleDetail->item->productionUnit->code,
                     $val->productionScheduleDetail->shift->code.' - '.$val->productionScheduleDetail->shift->name,
                     $val->productionScheduleDetail->line->code,
@@ -191,6 +191,7 @@ class ProductionOrderController extends Controller
                     $val->area()->exists() ? $val->area->name : '-',
                     $val->status(),
                     '
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
@@ -439,7 +440,7 @@ class ProductionOrderController extends Controller
         $po['warehouses'] = $po->productionScheduleDetail->item->warehouseList();
         $po['warehouse_transit_id'] = $warehouse ? $warehouse->id : '';
         $po['warehouse_transit_name'] = $warehouse ? $warehouse->name : '';
-        $po['qty'] = number_format($po->productionScheduleDetail->qty,3,',','.').' '.$po->productionScheduleDetail->item->productionUnit->code;
+        $po['qty'] = CustomHelper::formatConditionalQty($po->productionScheduleDetail->qty).' '.$po->productionScheduleDetail->item->productionUnit->code;
         $po['shift'] = $po->productionScheduleDetail->shift->code.' - '.$po->productionScheduleDetail->shift->name;
         $po['group'] = $po->productionScheduleDetail->group;
         $po['line'] = $po->productionScheduleDetail->line->code;
@@ -456,8 +457,8 @@ class ProductionOrderController extends Controller
                 'lookable_code' => $row->lookable->code,
                 'lookable_name' => $row->lookable->name,
                 'warehouse'     => $row->item()->exists() ? $row->item->getStockWarehousePlaceArea($po->productionSchedule->place_id) : '-',
-                'stock'         => $row->item()->exists() ? number_format($row->item->getStockPlace($po->productionSchedule->place_id) / $row->item->production_convert,3,',','.').' '.$row->item->productionUnit->code : '-',
-                'qty'           => $row->item()->exists() ? number_format($row->qty,3,',','.') : '0,000',
+                'stock'         => $row->item()->exists() ? CustomHelper::formatConditionalQty($row->item->getStockPlace($po->productionSchedule->place_id) / $row->item->production_convert).' '.$row->item->productionUnit->code : '-',
+                'qty'           => $row->item()->exists() ? CustomHelper::formatConditionalQty($row->qty) : '0,000',
                 'unit'          => $row->item()->exists() ? $row->item->productionUnit->code : '-',
                 'nominal'       => $row->coa()->exists() ? number_format($row->nominal,2,',','.') : '0,00',
                 'total'         => $row->coa()->exists() ? number_format($row->total,2,',','.') : '0,00',
@@ -511,7 +512,7 @@ class ProductionOrderController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td>'.($row->item()->exists() ? $row->item->code.' - '.$row->item->name : ($row->coa()->exists() ? $row->coa->code.' - '.$row->coa->name : '')).'</td>
-                <td class="right-align">'.($row->item()->exists() ? number_format($row->qty,3,',','.') : '-').'</td>
+                <td class="right-align">'.($row->item()->exists() ? CustomHelper::formatConditionalQty($row->qty) : '-').'</td>
                 <td class="center-align">'.($row->item()->exists() ? $row->item->productionUnit->code : '-').'</td>
                 <td class="right-align">'.($row->coa()->exists() ? number_format($row->nominal,2,',','.') : '-').'</td>
                 <td class="right-align">'.($row->coa()->exists() ? number_format($row->total,2,',','.') : '-').'</td>
@@ -1735,6 +1736,37 @@ class ProductionOrderController extends Controller
             ];
         }
         return response()->json($response);
+    }
+
+    public function done(Request $request){
+        $query_done = ProductionOrder::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query_done){
+
+            if(in_array($query_done->status,['1','2'])){
+                $query_done->update([
+                    'status'    => '3'
+                ]);
+    
+                activity()
+                        ->performedOn(new ProductionOrder())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query_done)
+                        ->log('Done the Production Order data');
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data updated successfully.'
+                ];
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+                ];
+            }
+
+            return response()->json($response);
+        }
     }
 
 }

@@ -226,7 +226,8 @@ class GoodReturnPOController extends Controller
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
                     '
-                    <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
@@ -270,9 +271,9 @@ class GoodReturnPOController extends Controller
                             'good_receipt_detail_id'    => $row->id,
                             'item_id'                   => $row->item_id,
                             'item_name'                 => $row->item->code.' - '.$row->item->name,
-                            'qty'                       => number_format($row->qty,3,',','.'),
-                            'qty_balance'               => number_format($row->getBalanceReturn(),3,',','.'),
-                            'qty_stock'                 => number_format($row->getBalanceReturn() * $row->qty_conversion,3,',','.'),
+                            'qty'                       => CustomHelper::formatConditionalQty($row->qty),
+                            'qty_balance'               => CustomHelper::formatConditionalQty($row->getBalanceReturn()),
+                            'qty_stock'                 =>CustomHelper::formatConditionalQty($row->getBalanceReturn() * $row->qty_conversion),
                             'unit_stock'                => $row->item->uomUnit->code,
                             'unit'                      => $row->itemUnit->unit->code,
                             'place_id'                  => $row->place_id,
@@ -586,8 +587,8 @@ class GoodReturnPOController extends Controller
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$rowdetail->item->code.' - '.$rowdetail->item->name.'</td>
                 <td class="center-align">'.$rowdetail->goodReceiptDetail->goodReceipt->account->name.'</td>
-                <td class="center-align">'.number_format($rowdetail->goodReceiptDetail->qty,3,',','.').'</td>
-                <td class="center-align">'.number_format($rowdetail->qty,3,',','.').'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty($rowdetail->goodReceiptDetail->qty).'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty($rowdetail->qty).'</td>
                 <td class="center-align">'.$rowdetail->itemUnit->unit->code.'</td>
                 <td class="">'.$rowdetail->listSerial().'</td>
                 <td class="">'.$rowdetail->note.'</td>
@@ -693,11 +694,11 @@ class GoodReturnPOController extends Controller
                 'good_receipt_detail_id'    => $row->good_receipt_detail_id,
                 'item_id'                   => $row->item_id,
                 'item_name'                 => $row->item->code.' - '.$row->item->name,
-                'qty_returned'              => number_format($row->qty,3,',','.'),
-                'qty_received'              => number_format($row->goodReceiptDetail->qty,3,',','.'),
-                'qty_balance'               => number_format($row->goodReceiptDetail->getBalanceReturn(),3,',','.'),
+                'qty_returned'              => CustomHelper::formatConditionalQty($row->qty),
+                'qty_received'              => CustomHelper::formatConditionalQty($row->goodReceiptDetail->qty),
+                'qty_balance'               => CustomHelper::formatConditionalQty($row->goodReceiptDetail->getBalanceReturn()),
                 'unit'                      => $row->itemUnit->unit->code,
-                'qty_stock'                 => number_format($row->qty * $row->qty_conversion,3,',','.'),
+                'qty_stock'                 => CustomHelper::formatConditionalQty($row->qty * $row->qty_conversion),
                 'unit_stock'                => $row->item->uomUnit->code,
                 'note'                      => $row->note ? $row->note : '',
                 'note2'                     => $row->note2 ? $row->note2 : '',
@@ -2995,5 +2996,36 @@ class GoodReturnPOController extends Controller
             ]; 
         }
         return response()->json($response);
+    }
+
+    public function done(Request $request){
+        $query_done = GoodReturnPO::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query_done){
+
+            if(in_array($query_done->status,['1','2'])){
+                $query_done->update([
+                    'status'    => '3'
+                ]);
+    
+                activity()
+                        ->performedOn(new GoodReturnPO())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query_done)
+                        ->log('Done the Good Return PO data');
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data updated successfully.'
+                ];
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+                ];
+            }
+
+            return response()->json($response);
+        }
     }
 }

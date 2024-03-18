@@ -261,7 +261,7 @@
                                             :
                                         </td>
                                         <td width="65%">
-                                            {{ number_format($data->productionScheduleDetail->qty,3,',','.').' '.$data->productionScheduleDetail->item->productionUnit->code }}
+                                            {{ CustomHelper::formatConditionalQty($data->productionScheduleDetail->qty).' '.$data->productionScheduleDetail->item->productionUnit->code }}
                                         </td>
                                     </tr>
                                     <tr>

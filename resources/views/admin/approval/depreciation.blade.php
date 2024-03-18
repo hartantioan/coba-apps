@@ -218,7 +218,7 @@
                             <td>{{ $row->asset->name }}</td>
                             <td>{{ $row->asset->code }}</td>
                             <td class="center">{{ $row->depreciationNumber().' / '.$row->asset->assetGroup->depreciation_period }}</td>
-                            <td class="right-align">{{ number_format($row->nominal,3,',','.') }}</td>
+                            <td class="right-align">{{ number_format($row->nominal,2,',','.') }}</td>
                         </tr>
                     @endforeach
                 </tbody>

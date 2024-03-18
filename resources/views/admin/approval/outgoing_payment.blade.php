@@ -228,8 +228,8 @@
                         <th class="center">Total Bayar</th>
                     </tr>
                     <tr>
-                        <th class="right-align">{{ number_format($data->admin,3,',','.') }}</th>
-                        <th class="right-align">{{ number_format($data->grandtotal,3,',','.') }}</th>
+                        <th class="right-align">{{ number_format($data->admin,2,',','.') }}</th>
+                        <th class="right-align">{{ number_format($data->grandtotal,2,',','.') }}</th>
                     </tr>
                 </thead>
                 <tfoot>

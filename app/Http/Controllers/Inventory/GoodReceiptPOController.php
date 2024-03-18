@@ -254,7 +254,8 @@ class GoodReceiptPOController extends Controller
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
                     '
-                    <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
@@ -301,9 +302,9 @@ class GoodReceiptPOController extends Controller
                             'purchase_order_detail_id'  => $row->id,
                             'item_id'                   => $row->item_id,
                             'item_name'                 => $row->item->code.' - '.$row->item->name,
-                            'qty'                       => number_format($qtyBalance,3,',','.'),
+                            'qty'                       => CustomHelper::formatConditionalQty($qtyBalance),
                             'unit'                      => $row->itemUnit->unit->code,
-                            'qty_stock'                 => number_format($qtyBalance * $row->qty_conversion,3,',','.'),
+                            'qty_stock'                 => CustomHelper::formatConditionalQty($qtyBalance * $row->qty_conversion),
                             'unit_stock'                => $row->item->uomUnit->code,
                             'place_id'                  => $row->place_id,
                             'place_name'                => $row->place->code,
@@ -362,7 +363,7 @@ class GoodReceiptPOController extends Controller
                             'purchase_order_detail_id'  => $row->id,
                             'item_id'                   => $row->item_id,
                             'item_name'                 => $row->item->code.' - '.$row->item->name,
-                            'qty'                       => number_format($row->getBalanceReceipt(),3,',','.'),
+                            'qty'                       => CustomHelper::formatConditionalQty($row->getBalanceReceipt()),
                             'item_unit_id'              => $row->item_unit_id,
                             'place_id'                  => $row->place_id,
                             'place_name'                => $row->place->code.' - '.$row->place->company->name,
@@ -716,7 +717,7 @@ class GoodReceiptPOController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$rowdetail->item->code.' - '.$rowdetail->item->name.'</td>
-                <td class="center-align">'.number_format($rowdetail->qty,3,',','.').'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty($rowdetail->qty).'</td>
                 <td class="center-align">'.$rowdetail->itemUnit->unit->code.'</td>
                 <td class="center-align">'.$rowdetail->note.'</td>
                 <td class="center-align">'.$rowdetail->note2.'</td>
@@ -827,9 +828,9 @@ class GoodReceiptPOController extends Controller
                 'good_scale_detail_name'    => $row->good_scale_detail_id ? $row->goodScaleDetail->goodScale->code.' '.$row->goodScaleDetail->item->name.' '.$row->goodScaleDetail->qty_balance.' '.$row->goodScaleDetail->item->uomUnit->code : '',
                 'item_id'                   => $row->item_id,
                 'item_name'                 => $row->item->name,
-                'qty'                       => number_format($row->qty,3,',','.'),
+                'qty'                       => CustomHelper::formatConditionalQty($row->qty),
                 'unit'                      => $row->itemUnit->unit->code,
-                'qty_stock'                 => number_format($row->qty * $row->qty_conversion,3,',','.'),
+                'qty_stock'                 => CustomHelper::formatConditionalQty($row->qty * $row->qty_conversion),
                 'unit_stock'                => $row->item->uomUnit->code,
                 'note'                      => $row->note ? $row->note : '',
                 'note2'                     => $row->note2 ? $row->note2 : '',
@@ -3202,5 +3203,36 @@ class GoodReceiptPOController extends Controller
        
 		
 		return Excel::download(new ExportOutstandingGRPO(), 'outstanding_grpo_'.uniqid().'.xlsx');
+    }
+
+    public function done(Request $request){
+        $query_done = GoodReceipt::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query_done){
+
+            if(in_array($query_done->status,['1','2'])){
+                $query_done->update([
+                    'status'    => '3'
+                ]);
+    
+                activity()
+                        ->performedOn(new GoodReceipt())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query_done)
+                        ->log('Done the Good Receipt data');
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data updated successfully.'
+                ];
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+                ];
+            }
+
+            return response()->json($response);
+        }
     }
 }

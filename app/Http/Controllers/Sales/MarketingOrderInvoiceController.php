@@ -236,7 +236,8 @@ class MarketingOrderInvoiceController extends Controller
                     number_format($val->balance,2,',','.'),
                     $val->status(),
                     '
-                    <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
@@ -558,7 +559,7 @@ class MarketingOrderInvoiceController extends Controller
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code.'</td>
                 <td class="center-align">'.$row->lookable->item->name.'</td>
-                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->lookable->item->sellUnit->code.'</td>
                 <td class="">'.$row->note_internal.' - '.$row->note_external.'</td>
                 <td class="right-align">'.number_format($row->total,2,',','.').'</td>
@@ -1173,9 +1174,9 @@ class MarketingOrderInvoiceController extends Controller
                 'grandtotal'                            => number_format($row->grandtotal,2,',','.'),
                 'code'                                  => $code,
                 'item_name'                             => $row->lookable->item->code.' - '.$row->lookable->item->name,
-                'qty_do'                                => number_format($row->lookable->qty,3,',','.'),
-                'qty_return'                            => number_format($row->lookable->qtyReturn(),3,',','.'),
-                'qty_sent'                              => number_format($row->lookable->getBalanceQtySentMinusReturn(),3,',','.'),
+                'qty_do'                                => CustomHelper::formatConditionalQty($row->lookable->qty),
+                'qty_return'                            => CustomHelper::formatConditionalQty($row->lookable->qtyReturn()),
+                'qty_sent'                              => CustomHelper::formatConditionalQty($row->lookable->getBalanceQtySentMinusReturn()),
                 'unit'                                  => $row->lookable->item->sellUnit->code,
                 'price'                                 => number_format($row->price,2,',','.'),
                 'percent_tax'                           => number_format($row->percent_tax,2,',','.'),
@@ -2125,5 +2126,36 @@ class MarketingOrderInvoiceController extends Controller
         }
         return response()->json($response);
 
+    }
+
+    public function done(Request $request){
+        $query_done = MarketingOrderInvoice::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query_done){
+
+            if(in_array($query_done->status,['1','2'])){
+                $query_done->update([
+                    'status'    => '3'
+                ]);
+    
+                activity()
+                        ->performedOn(new MarketingOrderInvoice())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query_done)
+                        ->log('Done the Marketing Order Invoice data');
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data updated successfully.'
+                ];
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+                ];
+            }
+
+            return response()->json($response);
+        }
     }
 }

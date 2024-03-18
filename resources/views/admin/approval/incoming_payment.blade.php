@@ -237,9 +237,9 @@
                     <td class="center-align">{{ $row->lookable->code }}</td>
                     <td class="center-align">{{ class_basename($row->lookable) }}</td>
                     <td class="center-align">{{ $row->cost_distribution_id ? $row->costDistribution->code : '-' }}</td>
-                    <td class="right-align">{{ number_format($row->total,3,',','.') }}</td>
-                    <td class="right-align">{{ number_format($row->rounding,3,',','.') }}</td>
-                    <td class="right-align">{{ number_format($row->subtotal,3,',','.') }}</td>
+                    <td class="right-align">{{ number_format($row->total,2,',','.') }}</td>
+                    <td class="right-align">{{ number_format($row->rounding,2,',','.') }}</td>
+                    <td class="right-align">{{ number_format($row->subtotal,2,',','.') }}</td>
                     <td class="">{{ $row->note }}</td>
                 </tr>
                 @endforeach

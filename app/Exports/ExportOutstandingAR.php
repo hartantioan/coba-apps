@@ -9,7 +9,7 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
-
+use App\Helpers\CustomHelper;
 class ExportOutstandingAR implements FromView , WithEvents
 {
     protected $date;
@@ -54,8 +54,8 @@ class ExportOutstandingAR implements FromView , WithEvents
                         'post_date'         => date('d/m/Y',strtotime($row->post_date)),
                         'top'               => $row->account->top,
                         'item_name'         => $rowdetail->lookable->item->name,
-                        'qty_order'         => number_format($rowdetail->lookable->marketingOrderDetail->qty,3,',','.'),
-                        'qty'               => number_format($rowdetail->qty,3,',','.'),
+                        'qty_order'         => CustomHelper::formatConditionalQty($rowdetail->lookable->marketingOrderDetail->qty),
+                        'qty'               => CustomHelper::formatConditionalQty($rowdetail->qty),
                         'unit'              => $rowdetail->lookable->item->sellUnit->code,
                         'price'             => number_format($price,2,',','.'),
                         'total'             => number_format($rowdetail->total,2,',','.'),

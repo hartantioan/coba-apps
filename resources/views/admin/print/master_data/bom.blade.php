@@ -220,8 +220,8 @@
 									<td>{{ $row->name }}</td>
 									<td>{{ $row->item->code.' - '.$row->item->name }}</td>
 									<td>{{ $row->place->code }}</td>
-									<td>{{ number_format($row->qty_output,3,',','.') }}</td>
-									<td>{{ number_format($row->qty_planned,3,',','.') }}</td>
+									<td>{{ CustomHelper::formatConditionalQty($row->qty_output) }}</td>
+									<td>{{ CustomHelper::formatConditionalQty($row->qty_planned) }}</td>
 									<td>{{ $row->type() }}</td>
 									<td>{!! $row->status() !!}</td>
 								</tr>
@@ -242,9 +242,9 @@
 													<tr>
 														<td>{{ $m->lookable->code.' - '.$m->lookable->name }}</td>
 														<td>{{ $m->description }}</td>
-														<td align="right">{{ $m->lookable_type == 'items' ? number_format($m->qty,3,',','.').' '.$m->lookable->uomUnit->code : number_format($m->qty,3,',','.') }}</td>
-														<td align="right">{{ number_format($m->nominal,3,',','.') }}</td>
-														<td align="right">{{ number_format($m->total,3,',','.') }}</td>
+														<td align="right">{{ $m->lookable_type == 'items' ? CustomHelper::formatConditionalQty($m->qty).' '.$m->lookable->uomUnit->code : CustomHelper::formatConditionalQty($m->qty) }}</td>
+														<td align="right">{{ number_format($m->nominal,2,',','.') }}</td>
+														<td align="right">{{ number_format($m->total,2,',','.') }}</td>
 													</tr>
 												@endforeach
 											</tbody>

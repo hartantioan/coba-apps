@@ -8,7 +8,7 @@ use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-
+use App\Helpers\CustomHelper;
 class ExportStockInQty implements FromView,ShouldAutoSize
 {
     protected $plant, $item, $warehouse,$group;
@@ -58,7 +58,7 @@ class ExportStockInQty implements FromView,ShouldAutoSize
                 'gudang' => $row->warehouse->name ?? '',
                 'kode' => $row->item->code,
                 'item' => $row->item->name,
-                'final'=>number_format($row->qty,3,',','.'),
+                'final'=>CustomHelper::formatConditionalQty($row->qty),
                 'satuan'=>$row->item->uomUnit->code,
                 'perlu' =>1,
             ];

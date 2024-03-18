@@ -71,7 +71,7 @@
                 <td>{{ $rowdetail->itemStock->warehouse->name }}</td>
                 <td>{{ $rowdetail->project()->exists() ? $rowdetail->project->name : '-' }}</td>
                 <td>{{ $rowdetail->requester }}</td>
-                <td>{{ number_format($rowdetail->qty_return,3,',','.') }}</td>
+                <td>{{ CustomHelper::formatConditionalQty($rowdetail->qty_return) }}</td>
                 <td>{{ $rowdetail->total }}</td>
                 <td>{{ $rowdetail->materialRequestDetail()  ? $rowdetail->lookable->code : '-'}}</td>                
             </tr>

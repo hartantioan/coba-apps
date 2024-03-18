@@ -6,7 +6,7 @@ use App\Models\FundRequest;
 use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-
+use App\Helpers\CustomHelper;
 class ExportOutstandingFundRequest implements FromView,ShouldAutoSize
 {
     public function view(): View
@@ -20,9 +20,9 @@ class ExportOutstandingFundRequest implements FromView,ShouldAutoSize
             $entry["nama_supp"]=$row->account->name;
             $entry["note"] = $row->note;
             $entry["status"] = $row->statusRaw();
-            $entry["grandtotal"] = number_format($row->grandtotal,3,',','.');
-            $entry["total_pr"] = number_format($row->totalPaymentRequest(),3,',','.');
-            $entry["tunggakan"] = number_format($row->balancePaymentRequest(),3,',','.');
+            $entry["grandtotal"] = number_format($row->grandtotal,2,',','.');
+            $entry["total_pr"] = number_format($row->totalPaymentRequest(),2,',','.');
+            $entry["tunggakan"] = number_format($row->balancePaymentRequest(),2,',','.');
             
             if($row->balancePaymentRequest()> 0){
                 $array[] = $entry;

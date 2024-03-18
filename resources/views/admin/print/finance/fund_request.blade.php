@@ -167,16 +167,16 @@
                             <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                             <td>{{ date('d/m/Y',strtotime($row->required_date)) }}</td>
                             <td>{{ $row->currency->code }}</td>
-                            <td>{{ number_format($row->currency_rate,3,',','.') }}</td>
+                            <td>{{ number_format($row->currency_rate,2,',','.') }}</td>
                             <td>{{ $row->note }}</td>
                             <td>{{ $row->termin_note }}</td>
                             <td>{{ $row->paymentType() }}</td>
                             <td>{{ $row->name_account }}</td>
                             <td>{{ $row->no_account }}</td>
-                            <td>{{ number_format($row->total,3,',','.') }}</td>
-                            <td>{{ number_format($row->tax,3,',','.') }}</td>
-                            <td>{{ number_format($row->wtax,3,',','.') }}</td>
-                            <td>{{ number_format($row->grandtotal,3,',','.') }}</td>
+                            <td>{{ number_format($row->total,2,',','.') }}</td>
+                            <td>{{ number_format($row->tax,2,',','.') }}</td>
+                            <td>{{ number_format($row->wtax,2,',','.') }}</td>
+                            <td>{{ number_format($row->grandtotal,2,',','.') }}</td>
                             <td><a href="{{ $row->attachment() }}">File</a></td>
                             <td>{!! $row->status() !!}</td>
                         </tr>

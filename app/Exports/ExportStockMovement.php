@@ -7,7 +7,7 @@ use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-
+use App\Helpers\CustomHelper;
 class ExportStockMovement implements FromView,ShouldAutoSize
 {
     protected $plant, $item, $warehouse, $start_date, $finish_date,$type,$group;
@@ -134,11 +134,11 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                 'satuan' => $row->item->uomUnit->code,
                 'kode' => $row->item->code,
                 'final'=>number_format($row->price_final,2,',','.'),
-                'total'=>$perlu == 0 ? '-' : number_format($cum_val, 3, ',', '.'),
-                'qty'=>$perlu == 0 ? '-' : number_format($cum_qty, 3, ',', '.'),
+                'total'=>$perlu == 0 ? '-' : number_format($cum_val, 2, ',', '.'),
+                'qty'=>$perlu == 0 ? '-' : CustomHelper::formatConditionalQty($cum_qty),
                 'date' =>  date('d/m/Y',strtotime($row->date)),
                 'document' => $row->lookable->code,
-                'cum_qty' => number_format($row->qty_final,3,',','.'),
+                'cum_qty' => CustomHelper::formatConditionalQty($row->qty_final),
                 'cum_val' => number_format($row->total_final,2,',','.'),
             ];
             $array_filter[]=$data_tempura;

@@ -112,8 +112,8 @@ class BomController extends Controller
                     $val->name,
                     $val->item->name,
                     $val->place->name,
-                    number_format($val->qty_output,3,',','.').' Satuan '.$val->item->productionUnit->code,
-                    number_format($val->qty_planned,3,',','.').' Satuan '.$val->item->productionUnit->code,
+                    CustomHelper::formatConditionalQty($val->qty_output).' Satuan '.$val->item->productionUnit->code,
+                    CustomHelper::formatConditionalQty($val->qty_planned).' Satuan '.$val->item->productionUnit->code,
                     $val->type(),
                     $val->status(),
                     '
@@ -290,7 +290,7 @@ class BomController extends Controller
                 <td class="center-align">'.($key + 1).'</td>
                 <td>'.$m->lookable->code.' - '.$m->lookable->name.'</td>
                 <td>'.$m->description.' - '.($m->item()->exists() ? 'ADA' : 'TIDAK').'</td>
-                <td class="right-align">'.number_format($m->qty,3,',','.').'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($m->qty).'</td>
                 <td class="center-align">'.($m->lookable_type == 'items' ? $m->lookable->productionUnit->code : '-').'</td>
                 <td class="right-align">'.number_format($m->nominal,2,',','.').'</td>
                 <td class="right-align">'.number_format($m->total,2,',','.').'</td>
@@ -305,8 +305,8 @@ class BomController extends Controller
     public function show(Request $request){
         $bom = Bom::find($request->id);
         $bom['item_name'] = $bom->item->name;
-        $bom['qty_output'] = number_format($bom->qty_output,3,',','.');
-        $bom['qty_planned'] = number_format($bom->qty_planned,3,',','.');
+        $bom['qty_output'] = CustomHelper::formatConditionalQty($bom->qty_output);
+        $bom['qty_planned'] = CustomHelper::formatConditionalQty($bom->qty_planned);
 
         $arr = [];
 
@@ -315,7 +315,7 @@ class BomController extends Controller
                 'lookable_type' => $m->lookable_type,
                 'lookable_id'   => $m->lookable_id,
                 'detail_text'   => $m->lookable->code.' - '.$m->lookable->name,    
-                'qty'           => number_format($m->qty,3,',','.'),
+                'qty'           => CustomHelper::formatConditionalQty($m->qty),
                 'uom_unit'      => $m->lookable_type == 'items' ? $m->lookable->uomUnit->code : '-',
                 'nominal'       => number_format($m->nominal,2,',','.'),
                 'total'         => number_format($m->total,2,',','.'),

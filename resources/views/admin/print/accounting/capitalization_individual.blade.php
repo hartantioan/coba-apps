@@ -287,10 +287,10 @@
                                     <td class="center-align">{{ $key + 1 }}</td>
                                     <td>{{ $row->asset->code }}</td>
                                     <td>{{ $row->asset->name }}</td>
-                                    <td class="right-align">{{ number_format($row->price,3,',','.') }}</td>
+                                    <td class="right-align">{{ number_format($row->price,2,',','.') }}</td>
                                     <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                                     <td class="center-align">{{ $row->unit->code }}</td>
-                                    <td class="right-align">{{ number_format($row->total,3,',','.') }}</td>
+                                    <td class="right-align">{{ number_format($row->total,2,',','.') }}</td>
                                     <td>{{ $row->note }}</td>
                                 </tr>
                             @endforeach

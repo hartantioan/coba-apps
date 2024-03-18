@@ -225,6 +225,7 @@ class MaterialRequestController extends Controller
                     $val->note,
                     $val->status(),
                     '
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
@@ -286,8 +287,8 @@ class MaterialRequestController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td>'.$row->item->code.' - '.$row->item->name.'</td>
-                <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
-                <td class="right-align">'.number_format($row->getStockNow($row->qty_conversion),3,',','.').'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->getStockNow($row->qty_conversion)).'</td>
                 <td class="center-align">'.$row->itemUnit->unit->code.'</td>
                 <td class="">'.$row->note.'</td>
                 <td class="">'.$row->note2.'</td>
@@ -657,8 +658,8 @@ class MaterialRequestController extends Controller
             $arr[] = [
                 'item_id'           => $row->item_id,
                 'item_name'         => $row->item->code.' - '.$row->item->name,
-                'qty'               => number_format($row->qty,3,',','.'),
-                'qty_stock'         => $row->item_id ? number_format($row->qty * $row->qty_conversion,3,',','.') : '-',
+                'qty'               => CustomHelper::formatConditionalQty($row->qty),
+                'qty_stock'         => $row->item_id ? CustomHelper::formatConditionalQty($row->qty * $row->qty_conversion) : '-',
                 'unit_stock'        => $row->item_id ? $row->item->uomUnit->code : '-',
                 'item_unit_id'      => $row->item_unit_id,
                 'note'              => $row->note ? $row->note : '',
@@ -2822,5 +2823,36 @@ class MaterialRequestController extends Controller
     public function getOutstanding(Request $request){
        
 		return Excel::download(new ExportOutstandingMaterialRequest(), 'item_request_'.uniqid().'.xlsx');
+    }
+
+    public function done(Request $request){
+        $query_done = MaterialRequest::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query_done){
+
+            if(in_array($query_done->status,['1','2'])){
+                $query_done->update([
+                    'status'    => '3'
+                ]);
+    
+                activity()
+                        ->performedOn(new MaterialRequest())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query_done)
+                        ->log('Done the Material Request data');
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data updated successfully.'
+                ];
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+                ];
+            }
+
+            return response()->json($response);
+        }
     }
 }

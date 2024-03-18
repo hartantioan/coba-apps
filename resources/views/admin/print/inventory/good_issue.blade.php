@@ -150,7 +150,7 @@
                             <td>{{ $row->company->name }}</td>
                             <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                             <td>{{ $row->currency->code }}</td>
-                            <td>{{ number_format($row->currency_rate,3,',','.') }}</td>
+                            <td>{{ number_format($row->currency_rate,2,',','.') }}</td>
                             <td>{{ $row->note }}</td>
                             <td><a href="{{ $row->attachment() }}">File</a></td>
                             <td>{!! $row->status() !!}</td>

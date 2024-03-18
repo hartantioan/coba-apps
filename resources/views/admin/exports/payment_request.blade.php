@@ -49,7 +49,7 @@
                 <td>{{ $row->note }}</td>
                 <td>{!! $row->status() !!}</td>
                 <td>{{ number_format($row->admin,3,',','.') }}</td>
-                <td>{{ number_format($row->grandtotal,3,',','.') }}</td>
+                <td>{{ number_format($row->grandtotal,2,',','.') }}</td>
             </tr>
             <tr align="center">
                 <th></th>

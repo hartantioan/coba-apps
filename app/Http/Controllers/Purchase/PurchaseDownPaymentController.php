@@ -110,7 +110,7 @@ class PurchaseDownPaymentController extends Controller
                 $item_code = $rowdetail->item()->exists() ? $rowdetail->item->code : ($rowdetail->coa()->exists() ? $rowdetail->coa->code : '');
                 $item_name = $rowdetail->item()->exists() ? $rowdetail->item->name : ($rowdetail->coa()->exists() ? $rowdetail->coa->name : '');
                 $item_unit = $rowdetail->item()->exists() ? $rowdetail->itemUnit->unit->code : '-';
-                $list_items .= '<li>'.$item_code.' - '.$item_name.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit.' Total '.number_format($rowdetail->subtotal,2,',','.').' PPN '.number_format($rowdetail->tax,2,',','.').' PPh '.number_format($rowdetail->wtax,2,',','.').' Grandtotal '.number_format($rowdetail->grandtotal,2,',','.').'</li>';
+                $list_items .= '<li>'.$item_code.' - '.$item_name.' Qty : '.CustomHelper::formatConditionalQty($rowdetail->qty).' '.$item_unit.' Total '.number_format($rowdetail->subtotal,2,',','.').' PPN '.number_format($rowdetail->tax,2,',','.').' PPh '.number_format($rowdetail->wtax,2,',','.').' Grandtotal '.number_format($rowdetail->grandtotal,2,',','.').'</li>';
             }
 
             $list_items .= '</ol>';
@@ -135,8 +135,7 @@ class PurchaseDownPaymentController extends Controller
             $list_items = '<ol>';
 
             foreach($row->fundRequestDetail as $key => $rowdetail){
-                $item_unit = $rowdetail->unit->code;
-                $list_items .= '<li>'.$rowdetail->note.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit.' Total '.number_format($rowdetail->total,2,',','.').' PPN '.number_format($rowdetail->tax,2,',','.').' PPh '.number_format($rowdetail->wtax,2,',','.').' Grandtotal '.number_format($rowdetail->grandtotal,2,',','.').' 1231312321321312312312312312</li>';
+                $item_unit = $rowdetail->unit->code;CustomHelper::formatConditionalQty($rowdetail->qty).' '.$item_unit.' Total '.number_format($rowdetail->total,2,',','.').' PPN '.number_format($rowdetail->tax,2,',','.').' PPh '.number_format($rowdetail->wtax,2,',','.').' Grandtotal '.number_format($rowdetail->grandtotal,2,',','.').' 1231312321321312312312312312</li>';
             }
 
             $list_items .= '</ol>';
@@ -176,7 +175,7 @@ class PurchaseDownPaymentController extends Controller
                         $item_code = $rowdetail->item()->exists() ? $rowdetail->item->code : ($rowdetail->coa()->exists() ? $rowdetail->coa->code : '');
                         $item_name = $rowdetail->item()->exists() ? $rowdetail->item->name : ($rowdetail->coa()->exists() ? $rowdetail->coa->name : '');
                         $item_unit = $rowdetail->item()->exists() ? $rowdetail->itemUnit->unit->code : '-';
-                        $list_items .= '<li>'.$item_code.' - '.$item_name.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit.' Total '.number_format($rowdetail->subtotal,2,',','.').' PPN '.number_format($rowdetail->tax,2,',','.').' PPh '.number_format($rowdetail->wtax,2,',','.').' Grandtotal '.number_format($rowdetail->grandtotal,2,',','.').'</li>';
+                        $list_items .= '<li>'.$item_code.' - '.$item_name.' Qty : '.CustomHelper::formatConditionalQty($rowdetail->qty).' '.$item_unit.' Total '.number_format($rowdetail->subtotal,2,',','.').' PPN '.number_format($rowdetail->tax,2,',','.').' PPh '.number_format($rowdetail->wtax,2,',','.').' Grandtotal '.number_format($rowdetail->grandtotal,2,',','.').'</li>';
                     }
 
                     $list_items .= '</ol>';
@@ -220,7 +219,7 @@ class PurchaseDownPaymentController extends Controller
                             'post_date'     => date('d/m/Y',strtotime($data->post_date)),
                             'delivery_date' => date('d/m/Y',strtotime($data->required_date)),
                             'grandtotal'    => number_format($rowdetail->grandtotal,2,',','.'),
-                            'list_items'    => $rowdetail->note.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit,
+                            'list_items'    => $rowdetail->note.' Qty : '.CustomHelper::formatConditionalQty($rowdetail->qty).' '.$item_unit,
                             'note'          => $rowdetail->note ? $rowdetail->note : '',
                             'type'          => $rowdetail->getTable(),
                             'total'         => number_format($rowdetail->total,2,',','.'),
@@ -918,7 +917,7 @@ class PurchaseDownPaymentController extends Controller
                     $item_code = $rowdetail->item()->exists() ? $rowdetail->item->code : ($rowdetail->coa()->exists() ? $rowdetail->coa->code : '');
                     $item_name = $rowdetail->item()->exists() ? $rowdetail->item->name : ($rowdetail->coa()->exists() ? $rowdetail->coa->name : '');
                     $item_unit = $rowdetail->item()->exists() ? $rowdetail->itemUnit->unit->code : '-';
-                    $list_items .= '<li>'.$item_code.' - '.$item_name.' Qty : '.number_format($rowdetail->qty,3,',','.').' '.$item_unit.' Total '.number_format($rowdetail->subtotal,2,',','.').' PPN '.number_format($rowdetail->tax,2,',','.').' PPh '.number_format($rowdetail->wtax,2,',','.').' Grandtotal '.number_format($rowdetail->grandtotal,2,',','.').'</li>';
+                    $list_items .= '<li>'.$item_code.' - '.$item_name.' Qty : '.CustomHelper::formatConditionalQty($rowdetail->qty).' '.$item_unit.' Total '.number_format($rowdetail->subtotal,2,',','.').' PPN '.number_format($rowdetail->tax,2,',','.').' PPh '.number_format($rowdetail->wtax,2,',','.').' Grandtotal '.number_format($rowdetail->grandtotal,2,',','.').'</li>';
                 }
             }elseif($row->fundRequestDetail()->exists()){
                 
@@ -3391,5 +3390,36 @@ class PurchaseDownPaymentController extends Controller
 
     public function getOutstanding(Request $request){
 		return Excel::download(new ExportOutstandingDP(), 'outstanding_purchase_down_payment'.uniqid().'.xlsx');
+    }
+
+    public function done(Request $request){
+        $query_done = PurchaseDownPayment::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query_done){
+
+            if(in_array($query_done->status,['1','2'])){
+                $query_done->update([
+                    'status'    => '3'
+                ]);
+    
+                activity()
+                        ->performedOn(new PurchaseDownPayment())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query_done)
+                        ->log('Done the Purchase Down Payment data');
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data updated successfully.'
+                ];
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+                ];
+            }
+
+            return response()->json($response);
+        }
     }
 }

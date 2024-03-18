@@ -227,7 +227,7 @@
 									<td>{{ $row->city->name }}</td>
                                     <td>{{ $row->district->name }}</td>
                                     <td>{{ $row->subdistrict->name }}</td>
-                                    <td>{{ number_format($row->capacity,3,',','.') }}</td>
+                                    <td>{{ CustomHelper::formatConditionalQty($row->capacity) }}</td>
 								</tr>
 							@endforeach
                         </tbody>

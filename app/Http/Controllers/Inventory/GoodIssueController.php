@@ -2009,7 +2009,8 @@ class GoodIssueController extends Controller
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
                     '
-                    <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         '.$btn_jurnal.'
@@ -2354,7 +2355,7 @@ class GoodIssueController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="">'.$row->itemStock->item->code.' - '.$row->itemStock->item->name.'</td>
-                <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->itemStock->item->uomUnit->code.'</td>
                 <td class="">'.$row->note.'</td>
                 <td class="">'.$row->note2.'</td>
@@ -2371,7 +2372,7 @@ class GoodIssueController extends Controller
                 <td class="center-align">'.$row->getDepartment().'</td>
                 <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
                 <td class="center-align">'.($row->requester ? $row->requester : '-').'</td>
-                <td class="right-align">'.number_format($row->qty_return,3,',','.').'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty_return).'</td>
             </tr>
             <tr>
                 <td colspan="16">Serial : '.$row->listSerial().'</td>
@@ -2453,8 +2454,8 @@ class GoodIssueController extends Controller
                 'item_name'                 => $row->itemStock->item->code.' - '.$row->itemStock->item->name,
                 'uom'                       => $row->itemStock->item->uomUnit->code,
                 'item_stock_id'             => $row->item_stock_id,
-                'qty'                       => number_format($row->qty,3,',','.'),
-                'qtyraw'                    => in_array($gr->status,['2','3']) ? number_format($row->qty + $row->itemStock->qty,3,',','.') : number_format($row->itemStock->qty,3,',','.'),
+                'qty'                       => CustomHelper::formatConditionalQty($row->qty),
+                'qtyraw'                    => in_array($gr->status,['2','3']) ? CustomHelper::formatConditionalQty($row->qty + $row->itemStock->qty) : number_format($row->itemStock->qty),
                 'price'                     => number_format($row->price,2,',','.'),
                 'total'                     => number_format($row->total,2,',','.'),
                 'inventory_coa_id'          => $row->inventoryCoa()->exists() ? $row->inventory_coa_id : '',
@@ -2476,7 +2477,7 @@ class GoodIssueController extends Controller
                 'project_id'                => $row->project()->exists() ? $row->project->id : '',
                 'project_name'              => $row->project()->exists() ? $row->project->name : '',
                 'requester'                 => $row->requester,
-                'qty_return'                => number_format($row->qty_return,3,',','.'),
+                'qty_return'                => CustomHelper::formatConditionalQty($row->qty_return),
                 'is_activa'                 => $row->itemStock->item->itemGroup->is_activa ? $row->itemStock->item->itemGroup->is_activa : '',
                 'list_serial'               => $row->arrSerial(),
                 'cost_distribution_id'      => $row->cost_distribution_id ? $row->cost_distribution_id : '',
@@ -3053,5 +3054,36 @@ class GoodIssueController extends Controller
             'status'    => 200,
             'message'   => ''
         ]);
+    }
+
+    public function done(Request $request){
+        $query_done = GoodIssue::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query_done){
+
+            if(in_array($query_done->status,['1','2'])){
+                $query_done->update([
+                    'status'    => '3'
+                ]);
+    
+                activity()
+                        ->performedOn(new GoodIssue())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query_done)
+                        ->log('Done the Good Issue data');
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data updated successfully.'
+                ];
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+                ];
+            }
+
+            return response()->json($response);
+        }
     }
 }

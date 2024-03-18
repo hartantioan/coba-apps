@@ -230,7 +230,7 @@
                                     <td align="">{{ $row->lookable->item->name }}</td>
                                     <td align="">{{ $row->lookable->marketingOrderDelivery->code }}</td>
                                     <td align="">{{ $row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code }}</td>
-                                    <td align="right">{{ number_format($row->qty / $row->lookable->item->pallet_convert,3,',','.') }}</td>
+                                    <td align="right">{{ CustomHelper::formatConditionalQty($row->qty / $row->lookable->item->pallet_convert) }}</td>
                                     <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                                     <td align="center">{{ $row->lookable->item->sellUnit->code }}</td>
                                     <td align="right">{{ number_format($row->price,2,',','.') }}</td>

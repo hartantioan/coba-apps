@@ -326,7 +326,8 @@ class PaymentRequestController extends Controller
                     '<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small" data-popup="tooltip" title="Bayar" onclick="cashBankOut(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">screen_share</i></button>' : ($val->outgoingPayment()->exists() ? $val->outgoingPayment->code : $val->statusRaw() )),
                     '
                     '.$btn_jurnal.'
-                    <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat cyan darken-4 white-text btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
@@ -1178,7 +1179,7 @@ class PaymentRequestController extends Controller
                 <td class="center-align">'.$row->getCode().'</td>
                 <td class="center-align">'.$row->type().'</td>
                 <td class="center-align">'.$row->note.'</td>
-                <td class="right-align">'.number_format($row->nominal,3,',','.').'</td>
+                <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
             </tr>';
         }
         $string .= '<tr>
@@ -1257,7 +1258,7 @@ class PaymentRequestController extends Controller
                     <td class="center-align">'.$row->lookable->account->name.'</td>
                     <td class="center-align">'.date('d/m/Y',strtotime($row->lookable->post_date)).'</td>
                     <td class="center-align">'.$row->lookable->coaSource->name.'</td>
-                    <td class="right-align">'.number_format($row->nominal,3,',','.').'</td>
+                    <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
                 </tr>';
             }
         }else{
@@ -1327,7 +1328,7 @@ class PaymentRequestController extends Controller
         $pr['account_name'] = $pr->account()->exists() ? $pr->account->name : '';
         $pr['code_place_id'] = substr($pr->code,7,2);
         $pr['coa_source_name'] = $pr->coaSource()->exists() ? $pr->coaSource->code.' - '.$pr->coaSource->name.' - '.$pr->coaSource->company->name : '';
-        $pr['currency_rate'] = number_format($pr->currency_rate,3,',','.');
+        $pr['currency_rate'] = number_format($pr->currency_rate,2,',','.');
         $pr['cost_distribution_name'] = $pr->cost_distribution_id ? $pr->costDistribution->code.' - '.$pr->costDistribution->name : '';
         $pr['total'] = number_format($pr->total,2,',','.');
         $pr['rounding'] = number_format($pr->rounding,2,',','.');
@@ -1366,12 +1367,12 @@ class PaymentRequestController extends Controller
                 'rawcode'       => $row->getCode(),
                 'post_date'     => $row->lookable_type == 'fund_request_details' ? $row->lookable->fundRequest->post_date : $row->lookable->post_date,
                 'due_date'      => isset($row->lookable->due_date) ? $row->lookable->due_date : ($row->lookable_type == 'fund_request_details' ? $row->lookable->fundRequest->post_date : $row->lookable->post_date),
-                'total'         => number_format($row->lookable->total,3,',','.'),
-                'tax'           => number_format($row->lookable->tax,3,',','.'),
-                'wtax'          => number_format($row->lookable->wtax,3,',','.'),
-                'grandtotal'    => number_format($row->lookable->grandtotal,3,',','.'),
-                'nominal'       => number_format($row->nominal,3,',','.'),
-                'balance'       => number_format($row->lookable->balancePaymentRequest() + $row->nominal,3,',','.'),
+                'total'         => number_format($row->lookable->total,2,',','.'),
+                'tax'           => number_format($row->lookable->tax,2,',','.'),
+                'wtax'          => number_format($row->lookable->wtax,2,',','.'),
+                'grandtotal'    => number_format($row->lookable->grandtotal,2,',','.'),
+                'nominal'       => number_format($row->nominal,2,',','.'),
+                'balance'       => number_format($row->lookable->balancePaymentRequest() + $row->nominal,2,',','.'),
                 'note'          => $row->note ? $row->note : '',
                 'remark'        => $row->remark ? $row->remark : '',
                 'cost_distribution_id'        => $row->cost_distribution_id ? $row->cost_distribution_id : '',
@@ -4145,5 +4146,36 @@ class PaymentRequestController extends Controller
             ]; 
         }
         return response()->json($response);
+    }
+
+    public function done(Request $request){
+        $query_done = PaymentRequest::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query_done){
+
+            if(in_array($query_done->status,['1','2'])){
+                $query_done->update([
+                    'status'    => '3'
+                ]);
+    
+                activity()
+                        ->performedOn(new PaymentRequest())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query_done)
+                        ->log('Done the Good Issue Request data');
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data updated successfully.'
+                ];
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+                ];
+            }
+
+            return response()->json($response);
+        }
     }
 }

@@ -257,6 +257,7 @@ class OutgoingPaymentController extends Controller
                     $val->note,
                     $val->status(),
                     '
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         '.$btn_jurnal.'
                         <button type="button" class="btn-floating mb-1 btn-flat cyan darken-4 white-text btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
@@ -306,7 +307,7 @@ class OutgoingPaymentController extends Controller
                 <td class="center-align">'.$row->getCode().'</td>
                 <td class="center-align">'.$row->type().'</td>
                 <td class="center-align">'.$row->note.'</td>
-                <td class="right-align">'.number_format($row->nominal,3,',','.').'</td>
+                <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
             </tr>';
         }
         $string .= '<tr>
@@ -385,7 +386,7 @@ class OutgoingPaymentController extends Controller
                     <td class="center-align">'.$row->lookable->account->name.'</td>
                     <td class="center-align">'.date('d/m/Y',strtotime($row->lookable->post_date)).'</td>
                     <td class="center-align">'.$row->lookable->coaSource->name.'</td>
-                    <td class="right-align">'.number_format($row->nominal,3,',','.').'</td>
+                    <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
                 </tr>';
             }
         }else{
@@ -502,9 +503,9 @@ class OutgoingPaymentController extends Controller
             $pr['status'] = 200;
             $pr['account_name'] = $pr->account->name;
             $pr['coa_source_name'] = $pr->coaSource->code.' - '.$pr->coaSource->name.' - '.$pr->coaSource->company->name;
-            $pr['currency_rate'] = number_format($pr->currency_rate,3,',','.');
-            $pr['admin'] = number_format($pr->admin,3,',','.');
-            $pr['grandtotal'] = number_format($pr->grandtotal,3,',','.');
+            $pr['currency_rate'] = number_format($pr->currency_rate,2,',','.');
+            $pr['admin'] = number_format($pr->admin,2,',','.');
+            $pr['grandtotal'] = number_format($pr->grandtotal,2,',','.');
             $pr['payment_request_id'] = $pr->payment_request_id ? $pr->payment_request_id : '';
             $pr['payment_request_code'] = $pr->paymentRequest->code;
         }
@@ -2990,5 +2991,36 @@ class OutgoingPaymentController extends Controller
             ]; 
         }
         return response()->json($response);
+    }
+
+    public function done(Request $request){
+        $query_done = OutgoingPayment::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query_done){
+
+            if(in_array($query_done->status,['1','2'])){
+                $query_done->update([
+                    'status'    => '3'
+                ]);
+    
+                activity()
+                        ->performedOn(new OutgoingPayment())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query_done)
+                        ->log('Done the Good Issue Request data');
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data updated successfully.'
+                ];
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+                ];
+            }
+
+            return response()->json($response);
+        }
     }
 }

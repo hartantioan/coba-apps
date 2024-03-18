@@ -53,10 +53,10 @@
                 <td>{{ $row->voidUser()->exists() ? $row->void_note : '' }}</td>
                 <td>{{ $rowdetail->purchase_order_detail_id ? $rowdetail->purchaseOrderDetail->purchaseOrder->code : '-' }}</td>
                 <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name }}</td>
-                <td>{{ $rowdetail->purchase_order_detail_id ? number_format($rowdetail->purchaseOrderDetail->qty,3,',','.') : '-' }}</td>
-                <td>{{ number_format($rowdetail->qty_in,3,',','.') }}</td>
-                <td>{{ number_format($rowdetail->qty_out,3,',','.') }}</td>
-                <td>{{ number_format($rowdetail->qty_balance,3,',','.') }}</td>
+                <td>{{ $rowdetail->purchase_order_detail_id ? CustomHelper::formatConditionalQty($rowdetail->purchaseOrderDetail->qty) : '-' }}</td>
+                <td>{{ CustomHelper::formatConditionalQty($rowdetail->qty_in) }}</td>
+                <td>{{ CustomHelper::formatConditionalQty($rowdetail->qty_out) }}</td>
+                <td>{{ CustomHelper::formatConditionalQty($rowdetail->qty_balance) }}</td>
                 <td>{{ $rowdetail->item->uomUnit->code }}</td>
                 <td>{{ $rowdetail->note }}</td>
                 <td>{{ $rowdetail->note2 }}</td>

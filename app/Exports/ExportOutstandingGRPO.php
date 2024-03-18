@@ -6,7 +6,7 @@ use App\Models\GoodReceiptDetail;
 use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-
+use App\Helpers\CustomHelper;
 class ExportOutstandingGRPO implements FromView,ShouldAutoSize
 {
     /**
@@ -27,9 +27,9 @@ class ExportOutstandingGRPO implements FromView,ShouldAutoSize
             $entry["item_code"] = $row->item->code;
             $entry["item_name"] = $row->item->name;
             $entry["satuan"] =$row->itemUnit->unit->code;
-            $entry["qty"] = number_format($row->qty,3,',','.');
-            $entry["qty_gr"] = number_format($row->qtyInvoice(),3,',','.');
-            $entry["qty_balance"] = number_format($row->balanceQtyInvoice(),3,',','.');
+            $entry["qty"] = CustomHelper::formatConditionalQty($row->qty,3,',','.');
+            $entry["qty_gr"] = CustomHelper::formatConditionalQty($row->qtyInvoice(),3,',','.');
+            $entry["qty_balance"] = CustomHelper::formatConditionalQty($row->balanceQtyInvoice(),3,',','.');
             if($row->balanceQtyInvoice()> 0){
                 $array[] = $entry;
             }

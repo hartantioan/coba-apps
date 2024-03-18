@@ -150,7 +150,7 @@ class MarketingHandoverReportController extends Controller
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code.'</td>
                 <td class="center-align">'.$row->lookable->item->name.'</td>
-                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->lookable->item->sellUnit->code.'</td>
                 <td class="">'.$row->note_internal.' - '.$row->note_external.'</td>
                 <td class="right-align">'.number_format($row->total,2,',','.').'</td>

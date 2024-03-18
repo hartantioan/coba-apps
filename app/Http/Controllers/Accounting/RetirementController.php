@@ -147,12 +147,13 @@ class RetirementController extends Controller
                     $val->user->name,
                     $val->company->name,
                     $val->currency->code.' - '.$val->currency->name,
-                    number_format($val->currency_rate,3,',','.'),
+                    number_format($val->currency_rate),
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
                     $val->status(),
                     '
-                    <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         '.$btn_jurnal.'
@@ -351,9 +352,9 @@ class RetirementController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td>'.$row->asset->code.' - '.$row->asset->name.'</td>
-                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->unit->code.'</td>
-                <td class="right-align">'.number_format($row->retirement_nominal,3,',','.').'</td>
+                <td class="right-align">'.number_format($row->retirement_nominal,2,',','.').'</td>
                 <td>'.$row->note.'</td>
                 <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
             </tr>';
@@ -424,7 +425,7 @@ class RetirementController extends Controller
 
     public function show(Request $request){
         $ret = Retirement::where('code',CustomHelper::decrypt($request->id))->first();
-        $ret['currency_rate'] = number_format($ret->currency_rate,3,',','.');
+        $ret['currency_rate'] = number_format($ret->currency_rate,2,',','.');
         $ret['code_place_id'] = substr($ret->code,7,2);
 
         $arr = [];
@@ -437,8 +438,8 @@ class RetirementController extends Controller
                 'qty'               => $row->qty,
                 'unit_id'           => $row->unit_id,
                 'unit_name'         => $row->unit->name,
-                'asset_nominal'     => number_format($row->asset->nominal,3,',','.'),
-                'retirement_nominal'=> number_format($row->retirement_nominal,3,',','.'),
+                'asset_nominal'     => number_format($row->asset->nominal,2,',','.'),
+                'retirement_nominal'=> number_format($row->retirement_nominal,2,',','.'),
                 'note'              => $row->note ? $row->note : '',
                 'coa_id'            => $row->coa_id,
                 'coa_name'          => $row->coa->code.' - '.$row->coa->name
@@ -971,6 +972,37 @@ class RetirementController extends Controller
             return $document_po;
         }else{
             abort(404);
+        }
+    }
+
+    public function done(Request $request){
+        $query_done = Retirement::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query_done){
+
+            if(in_array($query_done->status,['1','2'])){
+                $query_done->update([
+                    'status'    => '3'
+                ]);
+    
+                activity()
+                        ->performedOn(new Retirement())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query_done)
+                        ->log('Done the Retirement data');
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data updated successfully.'
+                ];
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+                ];
+            }
+
+            return response()->json($response);
         }
     }
 }

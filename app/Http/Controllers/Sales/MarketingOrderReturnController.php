@@ -199,6 +199,7 @@ class MarketingOrderReturnController extends Controller
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
                     '
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
@@ -475,7 +476,7 @@ class MarketingOrderReturnController extends Controller
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->marketingOrderDeliveryDetail->marketingOrderDelivery->marketingOrderDeliveryProcess->code.'</td>
                 <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
-                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->item->sellUnit->code.'</td>
                 <td class="">'.$row->note.'</td>
                 <td class="center-align">'.$row->place->code.'</td>
@@ -949,8 +950,8 @@ class MarketingOrderReturnController extends Controller
                 'warehouse_name'                        => $row->warehouse->name,
                 'area_id'                               => $row->area_id,
                 'area_name'                             => $row->area->name,
-                'qty_sent'                              => number_format($row->marketingOrderDeliveryDetail->getBalanceQtySentMinusReturn(),3,',','.'),
-                'qty'                                   => number_format($row->qty,3,',','.'),
+                'qty_sent'                              => CustomHelper::formatConditionalQty($row->marketingOrderDeliveryDetail->getBalanceQtySentMinusReturn()),
+                'qty'                                   => CustomHelper::formatConditionalQty($row->qty),
                 'unit'                                  => $row->item->sellUnit->code,
                 'note'                                  => $row->note,
             ];
@@ -1087,5 +1088,36 @@ class MarketingOrderReturnController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function done(Request $request){
+        $query_done = MarketingOrderReturn::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query_done){
+
+            if(in_array($query_done->status,['1','2'])){
+                $query_done->update([
+                    'status'    => '3'
+                ]);
+    
+                activity()
+                        ->performedOn(new MarketingOrderReturn())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query_done)
+                        ->log('Done the Marketing Order Return data');
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data updated successfully.'
+                ];
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+                ];
+            }
+
+            return response()->json($response);
+        }
     }
 }

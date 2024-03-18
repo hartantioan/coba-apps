@@ -214,7 +214,8 @@ class GoodReturnIssueController extends Controller
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
                     '
-                    <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         '.$btn_jurnal.'
@@ -445,8 +446,8 @@ class GoodReturnIssueController extends Controller
                 <td class="">'.($row->goodIssueDetail->itemStock->area()->exists() ? $row->goodIssueDetail->itemStock->area->code : '-').'</td>
                 <td class="">'.($row->goodIssueDetail->itemStock->itemShading()->exists() ? $row->goodIssueDetail->itemStock->itemShading->code : '-').'</td>
                 <td class="">'.$row->goodIssueDetail->requester.'</td>
-                <td class="right-align">'.number_format($row->goodIssueDetail->qtyBalanceReturn(),3,',','.').'</td>
-                <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->goodIssueDetail->qtyBalanceReturn()).'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->item->uomUnit->code.'</td>
                 <td class="">'.$row->note.'</td>
             </tr>';
@@ -530,8 +531,8 @@ class GoodReturnIssueController extends Controller
                 'warehouse_name'        => $row->goodIssueDetail->itemStock->warehouse->name,
                 'area_name'             => $row->goodIssueDetail->itemStock->area()->exists() ? $row->goodIssueDetail->itemStock->area->code : '-',
                 'shading_name'          => $row->goodIssueDetail->itemStock->itemShading()->exists() ? $row->goodIssueDetail->itemStock->itemShading->code : '-',
-                'qty_balance'           => number_format($row->goodIssueDetail->qtyBalanceReturn(),3,',','.'),
-                'qty'                   => number_format($row->qty,3,',','.'),
+                'qty_balance'           => CustomHelper::formatConditionalQty($row->goodIssueDetail->qtyBalanceReturn()),
+                'qty'                   => CustomHelper::formatConditionalQty($row->qty),
                 'note'                  => $row->note ? $row->note : '',
                 'unit'                  => $row->item->uomUnit->code,
             ];
@@ -1083,5 +1084,36 @@ class GoodReturnIssueController extends Controller
             'status'    => 200,
             'message'   => ''
         ]);
+    }
+
+    public function done(Request $request){
+        $query_done = GoodReturnIssue::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query_done){
+
+            if(in_array($query_done->status,['1','2'])){
+                $query_done->update([
+                    'status'    => '3'
+                ]);
+    
+                activity()
+                        ->performedOn(new GoodReturnIssue())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query_done)
+                        ->log('Done the Good Return Issue data');
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data updated successfully.'
+                ];
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+                ];
+            }
+
+            return response()->json($response);
+        }
     }
 }

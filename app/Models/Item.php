@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
+use App\Helpers\CustomHelper;
 
 class Item extends Model
 {
@@ -233,8 +234,8 @@ class Item extends Model
                 'area'              => $detail->area()->exists() ? $detail->area->name : '',
                 'item_shading_id'   => $detail->itemShading()->exists() ? $detail->item_shading_id : '',
                 'shading'           => $detail->itemShading()->exists() ? $detail->itemShading->code : '',
-                'qty'               => number_format($detail->qty,3,',','.').' '.$this->uomUnit->code,
-                'qty_raw'           => number_format($detail->qty,3,',','.'),
+                'qty'               => CustomHelper::formatConditionalQty($detail->qty).' '.$this->uomUnit->code,
+                'qty_raw'           => CustomHelper::formatConditionalQty($detail->qty),
             ];
         }
         
@@ -251,8 +252,8 @@ class Item extends Model
                 'warehouse'     => $detail->place->code.' - '.$detail->warehouse->name,
                 'warehouse_id'  => $detail->warehouse_id,
                 'place_id'      => $detail->place_id,
-                'qty'           => number_format($detail->qty,3,',','.').' '.$this->uomUnit->code,
-                'qty_raw'       => number_format($detail->qty,3,',','.'),
+                'qty'           => CustomHelper::formatConditionalQty($detail->qty).' '.$this->uomUnit->code,
+                'qty_raw'       => CustomHelper::formatConditionalQty($detail->qty),
             ];
         }
         
@@ -272,9 +273,9 @@ class Item extends Model
                 'area'          => $detail->area()->exists() ? $detail->area->name : '',
                 'area_id'       => $detail->area_id ? $detail->area_id : '',
                 'place_id'      => $detail->place_id,
-                'qty'           => number_format(($detail->qty / $detail->item->sell_convert) - $qtyUnapproved,3,',','.').' '.$this->uomUnit->code,
-                'qty_raw'       => number_format(($detail->qty / $detail->item->sell_convert) - $qtyUnapproved,3,',','.'),
-                'qty_commited'  => number_format($detail->totalUndeliveredItemSales(),3,',','.'),
+                'qty'           => CustomHelper::formatConditionalQty(($detail->qty / $detail->item->sell_convert) - $qtyUnapproved).' '.$this->uomUnit->code,
+                'qty_raw'       => CustomHelper::formatConditionalQty(($detail->qty / $detail->item->sell_convert) - $qtyUnapproved),
+                'qty_commited'  => CustomHelper::formatConditionalQty($detail->totalUndeliveredItemSales()),
             ];
         }
         
@@ -293,8 +294,8 @@ class Item extends Model
                 'area'          => $detail->area()->exists() ? $detail->area->name : '',
                 'area_id'       => $detail->area_id ? $detail->area_id : '',
                 'place_id'      => $detail->place_id,
-                'qty'           => number_format($detail->qty,3,',','.').' '.$this->uomUnit->code,
-                'qty_raw'       => number_format($detail->qty,3,',','.'),
+                'qty'           => CustomHelper::formatConditionalQty($detail->qty).' '.$this->uomUnit->code,
+                'qty_raw'       => CustomHelper::formatConditionalQty($detail->qty),
             ];
         }
         
@@ -309,10 +310,10 @@ class Item extends Model
             $arrData[] = [
                 'id'                    => $detail->id,
                 'warehouse'             => $detail->place->code.' - '.$detail->warehouse->name.($detail->area()->exists() ? ' - '.$detail->area->code : ''),
-                'qty'                   => number_format($detail->qty,3,',','.').' '.$this->uomUnit->code,
-                'qty_raw'               => number_format($detail->qty,3,',','.'),
-                'qty_production'        => number_format($detail->qty / $this->production_convert,3,',','.').' '.$this->productionUnit->code,
-                'qty_production_raw'    => number_format($detail->qty / $this->production_convert,3,',','.'),
+                'qty'                   => CustomHelper::formatConditionalQty($detail->qty).' '.$this->uomUnit->code,
+                'qty_raw'               => CustomHelper::formatConditionalQty($detail->qty),
+                'qty_production'        => CustomHelper::formatConditionalQty($detail->qty / $this->production_convert).' '.$this->productionUnit->code,
+                'qty_production_raw'    => CustomHelper::formatConditionalQty($detail->qty / $this->production_convert),
             ];
         }
         
@@ -442,10 +443,10 @@ class Item extends Model
                 $arr[] = [
                     'item_id'   => $row->lookable_id,
                     'item_name' => $row->lookable->name,
-                    'qty'       => number_format($qtyNeeded,3,',','.').' '.$row->lookable->uomUnit->code,
-                    'stock'     => number_format($stock,3,',','.').' '.$row->lookable->uomUnit->code,
-                    'stock_raw' => number_format($stock,3,',','.'),
-                    'qty_raw'   => number_format($qtyNeeded,3,',','.'),
+                    'qty'       => CustomHelper::formatConditionalQty($qtyNeeded).' '.$row->lookable->uomUnit->code,
+                    'stock'     => CustomHelper::formatConditionalQty($stock).' '.$row->lookable->uomUnit->code,
+                    'stock_raw' => CustomHelper::formatConditionalQty($stock),
+                    'qty_raw'   => CustomHelper::formatConditionalQty($qtyNeeded),
                     'status'    => $status,
                     'unit'      => $row->lookable->uomUnit->code,
                     'not_enough'=> $qtyNeeded > $stock ? '1':'',

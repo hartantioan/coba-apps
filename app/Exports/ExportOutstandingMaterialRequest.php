@@ -6,7 +6,7 @@ use App\Models\MaterialRequestDetail;
 use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-
+use App\Helpers\CustomHelper;
 class ExportOutstandingMaterialRequest implements FromView,ShouldAutoSize
 {
     
@@ -35,10 +35,10 @@ class ExportOutstandingMaterialRequest implements FromView,ShouldAutoSize
             $entry["ket1"] = $row->note;
             $entry["ket2"] = $row->note2;
             $entry["satuan"] =$row->itemUnit->unit->code;
-            $entry["qty"] = number_format($row->qty,3,',','.');
-            $entry["qty_pr"] = number_format($row->totalPr(),3,',','.');
-            $entry["qty_gi"] = number_format($row->totalGi(),3,',','.');
-            $entry["qty_balance"] = number_format($row->balancePrGi(),3,',','.');
+            $entry["qty"] = CustomHelper::formatConditionalQty($row->qty,3,',','.');
+            $entry["qty_pr"] = CustomHelper::formatConditionalQty($row->totalPr(),3,',','.');
+            $entry["qty_gi"] = CustomHelper::formatConditionalQty($row->totalGi(),3,',','.');
+            $entry["qty_balance"] = CustomHelper::formatConditionalQty($row->balancePrGi(),3,',','.');
             $entry["required_date"] =$row->required_date;
             $entry["warehouse"] =$row->warehouse->name;
             $entry["line"] =$row->line->name ?? '-';

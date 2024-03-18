@@ -385,7 +385,7 @@ class RequestSparepartController extends Controller
                 'equipment_sparepart_id'=>$row->equipment_sparepart_id,
                 'stock' =>[
                     "id"            => $row->itemStock->id,
-                    'qty'           => number_format($row->itemStock->qty,3,',','.').' '.$row->itemStock->item->uomUnit->code,
+                    'qty'           => number_format($row->itemStock->qty).' '.$row->itemStock->item->uomUnit->code,
                     'warehouse'     => $row->itemStock->warehouse->name,
                 ],
                 'qty_request'=>$row->qty_request,

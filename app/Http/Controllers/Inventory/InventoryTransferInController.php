@@ -265,7 +265,8 @@ class InventoryTransferInController extends Controller
                     $val->inventoryTransferOut->warehouseTo->name,
                     $val->status(),
                     '
-                    <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         '.$btn_jurnal.'
@@ -463,7 +464,7 @@ class InventoryTransferInController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
-                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->item->uomUnit->code.'</td>
                 <td>'.$row->listSerialIn().'</td>
                 <td class="center-align">'.$row->note.'</td>
@@ -543,7 +544,7 @@ class InventoryTransferInController extends Controller
             $details[] = [
                 'name'          => $row->item->code.' - '.$row->item->name,
                 'origin'        => $row->itemStock->place->code.' - '.$row->itemStock->warehouse->name,
-                'qty'           => number_format($row->qty,3,',','.'),
+                'qty'           => CustomHelper::formatConditionalQty($row->qty),
                 'unit'          => $row->item->uomUnit->code,
                 'note'          => $row->note ? $row->note : '',
                 'list_serial'   => $row->listSerialIn(),
@@ -1077,5 +1078,36 @@ class InventoryTransferInController extends Controller
         $end_date = $request->end_date ? $request->end_date : '';
         $mode = $request->mode ? $request->mode : '';
 		return Excel::download(new ExportInventoryTransferIn($post_date,$end_date,$mode), 'inventory_transfer_in_'.uniqid().'.xlsx');
+    }
+
+    public function done(Request $request){
+        $query_done = InventoryTransferIn::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query_done){
+
+            if(in_array($query_done->status,['1','2'])){
+                $query_done->update([
+                    'status'    => '3'
+                ]);
+    
+                activity()
+                        ->performedOn(new InventoryTransferIn())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query_done)
+                        ->log('Done the Inventory Transfer In data');
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data updated successfully.'
+                ];
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+                ];
+            }
+
+            return response()->json($response);
+        }
     }
 }

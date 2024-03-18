@@ -148,7 +148,7 @@
                             <td>{{ $row->code }}</td>
                             <td>{{ $row->lookable_type ? $row->lookable->code : '-' }}</td>
                             <td>{{ $row->currency_id ? $row->currency->code : '-' }}</td>
-                            <td>{{ number_format($row->currency_rate,3,',','.') }}</td>
+                            <td>{{ number_format($row->currency_rate,2,',','.') }}</td>
                             <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                             <td>{{ date('d/m/Y',strtotime($row->due_date)) }}</td>
                             <td>{{ $row->note }}</td>
@@ -184,8 +184,8 @@
                                                 <td align="center">{{ ($rowdetail->item_id ? $rowdetail->item->code.' - '.$rowdetail->item->name : '-') }}</td>
                                                 <td align="center">{{ ($rowdetail->department_id ? $rowdetail->department->name : '-') }}</td>
                                                 <td align="center">{{ ($rowdetail->warehouse_id ? $rowdetail->warehouse->name : '-') }}</td>
-                                                <td align="right">{{ ($rowdetail->type == '1' ? number_format($rowdetail->nominal,3,',','.') : '') }}</td>
-                                                <td align="right">{{ ($rowdetail->type == '2' ? number_format($rowdetail->nominal,3,',','.') : '') }}</td>
+                                                <td align="right">{{ ($rowdetail->type == '1' ? number_format($rowdetail->nominal,2,',','.') : '') }}</td>
+                                                <td align="right">{{ ($rowdetail->type == '2' ? number_format($rowdetail->nominal,2,',','.') : '') }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>

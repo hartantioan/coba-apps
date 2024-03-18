@@ -194,6 +194,7 @@ class CloseBillController extends Controller
                     number_format($val->grandtotal,2,',','.'),
                     $val->status(),
                     '
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
@@ -291,7 +292,7 @@ class CloseBillController extends Controller
                                 'code'      => $op->code,
                                 'bp'        => $op->account->employee_no.' - '.$op->account->name,
                                 'post_date' => $op->pay_date,
-                                'total'     => number_format($op->total,2,',','.'),
+                                'total'     => number_format($op->balance,2,',','.'),
                                 'used'      => number_format($op->totalUsedCross(),2,',','.'),
                                 'balance'   => number_format($balance,2,',','.'),
                                 'note'      => $op->note,
@@ -326,7 +327,7 @@ class CloseBillController extends Controller
         ->get();
 
         foreach($data as $row){
-            $balance = $row->balancePaymentCross();
+            $balance = $row->balancePaymentIncoming();
             if(!$row->used()->exists() && $balance > 0){
                 $details[] = [
                     'id'                    => $row->id,
@@ -335,6 +336,9 @@ class CloseBillController extends Controller
                     'name'                  => $row->account->employee_no.' - '.$row->account->name,
                     'post_date'             => date('d/m/Y',strtotime($row->post_date)),
                     'total'                 => number_format($row->total,2,',','.'),
+                    'tax'                   => number_format($row->tax,2,',','.'),
+                    'wtax'                  => number_format($row->wtax,2,',','.'),
+                    'grandtotal'            => number_format($row->grandtotal,2,',','.'),
                     'used'                  => number_format($row->totalUsedCross(),2,',','.'),
                     'balance'               => number_format($balance,2,',','.'),
                     'note'                  => $row->note,
@@ -2968,5 +2972,36 @@ class CloseBillController extends Controller
             ];
         }
         return response()->json($response);
+    }
+
+    public function done(Request $request){
+        $query_done = CloseBill::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query_done){
+
+            if(in_array($query_done->status,['1','2'])){
+                $query_done->update([
+                    'status'    => '3'
+                ]);
+    
+                activity()
+                        ->performedOn(new CloseBill())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query_done)
+                        ->log('Done the Good Issue Request data');
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data updated successfully.'
+                ];
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+                ];
+            }
+
+            return response()->json($response);
+        }
     }
 }

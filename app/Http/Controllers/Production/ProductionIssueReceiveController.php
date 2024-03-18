@@ -171,6 +171,7 @@ class ProductionIssueReceiveController extends Controller
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
                     '
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
@@ -455,12 +456,12 @@ class ProductionIssueReceiveController extends Controller
                 'lookable_name'         => $row->lookable->name,
                 'lookable_unit'         => $row->item()->exists() ? $row->item->productionUnit->code : '-',
                 'list_stock'            => $row->item()->exists() ? $row->item->currentStockPerPlace($po->productionOrder->productionSchedule->place_id) : [],
-                'qty'                   => number_format($row->qty,3,',','.'),
+                'qty'                   => CustomHelper::formatConditionalQty($row->qty),
                 'nominal'               => number_format($row->nominal,2,',','.'),
                 'total'                 => number_format($row->total,2,',','.'),
-                'qty_standard'          => number_format($row->productionOrderDetail->qty,3,',','.'),
-                'nominal_standard'      => number_format($row->productionOrderDetail->nominal,3,',','.'),
-                'total_standard'        => number_format($row->productionOrderDetail->total,3,',','.'),
+                'qty_standard'          => CustomHelper::formatConditionalQty($row->productionOrderDetail->qty),
+                'nominal_standard'      => number_format($row->productionOrderDetail->nominal,2,',','.'),
+                'total_standard'        => number_format($row->productionOrderDetail->total,2,',','.'),
                 'item_stock_id'         => $row->from_item_stock_id,
                 'shading'               => $row->shading,
                 'batch_no'              => $row->batch_no,
@@ -479,8 +480,8 @@ class ProductionIssueReceiveController extends Controller
         $po['item_receive_unit_uom']            = $po->productionOrder->productionScheduleDetail->item->uomUnit->code;
         $po['item_receive_unit_sell']           = $po->productionOrder->productionScheduleDetail->item->sellUnit->code;
         $po['item_receive_unit_pallet']         = $po->productionOrder->productionScheduleDetail->item->palletUnit->code;
-        $po['item_receive_qty']                 = number_format($po->productionOrder->productionScheduleDetail->qty,3,',','.');
-        $po['qty']                              = number_format($detailReceive->qty,3,',','.');
+        $po['item_receive_qty']                 = CustomHelper::formatConditionalQty($po->productionOrder->productionScheduleDetail->qty);
+        $po['qty']                              = CustomHelper::formatConditionalQty($detailReceive->qty);
         $po['production_convert']               = $po->productionOrder->productionScheduleDetail->item->production_convert;
         $po['sell_convert']                     = $po->productionOrder->productionScheduleDetail->item->sell_convert;
         $po['pallet_convert']                   = $po->productionOrder->productionScheduleDetail->item->pallet_convert;
@@ -537,8 +538,8 @@ class ProductionIssueReceiveController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key+1).'.</td>
                 <td>'.($row->item()->exists() ? $row->item->code.' - '.$row->item->name : $row->coa->code.' - '.$row->coa->name).'</td>
-                <td class="right-align">'.($row->item()->exists() ? number_format($row->productionOrderDetail->qty,3,',','.') : '-').'</td>
-                <td class="right-align">'.($row->item()->exists() ? number_format($row->qty,3,',','.') : '-').'</td>
+                <td class="right-align">'.($row->item()->exists() ? CustomHelper::formatConditionalQty($row->productionOrderDetail->qty) : '-').'</td>
+                <td class="right-align">'.($row->item()->exists() ? CustomHelper::formatConditionalQty($row->qty) : '-').'</td>
                 <td class="center-align">'.($row->item()->exists() ? $row->item->productionUnit->code : '-').'</td>
                 <td>'.($row->item()->exists() ? $row->itemStock->fullName() : '-').'</td>
             </tr>';
@@ -571,11 +572,11 @@ class ProductionIssueReceiveController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key+1).'.</td>
                 <td>'.$row->item->code.' - '.$row->item->name.'</td>
-                <td class="right-align">'.number_format($data->productionOrder->productionScheduleDetail->qty,3,',','.').' '.$row->item->productionUnit->code.'</td>
-                <td class="right-align">'.number_format($row->qty,3,',','.').' '.$row->item->productionUnit->code.'</td>
-                <td class="right-align">'.number_format($row->qty * $row->item->production_convert,3,',','.').' '.$row->item->uomUnit->code.'</td>
-                <td class="right-align">'.number_format(($row->qty * $row->item->production_convert) / $row->item->sell_convert,3,',','.').' '.$row->item->sellUnit->code.'</td>
-                <td class="right-align">'.number_format((($row->qty * $row->item->production_convert) / $row->item->sell_convert) / $row->item->pallet_convert,3,',','.').' '.$row->item->palletUnit->code.'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($data->productionOrder->productionScheduleDetail->qty).' '.$row->item->productionUnit->code.'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).' '.$row->item->productionUnit->code.'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty * $row->item->production_convert).' '.$row->item->uomUnit->code.'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty(($row->qty * $row->item->production_convert) / $row->item->sell_convert).' '.$row->item->sellUnit->code.'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty((($row->qty * $row->item->production_convert) / $row->item->sell_convert) / $row->item->pallet_convert).' '.$row->item->palletUnit->code.'</td>
                 <td class="center-align">'.$row->shading.'</td>
                 <td class="center-align">'.$row->batch_no.'</td>
             </tr>';
@@ -1903,5 +1904,36 @@ class ProductionIssueReceiveController extends Controller
             ]; 
         }
         return response()->json($response);
+    }
+
+    public function done(Request $request){
+        $query_done = ProductionIssueReceive::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query_done){
+
+            if(in_array($query_done->status,['1','2'])){
+                $query_done->update([
+                    'status'    => '3'
+                ]);
+    
+                activity()
+                        ->performedOn(new ProductionIssueReceive())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query_done)
+                        ->log('Done the Production Issue Receive data');
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data updated successfully.'
+                ];
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+                ];
+            }
+
+            return response()->json($response);
+        }
     }
 }

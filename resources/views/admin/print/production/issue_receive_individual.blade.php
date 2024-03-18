@@ -325,7 +325,7 @@
                                 <tr>
                                     <td align="center">{{ $key+1 }}.</td>
                                     <td>{{ $row->item()->exists() ? $row->item->code.' - '.$row->item->name : $row->coa->code.' - '.$row->coa->name }}</td>
-                                    <td align="right">{{ $row->item()->exists() ? number_format($row->productionOrderDetail->qty,3,',','.') : '-' }}</td>
+                                    <td align="right">{{ $row->item()->exists() ? CustomHelper::formatConditionalQty($row->productionOrderDetail->qty) : '-' }}</td>
                                     <td align="right">{{ $row->item()->exists() ? CustomHelper::formatConditionalQty($row->qty) : '-' }}</td>
                                     <td align="center">{{ $row->item()->exists() ? $row->item->productionUnit->code : '-' }}</td>
                                     <td>{{ $row->item()->exists() ? $row->itemStock->fullName() : '-' }}</td>
@@ -358,11 +358,11 @@
                                 <tr>
                                     <td align="center">{{ $key+1 }}</td>
                                     <td>{{ $row->item->code.' - '.$row->item->name }}</td>
-                                    <td align="right">{{ number_format($data->productionOrder->productionScheduleDetail->qty,3,',','.').' '.$row->item->productionUnit->code }}</td>
+                                    <td align="right">{{ CustomHelper::formatConditionalQty($data->productionOrder->productionScheduleDetail->qty).' '.$row->item->productionUnit->code }}</td>
                                     <td align="right">{{ CustomHelper::formatConditionalQty($row->qty).' '.$row->item->productionUnit->code }}</td>
-                                    <td align="right">{{ number_format($row->qty * $row->item->production_convert,3,',','.').' '.$row->item->uomUnit->code }}</td>
-                                    <td align="right">{{ number_format(($row->qty * $row->item->production_convert) / $row->item->sell_convert,3,',','.').' '.$row->item->sellUnit->code }}</td>
-                                    <td align="right">{{ number_format((($row->qty * $row->item->production_convert) / $row->item->sell_convert) / $row->item->pallet_convert,3,',','.').' '.$row->item->palletUnit->code }}</td>
+                                    <td align="right">{{ CustomHelper::formatConditionalQty($row->qty * $row->item->production_convert).' '.$row->item->uomUnit->code }}</td>
+                                    <td align="right">{{ CustomHelper::formatConditionalQty(($row->qty * $row->item->production_convert) / $row->item->sell_convert).' '.$row->item->sellUnit->code }}</td>
+                                    <td align="right">{{ CustomHelper::formatConditionalQty((($row->qty * $row->item->production_convert) / $row->item->sell_convert) / $row->item->pallet_convert).' '.$row->item->palletUnit->code }}</td>
                                     <td align="center">{{ $row->shading }}</td>
                                     <td align="center">{{ $row->batch_no }}</td>
                                 </tr>

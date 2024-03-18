@@ -217,7 +217,7 @@
                     <td align="center">{{ $row->goodIssueDetail->itemStock->warehouse->name }}</td>
                     <td align="center">{{ $row->goodIssueDetail->itemStock->area()->exists() ? $row->goodIssueDetail->itemStock->area->name : '-' }}</td>
                     <td align="center">{{ $row->goodIssueDetail->itemShading()->exists() ? $row->goodIssueDetail->itemShading->code : '-' }}</td>
-                    <td align="right">{{ number_format($row->goodIssueDetail->qtyBalanceReturn(),3,',','.') }}</td>
+                    <td align="right">{{ CustomHelper::formatConditionalQty($row->goodIssueDetail->qtyBalanceReturn()) }}</td>
                     <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                     <td align="center">{{ $row->item->uomUnit->code }}</td>
                 </tr>

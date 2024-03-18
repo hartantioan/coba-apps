@@ -11,7 +11,7 @@ use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithTitle;
-
+use App\Helpers\CustomHelper;
 class ExportPurchaseMemo implements FromCollection, WithTitle, WithHeadings, ShouldAutoSize
 {
     /**
@@ -91,7 +91,7 @@ class ExportPurchaseMemo implements FromCollection, WithTitle, WithHeadings, Sho
                 'ref'               => $row->getCode(),
                 'spk'               => $row->getSpk(),
                 'invoice'           => $row->getInvoiceNo(),
-                'qty'               => number_format($row->qty,3,',','.'),
+                'qty'               => CustomHelper::formatConditionalQty($row->qty,3,',','.'),
                 'nominal'           => number_format($row->getNominal(),2,',','.'),
                 'total'             => number_format($row->total,2,',','.'),
                 'tax'               => number_format($row->tax,2,',','.'),

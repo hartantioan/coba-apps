@@ -12,7 +12,7 @@ use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Illuminate\Support\Collection;
-
+use App\Helpers\CustomHelper;
 class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, ShouldAutoSize
 {
     /**
@@ -116,9 +116,9 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Sh
                     'plant'             => $row->place()->exists() ? $row->place->code : '',
                     'note'              => $row->note,
                     'note2'             => $row->note2,
-                    'qty'               => number_format($row->qty,3,',','.'),
+                    'qty'               => CustomHelper::formatConditionalQty($row->qty,3,',','.'),
                     'unit'              => $row->itemUnit->unit->code,
-                    'qty_stock'         => number_format($row->qty * $row->qty_conversion,3,',','.'),
+                    'qty_stock'         => CustomHelper::formatConditionalQty($row->qty * $row->qty_conversion,3,',','.'),
                     'unit_stock'        => $row->item->uomUnit->code,
                     'line'              => $row->line()->exists() ? $row->line->code : '',
                     'machine'           => $row->machine()->exists() ? $row->machine->name : '',

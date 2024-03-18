@@ -289,8 +289,8 @@ class GoodIssueRequestController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td>'.$row->item->code.' - '.$row->item->name.'</td>
-                <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
-                <td class="right-align">'.number_format($row->getStockNow($row->qty_conversion),3,',','.').'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->getStockNow($row->qty_conversion)).'</td>
                 <td class="center-align">'.$row->item->uomUnit->code.'</td>
                 <td class="">'.$row->note.'</td>
                 <td class="">'.$row->note2.'</td>
@@ -647,8 +647,8 @@ class GoodIssueRequestController extends Controller
             $arr[] = [
                 'item_id'           => $row->item_id,
                 'item_name'         => $row->item->code.' - '.$row->item->name,
-                'qty'               => number_format($row->qty,3,',','.'),
-                'qty_stock'         => $row->item_id ? number_format($row->qty * $row->qty_conversion,3,',','.') : '-',
+                'qty'               => CustomHelper::formatConditionalQty($row->qty),
+                'qty_stock'         => $row->item_id ? CustomHelper::formatConditionalQty($row->qty * $row->qty_conversion) : '-',
                 'unit_stock'        => $row->item_id ? $row->item->uomUnit->code : '-',
                 'note'              => $row->note ? $row->note : '',
                 'note2'             => $row->note2 ? $row->note2 : '',

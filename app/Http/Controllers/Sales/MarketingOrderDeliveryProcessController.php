@@ -249,7 +249,8 @@ class MarketingOrderDeliveryProcessController extends Controller
                     $val->statusTracking(),
                     $val->status(),
                     '
-                    <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light pink accent-2 white-text btn-small" data-popup="tooltip" title="Switch ke MOD lain" onclick="switchDocument(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">call_split</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light purple accent-2 white-text btn-small" data-popup="tooltip" title="Update Tracking" onclick="getTracking(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_shipping</i></button>
@@ -304,7 +305,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                         'item_name'     => $row->item->code.' - '.$row->item->name,
                         'place_name'    => $row->place->code,
                         'warehouse_name'=> $row->warehouse->name,
-                        'qty'           => number_format($row->qty,3,',','.'),
+                        'qty'           => CustomHelper::formatConditionalQty($row->qty),
                         'unit'          => $row->item->sellUnit->code,
                         'note'          => $row->note,
                     ];
@@ -601,7 +602,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 <td class="center-align">'.$row->marketingOrderDetail->marketingOrder->code.'</td>
                 <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
                 <td class="center-align">'.$row->itemStock->place->name.' - '.$row->itemStock->warehouse->name.'</td>
-                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->item->sellUnit->code.'</td>
                 <td class="">'.$row->note.'</td>
             </tr>';
@@ -1096,7 +1097,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 'item_name'     => $row->item->code.' - '.$row->item->name,
                 'place_name'    => $row->place->code,
                 'warehouse_name'=> $row->warehouse->name,
-                'qty'           => number_format($row->qty,3,',','.'),
+                'qty'           => CustomHelper::formatConditionalQty($row->qty),
                 'unit'          => $row->item->sellUnit->code,
                 'note'          => $row->note,
             ];
@@ -2219,5 +2220,36 @@ class MarketingOrderDeliveryProcessController extends Controller
             ];
         }
         return response()->json($response);
+    }
+
+    public function done(Request $request){
+        $query_done = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query_done){
+
+            if(in_array($query_done->status,['1','2'])){
+                $query_done->update([
+                    'status'    => '3'
+                ]);
+    
+                activity()
+                        ->performedOn(new MarketingOrderDeliveryProcess())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query_done)
+                        ->log('Done the Marketing Order Delivery Process data');
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data updated successfully.'
+                ];
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+                ];
+            }
+
+            return response()->json($response);
+        }
     }
 }

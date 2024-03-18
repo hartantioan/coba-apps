@@ -234,6 +234,7 @@ class PurchaseRequestController extends Controller
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
                     '
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
@@ -294,7 +295,7 @@ class PurchaseRequestController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
-                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->itemUnit->unit->code.'</td>
                 <td class="">'.$row->note.'</td>
                 <td class="">'.$row->note2.'</td>
@@ -736,7 +737,7 @@ class PurchaseRequestController extends Controller
             $arr[] = [
                 'item_id'           => $row->item_id,
                 'item_name'         => $row->item->code.' - '.$row->item->name,
-                'qty'               => number_format($row->qty,3,',','.'),
+                'qty'               => CustomHelper::formatConditionalQty($row->qty),
                 'item_unit_id'      => $row->item_unit_id,
                 'note'              => $row->note ? $row->note : '',
                 'note2'             => $row->note2 ? $row->note2 : '',
@@ -755,7 +756,7 @@ class PurchaseRequestController extends Controller
                 'project_name'      => $row->project_id ? $row->project->name : '',
                 'buy_units'         => $row->item->arrBuyUnits(),
                 'unit_stock'        => $row->item->uomUnit->code,
-                'qty_stock'         => number_format($row->qty * $row->qty_conversion,3,',','.'),
+                'qty_stock'         => CustomHelper::formatConditionalQty($row->qty * $row->qty_conversion),
             ];
         }
 
@@ -2921,10 +2922,10 @@ class PurchaseRequestController extends Controller
                 'id'                => $row->id,
                 'item_id'           => $row->item_id,
                 'item_name'         => $row->item->code.' - '.$row->item->name,
-                'qty'               => number_format($row->qty,3,',','.'),
+                'qty'               => CustomHelper::formatConditionalQty($row->qty),
                 'unit'              => $row->itemUnit->unit->code,
-                'qty_balance'       => number_format($row->qtyBalance(),3,',','.'),
-                'qty_po'            => number_format($row->qtyPO(),3,',','.'),
+                'qty_balance'       => CustomHelper::formatConditionalQty($row->qtyBalance()),
+                'qty_po'            => CustomHelper::formatConditionalQty($row->qtyPO()),
                 'closed'            => $row->status ? $row->status : '',
             ];
         }
@@ -3035,9 +3036,9 @@ class PurchaseRequestController extends Controller
     //                 <td class="center-align">'.$row->purchaseRequest->status().'</td>
     //                 <td class="">'.$row->item->code.' - '.$row->item->name.'</td>
     //                 <td class="center-align">'.$row->itemUnit->unit->code.'</td>
-    //                 <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
-    //                 <td class="right-align">'.number_format($row->qtyPO(),3,',','.').'</td>
-    //                 <td class="right-align">'.number_format($row->qtyBalance(),3,',','.').'</td>
+    //                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty,3,',','.').'</td>
+    //                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qtyPO(),3,',','.').'</td>
+    //                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qtyBalance(),3,',','.').'</td>
     //             </tr>';
     //         }
     //     }
@@ -3101,12 +3102,12 @@ class PurchaseRequestController extends Controller
                                 'item_id'       => $row->id,
                                 'item_name'     => $row->code.' - '.$row->name,
                                 'unit'          => $row->uomUnit->code,
-                                'in_stock'      => number_format($qtyStock,3,',','.'),
-                                'in_pr'         => number_format($stockPrd,3,',','.'),
-                                'in_po'         => number_format($stockPo,3,',','.'),
-                                'min_stock'     => number_format($min_stock,3,',','.'),
-                                'max_stock'     => number_format($max_stock,3,',','.'),
-                                'qty_request'   => number_format($balance,3,',','.'),
+                                'in_stock'      =>  CustomHelper::formatConditionalQty($qtyStock),
+                                'in_pr'         => CustomHelper::formatConditionalQty($stockPrd),
+                                'in_po'         => CustomHelper::formatConditionalQty($stockPo),
+                                'min_stock'     => CustomHelper::formatConditionalQty($min_stock),
+                                'max_stock'     => CustomHelper::formatConditionalQty($max_stock),
+                                'qty_request'   => CustomHelper::formatConditionalQty($balance),
                                 'list_warehouse'=> $row->warehouseList(),
                                 'buy_units'     => $row->arrBuyUnits(),
                                 'uom_unit'      => $row->uomUnit->code,
@@ -3156,5 +3157,36 @@ class PurchaseRequestController extends Controller
             'status'    => 200,
             'message'   => ''
         ]);
+    }
+
+    public function done(Request $request){
+        $query_done = PurchaseRequest::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query_done){
+
+            if(in_array($query_done->status,['1','2'])){
+                $query_done->update([
+                    'status'    => '3'
+                ]);
+    
+                activity()
+                        ->performedOn(new PurchaseRequest())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query_done)
+                        ->log('Done the Purchase Request data');
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data updated successfully.'
+                ];
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+                ];
+            }
+
+            return response()->json($response);
+        }
     }
 }

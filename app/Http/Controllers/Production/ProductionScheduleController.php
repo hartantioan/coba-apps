@@ -178,6 +178,7 @@ class ProductionScheduleController extends Controller
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
                     '
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
@@ -431,10 +432,10 @@ class ProductionScheduleController extends Controller
                 'item_id'               => $row->marketingOrderPlanDetail->item_id,
                 'item_code'             => $row->marketingOrderPlanDetail->item->code,
                 'item_name'             => $row->marketingOrderPlanDetail->item->code.' - '.$row->marketingOrderPlanDetail->item->name,
-                'qty_in_sell'           => number_format(($row->qty  * $row->marketingOrderPlanDetail->item->production_convert) / $row->marketingOrderPlanDetail->item->sell_convert,3,',','.'),
-                'qty_in_uom'            => number_format($row->qty * $row->marketingOrderPlanDetail->item->production_convert,3,',','.'),
-                'qty_in_production'     => number_format($row->qty,3,',','.'),
-                'qty_in_pallet'         => number_format((($row->qty * $row->marketingOrderPlanDetail->item->production_convert) / $row->marketingOrderPlanDetail->item->sell_convert) / $row->marketingOrderPlanDetail->item->pallet_convert,3,',','.'),
+                'qty_in_sell'           => number_format(($row->qty  * $row->marketingOrderPlanDetail->item->production_convert) / $row->marketingOrderPlanDetail->item->sell_convert),
+                'qty_in_uom'            => CustomHelper::formatConditionalQty($row->qty * $row->marketingOrderPlanDetail->item->production_convert),
+                'qty_in_production'     => CustomHelper::formatConditionalQty($row->qty),
+                'qty_in_pallet'         => CustomHelper::formatConditionalQty((($row->qty * $row->marketingOrderPlanDetail->item->production_convert) / $row->marketingOrderPlanDetail->item->sell_convert) / $row->marketingOrderPlanDetail->item->pallet_convert),
                 'unit_sell'             => $row->marketingOrderPlanDetail->item->sellUnit->code,
                 'unit_uom'              => $row->marketingOrderPlanDetail->item->uomUnit->code,
                 'unit_production'       => $row->marketingOrderPlanDetail->item->productionUnit->code,
@@ -444,7 +445,7 @@ class ProductionScheduleController extends Controller
                 'pallet_convert'        => $row->marketingOrderPlanDetail->item->pallet_convert,
                 'request_date'          => date('d/m/Y',strtotime($row->marketingOrderPlanDetail->request_date)),
                 'note'                  => $row->marketingOrderPlanDetail->note,
-                'qty_real'              => number_format($row->marketingOrderPlanDetail->qty * $row->marketingOrderPlanDetail->item->sell_convert,3,',','.'),
+                'qty_real'              => CustomHelper::formatConditionalQty($row->marketingOrderPlanDetail->qty * $row->marketingOrderPlanDetail->item->sell_convert),
                 'bom_link'              => $cekBom->exists() ? $cekBom->orderByDesc('id')->first()->code : '',
                 'stock_check'           => $cekBom->exists() ? $row->marketingOrderPlanDetail->item->arrRawStock($po->place_id,$row->marketingOrderPlanDetail->qty * $row->MarketingOrderPlanDetail->item->sell_convert) : '',
                 'is_urgent'             => $row->marketingOrderPlanDetail->isUrgent(),
@@ -463,7 +464,7 @@ class ProductionScheduleController extends Controller
                 'shift_id'          => $row->shift_id,
                 'shift_code'        => $row->shift->code.' - '.$row->shift->name.'|'.$row->shift->time_in.' - '.$row->shift->time_out,
                 'item_id'           => $row->item_id,
-                'qty'               => number_format($row->qty,3,',','.'),
+                'qty'               => CustomHelper::formatConditionalQty($row->qty),
                 'unit'              => $row->item->productionUnit->code,
                 'line_id'           => $row->line_id,
                 'group'             => $row->group,
@@ -522,8 +523,8 @@ class ProductionScheduleController extends Controller
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->marketingOrderPlanDetail->marketingOrderPlan->code.'</td>
                 <td class="center-align">'.$row->marketingOrderPlanDetail->item->name.'</td>
-                <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
-                <td class="right-align">'.number_format(($row->marketingOrderPlanDetail->qty * $row->marketingOrderPlanDetail->item->sell_convert) / $row->marketingOrderPlanDetail->item->production_convert,3,',','.').'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty(($row->marketingOrderPlanDetail->qty * $row->marketingOrderPlanDetail->item->sell_convert) / $row->marketingOrderPlanDetail->item->production_convert).'</td>
                 <td class="center-align">'.$row->marketingOrderPlanDetail->item->productionUnit->code.'</td>
                 <td class="center-align">'.date('d/m/Y',strtotime($row->marketingOrderPlanDetail->request_date)).'</td>
                 <td class="">'.$row->marketingOrderPlanDetail->note.'</td>
@@ -556,7 +557,7 @@ class ProductionScheduleController extends Controller
             $string .= '<tr>
                 <td class="center-align" rowspan="2">'.($key + 1).'</td>
                 <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
-                <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->item->productionUnit->code.'</td>
                 <td class="center-align">'.$row->warehouse->code.'</td>
                 <td class="center-align">'.date('d/m/Y',strtotime($row->production_date)).'</td>
@@ -1806,5 +1807,36 @@ class ProductionScheduleController extends Controller
             'status'    => 200,
             'message'   => ''
         ]);
+    }
+
+    public function done(Request $request){
+        $query_done = ProductionSchedule::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query_done){
+
+            if(in_array($query_done->status,['1','2'])){
+                $query_done->update([
+                    'status'    => '3'
+                ]);
+    
+                activity()
+                        ->performedOn(new ProductionSchedule())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query_done)
+                        ->log('Done the Production Schedule data');
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data updated successfully.'
+                ];
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+                ];
+            }
+
+            return response()->json($response);
+        }
     }
 }

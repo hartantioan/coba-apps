@@ -6,7 +6,7 @@ use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithTitle;
-
+use App\Helpers\CustomHelper;
 class ExportOutstandingPurchaseRequest implements FromView,ShouldAutoSize
 {
     /**
@@ -27,9 +27,9 @@ class ExportOutstandingPurchaseRequest implements FromView,ShouldAutoSize
             $entry["item_code"] = $row->item->code;
             $entry["item_name"] = $row->item->name;
             $entry["satuan"] =$row->itemUnit->unit->code;
-            $entry["qty"] = number_format($row->qty,3,',','.');
-            $entry["qty_po"] = number_format($row->qtyPO(),3,',','.');
-            $entry["qty_balance"] = number_format($row->qtyBalance(),3,',','.');
+            $entry["qty"] = CustomHelper::formatConditionalQty($row->qty,3,',','.');
+            $entry["qty_po"] = CustomHelper::formatConditionalQty($row->qtyPO(),3,',','.');
+            $entry["qty_balance"] = CustomHelper::formatConditionalQty($row->qtyBalance(),3,',','.');
             if($row->qtyBalance()> 0){
                 $array[] = $entry;
             }

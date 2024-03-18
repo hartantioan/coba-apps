@@ -236,10 +236,10 @@
                 <tr>
                     <td class="center-align">{{ $row->purchase_order_detail_id ? $row->purchaseOrderDetail->purchaseOrder->code : '-' }}</td>
                     <td>{{ $row->item->code.' - '.$row->item->name }}</td>
-                    <td class="center-align">{{ $row->purchase_order_detail_id ? number_format($row->purchaseOrderDetail->qty,3,',','.') : '0,000' }}</td>
-                    <td class="center-align">{{ number_format($row->qty_in,3,',','.') }}</td>
-                    <td class="center-align">{{ number_format($row->qty_out,3,',','.') }}</td>
-                    <td class="center-align">{{ number_format($row->qty_balance,3,',','.') }}</td>
+                    <td class="center-align">{{ $row->purchase_order_detail_id ? number_format($row->purchaseOrderDetail->qty) : '0,000' }}</td>
+                    <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty_in) }}</td>
+                    <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty_out) }}</td>
+                    <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty_balance) }}</td>
                     <td class="center-align">{{ $row->item->uomUnit->code }}</td>
                     <td class="center-align">{{ $row->place->code.' - '.$row->place->company->name }}</td>
                     <td class="center-align">{{ $row->warehouse->name }}</td>

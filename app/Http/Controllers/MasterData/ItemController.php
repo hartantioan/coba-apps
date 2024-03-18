@@ -521,7 +521,7 @@ class ItemController extends Controller
             $units .= '<tr>';
             $units .= '<td>'.($key + 1).'</td>';
             $units .= '<td>'.$row->unit->name.'</td>';
-            $units .= '<td class="right-align">'.number_format($row->conversion,3,',','.').'</td>';
+            $units .= '<td class="right-align">'.CustomHelper::formatConditionalQty($row->conversion).'</td>';
             $units .= '<td class="center-align">'.$data->uomUnit->name.'</td>';
             $units .= '<td>'.($row->is_sell_unit ? 'Ya' : 'Tidak').'</td>';
             $units .= '<td>'.($row->is_buy_unit ? 'Ya' : 'Tidak').'</td>';

@@ -305,8 +305,8 @@
                                     <td class="center-align">{{ $row->place->code.' - '.$row->warehouse->name }}</td>
                                     <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                                     <td class="center-align">{{ $row->item->uomUnit->code }}</td>
-                                    <td class="right-align">{{ number_format($row->price,3,',','.') }}</td>
-                                    <td class="right-align">{{ number_format($row->total,3,',','.') }}</td>
+                                    <td class="right-align">{{ number_format($row->price,2,',','.') }}</td>
+                                    <td class="right-align">{{ number_format($row->total,2,',','.') }}</td>
                                     <td class="center-align">{{ $row->inventoryCoa()->exists() ? $row->inventoryCoa->code.' - '.$row->inventoryCoa->name : '-' }}</td>
                                     <td class="center-align">{{ $row->coa()->exists() ? $row->coa->code.' - '.$row->coa->name : '-' }}</td>
                                     <td class="center-align">{{ $row->costDistribution()->exists() ? $row->costDistribution->name : '-' }}</td>

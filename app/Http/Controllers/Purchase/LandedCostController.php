@@ -203,7 +203,7 @@ class LandedCostController extends Controller
                         $details[] = [
                             'item_id'                   => $row->item_id,
                             'item_name'                 => $row->item->code.' - '.$row->item->name,
-                            'qty'                       => number_format($row->qtyConvert(),3,',','.'),
+                            'qty'                       => CustomHelper::formatConditionalQty($row->qtyConvert()),
                             'totalrow'                  => $row->getRowTotal(),
                             'qtyRaw'                    => $row->qtyConvert(),
                             'unit'                      => $row->item->uomUnit->code,
@@ -258,7 +258,7 @@ class LandedCostController extends Controller
                         $details[] = [
                             'item_id'                   => $row->item_id,
                             'item_name'                 => $row->item->code.' - '.$row->item->name,
-                            'qty'                       => number_format($row->qty,3,',','.'),
+                            'qty'                       => CustomHelper::formatConditionalQty($row->qty),
                             'totalrow'                  => $row->lookable->total,
                             'qtyRaw'                    => $row->qty,
                             'unit'                      => $row->item->uomUnit->code,
@@ -315,7 +315,7 @@ class LandedCostController extends Controller
                         $details[] = [
                             'item_id'                   => $row->itemStock->item_id,
                             'item_name'                 => $row->itemStock->item->code.' - '.$row->itemStock->item->name,
-                            'qty'                       => number_format($row->qty,3,',','.'),
+                            'qty'                       => CustomHelper::formatConditionalQty($row->qty),
                             'totalrow'                  => $row->total,
                             'qtyRaw'                    => $row->qty,
                             'unit'                      => $row->itemStock->item->uomUnit->code,
@@ -826,7 +826,7 @@ class LandedCostController extends Controller
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td>'.$row->item->code.' - '.$row->item->name.'</td>
-                    <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
+                    <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                     <td class="center-align">'.$row->item->uomUnit->code.'</td>
                     <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
                     <td class="right-align">'.number_format(round($row->nominal / $row->qty,3),2,',','.').'</td>
@@ -971,7 +971,7 @@ class LandedCostController extends Controller
                 'item_name'                 => $row->item->name.' - '.$row->item->name,
                 'qtyRaw'                    => $row->qty,
                 'totalrow'                  => $row->lookable->total,
-                'qty'                       => number_format($row->qty,3,',','.'),
+                'qty'                       => CustomHelper::formatConditionalQty($row->qty),
                 'nominal'                   => number_format($row->nominal,2,',','.'),
                 'unit'                      => $row->item->uomUnit->code,
                 'place_name'                => $row->place->name,
@@ -3380,4 +3380,34 @@ class LandedCostController extends Controller
 		return Excel::download(new ExportOutstandingLC(), 'outstanding_landed_cost'.uniqid().'.xlsx');
     }
 
+    public function done(Request $request){
+        $query_done = LandedCost::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query_done){
+
+            if(in_array($query_done->status,['1','2'])){
+                $query_done->update([
+                    'status'    => '3'
+                ]);
+    
+                activity()
+                        ->performedOn(new LandedCost())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query_done)
+                        ->log('Done the Landed Cost data');
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data updated successfully.'
+                ];
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+                ];
+            }
+
+            return response()->json($response);
+        }
+    }
 }

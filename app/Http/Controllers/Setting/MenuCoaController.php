@@ -130,7 +130,7 @@ class MenuCoaController extends Controller
                 'coa_name'      => $row->coa->code.' - '.$row->coa->name,
                 'field_name'    => $row->field_name,
                 'type'          => $row->type,
-                'percentage'    => number_format($row->percentage,3,',','.')
+                'percentage'    => number_format($row->percentage,2,',','.')
             ];
         }
 

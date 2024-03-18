@@ -299,9 +299,9 @@
                                     <td>{{ $row->type() }}</td>
                                     <td>{{ ($row->cost_distribution_id ? $row->costDistribution->code : '-') }}</td>
                                     <td>{{ $row->note }}</td>
-                                    <td align="right">{{ number_format($row->total,3,',','.') }}</td>
-                                    <td align="right">{{ number_format($row->rounding,3,',','.') }}</td>
-                                    <td align="right">{{ number_format($row->subtotal,3,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->total,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->rounding,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->subtotal,2,',','.') }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>

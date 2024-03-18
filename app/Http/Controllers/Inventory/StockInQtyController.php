@@ -99,7 +99,7 @@ class StockInQtyController extends Controller
                 'gudang' => $row->warehouse->name ?? '',
                 'kode' => $row->item->code,
                 'item' => $row->item->name,
-                'final'=>number_format($row->qty,3,',','.'),
+                'final'=>CustomHelper::formatConditionalQty($row->qty),
                 'satuan'=>$row->item->uomUnit->code,
                 'perlu' =>1,
             ];
@@ -154,7 +154,7 @@ class StockInQtyController extends Controller
     //         foreach($query_data as $row){
     //             $data_tempura = [
     //                 'item' => $row->item->code.'-'.$row->item->name,
-    //                 'final'=>number_format($row->qty,3,',','.'),
+    //                 'final'=>CustomHelper::formatConditionalQty($row->qty),
     //                 'satuan'=>$row->item->uomUnit->code
     //             ];
     //             $array_filter[]=$data_tempura;

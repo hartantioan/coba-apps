@@ -121,6 +121,13 @@ class PurchaseOrderController extends Controller
             'receiver_address',
             'receiver_phone',
             'received_date',
+            'due_date',
+            'document_date',
+            'tax_no',
+            'tax_cut_no',
+            'cut_date',
+            'spk_no',
+            'invoice_no',
             'note',
             'subtotal',
             'discount',
@@ -372,6 +379,13 @@ class PurchaseOrderController extends Controller
                     $val->receiver_address,
                     $val->receiver_phone,
                     $val->received_date ? date('d/m/Y',strtotime($val->received_date)) : '-',
+                    $val->due_date ? date('d/m/Y',strtotime($val->due_date)) : '-',
+                    $val->document_date ? date('d/m/Y',strtotime($val->document_date)) : '-',
+                    $val->tax_no ?? '-',
+                    $val->tax_cut_no ?? '-',
+                    $val->cut_date ? date('d/m/Y',strtotime($val->cut_date)) : '-',
+                    $val->spk_no,
+                    $val->invoice_no,
                     $val->note,
                     number_format($val->subtotal,2,',','.'),
                     number_format($val->discount,2,',','.'),
@@ -381,6 +395,7 @@ class PurchaseOrderController extends Controller
                     number_format($val->grandtotal,2,',','.'),
                     $val->status(),
                     $btn_close.$btn_print.'
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
@@ -446,7 +461,7 @@ class PurchaseOrderController extends Controller
                                 'item_name'                     => $row->item->code.' - '.$row->item->name,
                                 'old_prices'                    => $row->item->oldPrices($this->dataplaces),
                                 'item_unit_id'                  => $row->item_unit_id,
-                                'qty'                           => number_format($row->qtyBalance(),3,',','.'),
+                                'qty'                           => CustomHelper::formatConditionalQty($row->qtyBalance()),
                                 'note'                          => $row->note ? $row->note : '',
                                 'note2'                         => $row->note2 ? $row->note2 : '',
                                 'warehouse_name'                => $row->warehouse->code.' - '.$row->warehouse->name,
@@ -471,7 +486,7 @@ class PurchaseOrderController extends Controller
                             'item_name'                     => $row->itemStock->item->code.' - '.$row->itemStock->item->name,
                             'old_prices'                    => $row->itemStock->item->oldPrices($this->dataplaces),
                             'item_unit_id'                  => '',
-                            'qty'                           => number_format($row->qty,3,',','.'),
+                            'qty'                           => CustomHelper::formatConditionalQty($row->qty),
                             'note'                          => $row->note ? $row->note : '',
                             'note2'                         => '',
                             'warehouse_name'                => $row->itemStock->warehouse->code.' - '.$row->itemStock->warehouse->name,
@@ -733,6 +748,13 @@ class PurchaseOrderController extends Controller
                         $query->post_date = $request->post_date;
                         $query->delivery_date = $request->delivery_date;
                         $query->received_date = $request->received_date;
+                        $query->due_date = $request->due_date;
+                        $query->document_date = $request->document_date;
+                        $query->tax_no = $request->tax_no;
+                        $query->tax_cut_no = $request->tax_cut_no;
+                        $query->cut_date = $request->cut_date;
+                        $query->spk_no = $request->spk_no;
+                        $query->invoice_no = $request->invoice_no;
                         $query->note = $request->note;
                         $query->note_external = $request->note_external;
                         $query->subtotal = str_replace(',','.',str_replace('.','',$request->savesubtotal));
@@ -796,6 +818,13 @@ class PurchaseOrderController extends Controller
                         'post_date'                 => $request->post_date,
                         'delivery_date'             => $request->delivery_date,
                         'received_date'             => $request->received_date,
+                        'due_date'                  => $request->due_date,
+                        'document_date'             => $request->document_date,
+                        'tax_no'                    => $request->tax_no,
+                        'tax_cut_no'                => $request->tax_cut_no,
+                        'cut_date'                  => $request->cut_date,
+                        'spk_no'                    => $request->spk_no,
+                        'invoice_no'                => $request->invoice_no,
                         'note'                      => $request->note,
                         'note_external'             => $request->note_external,
                         'subtotal'                  => str_replace(',','.',str_replace('.','',$request->savesubtotal)),
@@ -1017,7 +1046,7 @@ class PurchaseOrderController extends Controller
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.($row->item_id ? $row->item->code.' - '.$row->item->name : $row->coa->name).'</td>
                 <td class="center-align">'.($row->item_id ? $row->item->itemGroup->name : '-').'</td>
-                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.($row->item_id ? $row->itemUnit->unit->code : '-').'</td>
                 <td class="right-align">'.number_format($row->price,2,',','.').'</td>
                 <td class="center-align">'.number_format($row->percent_discount_1,2,',','.').'</td>
@@ -1138,8 +1167,8 @@ class PurchaseOrderController extends Controller
                 'coa_id'                            => $row->coa_id,
                 'item_name'                         => $row->item_id ? $row->item->code.' - '.$row->item->name : '',
                 'coa_name'                          => $row->coa_id ? $row->coa->name : '',
-                'qty'                               => number_format($row->qty,3,',','.'),
-                'qty_stock'                         => $row->item_id ? number_format($row->qty * $row->qty_conversion,3,',','.') : '-',
+                'qty'                               => CustomHelper::formatConditionalQty($row->qty),
+                'qty_stock'                         => $row->item_id ? CustomHelper::formatConditionalQty($row->qty * $row->qty_conversion) : '-',
                 'unit_stock'                        => $row->item_id ? $row->item->uomUnit->code : '-',
                 'item_unit_id'                      => $row->item_id ? $row->item_unit_id : '-',
                 'note'                              => $row->note ? $row->note : '',
@@ -3642,10 +3671,10 @@ class PurchaseOrderController extends Controller
                 'id'                => $row->id,
                 'item_id'           => $row->item_id,
                 'item_name'         => $row->item->code.' - '.$row->item->name,
-                'qty'               => number_format($row->qty,3,',','.'),
+                'qty'               => CustomHelper::formatConditionalQty($row->qty),
                 'unit'              => $row->item_id ? $row->itemUnit->unit->code : '-',
-                'qty_balance'       => number_format($row->getBalanceReceipt(),3,',','.'),
-                'qty_gr'            => number_format($row->qtyGR(),3,',','.'),
+                'qty_balance'       => CustomHelper::formatConditionalQty($row->getBalanceReceipt()),
+                'qty_gr'            => CustomHelper::formatConditionalQty($row->qtyGR()),
                 'closed'            => $row->status ? $row->status : '',
             ];
         }
@@ -3753,8 +3782,8 @@ class PurchaseOrderController extends Controller
     //                 <td class="center-align">'.$row->purchaseOrder->status().'</td>
     //                 <td class="">'.$row->item->code.' - '.$row->item->name.'</td>
     //                 <td class="center-align">'.$row->itemUnit->unit->code.'</td>
-    //                 <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
-    //                 <td class="right-align">'.number_format($row->qtyGR(),3,',','.').'</td>
+    //                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty,3,',','.').'</td>
+    //                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qtyGR(),3,',','.').'</td>
     //                 <td class="right-align">'.number_format($row->getBalanceReceipt(),3,',','.').'</td>
     //             </tr>';
     //         }
@@ -3773,5 +3802,36 @@ class PurchaseOrderController extends Controller
 
     public function getOutstanding(Request $request){
 		return Excel::download(new ExportOutstandingPO(), 'outstanding_purchase_order_'.uniqid().'.xlsx');
+    }
+
+    public function done(Request $request){
+        $query_done = PurchaseOrder::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query_done){
+
+            if(in_array($query_done->status,['1','2'])){
+                $query_done->update([
+                    'status'    => '3'
+                ]);
+    
+                activity()
+                        ->performedOn(new PurchaseOrder())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query_done)
+                        ->log('Done the Purchase Order data');
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data updated successfully.'
+                ];
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+                ];
+            }
+
+            return response()->json($response);
+        }
     }
 }

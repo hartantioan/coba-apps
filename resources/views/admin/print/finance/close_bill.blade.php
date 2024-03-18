@@ -165,7 +165,7 @@
                                             <td>{{ $rowdetail->fundRequest->account->name }}</td>
                                             <td>{{ $rowdetail->coa->code.' - '.$rowdetail->coa->name }}</td>
                                             <td>{{ $rowdetail->note }}</td>
-                                            <td align="right">{{ number_format($rowdetail->nominal,3,',','.') }}</td>
+                                            <td align="right">{{ number_format($rowdetail->nominal,2,',','.') }}</td>
                                         </tr>
                                         @endforeach
                                     </tbody>

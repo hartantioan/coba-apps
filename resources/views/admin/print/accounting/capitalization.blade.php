@@ -145,7 +145,7 @@
                             <td>{{ $row->user->name }}</td>
                             <td>{{ $row->company->name }}</td>
                             <td>{{ $row->currency->code }}</td>
-                            <td>{{ number_format($row->currency_rate,3,',','.') }}</td>
+                            <td>{{ number_format($row->currency_rate,2,',','.') }}</td>
                             <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                             <td>{{ $row->note }}</td>
                             <td>{!! $row->status() !!}</td>
@@ -169,10 +169,10 @@
                                             <tr>
                                                 <td align="center">{{ $key1 + 1 }}</td>
                                                 <td>{{ $rowdetail->asset->name }}</td>
-                                                <td align="right">{{ number_format($rowdetail->price,3,',','.') }}</td>
+                                                <td align="right">{{ number_format($rowdetail->price,2,',','.') }}</td>
                                                 <td align="center">{{ CustomHelper::formatConditionalQty($rowdetail->qty) }}</td>
                                                 <td align="center">{{ $rowdetail->unit->code }}</td>
-                                                <td align="right">{{ number_format($rowdetail->total,3,',','.') }}</td>
+                                                <td align="right">{{ number_format($rowdetail->total,2,',','.') }}</td>
                                                 <td>{{ $rowdetail->note }}</td>
                                             </tr>
                                         @endforeach

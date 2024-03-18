@@ -355,7 +355,7 @@ class FundRequestController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->note.'</td>
-                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->unit->code.'</td>
                 <td class="right-align">'.number_format($row->price,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->total,2,',','.').'</td>
@@ -985,6 +985,7 @@ class FundRequestController extends Controller
                     $val->documentStatus(),
                     $val->status(),
                     '
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light blue accent-2 white-text" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light orange accent-2 white-text" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
@@ -1354,7 +1355,7 @@ class FundRequestController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->note.'</td>
-                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->unit->code.'</td>
                 <td class="right-align">'.number_format($row->price,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->total,2,',','.').'</td>
@@ -1468,7 +1469,7 @@ class FundRequestController extends Controller
         foreach($fr->fundRequestDetail as $row){
             $arr[] = [
                 'item'              => $row->note,
-                'qty'               => number_format($row->qty,3,',','.'),
+                'qty'               => CustomHelper::formatConditionalQty($row->qty),
                 'unit_id'           => $row->unit_id,
                 'unit_name'         => $row->unit->code.' - '.$row->unit->name,
                 'price'             => number_format($row->price,2,',','.'),
@@ -3455,5 +3456,36 @@ class FundRequestController extends Controller
        
 		
 		return Excel::download(new ExportOutstandingFundRequest(), 'outstanding_fund_request_'.uniqid().'.xlsx');
+    }
+
+    public function done(Request $request){
+        $query_done = FundRequest::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query_done){
+
+            if(in_array($query_done->status,['1','2'])){
+                $query_done->update([
+                    'status'    => '3'
+                ]);
+    
+                activity()
+                        ->performedOn(new FundRequest())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query_done)
+                        ->log('Done the FundRequest data');
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data updated successfully.'
+                ];
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+                ];
+            }
+
+            return response()->json($response);
+        }
     }
 }

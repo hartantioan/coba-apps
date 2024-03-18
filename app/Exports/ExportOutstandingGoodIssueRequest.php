@@ -7,7 +7,7 @@ use App\Models\goodIssueRequestDetail;
 use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-
+use App\Helpers\CustomHelper;
 class ExportOutstandingGoodIssueRequest implements FromView,ShouldAutoSize
 {
     
@@ -36,9 +36,9 @@ class ExportOutstandingGoodIssueRequest implements FromView,ShouldAutoSize
             $entry["ket1"] = $row->note;
             $entry["ket2"] = $row->note2;
             $entry["satuan"] =$row->item->uomUnit->code;
-            $entry["qty"] = number_format($row->qty,3,',','.');
-            $entry["qty_gi"] = number_format($row->totalGi(),3,',','.');
-            $entry["qty_balance"] = number_format($row->balanceGi(),3,',','.');
+            $entry["qty"] = CustomHelper::formatConditionalQty($row->qty);
+            $entry["qty_gi"] = CustomHelper::formatConditionalQty($row->totalGi());
+            $entry["qty_balance"] = CustomHelper::formatConditionalQty($row->balanceGi());
             $entry["required_date"] =$row->required_date;
             $entry["warehouse"] =$row->warehouse->name;
             $entry["line"] =$row->line->name ?? '-';

@@ -190,7 +190,8 @@ class GoodScaleController extends Controller
                     $val->image_out ? '<a href="'.$val->imageOut().'" target="_blank"><i class="material-icons">camera_rear</i></a>' : '<i class="material-icons">hourglass_empty</i>',
                     $val->status(),
                     '
-                    <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         '.$updateBtn.'
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
@@ -269,7 +270,7 @@ class GoodScaleController extends Controller
                             'purchase_order_detail_id'  => $row->id,
                             'item_id'                   => $row->item_id,
                             'item_name'                 => $row->item->code.' - '.$row->item->name,
-                            'qty'                       => number_format($row->getBalanceReceipt(),3,',','.'),
+                            'qty'                       => CustomHelper::formatConditionalQty($row->getBalanceReceipt()),
                             'unit'                      => $row->itemUnit->unit->code,
                             'place_id'                  => $row->place_id,
                             'place_name'                => $row->place->code,
@@ -531,9 +532,9 @@ class GoodScaleController extends Controller
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.($rowdetail->purchase_order_detail_id ? $rowdetail->purchaseOrderDetail->purchaseOrder->code : '-').'</td>
                 <td class="center-align">'.$rowdetail->item->code.' - '.$rowdetail->item->name.'</td>
-                <td class="center-align">'.number_format($rowdetail->qty_in,3,',','.').'</td>
-                <td class="center-align">'.number_format($rowdetail->qty_out,3,',','.').'</td>
-                <td class="center-align">'.number_format($rowdetail->qty_balance,3,',','.').'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty($rowdetail->qty_in).'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty($rowdetail->qty_out).'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty($rowdetail->qty_balance).'</td>
                 <td class="center-align">'.$rowdetail->itemUnit->unit->code.'</td>
                 <td class="center-align">'.$rowdetail->note.'</td>
                 <td class="center-align">'.$rowdetail->note2.'</td>
@@ -632,9 +633,9 @@ class GoodScaleController extends Controller
                 'purchase_order_detail_id'  => $row->purchase_order_detail_id ? $row->purchase_order_detail_id : '',
                 'item_id'                   => $row->item_id,
                 'item_name'                 => $row->item->code.' - '.$row->item->name,
-                'qty_po'                    => $row->purchase_order_detail_id ? number_format($row->purchaseOrderDetail->getBalanceReceipt(),3,',','.') : '-',
-                'qty_in'                    => number_format($row->qty_in,3,',','.'),
-                'qty_out'                   => number_format($row->qty_out,3,',','.'),
+                'qty_po'                    => $row->purchase_order_detail_id ? CustomHelper::formatConditionalQty($row->purchaseOrderDetail->getBalanceReceipt()) : '-',
+                'qty_in'                    => CustomHelper::formatConditionalQty($row->qty_in),
+                'qty_out'                   => CustomHelper::formatConditionalQty($row->qty_out),
                 'unit'                      => $row->itemUnit->unit->code,
                 'place_id'                  => $row->place_id,
                 'place_name'                => $row->place->code.' - '.$row->place->code,
@@ -742,10 +743,10 @@ class GoodScaleController extends Controller
                 'purchase_order_detail_id'  => $row->purchase_order_detail_id,
                 'item_id'                   => $row->item_id,
                 'item_name'                 => $row->item->code.' - '.$row->item->name,
-                'qty_po'                    => $row->purchase_order_detail_id ? number_format($row->purchaseOrderDetail->qty,3,',','.') : '-',
-                'qty_in'                    => number_format($row->qty_in,3,',','.'),
-                'qty_out'                   => number_format($row->qty_out,3,',','.'),
-                'qty_balance'               => number_format($row->qty_balance,3,',','.'),
+                'qty_po'                    => $row->purchase_order_detail_id ? CustomHelper::formatConditionalQty($row->purchaseOrderDetail->qty) : '-',
+                'qty_in'                    => CustomHelper::formatConditionalQty($row->qty_in),
+                'qty_out'                   => CustomHelper::formatConditionalQty($row->qty_out),
+                'qty_balance'               => CustomHelper::formatConditionalQty($row->qty_balance),
                 'item_unit_id'              => $row->item_unit_id,
                 'place_id'                  => $row->place_id,
                 'place_name'                => $row->place->code,
@@ -1202,5 +1203,36 @@ class GoodScaleController extends Controller
         $end_date = $request->end_date ? $request->end_date : '';
         $mode = $request->mode ? $request->mode : '';
 		return Excel::download(new ExportGoodScale($post_date,$end_date,$mode), 'good_scale_'.uniqid().'.xlsx');
+    }
+
+    public function done(Request $request){
+        $query_done = GoodScale::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query_done){
+
+            if(in_array($query_done->status,['1','2'])){
+                $query_done->update([
+                    'status'    => '3'
+                ]);
+    
+                activity()
+                        ->performedOn(new GoodScale())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query_done)
+                        ->log('Done the Good Scale data');
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data updated successfully.'
+                ];
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+                ];
+            }
+
+            return response()->json($response);
+        }
     }
 }

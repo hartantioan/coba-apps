@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
+use App\Helpers\CustomHelper;
 
 class Bom extends Model
 {
@@ -255,15 +256,15 @@ class Bom extends Model
                                                             'item_id'           => $row3->item->id,
                                                             'item_code'         => $row3->item->code,
                                                             'item_name'         => $row3->item->name,
-                                                            'qty_in_production' => number_format($row3->qty,3,',','.'),
+                                                            'qty_in_production' => CustomHelper::formatConditionalQty($row3->qty),
                                                             'unit_production'   => $row3->item->productionUnit->code,
-                                                            'qty_output'        => number_format($bom3->qty_output,3,',','.'),
+                                                            'qty_output'        => CustomHelper::formatConditionalQty($bom3->qty_output),
                                                             'bom_id'            => $bom4->id,
                                                             'materials'         => $arr3,
                                                             'group'             => $row3->item->itemGroup->production_type,
                                                             'warehouses'        => $row3->item->warehouseList(),
                                                             'item_goal'         => $bom3->item_id,
-                                                            'qty_proporsional'  => number_format($row3->qty * $bom3->qty_output,3,',','.'),
+                                                            'qty_proporsional'  => CustomHelper::formatConditionalQty($row3->qty * $bom3->qty_output),
                                                         ];
                                                     }
                                                     $arr2[] = [
@@ -288,15 +289,15 @@ class Bom extends Model
                                                 'item_id'           => $row2->item->id,
                                                 'item_code'         => $row2->item->code,
                                                 'item_name'         => $row2->item->name,
-                                                'qty_in_production' => number_format($row2->qty,3,',','.'),
+                                                'qty_in_production' => CustomHelper::formatConditionalQty($row2->qty),
                                                 'unit_production'   => $row2->item->productionUnit->code,
-                                                'qty_output'        => number_format($bom2->qty_output,3,',','.'),
+                                                'qty_output'        => CustomHelper::formatConditionalQty($bom2->qty_output),
                                                 'bom_id'            => $bom3->id,
                                                 'materials'         => $arr2,
                                                 'group'             => $row2->item->itemGroup->production_type,
                                                 'warehouses'        => $row2->item->warehouseList(),
                                                 'item_goal'         => $bom2->item_id,
-                                                'qty_proporsional'  => number_format($row2->qty * $bom2->qty_output,3,',','.'),
+                                                'qty_proporsional'  => CustomHelper::formatConditionalQty($row2->qty * $bom2->qty_output),
                                             ];
                                         }
                                         $arr1[] = [
@@ -321,15 +322,15 @@ class Bom extends Model
                                     'item_id'           => $row1->item->id,
                                     'item_code'         => $row1->item->code,
                                     'item_name'         => $row1->item->name,
-                                    'qty_in_production' => number_format($row1->qty,3,',','.'),
+                                    'qty_in_production' => CustomHelper::formatConditionalQty($row1->qty),
                                     'unit_production'   => $row1->item->productionUnit->code,
-                                    'qty_output'        => number_format($bom1->qty_output,3,',','.'),
+                                    'qty_output'        => CustomHelper::formatConditionalQty($bom1->qty_output),
                                     'bom_id'            => $bom2->id,
                                     'materials'         => $arr1,
                                     'group'             => $row1->item->itemGroup->production_type,
                                     'warehouses'        => $row1->item->warehouseList(),
                                     'item_goal'         => $bom1->item_id,
-                                    'qty_proporsional'  => number_format($row1->qty * $bom1->qty_output,3,',','.'),
+                                    'qty_proporsional'  => CustomHelper::formatConditionalQty($row1->qty * $bom1->qty_output),
                                 ];
                             }
                             $arrMain[] = [
@@ -354,15 +355,15 @@ class Bom extends Model
                         'item_id'           => $row->item->id,
                         'item_code'         => $row->item->code,
                         'item_name'         => $row->item->name,
-                        'qty_in_production' => number_format($row->qty,3,',','.'),
+                        'qty_in_production' => CustomHelper::formatConditionalQty($row->qty),
                         'unit_production'   => $row->item->productionUnit->code,
-                        'qty_output'        => number_format($this->qty_output,3,',','.'),
+                        'qty_output'        => CustomHelper::formatConditionalQty($this->qty_output),
                         'bom_id'            => $bom1->id,
                         'materials'         => $arrMain,
                         'group'             => $row->item->itemGroup->production_type,
                         'warehouses'        => $row->item->warehouseList(),
                         'item_goal'         => $this->item_id,
-                        'qty_proporsional'  => number_format($row->qty * $this->qty_output,3,',','.'),
+                        'qty_proporsional'  => CustomHelper::formatConditionalQty($row->qty * $this->qty_output),
                     ];
                 }
             }

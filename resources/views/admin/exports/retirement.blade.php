@@ -37,7 +37,7 @@
                 <td>{{ $row->user->name }}</td>
                 <td>{{ $row->company->name }}</td>
                 <td>{{ $row->currency->code }}</td>
-                <td>{{ number_format($row->currency_rate,3,',','.') }}</td>
+                <td>{{ number_format($row->currency_rate,2,',','.') }}</td>
                 <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                 <td>{{ $row->note }}</td>
                 <td>{!! $row->status() !!}</td>
@@ -50,8 +50,8 @@
                 <td>{{ $rowdetail->asset->name }}</td>
                 <td align="center">{{ CustomHelper::formatConditionalQty($rowdetail->qty) }}</td>
                 <td align="center">{{ $rowdetail->unit->code }}</td>
-                <td align="right">{{ number_format($rowdetail->asset->nominal,3,',','.') }}</td>
-                <td align="right">{{ number_format($rowdetail->retirement_nominal,3,',','.') }}</td>
+                <td align="right">{{ number_format($rowdetail->asset->nominal,2,',','.') }}</td>
+                <td align="right">{{ number_format($rowdetail->retirement_nominal,2,',','.') }}</td>
                 <td>{{ $rowdetail->note }}</td>
                 <td>{{ $rowdetail->coa->code.' - '.$rowdetail->coa->name }}</td>
             @php

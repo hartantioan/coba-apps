@@ -232,7 +232,7 @@
                         <tr>
                             <td class="center-align" >{{$row->user->employee_no.' - '.$row->user->name}}</td>
                             <td class="center-align">{{ $row->note }}</td>
-                            <td class="center-align">{{ number_format($row->nominal_total,3,',','.') }}</td>
+                            <td class="center-align">{{ number_format($row->nominal_total,2,',','.') }}</td>
                             <td class="center-align">{{ $row->instalment }}</td>
                             <td class="center-align">{{ number_format($row->nominal_payment) }}</td>
                         </tr>

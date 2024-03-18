@@ -57,7 +57,7 @@ class ItemStockLocationController extends Controller
             $data_tempura = [
                 'item_id' => CustomHelper::encrypt($row->id),
                 'item' => $row->item->code.'-'.$row->item->name,
-                'stock'=>number_format($row->qty),
+                'stock'=>CustomHelper::formatConditionalQty($row->qty),
                 'plant'=>$row->place->code,
                 'gudang'=>$row->warehouse->code . ' - ' . $row->warehouse->name,
                 'area' => $row->area->name??'-',

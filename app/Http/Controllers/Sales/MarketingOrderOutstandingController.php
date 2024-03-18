@@ -10,6 +10,7 @@ use App\Models\MarketingOrderInvoice;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Helpers\CustomHelper;
 
 class MarketingOrderOutstandingController extends Controller
 {
@@ -63,8 +64,8 @@ class MarketingOrderOutstandingController extends Controller
                             'post_date'         => date('d/m/Y',strtotime($row->post_date)),
                             'top'               => $row->account->top,
                             'item_name'         => $rowdetail->lookable->item->name,
-                            'qty_order'         => number_format($rowdetail->lookable->marketingOrderDetail->qty,3,',','.'),
-                            'qty'               => number_format($rowdetail->qty,3,',','.'),
+                            'qty_order'         => CustomHelper::formatConditionalQty($rowdetail->lookable->marketingOrderDetail->qty),
+                            'qty'               => CustomHelper::formatConditionalQty($rowdetail->qty),
                             'unit'              => $rowdetail->lookable->item->sellUnit->code,
                             'price'             => number_format($price,2,',','.'),
                             'total'             => number_format($rowdetail->total,2,',','.'),

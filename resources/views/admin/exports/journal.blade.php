@@ -64,10 +64,10 @@
                 <td>{{ $rowdetail->note2 }}</td>
                 <td>{{ $row->currency_id ? $row->currency->code : '-' }}</td>
                 <td>{{ number_format($row->currency_rate,2,',','.') }}</td>
-                <td align="right">{{ ($rowdetail->type == '1' ? number_format($rowdetail->nominal_fc,3,',','.') : '') }}</td>
-                <td align="right">{{ ($rowdetail->type == '2' ? number_format($rowdetail->nominal_fc,3,',','.') : '') }}</td>
-                <td align="right">{{ ($rowdetail->type == '1' ? number_format($rowdetail->nominal,3,',','.') : '') }}</td>
-                <td align="right">{{ ($rowdetail->type == '2' ? number_format($rowdetail->nominal,3,',','.') : '') }}</td>
+                <td align="right">{{ ($rowdetail->type == '1' ? number_format($rowdetail->nominal_fc,2,',','.') : '') }}</td>
+                <td align="right">{{ ($rowdetail->type == '2' ? number_format($rowdetail->nominal_fc,2,',','.') : '') }}</td>
+                <td align="right">{{ ($rowdetail->type == '1' ? number_format($rowdetail->nominal,2,',','.') : '') }}</td>
+                <td align="right">{{ ($rowdetail->type == '2' ? number_format($rowdetail->nominal,2,',','.') : '') }}</td>
             </tr>
             @php
                 $no++;

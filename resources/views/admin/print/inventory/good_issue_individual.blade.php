@@ -300,7 +300,7 @@
                                     <td class="center-align">{{ $row->department()->exists() ? $row->department->name : '-' }}</td>
                                     <td class="center-align">{{ $row->project()->exists() ? $row->project->name : '-' }}</td>
                                     <td class="center-align">{{ $row->requester ? $row->requester : '-' }}</td>
-                                    <td class="center-align">{{ number_format($row->qty_return,3,',','.') }}</td>
+                                    <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty_return) }}</td>
                                 </tr>
                                 <tr>
                                     <td colspan="17">Keterangan 1 : {{ $row->note }}</td>

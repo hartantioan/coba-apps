@@ -2500,6 +2500,10 @@ class CustomHelper {
                         ]);
                     }
 				}
+
+				$cp->update([
+					'status'	=> '3'
+				]);
 			}
 		}elseif($table_name == 'inventory_transfer_outs'){
 			

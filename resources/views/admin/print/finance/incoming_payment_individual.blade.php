@@ -311,7 +311,7 @@
                                     <th align="right">{{ number_format($data->grandtotal,2,',','.') }}</th>
                                 </tr>
                                 <tr>
-                                    <th colspan="7" style="border: none !important" border="0">Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords($data->currency->document_text) }}</i></th>
+                                    <th colspan="7" style="border: none !important" border="0">Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords(strtolower($data->currency->document_text)) }}</i></th>
                                 </tr>
                             </tfoot>
                         </table>

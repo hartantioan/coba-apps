@@ -308,7 +308,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="4">Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords($data->currency->document_text) }}</i></th>
+                        <th colspan="4">Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords(strtolower($data->currency->document_text)) }}</i></th>
                     </tr>
                 </tfoot>
             </table>

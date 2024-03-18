@@ -1079,7 +1079,7 @@ class PurchaseRequestController extends Controller
                                         ],
                                         'key'=>$invoice_detail->purchaseInvoice->code,
                                         'name'=>$invoice_detail->purchaseInvoice->code,
-                                        'url'=>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($invoice_detail->purchaseInvoice->code)
+                                        'url'=>request()->root()."/admin/finance/purchase_invoice?code=".CustomHelper::encrypt($invoice_detail->purchaseInvoice->code)
                                     ];
     
                                     $data_go_chart[]=$invoice_tempura;
@@ -1239,7 +1239,7 @@ class PurchaseRequestController extends Controller
                                             ['name'=> "Vendor  : ".$row_po->supplier->name],
                                             ['name'=> "Nominal : Rp.:".number_format($row_po->grandtotal,2,',','.')]
                                         ],
-                                        'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($row_po->post_date),           
+                                        'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($row_po->code),           
                                     ];
 
                                     $data_go_chart[]=$po;
@@ -1331,7 +1331,7 @@ class PurchaseRequestController extends Controller
                                             ['name'=> "Tanggal :".$purchase_memodetail->purchaseMemo->post_date],
                                             ['name'=> "Nominal : Rp.:".number_format($purchase_memodetail->purchaseMemo->grandtotal,2,',','.')],
                                         ],
-                                        'url'=>request()->root()."/admin/purchase/purchase_memo?code=".CustomHelper::encrypt($purchase_memodetail->purchaseMemo->code),           
+                                        'url'=>request()->root()."/admin/finance/purchase_memo?code=".CustomHelper::encrypt($purchase_memodetail->purchaseMemo->code),           
                                     ];
                                     $data_link[]=[
                                         'from'=>$query_invoice->code,
@@ -1377,7 +1377,7 @@ class PurchaseRequestController extends Controller
                                     ],
                                     "key" => $row_pi->purchaseDownPayment->code,
                                     "name" => $row_pi->purchaseDownPayment->code,
-                                    'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pi->purchaseDownPayment->code),
+                                    'url'=>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_pi->purchaseDownPayment->code),
                                 ];
                                     $data_go_chart[]=$data_down_payment;
                                     $data_link[]=[
@@ -1441,7 +1441,7 @@ class PurchaseRequestController extends Controller
                                                 ],
                                                 "key" => $row_pyr_detail->lookable->code,
                                                 "name" => $row_pyr_detail->lookable->code,
-                                                'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
+                                                'url'=>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
                                             ];
                                             
                                             $data_go_chart[]=$data_downp_tempura;
@@ -1462,7 +1462,7 @@ class PurchaseRequestController extends Controller
                                                 ],
                                                 "key" => $row_pyr_detail->lookable->code,
                                                 "name" => $row_pyr_detail->lookable->code,
-                                                'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
+                                                'url'=>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
                                             ];
                                     
                                                 
@@ -1541,7 +1541,7 @@ class PurchaseRequestController extends Controller
                                         ],
                                         "key" => $row_pyr_detail->lookable->code,
                                         "name" => $row_pyr_detail->lookable->code,
-                                        'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
+                                        'url'=>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
                                     ];
 
                                     $data_go_chart[]=$data_downp_tempura;
@@ -1562,7 +1562,7 @@ class PurchaseRequestController extends Controller
                                         ],
                                         "key" => $row_pyr_detail->lookable->code,
                                         "name" => $row_pyr_detail->lookable->code,
-                                        'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
+                                        'url'=>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
                                     ];
                                     
                                         
@@ -1655,7 +1655,7 @@ class PurchaseRequestController extends Controller
                                     ],
                                     "key" => $row_pyr_detail->lookable->code,
                                     "name" => $row_pyr_detail->lookable->code,
-                                    'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
+                                    'url'=>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
                                 ];       
                                 
                                 $data_go_chart[]=$data_downp_tempura;
@@ -1679,7 +1679,7 @@ class PurchaseRequestController extends Controller
                                     ],
                                     "key" => $row_pyr_detail->lookable->code,
                                     "name" => $row_pyr_detail->lookable->code,
-                                    'url'=>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
+                                    'url'=>request()->root()."/admin/finance/purchase_invoice?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
                                 ];
                             
                                     
@@ -1899,7 +1899,7 @@ class PurchaseRequestController extends Controller
                                     ['name'=> "Tanggal :".$purchase_invoicedp->purchaseInvoice->post_date],
                                     ['name'=> "Nominal : Rp.:".number_format($purchase_invoicedp->purchaseInvoice->grandtotal,2,',','.')],
                                     ],
-                                'url'=>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($purchase_invoicedp->purchaseInvoice->code),           
+                                'url'=>request()->root()."/admin/finance/purchase_invoice?code=".CustomHelper::encrypt($purchase_invoicedp->purchaseInvoice->code),           
                             ];
                             
                             
@@ -1925,7 +1925,7 @@ class PurchaseRequestController extends Controller
                                     ['name'=> "Tanggal :".$purchase_memodetail->purchaseMemo->post_date],
                                     ['name'=> "Nominal : Rp.:".number_format($purchase_memodetail->purchaseMemo->grandtotal,2,',','.')],
                                     ],
-                                'url'=>request()->root()."/admin/purchase/purchase_memo?code=".CustomHelper::encrypt($purchase_memodetail->purchaseMemo->code),           
+                                'url'=>request()->root()."/admin/finance/purchase_memo?code=".CustomHelper::encrypt($purchase_memodetail->purchaseMemo->code),           
                             ];
                             $data_go_chart[]=$data_memo;
                             $data_link[]=[
@@ -1979,7 +1979,7 @@ class PurchaseRequestController extends Controller
                                     ],
                                     "key" => $row->lookable->purchaseInvoice->code,
                                     "name" => $row->lookable->purchaseInvoice->code,
-                                    'url'=>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($row->lookable->purchaseInvoice->code),
+                                    'url'=>request()->root()."/admin/finance/purchase_invoice?code=".CustomHelper::encrypt($row->lookable->purchaseInvoice->code),
                                 ];
             
                                 $data_go_chart[]=$data_invoices_tempura;
@@ -2000,7 +2000,7 @@ class PurchaseRequestController extends Controller
                                     ],
                                     "key" => $row->lookable->code,
                                     "name" => $row->lookable->code,
-                                    'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row->lookable->code),
+                                    'url'=>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row->lookable->code),
                                 ];
             
                                 $data_go_chart[]=$data_downp_tempura;
@@ -2032,7 +2032,7 @@ class PurchaseRequestController extends Controller
                                         ['name'=> "Tanggal :".$data_detail_good_issue->lookable->materialRequest->post_date],
                                         ['name'=> "Nominal : Rp.:".number_format($data_detail_good_issue->lookable->materialRequest->grandtotal,2,',','.')],
                                     ],
-                                    'url'=>request()->root()."/admin/inventory/material_request?code=".CustomHelper::encrypt($data_detail_good_issue->lookable->materialRequest->code),
+                                    'url'=>request()->root()."/admin/purchase/material_request?code=".CustomHelper::encrypt($data_detail_good_issue->lookable->materialRequest->code),
                                 ];
 
                                 $data_go_chart[]=$material_request_tempura;
@@ -2175,7 +2175,7 @@ class PurchaseRequestController extends Controller
                                             ['name'=> "Tanggal: ".$row_invoice_detail->purchaseInvoice->post_date],
                                             ['name'=> "Nominal : Rp.".number_format($row_invoice_detail->purchaseInvoice->grandtotal,2,',','.')]
                                         ],
-                                        'url'   =>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($row_invoice_detail->purchaseInvoice->code),
+                                        'url'   =>request()->root()."/admin/finance/purchase_invoice?code=".CustomHelper::encrypt($row_invoice_detail->purchaseInvoice->code),
                                     ];
                                     $data_go_chart[]=$data_invoices_tempura;
                                     $data_link[]=[
@@ -2268,7 +2268,7 @@ class PurchaseRequestController extends Controller
                                             ['name'=> "Tanggal: ".$row_invoice_detail->purchaseInvoice->post_date],
                                             ['name'=> "Nominal : Rp.".number_format($row_invoice_detail->purchaseInvoice->grandtotal,2,',','.')]
                                         ],
-                                        'url'   =>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($row_invoice_detail->purchaseInvoice->code),
+                                        'url'   =>request()->root()."/admin/finance/purchase_invoice?code=".CustomHelper::encrypt($row_invoice_detail->purchaseInvoice->code),
                                     ];
                                     $data_go_chart[]=$data_invoices_tempura;
                                     $data_link[]=[
@@ -2293,7 +2293,7 @@ class PurchaseRequestController extends Controller
                                             ['name'=> "Tanggal: ".$row_dp_detail->purchaseDownPayment->post_date],
                                             ['name'=> "Vendor  : ".$row_dp_detail->purchaseDownPayment->name],
                                         ],
-                                        'url'   =>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_dp_detail->purchaseDownPayment->code),
+                                        'url'   =>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_dp_detail->purchaseDownPayment->code),
                                     ];
                                     $data_go_chart[]=$data_apdp_tempura;
                                     $data_link[]=[
@@ -2405,13 +2405,13 @@ class PurchaseRequestController extends Controller
                                             ['name'=> "Tanggal: ".$purchase_invoice_detail->purchaseInvoice->post_date],
                                         
                                         ],
-                                        'url'   =>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($purchase_invoice_detail->purchaseInvoice->code),
+                                        'url'   =>request()->root()."/admin/finance/purchase_invoice?code=".CustomHelper::encrypt($purchase_invoice_detail->purchaseInvoice->code),
                                     ];
                                     $data_go_chart[]=$data_invoices_tempura;
                                     $data_link[]=[
-                                        'from'  =>  $purchase_invoice_detail->purchaseInvoice->code,
-                                        'to'    =>  $query_po->code,
-                                        'string_link'=>$purchase_invoice_detail->purchaseInvoice->code.$query_po->code,
+                                        'from'  =>  $query_po->code,
+                                        'to'    =>  $purchase_invoice_detail->purchaseInvoice->code,
+                                        'string_link'=>$query_po->code.$purchase_invoice_detail->purchaseInvoice->code,
                                     ];
                                     if(!in_array($purchase_invoice_detail->purchaseInvoice->id,$data_id_invoice)){
                                         $data_id_invoice[]=$purchase_invoice_detail->purchaseInvoice->id;
@@ -2430,7 +2430,7 @@ class PurchaseRequestController extends Controller
                                         ['name'=> "Tanggal: ".$purchase_order_detail->marketingOrderDeliveryProcess->post_date],
                                     
                                     ],
-                                    'url'   =>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($purchase_order_detail->marketingOrderDeliveryProcess->code),
+                                    'url'   =>request()->root()."/admin/finance/purchase_invoice?code=".CustomHelper::encrypt($purchase_order_detail->marketingOrderDeliveryProcess->code),
                                 ];
                                 $data_go_chart[]=$data_marketing_order_delivery_process;
                                 $data_link[]=[
@@ -2459,7 +2459,7 @@ class PurchaseRequestController extends Controller
                                         ['name'=> "Tanggal: ".$row_dp_detail->purchaseDownPayment->post_date],
                                         ['name'=> "Vendor  : ".$row_dp_detail->purchaseDownPayment->name],
                                     ],
-                                    'url'   =>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_dp_detail->purchaseDownPayment->code),
+                                    'url'   =>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_dp_detail->purchaseDownPayment->code),
                                 ];
                                 $data_go_chart[]=$data_apdp_tempura;
                                 $data_link[]=[
@@ -2516,7 +2516,7 @@ class PurchaseRequestController extends Controller
                                     ],
                                     'key'=>$purchase_request_detail->lookable->materialRequest->code,
                                     'name'=>$purchase_request_detail->lookable->materialRequest->code,
-                                    'url'=>request()->root()."/admin/inventory/material_request?code=".CustomHelper::encrypt($purchase_request_detail->lookable->materialRequest->code),
+                                    'url'=>request()->root()."/admin/purchase/material_request?code=".CustomHelper::encrypt($purchase_request_detail->lookable->materialRequest->code),
                                 ];
                                 
                                 $data_go_chart[]=$mr;
@@ -2631,7 +2631,7 @@ class PurchaseRequestController extends Controller
                         }
                     }
                 }
-            }     
+            }      
             
             function unique_key($array,$keyname){
 

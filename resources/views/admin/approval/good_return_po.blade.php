@@ -224,7 +224,7 @@ td {
                     <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name }}</td>
                     <td class="center">{{ $rowdetail->goodReceiptDetail->goodReceipt->account->name }}</td>
                     <td class="center">{{ $rowdetail->goodReceiptDetail->qty }}</td>
-                    <td class="center">{{ $rowdetail->qty }}</td>
+                    <td class="center">{{ CustomHelper::formatConditionalQty($rowdetail->qty) }}</td>
                     <td class="center">{{ $rowdetail->itemUnit->unit->code }}</td>
                     <td>{{ $rowdetail->note }}</td>
                     <td>{{ $rowdetail->note2 }}</td>

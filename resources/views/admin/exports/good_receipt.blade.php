@@ -65,7 +65,7 @@
                 <td align="center">{{ $rowdetail->place->code }}</td>
                 <td>{{ $rowdetail->note }}</td>
                 <td>{{ $rowdetail->note2 }}</td>
-                <td align="center">{{ $rowdetail->qty }}</td>
+                <td align="center">{{ CustomHelper::formatConditionalQty($rowdetail->qty) }}</td>
                 <td align="center">{{ $rowdetail->itemUnit->unit->code }}</td>
                 <td align="center">{{ $rowdetail->qty * $rowdetail->qty_conversion }}</td>
                 <td align="center">{{ $rowdetail->item->uomUnit->code }}</td>

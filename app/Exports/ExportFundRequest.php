@@ -9,7 +9,7 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
-
+use App\Helpers\CustomHelper;
 class ExportFundRequest implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell,ShouldAutoSize
 {
     /**
@@ -101,7 +101,7 @@ class ExportFundRequest implements FromCollection, WithTitle, WithHeadings, With
                     'name_account'  => $row->name_account,
                     'bank_account'  => $row->bank_account,
                     'dekripsi'      => $rowDetail->note,
-                    'qty'           => $rowDetail->qty,
+                    'qty'           => CustomHelper::formatConditionalQty($rowDetail->qty),
                     'unit'          => $rowDetail->unit->name,
                     'harga'         => $rowDetail->price,
                     'subtotal'      => $rowDetail->total,

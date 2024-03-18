@@ -194,7 +194,7 @@
 											<td>{{ $rowdetail->department_id ? $rowdetail->department->name : '-' }}</td>
 											<td>{{ $rowdetail->warehouse->name }}</td>
                                             <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name }}</td>
-                                            <td>{{ $rowdetail->qty }}</td>
+                                            <td>{{ CustomHelper::formatConditionalQty($rowdetail->qty) }}</td>
                                             <td>{{ $rowdetail->item->uomUnit->code }}</td>
                                             <td align="right">{{ number_format($rowdetail->nominal,2,',','.') }}</td>
                                             <td align="right">{{ number_format($rowdetail->nominal / $rowdetail->qty,2,',','.') }}</td>

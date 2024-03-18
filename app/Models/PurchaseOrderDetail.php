@@ -23,6 +23,7 @@ class PurchaseOrderDetail extends Model
         'coa_id',
         'qty',
         'item_unit_id',
+        'coa_unit_id',
         'qty_conversion',
         'price',
         'percent_discount_1',
@@ -64,6 +65,11 @@ class PurchaseOrderDetail extends Model
     public function itemUnit()
     {
         return $this->belongsTo('App\Models\ItemUnit', 'item_unit_id', 'id')->withTrashed();
+    }
+
+    public function coaUnit()
+    {
+        return $this->belongsTo('App\Models\Unit', 'coa_unit_id', 'id')->withTrashed();
     }
 
     public function isTax(){

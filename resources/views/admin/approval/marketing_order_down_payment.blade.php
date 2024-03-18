@@ -179,7 +179,7 @@
                     <tr>
                         <th>Terbilang</th>
                         <th>:</th>
-                        <th><i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.$data->currency->document_text }}</i></th>
+                        <th><i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords(strtolower($data->currency->document_text)) }}</i></th>
                     </tr>
                     @if($data->type !== '1')
                     <tr>

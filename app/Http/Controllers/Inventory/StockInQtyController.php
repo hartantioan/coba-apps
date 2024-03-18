@@ -92,21 +92,20 @@ class StockInQtyController extends Controller
         }
         
         foreach($query_data as $row){
+            if($row->item()->exists()){
+                $data_tempura = [
+                    'item_id' => CustomHelper::encrypt($row->code),
+                    'plant' => $row->place->code,
+                    'gudang' => $row->warehouse->name ?? '',
+                    'kode' => $row->item->code,
+                    'item' => $row->item->name,
+                    'final'=>CustomHelper::formatConditionalQty($row->qty),
+                    'satuan'=>$row->item->uomUnit->code,
+                    'perlu' =>1,
+                ];
             
-            $data_tempura = [
-                'item_id' => CustomHelper::encrypt($row->code),
-                'plant' => $row->place->code,
-                'gudang' => $row->warehouse->name ?? '',
-                'kode' => $row->item->code,
-                'item' => $row->item->name,
-                'final'=>CustomHelper::formatConditionalQty($row->qty),
-                'satuan'=>$row->item->uomUnit->code,
-                'perlu' =>1,
-            ];
-        
-            $array_filter[]=$data_tempura;
-            
-            
+                $array_filter[]=$data_tempura;
+            }
         }
         
         $end_time = microtime(true);

@@ -49,6 +49,7 @@ use App\Models\PurchaseInvoiceDetail;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportPurchaseInvoice;
 use App\Exports\ExportTemplatePurchaseInvoice;
+use App\Models\Currency;
 use App\Models\Division;
 use App\Models\FundRequest;
 use App\Models\LandedCostFeeDetail;
@@ -93,6 +94,7 @@ class PurchaseInvoiceController extends Controller
             'newcode'       => $menu->document_code.date('y'),
             'menucode'      => $menu->document_code,
             'modedata'      => $menuUser->mode ? $menuUser->mode : '',
+            'currency'      => Currency::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -419,6 +421,8 @@ class PurchaseInvoiceController extends Controller
                         'total'         => number_format($datadp->total,2,',','.'),
                         'grandtotal'    => number_format($datadp->grandtotal,2,',','.'),
                         'balance'       => number_format($datadp->balanceInvoice(),2,',','.'),
+                        'currency_rate' => number_format($datadp->currency_rate,2,',','.'),
+                        'currency_id'   => $datadp->currency_id,
                     ];
                 }
             }elseif($row == 'purchase_orders'){
@@ -475,6 +479,8 @@ class PurchaseInvoiceController extends Controller
                             'spk_no'        => $datapo->spk_no ?? '',
                             'invoice_no'    => $datapo->invoice_no ?? '',
                             'header_note'   => $datapo->note,
+                            'currency_rate' => number_format($datapo->currency_rate,2,',','.'),
+                            'currency_id'   => $datapo->currency_id,
                         ];
                     }
                 }
@@ -531,6 +537,8 @@ class PurchaseInvoiceController extends Controller
                             'spk_no'        => $datafr->spk_no ?? '',
                             'invoice_no'    => $datafr->invoice_no ?? '',
                             'header_note'   => $datafr->note,
+                            'currency_rate' => number_format($datafr->currency_rate,2,',','.'),
+                            'currency_id'   => $datafr->currency_id,
                         ];
                     }
                 }
@@ -596,6 +604,8 @@ class PurchaseInvoiceController extends Controller
                             'spk_no'        => '',
                             'invoice_no'    => '',
                             'header_note'   => $datagr->note,
+                            'currency_rate' => number_format($rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate,2,',','.'),
+                            'currency_id'   => $rowdetail->purchaseOrderDetail->purchaseOrder->currency_id,
                         ];
                     }
                 }
@@ -653,6 +663,8 @@ class PurchaseInvoiceController extends Controller
                             'spk_no'        => '',
                             'invoice_no'    => '',
                             'header_note'   => $datalc->note,
+                            'currency_rate' => number_format($datalc->currency_rate,2,',','.'),
+                            'currency_id'   => $datalc->currency_id,
                         ];
                     }
                 }
@@ -676,6 +688,8 @@ class PurchaseInvoiceController extends Controller
             'received_date',
             'due_date',
             'document_date',
+            'currency_id',
+            'currency_rate',
             'type',
             'document',
             'note',
@@ -876,6 +890,8 @@ class PurchaseInvoiceController extends Controller
                     date('d/m/Y',strtotime($val->received_date)),
                     date('d/m/Y',strtotime($val->due_date)),
                     date('d/m/Y',strtotime($val->document_date)),
+                    $val->currency->name,
+                    number_format($val->currency_rate,2,',','.'),
                     $val->type(),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->note,
@@ -1080,6 +1096,8 @@ class PurchaseInvoiceController extends Controller
                         $query->due_date = $request->due_date;
                         $query->document_date = $request->document_date;
                         $query->type = $request->type;
+                        $query->currency_id = $request->currency_id;
+                        $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                         $query->total = round($total,2);
                         $query->tax = round($tax,2);
                         $query->wtax = round($wtax,2);
@@ -1134,6 +1152,8 @@ class PurchaseInvoiceController extends Controller
                         'due_date'                  => $request->due_date,
                         'document_date'             => $request->document_date,
                         'type'                      => $request->type,
+                        'currency_id'               => $request->currency_id,
+                        'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
                         'total'                     => round($total,2),
                         'tax'                       => round($tax,2),
                         'wtax'                      => round($wtax,2),
@@ -1614,6 +1634,7 @@ class PurchaseInvoiceController extends Controller
         $pi['grandtotal'] = number_format($pi->grandtotal,2,',','.');
         $pi['downpayment'] = number_format($pi->downpayment,2,',','.');
         $pi['rounding'] = number_format($pi->rounding,2,',','.');
+        $pi['currency_rate'] = number_format($pi->currency_rate,2,',','.');
 
         $downpayments = [];
         

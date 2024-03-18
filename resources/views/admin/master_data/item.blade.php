@@ -76,11 +76,11 @@
                             <span class="hide-on-small-onl">Excel</span>
                             <i class="material-icons right">view_list</i>
                         </a>
-                        {{-- <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3 modal-trigger" href="#modal2">
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3 modal-trigger" href="#modal2">
                             <i class="material-icons hide-on-med-and-up">file_download</i>
                             <span class="hide-on-small-onl">Import</span>
                             <i class="material-icons right">file_download</i>
-                        </a> --}}
+                        </a>
                     </div>
                 </div>
             </div>
@@ -301,7 +301,7 @@
                         </div>
                     </div>
                     <div class="input-field col m6 s12">
-                        <h6>Anda bisa menggunakan fitur copy paste dari format excel yang telah disediakan. Silahkan klik <a href="{{-- {{ asset(Storage::url('format_imports/format_copas_ap_invoice_2.xlsx')) }} --}}{{ Request::url() }}/get_import_excel" target="_blank">disini</a> untuk mengunduh. Jangan menyalin kolom paling atas (bagian header), dan tempel pada isian paling kiri di tabel di bawah ini.</h6>
+                        <h6>Anda bisa menggunakan fitur upload dokumen excel. Silahkan klik <a href="{{-- {{ asset(Storage::url('format_imports/format_copas_ap_invoice_2.xlsx')) }} --}}{{ Request::url() }}/get_import_excel" target="_blank">disini</a> untuk mengunduh. Untuk Satuan dan Grup Item, silahkan pilih dari dropdown yang tersedia.</h6>
                     </div>
                     <div class="input-field col m12 s12">
                         <button type="submit" class="btn cyan btn-primary btn-block right">Kirim</button>
@@ -683,7 +683,7 @@
                         $('#validation_alertImport').show();
                         $('.modal-content').scrollTop(0);
                         
-                        /* $.each(response.error, function(i, val) {
+                        $.each(response.error, function(i, val) {
                             $('#validation_alertImport').append(`
                                     <div class="card-alert card red">
                                         <div class="card-content white-text">
@@ -694,21 +694,9 @@
                                         </button>
                                     </div>
                                 `);
-                        }); */
+                        });
                     } else {
                         console.log(response);
-                       /*  $.each(response.error, function(i, val) {
-                            $('#validation_alertImport').append(`
-                                    <div class="card-alert card red">
-                                        <div class="card-content white-text">
-                                            <p> ` +val+`</p>
-                                        </div>
-                                        <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                            <span aria-hidden="true">×</span>
-                                        </button>
-                                    </div>
-                                `);
-                        }); */
                     }
                     loadingClose('.modal-content');
                 },

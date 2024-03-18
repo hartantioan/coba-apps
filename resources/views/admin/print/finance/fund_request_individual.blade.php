@@ -486,7 +486,7 @@
                                                 Terbilang
                                             </td>
                                             <td>
-                                                : {{ strtoupper(CustomHelper::terbilangWithKoma($data->grandtotal).' '.$data->currency->document_text) }}
+                                                : {{ strtoupper(CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords(strtolower($data->currency->document_text))) }}
                                             </td>
                                         </tr>
                                         <tr>

@@ -354,7 +354,7 @@
                                     </div>
                                     <br>
                                     <br>
-                                    Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->balance).' Rupiah' }}
+                                    Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->balance).' '.ucwords(strtolower($data->currency->document_text)) }}
                                 </td>
                                 
                             </tr>

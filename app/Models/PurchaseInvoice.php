@@ -25,8 +25,8 @@ class PurchaseInvoice extends Model
         'due_date',
         'document_date',
         'type',
-        'subtotal',
-        'discount',
+        'currency_id',
+        'currency_rate',
         'total',
         'tax',
         'wtax',
@@ -49,6 +49,11 @@ class PurchaseInvoice extends Model
         'spk_no',
         'invoice_no',
     ];
+
+    public function currency()
+    {
+        return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
+    }
 
     public function user()
     {
@@ -93,7 +98,7 @@ class PurchaseInvoice extends Model
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
-    public function currency(){
+    /* public function currency(){
         $currency = '';
         foreach($this->purchaseInvoiceDetail as $row){
             if($row->lookable_type == 'coas'){
@@ -110,9 +115,9 @@ class PurchaseInvoice extends Model
         }
 
         return $currency;
-    }
+    } */
 
-    public function currencyRate(){
+    /* public function currencyRate(){
         $rate = 1;
         foreach($this->purchaseInvoiceDetail as $row){
             if($row->lookable_type == 'coas'){
@@ -129,7 +134,7 @@ class PurchaseInvoice extends Model
         }
 
         return $rate;
-    }
+    } */
 
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
@@ -405,7 +410,7 @@ class PurchaseInvoice extends Model
         $total = 0;
         foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query) use ($date){
             $query->whereHas('outgoingPayment',function ($query) use ($date){
-                $query->whereDate('post_date','<=',$date);
+                $query->whereDate('pay_date','<=',$date);
             });
 
         })->get() as $rowpayment){
@@ -433,7 +438,7 @@ class PurchaseInvoice extends Model
         $totalAfterMemo = $total - $this->totalMemoByDate($date);
         foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query) use ($date){
             $query->whereHas('outgoingPayment',function ($query) use ($date){
-                $query->whereDate('post_date','<=',$date);
+                $query->whereDate('pay_date','<=',$date);
             });
 
         })->get() as $rowpayment){

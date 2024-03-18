@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator;
 
 use App\Models\Item;
 use App\Models\ItemGroup;
+use App\Models\ItemStock;
 use App\Models\ItemUnit;
 use App\Models\Unit;
 use Maatwebsite\Excel\Concerns\ToCollection;
@@ -17,17 +18,15 @@ class ImportItemMaster implements ToCollection
 {
     public function collection(Collection $rows)
     {
-        /* DB::beginTransaction();
-        try { */
-            foreach ($rows as $key => $row) {
+        foreach ($rows as $key => $row) {
+            if($key >= 1 && $row[0]){
                 $item = null;
-                $unit = Unit::where('code',trim($row[2]))->first();
-                $group = ItemGroup::where('name',trim($row[3]))->first();
+                $unit = Unit::where('code',trim(explode('#',$row[3])[0]))->first();
+                $group = ItemGroup::where('code',trim(explode('#',$row[2])[0]))->first();
                 $item = Item::where('code',$row[0])->first();
-                info($key);
                 if($item){
                     $item->update([
-                        'note'  => $item->note.','.$row[5],
+                        'note'  => $item->note.','.$row[9],
                     ]);
                 }else{
                     $item = Item::create([
@@ -35,31 +34,36 @@ class ImportItemMaster implements ToCollection
                         'name'              => $row[1],
                         'item_group_id'     => $group->id,
                         'uom_unit'          => $unit->id,
-                        'tolerance_gr'      => 0,
-                        'is_inventory_item' => '1',
-                        'is_sales_item'     => NULL,
-                        'is_purchase_item'  => '1',
-                        'is_service'        => $row[4] == '2' ? '1' : NULL,
-                        'note'              => $row[5],
-                        'min_stock'         => 0,
-                        'max_stock'         => 0,
-                        'status'            => $row[4],
-                        'created_at'        => date('Y-m-d H:i:s'),
-                        'updated_at'        => date('Y-m-d H:i:s'),
+                        'tolerance_gr'      => $row[4] ?? 0,
+                        'is_inventory_item' => $row[5] ?? NULL,
+                        'is_sales_item'     => $row[6] ?? NULL,
+                        'is_purchase_item'  => $row[7] ?? NULL,
+                        'is_service'        => $row[8] ?? NULL,
+                        'note'              => $row[9],
+                        'min_stock'         => $row[10] ?? NULL,
+                        'max_stock'         => $row[11] ?? NULL,
+                        'status'            => '1',
                     ]);
+
+                    foreach($item->itemGroup->itemGroupWarehouse as $row){
+                        ItemStock::create([
+                            'place_id'      => 1,
+                            'warehouse_id'  => $row->warehouse_id,
+                            'item_id'       => $item->id,
+                            'qty'           => 0
+                        ]);
+                    }
+                    
                     ItemUnit::create([
                         'item_id'       => $item->id,
                         'unit_id'       => $unit->id,
                         'conversion'    => 1,
-                        'is_sell_unit'  => NULL,
+                        'is_sell_unit'  => '1',
                         'is_buy_unit'   => '1',
                         'is_default'    => '1',
                     ]);
                 }
             }
-            /* DB::commit();
-        }catch(\Exception $e){
-            DB::rollback();
-        } */
+        }
     }
 }

@@ -107,10 +107,10 @@
                                                 <thead>
                                                     <tr>
                                                         <th rowspan="2">#</th>
+                                                        <th rowspan="2">Code</th>
                                                         <th rowspan="2">Pengguna</th>
                                                         <th rowspan="2">Supplier/Vendor</th>
                                                         <th rowspan="2">Perusahaan</th>
-                                                        <th rowspan="2">Code</th>
                                                         <th rowspan="2">Penerima</th>
                                                         <th colspan="2" class="center-align">Tanggal</th>
                                                         <th rowspan="2">Keterangan</th>

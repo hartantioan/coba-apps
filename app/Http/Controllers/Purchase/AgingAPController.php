@@ -46,8 +46,9 @@ class AgingAPController extends Controller
                     WHERE 
                         prd.lookable_id = pi.id 
                         AND prd.lookable_type = 'purchase_invoices'
-                        AND op.post_date <= :date1
+                        AND op.pay_date <= :date1
                         AND op.status IN ('2','3')
+                        AND prd.deleted_at IS NULL
                 ),0) AS total_payment,
                 IFNULL((
                     SELECT
@@ -61,6 +62,7 @@ class AgingAPController extends Controller
                         WHERE pmd.lookable_type = 'purchase_invoice_details'
                         AND pm.post_date <= :date2
                         AND pm.status IN ('2','3')
+                        AND pmd.deleted_at IS NULL
                 ),0) AS total_memo,
                 IFNULL((
                     SELECT
@@ -73,6 +75,7 @@ class AgingAPController extends Controller
                         AND pr.post_date <= :date3
                         AND pr.status IN ('2','3')
                         AND pr.payment_type = '5'
+                        AND prd.deleted_at IS NULL
                 ),0) AS total_reconcile,
                 IFNULL((
                     SELECT
@@ -86,9 +89,18 @@ class AgingAPController extends Controller
                         AND jd.note = CONCAT('VOID*',pi.code)
                         AND j.post_date <= :date4
                         AND j.status IN ('2','3')
+                        AND jd.deleted_at IS NULL
                 ),0) AS total_journal,
                 u.name AS account_name,
-                u.employee_no AS account_code
+                u.employee_no AS account_code,
+                pi.code,
+                pi.post_date,
+                pi.received_date,
+                pi.due_date,
+                pi.total,
+                pi.tax,
+                pi.wtax,
+                pi.balance
                 FROM purchase_invoices pi
                 LEFT JOIN users u
                     ON u.id = pi.account_id
@@ -96,6 +108,7 @@ class AgingAPController extends Controller
                     pi.post_date <= :date5
                     AND pi.balance > 0
                     AND pi.status IN ('2','3')
+                    AND pi.deleted_at IS NULL
         ", array(
             'date1' => $date,
             'date2' => $date,
@@ -116,8 +129,9 @@ class AgingAPController extends Controller
                     WHERE 
                         prd.lookable_id = pi.id 
                         AND prd.lookable_type = 'purchase_down_payments'
-                        AND op.post_date <= :date1
+                        AND op.pay_date <= :date1
                         AND op.status IN ('2','3')
+                        AND prd.deleted_at IS NULL
                 ),0) AS total_payment,
                 IFNULL((
                     SELECT
@@ -129,6 +143,7 @@ class AgingAPController extends Controller
                         AND pmd.lookable_id = pi.id
                         AND pm.post_date <= :date2
                         AND pm.status IN ('2','3')
+                        AND pmd.deleted_at IS NULL
                 ),0) AS total_memo,
                 IFNULL((
                     SELECT
@@ -141,9 +156,19 @@ class AgingAPController extends Controller
                         AND pr.post_date <= :date3
                         AND pr.status IN ('2','3')
                         AND pr.payment_type = '5'
+                        AND prd.deleted_at IS NULL
                 ),0) AS total_reconcile,
                 u.name AS account_name,
-                u.employee_no AS account_code
+                u.employee_no AS account_code,
+                pi.code,
+                pi.post_date,
+                pi.document_date,
+                pi.due_date,
+                pi.total,
+                pi.tax,
+                pi.wtax,
+                pi.grandtotal,
+                pi.currency_rate
                 FROM purchase_down_payments pi
                 LEFT JOIN users u
                     ON u.id = pi.account_id
@@ -151,6 +176,7 @@ class AgingAPController extends Controller
                     pi.post_date <= :date4
                     AND pi.grandtotal > 0
                     AND pi.status IN ('2','3')
+                    AND pi.deleted_at IS NULL
         ", array(
             'date1' => $date,
             'date2' => $date,
@@ -236,7 +262,7 @@ class AgingAPController extends Controller
         }
 
         foreach($results2 as $row){
-            $balance = $row->grandtotal - $row->total_payment - $row->total_memo - $row->total_reconcile;
+            $balance = ($row->grandtotal * $row->currency_rate) - $row->total_payment - $row->total_memo - $row->total_reconcile;
             $due_date = $row->due_date ? $row->due_date : date('Y-m-d', strtotime($row->post_date. ' + '.$row->topdp.' day'));
             if($balance > 0){
                 $daysDiff = $this->dateDiffInDays($due_date,$date);
@@ -364,8 +390,9 @@ class AgingAPController extends Controller
                     WHERE 
                         prd.lookable_id = pi.id 
                         AND prd.lookable_type = 'purchase_invoices'
-                        AND op.post_date <= :date1
+                        AND op.pay_date <= :date1
                         AND op.status IN ('2','3')
+                        AND prd.deleted_at IS NULL
                 ),0) AS total_payment,
                 IFNULL((
                     SELECT
@@ -379,6 +406,7 @@ class AgingAPController extends Controller
                         WHERE pmd.lookable_type = 'purchase_invoice_details'
                         AND pm.post_date <= :date2
                         AND pm.status IN ('2','3')
+                        AND pmd.deleted_at IS NULL
                 ),0) AS total_memo,
                 IFNULL((
                     SELECT
@@ -391,6 +419,7 @@ class AgingAPController extends Controller
                         AND pr.post_date <= :date3
                         AND pr.status IN ('2','3')
                         AND pr.payment_type = '5'
+                        AND prd.deleted_at IS NULL
                 ),0) AS total_reconcile,
                 IFNULL((
                     SELECT
@@ -404,9 +433,18 @@ class AgingAPController extends Controller
                         AND jd.note = CONCAT('VOID*',pi.code)
                         AND j.post_date <= :date4
                         AND j.status IN ('2','3')
+                        AND jd.deleted_at IS NULL
                 ),0) AS total_journal,
                 u.name AS account_name,
-                u.employee_no AS account_code
+                u.employee_no AS account_code,
+                pi.code,
+                pi.post_date,
+                pi.received_date,
+                pi.due_date,
+                pi.total,
+                pi.tax,
+                pi.wtax,
+                pi.balance
                 FROM purchase_invoices pi
                 LEFT JOIN users u
                     ON u.id = pi.account_id
@@ -414,6 +452,7 @@ class AgingAPController extends Controller
                     pi.post_date <= :date5
                     AND pi.balance > 0
                     AND pi.status IN ('2','3')
+                    AND pi.deleted_at IS NULL
         ", array(
             'date1' => $date,
             'date2' => $date,
@@ -434,8 +473,9 @@ class AgingAPController extends Controller
                     WHERE 
                         prd.lookable_id = pi.id 
                         AND prd.lookable_type = 'purchase_down_payments'
-                        AND op.post_date <= :date1
+                        AND op.pay_date <= :date1
                         AND op.status IN ('2','3')
+                        AND prd.deleted_at IS NULL
                 ),0) AS total_payment,
                 IFNULL((
                     SELECT
@@ -447,6 +487,7 @@ class AgingAPController extends Controller
                         AND pmd.lookable_id = pi.id
                         AND pm.post_date <= :date2
                         AND pm.status IN ('2','3')
+                        AND pmd.deleted_at IS NULL
                 ),0) AS total_memo,
                 IFNULL((
                     SELECT
@@ -459,9 +500,19 @@ class AgingAPController extends Controller
                         AND pr.post_date <= :date3
                         AND pr.status IN ('2','3')
                         AND pr.payment_type = '5'
+                        AND prd.deleted_at IS NULL
                 ),0) AS total_reconcile,
                 u.name AS account_name,
-                u.employee_no AS account_code
+                u.employee_no AS account_code,
+                pi.code,
+                pi.post_date,
+                pi.document_date,
+                pi.due_date,
+                pi.total,
+                pi.tax,
+                pi.wtax,
+                pi.grandtotal,
+                pi.currency_rate
                 FROM purchase_down_payments pi
                 LEFT JOIN users u
                     ON u.id = pi.account_id
@@ -469,6 +520,7 @@ class AgingAPController extends Controller
                     pi.post_date <= :date4
                     AND pi.grandtotal > 0
                     AND pi.status IN ('2','3')
+                    AND pi.deleted_at IS NULL
         ", array(
             'date1' => $date,
             'date2' => $date,
@@ -541,7 +593,7 @@ class AgingAPController extends Controller
         }
 
         foreach($results2 as $row){
-            $balance = $row->grandtotal - $row->total_payment - $row->total_memo - $row->total_reconcile;
+            $balance = ($row->grandtotal * $row->currency_rate) - $row->total_payment - $row->total_memo - $row->total_reconcile;
             $due_date = $row->due_date ? $row->due_date : date('Y-m-d', strtotime($row->post_date. ' + '.$row->topdp.' day'));
             if($balance > 0){
                 $daysDiff = $this->dateDiffInDays($due_date,$date);
@@ -655,7 +707,7 @@ class AgingAPController extends Controller
                 if($dp){
                     $memo = $dp->totalMemoByDate($date);
                     $paid = $dp->totalPaidByDate($date);
-                    $balance = $dp->grandtotal - $memo - $paid;
+                    $balance = ($dp->grandtotal * $dp->currency_rate) - $memo - $paid;
                     $due_date = $dp->due_date ? $dp->due_date : date('Y-m-d', strtotime($dp->post_date. ' + '.$dp->top.' day'));
                     $results[] = [
                         'code'          => $dp->code,
@@ -664,7 +716,7 @@ class AgingAPController extends Controller
                         'rec_date'      => '-',
                         'due_date'      => $due_date,
                         'due_days'      => $this->dateDiffInDays($due_date,$date),
-                        'grandtotal'    => number_format($dp->grandtotal,2,',','.'),
+                        'grandtotal'    => number_format($dp->grandtotal * $dp->currency_rate,2,',','.'),
                         'memo'          => number_format($memo,2,',','.'),
                         'paid'          => number_format($paid,2,',','.'),
                         'balance'       => number_format($balance,2,',','.'),
@@ -704,7 +756,7 @@ class AgingAPController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportAgingAP($request->date,$request->interval,$request->column,$request->type), 'aging_ap_'.uniqid().'.xlsx');
+		return Excel::download(new ExportAgingAP($request->date,$request->interval,$request->column,$request->type), 'aging_ap_'.uniqid().'.xls');
     }
 
     function findDuplicate($value,$array){

@@ -43,7 +43,7 @@
                                                         <label for="date" style="font-size:1rem;">Tanggal Posting :</label>
                                                         <input type="date" max="{{ date('9999'.'-12-31') }}" id="date" name="date" value="{{ date('Y-m-d') }}">
                                                     </div>
-                                                    <div class="col m4 s6 pt-2">
+                                                    <div class="col m9 s6 pt-2">
                                                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="filterByDate();">
                                                             <i class="material-icons hide-on-med-and-up">search</i>
                                                             <span class="hide-on-small-onl">Filter</span>
@@ -76,7 +76,7 @@
                                 </h4>
                                 <div class="row">
                                     <div class="col s12 m12" style="overflow: auto">
-                                        <div class="result" style="width:2500px;">
+                                        <div class="result" style="width:100%;">
                                             <table class="bordered" style="font-size:10px;">
                                                 <thead>
                                                     <tr>

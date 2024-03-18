@@ -362,7 +362,7 @@
                                         <div class="mt-3">
                                             Catatan Eksternal : {{ $data->note_external }}
                                         </div>
-                                        Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.$data->currency->document_text }}
+                                        Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords(strtolower($data->currency->document_text)) }}
                                     </td>
                                     
                                 </tr>

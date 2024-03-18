@@ -499,6 +499,7 @@ class PaymentRequestController extends Controller
                         'balance'           => number_format($row->balance,2,',','.'),
                         'memo'              => number_format($memo,2,',','.'),
                         'final'             => $row->currency->symbol.' '.number_format($final,2,',','.'),
+                        'note'              => $row->note ? $row->note : '',
                         'type_fr'           => '',
                         'document_status'   => '2',
                         'status_document'   => 'LENGKAP',

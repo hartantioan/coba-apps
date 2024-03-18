@@ -2240,6 +2240,7 @@
                                             $('#note').val(val.header_note);
                                             $('#currency_rate').val(val.currency_rate);
                                             $('#currency_id').val(val.currency_id).formSelect();
+                                            $('#rounding').val(val.rounding);
                                         });                        
                                     }else{
                                         $('.row_detail').remove();

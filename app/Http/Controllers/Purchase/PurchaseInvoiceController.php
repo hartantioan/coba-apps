@@ -481,6 +481,7 @@ class PurchaseInvoiceController extends Controller
                             'header_note'   => $datapo->note,
                             'currency_rate' => number_format($datapo->currency_rate,2,',','.'),
                             'currency_id'   => $datapo->currency_id,
+                            'rounding'      => number_format($datapo->rounding,2,',','.'),
                         ];
                     }
                 }
@@ -539,6 +540,7 @@ class PurchaseInvoiceController extends Controller
                             'header_note'   => $datafr->note,
                             'currency_rate' => number_format($datafr->currency_rate,2,',','.'),
                             'currency_id'   => $datafr->currency_id,
+                            'rounding'      => 0,
                         ];
                     }
                 }
@@ -606,6 +608,7 @@ class PurchaseInvoiceController extends Controller
                             'header_note'   => $datagr->note,
                             'currency_rate' => number_format($rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate,2,',','.'),
                             'currency_id'   => $rowdetail->purchaseOrderDetail->purchaseOrder->currency_id,
+                            'rounding'      => number_format($rowdetail->purchaseOrderDetail->purchaseOrder->rounding,2,',','.'),
                         ];
                     }
                 }
@@ -665,6 +668,7 @@ class PurchaseInvoiceController extends Controller
                             'header_note'   => $datalc->note,
                             'currency_rate' => number_format($datalc->currency_rate,2,',','.'),
                             'currency_id'   => $datalc->currency_id,
+                            'rounding'      => 0,
                         ];
                     }
                 }

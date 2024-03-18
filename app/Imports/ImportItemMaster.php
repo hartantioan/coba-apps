@@ -63,6 +63,11 @@ class ImportItemMaster implements ToCollection
                         'is_default'    => '1',
                     ]);
                 }
+                activity()
+                    ->performedOn(new Item())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($item)
+                    ->log('Import the item data');
             }
         }
     }

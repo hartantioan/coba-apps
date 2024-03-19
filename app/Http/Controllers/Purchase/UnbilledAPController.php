@@ -60,7 +60,28 @@ class UnbilledAPController extends Controller
                                 WHERE pi.status IN ('2','3') 
                                 AND pi.post_date <= :dateend
                             )
-                ) AS total_invoice
+                ) AS total_invoice,
+                (SELECT 
+                    SUM(grtd.total) 
+                    FROM good_return_details grtd 
+                    WHERE grtd.good_receipt_detail_id 
+                        IN (
+                            SELECT 
+                                grd.id 
+                                FROM good_receipt_details grd
+                                WHERE grd.good_receipt_id = gr.id 
+                                AND grd.deleted_at IS NULL
+                            )
+                    AND grtd.deleted_at IS NULL 
+                    AND grtd.good_return_id 
+                        IN (
+                            SELECT 
+                                grt.id 
+                                FROM good_returns grt 
+                                WHERE grt.status IN ('2','3') 
+                                AND grt.post_date <= :dateend2
+                            )
+                ) AS total_return
                 FROM good_receipts gr
                 LEFT JOIN users u
                     ON u.id = gr.account_id
@@ -71,6 +92,7 @@ class UnbilledAPController extends Controller
         ", array(
             'datestart'     => $start_date,
             'dateend'       => $end_date,
+            'dateend2'      => $end_date,
         ));
 
         $results = DB::select("
@@ -98,7 +120,28 @@ class UnbilledAPController extends Controller
                                 WHERE pi.status IN ('2','3') 
                                 AND pi.post_date <= :dateend2
                             )
-                ) AS total_invoice
+                ) AS total_invoice,
+                (SELECT 
+                    SUM(grtd.total) 
+                    FROM good_return_details grtd 
+                    WHERE grtd.good_receipt_detail_id 
+                        IN (
+                            SELECT 
+                                grd.id 
+                                FROM good_receipt_details grd
+                                WHERE grd.good_receipt_id = gr.id 
+                                AND grd.deleted_at IS NULL
+                            )
+                    AND grtd.deleted_at IS NULL 
+                    AND grtd.good_return_id 
+                        IN (
+                            SELECT 
+                                grt.id 
+                                FROM good_returns grt 
+                                WHERE grt.status IN ('2','3') 
+                                AND grt.post_date <= :dateend3
+                            )
+                ) AS total_return
                 FROM good_receipts gr
                 LEFT JOIN users u
                     ON u.id = gr.account_id
@@ -111,13 +154,14 @@ class UnbilledAPController extends Controller
             'datestart' => $start_date,
             'dateend'   => $end_date,
             'dateend2'  => $end_date,
+            'dateend3'  => $end_date,
         ));
 
         $totalUnbilled = 0;
         $totalUnbilledBefore = 0;
 
         foreach($resultsbefore as $key => $row){
-            $balance = $row->total - $row->total_invoice;
+            $balance = $row->total - $row->total_invoice - $row->total_return;
             if($balance > 0){
                 $totalUnbilledBefore += $balance;
             }
@@ -126,7 +170,7 @@ class UnbilledAPController extends Controller
         $totalUnbilled += $totalUnbilledBefore;
 
         foreach($results as $key => $row){
-            $balance = $row->total - $row->total_invoice;
+            $balance = $row->total - $row->total_invoice - $row->total_return;
             if($balance > 0){
                 $array_filter[] = [
                     'no'            => ($key + 1),

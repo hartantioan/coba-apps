@@ -1004,7 +1004,7 @@ class CustomHelper {
 
 			foreach($gr->goodReceiptDetail as $rowdetail){
 
-				$rowtotal = $rowdetail->getRowTotal() * $rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate;
+				$rowtotal = $rowdetail->total * $rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate;
 
 				JournalDetail::create([
 					'journal_id'	=> $query->id,

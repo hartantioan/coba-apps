@@ -337,7 +337,7 @@
                                 @foreach($data->fundRequestDetail as $row)
                                 <tr>
                                     <td>{{ $row->note }}</td>
-                                    <td class="center-align">{{ $row->qty }}</td>
+                                    <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                                     <td class="center-align">{{ $row->unit->code }}</td>
                                     <td class="right-align">{{ number_format($row->price,2,',','.') }}</td>
                                     <td class="right-align">{{ number_format($row->total,2,',','.') }}</td>

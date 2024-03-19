@@ -3076,7 +3076,7 @@ class CustomHelper {
 						}
 					}
 				}else{
-					if($row->nominal_debit_fc !== 0){
+					if($row->nominal_debit_fc > 0 || $row->nominal_debit_fc < 0){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $row->coa_id,
@@ -3092,7 +3092,7 @@ class CustomHelper {
 							'note2'			=> $row->note2,
 						]);
 					}
-					if($row->nominal_credit_fc !== 0){
+					if($row->nominal_credit_fc > 0 || $row->nominal_credit_fc < 0){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $row->coa_id,

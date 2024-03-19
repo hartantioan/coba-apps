@@ -144,10 +144,10 @@ class CustomHelper {
 				'item_id'			=> $item_id,
 				'item_shading_id'	=> $shading ? $shading : NULL,
 				'qty_in'			=> $qty,
-				'price_in'			=> $qty > 0 ? round($total / $qty,2) : 0,
+				'price_in'			=> $qty > 0 ? $total / $qty : 0,
 				'total_in'			=> $total,
 				'qty_final'			=> $old_data ? $old_data->qty_final + $qty : $qty,
-				'price_final'		=> $old_data ? round((($old_data->total_final + $total) / ($old_data->qty_final + $qty)),2) : ($qty > 0 ? round($total / $qty,2) : 0),
+				'price_final'		=> $old_data ? (($old_data->total_final + $total) / ($old_data->qty_final + $qty)) : ($qty > 0 ? $total / $qty : 0),
 				'total_final'		=> $old_data ? round(($old_data->total_final + $total),2) : $total,
 				'date'				=> $date,
 				'type'				=> $type

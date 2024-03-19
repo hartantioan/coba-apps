@@ -40,11 +40,11 @@
                                             <div class="col s12">
                                                 <div class="row">
                                                     <div class="col m3 s6 ">
-                                                        <label for="date" style="font-size:1rem;">Tanggal Mulai :</label>
+                                                        <label for="start_date" style="font-size:1rem;">Tanggal Mulai :</label>
                                                         <input type="date" id="start_date" name="start_date" value="{{ date('Y-m-d') }}">
                                                     </div>
                                                     <div class="col m3 s6 ">
-                                                        <label for="date" style="font-size:1rem;">Tanggal Akhir :</label>
+                                                        <label for="end_date" style="font-size:1rem;">Tanggal Akhir :</label>
                                                         <input type="date" max="{{ date('9999'.'-12-31') }}" id="end_date" name="end_date" value="{{ date('Y-m-d') }}">
                                                     </div>
                                                     <div class="col m9 s6 pt-2">
@@ -150,29 +150,25 @@
                 loadingClose('#main');
                 if(response.status == 200) {
                     $('#detail_invoice').empty();
-                    if(response.message.length > 0){
-                        $.each(response.message, function(i, val) {
+                    if(response.data.length > 0){
+                        $.each(response.data, function(i, val) {
                             $('#detail_invoice').append(`
                                 <tr>
-                                    <td class="center-align">`+(i+1)+`</td>
-                                    <td>`+val.code+`</td>
-                                    <td>`+val.vendor+`</td>
-                                    <td class="center-align">`+val.post_date+`</td>
-                                    <td class="center-align">`+val.rec_date+`</td>
-                                    <td class="center-align">`+val.top+`</td>
-                                    <td class="center-align">`+val.due_date+`</td>
-                                    <td class="right-align">`+val.total+`</td>
-                                    <td class="right-align">`+val.tax+`</td>
-                                    <td class="right-align">`+val.wtax+`</td>
-                                    <td class="right-align">`+val.grandtotal+`</td>
-                                    <td class="right-align">`+val.payed+`</td>
-                                    <td class="right-align">`+val.sisa+`</td>
+                                    <td class="center-align">`+ val.no +`</td>
+                                    <td>`+ val.code +`</td>
+                                    <td>`+ val.vendor +`</td>
+                                    <td class="center-align">`+ val.post_date +`</td>
+                                    <td class="center-align">`+ val.delivery_no +`</td>
+                                    <td class="">`+ val.note +`</td>
+                                    <td class="right-align">`+ val.total_received +`</td>
+                                    <td class="right-align">`+ val.total_invoice +`</td>
+                                    <td class="right-align">`+ val.total_balance +`</td>
                                 </tr>
                             `);
                         });
                         $('#detail_invoice').append(`
                             <tr>
-                                <td colspan="20" class="right-align"><h6><b>Grandtotal : `+response.totalall+`</b></h6></td>
+                                <td colspan="9" class="center-align"><h6><b>Waktu proses : ` + response.time + `</b></h6></td>
                             </tr>
                         `);
                     }else{

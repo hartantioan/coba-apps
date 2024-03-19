@@ -324,7 +324,7 @@ class FundRequestController extends Controller
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
-                                <th class="">Item</th>
+                                <th class="center-align">Item</th>
                                 <th class="right-align">Qty</th>
                                 <th class="center-align">Satuan</th>
                                 <th class="right-align">Harga Satuan</th>
@@ -354,7 +354,7 @@ class FundRequestController extends Controller
             $totalgrandtotal+=$row->grandtotal;
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$row->note.'</td>
+                <td class="">'.$row->note.'</td>
                 <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->unit->code.'</td>
                 <td class="right-align">'.number_format($row->price,2,',','.').'</td>
@@ -1335,7 +1335,7 @@ class FundRequestController extends Controller
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
-                                <th class="">Item</th>
+                                <th class="center-align">Item</th>
                                 <th class="right-align">Qty</th>
                                 <th class="center-align">Satuan</th>
                                 <th class="right-align">Harga Satuan</th>
@@ -1354,7 +1354,7 @@ class FundRequestController extends Controller
         foreach($data->fundRequestDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$row->note.'</td>
+                <td class="">'.$row->note.'</td>
                 <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->unit->code.'</td>
                 <td class="right-align">'.number_format($row->price,2,',','.').'</td>

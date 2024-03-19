@@ -33,9 +33,13 @@ class UnbilledAPController extends Controller
         $start_date = $request->start_date;
         $end_date = $request->end_date;
 
+        $start_time = microtime(true);
+
         $results = DB::select("
             SELECT 
-                *
+                *,
+                u.name AS account_name,
+                (SELECT SUM(pid.total) FROM purchase_invoice_details pid WHERE pid.lookable_type = 'good_receipt_details' AND pid.lookable_id IN (SELECT grd.id FROM good_receipt_details grd WHERE grd.good_receipt_id = gr.id AND grd.deleted_at IS NULL) AND pid.deleted_at IS NULL) AS total_invoice
                 FROM good_receipts gr
                 LEFT JOIN users u
                     ON u.id = gr.account_id
@@ -48,5 +52,31 @@ class UnbilledAPController extends Controller
             'datestart' => $start_date,
             'dateend'   => $end_date,
         ));
+
+        foreach($results as $key => $row){
+            $array_filter = [
+                'no'            => ($key + 1),
+                'code'          => $row->code,
+                'vendor'        => $row->account_name,
+                'post_date'     => date('d/m/Y',strtotime($row->post_date)),
+                'delivery_no'   => $row->delivery_no,
+                'note'          => $row->note,
+                'total_received'=> number_format($row->total,2,',','.'),
+                'total_invoice' => number_format($row->total_invoice,2,',','.'),
+                'total_balance' => number_format($row->total - $row->total_invoice,2,',','.'),
+            ];
+        }
+
+        $end_time = microtime(true);
+        
+        $execution_time = ($end_time - $start_time);
+
+        $response =[
+            'status'    => 200,
+            'data'      => $array_filter,
+            'time'      => $execution_time,
+        ];
+
+        return response()->json($response);
     }
 }

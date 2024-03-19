@@ -295,7 +295,7 @@ class FundRequest extends Model
             }
         }
 
-        return ceil($total);
+        return $total;
     }
 
     public function totalPaymentRequest(){

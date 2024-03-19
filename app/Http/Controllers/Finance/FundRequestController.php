@@ -1579,6 +1579,13 @@ class FundRequestController extends Controller
     }
 
     public function viewStructureTree(Request $request){
+        function formatNominal($model) {
+            if ($model->currency) {
+                return $model->currency->symbol;
+            } else {
+                return "Rp.";
+            }
+        }
         $query = FundRequest::where('code',CustomHelper::decrypt($request->id))->first();
         $data_go_chart = [];
         $data_link = [];
@@ -1634,7 +1641,7 @@ class FundRequestController extends Controller
                         $data_pyr_tempura=[
                             'properties'=> [
                                 ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
-                                ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
+                                ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
                             ],
                             "key" => $row_pyr_detail->paymentRequest->code,
                             "name" => $row_pyr_detail->paymentRequest->code,
@@ -1662,7 +1669,7 @@ class FundRequestController extends Controller
                         
                             'properties'=> [
                                 ['name'=> "Tanggal: ".$row_invoice_detail->purchaseInvoice->post_date],
-                                ['name'=> "Nominal : Rp.".number_format($row_invoice_detail->purchaseInvoice->grandtotal,2,',','.')]
+                                ['name'=> "Nominal :".formatNominal($row_invoice_detail->purchaseInvoice).number_format($row_invoice_detail->purchaseInvoice->grandtotal,2,',','.')]
                             ],
                             'url'   =>request()->root()."/admin/finance/purchase_invoice?code=".CustomHelper::encrypt($row_invoice_detail->purchaseInvoice->code),
                         ];
@@ -1737,7 +1744,7 @@ class FundRequestController extends Controller
                                 'properties'=> [
                                     ['name'=> "Tanggal: ".$good_receipt_detail->purchaseOrderDetail->purchaseOrder->post_date],
                                     ['name'=> "Vendor  : ".$good_receipt_detail->purchaseOrderDetail->purchaseOrder->supplier->name],
-                                    ['name'=> "Nominal : Rp.:".number_format($good_receipt_detail->purchaseOrderDetail->purchaseOrder->grandtotal,2,',','.')]
+                                    ['name'=> "Nominal :".formatNominal($good_receipt_detail->purchaseOrderDetail->purchaseOrder).number_format($good_receipt_detail->purchaseOrderDetail->purchaseOrder->grandtotal,2,',','.')]
                                 ],
                                 'key'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,
                                 'name'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,
@@ -1788,7 +1795,7 @@ class FundRequestController extends Controller
                                     $data_lc=[
                                         'properties'=> [
                                             ['name'=> "Tanggal : ".$landed_cost_detail->landedCost->post_date],
-                                            ['name'=> "Nominal : Rp.".number_format($landed_cost_detail->landedCost->grandtotal,2,',','.')]
+                                            ['name'=> "Nominal :".formatNominal($landed_cost_detail->landedCost).number_format($landed_cost_detail->landedCost->grandtotal,2,',','.')]
                                         ],
                                         'key'=>$landed_cost_detail->landedCost->code,
                                         'name'=>$landed_cost_detail->landedCost->code,
@@ -1818,7 +1825,7 @@ class FundRequestController extends Controller
                                     $invoice_tempura=[
                                         'properties'=> [
                                             ['name'=> "Tanggal : ".$invoice_detail->purchaseInvoice->post_date],
-                                            ['name'=> "Nominal : Rp.".number_format($invoice_detail->purchaseInvoice->grandtotal,2,',','.')]
+                                            ['name'=> "Nominal :".formatNominal($invoice_detail->purchaseInvoice).number_format($invoice_detail->purchaseInvoice->grandtotal,2,',','.')]
                                             
                                         ],
                                         'key'=>$invoice_detail->purchaseInvoice->code,
@@ -1846,7 +1853,7 @@ class FundRequestController extends Controller
                                         'properties'=> [
                                             ['name'=> "Tanggal: ".$good_receipt_detail->goodScaleDetail->goodScale->post_date],
                                             ['name'=> "Vendor  : ".$good_receipt_detail->goodScaleDetail->goodScale->supplier->name],
-                                            ['name'=> "Nominal : Rp.:".number_format($good_receipt_detail->goodScaleDetail->goodScale->grandtotal,2,',','.')]
+                                            ['name'=> "Nominal :".formatNominal($good_receipt_detail->goodScaleDetail->goodScale).number_format($good_receipt_detail->goodScaleDetail->goodScale->grandtotal,2,',','.')]
                                         ],
                                         'key'=>$good_receipt_detail->goodScaleDetail->goodScale->code,
                                         'name'=>$good_receipt_detail->goodScaleDetail->goodScale->code,
@@ -1910,7 +1917,7 @@ class FundRequestController extends Controller
                                     'properties'=> [
                                         ['name'=> "Tanggal: ".$data_gs->goodReceiptDetail->goodReceipt->post_date],
                                         ['name'=> "Vendor  : ".$data_gs->goodReceiptDetail->goodReceipt->supplier->name],
-                                        // ['name'=> "Nominal : Rp.:".number_format($data_gs->goodReceiptDetail->goodReceipt->grandtotal,2,',','.')]
+                                       
                                     ],
                                     'key'=>$data_gs->goodReceiptDetail->goodReceipt->code,
                                     'name'=>$data_gs->goodReceiptDetail->goodReceipt->code,
@@ -1981,7 +1988,7 @@ class FundRequestController extends Controller
                                         'properties'=> [
                                             ['name'=> "Tanggal :".$row_po->post_date],
                                             ['name'=> "Vendor  : ".$row_po->supplier->name],
-                                            ['name'=> "Nominal : Rp.:".number_format($row_po->grandtotal,2,',','.')]
+                                            ['name'=> "Nominal :".formatNominal($row_po).number_format($row_po->grandtotal,2,',','.')]
                                         ],
                                         'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($row_po->code),           
                                     ];
@@ -2000,7 +2007,7 @@ class FundRequestController extends Controller
                                                 $data_good_receipt=[
                                                     'properties'=> [
                                                         ['name'=> "Tanggal :".$good_receipt_detail->goodReceipt->post_date],
-                                                        ['name'=> "Nominal : Rp.".number_format($good_receipt_detail->goodReceipt->grandtotal,2,',','.')],
+                                                        ['name'=> "Nominal :".formatNominal($good_receipt_detail->goodReceipt).number_format($good_receipt_detail->goodReceipt->grandtotal,2,',','.')],
                                                     ],
                                                     "key" => $good_receipt_detail->goodReceipt->code,
                                                     "name" => $good_receipt_detail->goodReceipt->code,
@@ -2026,7 +2033,7 @@ class FundRequestController extends Controller
                                 $data_good_receipt=[
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row->lookable->goodReceipt->post_date],
-                                        // ['name'=> "Nominal : Rp.".number_format($row->lookable->goodReceipt->grandtotal,2,',','.')]
+                                       
                                     ],
                                     "key" => $row->lookable->goodReceipt->code,
                                     "name" => $row->lookable->goodReceipt->code,
@@ -2049,7 +2056,7 @@ class FundRequestController extends Controller
                                 $data_lc=[
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row->lookable->landedCost->post_date],
-                                        ['name'=> "Nominal : Rp.".number_format($row->lookable->landedCost->grandtotal,2,',','.')]
+                                        ['name'=> "Nominal :".formatNominal($row->lookable->landedCost).number_format($row->lookable->landedCost->grandtotal,2,',','.')]
                                     ],
                                     "key" => $row->lookable->landedCost->code,
                                     "name" => $row->lookable->landedCost->code,
@@ -2073,7 +2080,7 @@ class FundRequestController extends Controller
                                         "key" => $purchase_memodetail->purchaseMemo->code,
                                         'properties'=> [
                                             ['name'=> "Tanggal :".$purchase_memodetail->purchaseMemo->post_date],
-                                            ['name'=> "Nominal : Rp.:".number_format($purchase_memodetail->purchaseMemo->grandtotal,2,',','.')],
+                                            ['name'=> "Nominal :".formatNominal($purchase_memodetail->purchaseMemo).number_format($purchase_memodetail->purchaseMemo->grandtotal,2,',','.')],
                                         ],
                                         'url'=>request()->root()."/admin/finance/purchase_memo?code=".CustomHelper::encrypt($purchase_memodetail->purchaseMemo->code),           
                                     ];
@@ -2094,7 +2101,7 @@ class FundRequestController extends Controller
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row->fundRequestDetail->fundRequest->post_date],
                                         ['name'=> "User :".$row->fundRequestDetail->fundRequest->account->name],
-                                        ['name'=> "Nominal : Rp.:".number_format($row->fundRequestDetail->fundRequest->grandtotal,2,',','.')],
+                                        ['name'=> "Nominal :".formatNominal($row->fundRequestDetail->fundRequest).number_format($row->fundRequestDetail->fundRequest->grandtotal,2,',','.')],
                                     ],
                                     'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row->fundRequestDetail->fundRequest->code),
                                 ];
@@ -2117,7 +2124,7 @@ class FundRequestController extends Controller
                                 $data_down_payment=[
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row_pi->purchaseDownPayment->post_date],
-                                        ['name'=> "Nominal : Rp.".number_format($row_pi->purchaseDownPayment->grandtotal,2,',','.')]
+                                        ['name'=> "Nominal :".formatNominal($row_pi->purchaseDownPayment).number_format($row_pi->purchaseDownPayment->grandtotal,2,',','.')]
                                     ],
                                     "key" => $row_pi->purchaseDownPayment->code,
                                     "name" => $row_pi->purchaseDownPayment->code,
@@ -2135,7 +2142,7 @@ class FundRequestController extends Controller
                                         $data_pyr_tempura=[
                                             'properties'=> [
                                                 ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
-                                                ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
+                                                ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
                                             ],
                                             "key" => $row_pyr_detail->paymentRequest->code,
                                             "name" => $row_pyr_detail->paymentRequest->code,
@@ -2156,7 +2163,7 @@ class FundRequestController extends Controller
                                                 'properties'=> [
                                                     ['name'=> "Tanggal :".$row_pyr_detail->lookable->code],
                                                     ['name'=> "User :".$row_pyr_detail->lookable->account->name],
-                                                    ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                                    ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
                                                 ],
                                                 "key" => $row_pyr_detail->lookable->code,
                                                 "name" => $row_pyr_detail->lookable->code,
@@ -2181,7 +2188,7 @@ class FundRequestController extends Controller
                                             $data_downp_tempura = [
                                                 'properties'=> [
                                                     ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
-                                                    ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                                    ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
                                                 ],
                                                 "key" => $row_pyr_detail->lookable->code,
                                                 "name" => $row_pyr_detail->lookable->code,
@@ -2202,7 +2209,7 @@ class FundRequestController extends Controller
                                             $data_invoices_tempura = [
                                                 'properties'=> [
                                                     ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
-                                                    ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                                    ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
                                                 ],
                                                 "key" => $row_pyr_detail->lookable->code,
                                                 "name" => $row_pyr_detail->lookable->code,
@@ -2232,7 +2239,7 @@ class FundRequestController extends Controller
                                 $data_pyr_tempura=[
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
-                                        ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
+                                        ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
                                     ],
                                     "key" => $row_pyr_detail->paymentRequest->code,
                                     "name" => $row_pyr_detail->paymentRequest->code,
@@ -2257,7 +2264,7 @@ class FundRequestController extends Controller
                                         'properties'=> [
                                             ['name'=> "Tanggal :".$row_pyr_detail->lookable->code],
                                             ['name'=> "User :".$row_pyr_detail->lookable->account->name],
-                                            ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                            ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
                                         ],
                                         "key" => $row_pyr_detail->lookable->code,
                                         "name" => $row_pyr_detail->lookable->code,
@@ -2281,7 +2288,7 @@ class FundRequestController extends Controller
                                     $data_downp_tempura = [
                                         'properties'=> [
                                             ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
-                                            ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                            ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
                                         ],
                                         "key" => $row_pyr_detail->lookable->code,
                                         "name" => $row_pyr_detail->lookable->code,
@@ -2302,7 +2309,7 @@ class FundRequestController extends Controller
                                     $data_invoices_tempura = [
                                         'properties'=> [
                                             ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
-                                            ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                            ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
                                         ],
                                         "key" => $row_pyr_detail->lookable->code,
                                         "name" => $row_pyr_detail->lookable->code,
@@ -2336,7 +2343,7 @@ class FundRequestController extends Controller
                             $outgoing_payment = [
                                 'properties'=> [
                                     ['name'=> "Tanggal :".$query_pyr->outgoingPayment->post_date],
-                                    ['name'=> "Nominal : Rp.".number_format($query_pyr->outgoingPayment->grandtotal,2,',','.')]
+                                    ['name'=> "Nominal :".formatNominal($query_pyr->outgoingPayment).number_format($query_pyr->outgoingPayment->grandtotal,2,',','.')]
                                 ],
                                 "key" => $query_pyr->outgoingPayment->code,
                                 "name" => $query_pyr->outgoingPayment->code,
@@ -2357,7 +2364,7 @@ class FundRequestController extends Controller
                             $data_pyr_tempura=[
                                 'properties'=> [
                                     ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
-                                    ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
+                                    ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
                                 ],
                                 "key" => $row_pyr_detail->paymentRequest->code,
                                 "name" => $row_pyr_detail->paymentRequest->code,
@@ -2370,7 +2377,7 @@ class FundRequestController extends Controller
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row_pyr_detail->lookable->code],
                                         ['name'=> "User :".$row_pyr_detail->lookable->account->name],
-                                        ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                        ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
                                     ],
                                     "key" => $row_pyr_detail->lookable->code,
                                     "name" => $row_pyr_detail->lookable->code,
@@ -2395,7 +2402,7 @@ class FundRequestController extends Controller
                                 $data_downp_tempura = [
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
-                                        ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                        ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
                                     ],
                                     "key" => $row_pyr_detail->lookable->code,
                                     "name" => $row_pyr_detail->lookable->code,
@@ -2419,7 +2426,7 @@ class FundRequestController extends Controller
                                 $data_invoices_tempura = [
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
-                                        ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                        ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
                                     ],
                                     "key" => $row_pyr_detail->lookable->code,
                                     "name" => $row_pyr_detail->lookable->code,
@@ -2448,7 +2455,7 @@ class FundRequestController extends Controller
                                     $data_pyrc_tempura = [
                                         'properties'=> [
                                             ['name'=> "Tanggal :".$row_pyr_cross->lookable->post_date],
-                                            ['name'=> "Nominal : Rp.".number_format($row_pyr_cross->lookable->grandtotal,2,',','.')]
+                                            ['name'=> "Nominal :".formatNominal($row_pyr_cross->lookable).number_format($row_pyr_cross->lookable->grandtotal,2,',','.')]
                                         ],
                                         "key" => $row_pyr_cross->lookable->code,
                                         "name" => $row_pyr_cross->lookable->code,
@@ -2505,7 +2512,7 @@ class FundRequestController extends Controller
                             $outgoing_tempura = [
                                 'properties'=> [
                                     ['name'=> "Tanggal :".$query_pyrc->lookable->post_date],
-                                    ['name'=> "Nominal : Rp.".number_format($query_pyrc->lookable->grandtotal,2,',','.')]
+                                    ['name'=> "Nominal :".formatNominal($query_pyrc->lookable).number_format($query_pyrc->lookable->grandtotal,2,',','.')]
                                 ],
                                 "key" => $query_pyrc->lookable->code,
                                 "name" => $query_pyrc->lookable->code,
@@ -2537,7 +2544,7 @@ class FundRequestController extends Controller
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row->purchaseOrder->post_date],
                                         ['name'=> "Vendor  : ".$row->purchaseOrder->supplier->name],
-                                        ['name'=> "Nominal : Rp.:".number_format($row->purchaseOrder->grandtotal,2,',','.')],
+                                        ['name'=> "Nominal :".formatNominal($row->purchaseOrder).number_format($row->purchaseOrder->grandtotal,2,',','.')],
                                     ],
                                     'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($row->purchaseOrder->code),
                                 ];
@@ -2582,7 +2589,7 @@ class FundRequestController extends Controller
                                             $data_good_receipt = [
                                                 'properties'=> [
                                                     ['name'=> "Tanggal :".$good_receipt_detail->goodReceipt->post_date],
-                                                    ['name'=> "Nominal : Rp.:".number_format($good_receipt_detail->goodReceipt->grandtotal,2,',','.')],
+                                                    ['name'=> "Nominal :".formatNominal($good_receipt_detail->goodReceipt).number_format($good_receipt_detail->goodReceipt->grandtotal,2,',','.')],
                                                 ],
                                                 "key" => $good_receipt_detail->goodReceipt->code,
                                                 "name" => $good_receipt_detail->goodReceipt->code,
@@ -2616,7 +2623,7 @@ class FundRequestController extends Controller
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row->fundRequestDetail->fundRequest->post_date],
                                         ['name'=> "User :".$row->fundRequestDetail->fundRequest->account->name],
-                                        ['name'=> "Nominal : Rp.:".number_format($row->fundRequestDetail->fundRequest->grandtotal,2,',','.')],
+                                        ['name'=> "Nominal :".formatNominal($row->fundRequestDetail->fundRequest).number_format($row->fundRequestDetail->fundRequest->grandtotal,2,',','.')],
                                     ],
                                     'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row->fundRequestDetail->fundRequest->code),
                                 ];
@@ -2641,7 +2648,7 @@ class FundRequestController extends Controller
                                 "key" => $purchase_invoicedp->purchaseInvoice->code,
                                 'properties'=> [
                                     ['name'=> "Tanggal :".$purchase_invoicedp->purchaseInvoice->post_date],
-                                    ['name'=> "Nominal : Rp.:".number_format($purchase_invoicedp->purchaseInvoice->grandtotal,2,',','.')],
+                                    ['name'=> "Nominal :".formatNominal($purchase_invoicedp->purchaseInvoice).number_format($purchase_invoicedp->purchaseInvoice->grandtotal,2,',','.')],
                                     ],
                                 'url'=>request()->root()."/admin/finance/purchase_invoice?code=".CustomHelper::encrypt($purchase_invoicedp->purchaseInvoice->code),           
                             ];
@@ -2667,7 +2674,7 @@ class FundRequestController extends Controller
                                 "key" => $purchase_memodetail->purchaseMemo->code,
                                 'properties'=> [
                                     ['name'=> "Tanggal :".$purchase_memodetail->purchaseMemo->post_date],
-                                    ['name'=> "Nominal : Rp.:".number_format($purchase_memodetail->purchaseMemo->grandtotal,2,',','.')],
+                                    ['name'=> "Nominal :".formatNominal($purchase_memodetail->purchaseMemo).number_format($purchase_memodetail->purchaseMemo->grandtotal,2,',','.')],
                                     ],
                                 'url'=>request()->root()."/admin/finance/purchase_memo?code=".CustomHelper::encrypt($purchase_memodetail->purchaseMemo->code),           
                             ];
@@ -2689,7 +2696,7 @@ class FundRequestController extends Controller
                                     "key" => $row_pyr_detail->paymentRequest->code,
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
-                                        ['name'=> "Nominal : Rp.:".number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')],
+                                        ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')],
                                         ],
                                     'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),           
                                 ];
@@ -2719,7 +2726,7 @@ class FundRequestController extends Controller
                                 $data_invoices_tempura=[
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row->lookable->purchaseInvoice->post_date],
-                                        ['name'=> "Nominal : Rp.".number_format($row->lookable->purchaseInvoice->grandtotal,2,',','.')]
+                                        ['name'=> "Nominal :".formatNominal($row->lookable->purchaseInvoice).number_format($row->lookable->purchaseInvoice->grandtotal,2,',','.')]
                                     ],
                                     "key" => $row->lookable->purchaseInvoice->code,
                                     "name" => $row->lookable->purchaseInvoice->code,
@@ -2740,7 +2747,7 @@ class FundRequestController extends Controller
                                 $data_downp_tempura=[
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row->lookable->post_date],
-                                        ['name'=> "Nominal : Rp.".number_format($row->lookable->grandtotal,2,',','.')]
+                                        ['name'=> "Nominal :".formatNominal($row->lookable).number_format($row->lookable->grandtotal,2,',','.')]
                                     ],
                                     "key" => $row->lookable->code,
                                     "name" => $row->lookable->code,
@@ -2774,7 +2781,7 @@ class FundRequestController extends Controller
                                     "name" => $data_detail_good_issue->lookable->materialRequest->code,
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$data_detail_good_issue->lookable->materialRequest->post_date],
-                                        ['name'=> "Nominal : Rp.:".number_format($data_detail_good_issue->lookable->materialRequest->grandtotal,2,',','.')],
+                                        ['name'=> "Nominal :".formatNominal($data_detail_good_issue->lookable->materialRequest).number_format($data_detail_good_issue->lookable->materialRequest->grandtotal,2,',','.')],
                                     ],
                                     'url'=>request()->root()."/admin/purchase/material_request?code=".CustomHelper::encrypt($data_detail_good_issue->lookable->materialRequest->code),
                                 ];
@@ -2795,7 +2802,7 @@ class FundRequestController extends Controller
                                         "name" => $data_purchase_order_detail->purchaseOrder->code,
                                         'properties'=> [
                                             ['name'=> "Tanggal :".$data_purchase_order_detail->purchaseOrder->post_date],
-                                            ['name'=> "Nominal : Rp.:".number_format($data_purchase_order_detail->purchaseOrder->grandtotal,2,',','.')],
+                                            ['name'=> "Nominal :".formatNominal($data_purchase_order_detail->purchaseOrder).number_format($data_purchase_order_detail->purchaseOrder->grandtotal,2,',','.')],
                                         ],
                                         'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($data_purchase_order_detail->purchaseOrder->code),
                                     ];
@@ -2816,7 +2823,7 @@ class FundRequestController extends Controller
                                     "name" => $data_detail_good_issue->lookable->goodIssueRequest->code,
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$data_detail_good_issue->lookable->goodIssueRequest->post_date],
-                                        ['name'=> "Nominal : Rp.:".number_format($data_detail_good_issue->lookable->goodIssueRequest->grandtotal,2,',','.')],
+                                        ['name'=> "Nominal :".formatNominal($data_detail_good_issue->lookable->goodIssueRequest).number_format($data_detail_good_issue->lookable->goodIssueRequest->grandtotal,2,',','.')],
                                     ],
                                     'url'=>request()->root()."/admin/inventory/good_issue_request?code=".CustomHelper::encrypt($data_detail_good_issue->lookable->goodIssueRequest->code),
                                 ];
@@ -2844,7 +2851,7 @@ class FundRequestController extends Controller
                                     'name'=> $lc_detail->lookable->goodReceipt->code,
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$lc_detail->lookable->goodReceipt->post_date],
-                                        // ['name'=> "Nominal : Rp.:".number_format($lc_detail->lookable->goodReceipt->grandtotal,2,',','.')],
+                                        
                                     ],
                                     'url'=>request()->root()."/admin/purchase/good_receipt?code=".CustomHelper::encrypt($lc_detail->lookable->goodReceipt->code),
                                 ];
@@ -2869,7 +2876,7 @@ class FundRequestController extends Controller
                                     "name" => $lc_detail->lookable->landedCost->code,
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$lc_detail->lookable->landedCost->post_date],
-                                        ['name'=> "Nominal : Rp.:".number_format($lc_detail->lookable->landedCost->grandtotal,2,',','.')],
+                                        ['name'=> "Nominal :".formatNominal($lc_detail->lookable->landedCost).number_format($lc_detail->lookable->landedCost->grandtotal,2,',','.')],
                                     ],
                                     'url'=>request()->root()."/admin/purchase/landed_cost?code=".CustomHelper::encrypt($lc_detail->lookable->landedCost->code),
                                 ];
@@ -2893,7 +2900,7 @@ class FundRequestController extends Controller
                                     "name" => $lc_detail->lookable->inventoryTransferOut->code,
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$lc_detail->lookable->inventoryTransferOut->post_date],
-                                        ['name'=> "Nominal : Rp.:".number_format($lc_detail->lookable->inventoryTransferOut->grandtotal,2,',','.')],
+                                        ['name'=> "Nominal :".formatNominal($lc_detail->lookable->inventoryTransferOut).number_format($lc_detail->lookable->inventoryTransferOut->grandtotal,2,',','.')],
                                     ],
                                     'url'=>request()->root()."/admin/inventory/inventory_transfer_out?code=".CustomHelper::encrypt($lc_detail->lookable->inventoryTransferOut->code),
                                 ];
@@ -2917,7 +2924,7 @@ class FundRequestController extends Controller
                                     
                                         'properties'=> [
                                             ['name'=> "Tanggal: ".$row_invoice_detail->purchaseInvoice->post_date],
-                                            ['name'=> "Nominal : Rp.".number_format($row_invoice_detail->purchaseInvoice->grandtotal,2,',','.')]
+                                            ['name'=> "Nominal :".formatNominal($row_invoice_detail->purchaseInvoice).number_format($row_invoice_detail->purchaseInvoice->grandtotal,2,',','.')]
                                         ],
                                         'url'   =>request()->root()."/admin/finance/purchase_invoice?code=".CustomHelper::encrypt($row_invoice_detail->purchaseInvoice->code),
                                     ];
@@ -2949,7 +2956,7 @@ class FundRequestController extends Controller
                                     "name" => $row_transfer_out_detail->landedCostDetail->landedCost->code,
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row_transfer_out_detail->landedCostDetail->landedCost->post_date],
-                                        ['name'=> "Nominal : Rp.:".number_format($row_transfer_out_detail->landedCostDetail->landedCost->grandtotal,2,',','.')],
+                                        ['name'=> "Nominal :".formatNominal($row_transfer_out_detail->landedCostDetail).number_format($row_transfer_out_detail->landedCostDetail->landedCost->grandtotal,2,',','.')],
                                     ],
                                     'url'=>request()->root()."/admin/inventory/inventory_transfer_out?code=".CustomHelper::encrypt($row_transfer_out_detail->landedCostDetail->landedCost->code),
                                 ];
@@ -2982,7 +2989,7 @@ class FundRequestController extends Controller
                                     $data_pyr_tempura=[
                                         'properties'=> [
                                             ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
-                                            ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
+                                            ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
                                         ],
                                         "key" => $row_pyr_detail->paymentRequest->code,
                                         "name" => $row_pyr_detail->paymentRequest->code,
@@ -3010,7 +3017,7 @@ class FundRequestController extends Controller
                                     
                                         'properties'=> [
                                             ['name'=> "Tanggal: ".$row_invoice_detail->purchaseInvoice->post_date],
-                                            ['name'=> "Nominal : Rp.".number_format($row_invoice_detail->purchaseInvoice->grandtotal,2,',','.')]
+                                            ['name'=> "Nominal :".formatNominal($row_invoice_detail->purchaseInvoice).number_format($row_invoice_detail->purchaseInvoice->grandtotal,2,',','.')]
                                         ],
                                         'url'   =>request()->root()."/admin/finance/purchase_invoice?code=".CustomHelper::encrypt($row_invoice_detail->purchaseInvoice->code),
                                     ];
@@ -3091,7 +3098,7 @@ class FundRequestController extends Controller
                                     $data_good_receipt = [
                                         'properties'=> [
                                             ['name'=> "Tanggal :".$good_receipt_detail->goodReceipt->post_date],
-                                            // ['name'=> "Nominal : Rp.".number_format($good_receipt_detail->goodReceipt->grandtotal,2,',','.')]
+                                            
                                         ],
                                         "key" => $good_receipt_detail->goodReceipt->code,
                                         "name" => $good_receipt_detail->goodReceipt->code,
@@ -3375,7 +3382,7 @@ class FundRequestController extends Controller
                         }
                     }
                 }
-            }  
+            }   
             function unique_key($array,$keyname){
 
                 $new_array = array();

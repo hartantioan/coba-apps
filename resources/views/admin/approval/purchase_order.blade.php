@@ -284,7 +284,7 @@
                     </tr>
                     @endforeach
                     <tr>
-                        <td colspan="7" rowspan="7">
+                        <td colspan="7" rowspan="8">
                             Rekening :
                             {{ $data->supplier->defaultBank() ? $data->supplier->defaultBank() : ' - ' }}
                             <div class="mt-3">

@@ -357,6 +357,7 @@ class GoodReturnPOController extends Controller
             $grandtotal = 0;
             $tax = 0;
 
+            $arrTotal = [];
             foreach($request->arr_good_receipt_detail as $key => $row){
 
                 $grd = GoodReceiptDetail::find(intval($row));
@@ -387,6 +388,8 @@ class GoodReturnPOController extends Controller
                     $taxall += $tax;
                     $wtaxall += $wtax;
                     $grandtotalall += $grandtotal;
+
+                    $arrTotal[] = $total;
                 }
             }
 
@@ -507,6 +510,7 @@ class GoodReturnPOController extends Controller
                             'qty_conversion'            => $grd->qty_conversion,
                             'note'                      => $request->arr_note[$key],
                             'note2'                     => $request->arr_note2[$key],
+                            'total'                     => $arrTotal[$key],
                         ]);
                         
                         if($request->arr_serial[$key]){

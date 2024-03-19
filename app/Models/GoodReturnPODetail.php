@@ -23,6 +23,7 @@ class GoodReturnPODetail extends Model
         'qty_conversion',
         'note',
         'note2',
+        'total',
     ];
 
     public function itemUnit()

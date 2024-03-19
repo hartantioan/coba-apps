@@ -1,39 +1,31 @@
 <?php
 
-namespace App\Http\Controllers\Purchase;
+namespace App\Exports;
 
-use App\Exports\ExportUnbilledAP;
-use App\Http\Controllers\Controller;
-use App\Models\Menu;
-use Illuminate\Foundation\Auth\User;
-use Illuminate\Http\Request;
+use Illuminate\View\View;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\FromView;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Events\AfterSheet;
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Facades\Excel;
 
-class UnbilledAPController extends Controller
+class ExportUnbilledAP implements FromView , WithEvents
 {
-    protected $dataplaces, $lasturl, $mindate, $maxdate;
-    public function __construct(){
-        $user = User::find(session('bo_id'));
-    }
-    public function index(Request $request)
+    /**
+    * @return \Illuminate\Support\Collection
+    */
+
+    protected $date;
+
+    public function __construct(string $date)
     {
-        $parentSegment = request()->segment(2);
-        $menu = Menu::where('url', $parentSegment)->first();
-        $data = [
-            'title'     => 'Laporan Hutang Belum Ditagihkan',
-            'content'   => 'admin.purchase.unbilled_ap',
-        ];
-
-        return view('admin.layouts.index', ['data' => $data]);
-
+        $this->date = $date ? $date : '';
+		
     }
-
-    public function filterByDate(Request $request){
+    public function view(): View
+    {
         $array_filter = [];
-        $date = $request->date;
-
-        $start_time = microtime(true);
+        $date = $this->date;
 
         $results = DB::select("
             SELECT 
@@ -115,21 +107,22 @@ class UnbilledAPController extends Controller
             }
         }
 
-        $end_time = microtime(true);
-        
-        $execution_time = ($end_time - $start_time);
-
-        $response =[
-            'status'        => 200,
-            'data'          => $array_filter,
-            'total'         => number_format($totalUnbilled,2,',','.'),
-            'time'          => $execution_time,
-        ];
-
-        return response()->json($response);
+        return view('admin.exports.unbilled_ap', [
+            'data'      => $array_filter,
+            'total'     => number_format($totalUnbilled,2,',','.')
+        ]);
     }
 
-    public function export(Request $request){
-		return Excel::download(new ExportUnbilledAP($request->date), 'unbilled_ap_'.uniqid().'.xls');
+    public function registerEvents(): array
+    {
+        return [
+            AfterSheet::class => function(AfterSheet $event) {
+                // Auto-fit columns A to Z
+                $event->sheet->getDelegate()->getStyle('A:Z')->getAlignment()->setWrapText(true);
+                $event->sheet->getDelegate()->getStyle('A:Z')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+                $event->sheet->autoSize();
+                $event->sheet->freezePane("A1");
+            }
+        ];
     }
 }

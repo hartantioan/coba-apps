@@ -111,6 +111,8 @@
                                                         <th rowspan="2">Sisa</th>
                                                         <th rowspan="2">Lampiran</th>
                                                         <th rowspan="2">Dokumen</th>
+                                                        <th rowspan="2">Note</th>
+                                                        <th rowspan="2">PIC</th>
                                                         <th rowspan="2">Status</th>
                                                         <th rowspan="2">Action</th>
                                                     </tr>
@@ -885,6 +887,8 @@
                 { name: 'balance', searchable: false, orderable: false, className: 'right-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'document_status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'additional_note', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'additional_note_pic', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],

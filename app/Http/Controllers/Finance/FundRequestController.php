@@ -983,6 +983,8 @@ class FundRequestController extends Controller
                     number_format($totalReceivableBalance,2,',','.'),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->documentStatus(),
+                    $val->additional_note,
+                    $val->additional_note_pic,
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>

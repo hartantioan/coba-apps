@@ -150,6 +150,11 @@
                 loadingClose('#main');
                 if(response.status == 200) {
                     $('#detail_invoice').empty();
+                    $('#detail_invoice').append(`
+                        <tr>
+                            <td colspan="9" class="right-align"><h6><b>Saldo periode sebelumnya : ` + response.totalbefore + `</b></h6></td>
+                        </tr>
+                    `);
                     if(response.data.length > 0){
                         $.each(response.data, function(i, val) {
                             $('#detail_invoice').append(`

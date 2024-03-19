@@ -35,11 +35,70 @@ class UnbilledAPController extends Controller
 
         $start_time = microtime(true);
 
+        $resultsbefore = DB::select("
+            SELECT 
+                *,
+                u.name AS account_name,
+                (SELECT 
+                    SUM(pid.total) 
+                    FROM purchase_invoice_details pid 
+                    WHERE pid.lookable_type = 'good_receipt_details' 
+                    AND pid.lookable_id 
+                        IN (
+                            SELECT 
+                                grd.id 
+                                FROM good_receipt_details grd 
+                                WHERE grd.good_receipt_id = gr.id 
+                                AND grd.deleted_at IS NULL
+                            ) 
+                    AND pid.deleted_at IS NULL
+                    AND pid.purchase_invoice_id 
+                        IN (
+                            SELECT 
+                                pi.id 
+                                FROM purchase_invoices pi 
+                                WHERE pi.status IN ('2','3') 
+                                AND pi.post_date <= :dateend
+                            )
+                ) AS total_invoice
+                FROM good_receipts gr
+                LEFT JOIN users u
+                    ON u.id = gr.account_id
+                WHERE 
+                    gr.post_date < :datestart
+                    AND gr.status IN ('2','3')
+                    AND gr.deleted_at IS NULL
+        ", array(
+            'datestart'     => $start_date,
+            'dateend'       => $end_date,
+        ));
+
         $results = DB::select("
             SELECT 
                 *,
                 u.name AS account_name,
-                (SELECT SUM(pid.total) FROM purchase_invoice_details pid WHERE pid.lookable_type = 'good_receipt_details' AND pid.lookable_id IN (SELECT grd.id FROM good_receipt_details grd WHERE grd.good_receipt_id = gr.id AND grd.deleted_at IS NULL) AND pid.deleted_at IS NULL) AS total_invoice
+                (SELECT 
+                    SUM(pid.total) 
+                    FROM purchase_invoice_details pid 
+                    WHERE pid.lookable_type = 'good_receipt_details' 
+                    AND pid.lookable_id 
+                        IN (
+                            SELECT 
+                                grd.id 
+                                FROM good_receipt_details grd
+                                WHERE grd.good_receipt_id = gr.id 
+                                AND grd.deleted_at IS NULL
+                            )
+                    AND pid.deleted_at IS NULL 
+                    AND pid.purchase_invoice_id 
+                        IN (
+                            SELECT 
+                                pi.id 
+                                FROM purchase_invoices pi 
+                                WHERE pi.status IN ('2','3') 
+                                AND pi.post_date <= :dateend2
+                            )
+                ) AS total_invoice
                 FROM good_receipts gr
                 LEFT JOIN users u
                     ON u.id = gr.account_id
@@ -51,9 +110,21 @@ class UnbilledAPController extends Controller
         ", array(
             'datestart' => $start_date,
             'dateend'   => $end_date,
+            'dateend2'  => $end_date,
         ));
 
         $totalUnbilled = 0;
+        $totalUnbilledBefore = 0;
+
+        foreach($resultsbefore as $key => $row){
+            $balance = $row->total - $row->total_invoice;
+            if($balance > 0){
+                $totalUnbilledBefore += $balance;
+            }
+        }
+        
+        $totalUnbilled += $totalUnbilledBefore;
+
         foreach($results as $key => $row){
             $balance = $row->total - $row->total_invoice;
             if($balance > 0){
@@ -77,10 +148,11 @@ class UnbilledAPController extends Controller
         $execution_time = ($end_time - $start_time);
 
         $response =[
-            'status'    => 200,
-            'data'      => $array_filter,
-            'total'     => number_format($totalUnbilled,2,',','.'),
-            'time'      => $execution_time,
+            'status'        => 200,
+            'data'          => $array_filter,
+            'total'         => number_format($totalUnbilled,2,',','.'),
+            'totalbefore'   => number_format($totalUnbilledBefore,2,',','.'),
+            'time'          => $execution_time,
         ];
 
         return response()->json($response);

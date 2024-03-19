@@ -1384,6 +1384,8 @@ Route::prefix('admin')->group(function () {
 
                     Route::prefix('unbilled_ap')->middleware('operation.access:unbilled_ap,view')->group(function () {
                         Route::get('/',[UnbilledAPController::class, 'index']);
+                        Route::post('filter_by_date',[UnbilledAPController::class, 'filterByDate']);
+                        Route::get('export',[UnbilledAPController::class, 'export']);
                     });
                 });
 

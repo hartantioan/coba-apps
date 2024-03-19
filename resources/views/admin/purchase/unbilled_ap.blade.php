@@ -85,23 +85,19 @@
                                                 <thead>
                                                     <tr>
                                                         <th class="center-align">No.</th>
-                                                        <th class="center-align">No Invoice</th>
+                                                        <th class="center-align">No.GRPO</th>
                                                         <th class="center-align">Supplier/Vendor</th>
                                                         <th class="center-align">Tgl.Post</th>
-                                                        <th class="center-align">Tgl.Terima</th>
-                                                        <th class="center-align">TOP(Hari)</th>
-                                                        <th class="center-align">Tgl.Jatuh Tempo</th>
-                                                        <th class="center-align">Total</th>
-                                                        <th class="center-align">PPN</th>
-                                                        <th class="center-align">PPH</th>
-                                                        <th class="center-align">Grandtotal</th>
-                                                        <th class="center-align">Dibayar</th>
-                                                        <th class="center-align">Sisa</th>
+                                                        <th class="center-align">No.Surat Jalan</th>
+                                                        <th class="center-align">Keterangan</th>
+                                                        <th class="center-align">Total Diterima</th>
+                                                        <th class="center-align">Total Invoice</th>
+                                                        <th class="center-align">Total Sisa</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="detail_invoice">
                                                     <tr>
-                                                        <td class="center-align" colspan="14">Silahkan pilih tanggal dan tekan tombol filter.</td>
+                                                        <td class="center-align" colspan="9">Silahkan pilih tanggal dan tekan tombol filter.</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -182,7 +178,7 @@
                     }else{
                         $('#detail_invoice').append(`
                             <tr>
-                                <td class="center-align" colspan="20">Data tidak ditemukan.</td>
+                                <td class="center-align" colspan="9">Data tidak ditemukan.</td>
                             </tr>
                         `);
                     }
@@ -236,7 +232,7 @@
         $('#form_data_filter')[0].reset();
         $('#detail_invoice').html('').append(`
             <tr>
-                <td class="center-align" colspan="20">Silahkan pilih tanggal dan tekan tombol filter.</td>
+                <td class="center-align" colspan="9">Silahkan pilih tanggal dan tekan tombol filter.</td>
             </tr>
         `);
     }

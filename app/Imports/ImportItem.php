@@ -68,7 +68,6 @@ class ImportItem implements OnEachRow, WithHeadingRow, WithBatchInserts,WithMult
                     'item_id'       => $query->id,
                     'unit_id'       => $item_unit_id->id,
                     'conversion'    => 1,
-                    'is_sell_unit'  => '1',
                     'is_buy_unit'   => '1',
                     'is_default'    => '1',
                 ]);

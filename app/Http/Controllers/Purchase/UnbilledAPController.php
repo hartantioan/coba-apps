@@ -30,70 +30,9 @@ class UnbilledAPController extends Controller
 
     public function filterByDate(Request $request){
         $array_filter = [];
-        $start_date = $request->start_date;
-        $end_date = $request->end_date;
+        $date = $request->date;
 
         $start_time = microtime(true);
-
-        $resultsbefore = DB::select("
-            SELECT 
-                *,
-                u.name AS account_name,
-                (SELECT 
-                    SUM(pid.total) 
-                    FROM purchase_invoice_details pid 
-                    WHERE pid.lookable_type = 'good_receipt_details' 
-                    AND pid.lookable_id 
-                        IN (
-                            SELECT 
-                                grd.id 
-                                FROM good_receipt_details grd 
-                                WHERE grd.good_receipt_id = gr.id 
-                                AND grd.deleted_at IS NULL
-                            ) 
-                    AND pid.deleted_at IS NULL
-                    AND pid.purchase_invoice_id 
-                        IN (
-                            SELECT 
-                                pi.id 
-                                FROM purchase_invoices pi 
-                                WHERE pi.status IN ('2','3') 
-                                AND pi.post_date <= :dateend
-                            )
-                ) AS total_invoice,
-                (SELECT 
-                    SUM(grtd.total) 
-                    FROM good_return_details grtd 
-                    WHERE grtd.good_receipt_detail_id 
-                        IN (
-                            SELECT 
-                                grd.id 
-                                FROM good_receipt_details grd
-                                WHERE grd.good_receipt_id = gr.id 
-                                AND grd.deleted_at IS NULL
-                            )
-                    AND grtd.deleted_at IS NULL 
-                    AND grtd.good_return_id 
-                        IN (
-                            SELECT 
-                                grt.id 
-                                FROM good_returns grt 
-                                WHERE grt.status IN ('2','3') 
-                                AND grt.post_date <= :dateend2
-                            )
-                ) AS total_return
-                FROM good_receipts gr
-                LEFT JOIN users u
-                    ON u.id = gr.account_id
-                WHERE 
-                    gr.post_date < :datestart
-                    AND gr.status IN ('2','3')
-                    AND gr.deleted_at IS NULL
-        ", array(
-            'datestart'     => $start_date,
-            'dateend'       => $end_date,
-            'dateend2'      => $end_date,
-        ));
 
         $results = DB::select("
             SELECT 
@@ -118,7 +57,7 @@ class UnbilledAPController extends Controller
                                 pi.id 
                                 FROM purchase_invoices pi 
                                 WHERE pi.status IN ('2','3') 
-                                AND pi.post_date <= :dateend2
+                                AND pi.post_date <= :date1
                             )
                 ) AS total_invoice,
                 (SELECT 
@@ -139,35 +78,23 @@ class UnbilledAPController extends Controller
                                 grt.id 
                                 FROM good_returns grt 
                                 WHERE grt.status IN ('2','3') 
-                                AND grt.post_date <= :dateend3
+                                AND grt.post_date <= :date2
                             )
                 ) AS total_return
                 FROM good_receipts gr
                 LEFT JOIN users u
                     ON u.id = gr.account_id
                 WHERE 
-                    gr.post_date <= :dateend
-                    AND gr.post_date >= :datestart
+                    gr.post_date <= :date3
                     AND gr.status IN ('2','3')
                     AND gr.deleted_at IS NULL
         ", array(
-            'datestart' => $start_date,
-            'dateend'   => $end_date,
-            'dateend2'  => $end_date,
-            'dateend3'  => $end_date,
+            'date1'     => $date,
+            'date2'     => $date,
+            'date3'     => $date,
         ));
 
         $totalUnbilled = 0;
-        $totalUnbilledBefore = 0;
-
-        foreach($resultsbefore as $key => $row){
-            $balance = $row->total - $row->total_invoice - $row->total_return;
-            if($balance > 0){
-                $totalUnbilledBefore += $balance;
-            }
-        }
-        
-        $totalUnbilled += $totalUnbilledBefore;
 
         foreach($results as $key => $row){
             $balance = $row->total - $row->total_invoice - $row->total_return;
@@ -195,7 +122,6 @@ class UnbilledAPController extends Controller
             'status'        => 200,
             'data'          => $array_filter,
             'total'         => number_format($totalUnbilled,2,',','.'),
-            'totalbefore'   => number_format($totalUnbilledBefore,2,',','.'),
             'time'          => $execution_time,
         ];
 

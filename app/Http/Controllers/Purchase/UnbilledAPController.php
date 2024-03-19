@@ -53,6 +53,7 @@ class UnbilledAPController extends Controller
             'dateend'   => $end_date,
         ));
 
+        $totalUnbilled = 0;
         foreach($results as $key => $row){
             $balance = $row->total - $row->total_invoice;
             if($balance > 0){
@@ -67,6 +68,7 @@ class UnbilledAPController extends Controller
                     'total_invoice' => number_format($row->total_invoice,2,',','.'),
                     'total_balance' => number_format($balance,2,',','.'),
                 ];
+                $totalUnbilled += $balance;
             }
         }
 
@@ -77,6 +79,7 @@ class UnbilledAPController extends Controller
         $response =[
             'status'    => 200,
             'data'      => $array_filter,
+            'total'     => number_format($totalUnbilled,2,',','.'),
             'time'      => $execution_time,
         ];
 

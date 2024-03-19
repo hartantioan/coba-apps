@@ -168,6 +168,9 @@
                         });
                         $('#detail_invoice').append(`
                             <tr>
+                                <td colspan="9" class="right-align"><h6><b>Total : ` + response.total + `</b></h6></td>
+                            </tr>
+                            <tr>
                                 <td colspan="9" class="center-align"><h6><b>Waktu proses : ` + response.time + `</b></h6></td>
                             </tr>
                         `);

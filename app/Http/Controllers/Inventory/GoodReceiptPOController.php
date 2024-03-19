@@ -316,7 +316,7 @@ class GoodReceiptPOController extends Controller
                             'department_name'           => $row->department_id ? $row->department->name : '-',
                             'warehouse_id'              => $row->warehouse_id,
                             'warehouse_name'            => $row->warehouse->name,
-                            'note'                      => $row->note ? $row->note2 : '',
+                            'note'                      => $row->note ? $row->note : '',
                             'note2'                     => $row->note2 ? $row->note2 : '',
                             'qty_conversion'            => $row->qty_conversion,
                             'is_activa'                 => $row->item->itemGroup->is_activa ? $row->item->itemGroup->is_activa : '',

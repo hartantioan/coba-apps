@@ -623,7 +623,9 @@
             $('.rowgrandtotal').eq(index).text(
                 (row_grandtotal >= 0 ? '' : '-') + formatRupiahIni(row_grandtotal.toFixed(2).toString().replace('.',','))
             );
-            $('input[name^="arr_grandtotal"]').eq(index).val(row_grandtotal);
+            $('input[name^="arr_grandtotal"]').eq(index).val(
+                (row_grandtotal >= 0 ? '' : '-') + formatRupiahIni(row_grandtotal.toFixed(2).toString().replace('.',','))
+            );
             totalall += row_total;
             taxall += row_tax;
             wtaxall += row_wtax;

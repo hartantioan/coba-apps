@@ -158,7 +158,7 @@
                                     <td>`+ val.code +`</td>
                                     <td>`+ val.vendor +`</td>
                                     <td class="center-align">`+ val.post_date +`</td>
-                                    <td class="center-align">`+ val.delivery_no +`</td>
+                                    <td class="">`+ val.delivery_no +`</td>
                                     <td class="">`+ val.note +`</td>
                                     <td class="right-align">`+ val.total_received +`</td>
                                     <td class="right-align">`+ val.total_invoice +`</td>

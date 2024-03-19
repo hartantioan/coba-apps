@@ -54,17 +54,20 @@ class UnbilledAPController extends Controller
         ));
 
         foreach($results as $key => $row){
-            $array_filter = [
-                'no'            => ($key + 1),
-                'code'          => $row->code,
-                'vendor'        => $row->account_name,
-                'post_date'     => date('d/m/Y',strtotime($row->post_date)),
-                'delivery_no'   => $row->delivery_no,
-                'note'          => $row->note,
-                'total_received'=> number_format($row->total,2,',','.'),
-                'total_invoice' => number_format($row->total_invoice,2,',','.'),
-                'total_balance' => number_format($row->total - $row->total_invoice,2,',','.'),
-            ];
+            $balance = $row->total - $row->total_invoice;
+            if($balance > 0){
+                $array_filter[] = [
+                    'no'            => ($key + 1),
+                    'code'          => $row->code,
+                    'vendor'        => $row->account_name,
+                    'post_date'     => date('d/m/Y',strtotime($row->post_date)),
+                    'delivery_no'   => $row->delivery_no,
+                    'note'          => $row->note,
+                    'total_received'=> number_format($row->total,2,',','.'),
+                    'total_invoice' => number_format($row->total_invoice,2,',','.'),
+                    'total_balance' => number_format($balance,2,',','.'),
+                ];
+            }
         }
 
         $end_time = microtime(true);

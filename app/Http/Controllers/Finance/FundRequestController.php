@@ -1088,8 +1088,8 @@ class FundRequestController extends Controller
         } else {
                     
 			if($request->temp){
-                DB::beginTransaction();
-                try {
+                /* DB::beginTransaction();
+                try { */
                     $query = FundRequest::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     $approved = false;
@@ -1164,19 +1164,19 @@ class FundRequestController extends Controller
                             $row->delete();
                         }
 
-                        DB::commit();
+                        /* DB::commit(); */
                     }else{
                         return response()->json([
                             'status'  => 500,
 					        'message' => 'Status purchase request sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                }catch(\Exception $e){
+                /* }catch(\Exception $e){
                     DB::rollback();
-                }
+                } */
 			}else{
-                DB::beginTransaction();
-                try {
+                /* DB::beginTransaction();
+                try { */
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=FundRequest::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
@@ -1213,10 +1213,10 @@ class FundRequestController extends Controller
                         'status'        => '1',
                     ]);
 
-                    DB::commit();
+                    /* DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
-                }
+                } */
 			}
 			
 			if($query) {

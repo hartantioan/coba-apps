@@ -58,7 +58,6 @@ class ImportItemMaster implements ToCollection
                         'item_id'       => $item->id,
                         'unit_id'       => $unit->id,
                         'conversion'    => 1,
-                        'is_sell_unit'  => '1',
                         'is_buy_unit'   => '1',
                         'is_default'    => '1',
                     ]);

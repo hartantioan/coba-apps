@@ -118,6 +118,7 @@ use App\Http\Controllers\Purchase\PurchaseInvoiceController;
 use App\Http\Controllers\Purchase\PurchaseMemoController;
 use App\Http\Controllers\Purchase\AgingAPController;
 use App\Http\Controllers\Purchase\DownPaymentController;
+use App\Http\Controllers\Purchase\UnbilledAPController;
 
 use App\Http\Controllers\Production\MarketingOrderPlanController;
 use App\Http\Controllers\Production\ProductionScheduleController;
@@ -1379,6 +1380,10 @@ Route::prefix('admin')->group(function () {
                         Route::get('/',[DownPaymentController::class, 'index']);
                         Route::post('filter',[DownPaymentController::class, 'filter']);
                         Route::get('export',[DownPaymentController::class, 'export']);
+                    });
+
+                    Route::prefix('unbilled_ap')->middleware('operation.access:unbilled_ap,view')->group(function () {
+                        Route::get('/',[UnbilledAPController::class, 'index']);
                     });
                 });
 

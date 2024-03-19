@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CustomHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -92,7 +93,7 @@ class FundRequest extends Model
         $html = '<ol>';
 
         foreach($this->fundRequestDetail as $row){
-            $html .= '<li>'.$row->note.' Qty. '.$row->qty.' '.$row->unit->code.'</li>';
+            $html .= '<li>'.$row->note.' Qty. '.CustomHelper::formatConditionalQty($row->qty).' '.$row->unit->code.'</li>';
         }
 
         $html .= '</ol>';

@@ -107,7 +107,7 @@ class PurchaseInvoiceController extends Controller
     }
 
     public function getScanBarcode(Request $request){
-        $code = $request->code;
+        /* $code = $request->code;
         $precode = explode('-',$code)[0];
         
         $details = [];
@@ -298,7 +298,7 @@ class PurchaseInvoiceController extends Controller
         $result['details'] = $details;
         $result['status'] = count($details) > 0 ? 200 : 500;
         				
-		return response()->json($result);
+		return response()->json($result); */
     }
 
     public function getAccountData(Request $request){

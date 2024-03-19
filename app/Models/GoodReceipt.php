@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CustomHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -186,7 +187,7 @@ class GoodReceipt extends Model
         $html = '<ol>';
 
         foreach($this->goodReceiptDetail as $row){
-            $html .= '<li>'.$row->item->code.' - '.$row->item->name.' Qty. '.$row->qty.' '.$row->itemUnit->unit->code.'</li>';
+            $html .= '<li>'.$row->item->code.' - '.$row->item->name.' Qty. '.CustomHelper::formatConditionalQty($row->qty).' '.$row->itemUnit->unit->code.'</li>';
         }
 
         $html .= '</ol>';

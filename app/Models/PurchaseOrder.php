@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CustomHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -335,7 +336,7 @@ class PurchaseOrder extends Model
         $html = '<ol>';
 
         foreach($this->purchaseOrderDetail as $row){
-            $html .= '<li>'.($row->item_id ? $row->item->code.' - '.$row->item->name : $row->coa->name).' Qty. '.$row->qty.' '.($row->item_id ? $row->itemUnit->unit->code : '-').'</li>';
+            $html .= '<li>'.($row->item_id ? $row->item->code.' - '.$row->item->name : $row->coa->name).' Qty. '.CustomHelper::formatConditionalQty($row->qty).' '.($row->item_id ? $row->itemUnit->unit->code : '-').'</li>';
         }
 
         $html .= '</ol>';

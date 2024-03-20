@@ -2099,7 +2099,7 @@ class GoodIssueController extends Controller
                     $rowprice = NULL;
                     $item_stock = ItemStock::find(intval($row));
                     $rowprice = $item_stock->priceNow();
-                    $grandtotal += $rowprice * str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
+                    $grandtotal += round($rowprice * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),2);
                     if($item_stock){
 
                         $qtyout = str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));

@@ -2693,7 +2693,7 @@
                 $('#grandtotal').val(response.grandtotal);
                 $('#payment').val(response.payment);
                 $('#balance').val(response.balance);
-                $('#is_reimburse').val(response.is_reimburse).trigger('change').formSelect();
+                $('#is_reimburse').val(response.is_reimburse).formSelect();
                 
                 if(response.details.length > 0){
                     $('#body-detail').empty();
@@ -2907,22 +2907,7 @@
                 }
 
                 $('#user_bank_id').empty();
-                if(response.banks.length > 0){
-                    $('#user_bank_id').append(`
-                        <option value="">--Pilih dari daftar-</option>
-                    `);
-                    $.each(response.banks, function(i, val) {
-                        $('#user_bank_id').append(`
-                            <option value="` + val.id + `" data-name="` + val.name + `" data-bank="` + val.bank_name + `" data-no="` + val.no + `">` + val.bank_name + ` - ` + val.no + ` - ` + val.name + `</option>
-                        `);
-                    });                        
-                }else{
-                    $('#user_bank_id').append(`
-                        <option value="">--Pilih Partner Bisnis-</option>
-                    `);
-                }
-                $('#user_bank_id').formSelect();
-
+                
                 $('#top').val(response.top);
 
                 $('.modal-content').scrollTop(0);

@@ -1698,7 +1698,7 @@ class CustomHelper {
 						'department_id'	=> $row->lookable_type == 'fund_requests' ? $row->lookable->department_id : NULL,
 						'type'			=> $balanceKurs < 0  ? '1' : '2',
 						'nominal'		=> floatval(abs($balanceKurs)),
-						'nominal_fc'	=> floatval(abs($balanceKurs)),
+						'nominal_fc'	=> 0,
 					]);
 				}
 			}

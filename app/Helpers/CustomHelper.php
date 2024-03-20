@@ -1475,14 +1475,13 @@ class CustomHelper {
 			$arrNote = [];
 
 			foreach($op->paymentRequest->paymentRequestDetail as $row){
+				$mustpay = 0;
+				$balanceReal = 0;
 
 				if($row->coa_id){
 					if(self::checkArrayRaw($arrNote,$row->note) < 0){
 						$arrNote[] = $row->note;
 					}
-
-					$mustpay = 0;
-					$balanceReal = 0;
 
 					if($row->lookable_type == 'purchase_invoices'){
 						$mustpay = $row->lookable->getTotalPaidExcept($row->id);
@@ -1494,13 +1493,13 @@ class CustomHelper {
 						}
 					}elseif($row->lookable_type == 'fund_requests'){
 						$mustpay = $row->nominal;
-						$balanceReal = $row->nominal * $row->lookable->currency_rate;
+						$balanceReal = $row->nominal * $op->currency_rate;
 						if($row->lookable->type == '1' && $row->lookable->document_status == '3'){
 							CustomHelper::addCountLimitCredit($row->lookable->account_id,$balanceReal);
 						}
 					}elseif($row->lookable_type == 'fund_request_details'){
 						$mustpay = $row->nominal;
-						$balanceReal = $row->nominal * $row->lookable->fundRequest->currency_rate;
+						$balanceReal = $row->nominal * $op->currency_rate;
 						if($row->lookable->fundRequest->type == '1' && $row->lookable->fundRequest->document_status == '3'){
 							CustomHelper::addCountLimitCredit($row->lookable->fundRequest->account_id,$balanceReal);
 						}
@@ -1520,9 +1519,6 @@ class CustomHelper {
 						$mustpay = $rowtotal;
 						$balanceReal = $rowtotal;
 					}
-					
-					$totalMustPay += $mustpay;
-					$totalReal += $balanceReal;
 
 					if($row->cost_distribution_id){
 						$total = $balanceReal;
@@ -1568,7 +1564,18 @@ class CustomHelper {
 							CustomHelper::addCountLimitCredit($op->account_id,$balanceReal);
 						}
 					}
+				}else{
+					if($row->lookable_type == 'fund_requests'){
+						$mustpay = $row->nominal;
+						$balanceReal = $row->nominal * $op->currency_rate;
+						if($row->lookable->type == '1' && $row->lookable->document_status == '3'){
+							CustomHelper::addCountLimitCredit($row->lookable->account_id,$balanceReal);
+						}
+					}
 				}
+
+				$totalMustPay += $mustpay;
+				$totalReal += $balanceReal;
 			}
 
 			foreach($op->paymentRequest->paymentRequestCost as $row){
@@ -1686,6 +1693,7 @@ class CustomHelper {
 				
 			}
 
+			#perbaiki disini
 			if($op->balance >= $totalMustPay && $op->currency_rate > 1){
 				$balanceKurs = $totalReal - $totalPay;
 				if($balanceKurs < 0 || $balanceKurs > 0){

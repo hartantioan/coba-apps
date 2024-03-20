@@ -374,7 +374,7 @@ class PurchaseInvoiceController extends Controller
                     'post_date'     => date('d/m/Y',strtotime($row->post_date)),
                     'grandtotal'    => number_format($row->grandtotal,2,',','.'),
                     'invoice'       => number_format($invoice,2,',','.'),
-                    'balance'       => $row->currency()->symbol.' '.number_format($row->grandtotal - $invoice,2,',','.'),
+                    'balance'       => $row->currencyReference()->symbol.' '.number_format($row->grandtotal - $invoice,2,',','.'),
                     'info'          => $row->note,
                     'list_item'     => $row->getListItem(),
                 ];

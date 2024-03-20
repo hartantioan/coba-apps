@@ -956,7 +956,7 @@ class PurchaseOrderController extends Controller
                                     'marketing_order_delivery_process_id'   => $request->arr_type[$key] == 'sj' ? $request->arr_data[$key] : NULL,
                                     'coa_id'                                => $row,
                                     'qty'                                   => $qty,
-                                    'coa_unit_id'                           => $request->arr_unit[$key],
+                                    'coa_unit_id'                           => isset($request->arr_unit[$key]) ?? NULL,
                                     'price'                                 => $price,
                                     'percent_discount_1'                    => $disc1,
                                     'percent_discount_2'                    => $disc2,

@@ -144,10 +144,10 @@ class CustomHelper {
 				'item_id'			=> $item_id,
 				'item_shading_id'	=> $shading ? $shading : NULL,
 				'qty_in'			=> $qty,
-				'price_in'			=> $qty > 0 ? round($total / $qty,2) : 0,
+				'price_in'			=> $qty > 0 ? $total / $qty : 0,
 				'total_in'			=> $total,
 				'qty_final'			=> $old_data ? $old_data->qty_final + $qty : $qty,
-				'price_final'		=> $old_data ? round((($old_data->total_final + $total) / ($old_data->qty_final + $qty)),2) : ($qty > 0 ? round($total / $qty,2) : 0),
+				'price_final'		=> $old_data ? (($old_data->total_final + $total) / ($old_data->qty_final + $qty)) : ($qty > 0 ? $total / $qty : 0),
 				'total_final'		=> $old_data ? round(($old_data->total_final + $total),2) : $total,
 				'date'				=> $date,
 				'type'				=> $type
@@ -1004,7 +1004,7 @@ class CustomHelper {
 
 			foreach($gr->goodReceiptDetail as $rowdetail){
 
-				$rowtotal = $rowdetail->getRowTotal() * $rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate;
+				$rowtotal = $rowdetail->total * $rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate;
 
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
@@ -3076,7 +3076,7 @@ class CustomHelper {
 						}
 					}
 				}else{
-					if($row->nominal_debit_fc !== 0){
+					if($row->nominal_debit_fc > 0 || $row->nominal_debit_fc < 0){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $row->coa_id,
@@ -3092,7 +3092,7 @@ class CustomHelper {
 							'note2'			=> $row->note2,
 						]);
 					}
-					if($row->nominal_credit_fc !== 0){
+					if($row->nominal_credit_fc > 0 || $row->nominal_credit_fc < 0){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $row->coa_id,

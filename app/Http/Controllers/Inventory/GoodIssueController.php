@@ -2099,7 +2099,7 @@ class GoodIssueController extends Controller
                     $rowprice = NULL;
                     $item_stock = ItemStock::find(intval($row));
                     $rowprice = $item_stock->priceNow();
-                    $grandtotal += $rowprice * str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
+                    $grandtotal += round($rowprice * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),2);
                     if($item_stock){
 
                         $qtyout = str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
@@ -2216,7 +2216,7 @@ class GoodIssueController extends Controller
                         $query->post_date = $request->post_date;
                         $query->document = $document;
                         $query->note = $request->note;
-                        $query->grandtotal = $grandtotal;
+                        $query->grandtotal = round($grandtotal,2);
                         $query->status = '1';
 
                         $query->save();
@@ -2247,7 +2247,7 @@ class GoodIssueController extends Controller
                         'document'              => $request->file('document') ? $request->file('document')->store('public/good_issues') : NULL,
                         'note'                  => $request->note,
                         'status'                => '1',
-                        'grandtotal'            => $grandtotal
+                        'grandtotal'            => round($grandtotal,2)
                     ]);
                 }
                 

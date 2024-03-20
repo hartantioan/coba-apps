@@ -40,12 +40,8 @@
                                             <div class="col s12">
                                                 <div class="row">
                                                     <div class="col m3 s6 ">
-                                                        <label for="start_date" style="font-size:1rem;">Tanggal Mulai :</label>
-                                                        <input type="date" id="start_date" name="start_date" value="{{ date('Y-m-d') }}">
-                                                    </div>
-                                                    <div class="col m3 s6 ">
-                                                        <label for="end_date" style="font-size:1rem;">Tanggal Akhir :</label>
-                                                        <input type="date" max="{{ date('9999'.'-12-31') }}" id="end_date" name="end_date" value="{{ date('Y-m-d') }}">
+                                                        <label for="date" style="font-size:1rem;">Tanggal :</label>
+                                                        <input type="date" max="{{ date('9999'.'-12-31') }}" id="date" name="date" value="{{ date('Y-m-d') }}">
                                                     </div>
                                                     <div class="col m9 s6 pt-2">
                                                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="filterByDate();">
@@ -126,8 +122,8 @@
 
 <script>
     function exportExcel(){
-        var start_date = $('#start_date').val(), end_date = $('#end_date').val();
-        window.location = "{{ Request::url() }}/export?start_date=" + start_date + "&end_date=" + end_date;
+        var date = $('#date').val();
+        window.location = "{{ Request::url() }}/export?date=" + date;
     }
     function filterByDate(){
         var formData = new FormData($('#form_data_filter')[0]);
@@ -150,11 +146,6 @@
                 loadingClose('#main');
                 if(response.status == 200) {
                     $('#detail_invoice').empty();
-                    $('#detail_invoice').append(`
-                        <tr>
-                            <td colspan="9" class="right-align"><h6><b>Saldo periode sebelumnya : ` + response.totalbefore + `</b></h6></td>
-                        </tr>
-                    `);
                     if(response.data.length > 0){
                         $.each(response.data, function(i, val) {
                             $('#detail_invoice').append(`

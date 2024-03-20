@@ -566,7 +566,7 @@ class MaterialRequestController extends Controller
                 try { */
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode=MaterialRequest::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
+                    $newCode=MaterialRequest::generateCode('ITQS-'.date('y',strtotime($request->post_date)).$request->code_place_id);
                     
                     $query = MaterialRequest::create([
                         'code'			=> $newCode,

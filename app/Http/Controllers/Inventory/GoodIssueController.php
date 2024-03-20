@@ -2216,7 +2216,7 @@ class GoodIssueController extends Controller
                         $query->post_date = $request->post_date;
                         $query->document = $document;
                         $query->note = $request->note;
-                        $query->grandtotal = $grandtotal;
+                        $query->grandtotal = round($grandtotal,2);
                         $query->status = '1';
 
                         $query->save();
@@ -2247,7 +2247,7 @@ class GoodIssueController extends Controller
                         'document'              => $request->file('document') ? $request->file('document')->store('public/good_issues') : NULL,
                         'note'                  => $request->note,
                         'status'                => '1',
-                        'grandtotal'            => $grandtotal
+                        'grandtotal'            => round($grandtotal,2)
                     ]);
                 }
                 

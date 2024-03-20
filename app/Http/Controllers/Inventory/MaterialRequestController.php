@@ -527,8 +527,8 @@ class MaterialRequestController extends Controller
         } else {
 
 			if($request->temp){
-                /* DB::beginTransaction();
-                try { */
+                DB::beginTransaction();
+                try {
                     $query = MaterialRequest::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     if($query->hasChildDocument()){
@@ -551,22 +551,22 @@ class MaterialRequestController extends Controller
                             $row->delete();
                         }
 
-                        /* DB::commit(); */
+                        DB::commit();
                     }else{
                         return response()->json([
                             'status'  => 500,
 					        'message' => 'Status Item Request sudah SELESAI, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                /* }catch(\Exception $e){
+                }catch(\Exception $e){
                     DB::rollback();
-                } */
+                }
 			}else{
-                /* DB::beginTransaction();
-                try { */
+                DB::beginTransaction();
+                try {
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode=MaterialRequest::generateCode('ITQS-'.date('y',strtotime($request->post_date)).$request->code_place_id);
+                    $newCode=MaterialRequest::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                     
                     $query = MaterialRequest::create([
                         'code'			=> $newCode,
@@ -577,10 +577,10 @@ class MaterialRequestController extends Controller
                         'note'          => $request->note,
                     ]);
 
-                    /* DB::commit();
+                    DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
-                } */
+                }
 			}
 			
 			if($query) {

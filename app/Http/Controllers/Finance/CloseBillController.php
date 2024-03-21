@@ -36,6 +36,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Currency;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportCloseBill;
+use App\Exports\ExportCloseBillTransactionPage;
 use App\Models\CloseBillCost;
 use App\Models\Division;
 use App\Models\Line;
@@ -3020,5 +3021,15 @@ class CloseBillController extends Controller
 
             return response()->json($response);
         }
+    }
+
+    public function exportFromTransactionPage(Request $request){
+        $search = $request->search? $request->search : '';
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $status = $request->status ? $request->status : '';
+        $company = $request->company ? $request->company : '';
+		$modedata = $request->modedata ? $request->modedata : '';
+		return Excel::download(new ExportCloseBillTransactionPage($search,$company,$post_date,$end_date,$status,$modedata), 'purchase_request_'.uniqid().'.xlsx');
     }
 }

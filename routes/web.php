@@ -1324,6 +1324,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('get_items_from_stock', [PurchaseRequestController::class, 'getItemFromStock']);
                     Route::post('print',[PurchaseRequestController::class, 'print']);
                     Route::get('export',[PurchaseRequestController::class, 'export']);
+                    Route::get('export_from_page',[PurchaseRequestController::class, 'exportFromTransactionPage']);
                     Route::post('print_by_range',[PurchaseRequestController::class, 'printByRange']);
                     Route::post('send_used_data',[PurchaseRequestController::class, 'sendUsedData']);
                     Route::post('remove_used_data', [PurchaseRequestController::class, 'removeUsedData']);
@@ -1401,6 +1402,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('print',[PurchaseOrderController::class, 'print']);
                     Route::post('print_by_range',[PurchaseOrderController::class, 'printByRange']);
                     Route::get('export',[PurchaseOrderController::class, 'export']);
+                    Route::get('export_from_page',[PurchaseOrderController::class, 'exportFromTransactionPage']);
                     Route::get('viewstructuretree',[PurchaseOrderController::class, 'viewStructureTree']);
                     Route::post('get_details', [PurchaseOrderController::class, 'getDetails']);
                     Route::post('remove_used_data', [PurchaseOrderController::class, 'removeUsedData']);

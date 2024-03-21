@@ -131,6 +131,11 @@
                                                 <span class="hide-on-small-onl">Refresh</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
+                                            <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-2" href="javascript:void(0);" onclick="exportExcel();">
+                                                <i class="material-icons hide-on-med-and-up">view_headline</i>
+                                                <span class="hide-on-small-onl">Export</span>
+                                                <i class="material-icons right">view_headline</i>
+                                            </a>
                                             <table id="datatable_serverside" class="display responsive-table wrap">
                                                 <thead>
                                                     <tr>
@@ -519,7 +524,13 @@
             }
         };
 
-         reader.readAsDataURL(file);
+        reader.readAsDataURL(file);
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+
+       
+        fileInput.files = dataTransfer.files;
+         
         }
     }
     
@@ -1597,5 +1608,16 @@
                 });
             }
         });
+    }
+
+    function exportExcel(){
+        var search = table.search();
+        var status = $('#filter_status').val();
+        var start_date = $('#start_date').val();
+        var end_date = $('#finish_date').val();
+        var modedata = '{{ $modedata }}';
+
+        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata;
+       
     }
 </script>

@@ -48,6 +48,7 @@ use App\Models\PurchaseInvoiceDetail;
 
 use App\Helpers\CustomHelper;
 use App\Exports\ExportPurchaseInvoice;
+use App\Exports\ExportPurchaseInvoiceTransactionPage;
 use App\Exports\ExportTemplatePurchaseInvoice;
 use App\Models\Currency;
 use App\Models\Division;
@@ -4286,5 +4287,19 @@ class PurchaseInvoiceController extends Controller
 
             return response()->json($response);
         }
+    }
+
+    public function exportFromTransactionPage(Request $request){
+        $search= $request->search? $request->search : '';
+        $status = $request->status? $request->status : '';;
+        $company = $request->company ? $request->company : '';
+        $type_pay = $request->type_pay ? $request->type_pay : '';
+        $supplier = $request->supplier? $request->supplier : '';
+      
+        $end_date = $request->end_date ? $request->end_date : '';
+        $start_date = $request->start_date? $request->start_date : '';
+		$modedata = $request->modedata? $request->modedata : '';
+      
+		return Excel::download(new ExportPurchaseInvoiceTransactionPage($search,$status,$company,$type_pay,$supplier,$end_date,$start_date,$modedata), 'purchase_invoice'.uniqid().'.xlsx');
     }
 }

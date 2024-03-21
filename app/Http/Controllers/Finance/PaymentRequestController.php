@@ -57,6 +57,7 @@ use App\Models\OutgoingPayment;
 use App\Models\PaymentRequestCost;
 use App\Models\Warehouse;
 use Illuminate\Database\Eloquent\Builder;
+use App\Exports\ExportPaymentRequestTransactionPage;
 
 class PaymentRequestController extends Controller
 {
@@ -4235,5 +4236,18 @@ class PaymentRequestController extends Controller
 
             return response()->json($response);
         }
+    }
+    public function exportFromTransactionPage(Request $request){
+        $search= $request->search? $request->search : '';
+        $status = $request->status? $request->status : '';;
+        $company = $request->company ? $request->company : '';
+        $type_pay = $request->type_pay ? $request->type_pay : '';
+        $account = $request->account? $request->account : '';
+        $currency = $request->currency ? $request->currency : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $start_date = $request->start_date? $request->start_date : '';
+		$modedata = $request->modedata? $request->modedata : '';
+      
+		return Excel::download(new ExportPaymentRequestTransactionPage($search,$status,$company,$type_pay,$account,$currency,$end_date,$start_date,$modedata), 'purchase_down_payment'.uniqid().'.xlsx');
     }
 }

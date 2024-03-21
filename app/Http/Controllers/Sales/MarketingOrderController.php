@@ -2173,4 +2173,22 @@ class MarketingOrderController extends Controller
         }
     }
 
+    // public function exportFromTransactionPage(Request $request){
+    //     $search= $request->search? $request->search : '';
+    //     $status = $request->status? $request->status : '';
+    //     $type_buy = $request->type_buy ? $request->type_buy : '';
+    //     $type_deliv = $request->type_deliv? $request->type_deliv : '';
+    //     $company = $request->company ? $request->company : '';
+    //     $type_pay = $request->type_pay ? $request->type_pay : '';
+    //     $sender = $request->sender? $request->sender : '';
+    //     $sales = $request->sales ? $request->sales : '';
+    //     $supplier = $request->supplier? $request->supplier : '';
+    //     $currency = $request->currency ? $request->currency : '';
+    //     $end_date = $request->end_date ? $request->end_date : '';
+    //     $start_date = $request->start_date? $request->start_date : '';
+	// 	$modedata = $request->modedata? $request->modedata : '';
+      
+	// 	return Excel::download(new ExportPurchaseOrderTransactionPage($search,$status,$type_buy,$type_deliv,$company,$type_pay,$supplier,$currency,$end_date,$start_date,$modedata), 'purchase_order_'.uniqid().'.xlsx');
+    // }
+
 }

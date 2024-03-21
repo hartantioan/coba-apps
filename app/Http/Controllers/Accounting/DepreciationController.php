@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Accounting;
 use App\Exports\ExportDepreciation;
+use App\Exports\ExportDepreciationTransactionPage;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Place;
@@ -983,5 +984,14 @@ class DepreciationController extends Controller
 
             return response()->json($response);
         }
+    }
+
+    public function exportFromTransactionPage(Request $request){
+        $search = $request->search? $request->search : '';
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $status = $request->status ? $request->status : '';
+		$modedata = $request->modedata ? $request->modedata : '';
+		return Excel::download(new ExportDepreciationTransactionPage($search,$post_date,$end_date,$status,$modedata), 'purchase_request_'.uniqid().'.xlsx');
     }
 }

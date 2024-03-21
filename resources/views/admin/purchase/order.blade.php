@@ -179,6 +179,11 @@
                                                 <span class="hide-on-small-onl">Refresh</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
+                                            <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-2" href="javascript:void(0);" onclick="exportExcel();">
+                                                <i class="material-icons hide-on-med-and-up">view_headline</i>
+                                                <span class="hide-on-small-onl">Export</span>
+                                                <i class="material-icons right">view_headline</i>
+                                            </a>
                                             <table id="datatable_serverside">
                                                 <thead>
                                                     <tr>
@@ -2103,8 +2108,6 @@
                     shipping_type : $('#filter_shipping').val(),
                     'supplier_id[]' : $('#filter_supplier').val(),
                     company_id : $('#filter_company').val(),
-                    is_tax : $('#filter_is_tax').val(),
-                    is_include_tax : $('#filter_is_include_tax').val(),
                     payment_type : $('#filter_payment').val(),
                     'currency_id[]' : $('#filter_currency').val(),
                     start_date : $('#start_date').val(),
@@ -3395,5 +3398,22 @@
                 });
             }
         });
+    }
+
+    function exportExcel(){
+        var search = table.search();
+        var status = $('#filter_status').val();
+        var type_buy = $('#filter_inventory').val();
+        var type_deliv = $('#filter_shipping').val();
+        var company = $('#filter_company').val();
+        var type_pay = $('#filter_payment').val();
+        var supplier = $('#filter_supplier').val();
+        var currency = $('#filter_currency').val();
+        var start_date = $('#start_date').val();
+        var end_date = $('#finish_date').val();
+        var modedata = '{{ $modedata }}';
+
+        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&type_buy=" + type_buy + "&type_deliv=" + type_deliv + "&company=" + company + "&type_pay=" + type_pay + "&supplier=" + supplier + "&currency=" + currency + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata;
+       
     }
 </script>

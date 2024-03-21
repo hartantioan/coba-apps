@@ -30,6 +30,7 @@ use App\Models\PurchaseOrderDetail;
 use App\Models\InventoryTransferIn;
 use App\Models\LandedCostFee;
 use App\Exports\ExportOutstandingLC;
+use App\Exports\ExportLandedCostTransactionPage;
 use App\Models\Place;
 ;
 use App\Models\Tax;
@@ -1494,6 +1495,17 @@ class LandedCostController extends Controller
         $mode = $request->mode ? $request->mode : '';
 		
 		return Excel::download(new ExportLandedCost($post_date,$end_date,$mode), 'landed_cost'.uniqid().'.xlsx');
+    }
+
+    public function exportFromTransactionPage(Request $request){
+        $search = $request->search? $request->search : '';
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $status = $request->status ? $request->status : '';
+        $currency = $request->currency? $request->currency : '';
+        $supplier = $request->supplier? $request->supplier : '';
+		$modedata = $request->modedata ? $request->modedata : '';
+		return Excel::download(new ExportLandedCostTransactionPage($search,$post_date,$end_date,$currency,$supplier,$status,$modedata), 'purchase_request_'.uniqid().'.xlsx');
     }
     
     public function removeUsedData(Request $request){

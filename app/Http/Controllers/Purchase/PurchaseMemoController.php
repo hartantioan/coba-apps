@@ -43,6 +43,7 @@ use App\Helpers\CustomHelper;
 use App\Models\User;
 use App\Models\PurchaseMemoDetail;
 use App\Exports\ExportPurchaseMemo;
+use App\Exports\ExportPurchaseMemoTransactionPage;
 use App\Models\Division;
 use App\Models\MenuUser;
 use App\Models\PurchaseInvoiceDetail;
@@ -3188,5 +3189,19 @@ class PurchaseMemoController extends Controller
 
             return response()->json($response);
         }
+    }
+
+    public function exportFromTransactionPage(Request $request){
+        $search= $request->search? $request->search : '';
+        $status = $request->status? $request->status : '';;
+        $company = $request->company ? $request->company : '';
+        
+        $supplier = $request->supplier? $request->supplier : '';
+        
+        $end_date = $request->end_date ? $request->end_date : '';
+        $start_date = $request->start_date? $request->start_date : '';
+		$modedata = $request->modedata? $request->modedata : '';
+      
+		return Excel::download(new ExportPurchaseMemoTransactionPage($search,$status,$company,$supplier,$end_date,$start_date,$modedata), 'purchase_down_payment'.uniqid().'.xlsx');
     }
 }

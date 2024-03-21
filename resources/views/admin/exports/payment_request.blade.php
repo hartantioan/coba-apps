@@ -41,14 +41,14 @@
                 <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                 <td>{{ date('d/m/Y',strtotime($row->pay_date)) }}</td>
                 <td>{{ $row->currency->code }}</td>
-                <td>{{ number_format($row->currency_rate,3,',','.') }}</td>
+                <td>{{ number_format($row->currency_rate,2,',','.') }}</td>
                 <td><a href="{{ $row->attachment() }}">File</a></td>
                 <td>{{ $row->account_bank }}</td>
                 <td>{{ $row->account_no }}</td>
                 <td>{{ $row->account_name }}</td>
                 <td>{{ $row->note }}</td>
                 <td>{!! $row->status() !!}</td>
-                <td>{{ number_format($row->admin,3,',','.') }}</td>
+                <td>{{ number_format($row->admin,2,',','.') }}</td>
                 <td>{{ number_format($row->grandtotal,2,',','.') }}</td>
             </tr>
             <tr align="center">

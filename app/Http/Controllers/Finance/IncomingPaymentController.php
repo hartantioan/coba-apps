@@ -43,7 +43,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
-use App\Exports\ExportCloseBill;
+use App\Exports\ExportIncomingPaymentTransactionPage;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -3904,5 +3904,17 @@ class IncomingPaymentController extends Controller
 
             return response()->json($response);
         }
+    }
+    public function exportFromTransactionPage(Request $request){
+        $search= $request->search? $request->search : '';
+        $status = $request->status? $request->status : '';;
+        $company = $request->company ? $request->company : '';
+        $account = $request->account? $request->account : '';
+        $currency = $request->currency ? $request->currency : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $start_date = $request->start_date? $request->start_date : '';
+		$modedata = $request->modedata? $request->modedata : '';
+      
+		return Excel::download(new ExportIncomingPaymentTransactionPage($search,$status,$company,$account,$currency,$end_date,$start_date,$modedata), 'purchase_down_payment'.uniqid().'.xlsx');
     }
 }

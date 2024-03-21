@@ -45,6 +45,7 @@ use App\Models\PurchaseRequest;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
+use App\Exports\ExportGoodIssueTransactionPage;
 use App\Models\GoodIssueDetail;
 use App\Models\User;
 
@@ -2965,6 +2966,14 @@ class GoodIssueController extends Controller
         $end_date = $request->end_date ? $request->end_date : '';
         $mode = $request->mode ? $request->mode : '';
 		return Excel::download(new ExportGoodIssue($post_date,$end_date,$mode), 'good_issue_'.uniqid().'.xlsx');
+    }
+    public function exportFromTransactionPage(Request $request){
+        $search = $request->search? $request->search : '';
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $status = $request->status ? $request->status : '';
+		$modedata = $request->modedata ? $request->modedata : '';
+		return Excel::download(new ExportGoodIssueTransactionPage($search,$post_date,$end_date,$status,$modedata), 'purchase_request_'.uniqid().'.xlsx');
     }
 
     public function viewJournal(Request $request,$id){

@@ -3,10 +3,8 @@
 namespace App\Exports;
 
 use App\Models\CloseBill;
-use App\Models\PaymentRequest;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
-use Illuminate\Database\Eloquent\Builder;
 
 class ExportCloseBill implements FromView
 {

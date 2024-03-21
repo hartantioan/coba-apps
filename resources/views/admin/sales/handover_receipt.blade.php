@@ -487,7 +487,13 @@
             }
         };
 
-         reader.readAsDataURL(file);
+        reader.readAsDataURL(file);
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+
+       
+        fileInput.files = dataTransfer.files;
+         
         }
     }
     

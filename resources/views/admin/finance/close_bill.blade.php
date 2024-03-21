@@ -118,6 +118,11 @@
                                                 <span class="hide-on-small-onl">Refresh</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
+                                            <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-2" href="javascript:void(0);" onclick="exportExcel();">
+                                                <i class="material-icons hide-on-med-and-up">view_headline</i>
+                                                <span class="hide-on-small-onl">Export</span>
+                                                <i class="material-icons right">view_headline</i>
+                                            </a>
                                             <table id="datatable_serverside">
                                                 <thead>
                                                     <tr>

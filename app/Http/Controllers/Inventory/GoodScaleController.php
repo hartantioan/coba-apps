@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Inventory;
 
 use App\Exports\ExportGoodScale;
+use App\Exports\ExportGoodScaleTransactionPage;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\GoodScale;
@@ -20,6 +21,7 @@ use App\Models\Department;
 use App\Helpers\CustomHelper;
 use App\Models\ItemUnit;
 use App\Models\Menu;
+use App\Models\MenuUser;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -44,6 +46,7 @@ class GoodScaleController extends Controller
     {
         $lastSegment = request()->segment(count(request()->segments()));
         $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
             'title'     => 'Timbangan Truk',
             'content'   => 'admin.inventory.good_scale',
@@ -54,7 +57,8 @@ class GoodScaleController extends Controller
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
             'newcode'   => $menu->document_code.date('y'),
-            'menucode'  => $menu->document_code
+            'menucode'  => $menu->document_code,
+            'modedata'  => $menuUser->mode ? $menuUser->mode : '',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -1203,6 +1207,15 @@ class GoodScaleController extends Controller
         $end_date = $request->end_date ? $request->end_date : '';
         $mode = $request->mode ? $request->mode : '';
 		return Excel::download(new ExportGoodScale($post_date,$end_date,$mode), 'good_scale_'.uniqid().'.xlsx');
+    }
+
+    public function exportFromTransactionPage(Request $request){
+        $search = $request->search? $request->search : '';
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $status = $request->status ? $request->status : '';
+		$modedata = $request->modedata ? $request->modedata : '';
+		return Excel::download(new ExportGoodScaleTransactionPage($search,$post_date,$end_date,$status,$modedata), 'purchase_request_'.uniqid().'.xlsx');
     }
 
     public function done(Request $request){

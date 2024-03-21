@@ -36,6 +36,7 @@ use App\Models\Currency;
 use App\Models\Menu;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportOutgoingPayment;
+use App\Exports\ExportOutgoingPaymentTransactionPage;
 use App\Models\MenuUser;
 use App\Models\Place;
 
@@ -3031,5 +3032,18 @@ class OutgoingPaymentController extends Controller
 
             return response()->json($response);
         }
+    }
+    public function exportFromTransactionPage(Request $request){
+        $search= $request->search? $request->search : '';
+        $status = $request->status? $request->status : '';;
+        $company = $request->company ? $request->company : '';
+        $type_pay = $request->type_pay ? $request->type_pay : '';
+        $account = $request->account? $request->account : '';
+        $currency = $request->currency ? $request->currency : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $start_date = $request->start_date? $request->start_date : '';
+		$modedata = $request->modedata? $request->modedata : '';
+      
+		return Excel::download(new ExportOutgoingPaymentTransactionPage($search,$status,$company,$type_pay,$account,$currency,$end_date,$start_date,$modedata), 'purchase_down_payment'.uniqid().'.xlsx');
     }
 }

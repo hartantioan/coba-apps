@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Inventory;
 
 use App\Exports\ExportGoodIssueRequest;
+use App\Exports\ExportGoodIssueRequestTransactionPage;
 use App\Exports\ExportOutstandingGoodIssueRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
@@ -2792,6 +2793,15 @@ class GoodIssueRequestController extends Controller
         $end_date = $request->end_date ? $request->end_date : '';
         $mode = $request->mode ? $request->mode : '';
 		return Excel::download(new ExportGoodIssueRequest($post_date,$end_date,$mode), 'good_issue_request_'.uniqid().'.xlsx');
+    }
+
+    public function exportFromTransactionPage(Request $request){
+        $search = $request->search? $request->search : '';
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $status = $request->status ? $request->status : '';
+		$modedata = $request->modedata ? $request->modedata : '';
+		return Excel::download(new ExportGoodIssueRequestTransactionPage($search,$post_date,$end_date,$status,$modedata), 'purchase_request_'.uniqid().'.xlsx');
     }
 
     public function getOutstanding(Request $request){

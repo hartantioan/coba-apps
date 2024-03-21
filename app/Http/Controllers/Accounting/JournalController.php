@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportJournal;
+use App\Exports\ExportJournalTransactionPage;
 use App\Exports\ExportTemplateJournalCopy;
 use Illuminate\Database\Eloquent\Builder;
 use App\Helpers\CustomHelper;
@@ -1140,5 +1141,15 @@ class JournalController extends Controller
 
     public function getImportExcel(){
         return Excel::download(new ExportTemplateJournalCopy(), 'format_journal_copy'.uniqid().'.xlsx');
+    }
+
+    public function exportFromTransactionPage(Request $request){
+        $search = $request->search? $request->search : '';
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $currency = $request->currency ? $request->currency : '';
+        $status = $request->status ? $request->status : '';
+		$modedata = $request->modedata ? $request->modedata : '';
+		return Excel::download(new ExportJournalTransactionPage($search,$post_date,$end_date,$currency,$status,$modedata), 'purchase_request_'.uniqid().'.xlsx');
     }
 }

@@ -1358,6 +1358,7 @@ class DashboardController extends Controller
 
     public function getOutAttendance(Request $request){
         DB::statement("SET SQL_MODE=''");
+        $attendance_per_day = [];
         if($request->temp){
             $attendance_monthly_user = AttendanceMonthlyReport::where('period_id',$request->temp)
             ->where('user_id',session('bo_id'))->first();

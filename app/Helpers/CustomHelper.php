@@ -1445,7 +1445,6 @@ class CustomHelper {
 						'nominal'                       => floatval($row->nominal * $pr->currency_rate),
 						'nominal_fc'					=> $pr->currency->type == '1' ? floatval($row->nominal * $pr->currency_rate) : floatval($row->nominal),
 					]);
-					CustomHelper::removeCountLimitCredit($row->lookable->account_id,floatval($row->nominal * $pr->currency_rate));
 				}
 
 				$pr->update([
@@ -1497,9 +1496,6 @@ class CustomHelper {
 					}elseif($row->lookable_type == 'fund_requests'){
 						$mustpay = $row->nominal;
 						$balanceReal = $row->nominal * $op->currency_rate;
-						if($row->lookable->type == '1' && $row->lookable->document_status == '3'){
-							CustomHelper::addCountLimitCredit($row->lookable->account_id,$balanceReal);
-						}
 					}elseif($row->lookable_type == 'fund_request_details'){
 						$mustpay = $row->nominal;
 						$balanceReal = $row->nominal * $op->currency_rate;
@@ -3022,7 +3018,6 @@ class CustomHelper {
 					'nominal_fc'	=> $cb->currency->type == '1' || $cb->currency->type == '' ? $row->nominal * $cb->currency_rate : $row->nominal,
 					'note'			=> $row->note,
 				]);
-				CustomHelper::removeCountLimitCredit($row->outgoingPayment->account_id,floatval($row->nominal * $cb->currency_rate));
 				if($row->outgoingPayment->balancePaymentCross() <= 0){
 					foreach($row->outgoingPayment->paymentRequest->paymentRequestDetail as $rowdetail){
 						if($rowdetail->lookable_type == 'fund_requests'){

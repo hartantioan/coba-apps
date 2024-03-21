@@ -476,6 +476,10 @@ class FundRequestController extends Controller
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
+
+                if($query->type == '1' && $query->account->type == '1'){
+                    CustomHelper::removeCountLimitCredit($query->account_id,$query->grandtotal);
+                }
     
                 activity()
                     ->performedOn(new FundRequest())
@@ -1265,6 +1269,10 @@ class FundRequestController extends Controller
                     DB::rollback();
                 } */
 
+                if($query->type == '1' && $query->account->type == '1'){
+                    CustomHelper::addCountLimitCredit($request->account_id,$query->grandtotal);
+                }
+
                 CustomHelper::sendApproval('fund_requests',$query->id,$query->note);
                 CustomHelper::sendNotification('fund_requests',$query->id,'Pengajuan Permohonan Dana No. '.$query->code,$query->note,session('bo_id'));
 
@@ -1544,6 +1552,10 @@ class FundRequestController extends Controller
             
             $query->fundRequestDetail()->delete();
             CustomHelper::removeApproval('fund_requests',$query->id);
+
+            if($query->type == '1' && $query->account->type == '1'){
+                CustomHelper::removeCountLimitCredit($query->account_id,$query->grandtotal);
+            }
 
             activity()
                 ->performedOn(new FundRequest())

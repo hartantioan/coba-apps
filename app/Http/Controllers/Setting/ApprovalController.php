@@ -498,6 +498,16 @@ class ApprovalController extends Controller
                                     $updaterealtable->update([
                                         'status'    => '4'
                                     ]);
+                                    if($query->approvalSource->lookable_type == 'fund_requests'){
+                                        if($query->approvalSource->lookable->type == '1' && $query->approvalSource->lookable->account->type == '1'){
+                                            CustomHelper::removeCountLimitCredit($query->approvalSource->lookable->account_id,$query->approvalSource->lookable->grandtotal);
+                                        }
+                                    }
+                                    if($query->approvalSource->lookable_type == 'close_bills'){
+                                        foreach($query->approvalSource->lookable->closeBillDetail as $row){
+                                            CustomHelper::addCountLimitCredit($row->outgoingPayment->account_id,$row->nominal);
+                                        }
+                                    }
                                 }
                             }elseif($request->approve_reject_revision == '3'){
                                 $updaterealtable = $query->approvalSource->lookable;

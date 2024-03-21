@@ -701,13 +701,14 @@ class CloseBillController extends Controller
                     foreach($request->arr_type as $key => $row){
                         if($row == 'outgoing_payments'){
                             $op = OutgoingPayment::find($request->arr_id[$key]);
-                            CloseBillDetail::create([
+                            $cbd = CloseBillDetail::create([
                                 'close_bill_id'         => $query->id,
                                 'outgoing_payment_id'   => $op->id,
                                 'nominal'               => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
                                 'note'                  => $request->arr_note_source[$key],
                             ]);
                             CustomHelper::removeUsedData($row,$request->arr_id[$key]);
+                            CustomHelper::removeCountLimitCredit($op->account_id,$cbd->nominal);
                         }
                     }
                     foreach($request->arr_coa as $key => $row){
@@ -780,9 +781,6 @@ class CloseBillController extends Controller
             }else{
                 if($query->journal()->exists()){
                     CustomHelper::removeJournal($query->getTable(),$query->id);
-                    foreach($query->closeBillDetail as $row){
-                        CustomHelper::addCountLimitCredit($row->outgoingPayment->account_id,floatval($row->nominal * $query->currency_rate));
-                    }
                 }
 
                 $query->update([
@@ -793,6 +791,7 @@ class CloseBillController extends Controller
                 ]);
 
                 foreach($query->closeBillDetail as $row){
+                    CustomHelper::addCountLimitCredit($row->outgoingPayment->account_id,$row->nominal);
                     foreach($row->outgoingPayment->paymentRequest->paymentRequestDetail as $rowdetail){
                         if($rowdetail->lookable_type == 'fund_requests'){
                             $rowdetail->lookable->update([
@@ -868,7 +867,10 @@ class CloseBillController extends Controller
                 'delete_note'   => $request->msg,
             ]);
 
-            $query->closeBillDetail()->delete();
+            foreach($query->closeBillDetail as $row){
+                CustomHelper::addCountLimitCredit($row->outgoingPayment->account_id,$row->nominal);
+                $row->delete();
+            }
             $query->closeBillCost()->delete();
 
             CustomHelper::removeApproval('close_bills',$query->id);

@@ -1104,12 +1104,6 @@ class PaymentRequestController extends Controller
                             if(in_array($row,['purchase_invoices','purchase_down_payments','fund_requests'])){
                                 CustomHelper::updateStatus($row,$request->arr_id[$key],'7');
                             }
-
-                            if($row == 'fund_requests'){
-                                if($prd->lookable->document_status == '3'){
-                                    $prd->lookable->addLimitCreditEmployee($prd->nominal);
-                                }
-                            }
                         }
                     }
 
@@ -1132,6 +1126,7 @@ class PaymentRequestController extends Controller
                                         }
                                     }
                                 }
+                                CustomHelper::removeCountLimitCredit($op->account_id,$prc->nominal);
                             }
                         }
                     }
@@ -1509,17 +1504,11 @@ class PaymentRequestController extends Controller
                                     ]);
                                 }
                             }
+                            CustomHelper::addCountLimitCredit($op->account_id,$row->nominal);
                         }
-                        $row->addLimitCreditEmployee();
                     }
 
                     foreach($query->paymentRequestDetail as $row){
-                        if($row->lookable_type == 'fund_requests'){
-                            if($row->lookable->type == '1' && $row->lookable->document_status == '3'){
-                                $row->lookable->removeLimitCreditEmployee($row->nominal);
-                            }
-                        }
-
                         if(in_array($row->lookable_type,['purchase_invoices','purchase_down_payments','fund_requests'])){
                             CustomHelper::updateStatus($row->lookable_type,$row->lookable_id,'2');
                         }
@@ -1592,11 +1581,6 @@ class PaymentRequestController extends Controller
             ]);
 
             foreach($query->paymentRequestDetail as $row){
-                if($row->lookable_type == 'fund_requests'){
-                    if($row->lookable->document_status == '3'){
-                        $row->lookable->removeLimitCreditEmployee($row->nominal);
-                    }
-                }
                 if(in_array($row->lookable_type,['purchase_invoices','purchase_down_payments','fund_requests'])){
                     CustomHelper::updateStatus($row->lookable_type,$row->lookable_id,'2');
                 }
@@ -1615,8 +1599,8 @@ class PaymentRequestController extends Controller
                             }
                         }
                     }
+                    CustomHelper::addCountLimitCredit($op->account_id,$row->nominal);
                 }
-                $row->addLimitCreditEmployee();
                 $row->delete();
             }
 

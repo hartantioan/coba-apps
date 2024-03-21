@@ -709,7 +709,7 @@ class CustomHelper {
 		$arrUser = [];
 
 		if($menu){
-			foreach($menu->menuUser as $row){
+			/* foreach($menu->menuUser as $row){
 				$arrUser[] = $row->user_id;
 			}
 
@@ -736,10 +736,10 @@ class CustomHelper {
 					'note'				=> $note,
 					'status'			=> '1'
 				]);
-			}
+			} */
 			
 			if($to){
-				if($adato == false){
+				/* if($adato == false){ */
 					Notification::create([
 						'code'				=> Str::random(20),
 						'menu_id'			=> $menu->id,
@@ -751,7 +751,7 @@ class CustomHelper {
 						'note'				=> $note,
 						'status'			=> '1'
 					]);
-				}
+				/* } */
 			}
 		}
 	}

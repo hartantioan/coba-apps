@@ -1122,6 +1122,10 @@ class FundRequestController extends Controller
                 try { */
                     $query = FundRequest::where('code',CustomHelper::decrypt($request->temp))->first();
 
+                    $bp->update([
+                        'count_limit_credit'    => $bp->count_limit_credit - $query->grandtotal,
+                    ]);
+
                     $approved = false;
                     $revised = false;
 

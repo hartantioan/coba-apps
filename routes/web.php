@@ -1310,6 +1310,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('void_status', [MaterialRequestController::class, 'voidStatus'])->middleware('operation.access:material_request,void');
                     Route::get('approval/{id}',[MaterialRequestController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('destroy', [MaterialRequestController::class, 'destroy'])->middleware('operation.access:material_request,delete');
+                    Route::get('export_from_page',[MaterialRequestController::class, 'exportFromTransactionPage']);
                 });
 
                 Route::prefix('purchase_request')->middleware(['operation.access:purchase_request,view','lockacc'])->group(function () {
@@ -1437,6 +1438,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[LandedCostController::class, 'approval'])->middleware('operation.access:landed_cost,view')->withoutMiddleware('direct.access');
                     Route::post('destroy', [LandedCostController::class, 'destroy'])->middleware('operation.access:landed_cost,delete');
                     Route::get('test',[LandedCostController::class, 'test'])->withoutMiddleware('direct.access');
+                    Route::get('export_from_page',[LandedCostController::class, 'exportFromTransactionPage']);
                 });
 
             });
@@ -1623,6 +1625,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[GoodScaleController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [GoodScaleController::class, 'voidStatus'])->middleware('operation.access:good_scale,void');
                     Route::post('destroy', [GoodScaleController::class, 'destroy'])->middleware('operation.access:good_scale,delete');
+                    Route::get('export_from_page',[GoodScaleController::class, 'exportFromTransactionPage']);
                 });
 
                 Route::prefix('good_receipt_po')->middleware(['operation.access:good_receipt_po,view','lockacc'])->group(function () {
@@ -1646,6 +1649,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[GoodReceiptPOController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [GoodReceiptPOController::class, 'voidStatus'])->middleware('operation.access:good_receipt_po,void');
                     Route::post('destroy', [GoodReceiptPOController::class, 'destroy'])->middleware('operation.access:good_receipt_po,delete');
+                    Route::get('export_from_page',[GoodReceiptPOController::class, 'exportFromTransactionPage']);
                 });
 
                 Route::prefix('good_return_po')->middleware(['operation.access:good_return_po,view','lockacc'])->group(function () {
@@ -1667,6 +1671,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[GoodReturnPOController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [GoodReturnPOController::class, 'voidStatus'])->middleware('operation.access:good_return_po,void');
                     Route::post('destroy', [GoodReturnPOController::class, 'destroy'])->middleware('operation.access:good_return_po,delete');
+                    Route::get('export_from_page',[GoodReturnPOController::class, 'exportFromTransactionPage']);
                 });
 
                 Route::prefix('transfer_out')->middleware(['operation.access:transfer_out,view','lockacc'])->group(function () {
@@ -1685,6 +1690,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[InventoryTransferOutController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [InventoryTransferOutController::class, 'voidStatus'])->middleware('operation.access:transfer_out,void');
                     Route::post('destroy', [InventoryTransferOutController::class, 'destroy'])->middleware('operation.access:transfer_out,delete');
+                    Route::get('export_from_page',[InventoryTransferOutController::class, 'exportFromTransactionPage']);
                 });
 
                 Route::prefix('transfer_in')->middleware(['operation.access:transfer_in,view','lockacc'])->group(function () {
@@ -1706,6 +1712,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[InventoryTransferInController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [InventoryTransferInController::class, 'voidStatus'])->middleware('operation.access:transfer_in,void');
                     Route::post('destroy', [InventoryTransferInController::class, 'destroy'])->middleware('operation.access:transfer_in,delete');
+                    Route::get('export_from_page',[InventoryTransferInController::class, 'exportFromTransactionPage']);
                 });
 
                 Route::prefix('good_receive')->middleware(['operation.access:good_receive,view','lockacc'])->group(function () {
@@ -1724,6 +1731,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[GoodReceiveController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [GoodReceiveController::class, 'voidStatus'])->middleware('operation.access:good_receive,void');
                     Route::post('destroy', [GoodReceiveController::class, 'destroy'])->middleware('operation.access:good_receive,delete');
+                    Route::get('export_from_page',[GoodReceiveController::class, 'exportFromTransactionPage']);
                 });
 
                 Route::prefix('good_issue_request')->middleware(['operation.access:good_issue_request,view','lockacc'])->group(function () {
@@ -1746,6 +1754,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[GoodIssueRequestController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [GoodIssueRequestController::class, 'voidStatus'])->middleware('operation.access:good_issue_request,void');
                     Route::post('destroy', [GoodIssueRequestController::class, 'destroy'])->middleware('operation.access:good_issue_request,delete');
+                    Route::get('export_from_page',[GoodIssueRequestController::class, 'exportFromTransactionPage']);
                 });
 
                 Route::prefix('good_issue')->middleware(['operation.access:good_issue,view','lockacc'])->group(function () {
@@ -1767,6 +1776,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[GoodIssueController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [GoodIssueController::class, 'voidStatus'])->middleware('operation.access:good_issue,void');
                     Route::post('destroy', [GoodIssueController::class, 'destroy'])->middleware('operation.access:good_issue,delete');
+                    Route::get('export_from_page',[GoodIssueController::class, 'exportFromTransactionPage']);
                 });
 
                 Route::prefix('good_return_issue')->middleware(['operation.access:good_return_issue,view','lockacc'])->group(function () {
@@ -1787,6 +1797,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[GoodReturnIssueController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [GoodReturnIssueController::class, 'voidStatus'])->middleware('operation.access:good_return_issue,void');
                     Route::post('destroy', [GoodReturnIssueController::class, 'destroy'])->middleware('operation.access:good_return_issue,delete');
+                    Route::get('export_from_page',[GoodReturnIssueController::class, 'exportFromTransactionPage']);
                 });
 
                 Route::prefix('revaluation')->middleware(['operation.access:revaluation,view','lockacc'])->group(function () {
@@ -2200,6 +2211,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('void_status', [PurchaseDownPaymentController::class, 'voidStatus'])->middleware('operation.access:purchase_down_payment,void');
                     Route::get('approval/{id}',[PurchaseDownPaymentController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('destroy', [PurchaseDownPaymentController::class, 'destroy'])->middleware('operation.access:purchase_down_payment,delete');
+                    Route::get('export_from_page',[PurchaseDownPaymentController::class, 'exportFromTransactionPage']);
                 });
 
                 Route::prefix('purchase_invoice')->middleware(['operation.access:purchase_invoice,view','lockacc'])->group(function () {
@@ -2225,6 +2237,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('void_status', [PurchaseInvoiceController::class, 'voidStatus'])->middleware('operation.access:purchase_invoice,void');
                     Route::get('approval/{id}',[PurchaseInvoiceController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('destroy', [PurchaseInvoiceController::class, 'destroy'])->middleware('operation.access:purchase_invoice,delete');
+                    Route::get('export_from_page',[PurchaseInvoiceController::class, 'exportFromTransactionPage']);
                 });
                 
                 Route::prefix('purchase_memo')->middleware(['operation.access:purchase_memo,view','lockacc'])->group(function () {
@@ -2246,6 +2259,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('void_status', [PurchaseMemoController::class, 'voidStatus'])->middleware('operation.access:purchase_memo,void');
                     Route::get('approval/{id}',[PurchaseMemoController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('destroy', [PurchaseMemoController::class, 'destroy'])->middleware('operation.access:purchase_memo,delete');
+                    Route::get('export_from_page',[PurchaseMemoController::class, 'exportFromTransactionPage']);
                 });
 
                 Route::prefix('fund_request')->middleware(['operation.access:fund_request,view','lockacc'])->group(function () {
@@ -2265,6 +2279,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('update_document_status',[FundRequestController::class, 'updateDocumentStatus'])->middleware('operation.access:fund_request,update');
                     Route::post('void_status', [FundRequestController::class, 'voidStatus'])->middleware('operation.access:fund_request,void');
                     Route::get('approval/{id}',[FundRequestController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('export_from_page',[FundRequestController::class, 'exportFromTransactionPage']);
                 });
 
                 Route::prefix('finance_report')->middleware('direct.access')->group(function () {
@@ -2307,6 +2322,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('void_status', [PaymentRequestController::class, 'voidStatus'])->middleware('operation.access:payment_request,void');
                     Route::get('approval/{id}',[PaymentRequestController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('destroy', [PaymentRequestController::class, 'destroy'])->middleware('operation.access:payment_request,delete');
+                    Route::get('export_from_page',[PaymentRequestController::class, 'exportFromTransactionPage']);
                 });
 
                 Route::prefix('outgoing_payment')->middleware(['operation.access:outgoing_payment,view','lockacc'])->group(function () {
@@ -2327,6 +2343,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('void_status', [OutgoingPaymentController::class, 'voidStatus'])->middleware('operation.access:outgoing_payment,void');
                     Route::get('approval/{id}',[OutgoingPaymentController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('destroy', [OutgoingPaymentController::class, 'destroy'])->middleware('operation.access:outgoing_payment,delete');
+                    Route::get('export_from_page',[OutgoingPaymentController::class, 'exportFromTransactionPage']);
                 });
 
                 Route::prefix('incoming_payment')->middleware(['operation.access:incoming_payment,view','lockacc'])->group(function () {
@@ -2349,6 +2366,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('void_status', [IncomingPaymentController::class, 'voidStatus'])->middleware('operation.access:incoming_payment,void');
                     Route::get('approval/{id}',[IncomingPaymentController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('destroy', [IncomingPaymentController::class, 'destroy'])->middleware('operation.access:incoming_payment,delete');
+                    Route::get('export_from_page',[IncomingPaymentController::class, 'exportFromTransactionPage']);
                 });
 
                 Route::prefix('close_bill')->middleware(['operation.access:close_bill,view','lockacc'])->group(function () {
@@ -2371,6 +2389,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[CloseBillController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('destroy', [CloseBillController::class, 'destroy'])->middleware('operation.access:close_bill,delete');
                     Route::post('get_account_data', [CloseBillController::class, 'getAccountData']);
+                    Route::get('export_from_page',[CloseBillController::class, 'exportFromTransactionPage']);
                 });
 
             });
@@ -2394,6 +2413,7 @@ Route::prefix('admin')->group(function () {
                         Route::get('approval/{id}',[CapitalizationController::class, 'approval'])->withoutMiddleware('direct.access');
                         Route::post('void_status', [CapitalizationController::class, 'voidStatus'])->middleware('operation.access:capitalization,void');
                         Route::post('destroy', [CapitalizationController::class, 'destroy'])->middleware('operation.access:capitalization,delete');
+                        Route::get('export_from_page',[CapitalizationController::class, 'exportFromTransactionPage']);
                     });
 
                     Route::prefix('retirement')->middleware(['operation.access:retirement,view','lockacc'])->group(function () {
@@ -2412,6 +2432,7 @@ Route::prefix('admin')->group(function () {
                         Route::get('approval/{id}',[RetirementController::class, 'approval'])->withoutMiddleware('direct.access');
                         Route::post('void_status', [RetirementController::class, 'voidStatus'])->middleware('operation.access:retirement,void');
                         Route::post('destroy', [RetirementController::class, 'destroy'])->middleware('operation.access:retirement,delete');
+                        Route::get('export_from_page',[RetirementController::class, 'exportFromTransactionPage']);
                     });
 
                     Route::prefix('depreciation')->middleware(['operation.access:depreciation,view','lockacc'])->group(function () {
@@ -2431,6 +2452,7 @@ Route::prefix('admin')->group(function () {
                         Route::get('approval/{id}',[DepreciationController::class, 'approval'])->withoutMiddleware('direct.access');
                         Route::post('void_status', [DepreciationController::class, 'voidStatus'])->middleware('operation.access:depreciation,void');
                         Route::post('destroy', [DepreciationController::class, 'destroy'])->middleware('operation.access:depreciation,delete');
+                        Route::get('export_from_page',[DepreciationController::class, 'exportFromTransactionPage']);
                     });
                 });
 
@@ -2462,6 +2484,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[JournalController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [JournalController::class, 'voidStatus'])->middleware('operation.access:journal,void');
                     Route::post('destroy', [JournalController::class, 'destroy'])->middleware('operation.access:journal,delete');
+                    Route::get('export_from_page',[JournalController::class, 'exportFromTransactionPage']);
                 });
 
                 Route::prefix('closing_journal')->middleware(['operation.access:closing_journal,view','lockacc'])->group(function () {

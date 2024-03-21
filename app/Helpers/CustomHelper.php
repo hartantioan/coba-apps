@@ -1571,9 +1571,6 @@ class CustomHelper {
 					if($row->lookable_type == 'fund_requests'){
 						$mustpay = $row->nominal;
 						$balanceReal = $row->nominal * $op->currency_rate;
-						if($row->lookable->type == '1' && $row->lookable->document_status == '3'){
-							CustomHelper::addCountLimitCredit($row->lookable->account_id,$balanceReal);
-						}
 					}
 				}
 

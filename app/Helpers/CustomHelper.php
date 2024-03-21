@@ -700,6 +700,9 @@ class CustomHelper {
 				self::sendJournal($table_name,$table_id,null);
 			}
 		}
+
+		#delete approvalsource yang tidak punya matrix
+		ApprovalSource::whereDoesntHave('approvalMatrix')->forceDelete();
 	}
 
 	public static function sendNotification($table_name = null, $table_id = null, $title = null, $note = null, $to = null){

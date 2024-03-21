@@ -1093,6 +1093,29 @@ class FundRequestController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
+
+            $bp = User::find($request->account_id);
+            $passedLimit = true;
+            $balance = 0;
+            if($bp){
+                if($request->type == '1' && $bp->type == '1'){
+                    if($request->temp){
+                        $cek = FundRequest::where('code',CustomHelper::decrypt($request->temp))->first();
+                        $balance = $bp->limit_credit - $bp->count_limit_credit + $cek->grandtotal;
+                    }else{
+                        $balance = $bp->limit_credit - $bp->count_limit_credit;
+                    }
+                    if(str_replace(',','.',str_replace('.','',$request->grandtotal)) > $balance){
+                        $passedLimit = false;
+                    }
+                }
+            }
+            if(!$passedLimit){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Mohon maaf saldo limit BS & Pinjaman anda adalah '.number_format($balance,2,',','.'),
+                ]);
+            }
                     
 			if($request->temp){
                 /* DB::beginTransaction();
@@ -1458,8 +1481,8 @@ class FundRequestController extends Controller
     public function userShow(Request $request){
         $fr = FundRequest::where('code',CustomHelper::decrypt($request->id))->first();
         $fr['code_place_id'] = substr($fr->code,7,2);
-        $fr['limit_credit'] = number_format(floatval($fr->account->limit_credit - $fr->account->count_limit_credit),2,',','.');
-        $fr['limit_credit_raw'] = floatval($fr->account->limit_credit - $fr->account->count_limit_credit);
+        $fr['limit_credit'] = number_format(floatval($fr->account->limit_credit - $fr->account->count_limit_credit + $fr->grandtotal),2,',','.');
+        $fr['limit_credit_raw'] = floatval($fr->account->limit_credit - $fr->account->count_limit_credit + $fr->grandtotal);
         $fr['account_name'] = $fr->account->name;
         $fr['currency_rate'] = number_format($fr->currency_rate,2,',','.');
         $fr['total'] = number_format($fr->total,2,',','.');

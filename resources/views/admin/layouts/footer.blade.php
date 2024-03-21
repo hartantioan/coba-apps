@@ -33,7 +33,7 @@
                 cekNotif('{{ URL::to('/') }}');
                 setInterval(function () {
                     cekNotif('{{ URL::to('/') }}');
-                },50000);
+                },25000);
                 $('.tooltipped').tooltip();
                 /* checkPageMaintenance('{{ URL::to('/') }}'); */
             });

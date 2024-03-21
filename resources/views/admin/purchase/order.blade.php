@@ -2301,12 +2301,12 @@
                             beforeSend: function() {
                                 $('#validation_alert').hide();
                                 $('#validation_alert').html('');
-                                loadingOpen('.modal-content');
+                                loadingOpen('#modal1');
                             },
                             success: function(response) {
                                 $('input').css('border', 'none');
                                 $('input').css('border-bottom', '0.5px solid black');
-                                loadingClose('.modal-content');
+                                loadingClose('#modal1');
                                 if(response.status == 200) {
                                     success();
                                     M.toast({
@@ -2349,7 +2349,7 @@
                             },
                             error: function() {
                                 $('.modal-content').scrollTop(0);
-                                loadingClose('.modal-content');
+                                loadingClose('#modal1');
                                 swal({
                                     title: 'Ups!',
                                     text: 'Check your internet connection.',

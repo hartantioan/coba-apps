@@ -241,7 +241,6 @@ class FundRequestController extends Controller
                     number_format($val->tax,2,',','.'),
                     number_format($val->wtax,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
-                    number_format($totalReceivable,2,',','.'),
                     number_format($totalReceivableUsed,2,',','.'),
                     number_format($totalReceivableBalance,2,',','.'),
                     number_format($val->totalPaymentRequest(),2,',','.'),
@@ -261,6 +260,7 @@ class FundRequestController extends Controller
                         <input style="width:250px;" type="text" data-id="'.CustomHelper::encrypt($val->code).'" value="'.$val->additional_note_pic.'" onkeyup="updateAdditionalNote(this,`2`);">
                     ',
                     $val->status(),
+                    $val->balanceStatus(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light orange accent-2 white-text" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
@@ -978,7 +978,6 @@ class FundRequestController extends Controller
                     number_format($val->tax,2,',','.'),
                     number_format($val->wtax,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
-                    number_format($totalReceivable,2,',','.'),
                     number_format($totalReceivableUsed,2,',','.'),
                     number_format($totalReceivableBalance,2,',','.'),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
@@ -986,6 +985,7 @@ class FundRequestController extends Controller
                     $val->additional_note,
                     $val->additional_note_pic,
                     $val->status(),
+                    $val->balanceStatus(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>

@@ -790,6 +790,16 @@ class CloseBillController extends Controller
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
+
+                foreach($query->closeBillDetail as $row){
+                    foreach($row->outgoingPayment->paymentRequest->paymentRequestDetail as $rowdetail){
+                        if($rowdetail->lookable_type == 'fund_requests'){
+                            $rowdetail->lookable->update([
+                                'balance_status'	=> NULL
+                            ]);
+                        }
+                    }
+                }
     
                 activity()
                     ->performedOn(new CloseBill())

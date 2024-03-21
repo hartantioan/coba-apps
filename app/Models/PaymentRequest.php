@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CustomHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -257,5 +258,21 @@ class PaymentRequest extends Model
     public function printCounter()
     {
         return $this->hasMany('App\Models\PrintCounter','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
+    public function updateStatusProcess(){
+        foreach($this->paymentRequestDetail as $row){
+            if(in_array($row->lookable_type,['purchase_invoices','purchase_down_payments','fund_requests'])){
+                CustomHelper::updateStatus($row->lookable_type,$row->lookable_id,'2');
+            }
+        }
+    }
+
+    public function updateStatusSchedule(){
+        foreach($this->paymentRequestDetail as $row){
+            if(in_array($row->lookable_type,['purchase_invoices','purchase_down_payments','fund_requests'])){
+                CustomHelper::updateStatus($row->lookable_type,$row->lookable_id,'7');
+            }
+        }
     }
 }

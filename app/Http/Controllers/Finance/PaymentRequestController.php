@@ -1100,6 +1100,10 @@ class PaymentRequestController extends Controller
                                 'note'                          => $request->arr_note[$key],
                             ]);
 
+                            if(in_array($row,['purchase_invoices','purchase_down_payments','fund_requests'])){
+                                CustomHelper::updateStatus($row,$request->arr_id[$key],'7');
+                            }
+
                             if($row == 'fund_requests'){
                                 if($prd->lookable->document_status == '3'){
                                     $prd->lookable->addLimitCreditEmployee($prd->nominal);
@@ -1116,6 +1120,18 @@ class PaymentRequestController extends Controller
                                 'lookable_id'                   => intval($row),
                                 'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_payment[$key])),
                             ]);
+                            if($prc->lookable_type == 'outgoing_payments'){
+                                $op = $prc->lookable;
+                                if($op->balancePaymentCross() <= 0){
+                                    foreach($op->paymentRequest->paymentRequestDetail as $rowdetail){
+                                        if($rowdetail->lookable_type == 'fund_requests'){
+                                            $rowdetail->lookable->update([
+                                                'balance_status'	=> '1'
+                                            ]);
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
 
@@ -1465,9 +1481,7 @@ class PaymentRequestController extends Controller
                 ];
             }else{
 
-                if($query->journal()->exists()){
-                    CustomHelper::removeJournal($query->getTable(),$query->id);
-                }
+                $status = $query->status;
 
                 $query->update([
                     'status'    => '5',
@@ -1476,17 +1490,38 @@ class PaymentRequestController extends Controller
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
 
-                if(in_array($query->status,['2','3'])){
+                if($query->journal()->exists()){
+                    CustomHelper::removeJournal($query->getTable(),$query->id);
+                }
+
+                if(in_array($status,['2','3'])){
+    
+                    $query->updateStatusProcess();
+
+                    foreach($query->paymentRequestCross as $row){
+                        if($row->lookable_type == 'outgoing_payments'){
+                            $op = $row->lookable;
+                            foreach($op->paymentRequest->paymentRequestDetail as $rowdetail){
+                                if($rowdetail->lookable_type == 'fund_requests'){
+                                    $rowdetail->lookable->update([
+                                        'balance_status'	=> NULL
+                                    ]);
+                                }
+                            }
+                        }
+                        $row->addLimitCreditEmployee();
+                    }
+
                     foreach($query->paymentRequestDetail as $row){
                         if($row->lookable_type == 'fund_requests'){
                             if($row->lookable->type == '1' && $row->lookable->document_status == '3'){
                                 $row->lookable->removeLimitCreditEmployee($row->nominal);
                             }
                         }
-                    }
-    
-                    foreach($query->paymentRequestCross as $row){
-                        $row->addLimitCreditEmployee();
+
+                        if(in_array($row->lookable_type,['purchase_invoices','purchase_down_payments','fund_requests'])){
+                            CustomHelper::updateStatus($row->lookable_type,$row->lookable_id,'2');
+                        }
                     }
                 }
     
@@ -1561,10 +1596,25 @@ class PaymentRequestController extends Controller
                         $row->lookable->removeLimitCreditEmployee($row->nominal);
                     }
                 }
+                if(in_array($row->lookable_type,['purchase_invoices','purchase_down_payments','fund_requests'])){
+                    CustomHelper::updateStatus($row->lookable_type,$row->lookable_id,'2');
+                }
                 $row->delete();
             }
             
             foreach($query->paymentRequestCross as $row){
+                if($row->lookable_type == 'outgoing_payments'){
+                    $op = $row->lookable;
+                    if($op->balancePaymentCross() <= 0){
+                        foreach($op->paymentRequest->paymentRequestDetail as $rowdetail){
+                            if($rowdetail->lookable_type == 'fund_requests'){
+                                $rowdetail->lookable->update([
+                                    'balance_status'	=> NULL
+                                ]);
+                            }
+                        }
+                    }
+                }
                 $row->addLimitCreditEmployee();
                 $row->delete();
             }

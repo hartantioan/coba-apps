@@ -95,7 +95,7 @@ class OutgoingPayment extends Model
 
     public function paymentRequestCross(){
         return $this->hasMany('App\Models\PaymentRequestCross','lookable_id','id')->where('lookable_type',$this->table)->whereHas('paymentRequest',function($query){
-            $query->whereIn('status',['2','3']);
+            $query->whereIn('status',['1','2','3']);
         });
     }
 
@@ -107,7 +107,7 @@ class OutgoingPayment extends Model
 
     public function incomingPaymentDetail(){
         return $this->hasMany('App\Models\IncomingPaymentDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('incomingPayment',function($query){
-            $query->whereIn('status',['2','3']);
+            $query->whereIn('status',['1','2','3']);
         });
     }
 

@@ -105,6 +105,7 @@
                                                     <select class="form-control" id="filter_status" onchange="loadDataTable()" multiple>
                                                         <option value="1">Menunggu</option>
                                                         <option value="2">Dalam Proses</option>
+                                                        <option value="7">Schedule</option>
                                                         <option value="3">Selesai</option>
                                                         <option value="4">Ditolak</option>
                                                         <option value="5">Ditutup</option>
@@ -2415,8 +2416,6 @@
                                                     </td>
                                                 </tr>
                                             `);
-                                            $('#currency_rate').val(val.currency_rate);
-                                            $('#currency_id').val(val.currency_id).formSelect();
                                         });                        
                                     }else{
                                         $('#body-detail-dp').empty().append(`

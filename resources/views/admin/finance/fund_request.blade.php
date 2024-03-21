@@ -64,6 +64,7 @@
                                                     <select class="form-control" id="filter_status" onchange="loadDataTable()" multiple>
                                                         <option value="1">Menunggu</option>
                                                         <option value="2">Dalam Proses</option>
+                                                        <option value="7">Schedule</option>
                                                         <option value="3">Selesai</option>
                                                         <option value="4">Ditolak</option>
                                                         <option value="5">Ditutup</option>
@@ -143,7 +144,6 @@
                                                         <th rowspan="2">PPN</th>
                                                         <th rowspan="2">PPh</th>
                                                         <th rowspan="2">Grandtotal</th>
-                                                        <th rowspan="2">Diterima</th>
                                                         <th rowspan="2">Dipakai</th>
                                                         <th rowspan="2">Sisa</th>
                                                         <th rowspan="2">Total PYR</th>
@@ -153,6 +153,7 @@
                                                         <th rowspan="2">Note</th>
                                                         <th rowspan="2">PIC</th>
                                                         <th rowspan="2">Status</th>
+                                                        <th rowspan="2">Status Dokumen</th>
                                                         <th rowspan="2">Action</th>
                                                     </tr>
                                                     <tr>
@@ -525,7 +526,6 @@
                 { name: 'tax', className: 'right-align' },
                 { name: 'wtax', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
-                { name: 'received', searchable: false, orderable: false, className: 'right-align' },
                 { name: 'used', searchable: false, orderable: false, className: 'right-align' },
                 { name: 'balance', searchable: false, orderable: false, className: 'right-align' },
                 { name: 'total_pyr', searchable: false, orderable: false, className: 'right-align' },
@@ -535,6 +535,7 @@
                 { name: 'additional_note', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'additional_note_pic', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'balance_status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',

@@ -1574,6 +1574,10 @@ class CustomHelper {
 					}
 				}
 
+				if(in_array($row->lookable_type,['purchase_invoices','purchase_down_payments','fund_requests'])){
+					CustomHelper::updateStatus($row->lookable_type,$row->lookable_id,'3');
+				}
+
 				$totalMustPay += $mustpay;
 				$totalReal += $balanceReal;
 			}
@@ -1676,7 +1680,7 @@ class CustomHelper {
 				}
 			}
 
-			if($op->rounding && $op->currency_rate == 1){
+			if($op->rounding > 0 || $op->rounding < 0){
 				$coarounding = Coa::where('code','700.01.01.01.05')->where('company_id',$op->company_id)->first();
 				#start journal rounding
 				if($op->rounding > 0 || $op->rounding < 0){
@@ -1689,8 +1693,6 @@ class CustomHelper {
 						'nominal_fc'	=> $op->currency->type == '1' ? floatval(abs($op->rounding * $op->currency_rate)) : floatval(abs($op->rounding)),
 					]);
 				}
-			}elseif($op->rounding > 0 && $op->currency_rate > 1){
-				
 			}
 
 			#perbaiki disini
@@ -1702,8 +1704,6 @@ class CustomHelper {
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $coaselisihkurs->id,
 						'account_id'	=> $coaselisihkurs->bp_journal ? $op->account_id : NULL,
-						'place_id'		=> $row->lookable_type == 'fund_requests' ? $row->lookable->place_id : NULL,
-						'department_id'	=> $row->lookable_type == 'fund_requests' ? $row->lookable->department_id : NULL,
 						'type'			=> $balanceKurs < 0  ? '1' : '2',
 						'nominal'		=> floatval(abs($balanceKurs)),
 						'nominal_fc'	=> 0,
@@ -3023,6 +3023,15 @@ class CustomHelper {
 					'note'			=> $row->note,
 				]);
 				CustomHelper::removeCountLimitCredit($row->outgoingPayment->account_id,floatval($row->nominal * $cb->currency_rate));
+				if($row->outgoingPayment->balancePaymentCross() <= 0){
+					foreach($row->outgoingPayment->paymentRequest->paymentRequestDetail as $rowdetail){
+						if($rowdetail->lookable_type == 'fund_requests'){
+							$rowdetail->lookable->update([
+								'balance_status'	=> '1'
+							]);
+						}
+					}
+				}
 			}
 
 			foreach($cb->closeBillCost as $row){
@@ -3443,11 +3452,14 @@ class CustomHelper {
 			$coahutangbelumditagih = Coa::where('code','200.01.03.01.02')->where('company_id',$pi->company_id)->first();
 			$coahutangusaha = Coa::where('code','200.01.03.01.01')->where('company_id',$pi->company_id)->first();
 			$coarounding = Coa::where('code','700.01.01.01.05')->where('company_id',$pi->company_id)->first();
+			$coaselisihkurs = Coa::where('code','700.01.01.01.03')->where('company_id',$pi->company_id)->first();
 
 			$grandtotal = 0;
 			$tax = 0;
 			$wtax = 0;
 			$currency_rate = 1;
+			$realInvoice = 0;
+			$realDownPayment = 0;
 
 			$arrNote = [];
 
@@ -3773,7 +3785,6 @@ class CustomHelper {
 			#start journal down payment
 
 			if($pi->downpayment > 0){
-				$downpayment = 0;
 				foreach($pi->purchaseInvoiceDp as $row){
 					/* $downpayment += $row->nominal * $row->purchaseDownPayment->currency_rate; */
 					JournalDetail::create([
@@ -3781,8 +3792,8 @@ class CustomHelper {
 						'coa_id'		=> $coahutangusaha->id,
 						'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
 						'type'			=> '1',
-						'nominal'		=> $row->nominal * $pi->currency_rate,
-						'nominal_fc'	=> $pi->currency->type == '1' || $pi->currency->type == '' ? $row->nominal * $pi->currency_rate : $row->nominal,
+						'nominal'		=> $row->nominal * $row->purchaseDownPayment->currency_rate,
+						'nominal_fc'	=> $row->purchaseDownPayment->currency->type == '1' || $row->purchaseDownPayment->currency->type == '' ? $row->nominal * $row->purchaseDownPayment->currency_rate : $row->nominal,
 					]);
 	
 					JournalDetail::create([
@@ -3790,8 +3801,31 @@ class CustomHelper {
 						'coa_id'		=> $coauangmukapembelian->id,
 						'account_id'	=> $coauangmukapembelian->bp_journal ? $account_id : NULL,
 						'type'			=> '2',
-						'nominal'		=> $row->nominal * $pi->currency_rate,
-						'nominal_fc'	=> $pi->currency->type == '1' || $pi->currency->type == '' ? $row->nominal * $pi->currency_rate : $row->nominal,
+						'nominal'		=> $row->nominal * $row->purchaseDownPayment->currency_rate,
+						'nominal_fc'	=> $row->purchaseDownPayment->currency->type == '1' || $row->purchaseDownPayment->currency->type == '' ? $row->nominal * $row->purchaseDownPayment->currency_rate : $row->nominal,
+					]);
+					$realDownPayment += $row->nominal * $row->purchaseDownPayment->currency_rate;
+					$realInvoice += $row->nominal * $pi->currency_rate;
+				}
+
+				$balanceKurs = $realDownPayment - $realInvoice;
+
+				if($balanceKurs > 0 || $balanceKurs < 0){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coaselisihkurs->id,
+						'account_id'	=> $coaselisihkurs->bp_journal ? $pi->account_id : NULL,
+						'type'			=> $balanceKurs > 0  ? '1' : '2',
+						'nominal'		=> floatval(abs($balanceKurs)),
+						'nominal_fc'	=> 0,
+					]);
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coahutangusaha->id,
+						'account_id'	=> $coaselisihkurs->bp_journal ? $pi->account_id : NULL,
+						'type'			=> $balanceKurs > 0  ? '2' : '1',
+						'nominal'		=> floatval(abs($balanceKurs)),
+						'nominal_fc'	=> 0,
 					]);
 				}
 			}
@@ -4534,6 +4568,12 @@ class CustomHelper {
 			'user_id'		=> session('bo_id'),
 			'lookable_type'	=> $table_name,
 			'lookable_id'	=> $table_id
+		]);
+	}
+
+	public static function updateStatus($table_name = null, $table_id = null,$status = null){
+		DB::table($table_name)->where('id',$table_id)->update([
+			'status'	=> $status,
 		]);
 	}
 }

@@ -703,6 +703,8 @@ class OutgoingPaymentController extends Controller
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
+
+                $query->paymentRequest->updateStatusSchedule();
     
                 activity()
                     ->performedOn(new OutgoingPayment())

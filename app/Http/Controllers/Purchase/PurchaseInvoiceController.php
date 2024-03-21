@@ -421,8 +421,6 @@ class PurchaseInvoiceController extends Controller
                         'total'         => number_format($datadp->total,2,',','.'),
                         'grandtotal'    => number_format($datadp->grandtotal,2,',','.'),
                         'balance'       => number_format($datadp->balanceInvoice(),2,',','.'),
-                        'currency_rate' => number_format($datadp->currency_rate,2,',','.'),
-                        'currency_id'   => $datadp->currency_id,
                     ];
                 }
             }elseif($row == 'purchase_orders'){
@@ -1255,11 +1253,17 @@ class PurchaseInvoiceController extends Controller
 
                     if($request->arr_dp_code){
                         foreach($request->arr_dp_code as $key => $row){
+                            $apdp = PurchaseDownPayment::where('code',CustomHelper::decrypt($row))->first();
                             PurchaseInvoiceDp::create([
                                 'purchase_invoice_id'       => $query->id,
-                                'purchase_down_payment_id'  => PurchaseDownPayment::where('code',CustomHelper::decrypt($row))->first()->id,
+                                'purchase_down_payment_id'  => $apdp->id,
                                 'nominal'                   => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
                             ]);
+                            if($apdp->balanceInvoice() <= 0){
+                                $apdp->update([
+                                    'balance_status'	=> '1',
+                                ]);
+                            }
                         }
                     }
                 
@@ -1738,6 +1742,16 @@ class PurchaseInvoiceController extends Controller
 
                 $query->updateRootDocumentStatusProcess();
 
+                if($query->downpayment > 0){
+                    foreach($query->purchaseInvoiceDp as $row){
+                        if($row->purchaseDownPayment->balanceInvoice() > 0){
+                            $row->purchaseDownPayment->update([
+                                'balance_status'	=> NULL,
+                            ]);
+                        }
+                    }
+                }
+
                 activity()
                     ->performedOn(new PurchaseInvoice())
                     ->causedBy(session('bo_id'))
@@ -1804,6 +1818,16 @@ class PurchaseInvoiceController extends Controller
                 'delete_id'     => session('bo_id'),
                 'delete_note'   => $request->msg,
             ]);
+
+            if($query->downpayment > 0){
+                foreach($query->purchaseInvoiceDp as $row){
+                    if($row->purchaseDownPayment->balanceInvoice() > 0){
+                        $row->purchaseDownPayment->update([
+                            'balance_status'	=> NULL,
+                        ]);
+                    }
+                }
+            }
 
             CustomHelper::removeApproval('purchase_requests',$query->id);
             CustomHelper::addDeposit($query->account_id,$query->downpayment);

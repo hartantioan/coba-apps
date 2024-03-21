@@ -30,6 +30,7 @@ class PurchaseDownPayment extends Model
         'post_date',
         'due_date',
         'status',
+        'balance_status',
         'type',
         'currency_id',
         'currency_rate',
@@ -48,6 +49,15 @@ class PurchaseDownPayment extends Model
         'delete_id',
         'delete_note',
     ];
+
+    public function balanceStatus(){
+        $balance_status = match ($this->balance_status) {
+            '1' => 'Selesai',
+            default => 'Pending',
+        };
+
+        return $balance_status;
+    }
 
     public function hasPaymentRequestDetail(){
         return $this->hasMany('App\Models\PaymentRequestDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('paymentRequest',function($query){
@@ -183,7 +193,7 @@ class PurchaseDownPayment extends Model
     public function purchaseInvoiceDp()
     {
         return $this->hasMany('App\Models\PurchaseInvoiceDp')->whereHas('purchaseInvoice',function($query){
-            $query->whereIn('status',['2','3']);
+            $query->whereIn('status',['1','2','3']);
         });
     }
 
@@ -192,6 +202,16 @@ class PurchaseDownPayment extends Model
 
         foreach($this->purchaseInvoiceDp as $row){
             $total -= $row->nominal;
+        }
+
+        return $total;
+    }
+
+    public function totalInvoice(){
+        $total = 0;
+
+        foreach($this->purchaseInvoiceDp as $row){
+            $total += $row->nominal;
         }
 
         return $total;
@@ -282,13 +302,14 @@ class PurchaseDownPayment extends Model
 
     public function status(){
         $status = match ($this->status) {
-          '1' => '<span class="amber medium-small white-text padding-3">Menunggu</span>',
-          '2' => '<span class="cyan medium-small white-text padding-3">Proses</span>',
-          '3' => '<span class="green medium-small white-text padding-3">Selesai</span>',
-          '4' => '<span class="red medium-small white-text padding-3">Ditolak</span>',
-          '5' => '<span class="red darken-4 medium-small white-text padding-3">Ditutup</span>',
-          '6' => '<span class="yellow darken-4 medium-small white-text padding-3">Revisi</span>',
-          default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
+            '1' => '<span class="amber medium-small white-text padding-3">Menunggu</span>',
+            '2' => '<span class="cyan medium-small white-text padding-3">Proses</span>',
+            '3' => '<span class="green medium-small white-text padding-3">Selesai</span>',
+            '4' => '<span class="red medium-small white-text padding-3">Ditolak</span>',
+            '5' => '<span class="red darken-4 medium-small white-text padding-3">Ditutup</span>',
+            '6' => '<span class="yellow darken-4 medium-small white-text padding-3">Revisi</span>',
+            '7' => '<span class="blue darken-4 medium-small white-text padding-3">Schedule</span>',
+            default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
         };
 
         return $status;
@@ -302,6 +323,7 @@ class PurchaseDownPayment extends Model
             '4' => 'Ditolak',
             '5' => 'Ditutup',
             '6' => 'Direvisi',
+            '7' => 'Schedule',
             default => 'Invalid',
         };
 

@@ -50,6 +50,7 @@ class FundRequest extends Model
         'additional_note',
         'additional_note_pic',
         'status',
+        'balance_status',
         'void_id',
         'void_note',
         'void_date',
@@ -109,6 +110,15 @@ class FundRequest extends Model
         };
 
         return $reimburse;
+    }
+
+    public function balanceStatus(){
+        $balance_status = match ($this->balance_status) {
+            '1' => 'Selesai',
+            default => 'Pending',
+        };
+
+        return $balance_status;
     }
 
     public function user()
@@ -407,6 +417,7 @@ class FundRequest extends Model
           '4' => '<span class="red medium-small white-text padding-3">Ditolak</span>',
           '5' => '<span class="red darken-4 medium-small white-text padding-3">Ditutup</span>',
           '6' => '<span class="yellow darken-4 medium-small white-text padding-3">Revisi</span>',
+          '7' => '<span class="blue darken-4 medium-small white-text padding-3">Schedule</span>',
           default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
         };
 
@@ -421,6 +432,7 @@ class FundRequest extends Model
             '4' => 'Ditolak',
             '5' => 'Ditutup',
             '6' => 'Direvisi',
+            '7' => 'Schedule',
             default => 'Invalid',
         };
 

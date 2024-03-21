@@ -32,9 +32,11 @@ class ExportGoodIssueTransactionPage implements FromView,ShouldAutoSize
                             ->orWhere('driver', 'like', "%$this->search%")
                             ->orWhere('note', 'like', "%$this->search%")
                             ->orWhereHas('goodIssueDetail',function($query) {
-                                $query->whereHas('item',function($query){
-                                    $query->where('code', 'like', "%$this->search%")
-                                        ->orWhere('name','like',"%$this->search%");
+                                $query->whereHas('itemStock',function($query){
+                                    $query->whereHas('item',function($query){
+                                        $query->where('code', 'like', "%$this->search%")
+                                            ->orWhere('name','like',"%$this->search%");
+                                    });
                                 });
                             })
                             ->orWhereHas('user',function($query){

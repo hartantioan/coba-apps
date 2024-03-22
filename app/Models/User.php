@@ -183,7 +183,7 @@ class User extends Authenticatable
             if($kind){
                 if($kind == '1'){
                     $prefix = '3'.date('y');
-                    $query = User::selectRaw('RIGHT(employee_no, 3) as code')
+                    $query = User::withTrashed()->selectRaw('RIGHT(employee_no, 3) as code')
                         ->whereRaw("employee_no LIKE '$prefix%'")
                         ->withTrashed()
                         ->orderByDesc('employee_no')
@@ -191,7 +191,7 @@ class User extends Authenticatable
                         ->get();
                 }elseif($kind == '2'){
                     $prefix = '3'.'.'.$place_id.'-'.date('y').date('m');
-                    $query = User::selectRaw('RIGHT(employee_no, 8) as code')
+                    $query = User::withTrashed()->selectRaw('RIGHT(employee_no, 8) as code')
                         ->whereRaw("employee_no LIKE '$prefix%'")
                         ->withTrashed()
                         ->orderByDesc('employee_no')
@@ -218,7 +218,7 @@ class User extends Authenticatable
                 $prefix = 'E';
             }
     
-            $query = User::selectRaw('type, RIGHT(employee_no, 6) as code')
+            $query = User::withTrashed()->selectRaw('type, RIGHT(employee_no, 6) as code')
                 ->where('type',$type)
                 ->orderByDesc('employee_no')
                 ->limit(1)

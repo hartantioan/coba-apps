@@ -589,8 +589,8 @@ class UserController extends Controller
             }
 
 			if($request->temp){
-                DB::beginTransaction();
-                try {
+                /* DB::beginTransaction();
+                try { */
                     $query = User::find($request->temp);
                     $query->name            = $request->name;
                     $query->username        = $request->username ? $request->username : NULL;
@@ -630,13 +630,13 @@ class UserController extends Controller
                     $query->is_special_lock_user = $request->is_special_lock_user ?? NULL;
                     $query->save();
 
-                    DB::commit();
+                    /* DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
-                }
+                } */
 			}else{
-                DB::beginTransaction();
-                try {
+                /* DB::beginTransaction();
+                try { */
                     $query = User::create([
                         'name'			        => $request->name,
                         'employee_no'           => $request->employee_no ? $request->employee_no : User::generateCode($request->type,$request->employee_type,$request->place_id),
@@ -689,10 +689,10 @@ class UserController extends Controller
                         }
                     }
                     
-                    DB::commit();
+                    /* DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
-                }
+                } */
 			}
 			
 			if($query) {

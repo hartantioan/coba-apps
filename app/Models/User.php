@@ -200,7 +200,7 @@ class User extends Authenticatable
                 }
 
                 if($query->count() > 0) {
-                    $code = (int)$query[0]->code + 1;
+                    $code = intval($query[0]->code) + 1;
                 } else {
                     $code = '001';
                 }

@@ -19,6 +19,7 @@ class GoodIssueRequestDetail extends Model
         'item_id',
         'qty',
         'stock',
+        'outstanding',
         'item_unit_id',
         'qty_conversion',
         'note',

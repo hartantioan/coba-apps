@@ -242,6 +242,16 @@ class Item extends Model
         return $arrData;
     }
 
+    public function getOutstandingIssueRequest(){
+        $qty = 0;
+        foreach($this->goodIssueRequestDetail()->whereHas('goodIssueRequest',function($query){
+            $query->where('status','2');
+        })->get() as $row){
+            $qty += $row->balanceGi();
+        }
+        return $qty;
+    }
+
     public function currentStockPurchase($dataplaces,$datawarehouses){
         $arrData = [];
 
@@ -407,6 +417,13 @@ class Item extends Model
     {
         return $this->hasMany('App\Models\OutletPriceDetail','item_id','id')->whereHas('outletPrice',function($query){
             $query->where('status','1');
+        });
+    }
+
+    public function goodIssueRequestDetail()
+    {
+        return $this->hasMany('App\Models\GoodIssueRequestDetail','item_id','id')->whereHas('goodIssueRequest',function($query){
+            $query->whereIn('status',['1','2','3']);
         });
     }
 

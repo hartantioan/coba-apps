@@ -245,6 +245,7 @@
                                 <th align="center">Item</th>
                                 <th align="center">Jum.</th>
                                 <th align="center">Stok</th>
+                                <th align="center">Outstanding</th>
                                 <th align="center">Sat.</th>
                                 <th align="center">Tgl.Dipakai</th>
                                 <th align="center">Plant</th>
@@ -262,7 +263,8 @@
                                 <td>{{ $key + 1 }}</td>
                                 <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                                 <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
-                                <td align="right">{{ CustomHelper::formatConditionalQty($row->getStockNow($row->qty_conversion)) }}</td>
+                                <td align="right">{{ CustomHelper::formatConditionalQty($row->stock) }}</td>
+                                <td align="right">{{ CustomHelper::formatConditionalQty($row->outstanding) }}</td>
                                 <td align="center">{{ $row->item->uomUnit->code }}</td>
                                 <td align="center">{{ date('d/m/Y',strtotime($row->required_date)) }}</td>
                                 <td align="center">{{ $row->place->code }}</td>
@@ -274,10 +276,10 @@
                                 <td align="">{{ $row->requester }}</td>
                             </tr>
                             <tr>
-                                <td colspan="13">Keterangan 1 : {{ $row->note }}</td>
+                                <td colspan="14">Keterangan 1 : {{ $row->note }}</td>
                             </tr>
                             <tr>
-                                <td colspan="13">Keterangan 2 : {{ $row->note2 }}</td>
+                                <td colspan="14">Keterangan 2 : {{ $row->note2 }}</td>
                             </tr>
                             @endforeach
                         </tbody>

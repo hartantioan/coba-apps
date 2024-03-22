@@ -264,13 +264,14 @@ class GoodIssueRequestController extends Controller
         $string = '<div class="row pt-1 pb-1"><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="16">Daftar Item (Stok yang tampil adalah stok realtime pada saat dokumen dibuat)</th>
+                                <th class="center-align" colspan="17">Daftar Item (Stok yang tampil adalah stok realtime pada saat dokumen dibuat)</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Item</th>
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Stok</th>
+                                <th class="center-align">Outstand Req.</th>
                                 <th class="center-align">Satuan</th>
                                 <th class="center-align">Keterangan 1</th>
                                 <th class="center-align">Keterangan 2</th>
@@ -291,7 +292,8 @@ class GoodIssueRequestController extends Controller
                 <td class="center-align">'.($key + 1).'</td>
                 <td>'.$row->item->code.' - '.$row->item->name.'</td>
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
-                <td class="right-align">'.CustomHelper::formatConditionalQty($row->getStockNow($row->qty_conversion)).'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->stock).'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->outstanding).'</td>
                 <td class="center-align">'.$row->item->uomUnit->code.'</td>
                 <td class="">'.$row->note.'</td>
                 <td class="">'.$row->note2.'</td>
@@ -517,6 +519,28 @@ class GoodIssueRequestController extends Controller
             ];
         } else {
 
+            $passedQty = true;
+            $arrItemNotPassed = [];
+
+            foreach($request->arr_item as $key => $row){
+                $item = Item::find($row);
+                if($item){
+                    $totalStock = ItemStock::where('item_id',$row)->where('place_id',$request->arr_place[$key])->where('warehouse_id',$request->arr_warehouse[$key])->sum('qty');
+                    $balance = $totalStock;
+                    if(str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) > $balance){
+                        $arrItemNotPassed[] = $item->code.' - '.$item->name;
+                        $passedQty = false;
+                    }
+                }
+            }
+
+            if(!$passedQty){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Maaf, qty stok '.implode(', ',$arrItemNotPassed).' tidak mencukupi permintan yang anda ajukan.',
+                ]);
+            }
+
 			if($request->temp){
                 DB::beginTransaction();
                 try {
@@ -591,6 +615,7 @@ class GoodIssueRequestController extends Controller
                             'item_id'               => $row,
                             'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'stock'                 => $purchaseQty,
+                            'outstanding'           => $item->getOutstandingIssueRequest(),
                             'item_unit_id'          => NULL,
                             'qty_conversion'        => 1,
                             'note'                  => $request->arr_note[$key],
@@ -649,7 +674,8 @@ class GoodIssueRequestController extends Controller
                 'item_id'           => $row->item_id,
                 'item_name'         => $row->item->code.' - '.$row->item->name,
                 'qty'               => CustomHelper::formatConditionalQty($row->qty),
-                'qty_stock'         => $row->item_id ? CustomHelper::formatConditionalQty($row->qty * $row->qty_conversion) : '-',
+                'qty_stock'         => $row->item_id ? CustomHelper::formatConditionalQty($row->stock).' '.$row->item->uomUnit->code : '-',
+                'qty_outstanding'   => $row->item_id ? CustomHelper::formatConditionalQty($row->item->getOutstandingIssueRequest()).' '.$row->item->uomUnit->code : '-',
                 'unit_stock'        => $row->item_id ? $row->item->uomUnit->code : '-',
                 'note'              => $row->note ? $row->note : '',
                 'note2'             => $row->note2 ? $row->note2 : '',

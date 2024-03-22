@@ -309,6 +309,31 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function inventoryItem(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Item::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%");
+                })->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			            => $d->id,
+                'text' 			            => $d->code.' - '.$d->name,
+                'code'                      => $d->code,
+                'name'                      => $d->name,
+                'uom'                       => $d->uomUnit->code,
+                'stock_list'                => $d->currentStock($this->dataplaces,$this->datawarehouses),
+                'list_warehouse'            => $d->warehouseList(),
+                'outstanding_issue_request' => CustomHelper::formatConditionalQty($d->getOutstandingIssueRequest()).' '.$d->uomUnit->code,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function itemReceive(Request $request)
     {
         $response = [];
@@ -3387,7 +3412,7 @@ class Select2Controller extends Controller {
         })
         ->whereDoesntHave('used')
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
-        ->whereIn('status',['2','3'])
+        ->whereIn('status',['2'])
         ->get();
 
         foreach($data as $d) {

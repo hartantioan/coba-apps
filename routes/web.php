@@ -254,6 +254,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('item_issue', [Select2Controller::class, 'itemIssue']);
                 Route::get('item_revaluation', [Select2Controller::class, 'itemRevaluation']);
                 Route::get('purchase_item', [Select2Controller::class, 'purchaseItem']);
+                Route::get('inventory_item', [Select2Controller::class, 'inventoryItem']);
                 Route::get('sales_item', [Select2Controller::class, 'salesItem']);
                 Route::get('coa', [Select2Controller::class, 'coa']);
                 Route::get('inventory_coa_issue', [Select2Controller::class, 'inventoryCoaIssue']);
@@ -415,6 +416,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('finish',[FundRequestController::class, 'userFinish']);
                     Route::post('get_account_info', [FundRequestController::class, 'getAccountInfo']);
                     Route::post('destroy', [FundRequestController::class, 'userDestroy']);
+                    Route::post('void_status', [FundRequestController::class, 'voidStatus']);
                 });
             });
 

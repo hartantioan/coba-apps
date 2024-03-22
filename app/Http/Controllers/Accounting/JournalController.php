@@ -30,6 +30,7 @@ use App\Exports\ExportTemplateJournalCopy;
 use Illuminate\Database\Eloquent\Builder;
 use App\Helpers\CustomHelper;
 use App\Models\Menu;
+use App\Models\MenuUser;
 use App\Models\Project;
 
 class JournalController extends Controller
@@ -46,6 +47,7 @@ class JournalController extends Controller
     {
         $lastSegment = request()->segment(count(request()->segments()));
         $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
             'title'     => 'Jurnal',
             'content'   => 'admin.accounting.journal',
@@ -57,8 +59,9 @@ class JournalController extends Controller
             'machine'   => Machine::where('status','1')->orderBy('name')->get(),
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
-            'newcode'       => $menu->document_code.date('y'),
-            'menucode'      => $menu->document_code,
+            'newcode'   => $menu->document_code.date('y'),
+            'menucode'  => $menu->document_code,
+            'modedata'  => $menu->mode ? $menuUser->mode : '',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

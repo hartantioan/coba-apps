@@ -1473,4 +1473,45 @@
             }
         });
     }
+
+    function voidStatus(id){
+        var msg = '';
+        swal({
+            title: "Alasan mengapa anda menutup!",
+            text: "Anda tidak bisa mengembalikan data yang telah ditutup.",
+            buttons: true,
+            content: "input",
+        })
+        .then(message => {
+            if (message != "" && message != null) {
+                $.ajax({
+                    url: '{{ Request::url() }}/void_status',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: { id : id, msg : message },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('#main');
+                    },
+                    success: function(response) {
+                        loadingClose('#main');
+                        M.toast({
+                            html: response.message
+                        });
+                        loadDataTable();
+                    },
+                    error: function() {
+                        loadingClose('#main');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
 </script>

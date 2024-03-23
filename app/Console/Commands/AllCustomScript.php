@@ -2,11 +2,13 @@
 
 namespace App\Console\Commands;
 
+use App\Models\GoodIssueRequest;
 use App\Models\LockPeriod;
 use App\Models\LockPeriodDetail;
 use App\Models\PurchaseRequest;
 use App\Models\User;
 use Illuminate\Console\Command;
+use Carbon\Carbon;
 
 class AllCustomScript extends Command
 {
@@ -79,5 +81,33 @@ class AllCustomScript extends Command
         }
 
         #end make lock period for 1 year
+
+        #close and void good issue request
+
+        $gir = GoodIssueRequest::where('status','2')->get();
+
+        foreach($gir as $row){
+            $datedoc = date('Y-m-d',strtotime($row->updated_at));
+            $datenow = date('Y-m-d');
+            $diff = round((strtotime($datenow) - strtotime($datedoc)) / 86400);
+            if($diff >= 2){
+                if($row->hasBalanceQtyGi()){
+                    $row->update([
+                        'status'    => '3',
+                        'note'      => $row->note.' - DITUTUP OLEH SISTEM',
+                    ]);
+                }else{
+                    $row->update([
+                        'status'    => '5',
+                        'void_note' => 'Ditutup oleh sistem karena aturan masa tenggat 2 hari.',
+                        'void_date' => date('Y-m-d H:i:s'),
+                    ]);
+                }
+                activity()
+                    ->performedOn(new GoodIssueRequest())
+                    ->withProperties($row)
+                    ->log('Close good issue request by system.');
+            }
+        }
     }
 }

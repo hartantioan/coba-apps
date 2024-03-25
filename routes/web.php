@@ -1348,25 +1348,8 @@ Route::prefix('admin')->group(function () {
 
                     Route::prefix('purchase_progress')->middleware(['operation.access:purchase_progress,view','lockacc'])->group(function () {
                         Route::get('/',[PurchaseProgressController::class, 'index']);
-                        Route::post('done',[PurchaseProgressController::class, 'done'])->middleware('operation.access:purchase_progress,update');
-                        Route::get('datatable',[PurchaseProgressController::class, 'datatable']);
-                        Route::get('row_detail',[PurchaseProgressController::class, 'rowDetail']);
-                        Route::post('show', [PurchaseProgressController::class, 'show']);
-                        Route::post('get_items', [PurchaseProgressController::class, 'getItems']);
                         Route::post('filter', [PurchaseProgressController::class, 'filter']);
-                        Route::get('get_outstanding', [PurchaseProgressController::class, 'getOutstanding']);
-                        Route::post('get_items_from_stock', [PurchaseProgressController::class, 'getItemFromStock']);
-                        Route::post('print',[PurchaseProgressController::class, 'print']);
                         Route::get('export',[PurchaseProgressController::class, 'export']);
-                        Route::post('print_by_range',[PurchaseProgressController::class, 'printByRange']);
-                        Route::get('print_individual/{id}',[PurchaseProgressController::class, 'printIndividual'])->withoutMiddleware('direct.access');
-                        Route::get('viewstructuretree',[PurchaseProgressController::class, 'viewStructureTree']);
-                        Route::post('create',[PurchaseProgressController::class, 'create'])->middleware('operation.access:purchase_progress,update');
-                        Route::post('create_done',[PurchaseProgressController::class, 'createDone'])->middleware('operation.access:purchase_progress,update');
-                        Route::post('void_status', [PurchaseProgressController::class, 'voidStatus'])->middleware('operation.access:purchase_progress,void');
-                        Route::get('approval/{id}',[PurchaseProgressController::class, 'approval'])->withoutMiddleware('direct.access');
-                        Route::post('destroy', [PurchaseProgressController::class, 'destroy'])->middleware('operation.access:purchase_progress,delete');
-                        Route::get('export_from_page',[PurchaseProgressController::class, 'exportFromTransactionPage']);
                     });
 
                     Route::prefix('purchase_payment_history')->middleware('operation.access:purchase_payment_history,view')->group(function () {

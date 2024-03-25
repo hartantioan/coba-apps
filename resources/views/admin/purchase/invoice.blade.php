@@ -1374,10 +1374,10 @@
                                                     ` + val.grandtotal + `
                                                 </td>
                                                 <td>
-                                                    <input class="browser-default" type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
+                                                    <input type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
                                                 </td>
                                                 <td>
-                                                    <input class="browser-default" type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
+                                                    <input type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
                                                 </td>
                                                 <td class="center">
                                                     ` + val.place_name + `
@@ -2345,10 +2345,10 @@
                                                             ` + val.grandtotal + `
                                                         </td>
                                                         <td>
-                                                            <input class="browser-default" type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
+                                                            <input type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
                                                         </td>
                                                         <td>
-                                                            <input class="browser-default" type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
+                                                            <input type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
                                                         </td>
                                                         <td class="center">
                                                             ` + val.place_name + `
@@ -3824,10 +3824,10 @@
                                         ` + val.grandtotal + `
                                     </td>
                                     <td>
-                                        <input class="browser-default" type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
+                                        <input type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
                                     </td>
                                     <td>
-                                        <input class="browser-default" type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
+                                        <input type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
                                     </td>
                                     <td class="center">
                                         ` + val.place_name + `

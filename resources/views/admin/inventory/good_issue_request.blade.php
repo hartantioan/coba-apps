@@ -92,6 +92,18 @@
                                     <h4 class="card-title">
                                         List Data
                                     </h4>
+                                    <div class="col m12 s12">
+                                        <div class="card-alert card green">
+                                            <div class="card-content white-text">
+                                                <p>INFO : Setiap pukul 00:00 / 24:00 akan dilakukan PENUTUPAN permintaan barang keluar. PENUTUPAN ini berlaku untuk permintaan yang ber-status PROSES. 
+                                                    <ol>
+                                                        <li>Jika permintaan lebih dari 2 hari dan permintaan barang sudah ditarik sebagian ke BARANG KELUAR / GOOD ISSUE maka status akan dirubah menjadi SELESAI.</li>
+                                                        <li>Jika permintaan lebih dari 2 hari dan permintaan belum sama sekali ditarik menjadi BARANG KELUAR / GOOD ISSUE maka status akan dirubah menjadi DITUTUP.</li>
+                                                    </ol>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="row mt-2">
                                         <div class="col s12">
                                             <div id="datatable_buttons"></div>

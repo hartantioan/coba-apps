@@ -66,6 +66,9 @@
                             </a>
                         </li>
                         <li>
+                            <a class="grey-text text-darken-1" href="{{ url('admin/personal/personal_close_bill') }}"><i class="material-icons">money_off</i> Tutup BS</a>
+                        </li>
+                        <li>
                             <a class="grey-text text-darken-1" href="{{ url('admin/personal/task') }}"><i class="material-icons">add_alert</i> Tugas</a>
                         </li>
                         <li>

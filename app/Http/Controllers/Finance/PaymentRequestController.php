@@ -1338,7 +1338,7 @@ class PaymentRequestController extends Controller
 
     public function show(Request $request){
         $pr = PaymentRequest::where('code',CustomHelper::decrypt($request->id))->first();
-        $pr['account_name'] = $pr->account()->exists() ? $pr->account->name : '';
+        $pr['account_name_bp'] = $pr->account()->exists() ? $pr->account->name : '';
         $pr['code_place_id'] = substr($pr->code,7,2);
         $pr['coa_source_name'] = $pr->coaSource()->exists() ? $pr->coaSource->code.' - '.$pr->coaSource->name.' - '.$pr->coaSource->company->name : '';
         $pr['currency_rate'] = number_format($pr->currency_rate,2,',','.');

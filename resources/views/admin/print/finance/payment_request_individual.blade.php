@@ -370,17 +370,21 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @php
+                                    $total_debit = 0;
+                                    $total_credit = 0;
+                                @endphp
                                 @foreach($data->paymentRequestCost as $key => $row)
                                 <tr>
-                                    <td class="center-align">{{ ($key + 1) }}</td>
-                                    <td class="">{{ $row->coa->code.' - '.$row->coa->name }}</td>
-                                    <td class="center-align">{{ ($row->place()->exists() ? $row->place->code : '-') }}</td>
-                                    <td class="center-align">{{ ($row->line()->exists() ? $row->line->code : '-') }}</td>
-                                    <td class="center-align">{{ ($row->machine()->exists() ? $row->machine->name : '-') }}</td>
-                                    <td class="center-align">{{ ($row->division()->exists() ? $row->division->name : '-') }}</td>
-                                    <td class="center-align">{{ ($row->project()->exists() ? $row->project->name : '-') }}</td>
-                                    <td class="right-align">{{ $data->currency->symbol.number_format($row->nominal_debit_fc,2,',','.') }}</td>
-                                    <td class="right-align">{{ $data->currency->symbol.number_format($row->nominal_credit_fc,2,',','.') }}</td>
+                                    <td align="center">{{ ($key + 1) }}</td>
+                                    <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
+                                    <td align="center">{{ ($row->place()->exists() ? $row->place->code : '-') }}</td>
+                                    <td align="center">{{ ($row->line()->exists() ? $row->line->code : '-') }}</td>
+                                    <td align="center">{{ ($row->machine()->exists() ? $row->machine->name : '-') }}</td>
+                                    <td align="center">{{ ($row->division()->exists() ? $row->division->name : '-') }}</td>
+                                    <td align="center">{{ ($row->project()->exists() ? $row->project->name : '-') }}</td>
+                                    <td align="right">{{ $data->currency->symbol.number_format($row->nominal_debit_fc,2,',','.') }}</td>
+                                    <td align="right">{{ $data->currency->symbol.number_format($row->nominal_credit_fc,2,',','.') }}</td>
                                 </tr>
                                 <tr>
                                     <td colspan="9">Ket.1 : {{ $row->note }}</td>
@@ -388,9 +392,17 @@
                                 <tr>
                                     <td colspan="9">Ket.2 : {{ $row->note2 }}</td>
                                 </tr>
+                                    @php
+                                        $total_debit += $row->nominal_debit_fc;
+                                        $total_credit += $row->nominal_credit_fc;
+                                    @endphp
                                 @endforeach
-                            </tbody>
-                            
+                                <tr>
+                                    <td colspan="7" align="right">TOTAL</td>
+                                    <td align="right">{{ $data->currency->symbol.number_format($total_debit,2,',','.') }}</td>
+                                    <td align="right">{{ $data->currency->symbol.number_format($total_credit,2,',','.') }}</td>
+                                </tr>
+                            </tbody>                  
                         </table>
                     </div>
                     <!-- invoice subtotal -->

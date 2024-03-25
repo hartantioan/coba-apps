@@ -1785,7 +1785,7 @@ class CustomHelper {
 				'currency_id'	=> $gr->currency_id,
 				'currency_rate'	=> $gr->currency_rate,
 				'post_date'		=> $gr->post_date,
-				'note'			=> $gr->code,
+				'note'			=> $gr->note,
 				'status'		=> '3'
 			]);
 

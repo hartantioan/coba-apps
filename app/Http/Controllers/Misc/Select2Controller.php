@@ -3275,7 +3275,7 @@ class Select2Controller extends Controller {
         })
         ->whereDoesntHave('used')
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
-        ->whereIn('status',['2','3'])
+        ->whereIn('status',['2'])
         ->get();
 
         foreach($data as $d) {

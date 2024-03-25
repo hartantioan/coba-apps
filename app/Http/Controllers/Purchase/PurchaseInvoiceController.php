@@ -417,6 +417,7 @@ class PurchaseInvoiceController extends Controller
                 if($datadp->balanceInvoice() > 0){
                     $downpayments[] = [
                         'rawcode'       => $datadp->code,
+                        'pyr_code'      => $datadp->listPaymentRequest(),
                         'code'          => CustomHelper::encrypt($datadp->code),
                         'post_date'     => date('d/m/Y',strtotime($datadp->post_date)),
                         'total'         => number_format($datadp->total,2,',','.'),
@@ -1650,6 +1651,7 @@ class PurchaseInvoiceController extends Controller
         foreach($pi->purchaseInvoiceDp as $row){
             $downpayments[] = [
                 'rawcode'       => $row->purchaseDownPayment->code,
+                'pyr_code'      => $row->purchaseDownPayment->listPaymentRequest(),
                 'code'          => CustomHelper::encrypt($row->purchaseDownPayment->code),
                 'post_date'     => date('d/m/Y',strtotime($row->purchaseDownPayment->post_date)),
                 'nominal'       => number_format($row->nominal,2,',','.'),

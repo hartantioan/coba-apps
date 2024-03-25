@@ -488,6 +488,7 @@
                                                     <tr>
                                                         <th class="center">Hapus</th>
                                                         <th class="center">Purchase DP No.</th>
+                                                        <th class="center">Payment Req No.</th>
                                                         <th class="center">Tgl.Post</th>
                                                         <th class="center">Nominal</th>
                                                         <th class="center">Sisa</th>
@@ -496,7 +497,7 @@
                                                 </thead>
                                                 <tbody id="body-detail-dp">
                                                     <tr id="empty-detail-dp">
-                                                        <td colspan="6" class="center">
+                                                        <td colspan="7" class="center">
                                                             Pilih supplier/vendor untuk memulai...
                                                         </td>
                                                     </tr>
@@ -2414,6 +2415,9 @@
                                                         ` + val.rawcode + `
                                                     </td>
                                                     <td class="center">
+                                                        ` + val.pyr_code + `
+                                                    </td>
+                                                    <td class="center">
                                                         ` + val.post_date + `
                                                     </td>
                                                     <td class="center">
@@ -2431,7 +2435,7 @@
                                     }else{
                                         $('#body-detail-dp').empty().append(`
                                             <tr id="empty-detail-dp">
-                                                <td colspan="6" class="center">
+                                                <td colspan="7" class="center">
                                                     Pilih supplier/vendor untuk memulai...
                                                 </td>
                                             </tr>
@@ -2623,7 +2627,7 @@
             }else{
                 $('#body-detail-dp').empty().append(`
                     <tr id="empty-detail-dp">
-                        <td colspan="6" class="center">
+                        <td colspan="7" class="center">
                             Pilih supplier/vendor untuk memulai...
                         </td>
                     </tr>
@@ -3867,6 +3871,9 @@
                                 </td>
                                 <td class="center">
                                     ` + val.rawcode + `
+                                </td>
+                                <td class="center">
+                                    ` + val.pyr_code + `
                                 </td>
                                 <td class="center">
                                     ` + val.post_date + `

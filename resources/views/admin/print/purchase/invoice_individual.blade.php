@@ -312,6 +312,9 @@
                     <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
                         <thead>
                             <tr>
+                                <th align="center" colspan="7">DAFTAR ITEM</th>
+                            </tr>
+                            <tr>
                                 <th class="center-align" width="5%">No.</th>
                                 <th class="center-align" width="35%">Referensi/Item/Jasa</th>
                                 <th class="center-align">Qty</th>
@@ -341,6 +344,34 @@
                         
                     </table>
                 </div>
+                @if($data->downpayment > 0)
+                    <div class="invoice-product-details mt-2" style="margin-top:10px;">
+                        <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
+                            <thead>
+                                <tr>
+                                    <th align="center" colspan="4">DAFTAR DOWNPAYMENT</th>
+                                </tr>
+                                <tr>
+                                    <th align="center" width="5%">No.</th>
+                                    <th align="center">No. AP Down Payment</th>
+                                    <th align="center">No. Payment Request</th>
+                                    <th align="center">Nominal Terpakai</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($data->purchaseInvoiceDp as $key => $row)
+                                <tr>
+                                    <td align="center" style="text-align: center;">{{ ($key + 1) }}</td>
+                                    <td align="center">{{ $row->purchaseDownPayment->code }}</td>
+                                    <td align="center">{{ $row->purchaseDownPayment->listPaymentRequest() }}</td>
+                                    <td align="right">{{ number_format($row->nominal,2,',','.') }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                            
+                        </table>
+                    </div>
+                @endif
                 <!-- invoice subtotal -->
                 <div class="invoice-subtotal break-row">
                     <div class="row">

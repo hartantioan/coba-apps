@@ -979,7 +979,7 @@ class FundRequestController extends Controller
                     $val->name_account,
                     $val->no_account,
                     $val->bank_account,
-                    number_format($val->grandtotal,2,',','.'),
+                    number_format($val->total,2,',','.'),
                     number_format($val->tax,2,',','.'),
                     number_format($val->wtax,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),

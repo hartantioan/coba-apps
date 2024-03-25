@@ -170,6 +170,16 @@ class FundRequest extends Model
         });
     }
 
+    public function arrayOutgoingPayment(){
+        $arr = [];
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+            $query->whereHas('outgoingPayment');
+        })->get() as $rowpayment){
+            $arr[] = $rowpayment->paymentRequest->outgoingPayment->id;
+        }
+        return $arr;
+    }
+
     public function listCekBG(){
         $list = [];
         foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
@@ -220,15 +230,6 @@ class FundRequest extends Model
             })->get() as $row){
                 $total += $row->nominal;
             }
-            foreach($this->fundRequestDetail as $rowdetail){
-                foreach($rowdetail->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query)use($date){
-                    $query->whereHas('outgoingPayment',function($query)use($date){
-                        $query->whereDate('pay_date','<=',$date);
-                    });
-                })->get() as $row){
-                    $total += $row->nominal;
-                }
-            }
         }
         return $total;
     }
@@ -241,13 +242,6 @@ class FundRequest extends Model
             })->get() as $row){
                 $total += $row->totalOutgoingUsedWeight() + $row->totalIncomingUsedWeight();
             }
-            foreach($this->fundRequestDetail as $rowdetail){
-                foreach($rowdetail->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
-                    $query->whereHas('outgoingPayment');
-                })->get() as $row){
-                    $total += $row->totalOutgoingUsedWeight() + $row->totalIncomingUsedWeight();
-                }
-            }
         }
         return $total;
     }
@@ -259,13 +253,6 @@ class FundRequest extends Model
                 $query->whereHas('outgoingPayment');
             })->where('id','<>',$prd)->get() as $row){
                 $total += $row->totalOutgoingUsedWeight() + $row->totalIncomingUsedWeight();
-            }
-            foreach($this->fundRequestDetail as $rowdetail){
-                foreach($rowdetail->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
-                    $query->whereHas('outgoingPayment');
-                })->where('id','<>',$prd)->get() as $row){
-                    $total += $row->totalOutgoingUsedWeight() + $row->totalIncomingUsedWeight();
-                }
             }
         }
         return $total;

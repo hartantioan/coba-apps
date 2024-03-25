@@ -85,7 +85,6 @@
                                                         <th class="center-align">No.</th>
                                                         <th class="center-align">No.FREQ</th>
                                                         <th class="center-align">Karyawan</th>
-                                                        <th class="center-align">Plant</th>
                                                         <th class="center-align">Tgl.Pengajuan</th>
                                                         <th class="center-align">Tgl.Req.Bayar</th>
                                                         <th class="center-align">Keterangan</th>
@@ -100,7 +99,7 @@
                                                 </thead>
                                                 <tbody id="detail-result">
                                                     <tr>
-                                                        <td class="center-align" colspan="14">Silahkan pilih tanggal dan tekan tombol filter.</td>
+                                                        <td class="center-align" colspan="13">Silahkan pilih tanggal dan tekan tombol filter.</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -149,10 +148,10 @@
             },
             beforeSend: function() {
                 $('#validation_alert').html('');
-                loadingOpen('#main-display');
+                loadingOpen('#main');
             },
             success: function(response) {
-                loadingClose('#main-display');
+                loadingClose('#main');
                 if(response.status == 200) {
                     $('#detail-result').html('');
                     if(response.content.length > 0){
@@ -162,7 +161,6 @@
                                     <td class="center-align">` + (i+1) + `</td>
                                     <td>` + val.code + `</td>
                                     <td>` + val.employee_name + `</td>
-                                    <td>` + val.plant + `</td>
                                     <td>` + val.post_date + `</td>
                                     <td>` + val.required_date + `</td>
                                     <td>` + val.note + `</td>
@@ -178,19 +176,19 @@
                         });
                         $('#detail-result').append(`
                             <tr id="text-grandtotal">
-                                <td class="right-align" colspan="13">Total</td>
+                                <td class="right-align" colspan="12">Total</td>
                                 <td class="right-align">` + response.totalbalance + `</td>
                             </tr>
                         `);
                         $('#detail-result').append(`
                             <tr id="text-grandtotal">
-                                <td class="center-align" colspan="14">Waktu proses : ` + response.execution_time  + ` detik</td>
+                                <td class="center-align" colspan="13">Waktu proses : ` + response.execution_time  + ` detik</td>
                             </tr>
                         `);
                     }else{
                         $('#detail-result').append(`
                             <tr>
-                                <td class="center-align" colspan="14">Data tidak ditemukan.</td>
+                                <td class="center-align" colspan="13">Data tidak ditemukan.</td>
                             </tr>
                         `);
                     }
@@ -204,8 +202,8 @@
                 }
             },
             error: function() {
-                $('#main-display').scrollTop(0);
-                loadingClose('#main-display');
+                $('#main').scrollTop(0);
+                loadingClose('#main');
                 swal({
                     title: 'Ups!',
                     text: 'Check your internet connection.',
@@ -219,7 +217,7 @@
         $('#form_data_filter')[0].reset();
         $('#detail-result').html('').append(`
             <tr>
-                <td class="center-align" colspan="14">Silahkan pilih tanggal dan tekan tombol filter.</td>
+                <td class="center-align" colspan="13">Silahkan pilih tanggal dan tekan tombol filter.</td>
             </tr>
         `);
     }

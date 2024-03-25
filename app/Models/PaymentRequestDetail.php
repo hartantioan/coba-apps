@@ -181,6 +181,10 @@ class PaymentRequestDetail extends Model
             $totalUsed += $rowcross->nominal;
         }
 
+        foreach($this->paymentRequest->outgoingPayment->closeBillDetail as $rowclose){
+            $totalUsed += $rowclose->nominal;
+        }
+
         $result = round(($nominal / $this->paymentRequest->total) * $totalUsed,2);
 
         return $result;
@@ -193,6 +197,12 @@ class PaymentRequestDetail extends Model
             $query->whereDate('post_date','<=',$date);
         })->get() as $rowcross){
             $totalUsed += $rowcross->nominal;
+        }
+
+        foreach($this->paymentRequest->outgoingPayment->closeBillDetail()->whereHas('closeBill',function($query)use($date){
+            $query->whereDate('post_date','<=',$date);
+        })->get() as $rowclose){
+            $totalUsed += $rowclose->nominal;
         }
 
         $result = round(($nominal / $this->paymentRequest->total) * $totalUsed,2);

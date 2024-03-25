@@ -166,7 +166,8 @@ class AttendancePeriodController extends Controller
         
         $user_data = User::where(function($query) use ( $request) {
             $query->where('type','1');
-            $query->whereIn('employee_no',['312401001','3230801','312312001','312312002','312310001','312401002','312401003','312402001','312402002','312402004']);
+            $query->whereIn('employee_no',['312401001','3230801','312312001','312312002','312310001','312401002','312401003','312402001','312402004','312402002','312402038','312402039','312402051','312403006'
+            ,'312403008','312403012']);
             // $query->whereIn('employee_no',['323033']);    
             })->get();
         
@@ -175,6 +176,7 @@ class AttendancePeriodController extends Controller
             'period_id'                             => $request->id,
             'post_date'                             => Carbon::now(),
         ]);
+       
         
         $query_salary_component= SalaryComponent::where('status',1)->get();
         $punishment_get = Punishment::where('status',1)->get();
@@ -350,7 +352,7 @@ class AttendancePeriodController extends Controller
                         $lembur_awal_shift = 0;
                         $time_in = $row_schedule_filter->shift->time_in;
                         $time_out = $row_schedule_filter->shift->time_out;
-
+                       
                         
                         
                         if($row_schedule_filter->status == 5){
@@ -622,10 +624,11 @@ class AttendancePeriodController extends Controller
                                         $array_keluar[$key]=$timePart;
                                     }
                                 }
+                                
                                 //perhitungan pulang
                                 if($dateAttd >= $real_time_out && $dateAttd <= $real_max_time_out){
                                    
-                                        
+                                    
                                     
                                     
                                     $exact_out [$key]= 1 ;
@@ -647,12 +650,9 @@ class AttendancePeriodController extends Controller
                                     }
                                     
                                 }
-                                // if ($dateAttd>=$real_time_in && $dateAttd <= $real_time_out && $dateAttd <= $real_max_time_out && $date->toDateString() == $dateAttd->toDateString()) {
-                                //     if(count($query_data)>1 || $date->toDateString() == $dateAttd->toDateString()){
-                                //         $exact_out [$key]= 1 ;
-                                       
-                                //     }
-                                // }
+                               
+                                
+                               
                                 if ($dateAttd <= $real_time_out && $dateAttd <= $real_max_time_out && $date->toDateString() == $dateAttd->toDateString()&&count($query_data)==1) {
                                     
                                     if($muleh==null && $date->toDateString() == $dateAttd->toDateString()){
@@ -685,6 +685,7 @@ class AttendancePeriodController extends Controller
                                         
                                     }  
                                 }
+                              
                                 
                             }
                             
@@ -709,7 +710,7 @@ class AttendancePeriodController extends Controller
                                         ->first();
                                 }
                             }
-                           
+                            
                             if($row_schedule_filter->status == 5 && $query_lembur &&  $lembur_awal_shift != 1){//perhitungan lemboer
                                 
                                 $time_in_lembur = Carbon::parse($query_lembur->date)->format('Y-m-d') . ' ' . $query_lembur->time_in;
@@ -781,6 +782,7 @@ class AttendancePeriodController extends Controller
                                 $exact_in[$key]=0;
                                 
                             }
+                           
 
                             if(count($exact_in) == 3){
                                 if($exact_in[0] == 0 && $exact_out[2] == 0){
@@ -818,8 +820,9 @@ class AttendancePeriodController extends Controller
                                         
                                         $exact_out[$key]=1;
                                         $logout_real =$date->format('Y-m-d') . ' ' . $logout;
-
+                                         
                                         if($logout_real<$real_time_out){
+                                            
                                             $exact_out[$key]=0;
                                         }
                                     }else{
@@ -853,6 +856,12 @@ class AttendancePeriodController extends Controller
                             }
                         
                         }
+                        // if($row_user->id == '530'){
+                        //     info('masuk');
+                        //     info($exact_in);
+                        //     info('Keluar');
+                        //     info($exact_out);
+                        // }  
                         
                         
                         $time_ins[]=$time_in;
@@ -1131,9 +1140,7 @@ class AttendancePeriodController extends Controller
                        
                         
                         if($row_arrive == 0 && $exact_out[$key] == 1){
-                            if($row_user->id == '21'){
-
-                            }    
+                            
                             $date_arrived_forget[]=Carbon::parse($date)->format('d/m/Y');
                             
                         }

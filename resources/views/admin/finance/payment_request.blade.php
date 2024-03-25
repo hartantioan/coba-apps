@@ -2704,7 +2704,7 @@
                 $('#grandtotal').val(response.grandtotal);
                 $('#payment').val(response.payment);
                 $('#balance').val(response.balance);
-                /* $('#is_reimburse').val(response.is_reimburse).formSelect(); */
+                $('#is_reimburse').val(response.is_reimburse).formSelect();
                 
                 if(response.details.length > 0){
                     $('#body-detail').empty();

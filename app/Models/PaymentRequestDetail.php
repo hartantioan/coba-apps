@@ -194,13 +194,13 @@ class PaymentRequestDetail extends Model
         $nominal = $this->nominal;
         $totalUsed = 0;
         foreach($this->paymentRequest->outgoingPayment->paymentRequestCross()->whereHas('paymentRequest',function($query)use($date){
-            $query->whereDate('post_date','<=',$date);
+            $query->whereIn('status',['2','3'])->whereDate('post_date','<=',$date);
         })->get() as $rowcross){
             $totalUsed += $rowcross->nominal;
         }
 
         foreach($this->paymentRequest->outgoingPayment->closeBillDetail()->whereHas('closeBill',function($query)use($date){
-            $query->whereDate('post_date','<=',$date);
+            $query->whereIn('status',['2','3'])->whereDate('post_date','<=',$date);
         })->get() as $rowclose){
             $totalUsed += $rowclose->nominal;
         }

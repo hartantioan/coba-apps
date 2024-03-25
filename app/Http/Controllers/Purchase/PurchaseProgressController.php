@@ -283,7 +283,7 @@ class PurchaseProgressController extends Controller
     
 
         // Generate the HTML for the table
-        $tableHtml = '<table border="1">';
+        $tableHtml = '<table border="1" class="table-bordered">';
         $tableHtml .= '<thead>';
         $tableHtml .= '<tr>';
         $tableHtml .= '<th>Item</th>';

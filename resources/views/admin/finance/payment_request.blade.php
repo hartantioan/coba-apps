@@ -2695,9 +2695,6 @@
                 $('#post_date').val(response.post_date);
                 $('#pay_date').val(response.pay_date);                
                 $('#note').val(response.note);
-                $('#account_bank').val(response.account_bank);
-                $('#account_no').val(response.account_no);
-                $('#account_name').val(response.account_name);
                 $('#total').val(response.total);
                 $('#rounding').val(response.rounding);
                 $('#admin').val(response.admin);
@@ -2920,6 +2917,10 @@
                 $('#user_bank_id').empty();
                 
                 $('#top').val(response.top);
+
+                $('#account_bank').val(response.account_bank);
+                $('#account_no').val(response.account_no);
+                $('#account_name').val(response.account_name);
 
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();

@@ -823,7 +823,7 @@ class GoodIssueRequestController extends Controller
                 'properties'=> [
                      ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query->post_date))],
                   ],
-                'url'   =>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($query->code),
+                'url'   =>request()->root()."/admin/inventory/good_issue?code=".CustomHelper::encrypt($query->code),
                 "title" =>$query->code,
             ];
         $data_go_chart[]=$gir;
@@ -1938,7 +1938,7 @@ class GoodIssueRequestController extends Controller
                                         ['name'=> "Tanggal :".$data_detail_good_issue->lookable->materialRequest->post_date],
                                         ['name'=> "Nominal :".formatNominal($data_detail_good_issue->lookable->materialRequest).number_format($data_detail_good_issue->lookable->materialRequest->grandtotal,2,',','.')],
                                     ],
-                                    'url'=>request()->root()."/admin/inventory/good_issue?code=".CustomHelper::encrypt($data_detail_good_issue->lookable->materialRequest->code),
+                                    'url'=>request()->root()."/admin/purchase/material_request?code=".CustomHelper::encrypt($data_detail_good_issue->lookable->materialRequest->code),
                                 ];
 
                                 $data_go_chart[]=$material_request_tempura;
@@ -2455,7 +2455,7 @@ class GoodIssueRequestController extends Controller
                                         ],
                                         'key'=>$good_issue_detail->goodIssue->code,
                                         'name'=>$good_issue_detail->goodIssue->code,
-                                        'url'=>request()->root()."/admin/inventory/good_issue_request?code=".CustomHelper::encrypt($good_issue_detail->goodIssue->code),
+                                        'url'=>request()->root()."/admin/inventory/good_issue?code=".CustomHelper::encrypt($good_issue_detail->goodIssue->code),
                                     ];
         
                                     $data_go_chart[]=$good_issue_tempura;

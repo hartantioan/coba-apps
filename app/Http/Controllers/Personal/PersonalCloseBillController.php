@@ -29,8 +29,9 @@ use App\Models\Line;
 use App\Models\Machine;
 use App\Models\MenuUser;
 use App\Exports\ExportFundRequestTransactionPage;
+use App\Models\Tax;
 
-class FundRequestController extends Controller
+class PersonalCloseBillController extends Controller
 {
     protected $dataplaces, $datauser, $dataplacecode, $menu;
 
@@ -48,8 +49,8 @@ class FundRequestController extends Controller
         $menu = Menu::where('url', $lastSegment)->first();
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
-            'title'         => 'Permohonan Dana',
-            'content'       => 'admin.finance.fund_request',
+            'title'         => 'Tutup BS Personal',
+            'content'       => 'admin.personal.fund_request',
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
             'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),

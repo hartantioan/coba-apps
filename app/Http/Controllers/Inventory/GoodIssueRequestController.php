@@ -823,7 +823,7 @@ class GoodIssueRequestController extends Controller
                 'properties'=> [
                      ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query->post_date))],
                   ],
-                'url'   =>request()->root()."/admin/inventory/good_issue?code=".CustomHelper::encrypt($query->code),
+                'url'   =>request()->root()."/admin/inventory/good_issue_request?code=".CustomHelper::encrypt($query->code),
                 "title" =>$query->code,
             ];
         $data_go_chart[]=$gir;

@@ -430,7 +430,6 @@ Route::prefix('admin')->group(function () {
                     Route::post('get_code', [PersonalCloseBillController::class, 'getCode']);
                     Route::post('create',[PersonalCloseBillController::class, 'userCreate']);
                     Route::post('finish',[PersonalCloseBillController::class, 'userFinish']);
-                    Route::post('get_account_info', [PersonalCloseBillController::class, 'getAccountInfo']);
                     Route::post('destroy', [PersonalCloseBillController::class, 'userDestroy']);
                     Route::post('void_status', [PersonalCloseBillController::class, 'voidStatus']);
                 });

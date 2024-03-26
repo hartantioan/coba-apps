@@ -1938,7 +1938,7 @@ class GoodIssueRequestController extends Controller
                                         ['name'=> "Tanggal :".$data_detail_good_issue->lookable->materialRequest->post_date],
                                         ['name'=> "Nominal :".formatNominal($data_detail_good_issue->lookable->materialRequest).number_format($data_detail_good_issue->lookable->materialRequest->grandtotal,2,',','.')],
                                     ],
-                                    'url'=>request()->root()."/admin/purchase/material_request?code=".CustomHelper::encrypt($data_detail_good_issue->lookable->materialRequest->code),
+                                    'url'=>request()->root()."/admin/inventory/good_issue?code=".CustomHelper::encrypt($data_detail_good_issue->lookable->materialRequest->code),
                                 ];
 
                                 $data_go_chart[]=$material_request_tempura;

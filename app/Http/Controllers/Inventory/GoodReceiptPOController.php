@@ -3020,7 +3020,7 @@ class GoodReceiptPOController extends Controller
                                         ],
                                         'key'=>$good_issue_detail->goodIssue->code,
                                         'name'=>$good_issue_detail->goodIssue->code,
-                                        'url'=>request()->root()."/admin/inventory/good_issue_request?code=".CustomHelper::encrypt($good_issue_detail->goodIssue->code),
+                                        'url'=>request()->root()."/admin/inventory/good_issue?code=".CustomHelper::encrypt($good_issue_detail->goodIssue->code),
                                     ];
         
                                     $data_go_chart[]=$good_issue_tempura;
@@ -3102,7 +3102,7 @@ class GoodReceiptPOController extends Controller
                         }
                     }
                 }
-            }            
+            }           
             function unique_key($array,$keyname){
 
                 $new_array = array();

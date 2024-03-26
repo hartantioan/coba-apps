@@ -1462,7 +1462,7 @@ class CloseBillController extends Controller
                                 
                                 'properties'=> [
                                     ['name'=> "Tanggal: ".date('d/m/Y',strtotime($row_bill_detail->outgoingPayment->post_date))],
-                                    ['name'=> "Nominal :".formatNominal($row_bill_detail->outgoingPayment).number_format($row_bill_detail->outgoingPayment->grandtotal,2,',','.')]
+                                    ['name'=> "Nominal: Rp".number_format($row_bill_detail->outgoingPayment->grandtotal,2,',','.')]
                                 ],
                                 'url'   =>request()->root()."/admin/finance/outgoing_payment?code=".CustomHelper::encrypt($row_bill_detail->outgoingPayment->code),
                                 "title" => $row_bill_detail->outgoingPayment->code,
@@ -2877,7 +2877,7 @@ class CloseBillController extends Controller
                                         ],
                                         'key'=>$good_issue_detail->goodIssue->code,
                                         'name'=>$good_issue_detail->goodIssue->code,
-                                        'url'=>request()->root()."/admin/inventory/good_issue_request?code=".CustomHelper::encrypt($good_issue_detail->goodIssue->code),
+                                        'url'=>request()->root()."/admin/inventory/good_issue?code=".CustomHelper::encrypt($good_issue_detail->goodIssue->code),
                                     ];
         
                                     $data_go_chart[]=$good_issue_tempura;

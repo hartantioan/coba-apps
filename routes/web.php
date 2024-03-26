@@ -37,6 +37,7 @@ use App\Http\Controllers\MasterData\UserSpecialController;
 use App\Http\Controllers\Other\MenuIndexController;
 use App\Http\Controllers\Personal\TaskController;
 use App\Http\Controllers\Personal\CheckInController;
+use App\Http\Controllers\Personal\PersonalCloseBillController;
 use App\Http\Controllers\Purchase\OutStandingAPController;
 use App\Http\Controllers\Purchase\PriceHistoryPOController;
 use App\Http\Controllers\Purchase\PurchasePaymentHistoryController;
@@ -419,6 +420,19 @@ Route::prefix('admin')->group(function () {
                     Route::post('get_account_info', [FundRequestController::class, 'getAccountInfo']);
                     Route::post('destroy', [FundRequestController::class, 'userDestroy']);
                     Route::post('void_status', [FundRequestController::class, 'voidStatus']);
+                });
+
+                Route::prefix('personal_close_bill')->middleware('lockacc')->group(function () {
+                    Route::get('/',[PersonalCloseBillController::class, 'userIndex']);
+                    Route::get('datatable',[PersonalCloseBillController::class, 'userDatatable']);
+                    Route::get('row_detail',[PersonalCloseBillController::class, 'userRowDetail']);
+                    Route::post('show', [PersonalCloseBillController::class, 'userShow']);
+                    Route::post('get_code', [PersonalCloseBillController::class, 'getCode']);
+                    Route::post('create',[PersonalCloseBillController::class, 'userCreate']);
+                    Route::post('finish',[PersonalCloseBillController::class, 'userFinish']);
+                    Route::post('get_account_info', [PersonalCloseBillController::class, 'getAccountInfo']);
+                    Route::post('destroy', [PersonalCloseBillController::class, 'userDestroy']);
+                    Route::post('void_status', [PersonalCloseBillController::class, 'voidStatus']);
                 });
             });
 

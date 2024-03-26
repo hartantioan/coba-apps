@@ -241,7 +241,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     $val->note_internal,
                     $val->note_external,
                     $val->return_date ? date('d/m/Y',strtotime($val->return_date)) : '-',
-                    '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
+                      $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->marketingOrderDelivery->marketingOrder->destination_address
                     .' - '.ucwords(strtolower($val->marketingOrderDelivery->marketingOrder->subdistrict->name
                     .' - '.$val->marketingOrderDelivery->marketingOrder->city->name

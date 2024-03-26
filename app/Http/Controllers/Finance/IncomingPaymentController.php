@@ -500,7 +500,7 @@ class IncomingPaymentController extends Controller
                     $val->currency->code,
                     number_format($val->currency_rate,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
-                    '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
+                      $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->note,
                     $val->status(),
                     '

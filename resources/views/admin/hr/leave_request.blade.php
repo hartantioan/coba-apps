@@ -279,7 +279,7 @@
                             <div class="row ml-2 mt-2">
                                 <div class="row">
                                     <div class="input-field col m2 s12">
-                                        <p>{{ $menucode }}</p>
+                                        <p>{{ $newcode }}</p>
                                     </div>
                                     <div class="input-field col m2 s12">
                                         <select class="form-control" id="code_place_range" name="code_place_range">

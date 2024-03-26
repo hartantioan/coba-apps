@@ -316,7 +316,7 @@ class PaymentRequestController extends Controller
                     number_format($val->grandtotal,2,',','.'),
                     number_format($val->payment,2,',','.'),
                     number_format($val->balance,2,',','.'),
-                    '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
+                      $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->account_bank,
                     $val->account_no,
                     $val->account_name,

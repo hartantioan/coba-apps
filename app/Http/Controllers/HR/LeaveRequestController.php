@@ -122,7 +122,7 @@ class LeaveRequestController extends Controller
                     $val->start_date,
                     $val->end_date,
                     $val->note,
-                    '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
+                      $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->status(),
                     $btn
                 ];

@@ -214,7 +214,7 @@ class PurchasePaymentHistoryController extends Controller
                     date('d/m/Y',strtotime($val->due_date)),
                     date('d/m/Y',strtotime($val->document_date)),
                     $val->type(),
-                    '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
+                      $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->note,
                     $val->tax_no,
                     $val->tax_cut_no,

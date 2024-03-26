@@ -149,10 +149,9 @@ class ClosingJournalController extends Controller
                     date('F Y',strtotime($val->month)),
                     $val->note,
                     number_format($val->grandtotal,2,',','.'),
-                    '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
+                      $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->status(),
                     '
-                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
@@ -1188,7 +1187,7 @@ class ClosingJournalController extends Controller
                     'date'              => date('d/m/Y',strtotime($row->date)),
                     'code'              => $row->lookable->code,
                     'note'              => $row->lookable->note ? $row->lookable->note : '',
-                    'balance'           => number_format($row->qty_final,2,',','.'),
+                    'balance'           => CustomHelper::formatConditionalQty($row->qty_final,2,',','.'),
                 ];
             }
         }

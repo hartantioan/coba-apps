@@ -294,7 +294,7 @@ class MarketingOrderController extends Controller
                     date('d/m/Y',strtotime($val->post_date)),
                     date('d/m/Y',strtotime($val->valid_date)),
                     $val->project()->exists() ? $val->project->name : '-',
-                    '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
+                      $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->document_no,
                     $val->deliveryType(),
                     $val->sender->name,

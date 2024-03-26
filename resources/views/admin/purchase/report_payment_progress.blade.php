@@ -112,64 +112,14 @@
             },
             beforeSend: function() {
                 $('#validation_alert').html('');
-                loadingOpen('#main-display');
+                loadingOpen('#main');
             },
             success: function(response) {
-                loadingClose('#main-display');
+                loadingClose('#main');
                 if(response.status == 200) {
                     $('#content-result').html('');
                     $('#content-result').append(response.message);
-                    // if(response.message.length > 0){
-                    //     $('#content-result').append(`<tr>`);
-                    //     $.each(response.message, function(i, item_req) {
-                    //         $('#content-result').append(
-                    //             `<td rowspan="`+response.rowspan+`">`+item_req['item']+`<td>`
-                    //             `<td rowspan="`+response.rowspan+`">`+item_req['item_code']+`<td>`
-                    //             `<td rowspan="`+response.rowspan+`">`+item_req['ir_code']+`<td>`
-                    //             `<td rowspan="`+response.rowspan+`">`+item_req['ir_date']+`<td>`
-                    //             `<td rowspan="`+response.rowspan+`">`+item_req['ir_qty']+`<td>`
-                    //         );
-                    //         if(item_req['pr'].length > 0){
-                    //             $('#content-result').append(
-                    //                 `<td rowspan="`+$item_req['pr'][0]['po'].length+`">`+$item_req['pr'][0]['pr_code']+`<td>`
-                    //                 `<td rowspan="`+$item_req['pr'][0]['po'].length+`">`+$item_req['pr'][0]['pr_date']+`<td>`
-                    //                 `<td rowspan="`+$item_req['pr'][0]['po'].length+`">`+$item_req['pr'][0]['pr_qty']+`<td>`
-                    //             );
-                                
-                    //             $.each(item_req['pr'], function(i, pr) {
-                    //                 if(i == 0){
-                    //                     $('#content-result').append(
-                    //                         `<td>`+item_req['item']+`<td>`
-                    //                         `<td>`+item_req['item_code']+`<td>`
-                    //                         `<td>`+item_req['ir_code']+`<td>`
-                    //                         `<td>`+item_req['ir_date']+`<td>`
-                    //                         `<td>`+item_req['ir_qty']+`<td>`
-                    //                     );
-                    //                 }
-                                    
-                    //             });
-                    //         }else{
-                    //             $('#content-result').append(
-                    //                 `<td><td>`
-                    //                 `<td><td>`
-                    //                 `<td><td>`
-                    //                 `<td><td>`
-                    //                 `<td><td>`
-                    //                 `<td><td>`
-                    //                 `<td><td>`
-                    //                 `<td><td>`
-                    //                 `<td><td>`
-                    //             );
-                    //             span_ir = 1;
-                    //         }
-                    //         $('#content-result').append(`
-                    //             </tr>
-                    //         `);
-                    //     });
-                       
-                    // }else{
-                        
-                    // }
+                   
                     M.toast({
                         html: 'Sukses proses data'
                     });
@@ -180,8 +130,8 @@
                 }
             },
             error: function() {
-                $('#main-display').scrollTop(0);
-                loadingClose('#main-display');
+                $('#main').scrollTop(0);
+                loadingClose('#main');
                 swal({
                     title: 'Ups!',
                     text: 'Check your internet connection.',
@@ -189,94 +139,6 @@
                 });
             }
         });
-    }
-
-    /* function getOutstanding(){
-        $('#show-result').hide();
-        $('#content-result').html('');
-        var tipekuy = $('#type').val();
-        var startDatekuy = $('#start_date').val();
-        var endDatekuy = $('#end_date').val();
-
-        $.ajax({
-            url: "{{ URL::to('/') }}/admin/" + tipekuy + "/get_outstanding",
-            type: 'POST',
-            dataType: 'JSON',
-            data: {
-                type: tipekuy,
-                startDate: startDatekuy,
-                endDate: endDatekuy,
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                loadingOpen('#main');
-            },
-            success: function(response) {
-                loadingClose('#main');
-                if(response.status == '200'){
-                    $('#show-result').show();
-                    $('#content-result').html(response.content);
-                }else{
-                    swal({
-                        title: 'Ups!',
-                        text: response.message,
-                        icon: 'error'
-                    });
-                }
-            },
-            error: function(xhr, status) {
-                loadingClose('#main');
-                if(xhr.status == '404'){
-                    swal({
-                        title: 'Mohon maaf!',
-                        text: 'Laporan Tunggakan pada Modul ' + $( "#type option:selected" ).text() + ' belum siap. Sementara hanya untuk Permintaan Pembelian dan Order Pembelian',
-                        icon: 'warning'
-                    });
-                }else{
-                    swal({
-                        title: 'Ups!',
-                        text: 'Check your internet connection.',
-                        icon: 'error'
-                    });
-                }
-            }
-        });
-    } */
-
-    function printPreview(code,aslicode){
-        swal({
-            title: "Apakah Anda ingin mengeprint dokumen ini?",
-            text: "Dengan Kode "+aslicode,
-            icon: 'warning',
-            dangerMode: true,
-            buttons: {
-            cancel: 'Tidak, jangan!',
-            delete: 'Ya, lanjutkan!'
-            }
-        }).then(function (willDelete) {
-            if (willDelete) {
-                $.ajax({
-                    url: '{{ Request::url() }}/print_individual/' + code,
-                    type:'GET',
-                    beforeSend: function() {
-                        loadingOpen('.modal-content');
-                    },
-                    complete: function() {
-                        
-                    },
-                    success: function(data){
-                        loadingClose('.modal-content');
-                        printService.submit({
-                            'type': 'INVOICE',
-                            'url': data
-                        })
-                    }
-                });  
-            }
-        });
-        
     }
 
     function exportExcel(){

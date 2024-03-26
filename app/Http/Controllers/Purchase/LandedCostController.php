@@ -529,7 +529,7 @@ class LandedCostController extends Controller
                     $val->currency()->exists() ? $val->currency->code : '',
                     number_format($val->currency_rate,2,',','.'),
                     $val->note,
-                    '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
+                      $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     number_format($val->total,2,',','.'),
                     number_format($val->tax,2,',','.'),
                     number_format($val->wtax,2,',','.'),

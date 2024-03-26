@@ -221,7 +221,7 @@ class RegistrationController extends Controller
                     $val->address,
                     $val->email,
                     $val->hp,
-                    '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
+                      $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->status(),
                     $val->add_to_user ? 'Terdaftar - '.$val->account->employee_no : 'Tidak Terdaftar',
                     $editBtn

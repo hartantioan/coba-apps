@@ -227,7 +227,7 @@ class MarketingOrderHandoverReceiptController extends Controller
                     number_format($val->grandtotal,2,',','.'),
                     $val->totalReceived(),
                     $val->totalUnreceived(),
-                    '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
+                      $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->status(),
                     $val->statusTracking(),
                     '

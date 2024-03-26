@@ -41,15 +41,23 @@
                                         </div>
                                         <div class="col s12">
                                             <div class="row">
-                                                <div class="input-field col m4 s12">
+                                                <div class="input-field col m3 s12">
                                                     <input id="start_date" name="start_date" type="date" placeholder="Tgl. posting" value="{{ date('Y-m').'-01' }}">
                                                     <label class="active" for="start_date">Tanggal Awal</label>
                                                 </div>
-                                                <div class="input-field col m4 s12">
+                                                <div class="input-field col m3 s12">
                                                     <input id="end_date" name="end_date" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                                     <label class="active" for="end_date">Tanggal Akhir</label>
                                                 </div>
-                                                <div class="col m4 s12 mt-3">
+                                                <div class="input-field col m3 s12">
+                                                    
+                                                    <select class="form-control" id="type" name="type" onchange="loadDataTable()">
+                                                        <option value="all">Semua</option>
+                                                        <option value="sisa">Sisa</option>
+                                                    </select>
+                                                    <label for="type" style="font-size:1rem;">Tipe :</label>
+                                                </div>
+                                                <div class="col m3 s12 mt-3">
                                                     <button class="btn waves-effect waves-light right submit" onclick="exportExcel();">Export <i class="material-icons right">file_download</i></button>
                                                     <button class="btn waves-effect waves-light right cyan submit mr-2" onclick="filter();">Process <i class="material-icons right">list</i></button>
                                                 </div>
@@ -127,6 +135,7 @@
     function exportExcel(){
         var startDate = $('#start_date').val();
         var endDate = $('#end_date').val();
-        window.location = "{{ Request::url() }}/export?start_date=" + startDate + "&end_date=" + endDate;
+        var type = $('#type').val();
+        window.location = "{{ Request::url() }}/export?start_date=" + startDate + "&end_date=" + endDate+ "&type=" + type;
     }
 </script>

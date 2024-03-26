@@ -120,6 +120,7 @@ use App\Http\Controllers\Purchase\AgingAPController;
 use App\Http\Controllers\Purchase\DownPaymentController;
 use App\Http\Controllers\Purchase\UnbilledAPController;
 use App\Http\Controllers\Purchase\PurchaseProgressController;
+use App\Http\Controllers\Purchase\PaymentProgressController;
 
 use App\Http\Controllers\Production\MarketingOrderPlanController;
 use App\Http\Controllers\Production\ProductionScheduleController;
@@ -1344,6 +1345,13 @@ Route::prefix('admin')->group(function () {
                 Route::prefix('purchase_report')->middleware('direct.access')->group(function () {
                     Route::prefix('purchase_recap')->middleware('operation.access:purchase_recap,view')->group(function () {
                         Route::get('/',[PurchaseReportController::class, 'index']);
+                    });
+                    Route::prefix('payment_progress')->middleware(['operation.access:purchase_progress,view','lockacc'])->group(function () {
+                        Route::get('/',[PaymentProgressController::class, 'index']);
+                        Route::get('export',[PaymentProgressController::class, 'export']);
+                        Route::post('filter', [PaymentProgressController::class, 'filter']);
+                        Route::post('destroy', [PaymentProgressController::class, 'destroy'])->middleware('operation.access:purchase_progress,delete');
+                        Route::get('export_from_page',[PaymentProgressController::class, 'exportFromTransactionPage']);
                     });
 
                     Route::prefix('purchase_progress')->middleware(['operation.access:purchase_progress,view','lockacc'])->group(function () {

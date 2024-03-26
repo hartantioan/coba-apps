@@ -48,13 +48,13 @@ class PurchaseProgressController extends Controller
 
         $data = MaterialRequest::where(function($query) use ($request) {
             
-            if($request->start_date && $request->finish_date) {
+            if($request->start_date && $request->end_date) {
                 $query->whereDate('post_date', '>=', $request->start_date)
-                    ->whereDate('post_date', '<=', $request->finish_date);
+                    ->whereDate('post_date', '<=', $request->end_date);
             } else if($request->start_date) {
                 $query->whereDate('post_date','>=', $request->start_date);
-            } else if($request->finish_date) {
-                $query->whereDate('post_date','<=', $request->finish_date);
+            } else if($request->end_date) {
+                $query->whereDate('post_date','<=', $request->end_date);
             }
         })
         ->get();
@@ -272,13 +272,13 @@ class PurchaseProgressController extends Controller
 
         return response()->json([
             'status'  => 200,
-            'message' => $this->renderTable($array_detail),
+            'message' => $this->renderTable($array_detail,$request->type),
         ]);
 
         
     }
 
-    public function renderTable($data)
+    public function renderTable($data,$request)
     {
     
 
@@ -328,33 +328,46 @@ class PurchaseProgressController extends Controller
                     if($max_count_pr<$grpoTotalCount){
                         $max_count_pr=$grpoTotalCount;
                     }
+                    $masuk = 0 ;
+                    if($request != 'all'){
+                        foreach ($po['grpo'] as $grpoIndex => $grpo) {
+                            if( $grpo['outstanding'] == '' || $grpo['outstanding'] > 0){
+                                $masuk =1; 
+                            }
+                        }
+                    }else{
+                        $masuk = 1;
+                    }
                     foreach ($po['grpo'] as $grpoIndex => $grpo) {
                         $tableHtml .= '<tr>';
-                        if ($prIndex === 0 && $poIndex === 0 && $grpoIndex === 0) {
-                            $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['item'] . '</td>';
-                            $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['ir_code'] . '</td>';
-                            $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['ir_date'] . '</td>';
-                            $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['ir_qty'] . '</td>';
-                            $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['status'] . '</td>';
+                        if($masuk == 1){
+                            if ($prIndex === 0 && $poIndex === 0 && $grpoIndex === 0) {
+                                $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['item'] . '</td>';
+                                $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['ir_code'] . '</td>';
+                                $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['ir_date'] . '</td>';
+                                $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['ir_qty'] . '</td>';
+                                $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['status'] . '</td>';
+                            }
+                            if ($poIndex === 0 && $grpoIndex === 0) {
+                                $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['pr_code'] . '</td>';
+                                $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['pr_date'] . '</td>';
+                                $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['pr_qty'] . '</td>';
+                                $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['status'] . '</td>';
+                            }
+                            if ($grpoIndex === 0) {
+                                $tableHtml .= '<td rowspan="' . $grpoCount . '">' . $po['po_code'] . '</td>';
+                                $tableHtml .= '<td rowspan="' . $grpoCount . '">' . $po['po_date'] . '</td>';
+                                $tableHtml .= '<td rowspan="' . $grpoCount . '">' . $po['po_qty'] . '</td>';
+                                $tableHtml .= '<td rowspan="' . $grpoCount . '">' . $po['status'] . '</td>';
+                            }
+                            $tableHtml .= '<td>' . $grpo['grpo_code'] . '</td>';
+                            $tableHtml .= '<td>' . $grpo['grpo_date'] . '</td>';
+                            $tableHtml .= '<td>' . $grpo['grpo_qty'] . '</td>';
+                            $tableHtml .= '<td>' . $grpo['status'] . '</td>';
+                            $tableHtml .= '<td>' . $grpo['outstanding'] . '</td>';
+                            $tableHtml .= '</tr>';
                         }
-                        if ($poIndex === 0 && $grpoIndex === 0) {
-                            $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['pr_code'] . '</td>';
-                            $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['pr_date'] . '</td>';
-                            $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['pr_qty'] . '</td>';
-                            $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['status'] . '</td>';
-                        }
-                        if ($grpoIndex === 0) {
-                            $tableHtml .= '<td rowspan="' . $grpoCount . '">' . $po['po_code'] . '</td>';
-                            $tableHtml .= '<td rowspan="' . $grpoCount . '">' . $po['po_date'] . '</td>';
-                            $tableHtml .= '<td rowspan="' . $grpoCount . '">' . $po['po_qty'] . '</td>';
-                            $tableHtml .= '<td rowspan="' . $grpoCount . '">' . $po['status'] . '</td>';
-                        }
-                        $tableHtml .= '<td>' . $grpo['grpo_code'] . '</td>';
-                        $tableHtml .= '<td>' . $grpo['grpo_date'] . '</td>';
-                        $tableHtml .= '<td>' . $grpo['grpo_qty'] . '</td>';
-                        $tableHtml .= '<td>' . $grpo['status'] . '</td>';
-                        $tableHtml .= '<td>' . $grpo['outstanding'] . '</td>';
-                        $tableHtml .= '</tr>';
+                        
                     }
                 }
             }
@@ -370,7 +383,7 @@ class PurchaseProgressController extends Controller
     public function export(Request $request){
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
-		
-		return Excel::download(new ExportPurchaseProgressReport($post_date,$end_date), 'purchase_progress_report'.uniqid().'.xlsx');
+		$type = $request->type ? $request->type : '';
+		return Excel::download(new ExportPurchaseProgressReport($post_date,$end_date,$type), 'purchase_progress_report'.uniqid().'.xlsx');
     }
 }

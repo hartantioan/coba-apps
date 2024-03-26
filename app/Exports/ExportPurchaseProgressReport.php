@@ -11,16 +11,16 @@ use App\Helpers\CustomHelper;
 
 class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
 {
-    protected $start_date,$end_date;
-    public function __construct(string $start_date,string $end_date)
+    protected $start_date,$end_date,$type;
+    public function __construct(string $start_date,string $end_date,string $type)
     {
         $this->start_date = $start_date ? $start_date : '';
         $this->end_date = $end_date ? $end_date : '';
-
+        $this->type = $type ? $type : '';
     }
     public function title(): string
     {
-        return 'Progres Pemmbelian'; // Set the custom name for the first sheet
+        return 'Progres Pembelian'; // Set the custom name for the first sheet
     }
 
     public function view(): View
@@ -251,6 +251,7 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
         info($array_detail);
         return view('admin.exports.purchase_progress_report', [
             'data' => $array_detail,
+            'type' => $this->type,
         ]);
     }
 }

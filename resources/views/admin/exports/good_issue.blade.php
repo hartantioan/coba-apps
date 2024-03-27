@@ -61,7 +61,7 @@
                 <td>{{ $rowdetail->note }}</td>
                 <td>{{ $rowdetail->note2 }}</td>
                 <td>{{ $rowdetail->inventoryCoa()->exists() ? $rowdetail->inventoryCoa->name : '-' }}</td>
-                <td>{{ $rowdetail->inventoryCoa()->exists() ? $rowdetail->inventoryCoa->coa->name : ($rowdetail->coa()->exists() ? $rowdetail->coa->code.' - '.$rowdetail->coa->name : '-') }}</td>
+                <td>{{ $rowdetail->inventoryCoa()->exists() ? $rowdetail->inventoryCoa->coa->code.' - '.$rowdetail->inventoryCoa->coa->name : ($rowdetail->coa()->exists() ? $rowdetail->coa->code.' - '.$rowdetail->coa->name : '-') }}</td>
                 <td>{{ $rowdetail->costDistribution()->exists() ? $rowdetail->costDistribution->code.' - '.$rowdetail->costDistribution->name : '-' }}</td>
                 <td>{{ $rowdetail->qty }}</td>
                 <td>{{ $rowdetail->itemStock->item->uomUnit->code }}</td>

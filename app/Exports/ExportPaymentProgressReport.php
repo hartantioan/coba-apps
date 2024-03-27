@@ -48,7 +48,7 @@ class ExportPaymentProgressReport implements  FromView,ShouldAutoSize,WithTitle
                     'item_code'    => $row_item_po_detail->item->code ?? $row_item_po_detail->coa->code,
                     'po_code'      => $row_item_po->code,
                     'po_date'      => $row_item_po->post_date,
-                    'po_qty'       => CustomHelper::formatConditionalQty($row_item_po_detail->qty),
+                    'po_qty'       => $row_item_po_detail->qty,
                     'nominal'      => number_format($row_item_po_detail->grandtotal,2,',','.'),
                     'status'       => $row_item_po->statusRaw(),
                 ];
@@ -68,7 +68,7 @@ class ExportPaymentProgressReport implements  FromView,ShouldAutoSize,WithTitle
                         $grpo=[
                             'grpo_code'      => $row_gr_detail->goodReceipt->code,
                             'grpo_date'      => $row_gr_detail->goodReceipt->post_date,
-                            'grpo_qty'       => CustomHelper::formatConditionalQty($row_gr_detail->qty),
+                            'grpo_qty'       => $row_gr_detail->qty,
                             'nominal'        => number_format($row_gr_detail->grandtotal,2,',','.'),
                             'status'         => $row_gr_detail->goodReceipt->statusRaw(),
                         ];
@@ -86,7 +86,7 @@ class ExportPaymentProgressReport implements  FromView,ShouldAutoSize,WithTitle
                                 $inv=[
                                     'inv_code'      => $row_inv_detail->purchaseInvoice->code,
                                     'inv_date'      => $row_inv_detail->purchaseInvoice->post_date,
-                                    'inv_qty'       => CustomHelper::formatConditionalQty($row_inv_detail->qty),
+                                    'inv_qty'       => $row_inv_detail->qty,
                                     'nominal'       => number_format($row_inv_detail->grandtotal,2,',','.'),
                                     'status'        => $row_inv_detail->purchaseInvoice->statusRaw(),
                                 ];
@@ -97,7 +97,7 @@ class ExportPaymentProgressReport implements  FromView,ShouldAutoSize,WithTitle
                                         $pyr=[
                                             'pyr_code'    => $row_pyr_detail->paymentRequest->code,
                                             'pyr_date'    => $row_pyr_detail->paymentRequest->post_date,
-                                            'pyr_qty'     => CustomHelper::formatConditionalQty($row_pyr_detail->qty),
+                                            'pyr_qty'     => $row_pyr_detail->qty,
                                             'nominal'     => number_format($row_pyr_detail->nominal,2,',','.'),
                                             'status'      => $row_pyr_detail->paymentRequest->statusRaw(),
                                             'opym_code'   => $row_pyr_detail->paymentRequest->outgoingPayment()->exists() ? $row_pyr_detail->paymentRequest->outgoingPayment->code : ''
@@ -152,7 +152,7 @@ class ExportPaymentProgressReport implements  FromView,ShouldAutoSize,WithTitle
                             $grpo=[
                                 'grpo_code'      => $row_gr_detail->goodReceipt->code,
                                 'grpo_date'      => $row_gr_detail->goodReceipt->post_date,
-                                'grpo_qty'       => CustomHelper::formatConditionalQty($row_gr_detail->qty),
+                                'grpo_qty'       => $row_gr_detail->qty,
                                 'status'         => $row_gr_detail->goodReceipt->statusRaw(),
                                 'nominal'        => number_format($row_gr_detail->grandtotal,2,',','.'),
                             ];

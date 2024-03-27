@@ -123,7 +123,7 @@ class ExportPurchaseMemoTransactionPage implements FromCollection, WithTitle, Wi
                 'ref'               => $row->getCode(),
                 'spk'               => $row->getSpk(),
                 'invoice'           => $row->getInvoiceNo(),
-                'qty'               => CustomHelper::formatConditionalQty($row->qty),
+                'qty'               => $row->qty,
                 'nominal'           => number_format($row->getNominal(),2,',','.'),
                 'total'             => number_format($row->total,2,',','.'),
                 'tax'               => number_format($row->tax,2,',','.'),

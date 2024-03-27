@@ -36,9 +36,9 @@ class ExportOutstandingGoodIssueRequest implements FromView,ShouldAutoSize
             $entry["ket1"] = $row->note;
             $entry["ket2"] = $row->note2;
             $entry["satuan"] =$row->item->uomUnit->code;
-            $entry["qty"] = CustomHelper::formatConditionalQty($row->qty);
-            $entry["qty_gi"] = CustomHelper::formatConditionalQty($row->totalGi());
-            $entry["qty_balance"] = CustomHelper::formatConditionalQty($row->balanceGi());
+            $entry["qty"] = $row->qty;
+            $entry["qty_gi"] = $row->totalGi();
+            $entry["qty_balance"] = $row->balanceGi();
             $entry["required_date"] =$row->required_date;
             $entry["warehouse"] =$row->warehouse->name;
             $entry["line"] =$row->line->name ?? '-';

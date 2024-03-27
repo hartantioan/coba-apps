@@ -60,7 +60,7 @@
                 <td>{{ $rowdetail->inventoryCoa()->exists() ? $rowdetail->inventoryCoa->name.' - '.$rowdetail->inventoryCoa->code : '-' }}</td>
                 <td>{{ $rowdetail->coa()->exists() ? $rowdetail->coa->code.' - '.$rowdetail->coa->name : '-' }}</td>
                 <td>{{ $rowdetail->costDistribution()->exists() ? $rowdetail->costDistribution->name : '-' }}</td>
-                <td>{{ CustomHelper::formatConditionalQty($rowdetail->qty) }}</td>
+                <td>{{ $rowdetail->qty }}</td>
                 <td>{{ $rowdetail->item->uomUnit->code }}</td>
                 <td>{{ $rowdetail->line()->exists() ? $rowdetail->line->code : '-' }}</td>
                 <td>{{ $rowdetail->machine()->exists() ? $rowdetail->machine->code : '-' }}</td>

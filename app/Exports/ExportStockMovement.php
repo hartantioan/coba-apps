@@ -135,10 +135,10 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                 'kode' => $row->item->code,
                 'final'=>number_format($row->price_final,2,',','.'),
                 'total'=>$perlu == 0 ? '-' : number_format($cum_val, 2, ',', '.'),
-                'qty'=>$perlu == 0 ? '-' : CustomHelper::formatConditionalQty($cum_qty),
+                'qty'=>$perlu == 0 ? '-' : $cum_qty,
                 'date' =>  date('d/m/Y',strtotime($row->date)),
                 'document' => $row->lookable->code,
-                'cum_qty' => CustomHelper::formatConditionalQty($row->qty_final),
+                'cum_qty' => $row->qty_final,
                 'cum_val' => number_format($row->total_final,2,',','.'),
             ];
             $array_filter[]=$data_tempura;

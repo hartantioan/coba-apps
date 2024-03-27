@@ -48,7 +48,7 @@
                 <td>{{ $row->voidUser()->exists() ? $row->void_note : '' }}</td>
                 <td>{{ $rowdetail->asset->name }}</td>
                 <td align="right">{{ number_format($rowdetail->price,2,',','.') }}</td>
-                <td align="center">{{ CustomHelper::formatConditionalQty($rowdetail->qty) }}</td>
+                <td align="center">{{ $rowdetail->qty }}</td>
                 <td align="center">{{ $rowdetail->unit->code }}</td>
                 <td align="right">{{ number_format($rowdetail->total,2,',','.') }}</td>
                 <td>{{ $rowdetail->note }}</td>

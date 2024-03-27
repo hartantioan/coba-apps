@@ -47,7 +47,7 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                     'item_code'    => $row_item_request_detail->item->code,
                     'ir_code'      => $row_item_request->code,
                     'ir_date'      => $row_item_request->post_date,
-                    'ir_qty'       => CustomHelper::formatConditionalQty($row_item_request_detail->qty),
+                    'ir_qty'       => $row_item_request_detail->qty,
                     'status'    => $row_item_request->statusRaw(),
                 ];
                 $max_count_pr = 1;
@@ -66,7 +66,7 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                         $pr=[
                             'pr_code'      => $row_pr_detail->purchaseRequest->code,
                             'pr_date'      => $row_pr_detail->purchaseRequest->post_date,
-                            'pr_qty'       => CustomHelper::formatConditionalQty($row_pr_detail->qty),
+                            'pr_qty'       => $row_pr_detail->qty,
                             'status'       => $row_pr_detail->purchaseRequest->statusRaw(),
                         ];
                         if($row_pr_detail->purchaseOrderDetail()->exists()){
@@ -83,7 +83,7 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                                 $po=[
                                     'po_code'      => $row_po_detail->purchaseOrder->code,
                                     'po_date'      => $row_po_detail->purchaseOrder->post_date,
-                                    'po_qty'       => CustomHelper::formatConditionalQty($row_po_detail->qty),
+                                    'po_qty'       => $row_po_detail->qty,
                                     'status'       => $row_po_detail->purchaseOrder->statusRaw(),
                                 ];
                                 if($row_po_detail->goodReceiptDetail()->exists()){
@@ -93,7 +93,7 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                                         $grpo=[
                                             'grpo_code'    => $row_grpo_detail->goodReceipt->code,
                                             'grpo_date'    => $row_grpo_detail->goodReceipt->post_date,
-                                            'grpo_qty'     => CustomHelper::formatConditionalQty($row_grpo_detail->qty),
+                                            'grpo_qty'     => $row_grpo_detail->qty,
                                             'outstanding'  => $row_po_detail->getBalanceReceipt(),
                                             'status'       => $row_grpo_detail->goodReceipt->statusRaw(),
                                         ];
@@ -174,7 +174,7 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                             $pr=[
                                 'pr_code'      => $row_pr_detail->purchaseRequest->code,
                                 'pr_date'      => $row_pr_detail->purchaseRequest->post_date,
-                                'pr_qty'       => CustomHelper::formatConditionalQty($row_pr_detail->qty),
+                                'pr_qty'       => $row_pr_detail->qty,
                                 'status'       => $row_pr_detail->purchaseRequest->statusRaw(),
                             ];
                             $po['grpo'][]=$grpo;

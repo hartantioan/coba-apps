@@ -271,7 +271,7 @@
                         <th class="center">Referensi</th>
                         <th class="center">Tipe</th>
                         <th class="center">Keterangan</th>
-                        <th class="center">Bayar</th>
+                        <th class="center" colspan="2">Bayar</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -283,32 +283,41 @@
                         <td>{{ $row->getCode() }}</td>
                         <td class="center-align">{{ $row->type() }}</td>
                         <td>{{ $row->note }}</td>
-                        <td class="right-align">{{ $data->currency->symbol.number_format($row->nominal,2,',','.') }}</td>
+                        <td class="right-align" colspan="2">{{ $data->currency->symbol.number_format($row->nominal,2,',','.') }}</td>
                     </tr>
                     @php
                         $total += $row->nominal;
                     @endphp
                     @endforeach
                     <tr>
+                        <td colspan="3" class="right-align"></td>
+                        <td class="center-align">Mata Uang FC</td>
+                        <td class="center-align">Mata Uang Rp</td>
+                    </tr>
+                    <tr>
                         <td colspan="3" class="right-align">Total</td>
                         <td class="right-align">{{ $data->currency->symbol.number_format($data->total,2,',','.') }}</td>
+                        <td class="right-align">{{ 'Rp'.number_format($data->total * $data->currency_rate,2,',','.') }}</td>
                     </tr>
                     <tr>
                         <td colspan="3" class="right-align">Pembulatan</td>
                         <td class="right-align">{{ $data->currency->symbol.number_format($data->rounding,2,',','.') }}</td>
+                        <td class="right-align">{{ 'Rp'.number_format($data->rounding * $data->currency_rate,2,',','.') }}</td>
                     </tr>
                     <tr>
                         <td colspan="3" class="right-align">Admin</td>
                         <td class="right-align">{{ $data->currency->symbol.number_format($data->admin,2,',','.') }}</td>
+                        <td class="right-align">{{ 'Rp'.number_format($data->admin * $data->currency_rate,2,',','.') }}</td>
                     </tr>
                     <tr>
                         <td colspan="3" class="right-align">Grandtotal</td>
                         <td class="right-align">{{ $data->currency->symbol.number_format($data->grandtotal,2,',','.') }}</td>
+                        <td class="right-align">{{ 'Rp'.number_format($data->grandtotal * $data->currency_rate,2,',','.') }}</td>
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="4">Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords(strtolower($data->currency->document_text)) }}</i></th>
+                        <th colspan="5">Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords(strtolower($data->currency->document_text)) }}</i></th>
                     </tr>
                 </tfoot>
             </table>

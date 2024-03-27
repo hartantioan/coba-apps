@@ -63,7 +63,7 @@
                 <td>{{ $rowdetail->inventoryCoa()->exists() ? $rowdetail->inventoryCoa->name : '-' }}</td>
                 <td>{{ $rowdetail->inventoryCoa()->exists() ? $rowdetail->inventoryCoa->coa->name : ($rowdetail->coa()->exists() ? $rowdetail->coa->code.' - '.$rowdetail->coa->name : '-') }}</td>
                 <td>{{ $rowdetail->costDistribution()->exists() ? $rowdetail->costDistribution->code.' - '.$rowdetail->costDistribution->name : '-' }}</td>
-                <td>{{ CustomHelper::formatConditionalQty($rowdetail->qty) }}</td>
+                <td>{{ $rowdetail->qty }}</td>
                 <td>{{ $rowdetail->itemStock->item->uomUnit->code }}</td>
                 <td>{{ $rowdetail->line()->exists() ? $rowdetail->line->code : '-' }}</td>
                 <td>{{ $rowdetail->machine()->exists() ? $rowdetail->machine->name : '-' }}</td>
@@ -71,7 +71,7 @@
                 <td>{{ $rowdetail->itemStock->warehouse->name }}</td>
                 <td>{{ $rowdetail->project()->exists() ? $rowdetail->project->name : '-' }}</td>
                 <td>{{ $rowdetail->requester }}</td>
-                <td>{{ CustomHelper::formatConditionalQty($rowdetail->qty_return) }}</td>
+                <td>{{ $rowdetail->qty_return }}</td>
                 <td>{{ $rowdetail->total }}</td>
                 <td>{{ $rowdetail->materialRequestDetail()  ? $rowdetail->lookable->code : '-'}}</td>                
             </tr>

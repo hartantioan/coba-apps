@@ -57,7 +57,7 @@
                 
                 <td>{{ $rowdetail->item->code }}</td>
                 <td>{{ $rowdetail->item->name }}</td>
-                <td>{{ CustomHelper::formatConditionalQty($rowdetail->qty) }}</td>
+                <td>{{ $rowdetail->qty }}</td>
                 <td>{{ $rowdetail->item->uomUnit->code }}</td>
                 <td>{{ $rowdetail->note }}</td>
                 <td>{{ $rowdetail->listSerialIn() }}</td>

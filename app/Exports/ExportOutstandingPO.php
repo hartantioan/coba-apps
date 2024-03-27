@@ -29,9 +29,9 @@ class ExportOutstandingPO implements FromView,ShouldAutoSize
             $entry["item_code"] = $row->item->code;
             $entry["item_name"] = $row->item->name;
             $entry["satuan"] =$row->itemUnit->unit->code;
-            $entry["qty"] = CustomHelper::formatConditionalQty($row->qty);
-            $entry["qty_gr"] = CustomHelper::formatConditionalQty($row->qtyGR());
-            $entry["qty_balance"] = CustomHelper::formatConditionalQty($row->getBalanceReceipt());
+            $entry["qty"] = $row->qty;
+            $entry["qty_gr"] = $row->qtyGR();
+            $entry["qty_balance"] = $row->getBalanceReceipt();
             if($row->getBalanceReceipt()> 0){
                 $array[] = $entry;
             }

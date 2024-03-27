@@ -48,7 +48,7 @@
                 <td>{{ $row->note }}</td>
                 <td>{{ $rowdetail->item->code }}</td>
                 <td>{{ $rowdetail->item->name }}</td>
-                <td>{{ CustomHelper::formatConditionalQty($rowdetail->qty) }}</td>
+                <td>{{ $rowdetail->qty }}</td>
                 <td>{{ $rowdetail->item->uomUnit->code }}</td>
                 <td>{{ $rowdetail->itemStock->place->code.' - '.$rowdetail->itemStock->warehouse->name }}</td>
                 <td>{{ number_format($rowdetail->nominal,2,',','.') }}</td>

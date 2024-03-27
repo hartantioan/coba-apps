@@ -27,9 +27,9 @@ class ExportOutstandingPurchaseRequest implements FromView,ShouldAutoSize
             $entry["item_code"] = $row->item->code;
             $entry["item_name"] = $row->item->name;
             $entry["satuan"] =$row->itemUnit->unit->code;
-            $entry["qty"] = CustomHelper::formatConditionalQty($row->qty);
-            $entry["qty_po"] = CustomHelper::formatConditionalQty($row->qtyPO());
-            $entry["qty_balance"] = CustomHelper::formatConditionalQty($row->qtyBalance());
+            $entry["qty"] = $row->qty;
+            $entry["qty_po"] = $row->qtyPO();
+            $entry["qty_balance"] = $row->qtyBalance();
             if($row->qtyBalance()> 0){
                 $array[] = $entry;
             }

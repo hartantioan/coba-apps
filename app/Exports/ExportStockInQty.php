@@ -58,7 +58,7 @@ class ExportStockInQty implements FromView,ShouldAutoSize
                 'gudang' => $row->warehouse->name ?? '',
                 'kode' => $row->item->code,
                 'item' => $row->item->name,
-                'final'=>CustomHelper::formatConditionalQty($row->qty),
+                'final'=> $row->qty,
                 'satuan'=>$row->item->uomUnit->code,
                 'perlu' =>1,
             ];

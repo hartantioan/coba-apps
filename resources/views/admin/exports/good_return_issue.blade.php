@@ -58,8 +58,8 @@
                 <td>{{ $rowdetail->item->name }}</td>
                 <td>{{ $rowdetail->goodIssueDetail->itemStock->place->code }}</td>
                 <td>{{ $rowdetail->note }}</td>
-                <td>{{ CustomHelper::formatConditionalQty($rowdetail->goodIssueDetail->qtyBalanceReturn()) }}</td>
-                <td>{{ CustomHelper::formatConditionalQty($rowdetail->qty) }}</td>
+                <td>{{ $rowdetail->goodIssueDetail->qtyBalanceReturn() }}</td>
+                <td>{{ $rowdetail->qty }}</td>
                 <td>{{ $rowdetail->item->uomUnit->code }}</td>
       
   

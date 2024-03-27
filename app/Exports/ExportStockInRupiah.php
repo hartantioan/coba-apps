@@ -143,10 +143,10 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                 'kode' => $row->item->code,
                 'final'=>number_format($priceNow,2,',','.'),
                 'total'=>$perlu == 0 ? '-' : number_format($cum_val,2,',','.'),
-                'qty' => $perlu == 0 ? '-' : CustomHelper::formatConditionalQty($cum_qty),
+                'qty' => $perlu == 0 ? '-' : $cum_qty,
                 'date' =>  date('d/m/Y',strtotime($row->date)),
                 'document' => $row->lookable->code,
-                'cum_qty' => CustomHelper::formatConditionalQty($row->qty_final),
+                'cum_qty' => $row->qty_final,
                 'cum_val' => number_format($row->total_final,2,',','.'),
             ];
             $array_filter[]=$data_tempura;
@@ -181,7 +181,7 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                     'item'         => $row->item->name,
                     'satuan'       => $row->item->uomUnit->code,
                     'kode'         => $row->item->code,
-                    'last_qty'     => $query_first ? number_format($query_first->qty_final, 2, ',', '.') : 0,
+                    'last_qty'     => $query_first ? $query_first->qty_final : 0,
                 ];
 
 
@@ -250,7 +250,7 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                         'item'         => $row_tidak_ada->item->name,
                         'satuan'       => $row_tidak_ada->item->uomUnit->code,
                         'kode'         => $row_tidak_ada->item->code,
-                        'last_qty'     => $row_tidak_ada ? number_format($row_tidak_ada->qty_final, 2, ',', '.') : 0,
+                        'last_qty'     => $row_tidak_ada ? $row_tidak_ada->qty_final : 0,
                     ]; 
                 }
                 

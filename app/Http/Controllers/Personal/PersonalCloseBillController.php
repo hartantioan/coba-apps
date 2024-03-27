@@ -30,6 +30,8 @@ use App\Models\Machine;
 use App\Models\MenuUser;
 use App\Exports\ExportFundRequestTransactionPage;
 use App\Models\Currency;
+use App\Models\FundRequest;
+use App\Models\OutgoingPayment;
 use App\Models\PersonalCloseBill;
 use App\Models\Tax;
 
@@ -940,7 +942,7 @@ class PersonalCloseBillController extends Controller
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
                     '
-                       
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light blue accent-2 white-text" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light orange accent-2 white-text" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
@@ -966,23 +968,95 @@ class PersonalCloseBillController extends Controller
         return response()->json($response);
     }
 
-    public function getAccountInfo(Request $request){
-        $data = User::find($request->id);
+    public function getData(Request $request){
+        $details = [];
+        $data = FundRequest::where('type','1')->whereIn('status',['2','3'])->where('document_status','3')->whereHas('hasPaymentRequestDetail',function($query){
+            $query->whereHas('paymentRequest',function($query){
+                $query->whereHas('outgoingPayment');
+            });
+        })->whereDoesntHave('used')->where('account_id',session('bo_id'))->get();
 
-        $banks = [];
-
-        if($data){
-            foreach($data->userBank()->orderByDesc('is_default')->get() as $row){
-                $banks[] = [
-                    'id'        => $row->id,
-                    'bank'      => $row->bank,
-                    'name'      => $row->name,
-                    'no'        => $row->no,
+        foreach($data as $row){
+            $totalReceivable = $row->totalReceivable();
+            $totalReceivableUsed = $row->totalReceivableUsedPaid();
+            $balance = $totalReceivable - $totalReceivableUsed;
+            if(!$row->used()->exists() && $balance > 0){
+                $details[] = [
+                    'id'                    => $row->id,
+                    'type'                  => $row->getTable(),
+                    'code'                  => $row->code,
+                    'post_date'             => date('d/m/Y',strtotime($row->post_date)),
+                    'total'                 => number_format($totalReceivable,2,',','.'),
+                    'used'                  => number_format($totalReceivableUsed,2,',','.'),
+                    'balance'               => number_format($balance,2,',','.'),
+                    'note'                  => $row->note,
                 ];
             }
         }
 
-        $data['banks'] = $banks;
+        return response()->json([
+            'status'    => 200,
+            'data'      => $details,
+            'message'   => 'Data tidak ditemukan.' 
+        ]);
+    }
+
+    public function getAccountData(Request $request){
+        $details = [];
+
+        if($request->arr_type){
+            foreach($request->arr_type as $key => $row){
+                if($row == 'fund_requests'){
+                    $fr = FundRequest::whereDoesntHave('used')->where('id',$request->arr_id[$key])->first();
+                    if($fr){
+                        CustomHelper::sendUsedData($fr->getTable(),$fr->id,'Form Tutupan BS Personal');
+                        $totalReceivable = $fr->totalReceivable();
+                        $totalReceivableUsed = $fr->totalReceivableUsedPaid();
+                        $balance = $totalReceivable - $totalReceivableUsed;
+                        if($balance > 0){
+                            $arrDetail = [];
+                            foreach($fr->fundRequestDetail as $row){
+                                $arrDetail[] = [
+                                    'id'                => $fr->id,
+                                    'note'              => $row->note,
+                                    'qty'               => CustomHelper::formatConditionalQty($row->qty),
+                                    'unit_id'           => $row->unit_id,
+                                    'unit_name'         => $row->unit->code.' - '.$row->unit->name,
+                                    'tax_id'            => $row->tax_id ?? '',
+                                    'percent_tax'       => $row->percent_tax,
+                                    'is_include_tax'    => $row->is_include_tax,
+                                    'wtax_id'           => $row->wtax_id ?? '',
+                                    'percent_wtax'      => $row->percent_wtax,
+                                    'total'             => number_format($row->total,2,',','.'),
+                                    'tax'               => number_format($row->tax,2,',','.'),
+                                    'wtax'              => number_format($row->wtax,2,',','.'),
+                                    'grandtotal'        => number_format($row->grandtotal,2,',','.'),
+                                    'place_id'          => $row->place_id ?? '',
+                                    'line_id'           => $row->line_id ?? '',
+                                    'machine_id'        => $row->machine_id ?? '',
+                                    'division_id'       => $row->division_id ?? '',
+                                    'project_id'        => $row->project_id ?? '',
+                                    'project_name'      => $row->project()->exists() ? $row->project->code.' - '.$row->project->name : '',
+                                ];
+                            }
+                            $details[] = [
+                                'type'      => $fr->getTable(),
+                                'id'        => $fr->id,
+                                'code'      => $fr->code,
+                                'post_date' => $fr->pay_date,
+                                'total'     => number_format($totalReceivable,2,',','.'),
+                                'used'      => number_format($totalReceivableUsed,2,',','.'),
+                                'balance'   => number_format($balance,2,',','.'),
+                                'note'      => $fr->note,
+                                'detail'    => $arrDetail,
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+
+        $data['details'] = $details;
 
         return response()->json($data);
     }

@@ -209,13 +209,6 @@ class FundRequest extends Model
             })->get() as $row){
                 $total += $row->nominal;
             }
-            foreach($this->fundRequestDetail as $rowdetail){
-                foreach($rowdetail->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
-                    $query->whereHas('outgoingPayment');
-                })->get() as $row){
-                    $total += $row->nominal;
-                }
-            }
         }
         return $total;
     }

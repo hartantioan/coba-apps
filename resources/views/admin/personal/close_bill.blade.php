@@ -391,6 +391,41 @@
     </div>
 </div>
 
+<div id="modal5" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-header ml-2">
+        <h5>Daftar Tunggakan Dokumen</h5>
+    </div>
+    <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
+        <div class="row">
+            <div class="col s12">
+                <div class="row">
+                    <div class="col s12 mt-2 mb-5">
+                        <div id="datatable_buttons_multi"></div>
+                        <i class="right">Gunakan *pilih semua* untuk memilih seluruh data yang anda inginkan. Atau pilih baris untuk memilih data yang ingin dipindahkan.</i>
+                        <table id="table_multi" class="display" width="100%">
+                            <thead>
+                                <tr>
+                                    <th class="center-align">Kode Dokumen</th>
+                                    <th class="center-align">Tgl.Post</th>
+                                    <th class="center-align">Total</th>
+                                    <th class="center-align">Terpakai</th>
+                                    <th class="center-align">Sisa</th>
+                                    <th class="center-align">Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-detail-multi"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">Close</a>
+        <button class="btn waves-effect waves-light purple right submit" onclick="applyDocuments();">Gunakan <i class="material-icons right">forward</i></button>
+    </div>
+</div>
+
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
@@ -415,6 +450,56 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
+            }
+        });
+
+        $('#modal5').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) {
+                table_multi = $('#table_multi').DataTable({
+                    "ordering": false,
+                    scrollY: '50vh',
+                    scrollCollapse: true,
+                    "iDisplayInLength": 10,
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    "language": {
+                        "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Data tidak ditemukan / kosong",
+                        "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
+                        "infoEmpty": "Data tidak ditemukan / kosong",
+                        "infoFiltered": "(disaring dari _MAX_ total data)",
+                        "search": "Cari",
+                        "paginate": {
+                            first:      "<<",
+                            previous:   "<",
+                            next:       ">",
+                            last:       ">>"
+                        },
+                        "buttons": {
+                            selectAll: "Pilih semua",
+                            selectNone: "Hapus pilihan"
+                        },
+                        "select": {
+                            rows: "%d baris terpilih"
+                        }
+                    },
+                    select: {
+                        style: 'multi'
+                    }
+                });
+                $('#table_multi_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi');
+                $('select[name="table_multi_length"]').addClass('browser-default');
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#body-detail-multi').empty();
+                $('#table_multi').DataTable().clear().destroy();
             }
         });
 
@@ -456,7 +541,6 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
-                applyBpList();
             }
         });
 
@@ -489,9 +573,177 @@
                 }
             }
         });
-
-        applyBpList();
     });
+
+    function applyDocuments(){
+        swal({
+            title: "Apakah anda yakin?",
+            text: "Jika sudah ada di dalam tabel detail Permohonan Dana / Fund Request, maka akan tergantikan dengan pilihan baru anda saat ini.",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                let arr_id = [], arr_type = [];
+                $.map(table_multi.rows('.selected').nodes(), function (item) {
+                    arr_id.push($(item).data('id'));
+                    arr_type.push($(item).data('type'));
+                });
+
+                $.ajax({
+                    url: '{{ Request::url() }}/get_account_data',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        arr_id: arr_id,
+                        arr_type: arr_type,
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+                        $('#empty-detail').remove();
+                        $('.row_op').remove();
+                        if(response.details.length > 0){
+                            $.each(response.details, function(i, val) {
+                                var count = makeid(10);
+                                $('#list-used-data').append(`
+                                    <div class="chip purple darken-4 gradient-shadow white-text">
+                                        ` + val.code + `
+                                        <i class="material-icons close data-used" onclick="removeUsedData('` + val.type + `',` + val.id + `)">close</i>
+                                    </div>
+                                `);
+                                $('#body-detail-op').append(`
+                                    <tr class="row_op" data-id="` + val.id + `">
+                                        <input type="hidden" name="arr_type[]" value="` + val.type + `" id="arr_type` + count + `">
+                                        <input type="hidden" name="arr_id[]" value="` + val.id + `" id="arr_id` + count + `">
+                                        <td>
+                                            ` + val.code + `
+                                        </td>
+                                        <td>
+                                            ` + val.bp + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.post_date + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.total + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.used + `
+                                        </td>
+                                        <td class="center">
+                                            <input name="arr_nominal[]" onfocus="emptyThis(this);" class="browser-default" type="text" data-max="` + val.balance + `" value="` + val.balance + `" onkeyup="formatRupiah(this);checkRow('` + count + `');countAll();" style="text-align:right;width:100%;" id="arr_nominal` + count + `">
+                                        </td>
+                                        <td class="center">
+                                            <input name="arr_note_source[]" class="browser-default" type="text" value="` + val.note + `" style="width:100%;" id="arr_note_source` + count + `">
+                                        </td>
+                                        <td class="center">
+                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                                <i class="material-icons">delete</i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                `);
+                            });
+                            countAll();
+                        }else{
+
+                        }
+                        
+                        $('.modal-content').scrollTop(0);
+                        M.updateTextFields();
+
+                        $('#modal5').modal('close');
+                    }, 
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('.modal-content');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    function getData(){
+        $.ajax({
+            url: '{{ Request::url() }}/get_data',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: $('#fund_request_id').val()
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#modal1');
+            },
+            success: function(response) {
+                loadingClose('#modal1');
+                if(response.status == 500){
+                    swal({
+                        title: 'Ups!',
+                        text: response.message,
+                        icon: 'warning'
+                    });
+                }else{
+                    $('#modal5').modal('open');
+
+                    if(response.data.length > 0){
+                        $.each(response.data, function(i, val) {
+                            $('#body-detail-multi').append(`
+                                <tr data-type="` + val.type + `" data-id="` + val.id + `">
+                                    <td>
+                                        ` + val.code + `
+                                    </td>
+                                    <td>
+                                        ` + val.post_date + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.total + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.used + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.balance + `
+                                    </td>
+                                    <td class="">
+                                        ` + val.note + `
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }
+                    
+                    $('.modal-content').scrollTop(0);
+                    M.updateTextFields();
+                }
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#modal1');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
 
     var printService = new WebSocketPrinter({
         onConnect: function () {
@@ -715,24 +967,6 @@
         }
     }
 
-    function changeDateMinimum(val){
-        if(val){
-            $('#required_date').attr("min",val);
-            $('input[name^="arr_required_date"]').each(function(){
-                $(this).attr("min",val);
-            });
-
-            let newcode = $('#code').val().replaceAt(5,val.split('-')[0].toString().substr(-2));
-            if($('#code').val().substring(5, 7) !== val.split('-')[0].toString().substr(-2)){
-                if(newcode.length > 9){
-                    newcode = newcode.substring(0, 9);
-                }
-            }
-            $('#code').val(newcode);
-            $('#code_place_id').trigger('change');
-        }
-    }
-
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
             "scrollCollapse": true,
@@ -800,81 +1034,6 @@
         $('.dt-buttons').appendTo('#datatable_buttons');
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
-
-    function getAccountInfo(){
-        if($('#account_id').val()){
-            if((parseFloat($('#account_id').select2('data')[0].balance_limit) > 0 && $('#account_id').select2('data')[0].type == '1') || $('#type').val() == '2' || ['2','3','4'].includes($('#account_id').select2('data')[0].type)){
-                $.ajax({
-                    url: '{{ Request::url() }}/get_account_info',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: {
-                        id: $('#account_id').val()
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        loadingOpen('.modal-content');
-                    },
-                    success: function(response) {
-                        loadingClose('.modal-content');
-                        $('#user_bank_id').empty();
-                        $('#tempLimit').val($('#account_id').select2('data')[0].balance_limit);
-                        $('#limit').text(
-                            formatRupiahIni($('#account_id').select2('data')[0].balance_limit.toString().replace('.',','))
-                        );
-                        if(response.banks.length > 0){
-                            /* $('#user_bank_id').append(`
-                                <option value="">--Pilih dari daftar-</option>
-                            `);
-                            $.each(response.banks, function(i, val) {
-                                $('#user_bank_id').append(`
-                                    <option value="` + val.id + `" data-name="` + val.name + `" data-bank="` + val.bank + `" data-no="` + val.no + `">` + val.bank + ` - ` + val.no + ` - ` + val.name + `</option>
-                                `);
-                            }); */                        
-                        }else{
-                            $('#user_bank_id').append(`
-                                <option value="">--Pilih Partner Bisnis-</option>
-                            `);
-                        }
-                        $('#user_bank_id').formSelect();
-                        $('.modal-content').scrollTop(0);
-                        M.updateTextFields();
-                    },
-                    error: function() {
-                        $('.modal-content').scrollTop(0);
-                        loadingClose('.modal-content');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
-                        });
-                    }
-                });
-            }else{
-                $('#limit').text('0,00');
-                $('#tempLimit').val('0');
-                swal({
-                    title: 'Ups! Sisa limit BS adalah ' + $('#account_id').select2('data')[0].balance_limit,
-                    text: 'Maaf Partner Bisnis tidak bisa ditambahkan.',
-                    icon: 'warning'
-                });
-                $('#account_id').empty();
-                $('.row_item').remove();
-                $('#user_bank_id').empty().append(`
-                    <option value="">--Pilih Partner Bisnis-</option>
-                `);
-            }
-        }else{
-            $('#limit').text('0,00');
-            $('#tempLimit').val('0');
-            $('.row_item').remove();
-            $('#user_bank_id').empty().append(`
-                <option value="">--Pilih Partner Bisnis-</option>
-            `);
-        }
-    }
 
     function rowDetail(data) {
         $.ajax({
@@ -1019,58 +1178,6 @@
                         icon: 'warning'
                     });
                 }
-            }
-        });
-    }
-
-    function finish(id){
-		swal({
-            title: "Apakah anda yakin ingin simpan?",
-            text: "Status akan dirubah menjadi SELESAI!",
-            icon: 'warning',
-            dangerMode: true,
-            buttons: {
-            cancel: 'Tidak, jangan!',
-            delete: 'Ya, lanjutkan!'
-            }
-        }).then(function (willDelete) {
-            if (willDelete) {
-                $.ajax({
-                    url: '{{ Request::url() }}/finish',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: {
-                        code : id,
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        loadingOpen('.container');
-                    },
-                    success: function(response) {
-                        loadingClose('.container');
-                        if(response.status == 200) {
-                            loadDataTable();
-                            M.toast({
-                                html: response.message
-                            });
-                        } else {
-                            M.toast({
-                                html: response.message
-                            });
-                        }
-                    },
-                    error: function() {
-                        $('.container').scrollTop(0);
-                        loadingClose('.container');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
-                        });
-                    }
-                });
             }
         });
     }

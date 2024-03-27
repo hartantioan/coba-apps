@@ -674,7 +674,7 @@
                 </td>
                 <td>
                     <select class="browser-default" id="arr_tax_id` + count + `" name="arr_tax_id[]" onchange="count();">
-                        <option value="0" data-value="0">-- Pilih ini jika non-PPN --</option>
+                        <option value="0.00000" data-value="0">-- Pilih ini jika non-PPN --</option>
                         @foreach ($tax as $row)
                             <option value="{{ $row->id }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-value="{{ $row->percentage }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
                         @endforeach
@@ -688,7 +688,7 @@
                 </td>
                 <td>
                     <select class="browser-default" id="arr_wtax_id` + count + `" name="arr_wtax_id[]" onchange="count();">
-                        <option value="0" data-value="0">-- Pilih ini jika non-PPh --</option>
+                        <option value="0.00000" data-value="0">-- Pilih ini jika non-PPh --</option>
                         @foreach ($wtax as $row)
                         <option value="{{ $row->id }}" {{ $row->is_default_pph ? 'selected' : '' }} data-value="{{ $row->percentage }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
                         @endforeach

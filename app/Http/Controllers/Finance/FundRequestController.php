@@ -1123,6 +1123,13 @@ class FundRequestController extends Controller
                 try { */
                     $query = FundRequest::where('code',CustomHelper::decrypt($request->temp))->first();
 
+                    if($query->hasChildDocument()){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Permohonan Dana telah digunakan di dokumen lain, anda tidak bisa melakukan perubahan.'
+                        ]);
+                    }
+
                     $bp->update([
                         'count_limit_credit'    => $bp->count_limit_credit - $query->grandtotal,
                     ]);

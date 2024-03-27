@@ -52,7 +52,7 @@ class PersonalCloseBillController extends Controller
         $menu = $this->menu;
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
-            'title'         => 'Tutup BS Personal',
+            'title'         => 'Tutup BS',
             'content'       => 'admin.personal.fund_request',
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),

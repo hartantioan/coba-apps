@@ -30,7 +30,7 @@
             padding: 5px;
             }
             .column2 {
-                margin-left: 10%;
+                margin-right: 0;
                 float: left;
                 width: 50%;
                 padding: 5px;
@@ -424,30 +424,41 @@
                                 </table>
                             </div>
                             <div class="column2">
-                                <table style="border-collapse:collapse;text-align:right" width="74%" class="table-bot">
+                                <table style="border-collapse:collapse;text-align:right" width="94%" class="table-bot">
+                                    <tr class="break-row">
+                                        <td class="right-align"></td>
+                                        <td class="right-align" style="border:0.6px solid black;text-align:center">Mata Uang Asing</td>
+                                        <td class="right-align" style="border:0.6px solid black;text-align:center">Mata Uang Konversi</td>
+                                    </tr>
                                     <tr class="break-row">
                                         <td class="right-align">Total</td>
                                         <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->symbol.number_format($data->total,2,',','.') }}</td>
+                                        <td class="right-align" style="border:0.6px solid black;">{{ 'Rp'.number_format($data->total * $data->currency_rate,2,',','.') }}</td>
                                     </tr>
                                     <tr class="break-row">
                                         <td class="right-align">Pembulatan</td>
                                         <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->symbol.number_format($data->rounding,2,',','.') }}</td>
+                                        <td class="right-align" style="border:0.6px solid black;">{{ 'Rp'.number_format($data->rounding * $data->currency_rate,2,',','.') }}</td>
                                     </tr>
                                     <tr class="break-row">
                                         <td class="right-align">Admin</td>
                                         <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->symbol.number_format($data->admin,2,',','.') }}</td>
+                                        <td class="right-align" style="border:0.6px solid black;">{{ 'Rp'.number_format($data->admin * $data->currency_rate,2,',','.') }}</td>
                                     </tr class="break-row">
                                     <tr>
                                         <td class="right-align">Grandtotal</td>
                                         <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->symbol.number_format($data->grandtotal,2,',','.') }}</td>
+                                        <td class="right-align" style="border:0.6px solid black;">{{ 'Rp'.number_format($data->grandtotal * $data->currency_rate,2,',','.') }}</td>
                                     </tr class="break-row">
                                     <tr>
                                         <td class="right-align">Bayar (Piutang)</td>
                                         <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->symbol.number_format($data->payment,2,',','.') }}</td>
+                                        <td class="right-align" style="border:0.6px solid black;">{{ 'Rp'.number_format($data->payment * $data->currency_rate,2,',','.') }}</td>
                                     </tr class="break-row">
                                     <tr>
                                         <td class="right-align">Sisa</td>
                                         <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->symbol.number_format($data->balance,2,',','.') }}</td>
+                                        <td class="right-align" style="border:0.6px solid black;">{{ 'Rp'.number_format($data->balance * $data->currency_rate,2,',','.') }}</td>
                                     </tr class="break-row">                              
                                 </table>
                             </div>

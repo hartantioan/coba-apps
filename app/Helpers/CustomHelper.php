@@ -3447,7 +3447,7 @@ class CustomHelper {
 			$coahutangbelumditagih = Coa::where('code','200.01.03.01.02')->where('company_id',$pi->company_id)->first();
 			$coahutangusaha = Coa::where('code','200.01.03.01.01')->where('company_id',$pi->company_id)->first();
 			$coarounding = Coa::where('code','700.01.01.01.05')->where('company_id',$pi->company_id)->first();
-			$coaselisihkurs = Coa::where('code','700.01.01.01.03')->where('company_id',$pi->company_id)->first();
+			$coaselisihkurs = Coa::where('code','700.01.01.01.02')->where('company_id',$pi->company_id)->first();
 
 			$grandtotal = 0;
 			$tax = 0;

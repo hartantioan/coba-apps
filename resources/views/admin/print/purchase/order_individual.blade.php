@@ -355,8 +355,8 @@
                             <table style="width:100%">
                                 <tr class="break-row">
                                     <td>
-                                        {{-- Rekening :
-                                        {{ $data->supplier->defaultBank() ? $data->supplier->defaultBank() : ' - ' }} --}}
+                                        Rekening :
+                                        {{ $data->supplier->defaultBank() ? $data->supplier->defaultBank() : ' - ' }}
                                         <div class="mt-3">
                                             Catatan : {{ $data->note }}
                                         </div>

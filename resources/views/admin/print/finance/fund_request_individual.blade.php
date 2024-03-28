@@ -339,11 +339,11 @@
                                     <td>{{ $row->note }}</td>
                                     <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                                     <td class="center-align">{{ $row->unit->code }}</td>
-                                    <td class="right-align">{{ $data->currency->code.'.'number_format($row->price,2,',','.') }}</td>
-                                    <td class="right-align">{{ $data->currency->code.'.'number_format($row->total,2,',','.') }}</td>
+                                    <td class="right-align">{{ $data->currency->code.'.'.number_format($row->price,2,',','.') }}</td>
+                                    <td class="right-align">{{ $data->currency->code.'.'.number_format($row->total,2,',','.') }}</td>
                                     <td class="right-align">{{ number_format($row->tax,2,',','.') }}</td>
                                     <td class="right-align">{{ number_format($row->wtax,2,',','.') }}</td>
-                                    <td class="right-align">{{ $data->currency->code.'.'number_format($row->grandtotal,2,',','.') }}</td>
+                                    <td class="right-align">{{ $data->currency->code.'.'.number_format($row->grandtotal,2,',','.') }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>

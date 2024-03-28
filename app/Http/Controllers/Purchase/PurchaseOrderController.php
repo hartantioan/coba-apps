@@ -1196,7 +1196,7 @@ class PurchaseOrderController extends Controller
                 'coa_unit_name'                     => $row->coaUnit()->exists() ? $row->coaUnit->code.' - '.$row->coaUnit->name : '',
                 'note'                              => $row->note ? $row->note : '',
                 'note2'                             => $row->note2 ? $row->note2 : '',
-                'price'                             => number_format($row->price,5,',','.'),
+                'price'                             => CustomHelper::formatConditionalQty($row->price),
                 'disc1'                             => number_format($row->percent_discount_1,2,',','.'),
                 'disc2'                             => number_format($row->percent_discount_2,2,',','.'),
                 'disc3'                             => number_format($row->discount_3,2,',','.'),

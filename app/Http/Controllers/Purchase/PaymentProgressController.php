@@ -61,7 +61,7 @@ class PaymentProgressController extends Controller
            
         })
         ->get();
-        info($data);
+       
         $array_detail=[];
         foreach($data as $row_item_po){
             

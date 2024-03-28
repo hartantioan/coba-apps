@@ -91,7 +91,7 @@ class AllCustomScript extends Command
             $datenow = date('Y-m-d');
             $diff = round((strtotime($datenow) - strtotime($datedoc)) / 86400);
             if($diff >= 2){
-                if($row->hasBalanceQtyGi()){
+                if($row->hasChildDocument()){
                     $row->update([
                         'status'    => '3',
                         'note'      => $row->note.' - DITUTUP OLEH SISTEM',

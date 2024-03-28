@@ -41,7 +41,7 @@ class LockAccounting
                     }else{
                         return response()->json([
                             'status'    => 500,
-                            'message' => 'Mohon maaf pada bulan '.date('F Y').' seluruh transaksi telah ditutup oleh pihak Akunting dengan nomor '.$cekLock->code.' dan status '.$cekLock->statusClosing().'.',
+                            'message' => 'Mohon maaf pada bulan '.date('F Y',strtotime($month)).' seluruh transaksi telah ditutup oleh pihak Akunting dengan nomor '.$cekLock->code.' dan status '.$cekLock->statusClosing().'.',
                         ]);
                     }
                 }else{

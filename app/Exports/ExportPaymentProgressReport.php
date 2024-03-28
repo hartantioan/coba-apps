@@ -168,6 +168,71 @@ class ExportPaymentProgressReport implements  FromView,ShouldAutoSize,WithTitle
                         $max_count=$total_grpo;
                     }
                 
+                }else if($row_item_po_detail->purchaseInvoiceDetail()->exists()){
+                    $grpo=[
+                        'grpo_code'      => 'JASA',
+                        'grpo_date'      => '',
+                        'grpo_qty'       => '',
+                        'status'       => '',
+                        'nominal'     => '',
+                    ];
+                    if ($max_count_pr < count($row_item_po_detail->purchaseInvoiceDetail)) {
+                        $max_count_pr = count($row_item_po_detail->purchaseInvoiceDetail);
+                    }
+                    $total_pyr = 0;
+                    foreach($row_item_po_detail->purchaseInvoiceDetail as $row_inv_detail){
+                        $inv=[
+                            'inv_code'      => $row_inv_detail->purchaseInvoice->code,
+                            'inv_date'      => $row_inv_detail->purchaseInvoice->post_date,
+                            'inv_qty'       => CustomHelper::formatConditionalQty($row_inv_detail->qty),
+                            'nominal'       => number_format($row_inv_detail->grandtotal,2,',','.'),
+                            'status'        => $row_inv_detail->purchaseInvoice->status(),
+                        ];
+                        if($row_inv_detail->purchaseInvoice->hasPaymentRequestDetail()->exists()){
+                            
+                            
+                            foreach($row_inv_detail->purchaseInvoice->hasPaymentRequestDetail as $row_pyr_detail){
+                                $pyr=[
+                                    'pyr_code'    => $row_pyr_detail->paymentRequest->code,
+                                    'pyr_date'    => $row_pyr_detail->paymentRequest->post_date,
+                                    'pyr_qty'     => CustomHelper::formatConditionalQty($row_pyr_detail->qty),
+                                    'nominal'     => number_format($row_pyr_detail->nominal,2,',','.'),
+                                    'status'      => $row_pyr_detail->paymentRequest->status(),
+                                    'opym_code'   => $row_pyr_detail->paymentRequest->outgoingPayment()->exists() ? $row_pyr_detail->paymentRequest->outgoingPayment->code : ''
+                                ];
+                                $total_pyr++;
+                                $inv['pyr'][]=$pyr;
+                               
+                                
+                            }
+                            $grpo['invoice'][]=$inv;
+                            
+                            if($max_count<$total_pyr){
+                                $max_count=$total_pyr;
+                            }
+                            
+                            if ($max_count_pr < $total_pyr) {
+                                $max_count_pr = $total_pyr;
+                            }
+                            $grpo['rowspan']=$max_count_pr;
+                           
+                        }else{
+                            $inv['pyr'][]=[
+                                'pyr_code'    => '',
+                                'pyr_date'    => '',
+                                'pyr_qty'     => '',
+                                'nominal'     => '',
+                                'status'       => '',
+                                'opym_code'     => '',
+                            ];
+                            $grpo['invoice'][]=$inv;
+                            $grpo['rowspan']=$max_count_pr;
+                            
+                            
+                        }
+                    }
+                    $all_grpo[]=$grpo;
+
                 }else{
                     $pyr=[ 'pyr_code'    => '',
                     'pyr_date'    => '',

@@ -223,7 +223,7 @@ class ShiftController extends Controller
                     $time_out = date('H:i', strtotime($request->time_out));
                  /*    $query_department= Department::find($request->department_id); */
                     $query_place= Place::find($request->place_id);
-                    $code = $query_place->id.'||'.$time_in . '-' . $time_out;
+                    $code = $query_place->id.'||'.$time_in . ' - ' . $time_out;
                     $query = Shift::create([
                         'code'              => $code,
                         'name'			    => $request->name,

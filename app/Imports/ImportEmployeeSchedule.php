@@ -46,7 +46,7 @@ class ImportEmployeeSchedule implements ToCollection
             $dataFormatted[] = $data;
         }
         $arrayDate = $dataFormatted[0]["E-Z"];
-        
+  
         $dates = [];
         foreach ($arrayDate as $timestamp) {
             $dateTime = DateTime::createFromFormat('U', ($timestamp - 25569) * 86400);
@@ -63,7 +63,7 @@ class ImportEmployeeSchedule implements ToCollection
             // }
             if($keyd > 0){
                 foreach($dates as $index=>$datee){
-                   
+                    
                     $data_shift_schedule[]=[
                         "user_code" => $data_employee["B"],
                         "shift_code" => $data_employee["E-Z"][$index],
@@ -77,8 +77,8 @@ class ImportEmployeeSchedule implements ToCollection
         }
         foreach($data_shift_schedule as $data_masuk){
             $query_employee=User::where('employee_no',$data_masuk["user_code"])->first();
-            $query_shift=Shift::where('code','like',$data_masuk["shift_code"])->first();
-           
+            $query_shift=Shift::where('code','like','%'.$data_masuk["shift_code"])->first();
+        
             if($query_employee){
                 if($query_shift){
                     try {

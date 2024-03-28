@@ -1673,9 +1673,9 @@ class PurchaseOrderController extends Controller
                         ];
                         $data_go_chart[]=$data_invoices_tempura;
                         $data_link[]=[
-                            'from'  =>  $purchase_invoice_detail->purchaseInvoice->code,
-                            'to'    =>  $query->code,
-                            'string_link'=>$purchase_invoice_detail->purchaseInvoice->code.$query->code,
+                            'from'  =>  $query->code,
+                            'to'    =>  $purchase_invoice_detail->purchaseInvoice->code,
+                            'string_link'=>$query->code.$purchase_invoice_detail->purchaseInvoice->code,
                         ];
                         if(!in_array($purchase_invoice_detail->purchaseInvoice->id,$data_id_invoice)){
                             $data_id_invoice[]=$purchase_invoice_detail->purchaseInvoice->id;

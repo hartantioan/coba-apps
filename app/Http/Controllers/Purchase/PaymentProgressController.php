@@ -49,7 +49,7 @@ class PaymentProgressController extends Controller
     public function filter(Request $request){
 
         $data = PurchaseOrder::where(function($query) use ($request) {
-            // $query->where('code','PORD-24P1-00000107');
+            // $query->where('code','PORD-24P1-00000222');
             if($request->start_date && $request->end_date) {
                 $query->whereDate('post_date', '>=', $request->start_date)
                     ->whereDate('post_date', '<=', $request->end_date);
@@ -61,13 +61,14 @@ class PaymentProgressController extends Controller
            
         })
         ->get();
+        info($data);
         $array_detail=[];
         foreach($data as $row_item_po){
             
             foreach($row_item_po->purchaseOrderDetail as $row_item_po_detail){
                 $max_count=1;
                 $array_item_po = [
-                    'item'         => $row_item_po_detail->item->name ?? $row_item_po_detail->coa->name ,
+                    'item'         => $row_item_po_detail->item->name ?? $row_item_po_detail->note ,
                     'item_code'    => $row_item_po_detail->item->code ?? $row_item_po_detail->coa->code,
                     'po_code'      => $row_item_po->code,
                     'po_date'      => $row_item_po->post_date,
@@ -103,7 +104,7 @@ class PaymentProgressController extends Controller
                             if ($max_count_pr < count($row_gr_detail->purchaseInvoiceDetail)) {
                                 $max_count_pr = count($row_gr_detail->purchaseInvoiceDetail);
                             }
-                            $total_po = 0 ;
+                           
                             $total_pyr = 0;
                             foreach($row_gr_detail->purchaseInvoiceDetail as $row_inv_detail){
                                 $inv=[
@@ -156,9 +157,6 @@ class PaymentProgressController extends Controller
                                     
                                 }
                             }
-                            if($max_count<$total_po){
-                                $max_count=$total_po;
-                            }
                         
                         }else{
                             $pyr=[ 'pyr_code'    => '',
@@ -191,7 +189,73 @@ class PaymentProgressController extends Controller
                         $max_count=$total_grpo;
                     }
                 
-                }else{
+                }else if($row_item_po_detail->purchaseInvoiceDetail()->exists()){
+                    $grpo=[
+                        'grpo_code'      => 'JASA',
+                        'grpo_date'      => '',
+                        'grpo_qty'       => '',
+                        'status'       => '',
+                        'nominal'     => '',
+                    ];
+                    if ($max_count_pr < count($row_item_po_detail->purchaseInvoiceDetail)) {
+                        $max_count_pr = count($row_item_po_detail->purchaseInvoiceDetail);
+                    }
+                    $total_pyr = 0;
+                    foreach($row_item_po_detail->purchaseInvoiceDetail as $row_inv_detail){
+                        $inv=[
+                            'inv_code'      => $row_inv_detail->purchaseInvoice->code,
+                            'inv_date'      => $row_inv_detail->purchaseInvoice->post_date,
+                            'inv_qty'       => CustomHelper::formatConditionalQty($row_inv_detail->qty),
+                            'nominal'       => number_format($row_inv_detail->grandtotal,2,',','.'),
+                            'status'        => $row_inv_detail->purchaseInvoice->status(),
+                        ];
+                        if($row_inv_detail->purchaseInvoice->hasPaymentRequestDetail()->exists()){
+                            
+                            
+                            foreach($row_inv_detail->purchaseInvoice->hasPaymentRequestDetail as $row_pyr_detail){
+                                $pyr=[
+                                    'pyr_code'    => $row_pyr_detail->paymentRequest->code,
+                                    'pyr_date'    => $row_pyr_detail->paymentRequest->post_date,
+                                    'pyr_qty'     => CustomHelper::formatConditionalQty($row_pyr_detail->qty),
+                                    'nominal'     => number_format($row_pyr_detail->nominal,2,',','.'),
+                                    'status'      => $row_pyr_detail->paymentRequest->status(),
+                                    'opym_code'   => $row_pyr_detail->paymentRequest->outgoingPayment()->exists() ? $row_pyr_detail->paymentRequest->outgoingPayment->code : ''
+                                ];
+                                $total_pyr++;
+                                $inv['pyr'][]=$pyr;
+                               
+                                
+                            }
+                            $grpo['invoice'][]=$inv;
+                            
+                            if($max_count<$total_pyr){
+                                $max_count=$total_pyr;
+                            }
+                            
+                            if ($max_count_pr < $total_pyr) {
+                                $max_count_pr = $total_pyr;
+                            }
+                            $grpo['rowspan']=$max_count_pr;
+                           
+                        }else{
+                            $inv['pyr'][]=[
+                                'pyr_code'    => '',
+                                'pyr_date'    => '',
+                                'pyr_qty'     => '',
+                                'nominal'     => '',
+                                'status'       => '',
+                                'opym_code'     => '',
+                            ];
+                            $grpo['invoice'][]=$inv;
+                            $grpo['rowspan']=$max_count_pr;
+                            
+                            
+                        }
+                    }
+                    $all_grpo[]=$grpo;
+
+                }
+                else{
                     $pyr=[ 'pyr_code'    => '',
                     'pyr_date'    => '',
                     'pyr_qty'     => '',

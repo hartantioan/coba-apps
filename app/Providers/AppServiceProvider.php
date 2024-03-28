@@ -95,6 +95,7 @@ class AppServiceProvider extends ServiceProvider
             'employee_reward_punishments'           => 'App\Models\EmployeeRewardPunishment',
             'overtime_requests'                     => 'App\Models\OvertimeRequest',
             'good_return_issues'                    => 'App\Models\GoodReturnIssue',
+            'personal_close_bills'                  => 'App\Models\PersonalCloseBill',
         ]);
     }
 }

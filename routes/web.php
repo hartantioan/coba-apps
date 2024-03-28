@@ -432,7 +432,9 @@ Route::prefix('admin')->group(function () {
                     Route::post('finish',[PersonalCloseBillController::class, 'userFinish']);
                     Route::post('destroy', [PersonalCloseBillController::class, 'userDestroy']);
                     Route::post('get_data', [PersonalCloseBillController::class, 'getData']);
+                    Route::get('print_individual/{id}',[PersonalCloseBillController::class, 'userPrintIndividual'])->withoutMiddleware('direct.access');
                     Route::post('get_account_data', [PersonalCloseBillController::class, 'getAccountData']);
+                    Route::post('remove_used_data', [PersonalCloseBillController::class, 'removeUsedData']);
                     Route::post('void_status', [PersonalCloseBillController::class, 'voidStatus']);
                 });
             });

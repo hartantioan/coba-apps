@@ -17,12 +17,17 @@ class CloseBillDetail extends Model
     protected $fillable = [
         'close_bill_id',
         'outgoing_payment_id',
+        'personal_close_bill_id',
         'nominal',
         'note',
     ];
 
     public function closeBill(){
         return $this->belongsTo('App\Models\CloseBill', 'close_bill_id', 'id')->withTrashed();
+    }
+
+    public function personalCloseBill(){
+        return $this->belongsTo('App\Models\PersonalCloseBill', 'personal_close_bill_id', 'id')->withTrashed();
     }
 
     public function outgoingPayment(){

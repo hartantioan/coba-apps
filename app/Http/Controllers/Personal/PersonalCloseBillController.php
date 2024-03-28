@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ApprovalMatrix;
 use App\Models\ApprovalSource;
 use App\Models\Menu;
+use App\Models\PersonalCloseBillCost;
 use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Date;
@@ -33,7 +34,9 @@ use App\Models\Currency;
 use App\Models\FundRequest;
 use App\Models\OutgoingPayment;
 use App\Models\PersonalCloseBill;
+use App\Models\PersonalCloseBillDetail;
 use App\Models\Tax;
+use Faker\Provider\ar_EG\Person;
 
 class PersonalCloseBillController extends Controller
 {
@@ -270,33 +273,6 @@ class PersonalCloseBillController extends Controller
         return response()->json($response);
     }
 
-    public function updateAdditionalNote(Request $request){
-        $type = $request->type;
-        $fr = FundRequest::where('code',CustomHelper::decrypt($request->id))->first();
-        if($fr){
-            if($type == '1'){
-                $fr->update([
-                    'additional_note'   => $request->val,
-                ]);
-            }elseif($type == '2'){
-                $fr->update([
-                    'additional_note_pic'   => $request->val,
-                ]);
-            }
-            
-            activity()
-                    ->performedOn(new FundRequest())
-                    ->causedBy(session('bo_id'))
-                    ->withProperties($fr)
-                    ->log('Add / edit fund request additional note / pic note.');
-
-            return response()->json([
-                'status'    => 200,
-                'message'   => 'Tambahan catatan berhasil disimpan.',
-            ]);
-        }
-    }
-
     public function rowDetail(Request $request){
         $data   = FundRequest::where('code',CustomHelper::decrypt($request->id))->first();
         
@@ -431,7 +407,7 @@ class PersonalCloseBillController extends Controller
     }
 
     public function voidStatus(Request $request){
-        $query = FundRequest::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = PersonalCloseBill::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
 
@@ -450,7 +426,7 @@ class PersonalCloseBillController extends Controller
             }elseif($query->hasChildDocument()){
                 $response = [
                     'status'  => 500,
-                    'message' => 'Data telah digunakan pada Payment Request.'
+                    'message' => 'Data telah digunakan pada dokumen lainnya.'
                 ];
             }else{
                 $query->update([
@@ -459,19 +435,15 @@ class PersonalCloseBillController extends Controller
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
-
-                if($query->type == '1' && $query->account->type == '1'){
-                    CustomHelper::removeCountLimitCredit($query->account_id,$query->grandtotal);
-                }
     
                 activity()
-                    ->performedOn(new FundRequest())
+                    ->performedOn(new PersonalCloseBill())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Void the fund request data');
+                    ->log('Void the personal close bill data');
     
-                CustomHelper::sendNotification('fund_requests',$query->id,'Permohonan Dana No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
-                CustomHelper::removeApproval('fund_requests',$query->id);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Tutup BS Personal No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::removeApproval($query->getTable(),$query->id);
 
                 $response = [
                     'status'  => 200,
@@ -510,7 +482,7 @@ class PersonalCloseBillController extends Controller
                 
                 if($pr){
                     $data = [
-                        'title'     => 'Fund Request',
+                        'title'     => 'Tutup BS Personal',
                         'data'      => $pr
                     ];
                     CustomHelper::addNewPrinterCounter($pr->getTable(),$pr->id);
@@ -610,7 +582,7 @@ class PersonalCloseBillController extends Controller
                         $query = FundRequest::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
                             $data = [
-                                'title'     => 'Fund Request',
+                                'title'     => 'Tutup BS Personal',
                                     'data'      => $query
                             ];
                             CustomHelper::addNewPrinterCounter($query->getTable(),$query->id);
@@ -686,7 +658,7 @@ class PersonalCloseBillController extends Controller
                         $query = FundRequest::where('code', 'LIKE', '%'.$etNumbersArray[$code-1])->first();
                         if($query){
                             $data = [
-                                'title'     => 'Fund Request',
+                                'title'     => 'Tutup BS Personal',
                                     'data'      => $query
                             ];
                             CustomHelper::addNewPrinterCounter($query->getTable(),$query->id);
@@ -741,13 +713,13 @@ class PersonalCloseBillController extends Controller
 
     public function printIndividual(Request $request,$id){
         
-        $pr = FundRequest::where('code',CustomHelper::decrypt($id))->first();
+        $pr = PersonalCloseBill::where('code',CustomHelper::decrypt($id))->first();
         $currentDateTime = Date::now();
         $formattedDate = $currentDateTime->format('d/m/Y H:i:s');        
         if($pr){
 
             $data = [
-                'title'     => 'Fund Request',
+                'title'     => 'Tutup BS Personal',
                 'data'      => $pr
             ];
 
@@ -757,6 +729,7 @@ class PersonalCloseBillController extends Controller
                 "verify_peer_name"=>false,
                 ),
             );
+
             CustomHelper::addNewPrinterCounter($pr->getTable(),$pr->id);
 
             $temp_pdf = [];
@@ -768,8 +741,7 @@ class PersonalCloseBillController extends Controller
             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
             $data["image"]=$path_img;
              
-/*             $pdf = Pdf::loadView('admin.print.finance.fund_request_individual', $data)->setPaper('a5', 'landscape'); */
-            $pdf = Pdf::loadView('admin.print.finance.fund_request_individual', $data)->setPaper('a4', 'potrait');
+            $pdf = Pdf::loadView('admin.print.finance.', $data)->setPaper('a4', 'potrait');
             $pdf->render();
     
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
@@ -780,25 +752,64 @@ class PersonalCloseBillController extends Controller
             $content = $pdf->download()->getOriginalContent();
             
             $temp_pdf[]=$content;
-
-            #surat penjara
-           /*  $pdfjail = Pdf::loadView('admin.print.finance.jail_letter', $data)->setPaper('a5', 'landscape');
-            $pdfjail->render();
-
-            $font = $pdfjail->getFontMetrics()->get_font("helvetica", "bold");
-            $pdfjail->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-            $pdfjail->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
             
-            $contentjail = $pdfjail->download()->getOriginalContent();
+            $randomString = Str::random(10); 
+         
+            $filePath = 'public/pdf/' . $randomString . '.pdf';
+            
+            Storage::put($filePath, $content);
+            
+            $document_po = asset(Storage::url($filePath));
+            $var_link=$document_po;
+    
+    
+            return $document_po;
+        }else{
+            abort(404);
+        }
+    }
 
-            $temp_pdf[]=$contentjail;
+    public function userPrintIndividual(Request $request,$id){
+        
+        $pr = PersonalCloseBill::where('code',CustomHelper::decrypt($id))->first();
+        $currentDateTime = Date::now();
+        $formattedDate = $currentDateTime->format('d/m/Y H:i:s');        
+        if($pr){
 
-            $merger = new Merger();
-            foreach ($temp_pdf as $pdfContent) {
-                $merger->addRaw($pdfContent);
-            }
+            $data = [
+                'title'     => 'Tutup BS Personal',
+                'data'      => $pr
+            ];
 
-            $result = $merger->merge(); */
+            $opciones_ssl=array(
+                "ssl"=>array(
+                "verify_peer"=>false,
+                "verify_peer_name"=>false,
+                ),
+            );
+
+            CustomHelper::addNewPrinterCounter($pr->getTable(),$pr->id);
+
+            $temp_pdf = [];
+
+            $img_path = 'website/logo_web_fix.png';
+            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+            $image_temp = file_get_contents($img_path, false, stream_context_create($opciones_ssl));
+            $img_base_64 = base64_encode($image_temp);
+            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+            $data["image"]=$path_img;
+             
+            $pdf = Pdf::loadView('admin.print.personal.close_bill_individual', $data)->setPaper('a4', 'potrait');
+            $pdf->render();
+    
+            $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
+            $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
+            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+            
+            $content = $pdf->download()->getOriginalContent();
+            
+            $temp_pdf[]=$content;
             
             $randomString = Str::random(10); 
          
@@ -942,9 +953,8 @@ class PersonalCloseBillController extends Controller
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
                     '
-                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light blue accent-2 white-text" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light blue accent-2 white-text" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`,`'.$val->code.'`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light orange accent-2 white-text" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light yellow accent-2 white-text" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light red accent-2 white-text" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
@@ -1015,40 +1025,50 @@ class PersonalCloseBillController extends Controller
                         $balance = $totalReceivable - $totalReceivableUsed;
                         if($balance > 0){
                             $arrDetail = [];
-                            foreach($fr->fundRequestDetail as $row){
+                            foreach($fr->fundRequestDetail as $rowdetail){
                                 $arrDetail[] = [
                                     'id'                => $fr->id,
-                                    'note'              => $row->note,
-                                    'qty'               => CustomHelper::formatConditionalQty($row->qty),
-                                    'unit_id'           => $row->unit_id,
-                                    'unit_name'         => $row->unit->code.' - '.$row->unit->name,
-                                    'tax_id'            => $row->tax_id ?? '',
-                                    'percent_tax'       => $row->percent_tax,
-                                    'is_include_tax'    => $row->is_include_tax,
-                                    'wtax_id'           => $row->wtax_id ?? '',
-                                    'percent_wtax'      => $row->percent_wtax,
-                                    'total'             => number_format($row->total,2,',','.'),
-                                    'tax'               => number_format($row->tax,2,',','.'),
-                                    'wtax'              => number_format($row->wtax,2,',','.'),
-                                    'grandtotal'        => number_format($row->grandtotal,2,',','.'),
-                                    'place_id'          => $row->place_id ?? '',
-                                    'line_id'           => $row->line_id ?? '',
-                                    'machine_id'        => $row->machine_id ?? '',
-                                    'division_id'       => $row->division_id ?? '',
-                                    'project_id'        => $row->project_id ?? '',
-                                    'project_name'      => $row->project()->exists() ? $row->project->code.' - '.$row->project->name : '',
+                                    'note'              => $rowdetail->note,
+                                    'qty'               => CustomHelper::formatConditionalQty($rowdetail->qty),
+                                    'unit_id'           => $rowdetail->unit_id,
+                                    'unit_name'         => $rowdetail->unit->code.' - '.$rowdetail->unit->name,
+                                    'price'             => number_format($rowdetail->price,2,',','.'),
+                                    'tax_id'            => $rowdetail->tax_id ?? '0',
+                                    'percent_tax'       => $rowdetail->percent_tax,
+                                    'is_include_tax'    => $rowdetail->is_include_tax,
+                                    'wtax_id'           => $rowdetail->wtax_id ?? '0',
+                                    'percent_wtax'      => $rowdetail->percent_wtax,
+                                    'total'             => number_format($rowdetail->total,2,',','.'),
+                                    'tax'               => number_format($rowdetail->tax,2,',','.'),
+                                    'wtax'              => number_format($rowdetail->wtax,2,',','.'),
+                                    'grandtotal'        => number_format($rowdetail->grandtotal,2,',','.'),
+                                    'place_id'          => $rowdetail->place_id ?? '',
+                                    'line_id'           => $rowdetail->line_id ?? '',
+                                    'machine_id'        => $rowdetail->machine_id ?? '',
+                                    'division_id'       => $rowdetail->division_id ?? '',
+                                    'project_id'        => $rowdetail->project_id ?? '',
+                                    'project_name'      => $rowdetail->project()->exists() ? $rowdetail->project->code.' - '.$rowdetail->project->name : '',
                                 ];
                             }
                             $details[] = [
-                                'type'      => $fr->getTable(),
-                                'id'        => $fr->id,
-                                'code'      => $fr->code,
-                                'post_date' => $fr->pay_date,
-                                'total'     => number_format($totalReceivable,2,',','.'),
-                                'used'      => number_format($totalReceivableUsed,2,',','.'),
-                                'balance'   => number_format($balance,2,',','.'),
-                                'note'      => $fr->note,
-                                'detail'    => $arrDetail,
+                                'type'          => $fr->getTable(),
+                                'id'            => $fr->id,
+                                'code'          => $fr->code,
+                                'post_date'     => date('d/m/Y',strtotime($fr->post_date)),
+                                'total'         => number_format($totalReceivable,2,',','.'),
+                                'used'          => number_format($totalReceivableUsed,2,',','.'),
+                                'balance'       => number_format($balance,2,',','.'),
+                                'note'          => $fr->note,
+                                'detail'        => $arrDetail,
+                                'currency_rate' => number_format($fr->currency_rate,2,',','.'),
+                                'currency_id'   => $fr->currency_id,
+                                'document_no'   => $fr->document_no ?? '',
+                                'tax_no'        => $fr->tax_no ?? '',
+                                'tax_cut_no'    => $fr->tax_cut_no ?? '',
+                                'cut_date'      => $fr->cut_date ?? '',
+                                'spk_no'        => $fr->spk_no ?? '',
+                                'document_date' => $fr->document_date ?? '',
+                                'invoice_no'    => $fr->invoice_no ?? '',
                             ];
                         }
                     }
@@ -1065,17 +1085,12 @@ class PersonalCloseBillController extends Controller
         $validation = Validator::make($request->all(), [
             'code'                      => 'required',
             'code_place_id'             => 'required',
-            /* 'code'			            => $request->temp ? ['required', Rule::unique('fund_requests', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:fund_requests,code',
-             */'account_id'                => 'required',
             'company_id'                => 'required',
-            'type'                      => 'required',
-            'is_reimburse'              => 'required',
 			'post_date' 				=> 'required',
-			'required_date'		        => 'required',
             'note'		                => 'required',
-            'payment_type'		        => 'required',
             'currency_id'		        => 'required',
             'currency_rate'		        => 'required',
+            'arr_nominal'               => 'required|array',
             'arr_item'                  => 'required|array',
             'arr_qty'                   => 'required|array',
             'arr_unit'                  => 'required|array',
@@ -1085,16 +1100,13 @@ class PersonalCloseBillController extends Controller
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
             'code_place_id.required'            => 'Plant Tidak boleh kosong',
-            'account_id.required'               => 'Target Partner Bisnis tidak boleh kosong',
             'company_id.required'               => 'Perusahaan tidak boleh kosong',
-            'type.required'                     => 'Tipe tidak boleh kosong',
-            'is_reimburse.required'             => 'Reimburse tidak boleh kosong',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
-			'required_date.required' 			=> 'Tanggal request pembayaran tidak boleh kosong.',
 			'note.required'				        => 'Keterangan tidak boleh kosong',
-            'payment_type.required'				=> 'Tipe pembayaran tidak boleh kosong',
             'currency_id.required'				=> 'Mata uang tidak boleh kosong',
             'currency_rate.required'			=> 'Konversi tidak boleh kosong',
+            'arr_nominal.required'              => 'Nominal tidak boleh kosong',
+            'arr_nominal.array'                 => 'Nominal harus dalam bentuk array.',
             'arr_item.required'                 => 'Item tidak boleh kosong',
             'arr_item.array'                    => 'Item harus dalam bentuk array.',
             'arr_qty.required'                  => 'Qty tidak boleh kosong.',
@@ -1116,220 +1128,142 @@ class PersonalCloseBillController extends Controller
             ];
         } else {
 
-            $bp = User::find($request->account_id);
-            $passedLimit = true;
             $balance = 0;
-            if($bp){
-                if($request->type == '1' && $bp->type == '1'){
-                    if($request->temp){
-                        $cek = FundRequest::where('code',CustomHelper::decrypt($request->temp))->first();
-                        $balance = $bp->limit_credit - $bp->count_limit_credit + $cek->grandtotal;
-                    }else{
-                        $balance = $bp->limit_credit - $bp->count_limit_credit;
-                    }
-                    if(str_replace(',','.',str_replace('.','',$request->grandtotal)) > $balance){
-                        $passedLimit = false;
-                    }
-                }
+            
+            foreach($request->arr_nominal as $key => $row){
+                $balance += str_replace(',','.',str_replace('.','',$row));
             }
-            if(!$passedLimit){
+
+            foreach($request->arr_grandtotal as $key => $row){
+                $balance -= str_replace(',','.',str_replace('.','',$row));
+            }
+
+            if($balance < 0 || $balance > 0){
                 return response()->json([
                     'status'  => 500,
-                    'message' => 'Mohon maaf saldo limit BS & Pinjaman anda adalah '.number_format($balance,2,',','.'),
+                    'message' => 'Mohon maaf data tidak bisa disimpan karena ada selisih dokumen terpakai dan biaya sebesar '.number_format($balance,2,',','.'),
                 ]);
             }
                     
 			if($request->temp){
-                /* DB::beginTransaction();
-                try { */
-                    $query = FundRequest::where('code',CustomHelper::decrypt($request->temp))->first();
+                $query = PersonalCloseBill::where('code',CustomHelper::decrypt($request->temp))->first();
 
-                    $bp->update([
-                        'count_limit_credit'    => $bp->count_limit_credit - $query->grandtotal,
-                    ]);
-
-                    $approved = false;
-                    $revised = false;
-
-                    if($query->approval()){
-                        foreach ($query->approval() as $detail){
-                            foreach($detail->approvalMatrix as $row){
-                                if($row->approved){
-                                    $approved = true;
-                                }
-
-                                if($row->revised){
-                                    $revised = true;
-                                }
+                if(in_array($query->status,['1','2','6'])){
+                    if($request->has('file')) {
+                        if($query->document){
+                            if(Storage::exists($query->document)){
+                                Storage::delete($query->document);
                             }
                         }
+                        $document = $request->file('file')->store('public/personal_close_bills');
+                    } else {
+                        $document = $query->document;
                     }
-
-                    if($approved && !$revised){
-                        return response()->json([
-                            'status'  => 500,
-                            'message' => 'Pengajuan dana telah diapprove, anda tidak bisa melakukan perubahan.'
-                        ]);
-                    }
-
-                    if(in_array($query->status,['1','6'])){
-                        if($request->has('file')) {
-                            if($query->document){
-                                if(Storage::exists($query->document)){
-                                    Storage::delete($query->document);
-                                }
-                            }
-                            $document = $request->file('file')->store('public/fund_requests');
-                        } else {
-                            $document = $query->document;
-                        }
-                        
-                        $query->code = $request->code;
-                        $query->user_id = session('bo_id');
-                        $query->account_id = $request->account_id;
-                        $query->company_id = $request->company_id;
-                        $query->type = $request->type;
-                        $query->post_date = $request->post_date;
-                        $query->required_date = $request->required_date;
-                        $query->currency_id = $request->currency_id;
-                        $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
-                        $query->note = $request->note;
-                        $query->payment_type = $request->payment_type;
-                        $query->document_no = $request->document_no;
-                        $query->document_date = $request->document_date;
-                        $query->tax_no = $request->tax_no;
-                        $query->tax_cut_no = $request->tax_cut_no;
-                        $query->cut_date = $request->cut_date;
-                        $query->spk_no = $request->spk_no;
-                        $query->invoice_no = $request->invoice_no;
-                        $query->is_reimburse = $request->is_reimburse;
-                        $query->name_account = $request->name_account;
-                        $query->no_account = $request->no_account;
-                        $query->bank_account = $request->bank_account;
-                        $query->document = $document;
-                        $query->total = str_replace(',','.',str_replace('.','',$request->total));
-                        $query->tax = str_replace(',','.',str_replace('.','',$request->tax));
-                        $query->wtax = str_replace(',','.',str_replace('.','',$request->wtax));
-                        $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
-                        $query->document_status = '1';
-                        $query->status = '1';
-                        
-                        $query->save();
-
-                        foreach($query->fundRequestDetail as $row){
-                            $row->delete();
-                        }
-
-                        /* DB::commit(); */
-                    }else{
-                        return response()->json([
-                            'status'  => 500,
-					        'message' => 'Status purchase request sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
-                        ]);
-                    }
-                /* }catch(\Exception $e){
-                    DB::rollback();
-                } */
-			}else{
-                /* DB::beginTransaction();
-                try { */
-                    $lastSegment = $request->lastsegment;
-                    $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode=FundRequest::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                     
-                    $query = FundRequest::create([
-                        'code'			=> $newCode,
-                        'user_id'		=> session('bo_id'),
-                        'account_id'    => $request->account_id,
-                        'company_id'    => $request->company_id,
-                        'type'          => $request->type,
-                        'post_date'     => $request->post_date,
-                        'required_date' => $request->required_date,
-                        'currency_id'   => $request->currency_id,
-                        'currency_rate' => str_replace(',','.',str_replace('.','',$request->currency_rate)),
-                        'note'          => $request->note,
-                        'payment_type'  => $request->payment_type,
-                        'document_no'   => $request->document_no,
-                        'document_date' => $request->document_date,
-                        'tax_no'        => $request->tax_no,
-                        'tax_cut_no'    => $request->tax_cut_no,
-                        'cut_date'      => $request->cut_date,
-                        'spk_no'        => $request->spk_no,
-                        'invoice_no'    => $request->invoice_no,
-                        'is_reimburse'  => $request->is_reimburse,
-                        'name_account'  => $request->name_account,
-                        'no_account'    => $request->no_account,
-                        'bank_account'  => $request->bank_account,
-                        'document'      => $request->file('file') ? $request->file('file')->store('public/fund_requests') : NULL,
-                        'total'         => str_replace(',','.',str_replace('.','',$request->total)),
-                        'tax'           => str_replace(',','.',str_replace('.','',$request->tax)),
-                        'wtax'          => str_replace(',','.',str_replace('.','',$request->wtax)),
-                        'grandtotal'    => str_replace(',','.',str_replace('.','',$request->grandtotal)),
-                        'document_status'   => '1',
-                        'status'        => '1',
-                    ]);
+                    $query->code = $request->code;
+                    $query->user_id = session('bo_id');
+                    $query->company_id = $request->company_id;
+                    $query->post_date = $request->post_date;
+                    $query->currency_id = $request->currency_id;
+                    $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
+                    $query->note = $request->note;
+                    $query->document_no = $request->document_no;
+                    $query->document_date = $request->document_date;
+                    $query->tax_no = $request->tax_no;
+                    $query->tax_cut_no = $request->tax_cut_no;
+                    $query->cut_date = $request->cut_date;
+                    $query->spk_no = $request->spk_no;
+                    $query->invoice_no = $request->invoice_no;
+                    $query->document = $document;
+                    $query->total = str_replace(',','.',str_replace('.','',$request->total));
+                    $query->tax = str_replace(',','.',str_replace('.','',$request->tax));
+                    $query->wtax = str_replace(',','.',str_replace('.','',$request->wtax));
+                    $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
+                    $query->status = '1';
+                    
+                    $query->save();
 
-                    /* DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
-                } */
+                    $query->personalCloseBillCost()->delete();
+                    $query->personalCloseBillDetail()->delete();
+                }else{
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Status tutup bs personal sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                    ]);
+                }
+			}else{
+                
+                $lastSegment = $request->lastsegment;
+                $menu = Menu::where('url', $lastSegment)->first();
+                $newCode=PersonalCloseBill::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
+                
+                $query = PersonalCloseBill::create([
+                    'code'			    => $newCode,
+                    'user_id'		    => session('bo_id'),
+                    'company_id'        => $request->company_id,
+                    'post_date'         => $request->post_date,
+                    'currency_id'       => $request->currency_id,
+                    'currency_rate'     => str_replace(',','.',str_replace('.','',$request->currency_rate)),
+                    'note'              => $request->note,
+                    'document_no'       => $request->document_no,
+                    'document_date'     => $request->document_date,
+                    'tax_no'            => $request->tax_no,
+                    'tax_cut_no'        => $request->tax_cut_no,
+                    'cut_date'          => $request->cut_date,
+                    'spk_no'            => $request->spk_no,
+                    'invoice_no'        => $request->invoice_no,
+                    'document'          => $request->file('file') ? $request->file('file')->store('public/personal_close_bills') : NULL,
+                    'total'             => str_replace(',','.',str_replace('.','',$request->total)),
+                    'tax'               => str_replace(',','.',str_replace('.','',$request->tax)),
+                    'wtax'              => str_replace(',','.',str_replace('.','',$request->wtax)),
+                    'grandtotal'        => str_replace(',','.',str_replace('.','',$request->grandtotal)),
+                    'status'            => '1',
+                ]);
+
 			}
 			
 			if($query) {
-                /* DB::beginTransaction();
-                try { */
-                    foreach($request->arr_item as $key => $row){
-                        FundRequestDetail::create([
-                            'fund_request_id'       => $query->id,
-                            'note'                  => $row,
-                            'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                            'unit_id'               => $request->arr_unit[$key],
-                            'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
-                            'tax_id'                => $request->arr_tax_id[$key],
-                            'percent_tax'           => $request->arr_percent_tax[$key],
-                            'is_include_tax'        => $request->arr_is_include_tax[$key],
-                            'wtax_id'               => $request->arr_wtax_id[$key],
-                            'percent_wtax'          => $request->arr_percent_wtax[$key],
-                            'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
-                            'tax'                   => str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),
-                            'wtax'                  => str_replace(',','.',str_replace('.','',$request->arr_wtax[$key])),
-                            'grandtotal'            => str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key])),
-                            'place_id'              => $request->arr_place[$key] ?? NULL,
-                            'line_id'               => $request->arr_line[$key] ?? NULL,
-                            'machine_id'            => $request->arr_machine[$key] ?? NULL,
-                            'division_id'           => $request->arr_division[$key] ?? NULL,
-                            'project_id'            => $request->arr_project[$key] ?? NULL,
-                        ]);
-                    }
-
-                    if($request->arr_checklist_box){
-                        foreach($request->arr_checklist_box as $key => $row){
-                            ChecklistDocumentList::create([
-                                'checklist_document_id'         => $row,
-                                'lookable_type'                 => $query->getTable(),
-                                'lookable_id'                   => $query->id,
-                                'value'                         => '1',
-                                'note'                          => $request->arr_checklist_note[$key],
-                            ]);
-                        }
-                    }
-                    /* DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
-                } */
-
-                if($query->type == '1' && $query->account->type == '1'){
-                    CustomHelper::addCountLimitCredit($request->account_id,$query->grandtotal);
+                foreach($request->arr_nominal as $key => $row){
+                    PersonalCloseBillDetail::create([
+                        'personal_close_bill_id'        => $query->id,
+                        'fund_request_id'               => $request->arr_id[$key],
+                        'nominal'                       => str_replace(',','.',str_replace('.','',$row)),
+                        'note'                          => $request->arr_note_source[$key],
+                    ]);
                 }
 
-                CustomHelper::sendApproval('fund_requests',$query->id,$query->note);
-                CustomHelper::sendNotification('fund_requests',$query->id,'Pengajuan Permohonan Dana No. '.$query->code,$query->note,session('bo_id'));
+                foreach($request->arr_item as $key => $row){
+                    PersonalCloseBillCost::create([
+                        'personal_close_bill_id'=> $query->id,
+                        'note'                  => $row,
+                        'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                        'unit_id'               => $request->arr_unit[$key],
+                        'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
+                        'tax_id'                => $request->arr_tax_id[$key],
+                        'percent_tax'           => $request->arr_percent_tax[$key],
+                        'is_include_tax'        => $request->arr_is_include_tax[$key],
+                        'wtax_id'               => $request->arr_wtax_id[$key],
+                        'percent_wtax'          => $request->arr_percent_wtax[$key],
+                        'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
+                        'tax'                   => str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),
+                        'wtax'                  => str_replace(',','.',str_replace('.','',$request->arr_wtax[$key])),
+                        'grandtotal'            => str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key])),
+                        'place_id'              => $request->arr_place[$key] ?? NULL,
+                        'line_id'               => $request->arr_line[$key] ?? NULL,
+                        'machine_id'            => $request->arr_machine[$key] ?? NULL,
+                        'division_id'           => $request->arr_division[$key] ?? NULL,
+                        'project_id'            => $request->arr_project[$key] ?? NULL,
+                    ]);
+                }
+
+                CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Tutupan BS Personal No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()
-                    ->performedOn(new FundRequest())
+                    ->performedOn(new PersonalCloseBill())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit fund request.');
+                    ->log('Add / edit close bill personal.');
 
 				$response = [
 					'status'    => 200,
@@ -1384,14 +1318,46 @@ class PersonalCloseBillController extends Controller
     }
 
     public function userRowDetail(Request $request){
-        $data   = FundRequest::where('code',CustomHelper::decrypt($request->id))->first();
+        $data   = PersonalCloseBill::where('code',CustomHelper::decrypt($request->id))->first();
         $menu = $this->menu;
         
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">
-                    <table style="min-width:100%;max-width:100%;">
+        $totalDocument = 0;
+        $string = $data->code.'<div class="row pt-1 pb-1 lighten-4"><div class="col s8"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="9">Daftar Item Dokumen '.$data->code.'</th>
+                                <th class="center-align" colspan="4">Daftar Permohonan Dana Terpakai</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">No.</th>
+                                <th class="center-align">No.Dokumen</th>
+                                <th class="center-align">Keterangan</th>
+                                <th class="center-align">Nominal</th>
+                            </tr>
+                        </thead><tbody>';
+
+        foreach($data->personalCloseBillDetail as $key => $row){
+            $string .= '<tr>
+                <td class="center-align">'.($key + 1).'</td>
+                <td class="center-align">'.$row->fundRequest->code.'</td>
+                <td class="center-align">'.$row->note.'</td>
+                <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
+            </tr>';
+            $totalDocument += $row->nominal;
+        }
+
+        $string .= '</tbody>
+                        <tfoot>
+                            <tr>
+                                <th class="right-align" colspan="3">Total</th>
+                                <th class="right-align">'.number_format($totalDocument,2,',','.').'</th>
+                            </tr>
+                        </tfoot>
+                        </table></div>';
+
+        $string .= '<div class="col s12"><table style="min-width:100%;max-width:100%;">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="14">Daftar Biaya</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -1411,7 +1377,7 @@ class PersonalCloseBillController extends Controller
                             </tr>
                         </thead><tbody>';
         
-        foreach($data->fundRequestDetail as $key => $row){
+        foreach($data->personalCloseBillCost as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="">'.$row->note.'</td>
@@ -1505,11 +1471,8 @@ class PersonalCloseBillController extends Controller
     }
 
     public function userShow(Request $request){
-        $fr = FundRequest::where('code',CustomHelper::decrypt($request->id))->first();
+        $fr = PersonalCloseBill::where('code',CustomHelper::decrypt($request->id))->first();
         $fr['code_place_id'] = substr($fr->code,7,2);
-        $fr['limit_credit'] = number_format(floatval($fr->account->limit_credit - $fr->account->count_limit_credit + $fr->grandtotal),2,',','.');
-        $fr['limit_credit_raw'] = floatval($fr->account->limit_credit - $fr->account->count_limit_credit + $fr->grandtotal);
-        $fr['account_name'] = $fr->account->name;
         $fr['currency_rate'] = number_format($fr->currency_rate,2,',','.');
         $fr['total'] = number_format($fr->total,2,',','.');
         $fr['tax'] = number_format($fr->tax,2,',','.');
@@ -1517,29 +1480,38 @@ class PersonalCloseBillController extends Controller
         $fr['grandtotal'] = number_format($fr->grandtotal,2,',','.');
 
         $arr = [];
-        $arrChecklist = [];
+        $arrDoc = [];
 
-        foreach($fr->checklistDocumentList as $row){
-            $arrChecklist[] = [
-                'id'    => $row->checklist_document_id,
-                'note'  => $row->note ? $row->note : '',
+        foreach($fr->personalCloseBillDetail as $row){
+            $totalReceivable = $row->fundRequest->totalReceivable();
+            $totalReceivableUsed = $row->fundRequest->totalReceivableUsedPaid();
+            $balance = $totalReceivable - $totalReceivableUsed;
+            $arrDoc[] = [
+                'type'          => $row->fundRequest->getTable(),
+                'id'            => $row->fundRequest->id,
+                'code'          => $row->fundRequest->code,
+                'post_date'     => date('d/m/Y',strtotime($row->fundRequest->post_date)),
+                'total'         => number_format($totalReceivable,2,',','.'),
+                'used'          => number_format($totalReceivableUsed,2,',','.'),
+                'balance'       => number_format($balance + $row->nominal,2,',','.'),
+                'nominal'       => number_format($row->nominal,2,',','.'),
+                'note'          => $row->note,
             ];
         }
 
-        foreach($fr->fundRequestDetail as $row){
+        foreach($fr->personalCloseBillCost as $row){
             $arr[] = [
                 'item'              => $row->note,
                 'qty'               => CustomHelper::formatConditionalQty($row->qty),
                 'unit_id'           => $row->unit_id,
                 'unit_name'         => $row->unit->code.' - '.$row->unit->name,
                 'price'             => number_format($row->price,2,',','.'),
-                'total'             => number_format($row->total,2,',','.'),
                 'percent_tax'       => $row->percent_tax,
                 'percent_wtax'      => $row->percent_wtax,
+                'total'             => number_format($row->total,2,',','.'),
                 'tax'               => number_format($row->tax,2,',','.'),
                 'wtax'              => number_format($row->wtax,2,',','.'),
                 'grandtotal'        => number_format($row->grandtotal,2,',','.'),
-                'format_grandtotal' => number_format($row->grandtotal,2,',','.'),
                 'tax_id'            => $row->tax_id,
                 'wtax_id'           => $row->wtax_id,
                 'is_include_tax'    => $row->is_include_tax,
@@ -1553,9 +1525,17 @@ class PersonalCloseBillController extends Controller
         }
 
         $fr['details'] = $arr;
-        $fr['checklist'] = $arrChecklist;
+        $fr['docs'] = $arrDoc;
         				
 		return response()->json($fr);
+    }
+
+    public function removeUsedData(Request $request){
+        CustomHelper::removeUsedData($request->type,$request->id);
+        return response()->json([
+            'status'    => 200,
+            'message'   => ''
+        ]);
     }
 
     public function userDestroy(Request $request){
@@ -1610,7 +1590,7 @@ class PersonalCloseBillController extends Controller
                 ->performedOn(new FundRequest())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the fund request data');
+                ->log('Delete the personal close bill data');
 
             $response = [
                 'status'  => 200,

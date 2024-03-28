@@ -208,7 +208,7 @@
                     </div>
                     <div class="col s12">
                         <fieldset>
-                            <legend>2. Rekening & Mata Uang</legend>
+                            <legend>2. Mata Uang</legend>
                             <div class="row">
                                 <div class="col m12">
                                     <h6>Mata Uang</h6>
@@ -237,7 +237,7 @@
                                 </div>
                                 <div class="col m12 mt-1">
                                     <h6>
-                                        Detail Outgoing Payment / Kas Keluar (Tipe BS)
+                                        Detail Fund Request / Permohonan Dana
                                         <a class="waves-effect waves-light cyan btn-small ml-1" onclick="getData();" href="javascript:void(0);">
                                             <i class="material-icons left">add</i> Ambil Data
                                         </a>
@@ -246,8 +246,7 @@
                                         <thead>
                                             <tr>
                                                 <th class="center">Referensi</th>
-                                                <th class="center">Partner Bisnis</th>
-                                                <th class="center">Tgl.Bayar</th>
+                                                <th class="center">Tgl.Post</th>
                                                 <th class="center">Total</th>
                                                 <th class="center">Dipakai</th>
                                                 <th class="center">Sisa</th>
@@ -258,7 +257,7 @@
                                         <tbody id="body-detail-op">
                                             <tr id="empty-detail">
                                                 <td colspan="8">
-                                                    Pilih Outgoing Payment untuk memulai...
+                                                    Pilih Permohonan Dana untuk memulai...
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -272,8 +271,7 @@
                             <legend>4. Detail Biaya</legend>
                             <div class="row">
                                 <div class="col m12 s12">
-                                    <p class="mt-2 mb-2">
-                                        <h4>Detail Produk</h4>
+                                    <p class="mb-2">
                                         <table class="bordered" id="table-detail" style="width:2800px;font-size:0.9rem !important;">
                                             <thead>
                                                 <tr>
@@ -315,21 +313,7 @@
                             <div class="row">
                                 <div class="col m12 s12 row">
                                     <div class="input-field col m9 s12">
-                                        <p class="mt-2 mb-2">
-                                            <h6>Checklist Lampiran</h6>
-                                            @foreach ($menu->checklistDocument as $row)
-                                                <label style="margin: 0 5px 0 0;position:inherit !important;">
-                                                    <input class="validate" required="" type="checkbox" name="arr_checklist_box[]" value="{{ $row->id }}">
-                                                    <span>{{ $row->title.' '.$row->type() }}</span>
-                                                    @if($row->is_other)
-                                                        <input type="text" name="arr_checklist_note[]" style="width: 200px;height:1.5rem;">
-                                                    @else
-                                                        <input type="hidden" name="arr_checklist_note[]">
-                                                    @endif
-                                                </label>
-                                                <br>
-                                            @endforeach
-                                        </p>
+                                        
                                     </div>
                                     <div class="input-field col m3 s12">
                                         <table width="100%" class="bordered">
@@ -544,9 +528,23 @@
             }
         });
 
+        $('#body-detail-op').on('click', '.delete-data-detail', function() {
+            $(this).closest('tr').remove();
+            if($('.row_op').length == 0){
+                $('#body-detail-op').append(`
+                    <tr id="empty-detail">
+                        <td colspan="8">
+                            Pilih Permohonan Dana untuk memulai...
+                        </td>
+                    </tr>
+                `);
+            }
+            countAll();
+        });
+
         $('#body-item').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();
-            count();
+            countAll();
         });
 
         $('#user_bank_id').select2({
@@ -574,6 +572,13 @@
             }
         });
     });
+
+    function checkRow(code){
+        var nil = parseFloat($('#arr_nominal' + code).val().replaceAll(".", "").replaceAll(",",".")), max = parseFloat($('#arr_nominal' + code).data('max').replaceAll(".", "").replaceAll(",","."));
+        if(nil > max){
+            $('#arr_nominal' + code).val($('#arr_nominal' + code).data('max'));
+        }
+    }
 
     function applyDocuments(){
         swal({
@@ -620,15 +625,21 @@
                                         <i class="material-icons close data-used" onclick="removeUsedData('` + val.type + `',` + val.id + `)">close</i>
                                     </div>
                                 `);
+                                $('#document_date').val(val.document_date);
+                                $('#tax_no').val(val.tax_no);
+                                $('#tax_cut_no').val(val.tax_cut_no);
+                                $('#cut_date').val(val.cut_date);
+                                $('#spk_no').val(val.spk_no);
+                                $('#document_no').val(val.document_no);
+                                $('#invoice_no').val(val.invoice_no);
+                                $('#document_no').val(val.document_no);
+                                $('#note').val(val.note);
                                 $('#body-detail-op').append(`
                                     <tr class="row_op" data-id="` + val.id + `">
                                         <input type="hidden" name="arr_type[]" value="` + val.type + `" id="arr_type` + count + `">
                                         <input type="hidden" name="arr_id[]" value="` + val.id + `" id="arr_id` + count + `">
                                         <td>
                                             ` + val.code + `
-                                        </td>
-                                        <td>
-                                            ` + val.bp + `
                                         </td>
                                         <td class="center">
                                             ` + val.post_date + `
@@ -640,7 +651,7 @@
                                             ` + val.used + `
                                         </td>
                                         <td class="center">
-                                            <input name="arr_nominal[]" onfocus="emptyThis(this);" class="browser-default" type="text" data-max="` + val.balance + `" value="` + val.balance + `" onkeyup="formatRupiah(this);checkRow('` + count + `');countAll();" style="text-align:right;width:100%;" id="arr_nominal` + count + `">
+                                            <input name="arr_nominal[]" onfocus="emptyThis(this);" class="browser-default" type="text" data-max="` + val.balance + `" value="` + val.balance + `" onkeyup="formatRupiah(this);checkRow('` + count + `');" style="text-align:right;width:100%;" id="arr_nominal` + count + `">
                                         </td>
                                         <td class="center">
                                             <input name="arr_note_source[]" class="browser-default" type="text" value="` + val.note + `" style="width:100%;" id="arr_note_source` + count + `">
@@ -652,6 +663,115 @@
                                         </td>
                                     </tr>
                                 `);
+
+                                $.each(val.detail, function(i, valdetail) {
+                                    let countdetail = makeid(10);
+                                    $('#last-row-item').before(`
+                                        <tr class="row_item" data-id="` + val.id + `">
+                                            <input type="hidden" name="arr_percent_tax[]" value="` + valdetail.percent_tax + `" id="arr_percent_tax` + countdetail + `">
+                                            <input type="hidden" name="arr_percent_wtax[]" value="` + valdetail.percent_wtax + `" id="arr_percent_wtax` + countdetail + `">
+                                            <input type="hidden" name="arr_tax[]" value="` + valdetail.tax + `" id="arr_tax` + countdetail + `">
+                                            <input type="hidden" name="arr_wtax[]" value="` + valdetail.wtax + `" id="arr_wtax` + countdetail + `">
+                                            <input type="hidden" name="arr_grandtotal[]" value="` + valdetail.grandtotal + `" id="arr_grandtotal` + countdetail + `">
+                                            <td>
+                                                <textarea class="materialize-textarea" name="arr_item[]" type="text" placeholder="Keterangan Barang">` + valdetail.note + `</textarea>
+                                            </td>
+                                            <td>
+                                                <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + valdetail.qty + `" onkeyup="formatRupiahNoMinus(this);count();">
+                                            </td>
+                                            <td class="center">
+                                                <select class="browser-default" id="arr_unit` + countdetail + `" name="arr_unit[]"></select>
+                                            </td>>
+                                            <td class="center">
+                                                <input type="text" id="arr_price` + countdetail + `" name="arr_price[]" onfocus="emptyThis(this);" value="`+ valdetail.price +`" onkeyup="formatRupiah(this);count();" style="text-align:right;">
+                                            </td>
+                                            <td class="center">
+                                                <input type="text" id="arr_total` + countdetail + `" name="arr_total[]" onfocus="emptyThis(this);" value="`+ valdetail.total +`" onkeyup="formatRupiah(this);" readonly style="text-align:right;">
+                                            </td>
+                                            <td>
+                                                <select class="browser-default" id="arr_tax_id` + countdetail + `" name="arr_tax_id[]" onchange="count();">
+                                                    <option value="0" data-value="0">-- Pilih ini jika non-PPN --</option>
+                                                    @foreach ($tax as $row)
+                                                        <option value="{{ $row->id }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-value="{{ $row->percentage }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select class="browser-default" id="arr_is_include_tax` + countdetail + `" name="arr_is_include_tax[]" onchange="count();">
+                                                    <option value="0">--Tidak--</option>
+                                                    <option value="1">--Ya--</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select class="browser-default" id="arr_wtax_id` + countdetail + `" name="arr_wtax_id[]" onchange="count();">
+                                                    <option value="0" data-value="0">-- Pilih ini jika non-PPh --</option>
+                                                    @foreach ($wtax as $row)
+                                                    <option value="{{ $row->id }}" {{ $row->is_default_pph ? 'selected' : '' }} data-value="{{ $row->percentage }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </td>
+                                            <td class="right-align rowgrandtotal">
+                                                `+ valdetail.grandtotal +`
+                                            </td>
+                                            <td>
+                                                <select class="browser-default" id="arr_place` + countdetail + `" name="arr_place[]">
+                                                    @foreach ($place as $rowplace)
+                                                        <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                                    @endforeach
+                                                </select>    
+                                            </td>
+                                            <td>
+                                                <select class="browser-default" id="arr_line` + countdetail + `" name="arr_line[]" onchange="changePlace(this);">
+                                                    <option value="">--Kosong--</option>
+                                                    @foreach ($line as $rowline)
+                                                        <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
+                                                    @endforeach
+                                                </select>    
+                                            </td>
+                                            <td>
+                                                <select class="browser-default" id="arr_machine` + countdetail + `" name="arr_machine[]" onchange="changeLine(this);">
+                                                    <option value="">--Kosong--</option>
+                                                    @foreach ($machine as $row)
+                                                        <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                                                    @endforeach    
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select class="browser-default" id="arr_division` + countdetail + `" name="arr_division[]">
+                                                    <option value="">--Kosong--</option>
+                                                    @foreach ($division as $rowdiv)
+                                                        <option value="{{ $rowdiv->id }}">{{ $rowdiv->name }}</option>
+                                                    @endforeach
+                                                </select>    
+                                            </td>
+                                            <td>
+                                                <select class="browser-default" id="arr_project` + countdetail + `" name="arr_project[]"></select>
+                                            </td>
+                                            <td class="center">
+                                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                                    <i class="material-icons">delete</i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    `);
+                                    $('#arr_tax_id' + countdetail).val(valdetail.tax_id);
+                                    $('#arr_wtax_id' + countdetail).val(valdetail.wtax_id);
+                                    $('#arr_is_include_tax' + countdetail).val(valdetail.is_include_tax);
+                                    $('#arr_place' + countdetail).val(valdetail.place_id);
+                                    $('#arr_line' + countdetail).val(valdetail.line_id);
+                                    $('#arr_machine' + countdetail).val(valdetail.machine_id);
+                                    $('#arr_division' + countdetail).val(valdetail.division_id);
+                                    $('#arr_unit' + countdetail).append(`
+                                        <option value="` + valdetail.unit_id + `">` + valdetail.unit_name  + `</option>
+                                    `);
+                                    if(valdetail.project_id){
+                                        $('#arr_project' + countdetail).append(`
+                                            <option value="` + valdetail.project_id + `">` + valdetail.project_name + `</option>
+                                        `);
+                                    }
+                                    select2ServerSide('#arr_unit' + countdetail, '{{ url("admin/select2/unit") }}');
+                                    select2ServerSide('#arr_project' + countdetail, '{{ url("admin/select2/project") }}');
+                                });
                             });
                             countAll();
                         }else{
@@ -675,6 +795,61 @@
                 });
             }
         });
+    }
+    
+    function countAll(){
+        let totalall = 0, grandtotalall = 0, taxall = 0, wtaxall = 0;
+        $('input[name^="arr_qty"]').each(function(index){
+            let row_percent_tax = 0, row_percent_wtax = 0, row_total = 0, row_tax = 0, row_wtax = 0, row_grandtotal = 0;
+            let qty = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+            let price = parseFloat($('input[name^="arr_price"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+            row_total = qty * price;
+            row_percent_tax = $('select[name^="arr_tax_id"]').eq(index).find(':selected').data('value');
+            row_percent_wtax = $('select[name^="arr_wtax_id"]').eq(index).find(':selected').data('value');
+            if(row_percent_tax > 0){
+                if($('select[name^="arr_is_include_tax"]').eq(index).val() == '1'){
+                    row_total = row_total / (1 + (row_percent_tax / 100));
+                }
+                row_tax = Math.floor(row_total * (row_percent_tax / 100));
+            }
+            if(row_percent_wtax > 0){
+                row_wtax = Math.floor(row_total * (row_percent_wtax / 100));
+            }
+            row_grandtotal = row_total + row_tax - row_wtax;
+            $('input[name^="arr_percent_tax"]').eq(index).val(row_percent_tax);
+            $('input[name^="arr_percent_wtax"]').eq(index).val(row_percent_wtax);
+            $('input[name^="arr_tax"]').eq(index).val(
+                (row_tax >= 0 ? '' : '-') + formatRupiahIni(row_tax.toFixed(2).toString().replace('.',','))
+            );
+            $('input[name^="arr_wtax"]').eq(index).val(
+                (row_wtax >= 0 ? '' : '-') + formatRupiahIni(row_wtax.toFixed(2).toString().replace('.',','))
+            );
+            $('input[name^="arr_total"]').eq(index).val(
+                (row_total >= 0 ? '' : '-') + formatRupiahIni(row_total.toFixed(2).toString().replace('.',','))
+            );
+            $('.rowgrandtotal').eq(index).text(
+                (row_grandtotal >= 0 ? '' : '-') + formatRupiahIni(row_grandtotal.toFixed(2).toString().replace('.',','))
+            );
+            $('input[name^="arr_grandtotal"]').eq(index).val(
+                (row_grandtotal >= 0 ? '' : '-') + formatRupiahIni(row_grandtotal.toFixed(2).toString().replace('.',','))
+            );
+            totalall += row_total;
+            taxall += row_tax;
+            wtaxall += row_wtax;
+            grandtotalall += row_grandtotal;
+        });
+        $('#total').val(
+            (totalall >= 0 ? '' : '-') + formatRupiahIni(totalall.toFixed(2).toString().replace('.',','))
+        );
+        $('#tax').val(
+            (taxall >= 0 ? '' : '-') + formatRupiahIni(taxall.toFixed(2).toString().replace('.',','))
+        );
+        $('#wtax').val(
+            (wtaxall >= 0 ? '' : '-') + formatRupiahIni(wtaxall.toFixed(2).toString().replace('.',','))
+        );
+        $('#grandtotal').val(
+            (grandtotalall >= 0 ? '' : '-') + formatRupiahIni(grandtotalall.toFixed(2).toString().replace('.',','))
+        );
     }
 
     function getData(){
@@ -816,7 +991,7 @@
     function addItem(){
         var count = makeid(10);
         $('#last-row-item').before(`
-            <tr class="row_item">
+            <tr class="row_item" data-id="">
                 <input type="hidden" name="arr_percent_tax[]" value="0.00000" id="arr_percent_tax` + count + `">
                 <input type="hidden" name="arr_percent_wtax[]" value="0.00000" id="arr_percent_wtax` + count + `">
                 <input type="hidden" name="arr_tax[]" value="0" id="arr_tax` + count + `">
@@ -905,6 +1080,44 @@
         `);
         select2ServerSide('#arr_unit' + count, '{{ url("admin/select2/unit") }}');
         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
+    }
+
+    function removeUsedData(type,id){
+        $.ajax({
+            url: '{{ Request::url() }}/remove_used_data',
+            type: 'POST',
+            dataType: 'JSON',
+            data: { 
+                type : type,
+                id : id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                
+            },
+            success: function(response) {
+                $('.row_op[data-id="' + id + '"]').remove();
+                $('.row_item[data-id="' + id + '"]').remove();
+                if($('.row_op').length == 0 && $('#empty-detail').length == 0){
+                    $('#body-detail-op').append(`
+                        <tr id="empty-detail">
+                            <td colspan="8">
+                                Pilih Outgoing Payment untuk memulai...
+                            </td>
+                        </tr>
+                    `);
+                }
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
     }
 
     function changePlace(element){
@@ -1073,111 +1286,90 @@
         }).then(function (willDelete) {
             if (willDelete) {
                 
-                var formData = new FormData($('#form_data')[0]), passedLimit = true, limit = parseFloat($('#tempLimit').val()), grandtotal = parseFloat($('#grandtotal').val().replaceAll(".", "").replaceAll(",","."));
+                var formData = new FormData($('#form_data')[0]);
 
-                /* if(grandtotal > limit && $('#type').val() == '1'){
-                    passedLimit = false;
-                } */
+                var path = window.location.pathname;
+                path = path.replace(/^\/|\/$/g, '');
 
-                if(passedLimit){
-                    var path = window.location.pathname;
-                    path = path.replace(/^\/|\/$/g, '');
+                var segments = path.split('/');
+                var lastSegment = segments[segments.length - 1];
+            
+                formData.append('lastsegment',lastSegment.toString());
+                formData.delete("arr_project[]");
 
-                    var segments = path.split('/');
-                    var lastSegment = segments[segments.length - 1];
+                $('select[name^="arr_project[]"]').each(function(index){
+                    formData.append('arr_project[]',($(this).val() ? $(this).val() : ''));
+                });
                 
-                    formData.append('lastsegment',lastSegment.toString().replace('personal_',''));
-                    formData.delete("arr_project[]");
-                    formData.delete("arr_checklist_box[]");
-                    formData.delete("arr_checklist_note[]");
-
-                    $('select[name^="arr_project[]"]').each(function(index){
-                        formData.append('arr_project[]',($(this).val() ? $(this).val() : ''));
-                    });
-
-                    $('input[name^="arr_checklist_box[]"]').each(function(index){
-                        if($(this).is(':checked')){
-                            formData.append('arr_checklist_box[]',$(this).val());
-                            formData.append('arr_checklist_note[]',$('input[name^="arr_checklist_note[]"]').eq(index).val());
-                        }
-                    });
-                    
-                    $.ajax({
-                        url: '{{ Request::url() }}/create',
-                        type: 'POST',
-                        dataType: 'JSON',
-                        data: formData,
-                        contentType: false,
-                        processData: false,
-                        cache: true,
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        beforeSend: function() {
-                            $('#validation_alert').hide();
-                            $('#validation_alert').html('');
-                            loadingOpen('.modal-content');
-                        },
-                        success: function(response) {
-                            loadingClose('.modal-content');
-                            $('input').css('border', 'none');
-                            $('input').css('border-bottom', '0.5px solid black');
-                            if(response.status == 200) {
-                                success();
-                                M.toast({
-                                    html: response.message
-                                });
-                            } else if(response.status == 422) {
-                                $('#validation_alert').show();
-                                $('.modal-content').scrollTop(0);
-                                $.each(response.error, function(field, errorMessage) {
-                                    $('#' + field).addClass('error-input');
-                                    $('#' + field).css('border', '1px solid red');
-                                    
-                                });
-                                swal({
-                                    title: 'Ups! Validation',
-                                    text: 'Check your form.',
-                                    icon: 'warning'
-                                });
-
-                                $.each(response.error, function(i, val) {
-                                    $.each(val, function(i, val) {
-                                        $('#validation_alert').append(`
-                                            <div class="card-alert card red">
-                                                <div class="card-content white-text">
-                                                    <p>` + val + `</p>
-                                                </div>
-                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                    <span aria-hidden="true">×</span>
-                                                </button>
-                                            </div>
-                                        `);
-                                    });
-                                });
-                            } else {
-                                M.toast({
-                                    html: response.message
-                                });
-                            }
-                        },
-                        error: function() {
+                $.ajax({
+                    url: '{{ Request::url() }}/create',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    cache: true,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#validation_alert').hide();
+                        $('#validation_alert').html('');
+                        loadingOpen('#modal1');
+                    },
+                    success: function(response) {
+                        loadingClose('#modal1');
+                        $('input').css('border', 'none');
+                        $('input').css('border-bottom', '0.5px solid black');
+                        if(response.status == 200) {
+                            success();
+                            M.toast({
+                                html: response.message
+                            });
+                        } else if(response.status == 422) {
+                            $('#validation_alert').show();
                             $('.modal-content').scrollTop(0);
-                            loadingClose('.modal-content');
+                            $.each(response.error, function(field, errorMessage) {
+                                $('#' + field).addClass('error-input');
+                                $('#' + field).css('border', '1px solid red');
+                                
+                            });
                             swal({
-                                title: 'Ups!',
-                                text: 'Check your internet connection.',
-                                icon: 'error'
+                                title: 'Ups! Validation',
+                                text: 'Check your form.',
+                                icon: 'warning'
+                            });
+
+                            $.each(response.error, function(i, val) {
+                                $.each(val, function(i, val) {
+                                    $('#validation_alert').append(`
+                                        <div class="card-alert card red">
+                                            <div class="card-content white-text">
+                                                <p>` + val + `</p>
+                                            </div>
+                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    `);
+                                });
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
                             });
                         }
-                    });
-                }else{
-                    swal({
-                        title: 'Ups! Maaf.',
-                        text: 'Nominal grandtotal melebihi batas nominal pengajuan BS.',
-                        icon: 'warning'
-                    });
-                }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('#modal1');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
             }
         });
     }
@@ -1209,11 +1401,7 @@
                 $('#code').val(response.code);
                 $('#note').val(response.note);
                 $('#post_date').val(response.post_date);
-                $('#required_date').val(response.required_date);
-                $('#required_date').removeAttr('min');
                 $('#company_id').val(response.company_id).formSelect();
-                $('#payment_type').val(response.payment_type).formSelect();
-                $('#is_reimburse').val(response.is_reimburse).formSelect();
                 $('#document_no').val(response.document_no);
                 $('#document_date').val(response.document_date);
                 $('#tax_no').val(response.tax_no);
@@ -1221,20 +1409,12 @@
                 $('#cut_date').val(response.cut_date);
                 $('#spk_no').val(response.spk_no);
                 $('#invoice_no').val(response.invoice_no);
-                $('#name_account').val(response.name_account);
-                $('#no_account').val(response.no_account);
-                $('#bank_account').val(response.bank_account);
                 $('#currency_id').val(response.currency_id).formSelect();
                 $('#currency_rate').val(response.currency_rate);
                 $('#total').val(response.total);
                 $('#tax').val(response.tax);
                 $('#wtax').val(response.wtax);
                 $('#grandtotal').val(response.grandtotal);
-                $('#account_id').empty().append(`
-                    <option value="` + response.account_id + `">` + response.account_name + `</option>
-                `);
-                $('#limit').text(response.limit_credit);
-                $('#tempLimit').val(response.limit_credit_raw);
 
                 if(response.details.length > 0){
                     $('.row_item').each(function(){
@@ -1244,7 +1424,7 @@
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
                         $('#last-row-item').before(`
-                            <tr class="row_item">
+                            <tr class="row_item" data-id="">
                                 <input type="hidden" name="arr_percent_tax[]" value="` + val.percent_tax + `" id="arr_percent_tax` + count + `">
                                 <input type="hidden" name="arr_percent_wtax[]" value="` + val.percent_wtax + `" id="arr_percent_wtax` + count + `">
                                 <input type="hidden" name="arr_tax[]" value="` + val.tax + `" id="arr_tax` + count + `">
@@ -1288,7 +1468,7 @@
                                     </select>
                                 </td>
                                 <td class="right-align rowgrandtotal">
-                                    ` + val.format_grandtotal + `
+                                    ` + val.grandtotal + `
                                 </td>
                                 <td>
                                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
@@ -1359,14 +1539,41 @@
                     });
                 }
 
-                if(response.checklist.length > 0){
-                    $.each(response.checklist, function(i, val) {
-                        $('input[name^="arr_checklist_box[]"]').each(function(index){
-                            if(val.id == $(this).val()){
-                                $(this).prop( "checked", true);
-                                $('input[name^="arr_checklist_note[]"]').eq(index).val(val.note);
-                            }
-                        });
+                if(response.docs.length > 0){
+                    $('#empty-detail').remove();
+                    $('.row_op').remove();
+
+                    $.each(response.docs, function(i, val) {
+                        var count = makeid(10);
+                        $('#body-detail-op').append(`
+                            <tr class="row_op" data-id="` + val.id + `">
+                                <input type="hidden" name="arr_type[]" value="` + val.type + `" id="arr_type` + count + `">
+                                <input type="hidden" name="arr_id[]" value="` + val.id + `" id="arr_id` + count + `">
+                                <td>
+                                    ` + val.code + `
+                                </td>
+                                <td class="center">
+                                    ` + val.post_date + `
+                                </td>
+                                <td class="right-align">
+                                    ` + val.total + `
+                                </td>
+                                <td class="right-align">
+                                    ` + val.used + `
+                                </td>
+                                <td class="center">
+                                    <input name="arr_nominal[]" onfocus="emptyThis(this);" class="browser-default" type="text" data-max="` + val.balance + `" value="` + val.nominal + `" onkeyup="formatRupiah(this);checkRow('` + count + `');" style="text-align:right;width:100%;" id="arr_nominal` + count + `">
+                                </td>
+                                <td class="center">
+                                    <input name="arr_note_source[]" class="browser-default" type="text" value="` + val.note + `" style="width:100%;" id="arr_note_source` + count + `">
+                                </td>
+                                <td class="center">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        `);
                     });
                 }
                 
@@ -1374,7 +1581,6 @@
                 $('#note').focus();
                 M.updateTextFields();
                 $('#post_date').trigger('change');
-                /* count(); */
             },
             error: function() {
                 $('.modal-content').scrollTop(0);
@@ -1465,7 +1671,7 @@
 
     function whatPrinting(code){
         $.ajax({
-            url: window.location.origin + '/admin/finance/fund_request/print_individual/' + code,
+            url: '{{ Request::url() }}/print_individual/' + code,
             type:'GET',
             beforeSend: function() {
                 loadingOpen('.modal-content');

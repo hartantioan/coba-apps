@@ -170,6 +170,12 @@ class FundRequest extends Model
         });
     }
 
+    public function personalCloseBillDetail(){
+        return $this->hasMany('App\Models\PersonalCloseBillDetail','fund_request_id','id')->whereHas('personalCloseBill',function($query){
+            $query->whereIn('status',['1','2','3']);
+        });
+    }
+
     public function arrayOutgoingPayment(){
         $arr = [];
         foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
@@ -496,6 +502,10 @@ class FundRequest extends Model
         $hasRelation = false;
 
         if($this->hasPaymentRequestDetail()->exists()){
+            $hasRelation = true;
+        }
+
+        if($this->personalCloseBillDetail()->exists()){
             $hasRelation = true;
         }
 

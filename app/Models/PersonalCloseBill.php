@@ -174,4 +174,36 @@ class PersonalCloseBill extends Model
     {
         return $this->hasMany('App\Models\PrintCounter','lookable_id','id')->where('lookable_type',$this->table);
     }
+
+    public function closeBillDetail(){
+        return $this->hasMany('App\Models\CloseBillDetail')->whereHas('closeBill',function($query){
+            $query->whereIn('status',['1','2','3']);
+        });
+    }
+
+    public function balanceCloseBill(){
+        $total = $this->grandtotal;
+        foreach($this->closeBillDetail as $row){
+            $total -= $row->nominal;
+        }
+        return $total;
+    }
+
+    public function totalCloseBill(){
+        $total = 0;
+        foreach($this->closeBillDetail as $row){
+            $total += $row->nominal;
+        }
+        return $total;
+    }
+
+    public function hasChildDocument(){
+        $hasRelation = false;
+
+        if($this->closeBillDetail()->exists()){
+            $hasRelation = true;
+        }
+
+        return $hasRelation;
+    }
 }

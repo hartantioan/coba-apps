@@ -329,7 +329,7 @@
                             <tr>
                                 <td class="center-align" style="text-align: center;">{{ ($key + 1) }}</td>
                                 <td class="center-align">{!! 
-                                    $row->getCode().'<br>'.$row->getHeaderCode()
+                                    $row->getCode().'<br>'.$row->getNote()
                                 !!}</td>
                                 <td class="right-align" style="text-align: right;">
                                     {{ $row->getGoodReceiptQty() }}

@@ -186,6 +186,18 @@ class PurchaseInvoiceDetail extends Model
         return $code;
     }
 
+    public function getNote(){
+        $note = match ($this->lookable_type) {
+            'good_receipt_details'      => $this->lookable->note,
+            'landed_cost_fee_details'   => $this->lookable->note,
+            'purchase_order_details'    => $this->lookable->note,
+            'coas'                      => $this->note,
+            default                     => '-',
+        };
+
+        return $note;
+    }
+
     public function getTop(){
         $code = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->purchaseOrderDetail->purchaseOrder->payment_term,

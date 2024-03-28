@@ -1580,6 +1580,9 @@
                                         });
                                     });
                                 }
+
+                                $('#currency_rate').val(val.currency_rate);
+                                $('#currency_id').val(val.currency_id).formSelect();
                             });
                             M.updateTextFields();
                             countRow();

@@ -196,6 +196,8 @@ class PurchaseDownPaymentController extends Controller
                         'wtax'          => number_format($data->wtax,2,',','.'),
                         'checklist'     => $arrChecklist,
                         'payment_type'  => '',
+                        'currency_rate' => number_format($data->currency_rate,2,',','.'),
+                        'currency_id'   => $data->currency_id,
                     ];
                 }elseif($row == 'fund_requests'){
                     $data = FundRequest::find($request->arr_id[$key]);
@@ -228,6 +230,8 @@ class PurchaseDownPaymentController extends Controller
                             'wtax'          => number_format($rowdetail->wtax,2,',','.'),
                             'checklist'     => $arrChecklist,
                             'payment_type'  => $data->payment_type,
+                            'currency_rate' => number_format($data->currency_rate,2,',','.'),
+                            'currency_id'   => $data->currency_id,
                         ];
                     }
                 }

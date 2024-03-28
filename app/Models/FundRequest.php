@@ -241,7 +241,20 @@ class FundRequest extends Model
             })->get() as $row){
                 $total += $row->totalOutgoingUsedWeight() + $row->totalIncomingUsedWeight();
             }
+            foreach($this->personalCloseBillDetail as $row){
+                $total += $row->nominal;
+            }
         }
+        return $total;
+    }
+
+    public function balanceReceivable(){
+        $total = $this->grandtotal;
+
+        foreach($this->personalCloseBillDetail as $row){
+            $total -= $row->nominal;
+        }
+
         return $total;
     }
 

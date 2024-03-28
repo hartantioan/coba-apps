@@ -2403,6 +2403,20 @@ Route::prefix('admin')->group(function () {
                     Route::get('export_from_page',[IncomingPaymentController::class, 'exportFromTransactionPage']);
                 });
 
+                Route::prefix('personal_close_bill')->middleware(['operation.access:personal_close_bill,view','lockacc'])->group(function () {
+                    Route::get('/',[PersonalCloseBillController::class, 'index']);
+                    Route::post('datatable',[PersonalCloseBillController::class, 'datatable']);
+                    Route::post('print',[PersonalCloseBillController::class, 'print']);
+                    Route::get('get_outstanding', [PersonalCloseBillController::class, 'getOutstanding']);
+                    Route::post('print_by_range',[PersonalCloseBillController::class, 'printByRange']);
+                    Route::get('print_individual/{id}',[PersonalCloseBillController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::get('viewstructuretree',[PersonalCloseBillController::class, 'viewStructureTree']);
+                    Route::get('export',[PersonalCloseBillController::class, 'export']);
+                    Route::get('approval/{id}',[PersonalCloseBillController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('export_from_page',[PersonalCloseBillController::class, 'exportFromTransactionPage']);
+                    Route::get('row_detail',[PersonalCloseBillController::class, 'rowDetail']);
+                });
+
                 Route::prefix('close_bill')->middleware(['operation.access:close_bill,view','lockacc'])->group(function () {
                     Route::get('/',[CloseBillController::class, 'index']);
                     Route::get('datatable',[CloseBillController::class, 'datatable']);

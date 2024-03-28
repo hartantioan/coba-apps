@@ -256,7 +256,7 @@
                                         </thead>
                                         <tbody id="body-detail-op">
                                             <tr id="empty-detail">
-                                                <td colspan="8">
+                                                <td colspan="7">
                                                     Pilih Permohonan Dana untuk memulai...
                                                 </td>
                                             </tr>
@@ -518,13 +518,20 @@
                 $('#limit').text('0,00');
                 M.updateTextFields();
                 $('#project_id,#warehouse_id').empty();
-                $('.row_item').remove();
-                $('#user_bank_id').empty().append(`
-                    <option value="">--Pilih Partner Bisnis-</option>
-                `);
                 window.onbeforeunload = function() {
                     return null;
                 };
+                if($('.data-used').length > 0){
+                    $('.data-used').trigger('click');
+                }
+                $('#body-detail-op').empty().append(`
+                    <tr id="empty-detail">
+                        <td colspan="7">
+                            Pilih Permohonan Dana untuk memulai...
+                        </td>
+                    </tr>
+                `);
+                $('.row_item').remove();
             }
         });
 
@@ -533,7 +540,7 @@
             if($('.row_op').length == 0){
                 $('#body-detail-op').append(`
                     <tr id="empty-detail">
-                        <td colspan="8">
+                        <td colspan="7">
                             Pilih Permohonan Dana untuk memulai...
                         </td>
                     </tr>
@@ -545,31 +552,6 @@
         $('#body-item').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();
             countAll();
-        });
-
-        $('#user_bank_id').select2({
-            placeholder: '-- Kosong --',
-            minimumInputLength: 1,
-            allowClear: true,
-            cache: true,
-            width: 'resolve',
-            dropdownParent: $('body').parent(),
-            ajax: {
-                url: '{{ url("admin/select2/user_bank_by_account") }}',
-                type: 'GET',
-                dataType: 'JSON',
-                data: function(params) {
-                    return {
-                        search: params.term,
-                        account_id : $('#account_id').val()
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data.items
-                    }
-                }
-            }
         });
     });
 
@@ -1103,7 +1085,7 @@
                 if($('.row_op').length == 0 && $('#empty-detail').length == 0){
                     $('#body-detail-op').append(`
                         <tr id="empty-detail">
-                            <td colspan="8">
+                            <td colspan="7">
                                 Pilih Outgoing Payment untuk memulai...
                             </td>
                         </tr>

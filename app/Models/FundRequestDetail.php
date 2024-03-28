@@ -132,4 +132,22 @@ class FundRequestDetail extends Model
             $query->whereIn('status',['1','2','3']);
         });
     }
+
+    public function getDataBalanceUsed(){
+        $total = $this->fundRequest->grandtotal;
+        $used = $this->fundRequest->totalReceivableUsedPaid();
+        $bobotUsed = round($used / $total,2);
+        $total = $this->total * $bobotUsed;
+        $tax = $this->tax * $bobotUsed;
+        $wtax = $this->wtax * $bobotUsed;
+        $grandtotal = $this->grandtotal * $bobotUsed;
+        $qty = $this->qty * $bobotUsed;
+        $data['total'] = $total;
+        $data['tax'] = $tax;
+        $data['wtax'] = $wtax;
+        $data['grandtotal'] = $grandtotal;
+        $data['qty'] = $qty;
+
+        return $data;
+    }
 }

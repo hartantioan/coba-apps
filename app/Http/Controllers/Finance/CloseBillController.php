@@ -44,6 +44,7 @@ use App\Models\Machine;
 use App\Models\Menu;
 use App\Models\MenuUser;
 use App\Models\OutgoingPayment;
+use App\Models\PersonalCloseBill;
 use App\Models\Place;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -248,6 +249,14 @@ class CloseBillController extends Controller
             })
             ->orderBy('type');
         })->get() as $key => $row){
+                if($row->type == '1'){
+                    $total_debit_asli += $row->nominal_fc;
+                    $total_debit_konversi += $row->nominal;
+                }
+                if($row->type == '2'){
+                    $total_kredit_asli += $row->nominal_fc;
+                    $total_kredit_konversi += $row->nominal;
+                }
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
@@ -266,6 +275,13 @@ class CloseBillController extends Controller
                     <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
                 </tr>';
             }
+            $string .= '<tr>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="11"> Total </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_asli, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_kredit_asli, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_konversi, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_kredit_konversi, 2, ',', '.') . '</td>
+            </tr>';
             $response["tbody"] = $string; 
         }else{
             $response = [
@@ -288,15 +304,88 @@ class CloseBillController extends Controller
                         $balance = $op->balancePaymentCross();
                         if($balance > 0){
                             $details[] = [
-                                'type'      => $op->getTable(),
-                                'id'        => $op->id,
-                                'code'      => $op->code,
-                                'bp'        => $op->account->employee_no.' - '.$op->account->name,
-                                'post_date' => $op->pay_date,
-                                'total'     => number_format($op->balance,2,',','.'),
-                                'used'      => number_format($op->totalUsedCross(),2,',','.'),
-                                'balance'   => number_format($balance,2,',','.'),
-                                'note'      => $op->note,
+                                'type'          => $op->getTable(),
+                                'id'            => $op->id,
+                                'code'          => $op->code,
+                                'bp'            => $op->account->employee_no.' - '.$op->account->name,
+                                'post_date'     => $op->pay_date,
+                                'total'         => number_format($op->balance,2,',','.'),
+                                'used'          => number_format($op->totalUsedCross(),2,',','.'),
+                                'balance'       => number_format($balance,2,',','.'),
+                                'note'          => $op->note,
+                                'list_details'  => [],
+                            ];
+                        }
+                    }
+                }elseif($row == 'personal_close_bills'){
+                    $op = PersonalCloseBill::whereDoesntHave('used')->where('id',$request->arr_id[$key])->first();
+                    if($op){
+                        CustomHelper::sendUsedData($op->getTable(),$op->id,'Form Tutupan BS Karyawan');
+                        $balance = $op->balanceCloseBill();
+                        if($balance > 0){
+                            $listDetails = [];
+
+                            foreach($op->personalCloseBillCost as $rowdetail){
+                                if($rowdetail->total > 0){
+                                    $listDetails[] = [
+                                        'note'          => $rowdetail->note,
+                                        'nominal'       => number_format($rowdetail->total,2,',','.'),
+                                        'type'          => '1',
+                                        'coa_id'        => '',
+                                        'coa_name'      => '',
+                                        'place_id'      => $rowdetail->place_id ?? '',
+                                        'line_id'       => $rowdetail->line_id ?? '',
+                                        'machine_id'    => $rowdetail->machine_id ?? '',
+                                        'division_id'   => $rowdetail->division_id ?? '',
+                                        'project_id'    => $rowdetail->project_id ?? '',
+                                        'project_name'  => $rowdetail->project()->exists() ? $rowdetail->project->name : '',
+                                    ];
+                                }
+
+                                if($rowdetail->tax > 0){
+                                    $listDetails[] = [
+                                        'note'          => $rowdetail->note,
+                                        'nominal'       => number_format($rowdetail->tax,2,',','.'),
+                                        'type'          => '1',
+                                        'coa_id'        => $rowdetail->taxMaster()->exists() ? $rowdetail->taxMaster->coa_purchase_id : '',
+                                        'coa_name'      => $rowdetail->taxMaster()->exists() ? $rowdetail->taxMaster->coaPurchase->code.' - '.$rowdetail->taxMaster->coaPurchase->name : '',
+                                        'place_id'      => $rowdetail->place_id ?? '',
+                                        'line_id'       => '',
+                                        'machine_id'    => '',
+                                        'division_id'   => '',
+                                        'project_id'    => '',
+                                        'project_name'  => '',
+                                    ];
+                                }
+
+                                if($rowdetail->wtax > 0){
+                                    $listDetails[] = [
+                                        'note'          => $rowdetail->note,
+                                        'nominal'       => number_format($rowdetail->wtax,2,',','.'),
+                                        'type'          => '2',
+                                        'coa_id'        => $rowdetail->wtaxMaster()->exists() ? $rowdetail->wtaxMaster->coa_purchase_id : '',
+                                        'coa_name'      => $rowdetail->wtaxMaster()->exists() ? $rowdetail->wtaxMaster->coaPurchase->code.' - '.$rowdetail->wtaxMaster->coaPurchase->name : '',
+                                        'place_id'      => $rowdetail->place_id ?? '',
+                                        'line_id'       => '',
+                                        'machine_id'    => '',
+                                        'division_id'   => '',
+                                        'project_id'    => '',
+                                        'project_name'  => '',
+                                    ];
+                                }
+                            }
+
+                            $details[] = [
+                                'type'          => $op->getTable(),
+                                'id'            => $op->id,
+                                'code'          => $op->code,
+                                'bp'            => $op->user->employee_no.' - '.$op->user->name,
+                                'post_date'     => $op->post_date,
+                                'total'         => number_format($op->grandtotal,2,',','.'),
+                                'used'          => number_format($op->totalCloseBill(),2,',','.'),
+                                'balance'       => number_format($balance,2,',','.'),
+                                'note'          => $op->note,
+                                'list_details'  => $listDetails,
                             ];
                         }
                     }
@@ -311,7 +400,7 @@ class CloseBillController extends Controller
 
     public function getData(Request $request){
         $details = [];
-        $data = OutgoingPayment::whereHas('account',function($query){
+        /* $data = OutgoingPayment::whereHas('account',function($query){
             $query->where('type','1');
         })
         ->whereIn('status',['2','3'])
@@ -325,22 +414,23 @@ class CloseBillController extends Controller
             });
         })
         ->whereDoesntHave('used')
-        ->get();
+        ->get(); */
+        $data = PersonalCloseBill::whereIn('status',['2'])->whereDoesntHave('used')->get();
 
         foreach($data as $row){
-            $balance = $row->balancePaymentIncoming();
+            $balance = $row->balanceCloseBill();
             if(!$row->used()->exists() && $balance > 0){
                 $details[] = [
                     'id'                    => $row->id,
                     'type'                  => $row->getTable(),
                     'code'                  => $row->code,
-                    'name'                  => $row->account->employee_no.' - '.$row->account->name,
+                    'name'                  => $row->user->employee_no.' - '.$row->user->name,
                     'post_date'             => date('d/m/Y',strtotime($row->post_date)),
                     'total'                 => number_format($row->total,2,',','.'),
                     'tax'                   => number_format($row->tax,2,',','.'),
                     'wtax'                  => number_format($row->wtax,2,',','.'),
                     'grandtotal'            => number_format($row->grandtotal,2,',','.'),
-                    'used'                  => number_format($row->totalUsedCross(),2,',','.'),
+                    'used'                  => number_format($row->totalCloseBill(),2,',','.'),
                     'balance'               => number_format($balance,2,',','.'),
                     'note'                  => $row->note,
                 ];
@@ -365,7 +455,7 @@ class CloseBillController extends Controller
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
-                                <th class="center-align">OP No.</th>
+                                <th class="center-align">OP/CREQ No.</th>
                                 <th class="center-align">Partner Bisnis</th>
                                 <th class="center-align">Tgl.Bayar</th>
                                 <th class="center-align">Keterangan</th>
@@ -374,14 +464,26 @@ class CloseBillController extends Controller
                         </thead><tbody>';
         
         foreach($data->closeBillDetail as $key => $row){
-            $string .= '<tr>
-                <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$row->outgoingPayment->code.'</td>
-                <td class="center-align">'.$row->outgoingPayment->account->employee_no.' - '.$row->outgoingPayment->account->name.'</td>
-                <td class="center-align">'.date('d/m/Y',strtotime($row->outgoingPayment->pay_date)).'</td>
-                <td class="">'.$row->note.'</td>
-                <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
-            </tr>';
+            if($row->outgoingPayment()->exists()){
+                $string .= '<tr>
+                    <td class="center-align">'.($key + 1).'</td>
+                    <td class="center-align">'.$row->outgoingPayment->code.'</td>
+                    <td class="center-align">'.$row->outgoingPayment->account->employee_no.' - '.$row->outgoingPayment->account->name.'</td>
+                    <td class="center-align">'.date('d/m/Y',strtotime($row->outgoingPayment->pay_date)).'</td>
+                    <td class="">'.$row->note.'</td>
+                    <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
+                </tr>';
+            }
+            if($row->personalCloseBill()->exists()){
+                $string .= '<tr>
+                    <td class="center-align">'.($key + 1).'</td>
+                    <td class="center-align">'.$row->personalCloseBill->code.'</td>
+                    <td class="center-align">'.$row->personalCloseBill->user->employee_no.' - '.$row->personalCloseBill->user->name.'</td>
+                    <td class="center-align">'.date('d/m/Y',strtotime($row->personalCloseBill->post_date)).'</td>
+                    <td class="">'.$row->note.'</td>
+                    <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
+                </tr>';
+            }
         }
         
         $string .= '</tbody></table></div>';
@@ -519,19 +621,36 @@ class CloseBillController extends Controller
         $costs = [];
 
         foreach($cb->closeBillDetail as $row){
-            $balance = $row->outgoingPayment->balancePaymentCross();
-            $details[] = [
-                'type'      => $row->outgoingPayment->getTable(),
-                'id'        => $row->outgoing_payment_id,
-                'code'      => $row->outgoingPayment->code,
-                'bp'        => $row->outgoingPayment->account->employee_no.' - '.$row->outgoingPayment->account->name,
-                'post_date' => $row->outgoingPayment->pay_date,
-                'total'     => number_format($row->outgoingPayment->balance,2,',','.'),
-                'used'      => number_format($row->outgoingPayment->totalUsedCross(),2,',','.'),
-                'balance'   => number_format($balance + $row->nominal,2,',','.'),
-                'nominal'   => number_format($row->nominal,2,',','.'),
-                'note'      => $row->note,
-            ];
+            if($row->outgoingPayment()->exists()){
+                $balance = $row->outgoingPayment->balancePaymentCross();
+                $details[] = [
+                    'type'      => $row->outgoingPayment->getTable(),
+                    'id'        => $row->outgoing_payment_id,
+                    'code'      => $row->outgoingPayment->code,
+                    'bp'        => $row->outgoingPayment->account->employee_no.' - '.$row->outgoingPayment->account->name,
+                    'post_date' => $row->outgoingPayment->pay_date,
+                    'total'     => number_format($row->outgoingPayment->balance,2,',','.'),
+                    'used'      => number_format($row->outgoingPayment->totalUsedCross(),2,',','.'),
+                    'balance'   => number_format($balance + $row->nominal,2,',','.'),
+                    'nominal'   => number_format($row->nominal,2,',','.'),
+                    'note'      => $row->note,
+                ];
+            }
+            if($row->personalCloseBill()->exists()){
+                $balance = $row->personalCloseBill->balanceCloseBill();
+                $details[] = [
+                    'type'      => $row->personalCloseBill->getTable(),
+                    'id'        => $row->personal_close_bill_id,
+                    'code'      => $row->personalCloseBill->code,
+                    'bp'        => $row->personalCloseBill->user->employee_no.' - '.$row->personalCloseBill->user->name,
+                    'post_date' => $row->personalCloseBill->post_date,
+                    'total'     => number_format($row->personalCloseBill->grandtotal,2,',','.'),
+                    'used'      => number_format($row->personalCloseBill->totalCloseBill(),2,',','.'),
+                    'balance'   => number_format($balance + $row->nominal,2,',','.'),
+                    'nominal'   => number_format($row->nominal,2,',','.'),
+                    'note'      => $row->note,
+                ];
+            }
         }
 
         foreach($cb->closeBillCost as $row){
@@ -599,8 +718,8 @@ class CloseBillController extends Controller
             ];
         } else {
 
-            DB::beginTransaction();
-            try {
+            /* DB::beginTransaction();
+            try { */
 
                 $grandtotal = 0;
                 $op = 0;
@@ -707,9 +826,18 @@ class CloseBillController extends Controller
                                 'nominal'               => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
                                 'note'                  => $request->arr_note_source[$key],
                             ]);
-                            CustomHelper::removeUsedData($row,$request->arr_id[$key]);
                             CustomHelper::removeCountLimitCredit($op->account_id,$cbd->nominal);
+                        }elseif($row == 'personal_close_bills'){
+                            $op = PersonalCloseBill::find($request->arr_id[$key]);
+                            $cbd = CloseBillDetail::create([
+                                'close_bill_id'         => $query->id,
+                                'personal_close_bill_id'=> $op->id,
+                                'nominal'               => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
+                                'note'                  => $request->arr_note_source[$key],
+                            ]);
+                            CustomHelper::removeCountLimitCredit($op->user_id,$cbd->nominal);
                         }
+                        CustomHelper::removeUsedData($row,$request->arr_id[$key]);
                     }
                     foreach($request->arr_coa as $key => $row){
                         CloseBillCost::create([
@@ -752,10 +880,10 @@ class CloseBillController extends Controller
                     ];
                 }
 
-                DB::commit();
+                /* DB::commit();
             }catch(\Exception $e){
                 DB::rollback();
-            }
+            } */
 		}
 		
 		return response()->json($response);
@@ -791,13 +919,25 @@ class CloseBillController extends Controller
                 ]);
 
                 foreach($query->closeBillDetail as $row){
-                    CustomHelper::addCountLimitCredit($row->outgoingPayment->account_id,$row->nominal);
-                    foreach($row->outgoingPayment->paymentRequest->paymentRequestDetail as $rowdetail){
-                        if($rowdetail->lookable_type == 'fund_requests'){
-                            $rowdetail->lookable->update([
+                    if($row->outgoingPayment()->exists()){
+                        foreach($row->outgoingPayment->paymentRequest->paymentRequestDetail as $rowdetail){
+                            if($rowdetail->lookable_type == 'fund_requests'){
+                                $rowdetail->lookable->update([
+                                    'balance_status'	=> NULL
+                                ]);
+                            }
+                        }
+                        CustomHelper::addCountLimitCredit($row->outgoingPayment->account_id,$row->nominal);
+                    }elseif($row->personalCloseBill()->exists()){
+                        foreach($row->personalCloseBill->personalCloseBillDetail as $rowdetail){
+                            $rowdetail->fundRequest->update([
                                 'balance_status'	=> NULL
                             ]);
                         }
+                        $row->personalCloseBill->update([
+                            'status'    => '2'
+                        ]);
+                        CustomHelper::addCountLimitCredit($row->personalCloseBill->user_id,$row->nominal);
                     }
                 }
     
@@ -868,7 +1008,11 @@ class CloseBillController extends Controller
             ]);
 
             foreach($query->closeBillDetail as $row){
-                CustomHelper::addCountLimitCredit($row->outgoingPayment->account_id,$row->nominal);
+                if($row->outgoingPayment()->exists()){
+                    CustomHelper::addCountLimitCredit($row->outgoingPayment->account_id,$row->nominal);
+                }elseif($row->personalCloseBill()->exists()){
+                    CustomHelper::addCountLimitCredit($row->personalCloseBill->user_id,$row->nominal);
+                }
                 $row->delete();
             }
             $query->closeBillCost()->delete();

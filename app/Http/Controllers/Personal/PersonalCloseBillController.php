@@ -55,14 +55,9 @@ class PersonalCloseBillController extends Controller
         $menu = $this->menu;
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
-            'title'         => 'Tutup BS',
-            'content'       => 'admin.personal.fund_request',
+            'title'         => 'Tutup BS Personal',
+            'content'       => 'admin.finance.personal_close_bill',
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
-            'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
-            'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
-            'newcode'       => $menu->document_code.date('y'),
-            'menucode'      => $menu->document_code,
-            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'modedata'      => $menuUser->mode ? $menuUser->mode : '',
         ];
 
@@ -78,16 +73,12 @@ class PersonalCloseBillController extends Controller
     public function datatable(Request $request){
         $column = [
             'id',
-            'user_id',
             'code',
-            'account_id',
-            'type',
+            'user_id',
             'post_date',
-            'required_date',
             'currency_id',
             'currency_rate',
             'note',
-            'payment_type',
             'document_no',
             'document_date',
             'tax_no',
@@ -95,10 +86,6 @@ class PersonalCloseBillController extends Controller
             'cut_date',
             'spk_no',
             'invoice_no',
-            'is_reimburse',
-            'name_account',
-            'no_account',
-            'bank_account',
             'total',
             'tax',
             'wtax',
@@ -111,40 +98,24 @@ class PersonalCloseBillController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = FundRequest::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */where(function($query)use($request){
+        $total_data = PersonalCloseBill::/* whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")-> */where(function($query)use($request){
             if(!$request->modedata){
                 $query->where('user_id',session('bo_id'));
             }
         })->count();
         
-        $query_data = FundRequest::where(function($query) use ($search, $request) {
+        $query_data = PersonalCloseBill::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('required_date', 'like', "%$search%")
-                            ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('account',function($query) use($search, $request){
-                                $query->where('name','like',"%$search%")
-                                    ->orWhere('employee_no','like',"%$search%");
-                            });
+                            ->orWhere('note', 'like', "%$search%");
                     });
-                }
-                if($request->start_date && $request->finish_date) {
-                    $query->whereDate('post_date', '>=', $request->start_date)
-                        ->whereDate('post_date', '<=', $request->finish_date);
-                } else if($request->start_date) {
-                    $query->whereDate('post_date','>=', $request->start_date);
-                } else if($request->finish_date) {
-                    $query->whereDate('post_date','<=', $request->finish_date);
                 }
 
                 if($request->status){
                     $query->whereIn('status', $request->status);
-                }
-
-                if($request->document){
-                    $query->where('document_status', $request->document);
                 }
 
                 if(!$request->modedata){
@@ -157,34 +128,18 @@ class PersonalCloseBillController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = FundRequest::where(function($query) use ($search, $request) {
+        $total_filtered = PersonalCloseBill::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('required_date', 'like', "%$search%")
-                            ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('account',function($query) use($search, $request){
-                                $query->where('name','like',"%$search%")
-                                    ->orWhere('employee_no','like',"%$search%");
-                            });
+                            ->orWhere('note', 'like', "%$search%");
                     });
-                }
-                if($request->start_date && $request->finish_date) {
-                    $query->whereDate('post_date', '>=', $request->start_date)
-                        ->whereDate('post_date', '<=', $request->finish_date);
-                } else if($request->start_date) {
-                    $query->whereDate('post_date','>=', $request->start_date);
-                } else if($request->finish_date) {
-                    $query->whereDate('post_date','<=', $request->finish_date);
                 }
 
                 if($request->status){
                     $query->whereIn('status', $request->status);
-                }
-
-                if($request->document){
-                    $query->where('document_status', $request->document);
                 }
 
                 if(!$request->modedata){
@@ -198,21 +153,14 @@ class PersonalCloseBillController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-                $totalReceivable = $val->totalReceivable();
-                $totalReceivableUsed = $val->totalReceivableUsedPaid();
-                $totalReceivableBalance = $totalReceivable - $totalReceivableUsed;
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->user->name,
-                    $val->account->name,
-                    $val->type(),
                     date('d/m/Y',strtotime($val->post_date)),
-                    date('d/m/Y',strtotime($val->required_date)),
                     $val->currency->code,
                     number_format($val->currency_rate,2,',','.'),
                     $val->note,
-                    $val->paymentType(),
                     $val->document_no,
                     $val->document_date ? date('d/m/Y',strtotime($val->document_date)) : '',
                     $val->tax_no,
@@ -220,39 +168,16 @@ class PersonalCloseBillController extends Controller
                     $val->cut_date ? date('d/m/Y',strtotime($val->cut_date)) : '',
                     $val->spk_no,
                     $val->invoice_no,
-                    $val->isReimburse(),
-                    $val->name_account,
-                    $val->no_account,
-                    $val->bank_account,
                     number_format($val->total,2,',','.'),
                     number_format($val->tax,2,',','.'),
                     number_format($val->wtax,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
-                    number_format($totalReceivableUsed,2,',','.'),
-                    number_format($totalReceivableBalance,2,',','.'),
-                    number_format($val->totalPaymentRequest(),2,',','.'),
-                    number_format($val->totalOutgoingPayment(),2,',','.'),
-                    $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'KOSONG',
-                    '
-                        <select class="browser-default" onfocus="updatePrevious(this);" onchange="updateDocumentStatus(`'.CustomHelper::encrypt($val->code).'`,this)" style="width:150px;">
-                            <option value="1" '.($val->document_status == '1' ? 'selected' : '').'>MENUNGGU</option>
-                            <option value="2" '.($val->document_status == '2' ? 'selected' : '').'>LENGKAP</option>
-                            <option value="3" '.($val->document_status == '3' ? 'selected' : '').'>TIDAK LENGKAP</option>
-                        </select>
-                    ',
-                    '
-                        <input style="width:250px;" type="text" data-id="'.CustomHelper::encrypt($val->code).'" value="'.$val->additional_note.'" onkeyup="updateAdditionalNote(this,`1`);">
-                    ',
-                    '
-                        <input style="width:250px;" type="text" data-id="'.CustomHelper::encrypt($val->code).'" value="'.$val->additional_note_pic.'" onkeyup="updateAdditionalNote(this,`2`);">
-                    ',
+                    '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
-                    $val->balanceStatus(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light orange accent-2 white-text" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light blue accent-2 white-text" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`,`'.$val->code.'`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat cyan darken-4 white-text btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light red accent-2 white-text" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
 					'
                 ];
 
@@ -274,13 +199,46 @@ class PersonalCloseBillController extends Controller
     }
 
     public function rowDetail(Request $request){
-        $data   = FundRequest::where('code',CustomHelper::decrypt($request->id))->first();
+        $data   = PersonalCloseBill::where('code',CustomHelper::decrypt($request->id))->first();
+        $menu = $this->menu;
         
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">
-                    <table style="min-width:100%;max-width:100%;">
+        $totalDocument = 0;
+        $string = $data->code.'<div class="row pt-1 pb-1 lighten-4"><div class="col s8"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="9">Daftar Item Dokumen '.$data->code.'</th>
+                                <th class="center-align" colspan="4">Daftar Permohonan Dana Terpakai</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">No.</th>
+                                <th class="center-align">No.Dokumen</th>
+                                <th class="center-align">Keterangan</th>
+                                <th class="center-align">Nominal</th>
+                            </tr>
+                        </thead><tbody>';
+
+        foreach($data->personalCloseBillDetail as $key => $row){
+            $string .= '<tr>
+                <td class="center-align">'.($key + 1).'</td>
+                <td class="center-align">'.$row->fundRequest->code.'</td>
+                <td class="center-align">'.$row->note.'</td>
+                <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
+            </tr>';
+            $totalDocument += $row->nominal;
+        }
+
+        $string .= '</tbody>
+                        <tfoot>
+                            <tr>
+                                <th class="right-align" colspan="3">Total</th>
+                                <th class="right-align">'.number_format($totalDocument,2,',','.').'</th>
+                            </tr>
+                        </tfoot>
+                        </table></div>';
+
+        $string .= '<div class="col s12"><table style="min-width:100%;max-width:100%;">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="14">Daftar Biaya</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -299,19 +257,8 @@ class PersonalCloseBillController extends Controller
                                 <th class="center-align">Proyek</th>
                             </tr>
                         </thead><tbody>';
-        $totalqty=0;
-        $totalhargasatuan=0;
-        $totalsubtotal=0;
-        $totalppn=0;
-        $totalpph=0;
-        $totalgrandtotal=0;
-        foreach($data->fundRequestDetail as $key => $row){
-            $totalqty+=$row->qty;
-            $totalhargasatuan+=$row->price;
-            $totalsubtotal+=$row->total;
-            $totalppn+=$row->tax;
-            $totalpph+=$row->wtax;
-            $totalgrandtotal+=$row->grandtotal;
+        
+        foreach($data->personalCloseBillCost as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="">'.$row->note.'</td>
@@ -329,30 +276,28 @@ class PersonalCloseBillController extends Controller
                 <td class="">'.($row->project()->exists() ? $row->project->name : '-').'</td>
             </tr>';
         }
-        $string .= '<tr>
-                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2"> Total </td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqty, 3, ',', '.') . '</td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;"></td>   
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalhargasatuan, 2, ',', '.') . '</td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalsubtotal, 2, ',', '.') . '</td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalppn, 2, ',', '.') . '</td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalpph, 2, ',', '.') . '</td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalgrandtotal, 2, ',', '.') . '</td>
-                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="5"></td>    
-            </tr>  
-        ';
         
         $string .= '</tbody>
                         <tfoot>
                             <tr>
                                 <th class="right-align" colspan="8">Total</th>
                                 <th class="right-align">'.number_format($data->grandtotal,2,',','.').'</th>
-                                <th class="right-align" colspan="5"></th>
                             </tr>
                         </tfoot>
-                        </table></div>';
+                        </table></div><div class="col s12 mt-2"><h6>Daftar Lampiran</h6>';
 
-        $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
+        foreach($menu->checklistDocument as $row){
+            $rowceklist = $row->checkDocument($data->getTable(),$data->id);
+            $string .= '<label style="margin: 0 5px 0 0;">
+            <input class="validate" required="" type="checkbox" value="{{ $row->id }}" '.($rowceklist ? 'checked' : '').'>
+            <span>'.$row->title.' ('.$row->type().')'.'</span>
+            '.($rowceklist ? $rowceklist->note : '').'
+            </label>';
+        }
+
+        $string .= '</div>';
+
+        $string .= '<div class="col s12 mt-1"><table style="max-width:800px;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="5">Approval</th>
@@ -741,7 +686,7 @@ class PersonalCloseBillController extends Controller
             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
             $data["image"]=$path_img;
              
-            $pdf = Pdf::loadView('admin.print.finance.', $data)->setPaper('a4', 'potrait');
+            $pdf = Pdf::loadView('admin.print.personal.close_bill_individual', $data)->setPaper('a4', 'potrait');
             $pdf->render();
     
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
@@ -1539,7 +1484,7 @@ class PersonalCloseBillController extends Controller
     }
 
     public function userDestroy(Request $request){
-        $query = FundRequest::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = PersonalCloseBill::where('code',CustomHelper::decrypt($request->id))->first();
 
         $approved = false;
         $revised = false;
@@ -1568,7 +1513,7 @@ class PersonalCloseBillController extends Controller
         if(in_array($query->status,['2','3','4','5'])){
             return response()->json([
                 'status'  => 500,
-                'message' => 'Jurnal / dokumen sudah dalam progres, anda tidak bisa melakukan perubahan.'
+                'message' => 'Dokumen sudah dalam progres, anda tidak bisa melakukan perubahan.'
             ]);
         }
 
@@ -1579,15 +1524,12 @@ class PersonalCloseBillController extends Controller
                 'delete_note'   => $request->msg,
             ]);
             
-            $query->fundRequestDetail()->delete();
-            CustomHelper::removeApproval('fund_requests',$query->id);
-
-            if($query->type == '1' && $query->account->type == '1'){
-                CustomHelper::removeCountLimitCredit($query->account_id,$query->grandtotal);
-            }
+            $query->personalCloseBillCost()->delete();
+            $query->personalCloseBillDetail()->delete();
+            CustomHelper::removeApproval($query->getTable(),$query->id);
 
             activity()
-                ->performedOn(new FundRequest())
+                ->performedOn(new PersonalCloseBill())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
                 ->log('Delete the personal close bill data');
@@ -1608,15 +1550,15 @@ class PersonalCloseBillController extends Controller
 
     public function approval(Request $request,$id){
         
-        $pr = FundRequest::where('code',CustomHelper::decrypt($id))->first();
+        $pr = PersonalCloseBill::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
             $data = [
-                'title'     => 'Print Permohonan Dana',
+                'title'     => 'Tutup BS Personal',
                 'data'      => $pr
             ];
 
-            return view('admin.approval.fund_request', $data);
+            return view('admin.approval.personal_close_bill', $data);
         }else{
             abort(404);
         }

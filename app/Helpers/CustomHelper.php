@@ -3009,23 +3009,37 @@ class CustomHelper {
 			$coapiutangbs = Coa::where('code','100.01.03.03.02')->where('company_id',$cb->company_id)->first();
 
 			foreach($cb->closeBillDetail as $row){
+				$account_id = $row->outgoingPayment()->exists() ? $row->outgoingPayment->account_id : $row->personalCloseBill->user_id;
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $coapiutangbs->id,
-					'account_id'	=> $coapiutangbs->bp_journal ? $row->outgoingPayment->account_id : NULL,
+					'account_id'	=> $coapiutangbs->bp_journal ? $account_id : NULL,
 					'type'			=> '2',
 					'nominal'		=> $row->nominal * $cb->currency_rate,
 					'nominal_fc'	=> $cb->currency->type == '1' || $cb->currency->type == '' ? $row->nominal * $cb->currency_rate : $row->nominal,
 					'note'			=> $row->note,
 				]);
-				if($row->outgoingPayment->balancePaymentCross() <= 0){
-					foreach($row->outgoingPayment->paymentRequest->paymentRequestDetail as $rowdetail){
-						if($rowdetail->lookable_type == 'fund_requests'){
-							$rowdetail->lookable->update([
-								'balance_status'	=> '1'
-							]);
+				
+				if($row->outgoingPayment()->exists()){
+					if($row->outgoingPayment->balancePaymentCross() <= 0){
+						foreach($row->outgoingPayment->paymentRequest->paymentRequestDetail as $rowdetail){
+							if($rowdetail->lookable_type == 'fund_requests'){
+								$rowdetail->lookable->update([
+									'balance_status'	=> '1'
+								]);
+							}
 						}
 					}
+				}
+				if($row->personalCloseBill()->exists()){
+					foreach($row->personalCloseBill->personalCloseBillDetail as $rowdetail){
+						$rowdetail->fundRequest->update([
+							'balance_status'	=> '1',
+						]);
+					}
+					$row->personalCloseBill->update([
+						'status'	=> '3'
+					]);
 				}
 			}
 

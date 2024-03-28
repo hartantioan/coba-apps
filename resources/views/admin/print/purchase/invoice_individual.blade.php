@@ -287,7 +287,7 @@
                                         Tgl. Bukti Potong
                                     </td>
                                     <td width="50%">
-                                        {{ date('d/m/Y',strtotime($data->cut_date)) }}
+                                        {{ $data->cut_date ? date('d/m/Y',strtotime($data->cut_date)) : '-' }}
                                     </td>
                                 </tr>
                             </table>

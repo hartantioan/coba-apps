@@ -30,6 +30,7 @@ use App\Models\Line;
 use App\Models\Machine;
 use App\Models\MenuUser;
 use App\Exports\ExportFundRequestTransactionPage;
+use App\Exports\ExportPersonalCloseBill;
 use App\Models\Currency;
 use App\Models\FundRequest;
 use App\Models\OutgoingPayment;

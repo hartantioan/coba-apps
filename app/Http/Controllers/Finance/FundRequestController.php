@@ -998,7 +998,6 @@ class FundRequestController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light orange accent-2 white-text" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light yellow accent-2 white-text" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light red accent-2 white-text" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
-                        '.($totalReceivableBalance == 0 && $val->status == '2' ? '<button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light purple accent-2 white-text" data-popup="tooltip" title="Finish" onclick="finish(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">offline_pin</i></button>' : '').'
 					'
                 ];
 

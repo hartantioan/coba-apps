@@ -102,13 +102,17 @@ class SubsidiaryLedgerController extends Controller
                         </tr>';
             if(count($collect) > 0){
                 foreach($collect as $key => $detail){
+                    $additional_ref = '';
+                    if($detail['data']->journal->lookable_type == 'outgoing_payments'){
+                        $additional_ref = ' - '.$detail['data']->journal->lookable->paymentRequest->code;
+                    }
                     $balance += ($detail['data']->type == '1' ? $detail['data']->nominal : -1 * $detail['data']->nominal);
                     $html .= '<tr>
                                 <td>'.$detail['data']->coa->code.'</td>
                                 <td>'.$detail['data']->coa->name.'</td>
                                 <td>'.date('d/m/Y',strtotime($detail['data']->journal->post_date)).'</td>
                                 <td>'.$detail['data']->journal->code.'</td>
-                                <td>'.($detail['data']->journal->lookable_id ? $detail['data']->journal->lookable->code : '-').'</td>
+                                <td>'.($detail['data']->journal->lookable_id ? $detail['data']->journal->lookable->code.$additional_ref : '-').'</td>
                                 <td class="right-align">'.($detail['data']->type == '1' ? number_format($detail['data']->nominal,2,',','.') : '-').'</td>
                                 <td class="right-align">'.($detail['data']->type == '2' ? number_format($detail['data']->nominal,2,',','.') : '-').'</td>
                                 <td class="right-align">'.number_format($balance,2,',','.').'</td>

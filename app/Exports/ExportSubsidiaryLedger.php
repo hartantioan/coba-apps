@@ -58,13 +58,18 @@ class ExportSubsidiaryLedger implements  FromView,ShouldAutoSize
             ];
             if(count($collect) > 0){
                 foreach($collect as $key => $detail){
+                    $additional_ref = '';
+                    if($detail['data']->journal->lookable_type == 'outgoing_payments'){
+                        $additional_ref = ' - '.$detail['data']->journal->lookable->paymentRequest->code;
+                    }
+
                     $balance += ($detail['data']->type == '1' ? $detail['data']->nominal : -1 * $detail['data']->nominal);
 
                     $data_tempura['coa_code'][]=$detail['data']->coa->code;
                     $data_tempura['coa_name'][]=$detail['data']->coa->name;
                     $data_tempura['j_postdate'][]=date('d/m/Y',strtotime($detail['data']->journal->post_date));
                     $data_tempura['j_code'][]=$detail['data']->journal->code;
-                    $data_tempura['j_lookable'][]=($detail['data']->journal->lookable_id ? $detail['data']->journal->lookable->code : '-');
+                    $data_tempura['j_lookable'][]=($detail['data']->journal->lookable_id ? $detail['data']->journal->lookable->code.$additional_ref : '-');
                     $data_tempura['j_detail1'][]=($detail['data']->type == '1' ? number_format($detail['data']->nominal,2,',','.') : '-');
                     $data_tempura['j_detail2'][]=($detail['data']->type == '2' ? number_format($detail['data']->nominal,2,',','.') : '-');
                    

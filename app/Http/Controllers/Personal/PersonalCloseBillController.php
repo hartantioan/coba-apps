@@ -777,7 +777,7 @@ class PersonalCloseBillController extends Controller
         $end_date = $request->end_date ? $request->end_date : '';
         $mode = $request->mode ? $request->mode : '';
 		
-		return Excel::download(new ExportFundRequest($post_date,$end_date,$mode), 'fund_request_'.uniqid().'.xlsx');
+		return Excel::download(new ExportPersonalCloseBill($post_date,$end_date,$mode), 'personal_close_bill_'.uniqid().'.xlsx');
     }
 
     public function userIndex(Request $request)

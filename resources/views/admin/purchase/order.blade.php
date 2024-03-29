@@ -412,7 +412,7 @@
                             <div class="col m12 s12 step22" style="overflow:auto;width:100% !important;">
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Produk</h4>
-                                    <table class="bordered" style="width:3300px;font-size:0.9rem !important;" id="table-detail">
+                                    <table class="bordered" style="width:3800px;font-size:0.9rem !important;" id="table-detail">
                                         <thead>
                                             <tr>
                                                 <th>Hapus</th>
@@ -443,6 +443,10 @@
                                                 <th>Disc2(%)</th>
                                                 <th>Disc3(Rp)</th>
                                                 <th>Subtotal</th>
+                                                <th>Total</th>
+                                                <th>PPN</th>
+                                                <th>PPh</th>
+                                                <th>Grandtotal</th>
                                                 <th>Plant</th>
                                                 <th>Line</th>
                                                 <th>Mesin</th>
@@ -457,7 +461,7 @@
                                         </thead>
                                         <tbody id="body-item">
                                             <tr id="last-row-item">
-                                                <td colspan="23">
+                                                <td colspan="27">
                                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" id="button-add-item" onclick="addItem()" href="javascript:void(0);">
                                                         <i class="material-icons left">add</i> New Item
                                                     </a>
@@ -1471,6 +1475,18 @@
                                             <td class="center">
                                                 <span id="arr_subtotal` + count + `" class="arr_subtotal">0</span>
                                             </td>
+                                            <td class="center">
+                                                <input name="arr_nominal_total[]" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_total`+ count +`" readonly>
+                                            </td>
+                                            <td class="center">
+                                                <input name="arr_nominal_tax[]" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_tax`+ count +`" readonly>
+                                            </td>
+                                            <td class="center">
+                                                <input name="arr_nominal_wtax[]" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_wtax`+ count +`" readonly>
+                                            </td>
+                                            <td class="center">
+                                                <input name="arr_nominal_grandtotal[]" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_grandtotal`+ count +`" readonly>
+                                            </td>
                                             <td>
                                                 <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                                                     @foreach ($place as $rowplace)
@@ -1585,6 +1601,18 @@
                                             </td>
                                             <td class="center">
                                                 <span id="arr_subtotal` + count + `" class="arr_subtotal">0</span>
+                                            </td>
+                                            <td class="center">
+                                                <input name="arr_nominal_total[]" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_total`+ count +`" readonly>
+                                            </td>
+                                            <td class="center">
+                                                <input name="arr_nominal_tax[]" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_tax`+ count +`" readonly>
+                                            </td>
+                                            <td class="center">
+                                                <input name="arr_nominal_wtax[]" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_wtax`+ count +`" readonly>
+                                            </td>
+                                            <td class="center">
+                                                <input name="arr_nominal_grandtotal[]" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_grandtotal`+ count +`" readonly>
                                             </td>
                                             <td>
                                                 <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
@@ -1783,6 +1811,18 @@
                     </td>
                     <td class="center">
                         <span id="arr_subtotal` + count + `" class="arr_subtotal">0</span>
+                    </td>
+                    <td class="center">
+                        <input name="arr_nominal_total[]" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_total`+ count +`" readonly>
+                    </td>
+                    <td class="center">
+                        <input name="arr_nominal_tax[]" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_tax`+ count +`" readonly>
+                    </td>
+                    <td class="center">
+                        <input name="arr_nominal_wtax[]" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_wtax`+ count +`" readonly>
+                    </td>
+                    <td class="center">
+                        <input name="arr_nominal_grandtotal[]" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_grandtotal`+ count +`" readonly>
                     </td>
                     <td>
                         <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
@@ -2530,6 +2570,18 @@
                                     <td class="center">
                                         <span id="arr_subtotal` + count + `" class="arr_subtotal">` + val.subtotal + `</span>
                                     </td>
+                                    <td class="center">
+                                        <input name="arr_nominal_total[]" type="text" value="` + val.total  + `" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_total`+ count +`" readonly>
+                                    </td>
+                                    <td class="center">
+                                        <input name="arr_nominal_tax[]" type="text" value="` + val.tax  + `" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_tax`+ count +`" readonly>
+                                    </td>
+                                    <td class="center">
+                                        <input name="arr_nominal_wtax[]" type="text" value="` + val.wtax  + `" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_wtax`+ count +`" readonly>
+                                    </td>
+                                    <td class="center">
+                                        <input name="arr_nominal_grandtotal[]" type="text" value="` + val.grandtotal  + `" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_grandtotal`+ count +`" readonly>
+                                    </td>
                                     <td>
                                         <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                                             @foreach ($place as $rowplace)
@@ -2666,6 +2718,18 @@
                                     </td>
                                     <td class="center">
                                         <span id="arr_subtotal` + count + `" class="arr_subtotal">` + val.subtotal + `</span>
+                                    </td>
+                                    <td class="center">
+                                        <input name="arr_nominal_total[]" type="text" value="` + val.total  + `" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_total`+ count +`" readonly>
+                                    </td>
+                                    <td class="center">
+                                        <input name="arr_nominal_tax[]" type="text" value="` + val.tax  + `" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_tax`+ count +`" readonly>
+                                    </td>
+                                    <td class="center">
+                                        <input name="arr_nominal_wtax[]" type="text" value="` + val.wtax  + `" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_wtax`+ count +`" readonly>
+                                    </td>
+                                    <td class="center">
+                                        <input name="arr_nominal_grandtotal[]" type="text" value="` + val.grandtotal  + `" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_grandtotal`+ count +`" readonly>
                                     </td>
                                     <td>
                                         <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
@@ -2919,7 +2983,7 @@
 		});
 
         $('.arr_subtotal').each(function(index){
-            let rownominal = parseFloat($(this).text().replaceAll(".", "").replaceAll(",",".")), rowtax = 0, rowwtax = 0, rowbobot = 0, rowdiscount = 0;
+            let rownominal = parseFloat($(this).text().replaceAll(".", "").replaceAll(",",".")), rowtax = 0, rowwtax = 0, rowbobot = 0, rowdiscount = 0, rowgrandtotal = 0;
             rowbobot = rownominal / subtotal;
             rowdiscount = discount * rowbobot;
             rownominal -= rowdiscount;
@@ -2937,6 +3001,24 @@
                 let percent_wtax = parseFloat($('select[name^="arr_wtax"]').eq(index).val());
                 rowwtax = rownominal * (percent_wtax / 100);
             }
+
+            $('input[name^="arr_nominal_total"]').eq(index).val(
+                (rownominal >= 0 ? '' : '-') + formatRupiahIni(rownominal.toString().replace('.',','))
+            );
+
+            $('input[name^="arr_nominal_tax"]').eq(index).val(
+                (rowtax >= 0 ? '' : '-') + formatRupiahIni(rowtax.toString().replace('.',','))
+            );
+
+            $('input[name^="arr_nominal_wtax"]').eq(index).val(
+                (rowwtax >= 0 ? '' : '-') + formatRupiahIni(rowwtax.toString().replace('.',','))
+            );
+
+            rowgrandtotal = (rownominal + rowtax - rowwtax).toFixed(2);
+
+            $('input[name^="arr_nominal_grandtotal"]').eq(index).val(
+                (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(rowgrandtotal.toString().replace('.',','))
+            );
             
             tax += rowtax;
             wtax += rowwtax;

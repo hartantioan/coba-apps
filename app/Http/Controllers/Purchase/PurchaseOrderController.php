@@ -881,11 +881,6 @@ class PurchaseOrderController extends Controller
                                 $finalpricedisc3 = $finalpricedisc2 - $disc3;
                 
                                 $rowsubtotal = round($finalpricedisc3 * $qty,2);
-
-                                $bobot = $rowsubtotal / str_replace(',','.',str_replace('.','',$request->savesubtotal));
-
-                                $tax = round(($request->arr_tax[$key] / 100) * $rowsubtotal,2);
-                                $wtax = round($bobot * str_replace(',','.',str_replace('.','',$request->wtax)),2);
                                 
                                 $itemUnit = ItemUnit::find(intval($request->arr_unit[$key]));
                                 $querydetail = PurchaseOrderDetail::create([
@@ -901,9 +896,9 @@ class PurchaseOrderController extends Controller
                                     'percent_discount_2'            => $disc2,
                                     'discount_3'                    => $disc3,
                                     'subtotal'                      => $rowsubtotal,
-                                    'tax'                           => $tax,
-                                    'wtax'                          => $wtax,
-                                    'grandtotal'                    => $rowsubtotal + $tax - $wtax,
+                                    'tax'                           => str_replace(',','.',str_replace('.','',$request->arr_nominal_tax[$key])),
+                                    'wtax'                          => str_replace(',','.',str_replace('.','',$request->arr_nominal_wtax[$key])),
+                                    'grandtotal'                    => str_replace(',','.',str_replace('.','',$request->arr_nominal_grandtotal[$key])),
                                     'note'                          => $request->arr_note[$key] ? $request->arr_note[$key] : NULL,
                                     'note2'                         => $request->arr_note2[$key] ? $request->arr_note2[$key] : NULL,
                                     'is_tax'                        => $request->arr_tax[$key] > 0 ? '1' : NULL,
@@ -949,8 +944,8 @@ class PurchaseOrderController extends Controller
 
                                 $bobot = $rowsubtotal / str_replace(',','.',str_replace('.','',$request->savesubtotal));
 
-                                $tax = round(($request->arr_tax[$key] / 100) * $rowsubtotal,2);
-                                $wtax = round($bobot * str_replace(',','.',str_replace('.','',$request->wtax)),2);
+                                $tax = ($request->arr_tax[$key] / 100) * $rowsubtotal;
+                                $wtax = $bobot * str_replace(',','.',str_replace('.','',$request->wtax));
         
                                 $querydetail = PurchaseOrderDetail::create([
                                     'purchase_order_id'                     => $query->id,
@@ -963,9 +958,9 @@ class PurchaseOrderController extends Controller
                                     'percent_discount_2'                    => $disc2,
                                     'discount_3'                            => $disc3,
                                     'subtotal'                              => $rowsubtotal,
-                                    'tax'                                   => $tax,
-                                    'wtax'                                  => $wtax,
-                                    'grandtotal'                            => $rowsubtotal + $tax - $wtax,
+                                    'tax'                                   => str_replace(',','.',str_replace('.','',$request->arr_nominal_tax[$key])),
+                                    'wtax'                                  => str_replace(',','.',str_replace('.','',$request->arr_nominal_wtax[$key])),
+                                    'grandtotal'                            => str_replace(',','.',str_replace('.','',$request->arr_nominal_grandtotal[$key])),
                                     'note'                                  => $request->arr_note[$key] ? $request->arr_note[$key] : NULL,
                                     'note2'                                 => $request->arr_note2[$key] ? $request->arr_note2[$key] : NULL,
                                     'is_tax'                                => $request->arr_tax[$key] > 0 ? '1' : NULL,
@@ -1200,7 +1195,11 @@ class PurchaseOrderController extends Controller
                 'disc1'                             => number_format($row->percent_discount_1,2,',','.'),
                 'disc2'                             => number_format($row->percent_discount_2,2,',','.'),
                 'disc3'                             => number_format($row->discount_3,2,',','.'),
-                'subtotal'                          => number_format($row->subtotal,2,',','.'),
+                'subtotal'                          => CustomHelper::formatConditionalQty($row->subtotal),
+                'total'                             => CustomHelper::formatConditionalQty($row->subtotal),
+                'tax'                               => CustomHelper::formatConditionalQty($row->tax),
+                'wtax'                              => CustomHelper::formatConditionalQty($row->wtax),
+                'grandtotal'                        => CustomHelper::formatConditionalQty($row->grandtotal),
                 'is_tax'                            => $row->is_tax ? $row->is_tax : '',
                 'is_include_tax'                    => $row->is_include_tax ? $row->is_include_tax : '',
                 'percent_tax'                       => number_format($row->percent_tax,2,',','.'),

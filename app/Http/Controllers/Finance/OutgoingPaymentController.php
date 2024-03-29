@@ -706,6 +706,29 @@ class OutgoingPaymentController extends Controller
                 ]);
 
                 $query->paymentRequest->updateStatusSchedule();
+
+                foreach($query->paymentRequest->paymentRequestDetail as $row){
+                    if($row->lookable_type == 'purchase_invoices'){
+                        foreach($row->lookable->purchaseInvoiceDetail as $rowinvoicedetail){
+                            if($rowinvoicedetail->fundRequestDetail()->exists()){
+                                if(!$rowinvoicedetail->fundRequestDetail->fundRequest->hasBalanceInvoice()){
+                                    $rowinvoicedetail->fundRequestDetail->fundRequest->update([
+                                        'balance_status'	=> NULL
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+                    if($row->lookable_type == 'purchase_down_payments'){
+                        foreach($row->lookable->purchaseDownPaymentDetail as $rowdpdetail){
+                            if($rowdpdetail->fundRequestDetail()->exists()){
+                                $rowdpdetail->fundRequestDetail->fundRequest->update([
+                                    'balance_status'	=> '1'
+                                ]);
+                            }
+                        }
+                    }
+                }
     
                 activity()
                     ->performedOn(new OutgoingPayment())

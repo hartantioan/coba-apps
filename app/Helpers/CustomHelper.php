@@ -1492,6 +1492,15 @@ class CustomHelper {
 							$row->lookable->update([
 								'status'	=> '3'
 							]);
+							foreach($row->lookable->purchaseInvoiceDetail as $rowinvoicedetail){
+								if($rowinvoicedetail->fundRequestDetail()->exists()){
+									if(!$rowinvoicedetail->fundRequestDetail->fundRequest->hasBalanceInvoice()){
+										$rowinvoicedetail->fundRequestDetail->fundRequest->update([
+											'balance_status'	=> '1'
+										]);
+									}
+								}
+							}
 						}
 					}elseif($row->lookable_type == 'fund_requests'){
 						$mustpay = $row->nominal;
@@ -1512,6 +1521,13 @@ class CustomHelper {
 							$row->lookable->update([
 								'status'	=> '3'
 							]);
+							foreach($row->lookable->purchaseDownPaymentDetail as $rowdpdetail){
+								if($rowdpdetail->fundRequestDetail()->exists()){
+									$rowdpdetail->fundRequestDetail->fundRequest->update([
+										'balance_status'	=> '1'
+									]);
+								}
+							}
 						}
 					}elseif($row->lookable_type == 'marketing_order_memos'){
 						$rowtotal = $row->lookable->balance();

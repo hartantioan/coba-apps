@@ -57,9 +57,11 @@ class SubsidiaryLedgerController extends Controller
                             <th class="center-align" width="100px">Tanggal</th>
                             <th class="center-align" width="200px">No.JE</th>
                             <th class="center-align" width="200px">Dok.Ref.</th>
-                            <th class="center-align">Debit</th>
-                            <th class="center-align">Kredit</th>
-                            <th class="center-align">Total</th>
+                            <th class="center-align">Debit Rp</th>
+                            <th class="center-align">Kredit Rp</th>
+                            <th class="center-align">Total Rp</th>
+                            <th class="center-align">Debit FC</th>
+                            <th class="center-align">Kredit FC</th>
                             <th class="center-align">Keterangan 1</th>
                             <th class="center-align">Keterangan 2</th>
                             <th class="center-align">Keterangan 3</th>
@@ -98,7 +100,7 @@ class SubsidiaryLedgerController extends Controller
                             <td width="200px">'.$row->name.'</td>
                             <td colspan="5"></td>
                             <td class="right-align">'.number_format($balance,2,',','.').'</td>
-                            <td colspan="9"></td>
+                            <td colspan="11"></td>
                         </tr>';
             if(count($collect) > 0){
                 foreach($collect as $key => $detail){
@@ -116,6 +118,8 @@ class SubsidiaryLedgerController extends Controller
                                 <td class="right-align">'.($detail['data']->type == '1' ? number_format($detail['data']->nominal,2,',','.') : '-').'</td>
                                 <td class="right-align">'.($detail['data']->type == '2' ? number_format($detail['data']->nominal,2,',','.') : '-').'</td>
                                 <td class="right-align">'.number_format($balance,2,',','.').'</td>
+                                <td class="right-align">'.($detail['data']->type == '1' ? number_format($detail['data']->nominal_fc,2,',','.') : '-').'</td>
+                                <td class="right-align">'.($detail['data']->type == '2' ? number_format($detail['data']->nominal_fc,2,',','.') : '-').'</td>
                                 <td>'.$detail['data']->journal->note.'</td>
                                 <td>'.$detail['data']->note.$additional_ref.'</td>
                                 <td>'.$detail['data']->note2.'</td>

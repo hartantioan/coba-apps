@@ -6,9 +6,11 @@
             <th class="center-align" style="background-color:white; border: 2px solid #000;" width="100px">Tanggal</th>
             <th class="center-align" style="background-color:white; border: 2px solid #000;" width="200px">No.JE</th>
             <th class="center-align" style="background-color:white; border: 2px solid #000;" width="200px">Dok.Ref.</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Debit</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Kredit</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Total</th>
+            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Debit Rp</th>
+            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Kredit Rp</th>
+            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Total Rp</th>
+            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Debit FC</th>
+            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Kredit FC</th>
             <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Keterangan 1</th>
             <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Keterangan 2</th>
             <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Keterangan 3</th>
@@ -27,7 +29,7 @@
             <td width="200px">{{$row['name']}}</td>
             <td colspan="5"></td>
             <td class="right-align">{{$row['balance']}}</td>
-            <td colspan="9"></td>
+            <td colspan="11"></td>
         </tr>
         @if (isset($row['coa_code']) && is_array($row['coa_code']))
             @foreach ($row['coa_code'] as $key=>$row_sec)
@@ -40,6 +42,8 @@
                 <td>{{$row['j_detail1'][$key]}}</td>
                 <td>{{$row['j_detail2'][$key]}}</td>
                 <td>{{$row['j_balance'][$key]}}</td>
+                <td>{{$row['j_detail3'][$key]}}</td>
+                <td>{{$row['j_detail4'][$key]}}</td>
                 <td>{{$row['j_note'][$key]}}</td>
                 <td>{{$row['j_note1'][$key]}}</td>
                 <td>{{$row['j_note2'][$key]}}</td>

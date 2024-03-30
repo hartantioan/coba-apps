@@ -1939,6 +1939,18 @@
                     <td class="center">
                         <span id="arr_subtotal` + count + `" class="arr_subtotal">0</span>
                     </td>
+                    <td class="center">
+                        <input name="arr_nominal_total[]" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_total`+ count +`" readonly>
+                    </td>
+                    <td class="center">
+                        <input name="arr_nominal_tax[]" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_tax`+ count +`" readonly>
+                    </td>
+                    <td class="center">
+                        <input name="arr_nominal_wtax[]" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_wtax`+ count +`" readonly>
+                    </td>
+                    <td class="center">
+                        <input name="arr_nominal_grandtotal[]" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_grandtotal`+ count +`" readonly>
+                    </td>
                     <td>
                         <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                             @foreach ($place as $rowplace)

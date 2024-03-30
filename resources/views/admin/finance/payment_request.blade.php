@@ -473,16 +473,25 @@
                                     <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                     <label class="active" for="note">Keterangan</label>
                                 </div>
-                                <div class="input-field col m2 s12">
-                                    
-                                </div>
-                                <div class="input-field col m6 s12 step22">
+                                <div class="input-field col m8 s12 step22">
                                     <table width="100%" class="bordered">
                                         <thead>
+                                            <tr>
+                                                <td colspan="2" width="40%"></td>
+                                                <td class="center-align" width="30%">
+                                                    Nilai Asing
+                                                </td>
+                                                <td class="center-align" width="30%">
+                                                    Nilai Konversi
+                                                </td>
+                                            </tr>
                                             <tr>
                                                 <td colspan="2">Total</td>
                                                 <td class="right-align">
                                                     <input class="browser-default" id="total" name="total" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" readonly>
+                                                </td>
+                                                <td class="right-align">
+                                                    <span id="total_convert">0,00</span>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -490,14 +499,20 @@
                                                 <td class="right-align">
                                                     <input class="browser-default" id="rounding" name="rounding" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
                                                 </td>
+                                                <td class="right-align">
+                                                    <span id="rounding_convert">0,00</span>
+                                                </td>
                                             </tr>
                                             <tr>
-                                                <td width="33%">Biaya Admin</td>
-                                                <td width="33%">
+                                                <td width="20%">Biaya Admin</td>
+                                                <td width="20%">
                                                     <select class="browser-default" id="cost_distribution_id" name="cost_distribution_id"></select>
                                                 </td>
-                                                <td class="right-align" width="33%">
+                                                <td class="right-align">
                                                     <input class="browser-default" id="admin" name="admin" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
+                                                </td>
+                                                <td class="right-align">
+                                                    <span id="admin_convert">0,00</span>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -505,17 +520,26 @@
                                                 <td class="right-align">
                                                     <input class="browser-default" id="grandtotal" name="grandtotal" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" readonly>
                                                 </td>
+                                                <td class="right-align">
+                                                    <span id="grandtotal_convert">0,00</span>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <td colspan="2">Bayar dengan Piutang / dijadikan Biaya</td>
                                                 <td class="right-align">
                                                     <input class="browser-default" id="payment" name="payment" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" readonly>
                                                 </td>
+                                                <td class="right-align">
+                                                    <span id="payment_convert">0,00</span>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <td colspan="2">Sisa Harus Bayar</td>
                                                 <td class="right-align">
                                                     <input class="browser-default" id="balance" name="balance" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" readonly>
+                                                </td>
+                                                <td class="right-align">
+                                                    <span id="balance_convert">0,00</span>
                                                 </td>
                                             </tr>
                                         </thead>
@@ -1142,6 +1166,7 @@
                 `);
                 $('#account_id,#cost_distribution_id,#coa_source_id').empty();
                 $('#admin,#grandtotal').val('0,00');
+                $('#total_convert,#rounding_convert,#admin_convert,#grandtotal_convert,#payment_convert,#balance_convert').text('0,00');
                 if($('.data-used').length > 0){
                     $('.data-used').trigger('click');
                 }
@@ -2190,7 +2215,7 @@
 
     function countAll(){
 
-        var total = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",",".")), admin = parseFloat($('#admin').val().replaceAll(".", "").replaceAll(",",".")), grandtotal = 0, payment = 0, balance = 0;
+        var total = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",",".")), admin = parseFloat($('#admin').val().replaceAll(".", "").replaceAll(",",".")), grandtotal = 0, payment = 0, balance = 0, currencyRate = parseFloat($('#currency_rate').val().replaceAll(".", "").replaceAll(",","."));;
         
         $('input[name^="arr_cd_payment"]').each(function(){
             if($(this).is(':checked')){
@@ -2205,7 +2230,6 @@
         }
 
         if(!$('#cost-tab').hasClass('hide')){
-            let currencyRate = parseFloat($('#currency_rate').val().replaceAll(".", "").replaceAll(",","."));
             $('input[name^="arr_nominal_debit_fc[]"]').each(function(index){
                 let nominal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
                 let nominalConvert = currencyRate * nominal;
@@ -2224,17 +2248,29 @@
 
         grandtotal = total + admin + rounding;
         balance = grandtotal - payment;
+        $('#rounding_convert').text(
+            (rounding >= 0 ? '' : '-') + formatRupiahIni((rounding * currencyRate).toFixed(2).toString().replace('.',','))
+        );
         $('#total').val(formatRupiahIni(total.toFixed(2).toString().replace('.',',')));
+        $('#total_convert').text(formatRupiahIni((total * currencyRate).toFixed(2).toString().replace('.',',')));
         $('#grandtotal').val(
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
+        );
+        $('#grandtotal_convert').text(
+            (grandtotal >= 0 ? '' : '-') + formatRupiahIni((grandtotal * currencyRate).toFixed(2).toString().replace('.',','))
         );
         $('#payment').val(
             (payment >= 0 ? '' : '-') + formatRupiahIni(payment.toFixed(2).toString().replace('.',','))
         );
+        $('#payment_convert').text(
+            (payment >= 0 ? '' : '-') + formatRupiahIni((payment * currencyRate).toFixed(2).toString().replace('.',','))
+        );
         $('#balance').val(
             (balance >= 0 ? '' : '-') + formatRupiahIni(balance.toFixed(2).toString().replace('.',','))
         );
-        
+        $('#balance_convert').text(
+            (balance >= 0 ? '' : '-') + formatRupiahIni((balance * currencyRate).toFixed(2).toString().replace('.',','))
+        );
     }
 
     function chooseAllGas(element){
@@ -2708,6 +2744,13 @@
                 $('#grandtotal').val(response.grandtotal);
                 $('#payment').val(response.payment);
                 $('#balance').val(response.balance);
+                $('#total_convert').text(response.total_convert);
+                $('#rounding_convert').text(response.rounding_convert);
+                $('#admin_convert').text(response.admin_convert);
+                $('#grandtotal_convert').text(response.grandtotal_convert);
+                $('#payment_convert').text(response.payment_convert);
+                $('#balance_convert').text(response.balance_convert);
+                
                 $('#is_reimburse').val(response.is_reimburse).formSelect();
                 
                 if(response.details.length > 0){

@@ -1349,6 +1349,12 @@ class PaymentRequestController extends Controller
         $pr['account_name_bp'] = $pr->account()->exists() ? $pr->account->name : '';
         $pr['code_place_id'] = substr($pr->code,7,2);
         $pr['coa_source_name'] = $pr->coaSource()->exists() ? $pr->coaSource->code.' - '.$pr->coaSource->name.' - '.$pr->coaSource->company->name : '';
+        $pr['total_convert'] = number_format($pr->total * $pr->currency_rate,2,',','.');
+        $pr['rounding_convert'] = number_format($pr->rounding * $pr->currency_rate,2,',','.');
+        $pr['admin_convert'] = number_format($pr->admin * $pr->currency_rate,2,',','.');
+        $pr['grandtotal_convert'] = number_format($pr->grandtotal * $pr->currency_rate,2,',','.');
+        $pr['payment_convert'] = number_format($pr->payment * $pr->currency_rate,2,',','.');
+        $pr['balance_convert'] = number_format($pr->balance * $pr->currency_rate,2,',','.');
         $pr['currency_rate'] = number_format($pr->currency_rate,2,',','.');
         $pr['cost_distribution_name'] = $pr->cost_distribution_id ? $pr->costDistribution->code.' - '.$pr->costDistribution->name : '';
         $pr['total'] = number_format($pr->total,2,',','.');

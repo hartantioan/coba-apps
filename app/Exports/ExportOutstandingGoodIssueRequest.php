@@ -3,7 +3,7 @@
 namespace App\Exports;
 
 use App\Models\GoodIssue;
-use App\Models\goodIssueRequestDetail;
+use App\Models\GoodIssueRequestDetail;
 use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;

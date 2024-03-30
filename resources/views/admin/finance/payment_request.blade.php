@@ -366,6 +366,7 @@
                                                                 <th class="center">Referensi</th>
                                                                 <th class="center">Tgl.Post</th>
                                                                 <th class="center">Tgl.Jatuh Tempo</th>
+                                                                <th class="center">Mata Uang</th>
                                                                 <th class="center">Total</th>
                                                                 <th class="center">PPN</th>
                                                                 <th class="center">PPh</th>
@@ -378,7 +379,7 @@
                                                         </thead>
                                                         <tbody id="body-detail">
                                                             <tr id="empty-detail">
-                                                                <td colspan="11">
+                                                                <td colspan="12">
                                                                     Pilih partner bisnis untuk memulai...
                                                                 </td>
                                                             </tr>
@@ -1134,7 +1135,7 @@
                 M.updateTextFields();
                 $('#body-detail').empty().append(`
                     <tr id="empty-detail">
-                        <td colspan="11">
+                        <td colspan="12">
                             Pilih partner bisnis untuk memulai...
                         </td>
                     </tr>
@@ -1882,6 +1883,9 @@
                                             <td class="center">
                                                 ` + val.due_date + `
                                             </td>
+                                            <td class="center">
+                                                ` + val.currency_code + `
+                                            </td>
                                             <td class="right-align">
                                                 ` + val.total + `
                                             </td>
@@ -2041,7 +2045,7 @@
                             }else{
                                 $('#body-detail').empty().append(`
                                     <tr id="empty-detail">
-                                        <td colspan="11">
+                                        <td colspan="12">
                                             Pilih partner bisnis untuk memulai...
                                         </td>
                                     </tr>
@@ -2288,7 +2292,7 @@
                 if($('.row_detail').length == 0){
                     $('#body-detail').empty().append(`
                         <tr id="empty-detail">
-                            <td colspan="11">
+                            <td colspan="12">
                                 Pilih partner bisnis untuk memulai...
                             </td>
                         </tr>
@@ -2727,6 +2731,9 @@
                                 </td>
                                 <td class="center">
                                     ` + val.due_date + `
+                                </td>
+                                <td class="center">
+                                    ` + val.currency_code + `
                                 </td>
                                 <td class="right-align">
                                     ` + val.total + `

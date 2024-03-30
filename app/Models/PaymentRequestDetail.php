@@ -165,6 +165,18 @@ class PaymentRequestDetail extends Model
           return $code;
     }
 
+    public function getCurrencySymbol(){
+        $symbol = match ($this->lookable_type) {
+            'fund_requests'             => $this->lookable->currency->symbol,
+            'purchase_invoices'         => $this->lookable->currency->symbol,
+            'purchase_down_payments'    => $this->lookable->currency->symbol,
+            'marketing_order_memos'     => 'Rp',
+            default                     => 'Rp',
+          };
+  
+          return $symbol;
+    }
+
     public function getCode(){
         $code = match ($this->lookable_type) {
             'fund_requests'             => $this->lookable->code,

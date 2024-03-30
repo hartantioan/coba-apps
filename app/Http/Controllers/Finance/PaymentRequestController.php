@@ -674,6 +674,7 @@ class PaymentRequestController extends Controller
                                 'memo'          => number_format(0,2,',','.'),
                                 'currency_id'   => $data->currency_id,
                                 'currency_rate' => number_format($data->currency_rate,2,',','.'),
+                                'currency_code' => $data->currency->symbol,
                                 'note'          => $data->note ? $data->note : '',
                                 'name_account'  => $data->name_account ?? '',
                                 'no_account'    => $data->no_account ?? '',
@@ -730,6 +731,7 @@ class PaymentRequestController extends Controller
                                 'memo'          => number_format($data->totalMemo(),2,',','.'),
                                 'currency_id'   => $data->currency_id,
                                 'currency_rate' => number_format($data->currency_rate,2,',','.'),
+                                'currency_code' => $data->currency->symbol,
                                 'note'          => $data->note ? $data->note : '',
                                 'name_account'  => $name_account,
                                 'no_account'    => $no_account,
@@ -772,6 +774,7 @@ class PaymentRequestController extends Controller
                                 'memo'          => number_format($data->totalMemo(),2,',','.'),
                                 'currency_id'   => $data->currency_id,
                                 'currency_rate' => number_format($data->currency_rate,2,',','.'),
+                                'currency_code' => $data->currency->symbol,
                                 'note'          => $data->note ? $data->note : '',
                                 'name_account'  => '',
                                 'no_account'    => '',
@@ -814,6 +817,7 @@ class PaymentRequestController extends Controller
                                 'memo'          => number_format($data->totalUsed(),2,',','.'),
                                 'currency_id'   => 1,
                                 'currency_rate' => number_format(1,2,',','.'),
+                                'currency_code' => 'Rp',
                                 'note'          => $data->note ? $data->note : '',
                                 'name_account'  => '',
                                 'no_account'    => '',
@@ -1407,6 +1411,7 @@ class PaymentRequestController extends Controller
                 'project_id'    => $row->project()->exists() ? $row->project->id : '',
                 'project_name'  => $row->project()->exists() ? $row->project->name : '',
                 'account_code'  => $row->getAccountCode(),
+                'currency_code' => $row->getCurrencySymbol(),
             ];
         }
 

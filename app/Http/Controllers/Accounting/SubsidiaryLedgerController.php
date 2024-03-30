@@ -117,8 +117,8 @@ class SubsidiaryLedgerController extends Controller
                                 <td class="right-align">'.($detail['data']->type == '2' ? number_format($detail['data']->nominal,2,',','.') : '-').'</td>
                                 <td class="right-align">'.number_format($balance,2,',','.').'</td>
                                 <td>'.$detail['data']->journal->note.'</td>
-                                <td>'.$detail['data']->note.'</td>
-                                <td>'.$detail['data']->note2.$additional_ref.'</td>
+                                <td>'.$detail['data']->note.$additional_ref.'</td>
+                                <td>'.$detail['data']->note2.'</td>
                                 <td>'.($detail['data']->place()->exists() ? $detail['data']->place->code : '-').'</td>
                                 <td>'.($detail['data']->warehouse()->exists() ? $detail['data']->warehouse->name : '-').'</td>
                                 <td>'.($detail['data']->line()->exists() ? $detail['data']->line->code : '-').'</td>

@@ -75,8 +75,8 @@ class ExportSubsidiaryLedger implements  FromView,ShouldAutoSize
                    
                     $data_tempura['j_balance'][]=number_format($balance,2,',','.');
                     $data_tempura['j_note'][]=$detail['data']->journal->note;
-                    $data_tempura['j_note1'][]=$detail['data']->note;
-                    $data_tempura['j_note2'][]=$detail['data']->note2.$additional_ref;
+                    $data_tempura['j_note1'][]=$detail['data']->note.$additional_ref;
+                    $data_tempura['j_note2'][]=$detail['data']->note2;
                     $data_tempura['j_place'][]=($detail['data']->place()->exists() ? $detail['data']->place->code : '-');
                     $data_tempura['j_warehouse'][]=($detail['data']->warehouse()->exists() ? $detail['data']->warehouse->name : '-');
                     $data_tempura['j_line'][]=($detail['data']->line()->exists() ? $detail['data']->line->code : '-');

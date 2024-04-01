@@ -1522,12 +1522,6 @@ class PaymentRequestController extends Controller
                             CustomHelper::addCountLimitCredit($op->account_id,$row->nominal);
                         }
                     }
-
-                    foreach($query->paymentRequestDetail as $row){
-                        if(in_array($row->lookable_type,['purchase_invoices','purchase_down_payments','fund_requests'])){
-                            CustomHelper::updateStatus($row->lookable_type,$row->lookable_id,'2');
-                        }
-                    }
                 }
     
                 activity()

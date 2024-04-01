@@ -1505,7 +1505,7 @@ class PaymentRequestController extends Controller
                     CustomHelper::removeJournal($query->getTable(),$query->id);
                 }
 
-                if(in_array($status,['2','3'])){
+                if(in_array($status,['1','2','3'])){
     
                     $query->updateStatusProcess();
 

@@ -2544,6 +2544,7 @@
                         let nominal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
                         grandtotal += nominal;
                     });
+                    alert(grandtotal);
                     if(grandtotal !== 0){
                         passedCostWithBs = false;
                     }

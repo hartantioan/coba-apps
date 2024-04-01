@@ -19,6 +19,7 @@ use Maatwebsite\Excel\Concerns\ToModel;
 
 use App\Imports\ImportCoa;
 use App\Imports\ImportCoaMaster;
+use App\Models\Currency;
 
 class CoaController extends Controller
 {
@@ -29,6 +30,7 @@ class CoaController extends Controller
             'content'   => 'admin.master_data.coa',
             'coa'       => Coa::where('status','1')->get(),
             'company'   => Company::where('status','1')->get(),
+            'currency'  => Currency::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -153,6 +155,7 @@ class CoaController extends Controller
                     $val->name,
                     $val->company->name,
                     $val->parentSub()->exists() ? $val->parentSub->name : 'is Parent',
+                    $val->currency()->exists() ? $val->currency->name : '',
                     $val->level,
                     $val->is_cash_account ? '&#10003;' : '&#10005;',
                     $val->is_hidden ? '&#10003;' : '&#10005;',
@@ -196,12 +199,14 @@ class CoaController extends Controller
             'name'              => 'required',
             'company_id'        => 'required',
 			'level'		        => 'required',
+            'currency_id'       => $request->is_cash_account ? 'required' : '',
 		], [
 			'code.required' 	    => 'Kode tidak boleh kosong.',
             /* 'code.unique' 	        => 'Kode telah terpakai.', */
 			'name.required' 	    => 'Nama tidak boleh kosong.',
             'company_id.required'   => 'Perusahaan tidak boleh kosong.',
 			'level.required'	    => 'Level tidak boleh kosong.',
+            'currency_id.required'  => 'Mata uang tidak boleh kosong.',
 		]);
 
         if($validation->fails()) {
@@ -218,6 +223,7 @@ class CoaController extends Controller
                     $query->name = $request->name;
                     $query->company_id = $request->company_id;
                     $query->parent_id = $request->parent_id ? $request->parent_id : NULL;
+                    $query->currency_id = $request->currency_id ?? NULL;
                     $query->level = $request->level;
                     $query->status = $request->status ? $request->status : '2';
                     $query->is_cash_account = $request->is_cash_account ? $request->is_cash_account : NULL;
@@ -238,6 +244,7 @@ class CoaController extends Controller
                         'name'			        => $request->name,
                         'company_id'            => $request->company_id,
                         'parent_id'	            => $request->parent_id ? $request->parent_id : NULL,
+                        'currency_id'           => $request->currency_id ?? NULL,
                         'level'                 => $request->level,
                         'is_cash_account'       => $request->is_cash_account ? $request->is_cash_account : NULL,
                         'is_hidden'             => $request->is_hidden ? $request->is_hidden : NULL,

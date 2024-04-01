@@ -1,5 +1,9 @@
 <!-- BEGIN: Page Main-->
 <style>
+    .modal {
+        top:0px !important;
+    }
+
     body.tab-active input:focus {
         outline: 2px solid green !important; /* Adjust the color and style as needed */
         border-radius: 5px !important;
@@ -115,6 +119,7 @@
                                                         <th>Nama</th>
                                                         <th>Perusahaan</th>
                                                         <th>Parent</th>
+                                                        <th>Mata Uang</th>
                                                         <th>Level</th>
                                                         <th>Akun Kas</th>
                                                         <th>Block</th>
@@ -139,7 +144,7 @@
 </div>
 
 
-<div id="modal1" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;">
+<div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
@@ -178,55 +183,67 @@
                             <select class="browser-default" id="parent_id" name="parent_id"></select>
                             <label class="active" for="parent_id">Parent Coa</label>
                         </div>
-                        <div class="input-field col s6">
-                            <div class="switch mb-1">
-                                <label for="is_cash_account">Akun Kas</label>
-                                <label class="right">
-                                    Tidak
-                                    <input type="checkbox" id="is_cash_account" name="is_cash_account" value="1">
-                                    <span class="lever"></span>
-                                    Ya
-                                </label>
+                        <div class="col s12"></div>
+                        <div class="col s6 row">
+                            <div class="input-field col s12">
+                                <div class="switch mb-1">
+                                    <label for="is_cash_account">Akun Kas</label>
+                                    <label class="right">
+                                        Tidak
+                                        <input type="checkbox" id="is_cash_account" name="is_cash_account" value="1" onclick="showCurrency();">
+                                        <span class="lever"></span>
+                                        Ya
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="input-field col s12 hide" id="currency_option">
+                                <select class="browser-default" id="currency_id" name="currency_id">
+                                    <option value="">--Kosong--</option>
+                                    @foreach ($currency as $row)
+                                        <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
+                                    @endforeach
+                                </select>
+                                <label class="active" for="currency_id">Mata Uang</label>
                             </div>
                         </div>
-                        <div class="input-field col s6">
-                            <div class="switch mb-1">
-                                <label for="show_journal">Muncul di Jurnal</label>
-                                <label class="right">
-                                    Tidak
-                                    <input type="checkbox" id="show_journal" name="show_journal" value="1">
-                                    <span class="lever"></span>
-                                    Ya
-                                </label>
-                            </div>
-                            <div class="switch mb-1">
-                                <label for="bp_journal">BP di Form Jurnal</label>
-                                <label class="right">
-                                    Tidak
-                                    <input type="checkbox" id="bp_journal" name="bp_journal" value="1">
-                                    <span class="lever"></span>
-                                    Ya
-                                </label>
-                            </div>
-                            {{-- <div class="switch mb-1">
-                                <label for="is_hidden">Sembunyikan dari Transaksi</label>
-                                <label class="right">
-                                    Tidak
-                                    <input type="checkbox" id="is_hidden" name="is_hidden" value="1">
-                                    <span class="lever"></span>
-                                    Ya
-                                </label>
-                            </div> --}}
-                        </div>
-                        <div class="input-field col s6">
-                            <div class="switch mb-1">
-                                <label for="status">Status</label>
-                                <label class="right">
-                                    Non-Active
-                                    <input checked type="checkbox" id="status" name="status" value="1">
-                                    <span class="lever"></span>
-                                    Active
-                                </label>
+                        <div class="col s6 row">
+                            <div class="input-field col s12">
+                                <div class="switch mb-1">
+                                    <label for="show_journal">Muncul di Jurnal</label>
+                                    <label class="right">
+                                        Tidak
+                                        <input type="checkbox" id="show_journal" name="show_journal" value="1">
+                                        <span class="lever"></span>
+                                        Ya
+                                    </label>
+                                </div>
+                                <div class="switch mb-1">
+                                    <label for="bp_journal">BP di Form Jurnal</label>
+                                    <label class="right">
+                                        Tidak
+                                        <input type="checkbox" id="bp_journal" name="bp_journal" value="1">
+                                        <span class="lever"></span>
+                                        Ya
+                                    </label>
+                                </div>
+                                <div class="switch mb-1">
+                                    <label for="status">Status</label>
+                                    <label class="right">
+                                        Non-Active
+                                        <input checked type="checkbox" id="status" name="status" value="1">
+                                        <span class="lever"></span>
+                                        Active
+                                    </label>
+                                </div>
+                                {{-- <div class="switch mb-1">
+                                    <label for="is_hidden">Sembunyikan dari Transaksi</label>
+                                    <label class="right">
+                                        Tidak
+                                        <input type="checkbox" id="is_hidden" name="is_hidden" value="1">
+                                        <span class="lever"></span>
+                                        Ya
+                                    </label>
+                                </div> --}}
                             </div>
                         </div>
                         <div class="col s12 mt-3">
@@ -474,6 +491,7 @@
                 $('#show_journal').prop( "checked", false);
                 $('#is_hidden').prop( "checked", false);
                 $('#is_cash_account').prop( "checked", false);
+                showCurrency();
             }
         });
 
@@ -502,6 +520,14 @@
             }
         });
     });
+
+    function showCurrency(){
+        if($('#is_cash_account').is(':checked')){
+            $('#currency_option').removeClass('hide');
+        }else{
+            $('#currency_option').addClass('hide');
+        }
+    }
 
     function rowDetail(data) {
         $.ajax({
@@ -570,6 +596,7 @@
                 { name: 'name', className: '' },
                 { name: 'company_id', className: 'center-align' },
                 { name: 'parent_id', className: '' },
+                { name: 'currency_id', className: '' },
                 { name: 'level', className: 'center-align' },
                 { name: 'cash', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'hidden', searchable: false, orderable: false, className: 'center-align' },
@@ -731,6 +758,8 @@
                 
                 if(response.is_cash_account == '1'){
                     $('#is_cash_account').prop( "checked", true);
+                    showCurrency();
+                    $('#currency_id').val(response.currency_id);
                 }else{
                     $('#is_cash_account').prop( "checked", false);
                 }

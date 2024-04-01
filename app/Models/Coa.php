@@ -21,6 +21,7 @@ class Coa extends Model
         'name',
         'company_id',
         'parent_id',
+        'currency_id',
         'level',
         'status',
         'is_cash_account',
@@ -36,6 +37,10 @@ class Coa extends Model
 
     public function parentSub(){
         return $this->belongsTo('App\Models\Coa', 'parent_id', 'id')->withTrashed();
+    }
+
+    public function currency(){
+        return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
     }
 
     public function childSub(){

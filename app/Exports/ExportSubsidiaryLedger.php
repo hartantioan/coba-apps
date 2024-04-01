@@ -64,6 +64,8 @@ class ExportSubsidiaryLedger implements  FromView,ShouldAutoSize
                     }
 
                     $balance += ($detail['data']->type == '1' ? $detail['data']->nominal : -1 * $detail['data']->nominal);
+                    $currencySymbol = $detail['data']->journal->currency()->exists() ? $detail['data']->journal->currency->symbol : '';
+                    $nominalCurrency = $detail['data']->journal->currency()->exists() ? ($detail['data']->journal->currency->type == '1' ? '' : '1') : '';
 
                     $data_tempura['coa_code'][]=$detail['data']->coa->code;
                     $data_tempura['coa_name'][]=$detail['data']->coa->name;
@@ -72,8 +74,8 @@ class ExportSubsidiaryLedger implements  FromView,ShouldAutoSize
                     $data_tempura['j_lookable'][]=($detail['data']->journal->lookable_id ? $detail['data']->journal->lookable->code : '-');
                     $data_tempura['j_detail1'][]=($detail['data']->type == '1' ? number_format($detail['data']->nominal,2,',','.') : '-');
                     $data_tempura['j_detail2'][]=($detail['data']->type == '2' ? number_format($detail['data']->nominal,2,',','.') : '-');
-                    $data_tempura['j_detail3'][]=($detail['data']->type == '1' ? number_format($detail['data']->nominal_fc,2,',','.') : '-');
-                    $data_tempura['j_detail4'][]=($detail['data']->type == '2' ? number_format($detail['data']->nominal_fc,2,',','.') : '-');
+                    $data_tempura['j_detail3'][]=($detail['data']->type == '1' ? ($nominalCurrency ? $currencySymbol.number_format($detail['data']->nominal_fc,2,',','.') : '-') : '-');
+                    $data_tempura['j_detail4'][]=($detail['data']->type == '2' ? ($nominalCurrency ? $currencySymbol.number_format($detail['data']->nominal_fc,2,',','.') : '-') : '-');
                     $data_tempura['j_balance'][]=number_format($balance,2,',','.');
                     $data_tempura['j_note'][]=$detail['data']->journal->note;
                     $data_tempura['j_note1'][]=$detail['data']->note.$additional_ref;

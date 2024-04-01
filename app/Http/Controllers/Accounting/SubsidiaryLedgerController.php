@@ -57,11 +57,11 @@ class SubsidiaryLedgerController extends Controller
                             <th class="center-align" width="100px">Tanggal</th>
                             <th class="center-align" width="200px">No.JE</th>
                             <th class="center-align" width="200px">Dok.Ref.</th>
+                            <th class="center-align">Debit FC</th>
+                            <th class="center-align">Kredit FC</th>
                             <th class="center-align">Debit Rp</th>
                             <th class="center-align">Kredit Rp</th>
                             <th class="center-align">Total Rp</th>
-                            <th class="center-align">Debit FC</th>
-                            <th class="center-align">Kredit FC</th>
                             <th class="center-align">Keterangan 1</th>
                             <th class="center-align">Keterangan 2</th>
                             <th class="center-align">Keterangan 3</th>
@@ -109,17 +109,19 @@ class SubsidiaryLedgerController extends Controller
                         $additional_ref = ' - '.$detail['data']->journal->lookable->paymentRequest->code;
                     }
                     $balance += ($detail['data']->type == '1' ? $detail['data']->nominal : -1 * $detail['data']->nominal);
+                    $currencySymbol = $detail['data']->journal->currency()->exists() ? $detail['data']->journal->currency->symbol : '';
+                    $nominalCurrency = $detail['data']->journal->currency()->exists() ? ($detail['data']->journal->currency->type == '1' ? '' : '1') : '';
                     $html .= '<tr>
                                 <td>'.$detail['data']->coa->code.'</td>
                                 <td>'.$detail['data']->coa->name.'</td>
                                 <td>'.date('d/m/Y',strtotime($detail['data']->journal->post_date)).'</td>
                                 <td>'.$detail['data']->journal->code.'</td>
                                 <td>'.($detail['data']->journal->lookable_id ? $detail['data']->journal->lookable->code : '-').'</td>
+                                <td class="right-align">'.($detail['data']->type == '1' ? ($nominalCurrency ? $currencySymbol.number_format($detail['data']->nominal_fc,2,',','.') : '-') : '-').'</td>
+                                <td class="right-align">'.($detail['data']->type == '2' ? ($nominalCurrency ? $currencySymbol.number_format($detail['data']->nominal_fc,2,',','.') : '-') : '-').'</td>
                                 <td class="right-align">'.($detail['data']->type == '1' ? number_format($detail['data']->nominal,2,',','.') : '-').'</td>
                                 <td class="right-align">'.($detail['data']->type == '2' ? number_format($detail['data']->nominal,2,',','.') : '-').'</td>
                                 <td class="right-align">'.number_format($balance,2,',','.').'</td>
-                                <td class="right-align">'.($detail['data']->type == '1' ? number_format($detail['data']->nominal_fc,2,',','.') : '-').'</td>
-                                <td class="right-align">'.($detail['data']->type == '2' ? number_format($detail['data']->nominal_fc,2,',','.') : '-').'</td>
                                 <td>'.$detail['data']->journal->note.'</td>
                                 <td>'.$detail['data']->note.$additional_ref.'</td>
                                 <td>'.$detail['data']->note2.'</td>

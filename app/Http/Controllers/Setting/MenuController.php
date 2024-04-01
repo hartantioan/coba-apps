@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Setting;
 
 use App\Helpers\CustomHelper;
 use App\Models\ApprovalTemplateMenu;
+use App\Models\Journal;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -54,13 +55,24 @@ class MenuController extends Controller
             ]);
         } */
 
-        $data = [
+        /* $data = [
             'title'     => 'Menu',
             'menus'     => Menu::whereNull('parent_id')->get(),
             'content'   => 'admin.setting.menu'
         ];
 
-        return view('admin.layouts.index', ['data' => $data]);
+        return view('admin.layouts.index', ['data' => $data]); */
+
+        $jr = Journal::where('lookable_type','good_receipts')->get();
+
+        foreach($jr as $row){
+            foreach($row->lookable->goodReceiptDetail as $rowdetail){
+                $row->update([
+                    'currency_id'   => $rowdetail->purchaseOrderDetail->purchaseOrder->currency_id,
+                    'currency_rate' => $rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate,
+                ]);
+            }
+        }
 
         /* $gr = GoodReceipt::whereIn('status',['2','3'])->whereDate('post_date','<=','2024-02-29')->whereDate('post_date','>=','2024-02-01')->get();
 

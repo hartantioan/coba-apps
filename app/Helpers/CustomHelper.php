@@ -2286,7 +2286,9 @@ class CustomHelper {
 					'lookable_id'	=> $lc->id,
 					'post_date'		=> $data->post_date,
 					'note'			=> 'LANDED COST - '.$data->code,
-					'status'		=> '3'
+					'status'		=> '3',
+					'currency_id'	=> $lc->currency_id,
+					'currency_rate'	=> $lc->currency_rate,
 				]);
 
 				foreach($lc->landedCostDetail as $rowdetail){
@@ -2719,7 +2721,9 @@ class CustomHelper {
 				'lookable_id'	=> $table_id,
 				'post_date'		=> $data->post_date,
 				'note'			=> $data->note,
-				'status'		=> '3'
+				'status'		=> '3',
+				'currency_rate'	=> 1,
+				'currency_id'	=> 1,
 			]);
 
 			foreach($dpr->depreciationDetail as $row){

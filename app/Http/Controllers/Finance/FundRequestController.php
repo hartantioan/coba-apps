@@ -1054,6 +1054,7 @@ class FundRequestController extends Controller
             'payment_type'		        => 'required',
             'currency_id'		        => 'required',
             'currency_rate'		        => 'required',
+            'document_status'		    => 'required',
             'arr_item'                  => 'required|array',
             'arr_qty'                   => 'required|array',
             'arr_unit'                  => 'required|array',
@@ -1073,6 +1074,7 @@ class FundRequestController extends Controller
             'payment_type.required'				=> 'Tipe pembayaran tidak boleh kosong',
             'currency_id.required'				=> 'Mata uang tidak boleh kosong',
             'currency_rate.required'			=> 'Konversi tidak boleh kosong',
+            'document_status.required'			=> 'Status dokumen tidak boleh kosong',
             'arr_item.required'                 => 'Item tidak boleh kosong',
             'arr_item.array'                    => 'Item harus dalam bentuk array.',
             'arr_qty.required'                  => 'Qty tidak boleh kosong.',
@@ -1172,7 +1174,7 @@ class FundRequestController extends Controller
                         $query->tax = str_replace(',','.',str_replace('.','',$request->tax));
                         $query->wtax = str_replace(',','.',str_replace('.','',$request->wtax));
                         $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
-                        $query->document_status = '1';
+                        $query->document_status = $request->document_status;
                         $query->status = '1';
                         
                         $query->save();
@@ -1226,7 +1228,7 @@ class FundRequestController extends Controller
                         'tax'           => str_replace(',','.',str_replace('.','',$request->tax)),
                         'wtax'          => str_replace(',','.',str_replace('.','',$request->wtax)),
                         'grandtotal'    => str_replace(',','.',str_replace('.','',$request->grandtotal)),
-                        'document_status'   => '1',
+                        'document_status'   => $request->document_status,
                         'status'        => '1',
                     ]);
 

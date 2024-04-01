@@ -180,6 +180,14 @@
                                     <label class="" for="type">Tipe Permohonan</label>
                                 </div>
                                 <div class="input-field col m3 s12">
+                                    <select class="form-control" id="document_status" name="document_status">
+                                        <option value="1">Menunggu</option>
+                                        <option value="2">Lengkap</option>
+                                        <option value="3">Tidak Lengkap</option>
+                                    </select>
+                                    <label class="" for="type">Status Dokumen</label>
+                                </div>
+                                <div class="input-field col m3 s12">
                                     <input type="hidden" id="temp" name="temp">
                                     <input type="hidden" id="tempLimit" value="0">
                                     <select class="browser-default" id="account_id" name="account_id" onchange="getAccountInfo();"></select>
@@ -1208,6 +1216,7 @@
                 $('#company_id').val(response.company_id).formSelect();
                 $('#payment_type').val(response.payment_type).formSelect();
                 $('#is_reimburse').val(response.is_reimburse).formSelect();
+                $('#document_status').val(response.document_status).formSelect();
                 $('#document_no').val(response.document_no);
                 $('#document_date').val(response.document_date);
                 $('#tax_no').val(response.tax_no);

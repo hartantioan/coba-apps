@@ -2547,11 +2547,10 @@
                     grandtotal = grandtotal.toFixed(2);
                     if(grandtotal > 0 || grandtotal < 0){
                         passedCostWithBs = false;
-                        alert('asdasds');
                     }
                 }
 
-                /* if(passedCoaCost){
+                if(passedCoaCost){
                     if(passedCostWithBs){
                         var formData = new FormData($('#form_data')[0]);
 
@@ -2662,7 +2661,7 @@
                         text: 'Coa Biaya tidak boleh kosong',
                         icon: 'warning'
                     });
-                } */
+                }
             }
         });
     }

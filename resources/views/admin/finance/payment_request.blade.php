@@ -2545,7 +2545,7 @@
                         grandtotal += nominal;
                     });
                     grandtotal = grandtotal.toFixed(2);
-                    if(grandtotal !== 0){
+                    if(grandtotal > 0 || grandtotal < 0){
                         passedCostWithBs = false;
                         alert('asdasds');
                     }

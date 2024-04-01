@@ -55,15 +55,15 @@ class MenuController extends Controller
             ]);
         } */
 
-        /* $data = [
+        $data = [
             'title'     => 'Menu',
             'menus'     => Menu::whereNull('parent_id')->get(),
             'content'   => 'admin.setting.menu'
         ];
 
-        return view('admin.layouts.index', ['data' => $data]); */
+        return view('admin.layouts.index', ['data' => $data]);
 
-        $jr = Journal::where('lookable_type','good_returns')->get();
+        /* $jr = Journal::where('lookable_type','good_returns')->get();
 
         foreach($jr as $row){
             foreach($row->lookable->goodReturnPODetail as $rowdetail){
@@ -72,11 +72,11 @@ class MenuController extends Controller
                     'currency_rate' => $rowdetail->goodReceiptDetail->purchaseOrderDetail->purchaseOrder->currency_rate,
                 ]);
             }
-            /* $row->update([
+            $row->update([
                 'currency_id'   => 1,
                 'currency_rate' => 1,
-            ]); */
-        }
+            ]);
+        } */
 
         /* $gr = GoodReceipt::whereIn('status',['2','3'])->whereDate('post_date','<=','2024-02-29')->whereDate('post_date','>=','2024-02-01')->get();
 

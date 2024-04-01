@@ -681,6 +681,7 @@ class JournalController extends Controller
         $jou['code_place_id'] = substr($jou->code,7,2) == '00' ? '' : substr($jou->code,7,2);
         $jou['journal_id'] = $jou->lookable_type == 'journals' ? $jou->lookable_id : '';
         $jou['journal_name'] = $jou->lookable_id ? $jou->lookable->code.' - '.$jou->lookable->note : '';
+        $jou['has_relation'] = $jou->lookable_id ? '1' : '';
 
         $arr = [];
         

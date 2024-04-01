@@ -192,7 +192,7 @@
                                         <input id="note" name="note" type="text" placeholder="Keterangan">
                                         <label class="active" for="note">Keterangan</label>
                                     </div>
-                                    <div class="input-field col m3 s12">
+                                    <div class="input-field col m3 s12 disable-class">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);loadCurrency();">
                                         <label class="active" for="post_date">Tgl. Posting</label>
                                     </div>
@@ -549,6 +549,8 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
+                $('.disable-class').css('pointer-events','auto');
+                $("#post_date").removeAttr("tabindex");
             }
         });
 
@@ -1595,57 +1597,62 @@
                 $('#currency_rate').val(response.currency_rate);
 
                 $('.row_coa').remove();
-
+                
+                let attributeDisable = '';
+                if(response.has_relation){
+                    attributeDisable = 'tabindex="-1"';
+                    $("#post_date").attr("tabindex", "-1");
+                }
                 $.each(response.details, function(i, val) {
                     let count = makeid(10);
                     $('#last-row-coa').before(`
                         <tr class="row_coa">
                             <input type="hidden" name="arr_cost_distribution_detail[]" value="">
-                            <td class="center">
+                            <td class="center disable-class">
                                 <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" href="javascript:void(0);">
                                     <i class="material-icons">delete</i>
                                 </a>
                             </td>
-                            <td>
-                                <select class="browser-default" id="arr_account` + count + `" name="arr_account[]"></select>    
+                            <td class="disable-class">
+                                <select class="browser-default" id="arr_account` + count + `" name="arr_account[]" ` + attributeDisable + `></select>    
                             </td>
-                            <td>
-                                <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                            <td class="disable-class">
+                                <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" ` + attributeDisable + `></select>
                             </td>
-                            <td>
-                                <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" >
+                            <td class="disable-class">
+                                <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" ` + attributeDisable + `>
                                     <option value="">--Kosong--</option>
                                     @foreach ($place as $row)
                                         <option value="{{ $row->id }}">{{ $row->code }}</option>
                                     @endforeach
                                 </select>
                             </td>
-                            <td>
-                                <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);" >
+                            <td class="disable-class">
+                                <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);" ` + attributeDisable + `>
                                     <option value="">--Kosong--</option>
                                     @foreach ($line as $rowline)
                                         <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
                                     @endforeach
                                 </select>    
                             </td>
-                            <td>
-                                <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);" >
+                            <td class="disable-class">
+                                <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);" ` + attributeDisable + `>
                                     <option value="">--Kosong--</option>
                                     @foreach ($machine as $row)
                                         <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
                                     @endforeach    
                                 </select>
                             </td>
-                            <td>
-                                <select class="browser-default" id="arr_department` + count + `" name="arr_department[]" >
+                            <td class="disable-class">
+                                <select class="browser-default" id="arr_department` + count + `" name="arr_department[]" ` + attributeDisable + `>
                                     <option value="">--Kosong--</option>
                                     @foreach ($department as $row)
                                         <option value="{{ $row->id }}">{{ $row->name }}</option>
                                     @endforeach
                                 </select>
                             </td>
-                            <td>
-                                <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                            <td class="disable-class">
+                                <select class="browser-default" id="arr_project` + count + `" name="arr_project[]" ` + attributeDisable + `></select>
                             </td>
                             <td>
                                 <input name="arr_note[]" type="text" placeholder="Keterangan 1..." value="` + val.note + `">
@@ -1653,17 +1660,17 @@
                             <td>
                                 <input name="arr_note2[]" type="text" placeholder="Keterangan 2..." value="` + val.note2 + `">
                             </td>
-                            <td>
-                                <input name="arr_nominal_debit_fc[]" type="text" value="` + (val.type == '1' ? val.nominal_fc : '0,00' ) + `" style="width:175px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">
+                            <td class="disable-class">
+                                <input name="arr_nominal_debit_fc[]" type="text" value="` + (val.type == '1' ? val.nominal_fc : '0,00' ) + `" style="width:175px !important;" onkeyup="formatRupiah(this);countAll();convertThis();" ` + attributeDisable + `>
                             </td>
-                            <td>
-                                <input name="arr_nominal_credit_fc[]" type="text" value="` + (val.type == '2' ? val.nominal_fc : '0,00' ) + `" style="width:175px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">
+                            <td class="disable-class">
+                                <input name="arr_nominal_credit_fc[]" type="text" value="` + (val.type == '2' ? val.nominal_fc : '0,00' ) + `" style="width:175px !important;" onkeyup="formatRupiah(this);countAll();convertThis();" ` + attributeDisable + `>
                             </td>
-                            <td>
-                                <input name="arr_nominal_debit[]" type="text" value="` + (val.type == '1' ? val.nominal : '0,00' ) + `" style="width:175px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">
+                            <td class="disable-class">
+                                <input name="arr_nominal_debit[]" type="text" value="` + (val.type == '1' ? val.nominal : '0,00' ) + `" style="width:175px !important;" onkeyup="formatRupiah(this);countAll();convertThis();" ` + attributeDisable + `>
                             </td>
-                            <td>
-                                <input name="arr_nominal_credit[]" type="text" value="` + (val.type == '2' ? val.nominal : '0,00' ) + `" style="width:175px !important;" onkeyup="formatRupiah(this);countAll();convertThis();">
+                            <td class="disable-class">
+                                <input name="arr_nominal_credit[]" type="text" value="` + (val.type == '2' ? val.nominal : '0,00' ) + `" style="width:175px !important;" onkeyup="formatRupiah(this);countAll();convertThis();" ` + attributeDisable + `>
                             </td>
                         </tr>
                     `);
@@ -1692,6 +1699,11 @@
                             }
                         }
                     });
+
+                    if(response.has_relation){
+                        $('.disable-class').css('pointer-events','none');
+                    }
+
                     select2ServerSide('#arr_account' + count, '{{ url("admin/select2/business_partner") }}');
                     $('#arr_place' + count).val(val.place_id);
                     $('#arr_department' + count).val(val.department_id);

@@ -486,6 +486,7 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> ($d->prefix ? $d->prefix.' ' : '').''.$d->code.' - '.$d->name,
+                'currency_id'   => $d->currency()->exists() ? $d->currency_id : '',
             ];
         }
 

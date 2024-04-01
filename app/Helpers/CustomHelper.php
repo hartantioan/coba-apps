@@ -1000,10 +1000,13 @@ class CustomHelper {
 				'lookable_id'	=> $gr->id,
 				'post_date'		=> $data->post_date,
 				'note'			=> 'GOODS RECEIPT PO - '.$gr->account->employee_no,
-				'status'		=> '3'
+				'status'		=> '3',
 			]);
 
 			$coa_credit = Coa::where('code','200.01.03.01.02')->where('company_id',$gr->company_id)->first();
+
+			$currency_rate = 1;
+			$currency_id = 1;
 
 			foreach($gr->goodReceiptDetail as $rowdetail){
 
@@ -1064,9 +1067,17 @@ class CustomHelper {
 					NULL,
 					NULL,
 				);
+
+				$currency_rate = $rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate;
+				$currency_id = $rowdetail->purchaseOrderDetail->purchaseOrder->currency_id;
 			}
 
 			$gr->updateRootDocumentStatusDone();
+
+			$query->update([
+				'currency_id'	=> $currency_id,
+				'currency_rate'	=> $currency_rate,
+			]);
 		}elseif($table_name == 'shift_requests'){
 			$sr = ShiftRequest::find($table_id);
 			
@@ -1975,6 +1986,8 @@ class CustomHelper {
 
 			$coa_credit = Coa::where('code','200.01.03.01.02')->where('company_id',$gr->company_id)->first();
 
+			$currency_id = 1;
+			$currency_rate = 1;
 			foreach($gr->goodReturnPODetail as $row){
 				if(self::checkArrayRaw($arrNote,$row->goodReceiptDetail->goodReceipt->code) < 0){
 					$arrNote[] = $row->goodReceiptDetail->goodReceipt->code;
@@ -2036,7 +2049,15 @@ class CustomHelper {
 				);
 
 				$row->goodReceiptDetail->goodReceipt->updateRootDocumentStatusProcess();
+
+				$currency_id = $row->goodReceiptDetail->purchaseOrderDetail->purchaseOrder->currency_id;
+				$currency_rate = $row->goodReceiptDetail->purchaseOrderDetail->purchaseOrder->currency_rate;
 			}
+
+			$query->update([
+				'currency_rate'	=> $currency_rate,
+				'currency_id'	=> $currency_id,
+			]);
 
 		}elseif($table_name == 'marketing_order_delivery_processes'){
 
@@ -2054,7 +2075,9 @@ class CustomHelper {
 				'lookable_id'	=> $gr->id,
 				'post_date'		=> $gr->post_date,
 				'note'			=> $gr->note,
-				'status'		=> '3'
+				'status'		=> '3',
+				'currency_rate'	=> 1,
+				'currency_id'	=> 1,
 			]);
 
 			foreach($gr->goodIssueDetail as $row){
@@ -2538,7 +2561,9 @@ class CustomHelper {
 					'lookable_id'	=> $table_id,
 					'post_date'		=> $data->post_date,
 					'note'			=> 'TRANSFER OUT - '.$data->code,
-					'status'		=> '3'
+					'status'		=> '3',
+					'currency_rate'	=> 1,
+					'currency_id'	=> 1,
 				]);
 	
 				$coabdp = Coa::where('code','100.01.04.05.01')->where('company_id',$ito->company_id)->first();
@@ -2623,7 +2648,9 @@ class CustomHelper {
 					'lookable_id'	=> $table_id,
 					'post_date'		=> $data->post_date,
 					'note'			=> 'TRANSFER IN - '.$data->code,
-					'status'		=> '3'
+					'status'		=> '3',
+					'currency_rate'	=> 1,
+					'currency_id'	=> 1,
 				]);
 	
 				$coabdp = Coa::where('code','100.01.04.05.01')->where('company_id',$iti->company_id)->first();

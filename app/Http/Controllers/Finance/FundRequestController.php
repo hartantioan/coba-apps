@@ -1380,11 +1380,11 @@ class FundRequestController extends Controller
                 <td class="">'.$row->note.'</td>
                 <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->unit->code.'</td>
-                <td class="right-align">'.number_format($row->price,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->total,2,',','.').'</td>
+                <td class="right-align">'.$row->currency->code.'.'.number_format($row->price,2,',','.').'</td>
+                <td class="right-align">'.$row->currency->code.'.'.number_format($row->total,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->wtax,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->grandtotal,2,',','.').'</td>
+                <td class="right-align">'.$row->currency->code.'.'.number_format($row->grandtotal,2,',','.').'</td>
                 <td class="">'.($row->place()->exists() ? $row->place->code : '-').'</td>
                 <td class="">'.($row->line()->exists() ? $row->line->code : '-').'</td>
                 <td class="">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
@@ -1660,84 +1660,84 @@ class FundRequestController extends Controller
         $data_id_hand_over_receipt=[];
 
         if($query) {
-
+            $data_id_frs[]=$query->id;
             //Pengambilan Main Branch beserta id terkait
-            foreach($query->fundRequestDetail as $row_fr_detail){
-                if($row_fr_detail->hasPaymentRequestDetail()->exists()){
-                    foreach($row_fr_detail->hasPaymentRequestDetail as $row_pyr_detail){
-                        $data_pyr_tempura=[
-                            'properties'=> [
-                                ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
-                                ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
-                            ],
-                            "key" => $row_pyr_detail->paymentRequest->code,
-                            "name" => $row_pyr_detail->paymentRequest->code,
-                            'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
-                        ];
-                        $data_go_chart[]=$data_pyr_tempura;
-                        $data_link[]=[
-                            'from'=>$query->code,
-                            'to'=>$row_pyr_detail->paymentRequest->code,
-                            'string_link'=>$query->code.$row_pyr_detail->paymentRequest->code,
-                        ];
-                        if(!in_array($row_pyr_detail->paymentRequest->id,$data_id_pyrs)){
-                            $data_id_pyrs[] = $row_pyr_detail->paymentRequest->id;
-                            $added = true;
-                        } 
+            // foreach($query->fundRequestDetail as $row_fr_detail){
+            //     if($row_fr_detail->hasPaymentRequestDetail()->exists()){
+            //         foreach($row_fr_detail->hasPaymentRequestDetail as $row_pyr_detail){
+            //             $data_pyr_tempura=[
+            //                 'properties'=> [
+            //                     ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
+            //                     ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
+            //                 ],
+            //                 "key" => $row_pyr_detail->paymentRequest->code,
+            //                 "name" => $row_pyr_detail->paymentRequest->code,
+            //                 'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
+            //             ];
+            //             $data_go_chart[]=$data_pyr_tempura;
+            //             $data_link[]=[
+            //                 'from'=>$query->code,
+            //                 'to'=>$row_pyr_detail->paymentRequest->code,
+            //                 'string_link'=>$query->code.$row_pyr_detail->paymentRequest->code,
+            //             ];
+            //             if(!in_array($row_pyr_detail->paymentRequest->id,$data_id_pyrs)){
+            //                 $data_id_pyrs[] = $row_pyr_detail->paymentRequest->id;
+            //                 $added = true;
+            //             } 
                        
-                    }
-                }
+            //         }
+            //     }
                 
-                if($row_fr_detail->purchaseInvoiceDetail()->exists()){
-                    foreach($row_fr_detail->purchaseInvoiceDetail as $row_invoice_detail){
-                        $data_invoices_tempura = [
-                            'key'   => $row_invoice_detail->purchaseInvoice->code,
-                            "name"  => $row_invoice_detail->purchaseInvoice->code,
+            //     if($row_fr_detail->purchaseInvoiceDetail()->exists()){
+            //         foreach($row_fr_detail->purchaseInvoiceDetail as $row_invoice_detail){
+            //             $data_invoices_tempura = [
+            //                 'key'   => $row_invoice_detail->purchaseInvoice->code,
+            //                 "name"  => $row_invoice_detail->purchaseInvoice->code,
                         
-                            'properties'=> [
-                                ['name'=> "Tanggal: ".$row_invoice_detail->purchaseInvoice->post_date],
-                                ['name'=> "Nominal :".formatNominal($row_invoice_detail->purchaseInvoice).number_format($row_invoice_detail->purchaseInvoice->grandtotal,2,',','.')]
-                            ],
-                            'url'   =>request()->root()."/admin/finance/purchase_invoice?code=".CustomHelper::encrypt($row_invoice_detail->purchaseInvoice->code),
-                        ];
-                        $data_go_chart[]=$data_invoices_tempura;
-                        $data_link[]=[
-                            'from'  =>  $query->code,
-                            'to'    =>  $row_invoice_detail->purchaseInvoice->code,
-                            'string_link'=>$query->code.$row_invoice_detail->purchaseInvoice->code
-                        ];
-                        if(!in_array($row_invoice_detail->purchaseInvoice->id,$data_id_invoice)){
-                            $data_id_invoice[]=$row_invoice_detail->purchaseInvoice->id;
-                            $added = true;
-                        }
-                    }
-                }
+            //                 'properties'=> [
+            //                     ['name'=> "Tanggal: ".$row_invoice_detail->purchaseInvoice->post_date],
+            //                     ['name'=> "Nominal :".formatNominal($row_invoice_detail->purchaseInvoice).number_format($row_invoice_detail->purchaseInvoice->grandtotal,2,',','.')]
+            //                 ],
+            //                 'url'   =>request()->root()."/admin/finance/purchase_invoice?code=".CustomHelper::encrypt($row_invoice_detail->purchaseInvoice->code),
+            //             ];
+            //             $data_go_chart[]=$data_invoices_tempura;
+            //             $data_link[]=[
+            //                 'from'  =>  $query->code,
+            //                 'to'    =>  $row_invoice_detail->purchaseInvoice->code,
+            //                 'string_link'=>$query->code.$row_invoice_detail->purchaseInvoice->code
+            //             ];
+            //             if(!in_array($row_invoice_detail->purchaseInvoice->id,$data_id_invoice)){
+            //                 $data_id_invoice[]=$row_invoice_detail->purchaseInvoice->id;
+            //                 $added = true;
+            //             }
+            //         }
+            //     }
 
-                if($row_fr_detail->purchaseDownPaymentDetail()->exists()){
-                    foreach($row_fr_detail->purchaseDownPaymentDetail as $row_dp_detail){
-                        $data_apdp_tempura = [
-                            'key'   => $row_dp_detail->purchaseDownPayment->code,
-                            "name"  => $row_dp_detail->purchaseDownPayment->code,
+            //     if($row_fr_detail->purchaseDownPaymentDetail()->exists()){
+            //         foreach($row_fr_detail->purchaseDownPaymentDetail as $row_dp_detail){
+            //             $data_apdp_tempura = [
+            //                 'key'   => $row_dp_detail->purchaseDownPayment->code,
+            //                 "name"  => $row_dp_detail->purchaseDownPayment->code,
                         
-                            'properties'=> [
-                                ['name'=> "Tanggal: ".$row_dp_detail->purchaseDownPayment->post_date],
-                                ['name'=> "Vendor  : ".$row_dp_detail->purchaseDownPayment->name],
-                            ],
-                            'url'   =>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_dp_detail->purchaseDownPayment->code),
-                        ];
-                        $data_go_chart[]=$data_apdp_tempura;
-                        $data_link[]=[
-                            'from'  =>  $query->code,
-                            'to'    =>  $row_dp_detail->purchaseDownPayment->code,
-                            'string_link'=>$query->code.$row_dp_detail->purchaseDownPayment->code,
-                        ];
-                        if(!in_array($row_dp_detail->purchaseDownPayment->id,$data_id_dp)){
-                            $data_id_dp[]=$row_dp_detail->purchaseDownPayment->id;
-                            $added = true;
-                        } 
-                    }
-                }
-            }
+            //                 'properties'=> [
+            //                     ['name'=> "Tanggal: ".$row_dp_detail->purchaseDownPayment->post_date],
+            //                     ['name'=> "Vendor  : ".$row_dp_detail->purchaseDownPayment->name],
+            //                 ],
+            //                 'url'   =>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_dp_detail->purchaseDownPayment->code),
+            //             ];
+            //             $data_go_chart[]=$data_apdp_tempura;
+            //             $data_link[]=[
+            //                 'from'  =>  $query->code,
+            //                 'to'    =>  $row_dp_detail->purchaseDownPayment->code,
+            //                 'string_link'=>$query->code.$row_dp_detail->purchaseDownPayment->code,
+            //             ];
+            //             if(!in_array($row_dp_detail->purchaseDownPayment->id,$data_id_dp)){
+            //                 $data_id_dp[]=$row_dp_detail->purchaseDownPayment->id;
+            //                 $added = true;
+            //             } 
+            //         }
+            //     }
+            // }
 
             $finished_data_id_gr=[];
             $finished_data_id_gscale=[];
@@ -2365,7 +2365,7 @@ class FundRequestController extends Controller
                     if(!in_array($payment_request_id, $finished_data_id_pyrs)){
                         $finished_data_id_pyrs[]=$payment_request_id;
                         $query_pyr = PaymentRequest::find($payment_request_id);
-                        
+                       
                         if($query_pyr->outgoingPayment()->exists()){
                             $outgoing_payment = [
                                 'properties'=> [
@@ -2734,8 +2734,8 @@ class FundRequestController extends Controller
                                     'string_link'=>$query_dp->code.$row_pyr_detail->paymentRequest->code,
                                 ];
 
-                                if(!in_array($query_dp->id, $data_id_dp)){
-                                    $data_id_dp[] = $query_dp->id;
+                                if(!in_array($row_pyr_detail->paymentRequest->id, $data_id_pyrs)){
+                                    $data_id_pyrs[] = $row_pyr_detail->paymentRequest->id;
                                     $added=true;
                                 }
                             }

@@ -3102,7 +3102,7 @@ class GoodReceiptPOController extends Controller
                         }
                     }
                 }
-            }           
+            }          
             function unique_key($array,$keyname){
 
                 $new_array = array();

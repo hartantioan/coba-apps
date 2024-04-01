@@ -2367,7 +2367,7 @@ class PurchaseOrderController extends Controller
                     if(!in_array($payment_request_id, $finished_data_id_pyrs)){
                         $finished_data_id_pyrs[]=$payment_request_id;
                         $query_pyr = PaymentRequest::find($payment_request_id);
-                        
+                       
                         if($query_pyr->outgoingPayment()->exists()){
                             $outgoing_payment = [
                                 'properties'=> [
@@ -2736,8 +2736,8 @@ class PurchaseOrderController extends Controller
                                     'string_link'=>$query_dp->code.$row_pyr_detail->paymentRequest->code,
                                 ];
 
-                                if(!in_array($query_dp->id, $data_id_dp)){
-                                    $data_id_dp[] = $query_dp->id;
+                                if(!in_array($row_pyr_detail->paymentRequest->id, $data_id_pyrs)){
+                                    $data_id_pyrs[] = $row_pyr_detail->paymentRequest->id;
                                     $added=true;
                                 }
                             }

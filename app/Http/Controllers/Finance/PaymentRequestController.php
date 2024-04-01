@@ -894,7 +894,7 @@ class PaymentRequestController extends Controller
             ];
         } else {
 
-            if($request->arr_code){
+            if($request->arr_code && !$request->temp){
                 $arr = $request->arr_code;
                 $passedDuplicate = true;
                 

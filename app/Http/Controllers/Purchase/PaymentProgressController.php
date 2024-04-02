@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
 use App\Models\User;
 use App\Models\Menu;
+use App\Models\ItemGroup;
 use App\Models\MenuUser;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportPaymentProgressReport;
@@ -15,14 +16,14 @@ use App\Models\PurchaseOrder;
 
 class PaymentProgressController extends Controller
 {
-    protected $dataplaces, $dataplacecode;
+    protected $dataplaces, $dataplacecode, $datawarehouses;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
         $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
-
+        $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
     }
 
     public function index(Request $request)
@@ -31,6 +32,12 @@ class PaymentProgressController extends Controller
        
         $menu = Menu::where('url', $lastSegment)->first();
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
+        $itemGroup = ItemGroup::whereHas('childSub',function($query){
+            $query->whereHas('itemGroupWarehouse',function($query){
+                $query->whereIn('warehouse_id',$this->datawarehouses);
+            });
+        })->get();
+            
         $data = [
             'title'     => 'Laporan Progress Pembayaran',
             'content'   => 'admin.purchase.report_payment_progress',
@@ -39,7 +46,8 @@ class PaymentProgressController extends Controller
                                 $query->where('user_id', session('bo_id'))
                                     ->where('type','view');
                             })
-                            ->orderBy('order')->get()
+                            ->orderBy('order')->get(),
+            'group'     =>  $itemGroup,
         ];
 
 
@@ -58,7 +66,13 @@ class PaymentProgressController extends Controller
             } else if($request->end_date) {
                 $query->whereDate('post_date','<=', $request->end_date);
             }
-           
+            if($request->filter_group){
+                $query->whereHas('purchaseOrderDetail',function($query) use($request){
+                    $query->whereHas('item',function($query) use($request){
+                        $query->whereIn('item_group_id', $request->filter_group);
+                    });
+                });
+            }
         })
         ->get();
        
@@ -416,6 +430,7 @@ class PaymentProgressController extends Controller
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $type = $request->type ? $request->type : '';
-		return Excel::download(new ExportPaymentProgressReport($post_date,$end_date,$type), 'payment_progress_report'.uniqid().'.xlsx');
+        $group = $request->group ? $request->group:'';
+		return Excel::download(new ExportPaymentProgressReport($post_date,$end_date,$type,$group), 'payment_progress_report'.uniqid().'.xlsx');
     }
 }

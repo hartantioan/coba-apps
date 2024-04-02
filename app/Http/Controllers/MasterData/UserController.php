@@ -592,6 +592,9 @@ class UserController extends Controller
                 /* DB::beginTransaction();
                 try { */
                     $query = User::find($request->temp);
+                    if(!$query->manager_id){
+                        $query->manager_id = $request->manager_id;
+                    }
                     $query->name            = $request->name;
                     $query->username        = $request->username ? $request->username : NULL;
                     $query->employee_no     = $request->employee_no ? $request->employee_no : $query->employee_no;

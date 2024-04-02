@@ -12,12 +12,13 @@ use App\Models\PurchaseOrder;
 
 class ExportPaymentProgressReport implements  FromView,ShouldAutoSize,WithTitle
 {
-    protected $start_date,$end_date,$type;
-    public function __construct(string $start_date,string $end_date,string $type)
+    protected $start_date,$end_date,$type,$group;
+    public function __construct(string $start_date,string $end_date,string $type, string $group)
     {
         $this->start_date = $start_date ? $start_date : '';
         $this->end_date = $end_date ? $end_date : '';
         $this->type = $type ? $type : '';
+        $this->group = $group ? $group : '';
     }
     public function title(): string
     {
@@ -35,6 +36,13 @@ class ExportPaymentProgressReport implements  FromView,ShouldAutoSize,WithTitle
                 $query->whereDate('post_date','>=', $this->start_date);
             } else if($this->end_date) {
                 $query->whereDate('post_date','<=', $this->end_date);
+            }
+            if($this->group){
+                $query->whereHas('purchaseOrderDetail',function($query){
+                    $query->whereHas('item',function($query){
+                        $query->whereIn('item_group_id', explode(',',$this->group));
+                    });
+                });
             }
         })
         ->get();

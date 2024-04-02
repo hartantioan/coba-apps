@@ -199,6 +199,7 @@
                             <input id="employee_no" name="employee_no" type="text" placeholder="Kode BP...">
                             <label class="active" for="employee_no">Kode/NIK (Kosongkan untuk autogenerate)</label>
                         </div>
+                        <div class="col s12"></div>
                         <div class="input-field col s3 employee_inputs">
                             <input id="password" name="password" type="password" placeholder="Password">
                             <label class="active" for="password">Password</label>
@@ -215,6 +216,7 @@
                             <input id="address" name="address" type="text" placeholder="Alamat">
                             <label class="active" for="address">Alamat</label>
                         </div>
+                        <div class="col s12"></div>
                         <div class="input-field col s3">
                             <input id="id_card" name="id_card" type="text" placeholder="No KTP" class="ktp">
                             <label class="active" for="id_card">No KTP / Identitas</label>
@@ -235,6 +237,10 @@
                             <input id="tax_address" name="tax_address" type="text" placeholder="Alamat di NPWP">
                             <label class="active" for="tax_address">Alamat NPWP</label>
                         </div>
+                        <div class="input-field col s6 step5" id="manager_select">
+                            
+                        </div>
+                        <div class="col s12"></div>
                         <div class="input-field col s3 employee_inputs">
                             <select id="married_status" name="married_status">
                                 <option value="1">Single</option>
@@ -974,6 +980,7 @@
                 $('.row_bank').remove();
                 $('.row_info').remove();
                 $('.row_driver').remove();
+                $('#manager_select').empty();
                 refreshGroup();
                 $('#subdistrict_id').empty().append(`
                     <option value="">--Pilih ya--</option>
@@ -981,7 +988,7 @@
                 $('#name').prop('readonly',false);
             }
         });
-
+       
         $('#modal2').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
@@ -1980,6 +1987,15 @@
                     $('#province_id').append(`
                         <option value="` + response.province_id + `">` + response.province_name + `</option>
                     `);
+                }
+                if(!response.manager_id && response.type == 1){
+                    $('#manager_select').append(`
+                        <select class="select2 browser-default" id="manager_id" name="manager_id">
+                                    <option value="">--Pilih ya--</option>
+                        </select>
+                        <label class="active" for="manager_id">Select Manager</label>
+                    `);
+                    select2ServerSide('#manager_id', '{{ url("admin/select2/employee") }}');
                 }
                 
                 $('#subdistrict_id,#district_id,#city_id').empty().append(`

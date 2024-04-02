@@ -57,9 +57,54 @@
                                                     </select>
                                                     <label for="type" style="font-size:1rem;">Tipe :</label>
                                                 </div>
+                                                
                                                 <div class="col m3 s12 mt-3">
                                                     <button class="btn waves-effect waves-light right submit" onclick="exportExcel();">Export <i class="material-icons right">file_download</i></button>
-                                                    <button class="btn waves-effect waves-light right cyan submit mr-2" onclick="filter();">Process <i class="material-icons right">list</i></button>
+                                                    <button class="btn waves-effect waves-light right cyan submit mt-2" onclick="filter();">Process <i class="material-icons right">list</i></button>
+                                                </div>
+                                                <div class="input-field  col m6 s12 ">
+                                                    <label for="filter_group" class="active" style="font-size:1rem;">Filter Group :</label>
+                                                    
+                                                    <select class="select2 browser-default" multiple="multiple" id="filter_group" name="filter_group[]" onchange="loadDataTable()">
+                                                        @foreach($group->whereNull('parent_id') as $c)
+                                                            @if(!$c->childSub()->exists())
+                                                                <option value="{{ $c->id }}"> - {{ $c->name }}</option>
+                                                            @else
+                                                                <optgroup label=" - {{ $c->code.' - '.$c->name }}">
+                                                                @foreach($c->childSub as $bc)
+                                                                    @if(!$bc->childSub()->exists())
+                                                                        <option value="{{ $bc->id }}"> -  - {{ $bc->name }}</option>
+                                                                    @else
+                                                                        <optgroup label=" -  - {{ $bc->code.' - '.$bc->name }}">
+                                                                            @foreach($bc->childSub as $bcc)
+                                                                                @if(!$bcc->childSub()->exists())
+                                                                                    <option value="{{ $bcc->id }}"> -  -  - {{ $bcc->name }}</option>
+                                                                                @else
+                                                                                    <optgroup label=" -  -  - {{ $bcc->code.' - '.$bcc->name }}">
+                                                                                        @foreach($bcc->childSub as $bccc)
+                                                                                            @if(!$bccc->childSub()->exists())
+                                                                                                <option value="{{ $bccc->id }}"> -  -  -  - {{ $bccc->name }}</option>
+                                                                                            @else
+                                                                                                <optgroup label=" -  -  -  - {{ $bccc->code.' - '.$bccc->name }}">
+                                                                                                    @foreach($bccc->childSub as $bcccc)
+                                                                                                        @if(!$bcccc->childSub()->exists())
+                                                                                                            <option value="{{ $bcccc->id }}"> -  -  -  -  - {{ $bcccc->name }}</option>
+                                                                                                        @endif
+                                                                                                    @endforeach
+                                                                                                </optgroup>
+                                                                                            @endif
+                                                                                        @endforeach
+                                                                                    </optgroup>
+                                                                                @endif
+                                                                            @endforeach
+                                                                        </optgroup>
+                                                                    @endif
+                                                                @endforeach
+                                                                </optgroup>
+                                                            @endif
+                                                    @endforeach
+                                                    </select>
+                                                    
                                                 </div>
                                             </div>
                                         </div>
@@ -88,14 +133,14 @@
 
 <!-- END: Page Main-->
 <script>
-     
-    function exportExcel(){
-        var tipe = $('#type').val();
-        var startDate = $('#start_date').val();
-        var endDate = $('#end_date').val();
-        var mode = $('#mode').val();
-        window.location = "{{ URL::to('/') }}/admin/"+tipe+"/export?start_date=" + startDate + "&end_date=" + endDate + "&mode=" + mode;
-    }
+    $(function() {
+    
+        $(".select2").select2({
+            dropdownAutoWidth: true,
+            width: '100%',
+        });
+       
+    });
 
     function filter(){
         var formData = new FormData($('#form_data')[0]);
@@ -145,6 +190,7 @@
         var startDate = $('#start_date').val();
         var endDate = $('#end_date').val();
         var type = $('#type').val();
-        window.location = "{{ Request::url() }}/export?start_date=" + startDate + "&end_date=" + endDate+ "&type=" + type;
+        var group = $('#filter_group').val() ? $('#filter_group').val():'';
+        window.location = "{{ Request::url() }}/export?start_date=" + startDate + "&end_date=" + endDate+ "&type=" + type+ "&group=" + group;
     }
 </script>

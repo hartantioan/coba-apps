@@ -66,7 +66,7 @@ class PersonalCloseBillController extends Controller
     }
 
     public function getCode(Request $request){
-        $code = FundRequest::generateCode($request->val);
+        $code = PersonalCloseBill::generateCode($request->val);
         				
 		return response()->json($code);
     }

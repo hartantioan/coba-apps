@@ -262,7 +262,8 @@ class GoodIssueRequestController extends Controller
         $data   = GoodIssueRequest::where('code',CustomHelper::decrypt($request->id))->first();
         $x="";
         if (isset($data->void_date)) {
-            $x .= '<span style="color: red;">|| Tanggal Void: ' . $data->void_date .  ' || Void User: ' . $data->voidUser->employee_no .'-'.$data->voidUser->name.' || Note:' . $data->void_note.'</span>' ;
+            $voidUser = $data->voidUser ? $data->voidUser->employee_no . '-' . $data->voidUser->name : 'Sistem';
+            $x .= '<span style="color: red;">|| Tanggal Void: ' . $data->void_date .  ' || Void User: ' . $voidUser.' || Note:' . $data->void_note.'</span>' ;
         }
         $string = '<div class="row pt-1 pb-1">'.$x.'<div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>

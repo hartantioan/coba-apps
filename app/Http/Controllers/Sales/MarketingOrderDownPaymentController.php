@@ -362,7 +362,12 @@ class MarketingOrderDownPaymentController extends Controller
                             'message' => 'AR Down Payment telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-
+                    if(!CustomHelper::checkLockAcc($query->post_date)){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
+                        ]);
+                    }
                     if(in_array($query->status,['1','6'])){
 
                         CustomHelper::removeDeposit($query->account_id,$query->grandtotal);
@@ -493,8 +498,11 @@ class MarketingOrderDownPaymentController extends Controller
     public function rowDetail(Request $request)
     {
         $data   = MarketingOrderDownPayment::where('code',CustomHelper::decrypt($request->id))->first();
-        
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12 mt-1"><table style="min-width:100%;">
+        $x="";
+        if (isset($data->void_date)) {
+            $x .= '<span style="color: red;">|| Tanggal Void: ' . $data->void_date .  ' || Void User: ' . $data->voidUser->employee_no .'-'.$data->voidUser->name.' || Note:' . $data->void_note.'</span>' ;
+        }
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.$x.'</div><div class="col s12 mt-1"><table style="min-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="4">Sales Order</th>

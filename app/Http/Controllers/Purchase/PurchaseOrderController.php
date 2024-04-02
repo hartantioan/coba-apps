@@ -59,11 +59,16 @@ use Milon\Barcode\Facades\DNS2DFacade;
 
 class PurchaseOrderController extends Controller
 {
-    protected $dataplaces, $dataplacecode;
+    protected $dataplaces, $dataplacecode, $subordinate, $array_subordinate_id;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
-
+        $this->subordinate = $user ? $user->getAllSubordinates() : []; 
+        $this->array_subordinate_id=[];
+        foreach($this->subordinate as $row){
+            $this->array_subordinate_id[]= $row->id;
+        }
+        $this->array_subordinate_id[]=$user->id;
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
         $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
 
@@ -253,6 +258,9 @@ class PurchaseOrderController extends Controller
                     $query->where('user_id',session('bo_id'));
                     
                 }
+                // else{
+                //     $query->whereIn('user_id',$this->array_subordinate_id);
+                // }
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
             ->offset($start)
@@ -350,6 +358,9 @@ class PurchaseOrderController extends Controller
                     $query->where('user_id',session('bo_id'));
                     
                 }
+                // else{
+                //     $query->whereIn('user_id',$this->array_subordinate_id);
+                // }
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
             ->count();
@@ -1020,8 +1031,11 @@ class PurchaseOrderController extends Controller
     public function rowDetail(Request $request)
     {
         $data   = PurchaseOrder::where('code',CustomHelper::decrypt($request->id))->first();
-        
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;">
+        $x="";
+        if (isset($data->void_date)) {
+            $x .= '<span style="color: red;">|| Tanggal Void: ' . $data->void_date .  ' || Void User: ' . $data->voidUser->employee_no .'-'.$data->voidUser->name.' || Note:' . $data->void_note.'</span>' ;
+        }
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.$x.'</div><div class="col s12"><table style="min-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="19">Daftar Item</th>

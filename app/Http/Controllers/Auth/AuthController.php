@@ -238,7 +238,7 @@ class AuthController extends Controller
         $data = [
             'title'     => 'Profil Pengguna',
             'content'   => 'admin.personal.profile',
-            'data'      => User::find(session('bo_id'))
+            'data'      => User::find(session('bo_id')),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -570,5 +570,11 @@ class AuthController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function flushSession(Request $request)
+    {
+        session()->flush();
+        return;
     }
 }

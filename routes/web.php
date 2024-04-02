@@ -206,6 +206,7 @@ Route::prefix('admin')->group(function () {
         Route::get('/', [AuthController::class, 'login']);
         Route::post('auth',[AuthController::class, 'auth']);
     });
+    Route::post('flush-session',[AuthController::class, 'flushSession']);
 
     Route::prefix('reminder')->group(function () {
         Route::post('/', [AuthController::class, 'reminder']);

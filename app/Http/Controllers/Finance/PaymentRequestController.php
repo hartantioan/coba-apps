@@ -331,7 +331,7 @@ class PaymentRequestController extends Controller
                     '<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small" data-popup="tooltip" title="Bayar" onclick="cashBankOut(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">screen_share</i></button>' : ($val->outgoingPayment()->exists() ? $val->outgoingPayment->code : $val->statusRaw() )),
                     '
                     '.$btn_jurnal.'
-                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
+                        
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
@@ -965,6 +965,13 @@ class PaymentRequestController extends Controller
                         ]);
                     }
 
+                    if(!CustomHelper::checkLockAcc($query->post_date)){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
+                        ]);
+                    }
+
                     if(in_array($query->status,['1','2','3','6'])){
 
                         if($request->has('document')) {
@@ -1178,8 +1185,11 @@ class PaymentRequestController extends Controller
 
     public function rowDetail(Request $request){
         $data   = PaymentRequest::where('code',CustomHelper::decrypt($request->id))->first();
-        
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;max-width:100%;">
+        $x="";
+        if (isset($data->void_date)) {
+            $x .= '<span style="color: red;">|| Tanggal Void: ' . $data->void_date .  ' || Void User: ' . $data->voidUser->employee_no .'-'.$data->voidUser->name.' || Note:' . $data->void_note.'</span>' ;
+        }
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.$x.'</div><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="5">Daftar Pembayaran</th>
@@ -4200,36 +4210,36 @@ class PaymentRequestController extends Controller
         return response()->json($response);
     }
 
-    public function done(Request $request){
-        $query_done = PaymentRequest::where('code',CustomHelper::decrypt($request->id))->first();
+    // public function done(Request $request){
+    //     $query_done = PaymentRequest::where('code',CustomHelper::decrypt($request->id))->first();
 
-        if($query_done){
+    //     if($query_done){
 
-            if(in_array($query_done->status,['1','2'])){
-                $query_done->update([
-                    'status'    => '3'
-                ]);
+    //         if(in_array($query_done->status,['1','2'])){
+    //             $query_done->update([
+    //                 'status'    => '3'
+    //             ]);
     
-                activity()
-                        ->performedOn(new PaymentRequest())
-                        ->causedBy(session('bo_id'))
-                        ->withProperties($query_done)
-                        ->log('Done the Good Issue Request data');
+    //             activity()
+    //                     ->performedOn(new PaymentRequest())
+    //                     ->causedBy(session('bo_id'))
+    //                     ->withProperties($query_done)
+    //                     ->log('Done the Good Issue Request data');
     
-                $response = [
-                    'status'  => 200,
-                    'message' => 'Data updated successfully.'
-                ];
-            }else{
-                $response = [
-                    'status'  => 500,
-                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
-                ];
-            }
+    //             $response = [
+    //                 'status'  => 200,
+    //                 'message' => 'Data updated successfully.'
+    //             ];
+    //         }else{
+    //             $response = [
+    //                 'status'  => 500,
+    //                 'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+    //             ];
+    //         }
 
-            return response()->json($response);
-        }
-    }
+    //         return response()->json($response);
+    //     }
+    // }
     public function exportFromTransactionPage(Request $request){
         $search= $request->search? $request->search : '';
         $status = $request->status? $request->status : '';;

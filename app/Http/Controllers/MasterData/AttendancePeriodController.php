@@ -165,10 +165,10 @@ class AttendancePeriodController extends Controller
         $end_date = Carbon::parse($attendance_period->end_date);
         
         $user_data = User::where(function($query) use ( $request) {
-            $query->where('type','1');
-            $query->whereIn('employee_no',['312401001','3230801','312312001','312312002','312310001','312401002','312401003','312402001','312402004','312402002','312402038','312402039','312402051','312403006'
-            ,'312403008','312403012']);
-            // $query->whereIn('employee_no',['323033']);    
+            $query->where('employee_type','2');
+            // $query->whereIn('employee_no',['312401001','3230801','312312001','312312002','312310001','312401002','312401003','312402001','312402004','312402002','312402038','312402039','312402051','312403006'
+            // ,'312403008','312403012']);
+            // $query->whereIn('employee_no',['312402007']);    
             })->get();
         
         $query_salary_report = SalaryReport::create([
@@ -387,19 +387,14 @@ class AttendancePeriodController extends Controller
                             $tambah1hari=$date->copy()->addDay();
                          
                             $real_time_out =$tambah1hari->format('Y-m-d'). ' ' . $time_out;
-                            
+                            //info('masuk');
                         }else{
                             $real_time_out =$date->format('Y-m-d') . ' ' . $time_out;
                         }
-                        
                         $combinedDateTimeOutCarbon = Carbon::parse($real_time_out);
                         
                         $real_max_time_out = $combinedDateTimeOutCarbon->copy()->addHours($row_schedule_filter->shift->tolerant);
-                        if($time_in>$time_out){//ik disek digae op y ooo di buat untuk apabila max time out nya itu di hari yang sama tapi jam 00:00 seperti itu atau kurang dari jam masuknya jadie ditambahi tanggalnya jadi nextday ehey
-                            
-                            $real_max_time_out->addDay();
-                        }
-                       
+                        
                         if($row_schedule_filter->status == 4){
                             $counter_effective_day++;
                             $exact_in[$key]=3;
@@ -491,16 +486,16 @@ class AttendancePeriodController extends Controller
                                 
                                 //pengurangan apabila lebih besar dari 1 maka shift tidak bersamaan
                             }
-                            
+                         
                             $query_attendance = Attendances::where(function ($query) use ($date,$cleanedNik) {
                                 $mulaiDate = Carbon::parse($date)->subDays(1)->startOfDay()->toDateTimeString();
-                                $akhirDate = Carbon::parse($date)->addDays(1)->endOfDay()->toDateTimeString();
-                            
+                                $akhirDate = Carbon::parse($date)->addDays(2)->endOfDay()->toDateTimeString();
+                             
                                 $query->where('date', '>=', $mulaiDate)
-                                    ->where('date', '<=', $akhirDate)
+                                    ->where('date', '<', $akhirDate)
                                     ->where('employee_no',$cleanedNik);
                             })->orderBy('date')->get();
-                            
+                            //info($query_attendance);
                             //
                             foreach($query_attendance as $row_attendance_filter){
                                 $dateAttd = Carbon::parse($row_attendance_filter->date);
@@ -626,11 +621,22 @@ class AttendancePeriodController extends Controller
                                 }
                                 
                                 //perhitungan pulang
+                                // //info('tanggal '.$date);
+                                // //info($dateAttd);
+                                // //info('real time out '.$real_time_out.'&&'.'Max Time Out'.$real_max_time_out);
                                 if($dateAttd >= $real_time_out && $dateAttd <= $real_max_time_out){
+                                    $date1 = date('d', strtotime($date));
+                                    $date2 = date('d', strtotime($dateAttd));
+                                    $timeObject = DateTime::createFromFormat('H:i:s', $timePart);
                                    
-                                    
-                                    
-                                    
+                                    $newTimePart = $timeObject->format('H:i:s');
+                                    if ($date2 > $date1) {
+                                        $timeObject->modify('+12 hours');
+                                        $newTimePart = $timeObject->format('H:i:s');
+                                    }
+                                    //info('masuk nak');
+                                    //info($date);
+                                    //info($dateAttd);
                                     $exact_out [$key]= 1 ;
                                     
                                    
@@ -640,7 +646,7 @@ class AttendancePeriodController extends Controller
                                         $array_keluar[$key]=$timePart;
                                         $different_keluar[$key]='';
                                     }
-                                    if($logout<$timePart){
+                                    if($logout<$newTimePart){
                                        
                                         
                                         $logout = $timePart;
@@ -650,7 +656,7 @@ class AttendancePeriodController extends Controller
                                     }
                                     
                                 }
-                               
+                                
                                 
                                
                                 if ($dateAttd <= $real_time_out && $dateAttd <= $real_max_time_out && $date->toDateString() == $dateAttd->toDateString()&&count($query_data)==1) {
@@ -688,7 +694,8 @@ class AttendancePeriodController extends Controller
                               
                                 
                             }
-                            
+                            //info('logouts '.$logout);
+                            //info($exact_out);
                             $latestRecord = $query_attendance->last();
                             if($query_lembur){
                                 $query_libur = Holiday::where('date',$query_lembur->date)->first();
@@ -807,6 +814,9 @@ class AttendancePeriodController extends Controller
                                         $exact_out[$key]= 1 ;
                                     }
                                 }else{
+                                    //info('sebelums');
+                                    //info($login[$key].'login');
+                                    //info($exact_out);
                                     if($login[$key] == null && $masuk_awal == null){
                                         
                                         $exact_in[$key]= 0 ;
@@ -815,16 +825,19 @@ class AttendancePeriodController extends Controller
                                             $exact_out[$key]=1;
                                         }
                                     }
-                                    
+                                    //info($exact_out);
+                                    //info('cok');
                                     if($logout != null ){
                                         
                                         $exact_out[$key]=1;
                                         $logout_real =$date->format('Y-m-d') . ' ' . $logout;
                                          
-                                        if($logout_real<$real_time_out){
+                                        if($logout_real>$real_max_time_out){
                                             
                                             $exact_out[$key]=0;
                                         }
+                                        //info($exact_out);
+                                        //info('mbeng');
                                     }else{
                                        
                                         $exact_out[$key]= 0 ;
@@ -832,7 +845,8 @@ class AttendancePeriodController extends Controller
                                     
                                 }
                               
-                                
+                                //info("HALOS");
+                                //info($exact_out);
                             }
                             if($key == 1 &&  count($query_data) == 2){//mengecek saat schedule yang di tengah dan jumlahnya dua dan mengecek kalau dia itu tidak check saat masuk dan check saat pulang
                                 if($exact_out[$key]==1){
@@ -857,10 +871,10 @@ class AttendancePeriodController extends Controller
                         
                         }
                         // if($row_user->id == '530'){
-                        //     info('masuk');
-                        //     info($exact_in);
-                        //     info('Keluar');
-                        //     info($exact_out);
+                        //     //info('masuk');
+                        //     //info($exact_in);
+                        //     //info('Keluar');
+                        //     //info($exact_out);
                         // }  
                         
                         

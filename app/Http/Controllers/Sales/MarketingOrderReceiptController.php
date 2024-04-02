@@ -459,8 +459,11 @@ class MarketingOrderReceiptController extends Controller
     public function rowDetail(Request $request)
     {
         $data   = MarketingOrderReceipt::where('code',CustomHelper::decrypt($request->id))->first();
-        
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;">
+        $x="";
+        if (isset($data->void_date)) {
+            $x .= '<span style="color: red;">|| Tanggal Void: ' . $data->void_date .  ' || Void User: ' . $data->voidUser->employee_no .'-'.$data->voidUser->name.' || Note:' . $data->void_note.'</span>' ;
+        }
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.$x.'</div><div class="col s12"><table style="min-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="11">Daftar AR Invoice</th>

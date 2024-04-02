@@ -14,9 +14,9 @@
                 page-break-inside: avoid;
             }
 
-            .last-header {
+            /* .last-header {
                 page-break-after: always !important;
-            }
+            } */
 
             .row {
             margin-left:-5px;

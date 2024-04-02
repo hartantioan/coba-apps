@@ -354,6 +354,26 @@ class User extends Authenticatable
         return $has;
     }
 
+    public function subordinate(){
+        return $this->hasMany('App\Models\User','manager_id','id');
+    }
+
+    public function getAllSubordinates()
+    {
+        $allSubordinates = [];
+        $this->getAllSubordinatesRecursive($this, $allSubordinates);
+        return $allSubordinates;
+    }
+
+    protected function getAllSubordinatesRecursive($user, &$allSubordinates)
+    {
+        $subordinates = $user->subordinate;
+        foreach ($subordinates as $subordinate) {
+            $allSubordinates[] = $subordinate;
+            $this->getAllSubordinatesRecursive($subordinate, $allSubordinates);
+        }
+    }
+
     public function grandtotalUnsentMod(){
         $totalMod = 0;
         foreach($this->marketingOrder as $row){
@@ -511,10 +531,6 @@ class User extends Authenticatable
 
     public function manager(){
         return $this->belongsTo('App\Models\User','manager_id','id')->withTrashed();
-    }
-
-    public function subordinate(){
-        return $this->hasMany('App\Models\User','manager_id','id')->where('status',$this->table);
     }
 
     public function menuUser(){

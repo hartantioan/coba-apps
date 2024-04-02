@@ -260,8 +260,11 @@ class GoodIssueRequestController extends Controller
     public function rowDetail(Request $request)
     {
         $data   = GoodIssueRequest::where('code',CustomHelper::decrypt($request->id))->first();
-        
-        $string = '<div class="row pt-1 pb-1"><div class="col s12"><table style="min-width:100%;max-width:100%;">
+        $x="";
+        if (isset($data->void_date)) {
+            $x .= '<span style="color: red;">|| Tanggal Void: ' . $data->void_date .  ' || Void User: ' . $data->voidUser->employee_no .'-'.$data->voidUser->name.' || Note:' . $data->void_note.'</span>' ;
+        }
+        $string = '<div class="row pt-1 pb-1">'.$x.'<div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="17">Daftar Item (Stok yang tampil adalah stok realtime pada saat dokumen dibuat)</th>
@@ -552,7 +555,12 @@ class GoodIssueRequestController extends Controller
                             'message' => 'Good Issue Request telah dipakai pada dokumen lain, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-
+                    if(!CustomHelper::checkLockAcc($query->post_date)){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
+                        ]);
+                    }
                     if(in_array($query->status,['1','2','6'])){
                         $query->user_id = session('bo_id');
                         $query->code = $request->code;

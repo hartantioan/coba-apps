@@ -36,6 +36,37 @@
                 },25000);
                 $('.tooltipped').tooltip();
                 /* checkPageMaintenance('{{ URL::to('/') }}'); */
+                var sessionLifetime = {{  config('session.lifetime') }};
+                
+                function resetSession() {
+                    fetch('/admin/flush-session', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}', // Add CSRF token if CSRF protection is enabled
+                        },
+                        body: JSON.stringify({}),
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            console.log('Session flushed successfully');
+                        } else {
+                            console.error('Failed to flush session');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('An error occurred:', error);
+                    });
+                    location.reload();
+                }
+                function trackActivity() {
+                    setTimeout(resetSession, sessionLifetime * 60 * 1000);
+                }
+
+                document.addEventListener("mousemove", trackActivity);
+                document.addEventListener("keypress", trackActivity);
+
+                trackActivity();
             });
         </script>
     @endif

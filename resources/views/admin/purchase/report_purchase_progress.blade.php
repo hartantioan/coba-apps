@@ -101,10 +101,9 @@
                                                     </select>
                                                     
                                                 </div>
-                                                <div class="col m12 s12"></div>
                                                 <div class="col m3 s12">
                                                     <button class="btn waves-effect waves-light right submit" onclick="exportExcel();">Export <i class="material-icons right">file_download</i></button>
-                                                    <button class="btn waves-effect waves-light right cyan submit mt-2" onclick="filter();">Process <i class="material-icons right">list</i></button>
+                                                    <button class="btn waves-effect waves-light right cyan submit" onclick="filter();">Process <i class="material-icons right">list</i></button>
                                                 </div>
                                             </div>
                                         </div>

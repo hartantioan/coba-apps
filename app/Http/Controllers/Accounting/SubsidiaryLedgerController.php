@@ -98,7 +98,7 @@ class SubsidiaryLedgerController extends Controller
             $html .= '<tr style="font-weight:800;">
                             <td width="200px">'.$row->code.'</td>
                             <td width="200px">'.$row->name.'</td>
-                            <td colspan="5"></td>
+                            <td colspan="7"></td>
                             <td class="right-align">'.number_format($balance,2,',','.').'</td>
                             <td colspan="11"></td>
                         </tr>';

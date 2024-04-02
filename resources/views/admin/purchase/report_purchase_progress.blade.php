@@ -99,7 +99,6 @@
                                                             @endif
                                                     @endforeach
                                                     </select>
-                                                    
                                                 </div>
                                                 <div class="col m3 s12">
                                                     <button class="btn waves-effect waves-light right submit" onclick="exportExcel();">Export <i class="material-icons right">file_download</i></button>

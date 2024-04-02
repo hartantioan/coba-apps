@@ -1423,7 +1423,7 @@ class PaymentRequestController extends Controller
 
         foreach($pr->paymentRequestCost as $row){
             $costs[] = [
-                'note'                  => $row->note,
+                'note'                  => $row->note ?? '',
                 'cost_distribution_id'  => $row->cost_distribution_id ?? '',
                 'cost_distribution_name'=> $row->costDistribution()->exists() ? $row->costDistribution->name : '',
                 'coa_id'                => $row->coa_id,
@@ -1438,7 +1438,7 @@ class PaymentRequestController extends Controller
                 'nominal_credit_fc'     => number_format($row->nominal_credit_fc,2,',','.'),
                 'nominal_debit'         => number_format($row->nominal_debit,2,',','.'),
                 'nominal_credit'        => number_format($row->nominal_credit,2,',','.'),
-                'note2'                 => $row->note2,
+                'note2'                 => $row->note2 ?? '',
             ];
         }
 

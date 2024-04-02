@@ -66,7 +66,7 @@ class ClosingJournalController extends Controller
             'code',
             'user_id',
             'company_id',
-            'date',
+            'post_date',
             'month',
             'note',
             'grandtotal',

@@ -2,7 +2,7 @@ $(function() {
 	$('#loader').fadeOut();
 	initializeMasking();
 	$('.select2-hidden-accessible').on('select2:unselect',function(){
-		$('.select2-hidden-accessible').html(null);
+		$(this).html(null);
 	});
 });
 

@@ -29,7 +29,7 @@
             <td width="200px">{{$row['name']}}</td>
             <td colspan="7"></td>
             <td class="right-align">{{$row['balance']}}</td>
-            <td colspan="11"></td>
+            <td colspan="9"></td>
         </tr>
         @if (isset($row['coa_code']) && is_array($row['coa_code']))
             @foreach ($row['coa_code'] as $key=>$row_sec)

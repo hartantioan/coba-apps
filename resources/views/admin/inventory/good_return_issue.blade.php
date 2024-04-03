@@ -1682,57 +1682,6 @@
         });
     }
 
-    function done(id){
-        swal({
-            title: "Apakah anda yakin ingin menyelesaikan dokumen ini?",
-            text: "Data yang sudah terupdate tidak dapat dikembalikan.",
-            icon: 'warning',
-            dangerMode: true,
-            buttons: {
-            cancel: 'Tidak, jangan!',
-            delete: 'Ya, lanjutkan!'
-            }
-        }).then(function (willDelete) {
-            if (willDelete) {
-                $.ajax({
-                    url: '{{ Request::url() }}/done',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: {
-                        id: id
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        loadingOpen('#main');
-                    },
-                    success: function(response) {
-                        loadingClose('#main');
-                        if(response.status == 200) {
-                            loadDataTable();
-                            M.toast({
-                                html: response.message
-                            });
-                        } else {
-                            M.toast({
-                                html: response.message
-                            });
-                        }
-                    },
-                    error: function() {
-                        $('.modal-content').scrollTop(0);
-                        loadingClose('#main');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
-                        });
-                    }
-                });
-            }
-        });
-    }
     function exportExcel(){
         var search = table.search();
         var status = $('#filter_status').val();

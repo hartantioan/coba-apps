@@ -2271,6 +2271,10 @@ class CustomHelper {
 				);
 			}
 
+			$gr->update([
+				'status' => '3'
+			]);
+
 		}elseif($table_name == 'landed_costs'){
 
 			$lc = LandedCost::find($data->id);

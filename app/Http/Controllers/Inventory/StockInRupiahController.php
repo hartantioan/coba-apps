@@ -196,7 +196,7 @@ class StockInRupiahController extends Controller
                     'item'         => $row->item->name,
                     'satuan'       => $row->item->uomUnit->code,
                     'kode'         => $row->item->code,
-                    'last_qty'     => $query_first ? number_format($query_first->qty_final, 2, ',', '.') : 0,
+                    'last_qty'     => $query_first ? CustomHelper::formatConditionalQty($query_first->qty_final) : 0,
                 ];
 
 
@@ -266,7 +266,7 @@ class StockInRupiahController extends Controller
                         'item'         => $row_tidak_ada->item->name,
                         'satuan'       => $row_tidak_ada->item->uomUnit->code,
                         'kode'         => $row_tidak_ada->item->code,
-                        'last_qty'     => $row_tidak_ada ? number_format($row_tidak_ada->qty_final, 2, ',', '.') : 0,
+                        'last_qty'     => $row_tidak_ada ? CustomHelper::formatConditionalQty($row_tidak_ada->qty_final) : 0,
                     ]; 
                 }
                 

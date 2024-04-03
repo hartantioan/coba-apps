@@ -2264,7 +2264,7 @@ class GoodIssueController extends Controller
                     foreach($request->arr_item_stock as $key => $row){
                         $rowprice = NULL;
                         $item_stock = ItemStock::find(intval($row));
-                        $rowprice = round($item_stock->priceNow(),2);
+                        $rowprice = $item_stock->priceNow();
                         $gid = GoodIssueDetail::create([
                             'good_issue_id'         => $query->id,
                             'item_stock_id'         => $row,

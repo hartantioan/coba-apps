@@ -293,7 +293,7 @@ function loadCurrency(){
 	var yesterday = new Date(date);
 	yesterday.setDate(yesterday.getDate() -2);
 	let dateString = yesterday.yyyymmdd();
-	$.ajax({
+	/* $.ajax({
 		url: 'https://api.freecurrencyapi.com/v1/historical?apikey=fca_live_sJNdkvotKpFObXVFuzKSo0VBkrTkePfvixsZHBlz&currencies=IDR&base_currency=' + code + '&date=' + dateString,
 		type: 'GET',
 		beforeSend: function() {
@@ -317,7 +317,8 @@ function loadCurrency(){
 				icon: 'error'
 			});
 		}
-	});
+	}); */
+	$('#currency_rate').val('1');
 }
 
 function getRandomColor() {

@@ -41,7 +41,9 @@ class UnbilledAPController extends Controller
                 u.name AS account_name,
                 (SELECT 
                     SUM(pid.total) 
-                    FROM purchase_invoice_details pid 
+                    FROM purchase_invoice_details pid
+                    JOIN purchase_invoices pi
+                        ON pi.id = pid.purchase_invoice_id
                     WHERE pid.lookable_type = 'good_receipt_details' 
                     AND pid.lookable_id 
                         IN (
@@ -52,14 +54,18 @@ class UnbilledAPController extends Controller
                                 AND grd.deleted_at IS NULL
                             )
                     AND pid.deleted_at IS NULL 
-                    AND pid.purchase_invoice_id 
-                        IN (
-                            SELECT 
-                                pi.id 
-                                FROM purchase_invoices pi 
-                                WHERE pi.status IN ('2','3','7') 
-                                AND pi.post_date <= :date1
-                            )
+                    AND pi.status IN ('2','3','7') 
+                    AND pi.post_date <= :date1
+                    AND pi.id
+                        NOT IN (
+                            SELECT
+                                j.lookable_id
+                                FROM journals j
+                                WHERE j.lookable_type = 'purchase_invoices'
+                                AND j.status IN ('2','3')
+                                AND j.deleted_at IS NULL
+                                AND j.note = CONCAT('VOID*',pi.code)
+                        )
                 ) AS total_invoice,
                 (SELECT 
                     SUM(grtd.total) 

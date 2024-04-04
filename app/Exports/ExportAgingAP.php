@@ -94,7 +94,8 @@ class ExportAgingAP implements FromView , WithEvents
                 pi.total,
                 pi.tax,
                 pi.wtax,
-                pi.balance
+                pi.balance,
+                pi.currency_rate
                 FROM purchase_invoices pi
                 LEFT JOIN users u
                     ON u.id = pi.account_id
@@ -215,15 +216,15 @@ class ExportAgingAP implements FromView , WithEvents
             foreach($results as $row){
                 $balance = $row->balance - $row->total_payment - $row->total_memo - $row->total_reconcile - $row->total_journal;
                 if($balance > 0){
-                    $totalAll += $balance;
+                    $totalAll += $balance * $row->currency_rate;
                     $daysDiff = $this->dateDiffInDays($row->due_date,$this->date);
                     $index = $this->findDuplicate($row->account_code,$newData);
                     if($index >= 0){
                         foreach($newData[$index]['data'] as $key => $rowdata){
                             if($daysDiff <= $rowdata['end'] && $daysDiff >= $rowdata['start']){
-                                $newData[$index]['data'][$key]['balance'] += $balance;
-                                $newData[$index]['total'] += $balance;
-                                $arrColumn[$key]['total'] += $balance;
+                                $newData[$index]['data'][$key]['balance'] += $balance * $row->currency_rate;
+                                $newData[$index]['total'] += $balance * $row->currency_rate;
+                                $arrColumn[$key]['total'] += $balance * $row->currency_rate;
                                 $newData[$index]['data'][$key]['list_invoice'][] = $row->code;
                             }
                         }
@@ -235,10 +236,10 @@ class ExportAgingAP implements FromView , WithEvents
                                     'name'          => $rowcolumn['name'],
                                     'start'         => $rowcolumn['start'],
                                     'end'           => $rowcolumn['end'],
-                                    'balance'       => $balance,
+                                    'balance'       => $balance * $row->currency_rate,
                                     'list_invoice'  => array($row->code),
                                 ];
-                                $arrColumn[$key]['total'] += $balance;
+                                $arrColumn[$key]['total'] += $balance * $row->currency_rate;
                             }else{
                                 $arrDetail[] = [
                                     'name'          => $rowcolumn['name'],
@@ -253,24 +254,24 @@ class ExportAgingAP implements FromView , WithEvents
                             'supplier_code'         => $row->account_code,
                             'supplier_name'         => $row->account_name,
                             'data'                  => $arrDetail,
-                            'total'                 => $balance,
+                            'total'                 => $balance * $row->currency_rate,
                         ];
                     }
                 }
             }
     
             foreach($results2 as $row){
-                $balance = ($row->grandtotal * $row->currency_rate) - $row->total_payment - $row->total_memo - $row->total_reconcile;
+                $balance = $row->grandtotal - $row->total_payment - $row->total_memo - $row->total_reconcile;
                 if($balance > 0){
-                    $totalAll += $balance;
+                    $totalAll += $balance * $row->currency_rate;
                     $daysDiff = $this->dateDiffInDays($row->due_date,$this->date);
                     $index = $this->findDuplicate($row->account_code,$newData);
                     if($index >= 0){
                         foreach($newData[$index]['data'] as $key => $rowdata){
                             if($daysDiff <= $rowdata['end'] && $daysDiff >= $rowdata['start']){
-                                $newData[$index]['data'][$key]['balance'] += $balance;
-                                $newData[$index]['total'] += $balance;
-                                $arrColumn[$key]['total'] += $balance;
+                                $newData[$index]['data'][$key]['balance'] += $balance * $row->currency_rate;
+                                $newData[$index]['total'] += $balance * $row->currency_rate;
+                                $arrColumn[$key]['total'] += $balance * $row->currency_rate;
                                 $newData[$index]['data'][$key]['list_invoice'][] = $row->code;
                             }
                         }
@@ -282,10 +283,10 @@ class ExportAgingAP implements FromView , WithEvents
                                     'name'          => $rowcolumn['name'],
                                     'start'         => $rowcolumn['start'],
                                     'end'           => $rowcolumn['end'],
-                                    'balance'       => $balance,
+                                    'balance'       => $balance * $row->currency_rate,
                                     'list_invoice'  => array($row->code),
                                 ];
-                                $arrColumn[$key]['total'] += $balance;
+                                $arrColumn[$key]['total'] += $balance * $row->currency_rate;
                             }else{
                                 $arrDetail[] = [
                                     'name'          => $rowcolumn['name'],
@@ -300,7 +301,7 @@ class ExportAgingAP implements FromView , WithEvents
                             'supplier_code'         => $row->account_code,
                             'supplier_name'         => $row->account_name,
                             'data'                  => $arrDetail,
-                            'total'                 => $balance,
+                            'total'                 => $balance * $row->currency_rate,
                         ];
                     }
                 }
@@ -318,16 +319,16 @@ class ExportAgingAP implements FromView , WithEvents
                 if($balance > 0){
                     $daysDiff = $this->dateDiffInDays($row->due_date,$this->date);
                     $arrDetail = [];
-                    $totalAll += $balance;
+                    $totalAll += $balance * $row->currency_rate;
                     foreach($arrColumn as $key => $rowcolumn){
                         if($daysDiff <= $rowcolumn['end'] && $daysDiff >= $rowcolumn['start']){
                             $arrDetail[] = [
                                 'name'          => $rowcolumn['name'],
                                 'start'         => $rowcolumn['start'],
                                 'end'           => $rowcolumn['end'],
-                                'balance'       => $balance,
+                                'balance'       => $balance * $row->currency_rate,
                             ];
-                            $arrColumn[$key]['total'] += $balance;
+                            $arrColumn[$key]['total'] += $balance * $row->currency_rate;
                         }else{
                             $arrDetail[] = [
                                 'name'          => $rowcolumn['name'],
@@ -342,26 +343,26 @@ class ExportAgingAP implements FromView , WithEvents
                         'supplier_code'         => $row->account_name,
                         'invoice'               => $row->code,
                         'data'                  => $arrDetail,
-                        'total'                 => $balance,
+                        'total'                 => $balance * $row->currency_rate,
                     ];
                 }
             }
     
             foreach($results2 as $row){
-                $balance = ($row->grandtotal * $row->currency_rate) - $row->total_payment - $row->total_memo - $row->total_reconcile;
+                $balance = $row->grandtotal - $row->total_payment - $row->total_memo - $row->total_reconcile;
                 if($balance > 0){
                     $daysDiff = $this->dateDiffInDays($row->due_date,$this->date);
                     $arrDetail = [];
-                    $totalAll += $balance;
+                    $totalAll += $balance * $row->currency_rate;
                     foreach($arrColumn as $key => $rowcolumn){
                         if($daysDiff <= $rowcolumn['end'] && $daysDiff >= $rowcolumn['start']){
                             $arrDetail[] = [
                                 'name'          => $rowcolumn['name'],
                                 'start'         => $rowcolumn['start'],
                                 'end'           => $rowcolumn['end'],
-                                'balance'       => $balance,
+                                'balance'       => $balance * $row->currency_rate,
                             ];
-                            $arrColumn[$key]['total'] += $balance;
+                            $arrColumn[$key]['total'] += $balance * $row->currency_rate;
                         }else{
                             $arrDetail[] = [
                                 'name'          => $rowcolumn['name'],
@@ -376,7 +377,7 @@ class ExportAgingAP implements FromView , WithEvents
                         'supplier_name'         => $row->account_name,
                         'invoice'               => $row->code,
                         'data'                  => $arrDetail,
-                        'total'                 => $balance,
+                        'total'                 => $balance * $row->currency_rate,
                     ];
                 }
             }

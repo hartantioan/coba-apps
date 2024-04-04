@@ -40,7 +40,20 @@ class UnbilledAPController extends Controller
                 *,
                 u.name AS account_name,
                 (SELECT 
-                    SUM(pid.total) 
+                    SUM(pid.total) - (
+                        SELECT
+                            SUM(jd.nominal)
+                            FROM journal_details jd
+                            JOIN journals j
+                                ON j.id = jd.journal_id
+                            JOIN coas c
+                                ON jd.coa_id = c.id
+                            WHERE c.code = '200.01.03.01.02'
+                            AND j.status IN ('2','3')
+                            AND j.deleted_at IS NULL
+                            AND j.post_date <= :date1
+                            AND jd.note = CONCAT('VOID*',pi.code)
+                    )
                     FROM purchase_invoice_details pid
                     JOIN purchase_invoices pi
                         ON pi.id = pid.purchase_invoice_id
@@ -55,23 +68,7 @@ class UnbilledAPController extends Controller
                             )
                     AND pid.deleted_at IS NULL 
                     AND pi.status IN ('2','3','7') 
-                    AND pi.post_date <= :date1
-                    AND pi.id
-                        NOT IN (
-                            SELECT
-                                j.lookable_id
-                                FROM journal_details jd
-                                JOIN journals j
-                                    ON j.id = jd.journal_id
-                                JOIN coas c
-                                    ON jd.coa_id = c.id
-                                WHERE c.code = '200.01.03.01.02'
-                                AND j.lookable_type = 'purchase_invoices'
-                                AND j.status IN ('2','3')
-                                AND j.deleted_at IS NULL
-                                AND j.post_date <= :date2
-                                AND jd.note = CONCAT('VOID*',pi.code)
-                        )
+                    AND pi.post_date <= :date2
                 ) AS total_invoice,
                 (SELECT 
                     SUM(grtd.total) 

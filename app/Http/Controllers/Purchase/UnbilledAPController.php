@@ -37,50 +37,35 @@ class UnbilledAPController extends Controller
 
         $results = DB::select("
         SELECT 
-            *,
+            grd.*,
             u.name AS account_name,
             (SELECT 
-                SUM(pid.total) - (
-                    SELECT
-                        SUM(jd.nominal)
-                        FROM journal_details jd
-                        JOIN journals j
-                            ON j.id = jd.journal_id
-                        JOIN coas c
-                            ON jd.coa_id = c.id
-                        WHERE c.code = '200.01.03.01.02'
-                        AND j.status IN ('2','3')
-                        AND j.deleted_at IS NULL
-                        AND j.post_date <= :date1
-                        AND jd.note = CONCAT('VOID*',pi.code)
-                )
+                SUM(pid.total)
                 FROM purchase_invoice_details pid
                 JOIN purchase_invoices pi
                     ON pi.id = pid.purchase_invoice_id
                 WHERE pid.lookable_type = 'good_receipt_details' 
-                AND pid.lookable_id 
-                    IN (
-                        SELECT 
-                            grd.id 
-                            FROM good_receipt_details grd
-                            WHERE grd.good_receipt_id = gr.id 
-                            AND grd.deleted_at IS NULL
-                        )
+                AND pid.lookable_id = grd.id
                 AND pid.deleted_at IS NULL 
                 AND pi.status IN ('2','3','7') 
-                AND pi.post_date <= :date2
+                AND pi.post_date <= :date1
             ) AS total_invoice,
-            (SELECT 
+            IFNULL((
+                SELECT 
+                    GROUP_CONCAT(DISTINCT pi.code)
+                    FROM purchase_invoice_details pid
+                    JOIN purchase_invoices pi
+                        ON pi.id = pid.purchase_invoice_id
+                    WHERE pid.lookable_type = 'good_receipt_details' 
+                    AND pid.lookable_id = grd.id
+                    AND pid.deleted_at IS NULL 
+                    AND pi.status IN ('2','3','7') 
+                    AND pi.post_date <= :date2
+            ),'') AS data_reconcile,
+            IFNULL((SELECT 
                 SUM(grtd.total) 
                 FROM good_return_details grtd 
-                WHERE grtd.good_receipt_detail_id 
-                    IN (
-                        SELECT 
-                            grd.id 
-                            FROM good_receipt_details grd
-                            WHERE grd.good_receipt_id = gr.id 
-                            AND grd.deleted_at IS NULL
-                        )
+                WHERE grtd.good_receipt_detail_id = grd.id
                 AND grtd.deleted_at IS NULL 
                 AND grtd.good_return_id 
                     IN (
@@ -90,7 +75,7 @@ class UnbilledAPController extends Controller
                             WHERE grt.status IN ('2','3') 
                             AND grt.post_date <= :date3
                         )
-            ) AS total_return,
+            ),0) AS total_return,
             (SELECT 
                 j.currency_rate
                 FROM journals j 
@@ -98,10 +83,16 @@ class UnbilledAPController extends Controller
                     j.lookable_id = gr.id
                     AND j.lookable_type = 'good_receipts'
                     AND j.deleted_at IS NULL
-            ) AS currency_rate
-            FROM good_receipts gr
+            ) AS currency_rate,
+            CONCAT(i.code,' - ',i.name,' - ',gr.code) AS code,
+            u.name AS account_name
+            FROM good_receipt_details grd
+            LEFT JOIN good_receipts gr
+                ON gr.id = grd.good_receipt_id
             LEFT JOIN users u
                 ON u.id = gr.account_id
+            LEFT JOIN items i
+                ON i.id = grd.item_id
             WHERE 
                 gr.post_date <= :date4
                 AND gr.status IN ('2','3')

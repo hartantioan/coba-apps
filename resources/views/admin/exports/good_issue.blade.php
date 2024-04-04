@@ -73,7 +73,7 @@
                 <td>{{ $rowdetail->requester }}</td>
                 <td>{{ $rowdetail->qty_return }}</td>
                 <td>{{ $rowdetail->total }}</td>
-                <td>{{ $rowdetail->goodIssueRequestDetail()  ? $rowdetail->lookable->goodIssue->code : '-'}}</td>                
+                <td>{{ $rowdetail->goodIssueRequestDetail()  ? $rowdetail->lookable->goodIssueRequest->code : '-'}}</td>                
             </tr>
             @php
                 $no++;

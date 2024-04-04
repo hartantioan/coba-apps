@@ -49,7 +49,7 @@ class ExportUnbilledAP implements FromView , WithEvents
                             SELECT 
                                 pi.id 
                                 FROM purchase_invoices pi 
-                                WHERE pi.status IN ('2','3') 
+                                WHERE pi.status IN ('2','3','7') 
                                 AND pi.post_date <= :date1
                             )
                 ) AS total_invoice,

@@ -630,7 +630,7 @@
                                                 <th class="center-align">GR/LC/PO/FR No.</th>
                                                 <th class="center-align">Detail Item</th>
                                                 <th class="center-align">Tgl.Post</th>
-                                                <th class="center-align">Grandtotal</th>
+                                                <th class="center-align">Total</th>
                                                 <th class="center-align">Ter-Invoice</th>
                                                 <th class="center-align">Sisa</th>
                                                 <th class="center-align">Keterangan</th>

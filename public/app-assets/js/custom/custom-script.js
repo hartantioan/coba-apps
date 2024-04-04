@@ -293,8 +293,8 @@ function loadCurrency(){
 	var yesterday = new Date(date);
 	yesterday.setDate(yesterday.getDate() -2);
 	let dateString = yesterday.yyyymmdd();
-	/* $.ajax({
-		url: 'https://api.freecurrencyapi.com/v1/historical?apikey=fca_live_sJNdkvotKpFObXVFuzKSo0VBkrTkePfvixsZHBlz&currencies=IDR&base_currency=' + code + '&date=' + dateString,
+	$.ajax({
+		url: 'https://api.vatcomply.com/rates?base=' + code +'&date='+ dateString,
 		type: 'GET',
 		beforeSend: function() {
 			loadingOpen('#currency_rate');
@@ -304,11 +304,10 @@ function loadCurrency(){
 		},
 		success: function(response) {
 			loadingClose('#currency_rate');
-			let keys = Object.keys(response.data);
-			keys.forEach(function (k) {
-				$('#currency_rate').val(formatRupiahIni(parseFloat(response.data[k].IDR).toFixed(2).toString().replace('.',','))).trigger('change');
-			});
-			return 
+			
+			$('#currency_rate').val(formatRupiahIni(parseFloat(response['rates']['IDR']).toFixed(2).toString().replace('.',','))).trigger('change');
+			
+			console.log(response['rates']['IDR']);
 		},
 		error: function() {
 			swal({
@@ -317,8 +316,7 @@ function loadCurrency(){
 				icon: 'error'
 			});
 		}
-	}); */
-	$('#currency_rate').val('1');
+	});
 }
 
 function getRandomColor() {

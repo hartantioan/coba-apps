@@ -187,7 +187,7 @@ class OutStandingAPController extends Controller
                 WHERE 
                     pi.post_date <= :date4
                     AND pi.grandtotal > 0
-                    AND pi.status IN ('2','3')
+                    AND pi.status IN ('2','3','7')
                     AND pi.deleted_at IS NULL
         ", array(
             'date1' => $date,

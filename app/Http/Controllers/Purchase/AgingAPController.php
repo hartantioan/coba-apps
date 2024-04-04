@@ -100,7 +100,8 @@ class AgingAPController extends Controller
                 pi.total,
                 pi.tax,
                 pi.wtax,
-                pi.balance
+                pi.balance,
+                pi.currency_rate
                 FROM purchase_invoices pi
                 LEFT JOIN users u
                     ON u.id = pi.account_id
@@ -223,9 +224,9 @@ class AgingAPController extends Controller
                 if($index >= 0){
                     foreach($newData[$index]['data'] as $key => $rowdata){
                         if($daysDiff <= $rowdata['end'] && $daysDiff >= $rowdata['start']){
-                            $newData[$index]['data'][$key]['balance'] += $balance;
-                            $newData[$index]['total'] += $balance;
-                            $arrColumn[$key]['total'] += $balance;
+                            $newData[$index]['data'][$key]['balance'] += $balance * $row->currency_rate;
+                            $newData[$index]['total'] += $balance * $row->currency_rate;
+                            $arrColumn[$key]['total'] += $balance * $row->currency_rate;
                             $newData[$index]['data'][$key]['list_invoice'][] = $row->code;
                         }
                     }
@@ -237,10 +238,10 @@ class AgingAPController extends Controller
                                 'name'          => $rowcolumn['name'],
                                 'start'         => $rowcolumn['start'],
                                 'end'           => $rowcolumn['end'],
-                                'balance'       => $balance,
+                                'balance'       => $balance * $row->currency_rate,
                                 'list_invoice'  => array($row->code),
                             ];
-                            $arrColumn[$key]['total'] += $balance;
+                            $arrColumn[$key]['total'] += $balance * $row->currency_rate;
                         }else{
                             $arrDetail[] = [
                                 'name'          => $rowcolumn['name'],
@@ -255,14 +256,14 @@ class AgingAPController extends Controller
                         'supplier_code'         => $row->account_code,
                         'supplier_name'         => $row->account_name,
                         'data'                  => $arrDetail,
-                        'total'                 => $balance,
+                        'total'                 => $balance * $row->currency_rate,
                     ];
                 }
             }
         }
 
         foreach($results2 as $row){
-            $balance = ($row->grandtotal * $row->currency_rate) - $row->total_payment - $row->total_memo - $row->total_reconcile;
+            $balance = $row->grandtotal - $row->total_payment - $row->total_memo - $row->total_reconcile;
             $due_date = $row->due_date ? $row->due_date : date('Y-m-d', strtotime($row->post_date. ' + '.$row->topdp.' day'));
             if($balance > 0){
                 $daysDiff = $this->dateDiffInDays($due_date,$date);
@@ -270,9 +271,9 @@ class AgingAPController extends Controller
                 if($index >= 0){
                     foreach($newData[$index]['data'] as $key => $rowdata){
                         if($daysDiff <= $rowdata['end'] && $daysDiff >= $rowdata['start']){
-                            $newData[$index]['data'][$key]['balance'] += $balance;
-                            $newData[$index]['total'] += $balance;
-                            $arrColumn[$key]['total'] += $balance;
+                            $newData[$index]['data'][$key]['balance'] += $balance * $row->currency_rate;
+                            $newData[$index]['total'] += $balance * $row->currency_rate;
+                            $arrColumn[$key]['total'] += $balance * $row->currency_rate;
                             $newData[$index]['data'][$key]['list_invoice'][] = $row->code;
                         }
                     }
@@ -287,7 +288,7 @@ class AgingAPController extends Controller
                                 'balance'       => $balance,
                                 'list_invoice'  => array($row->code),
                             ];
-                            $arrColumn[$key]['total'] += $balance;
+                            $arrColumn[$key]['total'] += $balance * $row->currency_rate;
                         }else{
                             $arrDetail[] = [
                                 'name'          => $rowcolumn['name'],
@@ -302,7 +303,7 @@ class AgingAPController extends Controller
                         'supplier_code'         => $row->account_code,
                         'supplier_name'         => $row->account_name,
                         'data'                  => $arrDetail,
-                        'total'                 => $balance,
+                        'total'                 => $balance * $row->currency_rate,
                     ];
                 }
             }

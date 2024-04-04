@@ -3549,7 +3549,7 @@ class CustomHelper {
 					$tax += $row->tax;
 					$wtax += $row->wtax;
 
-					if($row->tax > 0){
+					if($row->tax_id){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $row->taxMaster->coa_purchase_id,
@@ -3567,7 +3567,7 @@ class CustomHelper {
 						]);
 					}
 	
-					if($row->wtax > 0){
+					if($row->wtax_id){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $row->wTaxMaster->coa_purchase_id,

@@ -112,7 +112,8 @@ class OutStandingAPController extends Controller
                 pi.total,
                 pi.tax,
                 pi.wtax,
-                pi.balance
+                pi.balance,
+                pi.currency_rate
                 FROM purchase_invoices pi
                 LEFT JOIN users u
                     ON u.id = pi.account_id
@@ -209,23 +210,23 @@ class OutStandingAPController extends Controller
                     'rec_date'  => date('d/m/Y',strtotime($row->received_date)),
                     'due_date'  => date('d/m/Y',strtotime($row->due_date)),
                     'top'       => '-',
-                    'total'     => number_format($row->total,2,',','.'),
-                    'tax'       => number_format($row->tax,2,',','.'),
-                    'wtax'      => number_format($row->wtax,2,',','.'),
-                    'grandtotal'=> number_format($row->balance,2,',','.'),
-                    'payed'     => number_format($totalPayed,2,',','.'),
-                    'sisa'      => number_format($balance,2,',','.'),
+                    'total'     => number_format($row->total * $row->currency_rate,2,',','.'),
+                    'tax'       => number_format($row->tax * $row->currency_rate,2,',','.'),
+                    'wtax'      => number_format($row->wtax * $row->currency_rate,2,',','.'),
+                    'grandtotal'=> number_format($row->balance * $row->currency_rate,2,',','.'),
+                    'payed'     => number_format($totalPayed * $row->currency_rate,2,',','.'),
+                    'sisa'      => number_format($balance * $row->currency_rate,2,',','.'),
                 ];
                 
                 if($balance > 0){
-                    $totalAll += $balance;
+                    $totalAll += ($balance * $row->currency_rate);
                     $array_filter[] = $data_tempura;
                 }
             }
 
             foreach($results2 as $row){
                 $totalPayed = $row->total_payment + $row->total_memo + $row->total_reconcile;
-                $balance = ($row->grandtotal * $row->currency_rate) - $totalPayed;
+                $balance = $row->grandtotal - $totalPayed;
                 $data_tempura = [
                     'code'      => $row->code,
                     'vendor'    => $row->account_name,
@@ -237,12 +238,12 @@ class OutStandingAPController extends Controller
                     'tax'       => number_format($row->tax * $row->currency_rate,2,',','.'),
                     'wtax'      => number_format($row->wtax * $row->currency_rate,2,',','.'),
                     'grandtotal'=> number_format($row->grandtotal * $row->currency_rate,2,',','.'),
-                    'payed'     => number_format($totalPayed,2,',','.'),
-                    'sisa'      => number_format($balance,2,',','.'),
+                    'payed'     => number_format($totalPayed * $row->currency_rate,2,',','.'),
+                    'sisa'      => number_format($balance * $row->currency_rate,2,',','.'),
                 ];
                 
                 if($balance > 0){
-                    $totalAll += $balance;
+                    $totalAll += ($balance * $row->currency_rate);
                     $array_filter[] = $data_tempura;
                 }
             }

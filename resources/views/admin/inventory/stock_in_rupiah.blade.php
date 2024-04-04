@@ -266,7 +266,7 @@
                                             <td class="center-align"></td>
                                             <td class="center-align"></td>
                                             <td class="center-align">` + val.kode + `</td>
-                                            <td class="right-align">` + val.item + `</td>
+                                            <td class="">` + val.item + `</td>
                                             <td class="center-align">` + val.satuan + `</td>
                                             <td class="center-align">Saldo Awal</td>
                                             <td class="center-align"></td>

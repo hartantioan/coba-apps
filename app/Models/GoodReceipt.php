@@ -242,11 +242,31 @@ class GoodReceipt extends Model
     }
 
     public function hasBalanceInvoice(){
-        $total = $this->grandtotal;
+        $total = $this->total;
 
         foreach($this->goodReceiptDetail()->whereHas('purchaseInvoiceDetail')->get() as $row){
             foreach($row->purchaseInvoiceDetail as $rowinvoice){
-                $total -= $rowinvoice->grandtotal;
+                $total -= $rowinvoice->total;
+            }
+        }
+
+        if($total > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public function hasBalanceTotalByDate($date){
+        $total = $this->total;
+
+        foreach($this->goodReceiptDetail()->whereHas('purchaseInvoiceDetail',function($query)use($date){
+            $query->whereHas('purchaseInvoice',function($query)use($date){
+                $query->where('post_date','<=',$date);
+            });
+        })->get() as $row){
+            foreach($row->purchaseInvoiceDetail as $rowinvoice){
+                $total -= $rowinvoice->total;
             }
         }
 
@@ -273,6 +293,32 @@ class GoodReceipt extends Model
 
     public function journal(){
         return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
+    public function adjustRateDetail(){
+        return $this->hasMany('App\Models\AdjustRateDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('adjustRate',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function latestCurrencyRate(){
+        $currency_rate = $this->journal()->exists() ? $this->journal->currency_rate : 1;
+        foreach($this->adjustRateDetail()->whereHas('adjustRate',function($query){
+            $query->orderBy('post_date');
+        })->get() as $row){
+            $currency_rate = $row->adjustRate->currency_rate;
+        }
+        return $currency_rate;
+    }
+
+    public function latestCurrencyRateByDate($date){
+        $currency_rate = $this->journal()->exists() ? $this->journal->currency_rate : 1;
+        foreach($this->adjustRateDetail()->whereHas('adjustRate',function($query)use($date){
+            $query->where('post_date','<=',$date)->orderBy('post_date');
+        })->get() as $row){
+            $currency_rate = $row->adjustRate->currency_rate;
+        }
+        return $currency_rate;
     }
 
     public function getLandedCostList(){

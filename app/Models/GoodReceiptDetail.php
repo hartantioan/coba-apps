@@ -181,10 +181,10 @@ class GoodReceiptDetail extends Model
     }
 
     public function balanceInvoice(){
-        $total = round($this->grandtotal,2);
+        $total = round($this->total,2);
 
         foreach($this->purchaseInvoiceDetail as $row){
-            $total -= $row->grandtotal;
+            $total -= $row->total;
         }
 
         return $total;
@@ -204,7 +204,7 @@ class GoodReceiptDetail extends Model
         $total = 0;
 
         foreach($this->purchaseInvoiceDetail as $row){
-            $total += $row->grandtotal;
+            $total += $row->total;
         }
 
         return $total;

@@ -367,15 +367,15 @@ class PurchaseInvoiceController extends Controller
         
         foreach($datagr as $row){
             $invoice = $row->totalInvoice();
-            if(round($row->grandtotal - $invoice,2) > 0){
+            if(round($row->total - $invoice,2) > 0){
                 $details[] = [
                     'type'          => 'good_receipts',
                     'id'            => $row->id,
                     'code'          => $row->code.' - No. SJ : '.$row->delivery_no,
                     'post_date'     => date('d/m/Y',strtotime($row->post_date)),
-                    'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                    'grandtotal'    => number_format($row->total,2,',','.'),
                     'invoice'       => number_format($invoice,2,',','.'),
-                    'balance'       => $row->currencyReference()->symbol.' '.number_format($row->grandtotal - $invoice,2,',','.'),
+                    'balance'       => $row->currencyReference()->symbol.' '.number_format($row->total - $invoice,2,',','.'),
                     'info'          => $row->note,
                     'list_item'     => $row->getListItem(),
                 ];

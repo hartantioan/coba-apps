@@ -20,6 +20,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportClosingJournal;
 use App\Helpers\CustomHelper;
 use App\Models\AdjustRate;
+use App\Models\AdjustRateDetail;
 use App\Models\Currency;
 use App\Models\GoodReceipt;
 use App\Models\LockPeriod;
@@ -211,6 +212,7 @@ class AdjustRateController extends Controller
                         'nominal_fc'    => number_format($total,2,',','.'),
                         'latest_rate'   => number_format($latest_rate,2,',','.'),
                         'nominal_rp'    => number_format($latest_rate * $total,5,',','.'),
+                        'type'          => '2',
                     ];
                 }
             }
@@ -228,6 +230,7 @@ class AdjustRateController extends Controller
                         'nominal_fc'    => number_format($total,2,',','.'),
                         'latest_rate'   => number_format($latest_rate,2,',','.'),
                         'nominal_rp'    => number_format($latest_rate * $total,2,',','.'),
+                        'type'          => '2',
                     ];
                 }
             }
@@ -265,30 +268,37 @@ class AdjustRateController extends Controller
             $validation = Validator::make($request->all(), [
                 'code'                      => 'required',
                 'code_place_id'             => 'required',
-                /* 'code' 				    => $request->temp ? ['required', Rule::unique('closing_journals', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:closing_journals,code', */
-                'post_date'			    => 'required',
-                'company_id'		    => 'required',
-                'month'		            => 'required',
-                'note'                  => 'required',
-                'arr_coa_id'            => 'required|array',
-                'arr_nominal'           => 'required|array',
-                'arr_nominal_fc'        => 'required|array',
+                'post_date'			        => 'required',
+                'company_id'		        => 'required',
+                'currency_id'               => 'required',
+                'currency_rate'             => 'required',
+                'note'                      => 'required',
+                'arr_type'                  => 'required|array',
+                'arr_nominal_fc'            => 'required|array',
+                'arr_latest_rate'           => 'required|array',
+                'arr_nominal_rp'            => 'required|array',
+                'arr_nominal_new'           => 'required|array',
+                'arr_balance'               => 'required|array',
             ], [
                 'code.required' 				    => 'Kode/No tidak boleh kosong.',
-             /*    'code.string'                       => 'Kode harus dalam bentuk string.',
-                'code.min'                          => 'Kode harus minimal 18 karakter.',
-                'code.unique' 				        => 'Kode/No telah dipakai.', */
                 'code_place_id.required'            => 'Plant Tidak boleh kosong',
                 'post_date.required' 			    => 'Tanggal post tidak boleh kosong.',
                 'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
-                'month.required' 			        => 'Periode bulan tidak boleh kosong.',
+                'currency_id.required' 			    => 'Mata Uang tidak boleh kosong.',
+                'currency_rate.required' 			=> 'Kurs tidak boleh kosong.',
                 'note.required' 			        => 'Keterangan / catatan tidak boleh kosong.',
-                'arr_coa_id.required'               => 'Coa tidak boleh kosong',
-                'arr_coa_id.array'                  => 'Coa harus dalam bentuk array.',
-                'arr_nominal.required'              => 'Nominal tidak boleh kosong',
-                'arr_nominal.array'                 => 'Nominal harus dalam bentuk array.',
-                'arr_nominal_fc.required'           => 'Nominal mata uang asli tidak boleh kosong',
-                'arr_nominal_fc.array'              => 'Nominal mata uang asli harus dalam bentuk array.',
+                'arr_type.required'                 => 'Tipe tidak boleh kosong',
+                'arr_type.array'                    => 'Tipe harus dalam bentuk array.',
+                'arr_nominal_fc.required'           => 'Nominal FC tidak boleh kosong',
+                'arr_nominal_fc.array'              => 'Nominal FC harus dalam bentuk array.',
+                'arr_latest_rate.required'          => 'Nominal Kurs Terakhir tidak boleh kosong',
+                'arr_latest_rate.array'             => 'Nominal Kurs Terakhir harus dalam bentuk array.',
+                'arr_nominal_rp.required'           => 'Nominal Rupiah Sisa tidak boleh kosong',
+                'arr_nominal_rp.array'              => 'Nominal Rupiah Sisa harus dalam bentuk array.',
+                'arr_nominal_new.required'          => 'Nominal Rupiah Terbaru tidak boleh kosong',
+                'arr_nominal_new.array'             => 'Nominal Rupiah Terbaru harus dalam bentuk array.',
+                'arr_balance.required'              => 'Nominal Selisih tidak boleh kosong',
+                'arr_balance.array'                 => 'Nominal Selisih harus dalam bentuk array.',
             ]);
 
             if($validation->fails()) {
@@ -298,33 +308,9 @@ class AdjustRateController extends Controller
                 ];
             } else {
 
-                $grandtotal = abs($request->arr_nominal[count($request->arr_nominal)-1]);
-
-                if($grandtotal == 0){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Data tidak bisa disimpan karena nilai laba/rugi adalah 0.',
-                    ]);
-                }
-
-                $passedClosingLockPeriod = false;
-
-                $datalockperiod = LockPeriod::where('month',$request->month)->where('status_closing','2')->whereIn('status',['2','3'])->first();
-
-                if($datalockperiod){
-                    $passedClosingLockPeriod = true;
-                }
-
-                if(!$passedClosingLockPeriod){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Kunci / Lock Periode tidak ditemukan, silakan rubah status menjadi tutup.',
-                    ]);
-                }
-
                 if($request->temp){
                     
-                    $query = ClosingJournal::where('code',CustomHelper::decrypt($request->temp))->first();
+                    $query = AdjustRate::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     $approved = false;
                     $revised = false;
@@ -346,85 +332,70 @@ class AdjustRateController extends Controller
                     if($approved && !$revised){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Penutupan Jurnal telah diapprove, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Adjust Kurs telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
 
                     if(in_array($query->status,['1','6'])){
 
-                        if($request->has('document')) {
-                            if($query->document){
-                                if(Storage::exists($query->document)){
-                                    Storage::delete($query->document);
-                                }
-                            }
-                            $document = $request->file('document')->store('public/closing_journals');
-                        } else {
-                            $document = $query->document;
-                        }
-
                         $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->company_id = $request->company_id;
                         $query->post_date = $request->post_date;
-                        $query->month = $request->month;
+                        $query->currency_id = $request->currency_id;
+                        $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                         $query->note = $request->note;
-                        $query->document = $document;
-                        $query->grandtotal = $grandtotal;
                         $query->status = '1';
                         $query->save();
 
-                        foreach($query->closingJournalDetail as $row){
-                            $row->delete();
-                        }
+                        $query->adjustRateDetail()->delete();
 
                     }else{
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Status penutupan jurnal sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Status adjust kurs sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                 }else{
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode=ClosingJournal::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
-                    $query = ClosingJournal::create([
+                    $newCode = AdjustRate::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
+                    $query = AdjustRate::create([
                         'code'			=> $newCode,
                         'user_id'		=> session('bo_id'),
                         'company_id'    => $request->company_id,
                         'post_date'	    => $request->post_date,
-                        'month'         => $request->month,
-                        'document'      => $request->file('document') ? $request->file('document')->store('public/closing_journals') : NULL,
+                        'currency_id'   => $request->currency_id,
+                        'currency_rate' => str_replace(',','.',str_replace('.','',$request->currency_rate)),
                         'status'        => '1',
                         'note'          => $request->note,
-                        'grandtotal'    => $grandtotal
                     ]);
                 }
                 
                 if($query) {
-
-                    $updateLockPeriod = LockPeriod::where('month',$request->month)->update([
-                        'status_closing'    => '3'
-                    ]);
                     
-                    foreach($request->arr_coa_id as $key => $row){
-                        ClosingJournalDetail::create([
-                            'closing_journal_id'    => $query->id,
-                            'coa_id'                => $row,
-                            'type'                  => $request->arr_nominal[$key] >= 0 ? '1' : '2',
-                            'nominal'               => abs($request->arr_nominal[$key]),
-                            'nominal_fc'            => abs($request->arr_nominal_fc[$key]),
+                    foreach($request->arr_nominal_fc as $key => $row){
+                        AdjustRateDetail::create([
+                            'adjust_rate_id'        => $query->id,
+                            'lookable_type'         => $request->arr_lookable_type[$key],
+                            'lookable_id'           => $request->arr_lookable_id[$key],
+                            'nominal_fc'            => str_replace(',','.',str_replace('.','',$row)),
+                            'nominal_rate'          => str_replace(',','.',str_replace('.','',$request->arr_latest_rate[$key])),
+                            'nominal_rp'            => str_replace(',','.',str_replace('.','',$request->arr_nominal_rp[$key])),
+                            'nominal_new'           => str_replace(',','.',str_replace('.','',$request->arr_nominal_new[$key])),
+                            'nominal'               => str_replace(',','.',str_replace('.','',$request->arr_balance[$key])),
+                            'type'                  => $request->arr_type[$key],
                         ]);
                     }
 
                     CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
-                    CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan penutupan jurnal No. '.$query->code,$query->note,session('bo_id'));
+                    CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Adjust Kurs No. '.$query->code,$query->note,session('bo_id'));
 
                     activity()
-                        ->performedOn(new ClosingJournal())
+                        ->performedOn(new AdjustRate())
                         ->causedBy(session('bo_id'))
                         ->withProperties($query)
-                        ->log('Add / edit closing journal.');
+                        ->log('Add / edit adjust rate.');
 
                     $response = [
                         'status'    => 200,

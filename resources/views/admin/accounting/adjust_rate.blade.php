@@ -630,6 +630,7 @@
                                 $('#body-detail').append(`
                                     <tr class="row_detail ` + (i == (response.length - 1) ? 'teal lighten-4' : '') + `">
                                         <input type="hidden" name="arr_coa_id[]" value="` + val.coa_id + `">
+                                        <input type="hidden" name="arr_type[]" value="` + val.type + `">
                                         <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
                                         <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
                                         <td class="center">
@@ -990,34 +991,8 @@
             delete: 'Ya, lanjutkan!'
             }
         }).then(async function (willDelete) {
-            if (willDelete) {
-                $('.loader-progress').show();
-                let cekstock = await checkStock();
-                let cekcash = await checkCash();
-                let cekqty = await checkQty();
-                $("#countdown").html("");
-                if(cekstock == '200' && cekcash == '200' && cekqty == '200'){
-                    setTimeout(function(){
-                        $('.loader-progress').hide( "fast", function() {
-                            $('#checkstock-progress').show();
-                            $('#checkstock-success').hide();
-                            $('#checkcash-progress').show();
-                            $('#checkcash-success').hide();
-                            $('#checkqty-progress').show();
-                            $('#checkqty-success').hide();
-                        });
-                        submit();
-                    }, 4000);
-                    var timeleft = 3;
-                    var downloadTimer = setInterval(function(){
-                        if(timeleft <= 0){
-                            clearInterval(downloadTimer);
-                        } else {
-                            $("#countdown").html(timeleft + " detik notifikasi akan ditutup.");
-                        }
-                        timeleft -= 1;
-                    }, 1000);
-                }
+            if (willDelete) {           
+                submit();
             }
         });
     }

@@ -23,6 +23,7 @@ class AdjustRateDetail extends Model
         'nominal_rp',
         'nominal_new',
         'nominal',
+        'type',
     ];
 
     public function adjustRate()

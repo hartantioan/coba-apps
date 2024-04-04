@@ -55,7 +55,7 @@
     </tbody>
     <tfoot>
         <tr>
-            <td colspan="12">Total</td>
+            <td colspan="14">Total</td>
             <td align="right">{{ $totalall }}</td>
         </tr>
     </tfoot>

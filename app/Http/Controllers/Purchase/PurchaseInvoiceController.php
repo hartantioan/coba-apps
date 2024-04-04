@@ -563,7 +563,7 @@ class PurchaseInvoiceController extends Controller
                             'name'          => $rowdetail->item->code.' - '.$rowdetail->item->name,
                             'qty_received'  => CustomHelper::formatConditionalQty($rowdetail->qty),
                             'qty_returned'  => CustomHelper::formatConditionalQty($rowdetail->qtyReturn()),
-                            'qty_balance'   => CustomHelper::formatConditionalQty($rowdetail->qty - $rowdetail->qtyReturn()),
+                            'qty_balance'   => CustomHelper::formatConditionalQty($rowdetail->balanceQtyInvoice() - $rowdetail->qtyReturn()),
                             'price'         => number_format($price,2,',','.'),
                             'buy_unit'      => $rowdetail->itemUnit->unit->code,
                             'rawcode'       => $datagr->code,

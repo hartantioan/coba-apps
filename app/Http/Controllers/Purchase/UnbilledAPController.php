@@ -81,7 +81,15 @@ class UnbilledAPController extends Controller
                                 WHERE grt.status IN ('2','3') 
                                 AND grt.post_date <= :date2
                             )
-                ) AS total_return
+                ) AS total_return,
+                (SELECT 
+                    j.currency_rate
+                    FROM journals j 
+                    WHERE 
+                        j.lookable_id = gr.id
+                        AND prd.lookable_type = 'good_receipts'
+                        AND prd.deleted_at IS NULL
+                ) AS currency_rate
                 FROM good_receipts gr
                 LEFT JOIN users u
                     ON u.id = gr.account_id
@@ -107,11 +115,11 @@ class UnbilledAPController extends Controller
                     'post_date'     => date('d/m/Y',strtotime($row->post_date)),
                     'delivery_no'   => $row->delivery_no,
                     'note'          => $row->note,
-                    'total_received'=> number_format($row->total,2,',','.'),
-                    'total_invoice' => number_format($row->total_invoice,2,',','.'),
-                    'total_balance' => number_format($balance,2,',','.'),
+                    'total_received'=> number_format($row->total * $row->currency_rate,2,',','.'),
+                    'total_invoice' => number_format($row->total_invoice * $row->currency_rate,2,',','.'),
+                    'total_balance' => number_format($balance * $row->currency_rate,2,',','.'),
                 ];
-                $totalUnbilled += $balance;
+                $totalUnbilled += $balance * $row->currency_rate;
             }
         }
 

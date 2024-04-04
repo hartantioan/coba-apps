@@ -126,7 +126,7 @@ class DownPaymentController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportDownPayment($request->date), 'down_payment_'.uniqid().'.xlsx');
+		return Excel::download(new ExportDownPayment($request->date), 'down_payment_'.uniqid().'.xls');
     }
 
     public function getOutstanding(Request $request){

@@ -58,7 +58,7 @@ class DownPaymentController extends Controller
                     WHERE 
                         pid.purchase_down_payment_id = pdp.id
                         AND pi.post_date <= :date1
-                        AND pi.status IN ('2','3')
+                        AND pi.status IN ('2','3','7')
                 ),0) AS total_used,
                 IFNULL((
                     SELECT
@@ -69,6 +69,7 @@ class DownPaymentController extends Controller
                         WHERE pmd.lookable_type = 'purchase_down_payments'
                         AND pmd.lookable_id = pdp.id
                         AND pm.post_date <= :date2
+                        AND pm.status IN ('2','3','7')
                 ),0) AS total_memo,
                 u.name AS account_name,
                 u.employee_no AS account_code
@@ -78,7 +79,7 @@ class DownPaymentController extends Controller
                 WHERE 
                     pdp.post_date <= :date3
                     AND pdp.grandtotal > 0
-                    AND pdp.status IN ('2','3')
+                    AND pdp.status IN ('2','3','7')
             ",array(
                 'date1' => $date,
                 'date2' => $date,

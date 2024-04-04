@@ -183,8 +183,15 @@ class PurchaseDownPayment extends Model
         $apdp = PurchaseDownPayment::where('code',$code)->first();
 
         foreach($apdp->purchaseDownPaymentDetail as $row){
-            $arr[] = $row->purchaseOrder->code;
+            if($row->purchaseOrder()->exists()){
+                $arr[] = $row->purchaseOrder->code;
+            }
+            if($row->fundRequestDetail()->exists()){
+                $arr[] = $row->fundRequestDetail->fundRequest->code;
+            }
         }
+
+        $arr = array_unique($arr);
 
         return implode(', ',$arr);
     }

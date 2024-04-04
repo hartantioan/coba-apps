@@ -63,7 +63,10 @@ class UnbilledAPController extends Controller
                                 FROM journal_details jd
                                 JOIN journals j
                                     ON j.id = jd.journal_id
-                                WHERE j.lookable_type = 'purchase_invoices'
+                                JOIN coas c
+                                    ON jd.coa_id = c.id
+                                WHERE c.code = '200.01.03.01.02'
+                                AND j.lookable_type = 'purchase_invoices'
                                 AND j.status IN ('2','3')
                                 AND j.deleted_at IS NULL
                                 AND j.post_date <= :date2

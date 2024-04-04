@@ -87,8 +87,8 @@ class UnbilledAPController extends Controller
                     FROM journals j 
                     WHERE 
                         j.lookable_id = gr.id
-                        AND prd.lookable_type = 'good_receipts'
-                        AND prd.deleted_at IS NULL
+                        AND j.lookable_type = 'good_receipts'
+                        AND j.deleted_at IS NULL
                 ) AS currency_rate
                 FROM good_receipts gr
                 LEFT JOIN users u

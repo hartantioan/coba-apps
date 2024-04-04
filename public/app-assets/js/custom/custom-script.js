@@ -306,8 +306,6 @@ function loadCurrency(){
 			loadingClose('#currency_rate');
 			
 			$('#currency_rate').val(formatRupiahIni(parseFloat(response['rates']['IDR']).toFixed(2).toString().replace('.',','))).trigger('change');
-			
-			console.log(response['rates']['IDR']);
 		},
 		error: function() {
 			swal({

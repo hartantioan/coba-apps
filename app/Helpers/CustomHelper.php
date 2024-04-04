@@ -2289,7 +2289,7 @@ class CustomHelper {
 					'lookable_type'	=> 'landed_costs',
 					'lookable_id'	=> $lc->id,
 					'post_date'		=> $data->post_date,
-					'note'			=> 'LANDED COST - '.$data->code,
+					'note'			=> $data->note,
 					'status'		=> '3',
 					'currency_id'	=> $lc->currency_id,
 					'currency_rate'	=> $lc->currency_rate,
@@ -3549,7 +3549,7 @@ class CustomHelper {
 					$tax += $row->tax;
 					$wtax += $row->wtax;
 
-					if($row->tax_id){
+					if($row->tax > 0){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $row->taxMaster->coa_purchase_id,
@@ -3567,7 +3567,7 @@ class CustomHelper {
 						]);
 					}
 	
-					if($row->wtax_id){
+					if($row->wtax > 0){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $row->wTaxMaster->coa_purchase_id,

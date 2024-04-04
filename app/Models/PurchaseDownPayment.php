@@ -177,10 +177,12 @@ class PurchaseDownPayment extends Model
         return $type;
     }
 
-    public function getReference(){
+    public static function getReference($code){
         $arr = [];
 
-        foreach($this->purchaseDownPaymentDetail as $row){
+        $apdp = PurchaseDownPayment::where('code',$code)->first();
+
+        foreach($apdp->purchaseDownPaymentDetail as $row){
             $arr[] = $row->purchaseOrder->code;
         }
 

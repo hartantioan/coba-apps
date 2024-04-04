@@ -13,7 +13,7 @@ class ExportOutstandingDP implements FromView,ShouldAutoSize
     */
     public function view(): View
     {
-        $data = PurchaseDownPayment::whereIn('status',['2','3'])->get();
+        $data = PurchaseDownPayment::whereIn('status',['2','3','7'])->get();
         $array=[];
         foreach($data as $row){
             $entry = [];

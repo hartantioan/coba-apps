@@ -39,7 +39,7 @@ class ExportDownPayment implements FromView , WithEvents
                         WHERE 
                             pid.purchase_down_payment_id = pdp.id
                             AND pi.post_date <= :date1
-                            AND pi.status IN ('2','3')
+                            AND pi.status IN ('2','3','7')
                     ),0) AS total_used,
                     IFNULL((
                         SELECT
@@ -50,6 +50,7 @@ class ExportDownPayment implements FromView , WithEvents
                             WHERE pmd.lookable_type = 'purchase_down_payments'
                             AND pmd.lookable_id = pdp.id
                             AND pm.post_date <= :date2
+                            AND pm.status IN ('2','3','7')
                     ),0) AS total_memo,
                     u.name AS account_name,
                     u.employee_no AS account_code,
@@ -65,6 +66,7 @@ class ExportDownPayment implements FromView , WithEvents
                     WHERE 
                         pdp.post_date <= :date3
                         AND pdp.grandtotal > 0
+                        AND pdp.status IN ('2','3','7')
                 ", array(
                     'date1' => $this->date,
                     'date2' => $this->date,
@@ -72,7 +74,7 @@ class ExportDownPayment implements FromView , WithEvents
                 ));
 
             foreach($query_data as $row_invoice){
-                $balance = $row_invoice->grandtotal - $row_invoice->total_used - $row_invoice->total_memo;
+                $balance = ($row_invoice->grandtotal - $row_invoice->total_used - $row_invoice->total_memo) * $row_invoice->currency_rate;
                 if($balance > 0){
                     $array_filter[] = [
                         'code'          => $row_invoice->code,
@@ -82,11 +84,11 @@ class ExportDownPayment implements FromView , WithEvents
                         'post_date'     => date('d/m/Y',strtotime($row_invoice->post_date)),
                         'due_date'      => date('d/m/Y',strtotime($row_invoice->due_date)),
                         'note'          => $row_invoice->note,
-                        'subtotal'      => round($row_invoice->subtotal,2),
-                        'discount'      => round($row_invoice->discount,2),
-                        'total'         => round($row_invoice->total,2),
-                        'used'          => round($row_invoice->total_used,2),
-                        'memo'          => round($row_invoice->total_memo,2),
+                        'subtotal'      => round($row_invoice->subtotal * $row_invoice->currency_rate,2),
+                        'discount'      => round($row_invoice->discount * $row_invoice->currency_rate,2),
+                        'total'         => round($row_invoice->total * $row_invoice->currency_rate,2),
+                        'used'          => round($row_invoice->total_used * $row_invoice->currency_rate,2),
+                        'memo'          => round($row_invoice->total_memo * $row_invoice->currency_rate,2),
                         'balance'       => round($balance,2),
                         'status'        => $this->getStatus($row_invoice->status),
                         'void_name'     => $row_invoice->void_name,

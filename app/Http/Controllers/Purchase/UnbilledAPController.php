@@ -36,76 +36,76 @@ class UnbilledAPController extends Controller
         $start_time = microtime(true);
 
         $results = DB::select("
-            SELECT 
-                *,
-                u.name AS account_name,
-                (SELECT 
-                    SUM(pid.total) - (
-                        SELECT
-                            SUM(jd.nominal)
-                            FROM journal_details jd
-                            JOIN journals j
-                                ON j.id = jd.journal_id
-                            JOIN coas c
-                                ON jd.coa_id = c.id
-                            WHERE c.code = '200.01.03.01.02'
-                            AND j.status IN ('2','3')
-                            AND j.deleted_at IS NULL
-                            AND j.post_date <= :date1
-                            AND jd.note = CONCAT('VOID*',pi.code)
-                    )
-                    FROM purchase_invoice_details pid
-                    JOIN purchase_invoices pi
-                        ON pi.id = pid.purchase_invoice_id
-                    WHERE pid.lookable_type = 'good_receipt_details' 
-                    AND pid.lookable_id 
-                        IN (
-                            SELECT 
-                                grd.id 
-                                FROM good_receipt_details grd
-                                WHERE grd.good_receipt_id = gr.id 
-                                AND grd.deleted_at IS NULL
-                            )
-                    AND pid.deleted_at IS NULL 
-                    AND pi.status IN ('2','3','7') 
-                    AND pi.post_date <= :date2
-                ) AS total_invoice,
-                (SELECT 
-                    SUM(grtd.total) 
-                    FROM good_return_details grtd 
-                    WHERE grtd.good_receipt_detail_id 
-                        IN (
-                            SELECT 
-                                grd.id 
-                                FROM good_receipt_details grd
-                                WHERE grd.good_receipt_id = gr.id 
-                                AND grd.deleted_at IS NULL
-                            )
-                    AND grtd.deleted_at IS NULL 
-                    AND grtd.good_return_id 
-                        IN (
-                            SELECT 
-                                grt.id 
-                                FROM good_returns grt 
-                                WHERE grt.status IN ('2','3') 
-                                AND grt.post_date <= :date3
-                            )
-                ) AS total_return,
-                (SELECT 
-                    j.currency_rate
-                    FROM journals j 
-                    WHERE 
-                        j.lookable_id = gr.id
-                        AND j.lookable_type = 'good_receipts'
+        SELECT 
+            *,
+            u.name AS account_name,
+            (SELECT 
+                SUM(pid.total) - (
+                    SELECT
+                        SUM(jd.nominal)
+                        FROM journal_details jd
+                        JOIN journals j
+                            ON j.id = jd.journal_id
+                        JOIN coas c
+                            ON jd.coa_id = c.id
+                        WHERE c.code = '200.01.03.01.02'
+                        AND j.status IN ('2','3')
                         AND j.deleted_at IS NULL
-                ) AS currency_rate
-                FROM good_receipts gr
-                LEFT JOIN users u
-                    ON u.id = gr.account_id
+                        AND j.post_date <= :date1
+                        AND jd.note = CONCAT('VOID*',pi.code)
+                )
+                FROM purchase_invoice_details pid
+                JOIN purchase_invoices pi
+                    ON pi.id = pid.purchase_invoice_id
+                WHERE pid.lookable_type = 'good_receipt_details' 
+                AND pid.lookable_id 
+                    IN (
+                        SELECT 
+                            grd.id 
+                            FROM good_receipt_details grd
+                            WHERE grd.good_receipt_id = gr.id 
+                            AND grd.deleted_at IS NULL
+                        )
+                AND pid.deleted_at IS NULL 
+                AND pi.status IN ('2','3','7') 
+                AND pi.post_date <= :date2
+            ) AS total_invoice,
+            (SELECT 
+                SUM(grtd.total) 
+                FROM good_return_details grtd 
+                WHERE grtd.good_receipt_detail_id 
+                    IN (
+                        SELECT 
+                            grd.id 
+                            FROM good_receipt_details grd
+                            WHERE grd.good_receipt_id = gr.id 
+                            AND grd.deleted_at IS NULL
+                        )
+                AND grtd.deleted_at IS NULL 
+                AND grtd.good_return_id 
+                    IN (
+                        SELECT 
+                            grt.id 
+                            FROM good_returns grt 
+                            WHERE grt.status IN ('2','3') 
+                            AND grt.post_date <= :date3
+                        )
+            ) AS total_return,
+            (SELECT 
+                j.currency_rate
+                FROM journals j 
                 WHERE 
-                    gr.post_date <= :date4
-                    AND gr.status IN ('2','3')
-                    AND gr.deleted_at IS NULL
+                    j.lookable_id = gr.id
+                    AND j.lookable_type = 'good_receipts'
+                    AND j.deleted_at IS NULL
+            ) AS currency_rate
+            FROM good_receipts gr
+            LEFT JOIN users u
+                ON u.id = gr.account_id
+            WHERE 
+                gr.post_date <= :date4
+                AND gr.status IN ('2','3')
+                AND gr.deleted_at IS NULL;
         ", array(
             'date1'     => $date,
             'date2'     => $date,

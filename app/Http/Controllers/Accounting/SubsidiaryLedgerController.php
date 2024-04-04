@@ -106,7 +106,7 @@ class SubsidiaryLedgerController extends Controller
                 foreach($collect as $key => $detail){
                     $additional_ref = '';
                     if($detail['data']->journal->lookable_type == 'outgoing_payments'){
-                        $additional_ref = ' - '.$detail['data']->journal->lookable->paymentRequest->code;
+                        $additional_ref = ($detail['data']->note ? ' - ' : '').$detail['data']->journal->lookable->paymentRequest->code;
                     }
                     $balance += ($detail['data']->type == '1' ? $detail['data']->nominal : -1 * $detail['data']->nominal);
                     $currencySymbol = $detail['data']->journal->currency()->exists() ? $detail['data']->journal->currency->symbol : '';

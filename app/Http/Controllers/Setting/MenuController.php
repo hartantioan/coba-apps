@@ -63,13 +63,13 @@ class MenuController extends Controller
 
         return view('admin.layouts.index', ['data' => $data]);
 
-        /* $jr = Journal::where('lookable_type','good_returns')->get();
+        /* $jr = Journal::where('lookable_type','good_receipts')->get();
 
         foreach($jr as $row){
-            foreach($row->lookable->goodReturnPODetail as $rowdetail){
+            foreach($row->lookable->goodReceiptDetail as $rowdetail){
                 $row->update([
-                    'currency_id'   => $rowdetail->goodReceiptDetail->purchaseOrderDetail->purchaseOrder->currency_id,
-                    'currency_rate' => $rowdetail->goodReceiptDetail->purchaseOrderDetail->purchaseOrder->currency_rate,
+                    'currency_id'   => $rowdetail->purchaseOrderDetail->purchaseOrder->currency_id,
+                    'currency_rate' => $rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate,
                 ]);
             }
             $row->update([

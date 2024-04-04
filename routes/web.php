@@ -11,6 +11,7 @@ use App\Http\Controllers\HR\EmployeeRewardPunishmentController;
 use App\Http\Controllers\HR\OvertimeRequestController;
 
 use App\Http\Controllers\Accounting\AccountingReportController;
+use App\Http\Controllers\Accounting\AdjustRateController;
 use App\Http\Controllers\Finance\FinanceReportController;
 use App\Http\Controllers\HR\LeaveRequestController;
 use App\Http\Controllers\HR\ShiftRequestController;
@@ -2534,6 +2535,25 @@ Route::prefix('admin')->group(function () {
                     Route::post('void_status', [JournalController::class, 'voidStatus'])->middleware('operation.access:journal,void');
                     Route::post('destroy', [JournalController::class, 'destroy'])->middleware('operation.access:journal,delete');
                     Route::get('export_from_page',[JournalController::class, 'exportFromTransactionPage']);
+                });
+
+                Route::prefix('adjust_rate')->middleware(['operation.access:adjust_rate,view','lockacc'])->group(function () {
+                    Route::post('done',[AdjustRateController::class, 'done'])->middleware('operation.access:adjust_rate,update');
+                    Route::get('/',[AdjustRateController::class, 'index']);
+                    Route::get('datatable',[AdjustRateController::class, 'datatable']);
+                    Route::get('row_detail',[AdjustRateController::class, 'rowDetail']);
+                    Route::post('show', [AdjustRateController::class, 'show']);
+                    Route::post('get_code', [JournalController::class, 'getCode']);
+                    Route::post('print',[AdjustRateController::class, 'print']);
+                    Route::get('export',[AdjustRateController::class, 'export']);
+                    Route::post('print_by_range',[AdjustRateController::class, 'printByRange']);
+                    Route::post('preview', [AdjustRateController::class, 'preview']);
+                    Route::get('view_journal/{id}',[AdjustRateController::class, 'viewJournal'])->middleware('operation.access:adjust_rate,journal');
+                    Route::get('print_individual/{id}',[AdjustRateController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('create',[AdjustRateController::class, 'create'])->middleware('operation.access:adjust_rate,update');
+                    Route::get('approval/{id}',[AdjustRateController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [AdjustRateController::class, 'voidStatus'])->middleware('operation.access:adjust_rate,void');
+                    Route::post('destroy', [AdjustRateController::class, 'destroy'])->middleware('operation.access:adjust_rate,delete');
                 });
 
                 Route::prefix('closing_journal')->middleware(['operation.access:closing_journal,view','lockacc'])->group(function () {

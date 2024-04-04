@@ -96,6 +96,7 @@ class AppServiceProvider extends ServiceProvider
             'overtime_requests'                     => 'App\Models\OvertimeRequest',
             'good_return_issues'                    => 'App\Models\GoodReturnIssue',
             'personal_close_bills'                  => 'App\Models\PersonalCloseBill',
+            'adjust_rates'                          => 'App\Models\AdjustRate',
         ]);
     }
 }

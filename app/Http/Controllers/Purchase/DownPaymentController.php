@@ -90,7 +90,7 @@ class DownPaymentController extends Controller
         $totalbalance = 0;
 
         foreach($data as $row){
-            $balance = $row->grandtotal - $row->total_used - $row->total_memo;
+            $balance = ($row->grandtotal - $row->total_used - $row->total_memo) * $row->currency_rate;
             if($balance > 0){
                 $results[] = [
                     'code'          => $row->code,
@@ -99,11 +99,11 @@ class DownPaymentController extends Controller
                     'post_date'     => date('d/m/Y',strtotime($row->post_date)),
                     'due_date'      => date('d/m/Y',strtotime($row->due_date)),
                     'note'          => $row->note,
-                    'subtotal'      => number_format($row->subtotal,2,',','.'),
-                    'discount'      => number_format($row->discount,2,',','.'),
-                    'total'         => number_format($row->total,2,',','.'),
-                    'used'          => number_format($row->total_used,2,',','.'),
-                    'memo'          => number_format($row->total_memo,2,',','.'),
+                    'subtotal'      => number_format($row->subtotal * $row->currency_rate,2,',','.'),
+                    'discount'      => number_format($row->discount * $row->currency_rate,2,',','.'),
+                    'total'         => number_format($row->total * $row->currency_rate,2,',','.'),
+                    'used'          => number_format($row->total_used * $row->currency_rate,2,',','.'),
+                    'memo'          => number_format($row->total_memo * $row->currency_rate,2,',','.'),
                     'balance'       => number_format($balance,2,',','.'),
                 ];
                 $totalbalance += $balance;

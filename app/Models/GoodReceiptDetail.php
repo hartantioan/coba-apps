@@ -190,6 +190,16 @@ class GoodReceiptDetail extends Model
         return $total;
     }
 
+    public function balanceTotalInvoice(){
+        $total = round($this->total,2);
+
+        foreach($this->purchaseInvoiceDetail as $row){
+            $total -= $row->total;
+        }
+
+        return $total;
+    }
+
     public function totalInvoice(){
         $total = 0;
 

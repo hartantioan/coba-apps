@@ -555,7 +555,7 @@ class PurchaseInvoiceController extends Controller
                     $info .= 'Diterima '.$rowdetail->qty.' '.$rowdetail->itemUnit->unit->code.' dari '.$rowdetail->purchaseOrderDetail->qty.' '.$rowdetail->itemUnit->unit->code;
                 }
                 foreach($datagr->goodReceiptDetail as $rowdetail){
-                    if($rowdetail->balanceInvoice() > 0){
+                    if($rowdetail->balanceTotalInvoice() > 0){
                         $price = round($rowdetail->total / $rowdetail->qty,2);
                         $details[] = [
                             'type'          => 'good_receipt_details',

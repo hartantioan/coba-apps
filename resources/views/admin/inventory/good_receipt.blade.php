@@ -198,7 +198,7 @@
                                 <label class="active" for="post_date">Tgl. Diterima</label>
                             </div>
                             <div class="input-field col m4 s12 step8">
-                                <input id="document_date" name="document_date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. dokumen">
+                                <input id="document_date" name="document_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. dokumen">
                                 <label class="active" for="document_date">Tgl. Dokumen</label>
                             </div>
                             <div class="input-field col m4 s12 step9">
@@ -705,7 +705,6 @@
             onOpenStart: function(modal,trigger) {
                 $('#post_date').attr('min','{{ $minDate }}');
                 $('#post_date').attr('max','{{ $maxDate }}');
-                $('#document_date').attr('min','{{ date("Y-m-d") }}');
             },
             onOpenEnd: function(modal, trigger) {
                 $('#validation_alert').hide();
@@ -1773,7 +1772,6 @@
                 $('#post_date').val(response.post_date);
                 $('#document_date').val(response.document_date);
                 $('#delivery_no').val(response.delivery_no);
-                $('#document_date').removeAttr('min');
                 
                 if(response.details.length > 0){
                     $.each(response.details, function(i, val) {

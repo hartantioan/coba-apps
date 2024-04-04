@@ -51,7 +51,7 @@ class OutStandingAPController extends Controller
             SELECT 
                 *,
                 IFNULL((SELECT 
-                    SUM(nominal) 
+                    SUM(prd.nominal) 
                     FROM payment_request_details prd 
                     JOIN outgoing_payments op
                         ON op.payment_request_id = prd.payment_request_id
@@ -135,7 +135,7 @@ class OutStandingAPController extends Controller
                 *,
                 pi.top AS topdp,
                 IFNULL((SELECT 
-                    SUM(nominal) 
+                    SUM(prd.nominal) 
                     FROM payment_request_details prd 
                     JOIN outgoing_payments op
                         ON op.payment_request_id = prd.payment_request_id

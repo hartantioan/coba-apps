@@ -312,12 +312,12 @@ class ItemController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = Item::find($request->temp);
-                    if($query->hasChildDocument()){
+                    /* if($query->hasChildDocument()){
                         return response()->json([
                             'status'  => 500,
                             'message' => 'Pengeditan item tidak dapat dilakukan. Masih terdapat dokumen yang terkait dengan item tersebut.'
                         ]);
-                    }
+                    } */
                     $query->code                = $request->code;
                     $query->name                = $request->name;
                     $query->other_name          = $request->other_name;

@@ -285,7 +285,7 @@ class AgingAPController extends Controller
                                 'name'          => $rowcolumn['name'],
                                 'start'         => $rowcolumn['start'],
                                 'end'           => $rowcolumn['end'],
-                                'balance'       => $balance,
+                                'balance'       => $balance * $row->currency_rate,
                                 'list_invoice'  => array($row->code),
                             ];
                             $arrColumn[$key]['total'] += $balance * $row->currency_rate;

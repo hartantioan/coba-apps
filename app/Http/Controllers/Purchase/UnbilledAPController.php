@@ -60,12 +60,14 @@ class UnbilledAPController extends Controller
                         NOT IN (
                             SELECT
                                 j.lookable_id
-                                FROM journals j
+                                FROM journal_details jd
+                                JOIN journals j
+                                    ON j.id = jd.journal_id
                                 WHERE j.lookable_type = 'purchase_invoices'
                                 AND j.status IN ('2','3')
                                 AND j.deleted_at IS NULL
                                 AND j.post_date <= :date2
-                                AND j.note = CONCAT('VOID*',pi.code)
+                                AND jd.note = CONCAT('VOID*',pi.code)
                         )
                 ) AS total_invoice,
                 (SELECT 

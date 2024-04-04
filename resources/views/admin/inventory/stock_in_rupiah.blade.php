@@ -231,7 +231,7 @@
                                         <td >`+val.warehouse+`</td>
                                         <td >`+val.kode+`</td>
                                         <td >`+val.item+`</td>
-                                        <td >`+val.satuan+`</td>
+                                        <td class="center-align">`+val.satuan+`</td>
                                         <td class="right-align">`+val.cum_qty+`</td>
                                         <td class="right-align">`+val.cum_val+`</td>
                                     </tr>
@@ -286,7 +286,7 @@
                                             <td >`+val.warehouse+`</td>
                                             <td >`+val.kode+`</td>
                                             <td >`+val.item+`</td>
-                                            <td >`+val.satuan+`</td>
+                                            <td class="center-align">`+val.satuan+`</td>
                                             <td >`+val.document+`</td>
                                             <td class="right-align">`+val.qty+`</td>
                                             <td class="right-align">`+val.final+`</td>

@@ -64,6 +64,7 @@ class UnbilledAPController extends Controller
                                 WHERE j.lookable_type = 'purchase_invoices'
                                 AND j.status IN ('2','3')
                                 AND j.deleted_at IS NULL
+                                AND j.post_date <= :date2
                                 AND j.note = CONCAT('VOID*',pi.code)
                         )
                 ) AS total_invoice,
@@ -85,7 +86,7 @@ class UnbilledAPController extends Controller
                                 grt.id 
                                 FROM good_returns grt 
                                 WHERE grt.status IN ('2','3') 
-                                AND grt.post_date <= :date2
+                                AND grt.post_date <= :date3
                             )
                 ) AS total_return,
                 (SELECT 
@@ -100,13 +101,14 @@ class UnbilledAPController extends Controller
                 LEFT JOIN users u
                     ON u.id = gr.account_id
                 WHERE 
-                    gr.post_date <= :date3
+                    gr.post_date <= :date4
                     AND gr.status IN ('2','3')
                     AND gr.deleted_at IS NULL
         ", array(
             'date1'     => $date,
             'date2'     => $date,
             'date3'     => $date,
+            'date4'     => $date,
         ));
 
         $totalUnbilled = 0;

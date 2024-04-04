@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Purchase;
 
 use App\Exports\ExportUnbilledAP;
 use App\Http\Controllers\Controller;
+use App\Models\JournalDetail;
 use App\Models\Menu;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
@@ -37,7 +38,7 @@ class UnbilledAPController extends Controller
 
         $results = DB::select("
         SELECT 
-            grd.*,
+            gr.*,
             u.name AS account_name,
             (SELECT 
                 SUM(pid.total)
@@ -45,7 +46,14 @@ class UnbilledAPController extends Controller
                 JOIN purchase_invoices pi
                     ON pi.id = pid.purchase_invoice_id
                 WHERE pid.lookable_type = 'good_receipt_details' 
-                AND pid.lookable_id = grd.id
+                AND pid.lookable_id 
+                    IN (
+                        SELECT 
+                            grd.id 
+                            FROM good_receipt_details grd
+                            WHERE grd.good_receipt_id = gr.id 
+                            AND grd.deleted_at IS NULL
+                        )
                 AND pid.deleted_at IS NULL 
                 AND pi.status IN ('2','3','7') 
                 AND pi.post_date <= :date1
@@ -57,7 +65,14 @@ class UnbilledAPController extends Controller
                     JOIN purchase_invoices pi
                         ON pi.id = pid.purchase_invoice_id
                     WHERE pid.lookable_type = 'good_receipt_details' 
-                    AND pid.lookable_id = grd.id
+                    AND pid.lookable_id 
+                        IN (
+                            SELECT 
+                                grd.id 
+                                FROM good_receipt_details grd
+                                WHERE grd.good_receipt_id = gr.id 
+                                AND grd.deleted_at IS NULL
+                            )
                     AND pid.deleted_at IS NULL 
                     AND pi.status IN ('2','3','7') 
                     AND pi.post_date <= :date2
@@ -65,7 +80,14 @@ class UnbilledAPController extends Controller
             IFNULL((SELECT 
                 SUM(grtd.total) 
                 FROM good_return_details grtd 
-                WHERE grtd.good_receipt_detail_id = grd.id
+                WHERE grtd.good_receipt_detail_id 
+                    IN (
+                        SELECT 
+                            grd.id 
+                            FROM good_receipt_details grd
+                            WHERE grd.good_receipt_id = gr.id 
+                            AND grd.deleted_at IS NULL
+                        )
                 AND grtd.deleted_at IS NULL 
                 AND grtd.good_return_id 
                     IN (
@@ -83,16 +105,10 @@ class UnbilledAPController extends Controller
                     j.lookable_id = gr.id
                     AND j.lookable_type = 'good_receipts'
                     AND j.deleted_at IS NULL
-            ) AS currency_rate,
-            CONCAT(i.code,' - ',i.name,' - ',gr.code) AS code,
-            u.name AS account_name
-            FROM good_receipt_details grd
-            LEFT JOIN good_receipts gr
-                ON gr.id = grd.good_receipt_id
+            ) AS currency_rate
+            FROM good_receipts gr
             LEFT JOIN users u
                 ON u.id = gr.account_id
-            LEFT JOIN items i
-                ON i.id = grd.item_id
             WHERE 
                 gr.post_date <= :date4
                 AND gr.status IN ('2','3')
@@ -107,7 +123,19 @@ class UnbilledAPController extends Controller
         $totalUnbilled = 0;
 
         foreach($results as $key => $row){
-            $balance = $row->total - $row->total_invoice - $row->total_return;
+            $invoices = explode(',',$row->data_reconcile);
+            $total_reconcile = 0;
+            if(count($invoices) > 0){
+                foreach($invoices as $rowinvoice){
+                    $total_reconcile += JournalDetail::where('note','VOID*'.$rowinvoice)
+                    ->whereHas('coa',function($query){
+                        $query->where('code','200.01.03.01.02');
+                    })->whereHas('journal',function($query)use($date){
+                        $query->where('post_date','<=',$date)->whereIn('status',['2','3']);
+                    })->sum('nominal_fc');
+                }
+            }
+            $balance = $row->total - ($row->total_invoice - $total_reconcile) - $row->total_return;
             if($balance > 0){
                 $array_filter[] = [
                     'no'            => ($key + 1),
@@ -117,7 +145,7 @@ class UnbilledAPController extends Controller
                     'delivery_no'   => $row->delivery_no,
                     'note'          => $row->note,
                     'total_received'=> number_format($row->total * $row->currency_rate,2,',','.'),
-                    'total_invoice' => number_format($row->total_invoice * $row->currency_rate,2,',','.'),
+                    'total_invoice' => number_format(($row->total_invoice - $total_reconcile) * $row->currency_rate,2,',','.'),
                     'total_balance' => number_format($balance * $row->currency_rate,2,',','.'),
                 ];
                 $totalUnbilled += $balance * $row->currency_rate;

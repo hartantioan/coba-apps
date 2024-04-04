@@ -24,6 +24,8 @@ use App\Models\Currency;
 use App\Models\GoodReceipt;
 use App\Models\LockPeriod;
 use App\Models\Menu;
+use App\Models\PurchaseDownPayment;
+
 class AdjustRateController extends Controller
 {
     protected $dataplaces, $dataplacecode;
@@ -183,27 +185,51 @@ class AdjustRateController extends Controller
         $cek = AdjustRate::where('company_id',$request->company_id)->where('post_date',$request->post_date)->whereIn('status',['1','2','3'])->first();
 
         if(!$cek){
-            $data = GoodReceipt::whereDoesntHave('used')->whereIn('status',['2','3'])->where('post_date','<=',$request->post_date)->whereHas('journal',function($query)use($request){
+            $datagr = GoodReceipt::whereDoesntHave('used')->whereIn('status',['2','3'])->where('post_date','<=',$request->post_date)->whereHas('journal',function($query)use($request){
+                $query->where('currency_id',$request->currency_id);
+            })->get();
+
+            $dataapdp = PurchaseDownPayment::whereDoesntHave('used')->whereIn('status',['2','3','7'])->where('post_date','<=',$request->post_date)->whereHas('journal',function($query)use($request){
                 $query->where('currency_id',$request->currency_id);
             })->get();
 
             $result = [];
 
             $coahutangusahabelumditagih = Coa::where('code','200.01.03.01.02')->where('company_id',$request->company_id)->first();
+            $coahutangusaha = Coa::where('code','200.01.03.01.01')->where('company_id',$request->company_id)->first();
 
-            foreach($data as $row){
+            foreach($datagr as $row){
                 $latest_rate = $row->latestCurrencyRateByDate($request->post_date);
-                $total = $row->hasBalanceTotalByDate($request->post_date);
-                $result[] = [
-                    'coa_id'        => $coahutangusahabelumditagih->id,
-                    'lookable_type' => $row->getTable(),
-                    'lookable_id'   => $row->id,
-                    'code'          => $row->code,
-                    'type'          => 'GRPO',
-                    'nominal_fc'    => number_format($total,2,',','.'),
-                    'latest_rate'   => number_format($latest_rate,2,',','.'),
-                    'nominal_rp'    => number_format($latest_rate * $total,5,',','.'),
-                ];
+                $total = $row->balanceTotalByDate($request->post_date);
+                if($total > 0){
+                    $result[] = [
+                        'coa_id'        => $coahutangusahabelumditagih->id,
+                        'lookable_type' => $row->getTable(),
+                        'lookable_id'   => $row->id,
+                        'code'          => $row->code,
+                        'type'          => 'GRPO',
+                        'nominal_fc'    => number_format($total,2,',','.'),
+                        'latest_rate'   => number_format($latest_rate,2,',','.'),
+                        'nominal_rp'    => number_format($latest_rate * $total,5,',','.'),
+                    ];
+                }
+            }
+
+            foreach($dataapdp as $row){
+                $latest_rate = $row->latestCurrencyRateByDate($request->post_date);
+                $total = $row->balancePaymentRequestByDate($request->post_date);
+                if($total > 0){
+                    $result[] = [
+                        'coa_id'        => $coahutangusaha->id,
+                        'lookable_type' => $row->getTable(),
+                        'lookable_id'   => $row->id,
+                        'code'          => $row->code,
+                        'type'          => 'APDP',
+                        'nominal_fc'    => number_format($total,2,',','.'),
+                        'latest_rate'   => number_format($latest_rate,2,',','.'),
+                        'nominal_rp'    => number_format($latest_rate * $total,2,',','.'),
+                    ];
+                }
             }
 
             $response = [

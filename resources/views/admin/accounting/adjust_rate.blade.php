@@ -184,7 +184,7 @@
                             <label class="" for="currency_id">Mata Uang</label>
                         </div>
                         <div class="input-field col s3">
-                            <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this);">
+                            <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this);countAll();">
                             <label class="active" for="currency_rate">Konversi</label>
                         </div>
                         <div class="input-field col s3 step8">
@@ -665,6 +665,7 @@
                                     <th class="right-align" id="total_balance">0,00</th>
                                 </tr>
                             `);
+                            countAll();
                         }else{
                             resetDetailForm();
                         }
@@ -700,10 +701,10 @@
     }
 
     function countAll(){
-        let currency_rate = parseFloat($('#currency_rate').val().replaceAll(".", "").replaceAll(",","."));
+        let currency_rate = parseFloat($('#currency_rate').val().replaceAll(".", "").replaceAll(",",".")), grandtotal = 0;
         $('input[name^="arr_nominal_fc[]"]').each(function(index){
             let rowfc = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-            let rowrp = parseFloat($('input[name^="arr_nominal_fc[]"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+            let rowrp = parseFloat($('input[name^="arr_nominal_rp[]"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
             let rownew = rowfc * currency_rate;
             let rowbalance = rowrp - rownew;
             $('input[name^="arr_nominal_new[]"]').eq(index).val(
@@ -712,7 +713,11 @@
             $('input[name^="arr_balance[]"]').eq(index).val(
                 (rowbalance >= 0 ? '' : '-') + formatRupiahIni(rowbalance.toFixed(2).toString().replace('.',','))
             );
+            grandtotal += rowbalance;
         });
+        $('#total_balance').text(
+            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
+        );
     }
 
     function rowDetail(data) {

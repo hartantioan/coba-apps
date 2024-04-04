@@ -257,7 +257,7 @@ class GoodReceipt extends Model
         }
     }
 
-    public function hasBalanceTotalByDate($date){
+    public function balanceTotalByDate($date){
         $total = $this->total;
 
         foreach($this->goodReceiptDetail()->whereHas('purchaseInvoiceDetail',function($query)use($date){
@@ -270,11 +270,7 @@ class GoodReceipt extends Model
             }
         }
 
-        if($total > 0){
-            return true;
-        }else{
-            return false;
-        }
+        return $total;
     }
 
     public function balanceQtyInvoice(){

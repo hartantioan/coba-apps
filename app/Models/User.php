@@ -306,7 +306,7 @@ class User extends Authenticatable
     }
 
     public function fundRequest(){
-        return $this->hasMany('App\Models\FundRequest','account_id','id')->whereIn('status',['2','3']);
+        return $this->hasMany('App\Models\FundRequest','account_id','id')->whereIn('status',['2','3','7']);
     }
 
     public function purchaseOrder(){
@@ -318,11 +318,11 @@ class User extends Authenticatable
     }
 
     public function purchaseDownPayment(){
-        return $this->hasMany('App\Models\PurchaseDownPayment','account_id','id')->whereIn('status',['2','3']);
+        return $this->hasMany('App\Models\PurchaseDownPayment','account_id','id')->whereIn('status',['2','3','7']);
     }
 
     public function purchaseInvoice(){
-        return $this->hasMany('App\Models\PurchaseInvoice','account_id','id')->whereIn('status',['2','3']);
+        return $this->hasMany('App\Models\PurchaseInvoice','account_id','id')->whereIn('status',['2','3','7']);
     }
 
     public function marketingOrderDownPayment(){

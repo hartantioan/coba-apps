@@ -18,6 +18,7 @@ class AdjustRateDetail extends Model
         'adjust_rate_id',
         'lookable_type',
         'lookable_id',
+        'coa_id',
         'nominal_fc',
         'nominal_rate',
         'nominal_rp',
@@ -29,6 +30,11 @@ class AdjustRateDetail extends Model
     public function adjustRate()
     {
         return $this->belongsTo('App\Models\AdjustRate', 'adjust_rate_id', 'id')->withTrashed();
+    }
+
+    public function coa()
+    {
+        return $this->belongsTo('App\Models\Coa', 'coa_id', 'id')->withTrashed();
     }
     
     public function lookable(){

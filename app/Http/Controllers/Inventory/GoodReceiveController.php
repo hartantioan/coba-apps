@@ -725,14 +725,32 @@ class GoodReceiveController extends Controller
         $query = GoodReceive::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
-
+            
             if(!CustomHelper::checkLockAcc($query->post_date)){
                 return response()->json([
                     'status'  => 500,
                     'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
                 ]);
             }
-
+            $array_minus_stock=[];
+          
+            foreach($query->goodReceiveDetail as $row_good_receive_detail){
+                $item_real_stock = $row_good_receive_detail->item->getStockPlaceWarehouse($row_good_receive_detail->place_id,$row_good_receive_detail->warehouse_id);
+                $item_stock_detail = $row_good_receive_detail->qty;
+                if($item_real_stock-$item_stock_detail < -1){
+                    $array_minus_stock[]=$row_good_receive_detail->item->name;
+                }
+            }
+            if(count($array_minus_stock) > 0){
+                $arrError = [];
+                foreach($array_minus_stock as $row){
+                    $arrError[] = $row;
+                }
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Mohon maaf Good Recive tidak dapat di void karena item stock saat ini kurang dari 0. Daftar Item : '.implode(', ',$arrError),
+                ]);
+            }
             if(in_array($query->status,['4','5'])){
                 $response = [
                     'status'  => 500,

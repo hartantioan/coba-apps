@@ -1546,7 +1546,12 @@
 	}
 
     function addBank(){
-        var count = $('select[name^="arr_bank"]').length;
+        var count = $('input[name^="arr_bank"]').length;
+        var checked = '';
+       
+        if(count < 1){
+            checked = 'checked';
+        }
         $('#last-row-bank').before(`
             <tr class="row_bank">
                 <input type="hidden" name="arr_id_bank[]" value="">
@@ -1564,7 +1569,7 @@
                 </td>
                 <td class="center">
                     <label>
-                        <input class="with-gap" name="check" type="radio" value="` + count + `">
+                        <input class="with-gap" name="check" type="radio" value="` + count + `" `+checked+`>
                         <span>Pilih</span>
                     </label>
                 </td>

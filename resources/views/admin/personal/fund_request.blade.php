@@ -54,9 +54,9 @@
                         <div class="col s12">
                             <div class="card-panel">
                                 <div class="row">
-                                    <div class="col s12 ">
+                                    <div class="col m4 s6">
                                         <label for="filter_status" style="font-size:1.2rem;">Filter Status :</label>
-                                        <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;">
+                                        <div class="input-field" >
                                             <select class="form-control" id="filter_status" onchange="loadDataTable()" multiple>
                                                 <option value="1">Menunggu</option>
                                                 <option value="2">Dalam Proses</option>
@@ -65,6 +65,16 @@
                                                 <option value="4">Ditolak</option>
                                                 <option value="5">Ditutup</option>
                                                 <option value="6">Direvisi</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col m4 s6 ">
+                                        <label for="filter_status_dokumen" style="font-size:1rem;">Status Dokumen :</label>
+                                        <div class="input-field">
+                                            <select class="form-control" id="filter_status_dokumen" onchange="loadDataTable()">
+                                                <option value=""></option>
+                                                <option value="1">Selesai</option>
+                                                <option value="2">Pending</option>
                                             </select>
                                         </div>
                                     </div>
@@ -848,6 +858,7 @@
                 url: '{{ Request::url() }}/datatable',
                 type: 'GET',
                 data: {
+                    'status_document' : $('#filter_status_dokumen').val(),
                     'status[]' : $('#filter_status').val(),
                 },
                 beforeSend: function() {

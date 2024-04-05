@@ -12,15 +12,16 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
 class ExportDownPaymentTransactionPage implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell, ShouldAutoSize
 {
-    protected $status, $type_buy,$type_deliv, $company, $type_pay,$supplier, $currency, $end_date, $start_date , $search , $modedata;
+    protected $status, $type_buy,$type_deliv, $company, $type_pay,$supplier, $currency, $end_date, $start_date , $search , $modedata,$status_dokumen;
 
 
-    public function __construct(string $search,string $status, string $company, string $type_pay,string $supplier, string $currency, string $end_date, string $start_date,  string $modedata )
+    public function __construct(string $search,string $status, string $company, string $type_pay,string $supplier, string $currency, string $end_date, string $start_date,  string $modedata, string $status_dokumen )
     {
         $this->search = $search ? $search : '';
         $this->start_date = $start_date ? $start_date : '';
 		$this->end_date = $end_date ? $end_date : '';
         $this->status = $status ? $status : '';
+        $this->status_dokumen = $status_dokumen? $status_dokumen : '';
         $this->company = $company ? $company : '';
         $this->type_pay = $type_pay ? $type_pay : '';
         $this->supplier = $supplier ? $supplier : '';
@@ -99,6 +100,10 @@ class ExportDownPaymentTransactionPage implements FromCollection, WithTitle, Wit
             if($this->currency){
                 $groupIds = explode(',', $this->currency);
                 $query->whereIn('currency_id',$groupIds);
+            }
+
+            if($this->status_dokumen == 1 && $this->status_dokumen){
+                $query->where('balance_status',$this->status_dokumen);
             }
     
             if(!$this->modedata){

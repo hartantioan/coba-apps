@@ -95,6 +95,16 @@
                                                     <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
+                                            <div class="col m3 s6 ">
+                                                <label for="filter_status_dokumen" style="font-size:1rem;">Status Dokumen :</label>
+                                                <div class="input-field">
+                                                    <select class="form-control" id="filter_status_dokumen" onchange="loadDataTable()">
+                                                        <option value=""></option>
+                                                        <option value="1">Selesai</option>
+                                                        <option value="2">Pending</option>
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </li>
@@ -480,6 +490,7 @@
                 type: 'POST',
                 dataType: 'JSON',
                 data: {
+                    'status_document' : $('#filter_status_dokumen').val(),
                     'status[]' : $('#filter_status').val(),
                     document : $('#filter_document').val(),
                     start_date : $('#start_date').val(),

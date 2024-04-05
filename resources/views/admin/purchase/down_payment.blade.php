@@ -149,6 +149,16 @@
                                                     </select>
                                                 </div>
                                             </div>
+                                            <div class="col m4 s6 ">
+                                                <label for="filter_status_dokumen" style="font-size:1rem;">Status Dokumen :</label>
+                                                <div class="input-field">
+                                                    <select class="form-control" id="filter_status_dokumen" onchange="loadDataTable()">
+                                                        <option value=""></option>
+                                                        <option value="1">Selesai</option>
+                                                        <option value="2">Pending</option>
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>  
                                     </div>
                                 </li>
@@ -1720,6 +1730,7 @@
                 type: 'GET',
                 data: {
                     'status' : $('#filter_status').val(),
+                    'status_document' : $('#filter_status_dokumen').val(),
                     type : $('#filter_type').val(),
                     'supplier_id[]' : $('#filter_supplier').val(),
                     company_id : $('#filter_company').val(),

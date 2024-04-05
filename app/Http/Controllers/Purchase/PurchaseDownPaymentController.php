@@ -341,6 +341,10 @@ class PurchaseDownPaymentController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
 
+                if($request->status_document == 1 &&$request->status_document){
+                    $query->where('balance_status',$request->status_document);
+                }
+
                 if(!$request->modedata){
                     
                     /*if(session('bo_position_id') == ''){
@@ -424,6 +428,10 @@ class PurchaseDownPaymentController extends Controller
                 
                 if($request->currency_id){
                     $query->whereIn('currency_id',$request->currency_id);
+                }
+
+                if($request->status_document == 1 &&$request->status_document){
+                    $query->where('balance_status',$request->status_document);
                 }
 
                 if(!$request->modedata){
@@ -3450,7 +3458,8 @@ class PurchaseDownPaymentController extends Controller
     }
     public function exportFromTransactionPage(Request $request){
         $search= $request->search? $request->search : '';
-        $status = $request->status? $request->status : '';;
+        $status = $request->status? $request->status : '';
+        $status_dokumen = $request->status_dokumen? $request->status_dokumen : '';
         $company = $request->company ? $request->company : '';
         $type_pay = $request->type_pay ? $request->type_pay : '';
         $supplier = $request->supplier? $request->supplier : '';
@@ -3459,6 +3468,6 @@ class PurchaseDownPaymentController extends Controller
         $start_date = $request->start_date? $request->start_date : '';
 		$modedata = $request->modedata? $request->modedata : '';
       
-		return Excel::download(new ExportDownPaymentTransactionPage($search,$status,$company,$type_pay,$supplier,$currency,$end_date,$start_date,$modedata), 'purchase_down_payment'.uniqid().'.xlsx');
+		return Excel::download(new ExportDownPaymentTransactionPage($search,$status,$company,$type_pay,$supplier,$currency,$end_date,$start_date,$modedata,$status_dokumen), 'purchase_down_payment'.uniqid().'.xlsx');
     }
 }

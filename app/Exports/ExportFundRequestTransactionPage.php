@@ -13,13 +13,14 @@ use App\Helpers\CustomHelper;
 
 class ExportFundRequestTransactionPage implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell,ShouldAutoSize
 {
-    protected $search,$document,$start_date, $end_date, $status, $modedata;
-    public function __construct(string $search,string $document,string $start_date, string $end_date,string $status, string $modedata)
+    protected $search,$document,$start_date, $end_date, $status, $modedata, $status_dokumen;
+    public function __construct(string $search,string $document,string $start_date, string $end_date,string $status, string $modedata , string  $status_dokumen)
     {
         $this->search = $search ? $search : '';
         $this->start_date = $start_date ? $start_date : '';
 		$this->end_date = $end_date ? $end_date : '';
         $this->status   = $status ? $status : '';
+        $this->status_dokumen = $status_dokumen? $status_dokumen : '';
         $this->modedata = $modedata ? $modedata : '';
         $this->document = $document ? $document : '';
     }
@@ -90,6 +91,10 @@ class ExportFundRequestTransactionPage implements FromCollection, WithTitle, Wit
             if($this->status){
                 $groupIds = explode(',', $this->status);
                 $query->whereIn('status', $groupIds);
+            }
+
+            if($this->status_dokumen == 1 && $this->status_dokumen){
+                $query->where('balance_status',$this->status_dokumen);
             }
 
             if(!$this->modedata){

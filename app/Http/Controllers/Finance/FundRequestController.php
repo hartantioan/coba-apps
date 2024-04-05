@@ -160,7 +160,9 @@ class FundRequestController extends Controller
                 if($request->document){
                     $query->where('document_status', $request->document);
                 }
-
+                if($request->status_document == 1 &&$request->status_document){
+                    $query->where('balance_status',$request->status_document);
+                }
                 if(!$request->modedata){
                     $query->where('user_id',session('bo_id'));
                 }
@@ -200,7 +202,9 @@ class FundRequestController extends Controller
                 if($request->document){
                     $query->where('document_status', $request->document);
                 }
-
+                if($request->status_document == 1 &&$request->status_document){
+                    $query->where('balance_status',$request->status_document);
+                }
                 if(!$request->modedata){
                     $query->where('user_id',session('bo_id'));
                 }
@@ -922,10 +926,13 @@ class FundRequestController extends Controller
                             });
                     });
                 }
-
+                if($request->status_document == 1 &&$request->status_document){
+                    $query->where('balance_status',$request->status_document);
+                }
                 if($request->status){
                     $query->whereIn('status', $request->status);
                 }
+                
             })
             ->where('user_id',session('bo_id'))
             ->offset($start)
@@ -946,7 +953,9 @@ class FundRequestController extends Controller
                             });
                     });
                 }
-
+                if($request->status_document == 1 &&$request->status_document){
+                    $query->where('balance_status',$request->status_document);
+                }
                 if($request->status){
                     $query->whereIn('status', $request->status);
                 }
@@ -3537,8 +3546,9 @@ class FundRequestController extends Controller
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $status = $request->status ? $request->status : '';
+        $status_dokumen = $request->status_dokumen? $request->status_dokumen : '';
         $document = $request->document ? $request->document : '';
 		$modedata = $request->modedata ? $request->modedata : '';
-		return Excel::download(new ExportFundRequestTransactionPage($search,$document,$post_date,$end_date,$status,$modedata), 'purchase_request_'.uniqid().'.xlsx');
+		return Excel::download(new ExportFundRequestTransactionPage($search,$document,$post_date,$end_date,$status,$modedata,$status_dokumen), 'fund_request_'.uniqid().'.xlsx');
     }
 }

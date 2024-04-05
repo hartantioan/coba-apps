@@ -1036,10 +1036,10 @@ class PurchaseOrderController extends Controller
             $voidUser = $data->voidUser ? $data->voidUser->employee_no . '-' . $data->voidUser->name : 'Sistem';
             $x .= '<span style="color: red;">|| Tanggal Void: ' . $data->void_date .  ' || Void User: ' . $voidUser.' || Note:' . $data->void_note.'</span>' ;
         }
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.$x.'</div><div class="col s12"><table style="min-width:100%;">
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.$x.'</div><div class="col s12" style="overflow:auto;"><table style="min-width:2500px;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="19">Daftar Item</th>
+                                <th class="center-align" colspan="22">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -1052,6 +1052,9 @@ class PurchaseOrderController extends Controller
                                 <th class="center-align">Discount 2 (%)</th>
                                 <th class="center-align">Discount 3 (Rp)</th>
                                 <th class="center-align">Subtotal</th>
+                                <th class="center-align">PPN</th>
+                                <th class="center-align">PPh</th>
+                                <th class="center-align">Grandtotal</th>
                                 <th class="center-align">Keterangan 1</th>
                                 <th class="center-align">Keterangan 2</th>
                                 <th class="center-align">Plant</th>
@@ -1070,12 +1073,18 @@ class PurchaseOrderController extends Controller
         $totaldiskon2=0;
         $totaldiskon3=0;
         $totalsubtotal=0;
+        $totaltax=0;
+        $totalwtax=0;
+        $totalgrandtotal=0;
         foreach($data->purchaseOrderDetail as $key => $row){
             $totalqty+=$row->qty;
             $totaldiskon1+=$row->percent_discount_1;
             $totaldiskon1+=$row->percent_discount_2;
             $totaldiskon3+=$row->discount_3;
             $totalsubtotal+=$row->subtotal;
+            $totaltax+=$row->tax;
+            $totalwtax+=$row->wtax;
+            $totalgrandtotal+=$row->grandtotal;
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.($row->item_id ? $row->item->code.' - '.$row->item->name : $row->coa->name).'</td>
@@ -1087,6 +1096,9 @@ class PurchaseOrderController extends Controller
                 <td class="center-align">'.number_format($row->percent_discount_2,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->discount_3,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->subtotal,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->wtax,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->grandtotal,2,',','.').'</td>
                 <td class="">'.$row->note.'</td>
                 <td class="">'.$row->note2.'</td>
                 <td class="center-align">'.$row->place->code.'</td>
@@ -1107,6 +1119,9 @@ class PurchaseOrderController extends Controller
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totaldiskon2, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totaldiskon3, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalsubtotal, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totaltax, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalwtax, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalgrandtotal, 2, ',', '.') . '</td>
             </tr>  
         ';
         $string .= '</tbody></table></div>';

@@ -555,27 +555,39 @@ class Item extends Model
     }
 
     public function activeMaterialRequestDetail(){
-        return $this->hasMany('App\Models\MaterialRequestDetail','item_id','id');
+        return $this->hasMany('App\Models\MaterialRequestDetail','item_id','id')->whereHas('materialRequest',function($query){
+            $query->whereIn('status',['1','2','3']);
+        });
     }
 
     public function activePurchaseRequestDetail(){
-        return $this->hasMany('App\Models\PurchaseRequestDetail','item_id','id');
+        return $this->hasMany('App\Models\PurchaseRequestDetail','item_id','id')->whereHas('purchaseRequest',function($query){
+            $query->whereIn('status',['1','2','3']);
+        });
     }
 
     public function activePurchaseOrderDetail(){
-        return $this->hasMany('App\Models\PurchaseOrderDetail','item_id','id');
+        return $this->hasMany('App\Models\PurchaseOrderDetail','item_id','id')->whereHas('purchaseOrder',function($query){
+            $query->whereIn('status',['1','2','3']);
+        });
     }
 
     public function activeGoodReceiptDetail(){
-        return $this->hasMany('App\Models\GoodReceiptDetail','item_id','id');
+        return $this->hasMany('App\Models\GoodReceiptDetail','item_id','id')->whereHas('goodReceipt',function($query){
+            $query->whereIn('status',['1','2','3']);
+        });
     }
 
     public function activeGoodIssueRequestDetail(){
-        return $this->hasMany('App\Models\GoodIssueRequestDetail','item_id','id');
+        return $this->hasMany('App\Models\GoodIssueRequestDetail','item_id','id')->whereHas('goodIssueRequest',function($query){
+            $query->whereIn('status',['1','2','3']);
+        });
     }
 
     public function activeLandedCostDetail(){
-        return $this->hasMany('App\Models\LandedCostDetail','item_id','id');
+        return $this->hasMany('App\Models\LandedCostDetail','item_id','id')->whereHas('landedCost',function($query){
+            $query->whereIn('status',['1','2','3']);
+        });
     }
 
     public function hasChildDocument(){

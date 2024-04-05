@@ -3,6 +3,7 @@
 namespace App\Helpers;
 use App\Jobs\ResetCogs;
 use App\Jobs\ResetStock;
+use App\Models\AdjustRate;
 use App\Models\ApprovalMatrix;
 use App\Models\LockPeriod;
 use App\Models\ApprovalStage;
@@ -4099,6 +4100,67 @@ class CustomHelper {
 					]);
 				}
 			}
+		}elseif($table_name == 'adjust_rates'){
+			$ar = AdjustRate::find($table_id);
+
+			if($ar){
+				$query = Journal::create([
+					'user_id'		=> session('bo_id'),
+					'company_id'	=> $ar->company_id,
+					'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+					'post_date'		=> $data->post_date,
+					'note'			=> $ar->note,
+					'currency_id'	=> $ar->currency_id,
+					'currency_rate'	=> $ar->currency_rate,
+					'status'		=> '3'
+				]);
+				
+				$coaselisihkurs = Coa::where('code','700.01.01.01.03')->where('company_id',$ar->company_id)->first();
+
+				foreach($ar->adjustRateDetail as $row){
+					$nominal = abs($row->nominal);
+					if($row->type == '1'){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->coa_id,
+							'type'			=> $row->nominal > 0 ? '2' : '1',
+							'account_id'	=> $row->coa->bp_journal ? ($row->lookable->account_id ?? NULL) : NULL,
+							'nominal'		=> $nominal,
+							'nominal_fc'	=> 0,
+						]);
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $coaselisihkurs->id,
+							'type'			=> $row->nominal > 0 ? '1' : '2',
+							'nominal'		=> $nominal,
+							'nominal_fc'	=> 0,
+						]);
+					}
+					if($row->type == '2'){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->coa_id,
+							'type'			=> $row->nominal > 0 ? '1' : '2',
+							'account_id'	=> $row->coa->bp_journal ? ($row->lookable->account_id ?? NULL) : NULL,
+							'nominal'		=> $nominal,
+							'nominal_fc'	=> 0,
+						]);
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $coaselisihkurs->id,
+							'type'			=> $row->nominal > 0 ? '2' : '1',
+							'nominal'		=> $nominal,
+							'nominal_fc'	=> 0,
+						]);
+					}
+				}
+			}
+
+			$ar->update([
+				'status'	=> '3'
+			]);
 		}elseif($table_name == 'closing_journals'){
 			$cj = ClosingJournal::find($table_id);
 

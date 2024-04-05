@@ -377,26 +377,27 @@
         <div class="row mt-2">
             <table class="bordered Highlight striped" style="zoom:0.7;">
                 <thead>
-                        <tr>
-                            <th class="center-align" rowspan="2">No</th>
-                            <th class="center-align" rowspan="2">Coa</th>
-                            <th class="center-align" rowspan="2">Partner Bisnis</th>
-                            <th class="center-align" rowspan="2">Plant</th>
-                            <th class="center-align" rowspan="2">Line</th>
-                            <th class="center-align" rowspan="2">Mesin</th>
-                            <th class="center-align" rowspan="2">Divisi</th>
-                            <th class="center-align" rowspan="2">Proyek</th>
-                            <th class="center-align" rowspan="2">Ket.1</th>
-                            <th class="center-align" rowspan="2">Ket.2</th>
-                            <th class="center-align" colspan="2">Mata Uang Asli</th>
-                            <th class="center-align" colspan="2">Mata Uang Konversi</th>
-                        </tr>
-                        <tr>
-                            <th class="center-align">Debit</th>
-                            <th class="center-align">Kredit</th>
-                            <th class="center-align">Debit</th>
-                            <th class="center-align">Kredit</th>
-                        </tr>
+                    <tr>
+                        <th class="center-align" rowspan="2">No</th>
+                        <th class="center-align" rowspan="2">Coa</th>
+                        <th class="center-align" rowspan="2">Partner Bisnis</th>
+                        <th class="center-align" rowspan="2">Plant</th>
+                        <th class="center-align" rowspan="2">Line</th>
+                        <th class="center-align" rowspan="2">Mesin</th>
+                        <th class="center-align" rowspan="2">Divisi</th>
+                        <th class="center-align" rowspan="2">Gudang</th>
+                        <th class="center-align" rowspan="2">Proyek</th>
+                        <th class="center-align" rowspan="2">Ket.1</th>
+                        <th class="center-align" rowspan="2">Ket.2</th>
+                        <th class="center-align" colspan="2">Mata Uang Asli</th>
+                        <th class="center-align" colspan="2">Mata Uang Konversi</th>
+                    </tr>
+                    <tr>
+                        <th class="center-align">Debit</th>
+                        <th class="center-align">Kredit</th>
+                        <th class="center-align">Debit</th>
+                        <th class="center-align">Kredit</th>
+                    </tr>
                     
                 </thead>
                 <tbody id="body-journal-table">
@@ -640,7 +641,7 @@
                                             ` + val.code + `
                                         </td>
                                         <td>
-                                            ` + val.type + `
+                                            ` + val.type_document + `
                                         </td>
                                         <td>
                                             <input name="arr_nominal_fc[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal_fc + `" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_fc`+ count +`" readonly>

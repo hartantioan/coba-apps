@@ -438,6 +438,7 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
+                $('#asset_group_id').val($('#asset_group_id option:eq(0)').val()).trigger('change');
                 M.updateTextFields();
             }
         });

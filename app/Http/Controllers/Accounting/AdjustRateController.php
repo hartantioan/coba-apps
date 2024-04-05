@@ -208,7 +208,7 @@ class AdjustRateController extends Controller
                         'lookable_type' => $row->getTable(),
                         'lookable_id'   => $row->id,
                         'code'          => $row->code,
-                        'type'          => 'GRPO',
+                        'type_document' => 'GRPO',
                         'nominal_fc'    => number_format($total,2,',','.'),
                         'latest_rate'   => number_format($latest_rate,2,',','.'),
                         'nominal_rp'    => number_format($latest_rate * $total,5,',','.'),
@@ -226,7 +226,7 @@ class AdjustRateController extends Controller
                         'lookable_type' => $row->getTable(),
                         'lookable_id'   => $row->id,
                         'code'          => $row->code,
-                        'type'          => 'APDP',
+                        'type_document' => 'APDP',
                         'nominal_fc'    => number_format($total,2,',','.'),
                         'latest_rate'   => number_format($latest_rate,2,',','.'),
                         'nominal_rp'    => number_format($latest_rate * $total,2,',','.'),
@@ -263,8 +263,8 @@ class AdjustRateController extends Controller
 
     public function create(Request $request){
 
-        DB::beginTransaction();
-        try {
+        /* DB::beginTransaction();
+        try { */
             $validation = Validator::make($request->all(), [
                 'code'                      => 'required',
                 'code_place_id'             => 'required',
@@ -274,6 +274,7 @@ class AdjustRateController extends Controller
                 'currency_rate'             => 'required',
                 'note'                      => 'required',
                 'arr_type'                  => 'required|array',
+                'arr_coa_id'                   => 'required|array',
                 'arr_nominal_fc'            => 'required|array',
                 'arr_latest_rate'           => 'required|array',
                 'arr_nominal_rp'            => 'required|array',
@@ -289,6 +290,8 @@ class AdjustRateController extends Controller
                 'note.required' 			        => 'Keterangan / catatan tidak boleh kosong.',
                 'arr_type.required'                 => 'Tipe tidak boleh kosong',
                 'arr_type.array'                    => 'Tipe harus dalam bentuk array.',
+                'arr_coa_id.required'               => 'Coa tidak boleh kosong',
+                'arr_coa_id.array'                  => 'Coa harus dalam bentuk array.',
                 'arr_nominal_fc.required'           => 'Nominal FC tidak boleh kosong',
                 'arr_nominal_fc.array'              => 'Nominal FC harus dalam bentuk array.',
                 'arr_latest_rate.required'          => 'Nominal Kurs Terakhir tidak boleh kosong',
@@ -379,6 +382,7 @@ class AdjustRateController extends Controller
                             'adjust_rate_id'        => $query->id,
                             'lookable_type'         => $request->arr_lookable_type[$key],
                             'lookable_id'           => $request->arr_lookable_id[$key],
+                            'coa_id'                => $request->arr_coa_id[$key],
                             'nominal_fc'            => str_replace(',','.',str_replace('.','',$row)),
                             'nominal_rate'          => str_replace(',','.',str_replace('.','',$request->arr_latest_rate[$key])),
                             'nominal_rp'            => str_replace(',','.',str_replace('.','',$request->arr_nominal_rp[$key])),
@@ -409,37 +413,54 @@ class AdjustRateController extends Controller
                 }
             }
 
-            DB::commit();
+            /* DB::commit(); */
             
             return response()->json($response);
-        }catch(\Exception $e){
+        /* }catch(\Exception $e){
             DB::rollback();
-        }
+        } */
     }
 
     public function rowDetail(Request $request){
-        $data   = ClosingJournal::where('code',CustomHelper::decrypt($request->id))->first();
-        
+        $data   = AdjustRate::where('code',CustomHelper::decrypt($request->id))->first();
+        $total = 0;
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align">No.</th>
-                                <th class="center-align">Coa</th>
-                                <th class="center-align">Debit</th>
-                                <th class="center-align">Kredit</th>
+                                <th class="center">No.</th>
+                                <th class="center">Nomor</th>
+                                <th class="center">Coa</th>
+                                <th class="center">Nominal Sisa (FC)</th>
+                                <th class="center">Kurs Terakhir</th>
+                                <th class="center">Nominal Sisa (Rp)</th>
+                                <th class="center">Nominal Terbaru (Rp)</th>
+                                <th class="center">Nominal Selisih (Rp)</th>
                             </tr>
                         </thead><tbody>';
         
-        foreach($data->closingJournalDetail as $key => $row){
+        foreach($data->adjustRateDetail as $key => $row){
+            $total += $row->nominal;
             $string .= '<tr>
+
                 <td class="center-align">'.($key + 1).'</td>
+                <td>'.$row->lookable->code.'</td>
                 <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
-                <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '0,00').'</td>
-                <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '0,00').'</td>
+                <td class="right-align">'.number_format($row->nominal_fc,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->nominal_rate,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->nominal_rp,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->nominal_new,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
             </tr>';
         }
         
-        $string .= '</tbody></table></div>';
+        $string .= '</tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="7" class="right-align">TOTAL</th>
+                                <td class="right-align">'.number_format($total,2,',','.').'</td>
+                            </tr>
+                        </tfoor>
+                    </table></div>';
 
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
                         <thead>
@@ -926,7 +947,7 @@ class AdjustRateController extends Controller
         $total_debit_konversi = 0;
         $total_kredit_asli = 0;
         $total_kredit_konversi = 0;
-        $query = ClosingJournal::where('code',CustomHelper::decrypt($id))->first();
+        $query = AdjustRate::where('code',CustomHelper::decrypt($id))->first();
         if($query->journal()->exists()){
             $rowmain = $query->journal()->first();
             $response = [
@@ -947,6 +968,16 @@ class AdjustRateController extends Controller
                 })
                 ->orderBy('type');
             })->get() as $key => $row){
+
+                if($row->type == '1'){
+                    $total_debit_asli += $row->nominal_fc;
+                    $total_debit_konversi += $row->nominal;
+                }
+                if($row->type == '2'){
+                    $total_kredit_asli += $row->nominal_fc;
+                    $total_kredit_konversi += $row->nominal;
+                }
+
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
@@ -955,15 +986,23 @@ class AdjustRateController extends Controller
                     <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
                     <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
                     <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
+                    <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
                     <td class="center-align">'.($row->project_id ? $row->project->name : '-').'</td>
-                    <td>'.$row->note.'</td>
-                    <td>'.$row->note2.'</td>
+                    <td class="center-align">'.($row->note ? $row->note : '').'</td>
+                    <td class="center-align">'.($row->note2 ? $row->note2 : '').'</td>
                     <td class="right-align">'.($row->type == '1' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
                     <td class="right-align">'.($row->type == '2' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
                     <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
                     <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
                 </tr>';
             }
+            $string .= '<tr>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="11"> Total </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_asli, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_kredit_asli, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_konversi, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_kredit_konversi, 2, ',', '.') . '</td>
+            </tr>';
             $response["tbody"] = $string; 
         }else{
             $response = [

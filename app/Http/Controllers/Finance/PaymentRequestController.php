@@ -485,7 +485,7 @@ class PaymentRequestController extends Controller
             }
 
             foreach($data->purchaseInvoice as $row){
-                if(!$row->used()->exists() && $row->balancePaymentRequest() > 0){
+                if(!$row->used()->exists() && $row->realBalancePaymentRequest() > 0){
                     $memo = $row->totalMemo();
                     $final = $row->balance - $memo;
                     $details[] = [

@@ -240,6 +240,16 @@ class PurchaseInvoice extends Model
         return $total;
     }
 
+    public function realBalancePaymentRequest(){
+        $total = $this->balance - $this->totalMemo();
+
+        foreach($this->realPaymentRequestDetail as $row){
+            $total -= $row->nominal;
+        }
+
+        return $total;
+    }
+
     public function approval(){
         $source = ApprovalSource::where('lookable_type',$this->table)->where('lookable_id',$this->id)->whereHas('approvalMatrix')->get();
         if($source){

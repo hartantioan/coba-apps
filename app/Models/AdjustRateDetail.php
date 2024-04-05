@@ -40,4 +40,14 @@ class AdjustRateDetail extends Model
     public function lookable(){
         return $this->morphTo();
     }
+
+    public function getType(){
+        $type = match ($this->lookable_type) {
+            'good_receipts'             => 'GRPO',
+            'purchase_down_payments'    => 'APDP',
+            default                     => 'Kosong',
+        };
+  
+        return $type;
+    }
 }

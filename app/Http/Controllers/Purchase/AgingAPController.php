@@ -740,7 +740,7 @@ class AgingAPController extends Controller
                         'due_days'      => $this->dateDiffInDays($pi->due_date,$date),
                         'grandtotal'    => number_format($pi->balance * $pi->currency_rate,2,',','.'),
                         'memo'          => number_format($memo * $pi->currency_rate,2,',','.'),
-                        'paid'          => number_format($paid * $pi->currency_rate2,',','.'),
+                        'paid'          => number_format($paid * $pi->currency_rate,2,',','.'),
                         'balance'       => number_format($balance * $pi->currency_rate,2,',','.'),
                     ];
                     $grandtotal += ($balance * $pi->currency_rate);

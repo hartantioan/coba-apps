@@ -975,7 +975,7 @@ class PurchaseRequestController extends Controller
                          ],
                         'key'=>$purchase_request_detail->lookable->materialRequest->code,
                         'name'=>$purchase_request_detail->lookable->materialRequest->code,
-                        'url'=>request()->root()."/admin/inventory/material_request?code=".CustomHelper::encrypt($purchase_request_detail->lookable->materialRequest->code),
+                        'url'=>request()->root()."/admin/purchase/material_request?code=".CustomHelper::encrypt($purchase_request_detail->lookable->materialRequest->code),
                     ];
                     
                     $data_go_chart[]=$mr;

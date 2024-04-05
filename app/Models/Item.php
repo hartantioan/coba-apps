@@ -554,6 +554,30 @@ class Item extends Model
         return $this->hasMany('App\Models\LandedCostDetail','item_id','id')->withTrashed();
     }
 
+    public function activeMaterialRequestDetail(){
+        return $this->hasMany('App\Models\MaterialRequestDetail','item_id','id');
+    }
+
+    public function activePurchaseRequestDetail(){
+        return $this->hasMany('App\Models\PurchaseRequestDetail','item_id','id');
+    }
+
+    public function activePurchaseOrderDetail(){
+        return $this->hasMany('App\Models\PurchaseOrderDetail','item_id','id');
+    }
+
+    public function activeGoodReceiptDetail(){
+        return $this->hasMany('App\Models\GoodReceiptDetail','item_id','id');
+    }
+
+    public function activeGoodIssueRequestDetail(){
+        return $this->hasMany('App\Models\GoodIssueRequestDetail','item_id','id');
+    }
+
+    public function activeLandedCostDetail(){
+        return $this->hasMany('App\Models\LandedCostDetail','item_id','id');
+    }
+
     public function hasChildDocument(){
         $hasRelation = false;
 
@@ -573,7 +597,41 @@ class Item extends Model
             $hasRelation = true;
         }
 
+        if($this->goodIssueRequestDetail()->exists()){
+            $hasRelation = true;
+        }
+
         if($this->landedCostDetail()->exists()){
+            $hasRelation = true;
+        }
+
+        return $hasRelation;
+    }
+
+    public function hasActiveChildDocument(){
+        $hasRelation = false;
+
+        if($this->activeMaterialRequestDetail()->exists()){
+            $hasRelation = true;
+        }
+
+        if($this->activePurchaseRequestDetail()->exists()){
+            $hasRelation = true;
+        }
+
+        if($this->activePurchaseOrderDetail()->exists()){
+            $hasRelation = true;
+        }
+
+        if($this->activeGoodReceiptDetail()->exists()){
+            $hasRelation = true;
+        }
+
+        if($this->activeGoodIssueRequestDetail()->exists()){
+            $hasRelation = true;
+        }
+
+        if($this->activeLandedCostDetail()->exists()){
             $hasRelation = true;
         }
 

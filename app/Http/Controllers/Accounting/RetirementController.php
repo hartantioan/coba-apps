@@ -26,6 +26,7 @@ use App\Exports\ExportRetirementTransactionPage;
 use Illuminate\Database\Eloquent\Builder;
 use App\Helpers\CustomHelper;
 use App\Models\Menu;
+use App\Models\MenuUser;
 
 class RetirementController extends Controller
 {
@@ -42,6 +43,7 @@ class RetirementController extends Controller
     {
         $lastSegment = request()->segment(count(request()->segments()));
         $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
             'title'         => 'Purna Operasi Aset',
             'content'       => 'admin.accounting.retirement',
@@ -52,6 +54,7 @@ class RetirementController extends Controller
             'newcode'       => $menu->document_code.date('y'),
             'menucode'      => $menu->document_code,
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+            'modedata'      => $menuUser->mode ? $menuUser->mode : '',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

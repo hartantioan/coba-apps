@@ -24,6 +24,8 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Database\Eloquent\Builder;
 use App\Helpers\CustomHelper;
 use App\Models\Menu;
+use App\Models\MenuUser;
+
 class DepreciationController extends Controller
 {
     protected $dataplaces,$dataplacecode;
@@ -39,13 +41,14 @@ class DepreciationController extends Controller
     {
         $lastSegment = request()->segment(count(request()->segments()));
         $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
             'title'         => 'Depresiasi Aset',
             'content'       => 'admin.accounting.depreciation',
             'company'       => Company::where('status','1')->get(),
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-
+            'modedata'      => $menuUser->mode ? $menuUser->mode : '',
             'newcode'       => $menu->document_code.date('y'),
             'menucode'      => $menu->document_code,
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),

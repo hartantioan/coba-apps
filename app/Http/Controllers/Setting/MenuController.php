@@ -67,7 +67,7 @@ class MenuController extends Controller
 
         foreach($items as $row){
             if($row->hasChildDocument()){
-                echo $row->code.' - '.$row->name.'<br>';
+                echo $row->code.' - '.$row->name.' Stok '.$row->getStockAll().'<br>';
             }
         }
 

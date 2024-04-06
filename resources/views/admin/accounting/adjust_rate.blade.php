@@ -598,6 +598,7 @@
                 </td>
             </tr>
         `);
+        $('#temp').val('');
     }
 
     function preview(){
@@ -1101,48 +1102,60 @@
             success: function(response) {
                 loadingClose('#main');
                 $('#modal1').modal('open');
+
+                resetDetailForm();
                 
                 $('#temp').val(id);
                 $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#code').val(response.code);
                 $('#company_id').val(response.company_id).formSelect();
                 $('#post_date').val(response.post_date);
-                $('#month').val(response.month);
                 $('#note').val(response.note);
-
-                resetDetailForm();
+                $('#currency_rate').val(response.currency_rate);
 
                 $('#empty-detail').remove();
 
                 $.each(response.details, function(i, val) {
                     var count = makeid(10);
                     $('#body-detail').append(`
-                        <tr class="row_detail ` + (i == (response.details.length - 1) ? 'teal lighten-4' : '') + `">
+                        <tr class="row_detail ` + (i == (response.length - 1) ? 'teal lighten-4' : '') + `">
                             <input type="hidden" name="arr_coa_id[]" value="` + val.coa_id + `">
-                            <input type="hidden" name="arr_nominal[]" value="` + val.nominal + `">
-                            <input type="hidden" name="arr_nominal_fc[]" value="` + val.nominal_fc + `">
+                            <input type="hidden" name="arr_type[]" value="` + val.type + `">
+                            <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
+                            <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
                             <td class="center">
                                 ` + (i + 1) + `
                             </td>
                             <td>
-                                ` + val.coa_code + ` - ` + val.coa_name + `
+                                ` + val.code + `
                             </td>
-                            <td class="right-align">
-                                ` + (parseFloat(val.nominal) >= 0 ? formatRupiahIni(parseFloat(val.nominal)) : '0,00' ) + `
+                            <td>
+                                ` + val.type_document + `
                             </td>
-                            <td class="right-align">
-                                ` + (parseFloat(val.nominal) < 0 ? formatRupiahIni(-1 * parseFloat(val.nominal)) : '0,00' ) + `
+                            <td>
+                                <input name="arr_nominal_fc[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal_fc + `" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_fc`+ count +`" readonly>
+                            </td>
+                            <td>
+                                <input name="arr_latest_rate[]" onfocus="emptyThis(this);" type="text" value="` + val.latest_rate + `" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_latest_rate`+ count +`" readonly>
+                            </td>
+                            <td>
+                                <input name="arr_nominal_rp[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal_rp + `" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_rp`+ count +`" readonly>
+                            </td>
+                            <td>
+                                <input name="arr_nominal_new[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal_new + `" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_new`+ count +`" readonly>
+                            </td>
+                            <td>
+                                <input name="arr_balance[]" onfocus="emptyThis(this);" type="text" value="` + val.balance + `" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_balance`+ count +`" readonly>
                             </td>
                         </tr>
                     `);
                 });
-
-                if(response.document){
-                    const baseUrl = 'http://127.0.0.1:8000/storage/';
-                    const filePath = response.document.replace('public/', '');
-                    const fileUrl = baseUrl + filePath;
-                    displayFile(fileUrl);
-                }
+                $('#body-detail').append(`
+                    <tr>
+                        <th class="right-align" colspan="7">TOTAL</th>
+                        <th class="right-align" id="total_balance">` + response.total + `</th>
+                    </tr>
+                `);
 
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();

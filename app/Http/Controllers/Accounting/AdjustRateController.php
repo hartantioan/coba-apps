@@ -183,7 +183,10 @@ class AdjustRateController extends Controller
 
     public function preview(Request $request){
         
-        $cek = AdjustRate::where('company_id',$request->company_id)->where('post_date',$request->post_date)->whereIn('status',['1','2','3'])->first();
+        $cek = AdjustRate::where('company_id',$request->company_id)
+                ->where('post_date',$request->post_date)
+                ->where('currency_id',$request->currency_id)
+                ->whereIn('status',['1','2','3'])->first();
 
         if(!$cek){
             $datagr = GoodReceipt::whereDoesntHave('used')->whereIn('status',['2','3'])->where('post_date','<=',$request->post_date)->whereHas('journal',function($query)use($request){
@@ -244,7 +247,7 @@ class AdjustRateController extends Controller
         }else{
             $response = [
                 'status'    => 500,
-                'message'   => 'Mohon maaf tanggal '.date('d/m/Y',strtotime($cek->post_date)).' untuk perusahaan '.$cek->company->name.' telah dibuat Perbaikan Kurs, silahkan pilih tanggal lainnya.'
+                'message'   => 'Mohon maaf tanggal '.date('d/m/Y',strtotime($cek->post_date)).' untuk mata uang '.$cek->currency->name.' dan perusahaan '.$cek->company->name.' telah dibuat Perbaikan Kurs, silahkan pilih tanggal lainnya.'
             ];
         }
 
@@ -517,22 +520,31 @@ class AdjustRateController extends Controller
     }
 
     public function show(Request $request){
-        $ret = ClosingJournal::where('code',CustomHelper::decrypt($request->id))->first();
+        $ret = AdjustRate::where('code',CustomHelper::decrypt($request->id))->first();
         $ret['code_place_id'] = substr($ret->code,7,2);
+        $ret['currency_rate'] = number_format($ret->currency_rate,2,',','.');
 
         $arr = [];
-        
-        foreach($ret->closingJournalDetail as $row){
+        $total = 0;
+        foreach($ret->adjustRateDetail as $row){
             $arr[] = [
-                'coa_id'    => $row->coa_id,
-                'coa_code'  => $row->coa->code,
-                'coa_name'  => $row->coa->name,
-                'nominal'   => $row->type == '1' ? $row->nominal : -1 * $row->nominal,
-                'nominal_fc'=> $row->type == '1' ? $row->nominal_fc : -1 * $row->nominal_fc,
+                'coa_id'        => $row->coa_id,
+                'lookable_type' => $row->lookable_type,
+                'lookable_id'   => $row->lookable_id,
+                'code'          => $row->lookable->code,
+                'type_document' => $row->getType(),
+                'nominal_fc'    => number_format($row->nominal_fc,2,',','.'),
+                'latest_rate'   => number_format($row->nominal_rate,2,',','.'),
+                'nominal_rp'    => number_format($row->nominal_rp,2,',','.'),
+                'nominal_new'   => number_format($row->nominal_new,2,',','.'),
+                'balance'       => number_format($row->nominal,2,',','.'),
+                'type'          => $row->type,
             ];
+            $total += $row->nominal;
         }
 
         $ret['details'] = $arr;
+        $ret['total'] = number_format($total,2,',','.');
         				
 		return response()->json($ret);
     }
@@ -687,11 +699,11 @@ class AdjustRateController extends Controller
             $currentDateTime = Date::now();
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             foreach($request->arr_id as $key =>$row){
-                $pr = ClosingJournal::where('code',$row)->first();
+                $pr = AdjustRate::where('code',$row)->first();
                 
                 if($pr){
                     $data = [
-                        'title'     => 'Penutupan Jurnal',
+                        'title'     => 'Adjust Kurs',
                         'data'      => $pr
                     ];
                     CustomHelper::addNewPrinterCounter($pr->getTable(),$pr->id);
@@ -701,12 +713,12 @@ class AdjustRateController extends Controller
                     $img_base_64 = base64_encode($image_temp);
                     $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                     $data["image"]=$path_img;
-                    $pdf = Pdf::loadView('admin.print.accounting.closing_journal_individual', $data)->setPaper('a5', 'landscape');
+                    $pdf = Pdf::loadView('admin.print.accounting.adjust_rate_individual', $data)->setPaper('a4', 'portrait');
                     $pdf->render();
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                    $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
-                    $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                    $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(495, 770, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(505, 780, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(422, 790, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                     $content = $pdf->download()->getOriginalContent();
                     $temp_pdf[]=$content;
                 }
@@ -787,10 +799,10 @@ class AdjustRateController extends Controller
                         // Pad $nomor with leading zeros to ensure it has at least 8 digits
                         $nomorPadded = str_repeat('0', $paddingLength) . $nomor;
                         $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
-                        $query = ClosingJournal::where('Code', 'LIKE', '%'.$x)->first();
+                        $query = AdjustRate::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
                             $data = [
-                                'title'     => 'Penutupan Journal',
+                                'title'     => 'Adjust Kurs',
                                     'data'      => $query
                             ];
                             CustomHelper::addNewPrinterCounter($query->getTable(),$query->id);
@@ -800,12 +812,12 @@ class AdjustRateController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.accounting.closing_journal_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.accounting.adjust_rate_individual', $data)->setPaper('a4', 'portrait');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                            $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(495, 770, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(505, 780, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(422, 790, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
                            
@@ -865,7 +877,7 @@ class AdjustRateController extends Controller
                 }else{
                     foreach($merged as $code){
                         $etNumbersArray = explode(',', $request->tabledata);
-                        $query = ClosingJournal::where('code', 'LIKE', '%'.$etNumbersArray[$code-1])->first();
+                        $query = AdjustRate::where('code', 'LIKE', '%'.$etNumbersArray[$code-1])->first();
                         if($query){
                             $data = [
                                 'title'     => 'Penutupan Jurnal',
@@ -878,12 +890,12 @@ class AdjustRateController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.accounting.closing_journal_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.accounting.adjust_rate_individual', $data)->setPaper('a4', 'portrait');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                            $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(495, 770, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(505, 780, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(422, 790, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
                            
@@ -926,17 +938,18 @@ class AdjustRateController extends Controller
 		return Excel::download(new ExportClosingJournal($post_date,$end_date,$mode), 'closing_journal_'.uniqid().'.xlsx');
     }
 
+    #sampek kene
     public function approval(Request $request,$id){
         
-        $cap = ClosingJournal::where('code',CustomHelper::decrypt($id))->first();
+        $cap = AdjustRate::where('code',CustomHelper::decrypt($id))->first();
                 
         if($cap){
             $data = [
-                'title'     => 'Closing Journal',
+                'title'     => 'Adjust Kurs',
                 'data'      => $cap
             ];
 
-            return view('admin.approval.closing_journal', $data);
+            return view('admin.approval.adjust_rate', $data);
         }else{
             abort(404);
         }
@@ -1015,12 +1028,12 @@ class AdjustRateController extends Controller
 
     public function printIndividual(Request $request,$id){
         
-        $pr = ClosingJournal::where('code',CustomHelper::decrypt($id))->first();
+        $pr = AdjustRate::where('code',CustomHelper::decrypt($id))->first();
         $currentDateTime = Date::now();
         $formattedDate = $currentDateTime->format('d/m/Y H:i:s');        
         if($pr){
             $data = [
-                'title'     => 'Penutupan Journal',
+                'title'     => 'Adjust Kurs',
                 'data'      => $pr
             ];
 
@@ -1038,13 +1051,13 @@ class AdjustRateController extends Controller
             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
             $data["image"]=$path_img;
              
-            $pdf = Pdf::loadView('admin.print.accounting.closing_journal_individual', $data)->setPaper('a5', 'landscape');
+            $pdf = Pdf::loadView('admin.print.accounting.adjust_rate_individual', $data)->setPaper('a4', 'portrait');
             $pdf->render();
     
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-            $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
-            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+            $pdf->getCanvas()->page_text(495, 770, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
+            $pdf->getCanvas()->page_text(505, 780, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+            $pdf->getCanvas()->page_text(422, 790, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
             
             $content = $pdf->download()->getOriginalContent();
             

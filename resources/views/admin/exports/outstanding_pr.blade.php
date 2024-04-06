@@ -6,6 +6,7 @@
         <tr>
             <th class="center-align">No</th>
             <th class="center-align">Dokumen</th>
+            <th class="center-align">Pengguna</th>
             <th class="center-align">Tgl.Post</th>
             <th class="center-align">Keterangan</th>
             <th class="center-align">Status</th>
@@ -23,6 +24,7 @@
             <tr>
                 <td>{{ $key + 1 }}.</td>
                 <td>{{ $row['code'] }}</td>
+                <td>{{ $row['user'] }}</td>
                 <td>{{ $row['post_date'] }}</td>
                 <td>{{ $row['note'] }}</td>
                 <td>{{ $row['status'] }}</td>

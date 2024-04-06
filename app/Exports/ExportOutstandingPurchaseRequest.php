@@ -21,6 +21,7 @@ class ExportOutstandingPurchaseRequest implements FromView,ShouldAutoSize
         foreach($data as $row){
             $entry = [];
             $entry["code"]=$row->purchaseRequest->code;
+            $entry["user"]=$row->purchaseRequest->user->name;
             $entry["post_date"] = date('d/m/Y',strtotime($row->purchaseRequest->post_date));
             $entry["note"] = $row->purchaseRequest->note;
             $entry["status"] = $row->purchaseRequest->statusRaw();

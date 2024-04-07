@@ -45,7 +45,8 @@ class UserActivityController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search) {
                         $query->where('description', 'like', "%$search%")
-                        ->orWhere('properties', 'like', "%$search%")
+                            ->orWhere('subject_type', 'like', "%$search%")
+                            ->orWhere('properties', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use($search){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
@@ -62,6 +63,7 @@ class UserActivityController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search) {
                         $query->where('description', 'like', "%$search%")
+                            ->orWhere('subject_type', 'like', "%$search%")
                             ->orWhere('properties', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use($search){
                                 $query->where('name','like',"%$search%")

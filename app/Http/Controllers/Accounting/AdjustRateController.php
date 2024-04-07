@@ -462,7 +462,7 @@ class AdjustRateController extends Controller
                                 <th colspan="7" class="right-align">TOTAL</th>
                                 <td class="right-align">'.number_format($total,2,',','.').'</td>
                             </tr>
-                        </tfoor>
+                        </tfoot>
                     </table></div>';
 
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
@@ -938,7 +938,6 @@ class AdjustRateController extends Controller
 		return Excel::download(new ExportClosingJournal($post_date,$end_date,$mode), 'closing_journal_'.uniqid().'.xlsx');
     }
 
-    #sampek kene
     public function approval(Request $request,$id){
         
         $cap = AdjustRate::where('code',CustomHelper::decrypt($id))->first();

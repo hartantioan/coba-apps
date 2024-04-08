@@ -23,6 +23,7 @@ use App\Models\AdjustRate;
 use App\Models\AdjustRateDetail;
 use App\Models\Currency;
 use App\Models\GoodReceipt;
+use App\Models\Journal;
 use App\Models\LockPeriod;
 use App\Models\Menu;
 use App\Models\PurchaseDownPayment;
@@ -190,6 +191,8 @@ class AdjustRateController extends Controller
                 ->whereIn('status',['1','2','3'])->first();
 
         if(!$cek){
+            $result = [];
+
             $datagr = GoodReceipt::whereDoesntHave('used')->whereIn('status',['2','3'])->where('post_date','<=',$request->post_date)->whereHas('journal',function($query)use($request){
                 $query->where('currency_id',$request->currency_id);
             })->get();
@@ -200,7 +203,38 @@ class AdjustRateController extends Controller
 
             $datainvoice = PurchaseInvoice::whereDoesntHave('used')->whereIn('status',['2','3','7'])->where('post_date','<=',$request->post_date)->where('currency_id',$request->currency_id)->get();
 
-            $result = [];
+            $arrCoa = Coa::where('status','1')->where('currency_id',$request->currency_id)->whereNotNull('is_cash_account')->get();
+
+            foreach($arrCoa as $coacash){
+                $datadebitfc = JournalDetail::whereHas('journal',function($query)use($request){
+                    $query->whereIn('status',['2','3'])->where('post_date','<=',$request->post_date);
+                })->where('coa_id',$coacash->id)->where('type','1')->sum('nominal_fc');
+                $datacreditfc = JournalDetail::whereHas('journal',function($query)use($request){
+                    $query->whereIn('status',['2','3'])->where('post_date','<=',$request->post_date);
+                })->where('coa_id',$coacash->id)->where('type','2')->sum('nominal_fc');
+                $datadebitrp = JournalDetail::whereHas('journal',function($query)use($request){
+                    $query->whereIn('status',['2','3'])->where('post_date','<=',$request->post_date);
+                })->where('coa_id',$coacash->id)->where('type','1')->sum('nominal');
+                $datacreditrp = JournalDetail::whereHas('journal',function($query)use($request){
+                    $query->whereIn('status',['2','3'])->where('post_date','<=',$request->post_date);
+                })->where('coa_id',$coacash->id)->where('type','2')->sum('nominal');
+                $balancefc = $datadebitfc - $datacreditfc;
+                if($balancefc > 0){
+                    $balancerp = $datadebitrp - $datacreditrp;
+                    $currency_rate = round($balancerp / $balancefc,2);
+                    $result[] = [
+                        'coa_id'        => $coacash->id,
+                        'lookable_type' => $coacash->getTable(),
+                        'lookable_id'   => $coacash->id,
+                        'code'          => $coacash->code.' - '.$coacash->name,
+                        'type_document' => 'Kas Mata Uang Asing',
+                        'nominal_fc'    => number_format($balancefc,2,',','.'),
+                        'latest_rate'   => number_format($currency_rate,2,',','.'),
+                        'nominal_rp'    => number_format($balancerp,2,',','.'),
+                        'type'          => '1',
+                    ];
+                }
+            }
 
             $coahutangusahabelumditagih = Coa::where('code','200.01.03.01.02')->where('company_id',$request->company_id)->first();
             $coahutangusaha = Coa::where('code','200.01.03.01.01')->where('company_id',$request->company_id)->first();

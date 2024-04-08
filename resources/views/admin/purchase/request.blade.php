@@ -1269,7 +1269,7 @@
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
 
-    function done(id){
+    /* function done(id){
         $.ajax({
             url: '{{ Request::url() }}/get_items',
             type: 'POST',
@@ -1334,7 +1334,7 @@
                 });
             }
         });
-    }
+    } */
 
     function printData(){
         var arr_id_temp=[];

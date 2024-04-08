@@ -424,6 +424,10 @@ class PurchaseDownPayment extends Model
             $hasRelation = true;
         }
 
+        if($this->adjustRateDetail()->exists()){
+            $hasRelation = true;
+        }
+
         return $hasRelation;
     }
 

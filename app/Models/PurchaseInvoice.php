@@ -297,6 +297,10 @@ class PurchaseInvoice extends Model
             }
         }
 
+        if($this->adjustRateDetail()->exists()){
+            $hasRelation = true;
+        }
+
         return $hasRelation;
     }
 

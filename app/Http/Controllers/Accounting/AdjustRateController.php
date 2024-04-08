@@ -26,6 +26,7 @@ use App\Models\GoodReceipt;
 use App\Models\LockPeriod;
 use App\Models\Menu;
 use App\Models\PurchaseDownPayment;
+use App\Models\PurchaseInvoice;
 
 class AdjustRateController extends Controller
 {
@@ -197,6 +198,8 @@ class AdjustRateController extends Controller
                 $query->where('currency_id',$request->currency_id);
             })->get();
 
+            $datainvoice = PurchaseInvoice::whereDoesntHave('used')->whereIn('status',['2','3','7'])->where('post_date','<=',$request->post_date)->where('currency_id',$request->currency_id)->get();
+
             $result = [];
 
             $coahutangusahabelumditagih = Coa::where('code','200.01.03.01.02')->where('company_id',$request->company_id)->first();
@@ -214,7 +217,7 @@ class AdjustRateController extends Controller
                         'type_document' => 'GRPO',
                         'nominal_fc'    => number_format($total,2,',','.'),
                         'latest_rate'   => number_format($latest_rate,2,',','.'),
-                        'nominal_rp'    => number_format($latest_rate * $total,5,',','.'),
+                        'nominal_rp'    => number_format($latest_rate * $total,2,',','.'),
                         'type'          => '2',
                     ];
                 }
@@ -230,6 +233,24 @@ class AdjustRateController extends Controller
                         'lookable_id'   => $row->id,
                         'code'          => $row->code,
                         'type_document' => 'APDP',
+                        'nominal_fc'    => number_format($total,2,',','.'),
+                        'latest_rate'   => number_format($latest_rate,2,',','.'),
+                        'nominal_rp'    => number_format($latest_rate * $total,2,',','.'),
+                        'type'          => '2',
+                    ];
+                }
+            }
+
+            foreach($datainvoice as $row){
+                $latest_rate = $row->latestCurrencyRateByDate($request->post_date);
+                $total = $row->balancePaymentRequestByDate($request->post_date);
+                if($total > 0){
+                    $result[] = [
+                        'coa_id'        => $coahutangusaha->id,
+                        'lookable_type' => $row->getTable(),
+                        'lookable_id'   => $row->id,
+                        'code'          => $row->code,
+                        'type_document' => 'APIN',
                         'nominal_fc'    => number_format($total,2,',','.'),
                         'latest_rate'   => number_format($latest_rate,2,',','.'),
                         'nominal_rp'    => number_format($latest_rate * $total,2,',','.'),
@@ -550,7 +571,7 @@ class AdjustRateController extends Controller
     }
 
     public function voidStatus(Request $request){
-        $query = ClosingJournal::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = AdjustRate::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
 
@@ -567,9 +588,6 @@ class AdjustRateController extends Controller
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
                 ];
             }else{
-                LockPeriod::where('month',$query->month)->update([
-                    'status_closing'    => '2'
-                ]);
 
                 CustomHelper::removeJournal($query->getTable(),$query->id);
 
@@ -581,12 +599,12 @@ class AdjustRateController extends Controller
                 ]);
     
                 activity()
-                    ->performedOn(new ClosingJournal())
+                    ->performedOn(new AdjustRate())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Void the closing journal data');
+                    ->log('Void the adjust rate data');
     
-                CustomHelper::sendNotification($query->getTable(),$query->id,'Penutupan Jurnal No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Adjust Kurs No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval($query->getTable(),$query->id);
                 if(in_array($query->status,['2','3'])){
                     CustomHelper::removeJournal($query->getTable(),$query->id);
@@ -608,48 +626,13 @@ class AdjustRateController extends Controller
     }
 
     public function destroy(Request $request){
-        $query = ClosingJournal::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = AdjustRate::where('code',CustomHelper::decrypt($request->id))->first();
 
-        /* $approved = false;
-        $revised = false;
-
-        if($query->approval()){
-            foreach ($query->approval() as $detail){
-                foreach($detail->approvalMatrix as $row){
-                    if($row->approved){
-                        $approved = true;
-                    }
-
-                    if($row->revised){
-                        $revised = true;
-                    }
-                }
-            }
-        }
-
-        if($approved && !$revised){
-            return response()->json([
-                'status'  => 500,
-                'message' => 'Dokumen telah diapprove, anda tidak bisa melakukan perubahan.'
-            ]);
-        }
-
-        if(in_array($query->status,['2','3','4','5'])){
-            return response()->json([
-                'status'  => 500,
-                'message' => 'Closing Journal sudah dalam progres, anda tidak bisa melakukan perubahan.'
-            ]);
-        } */
-        
         if($query->delete()) {
 
             if(in_array($query->status,['2','3'])){
                 CustomHelper::removeJournal($query->getTable(),$query->id);
             }
-
-            LockPeriod::where('month',$query->month)->update([
-                'status_closing'    => '2'
-            ]);
 
             $query->update([
                 'delete_id'     => session('bo_id'),
@@ -658,15 +641,15 @@ class AdjustRateController extends Controller
 
             CustomHelper::removeApproval($query->getTable(),$query->id);
             
-            foreach($query->closingJournalDetail as $row){
+            foreach($query->adjustRateDetail as $row){
                 $row->delete();
             }
 
             activity()
-                ->performedOn(new ClosingJournal())
+                ->performedOn(new AdjustRate())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the closing journal data');
+                ->log('Delete the adjust rate data');
 
             $response = [
                 'status'  => 200,
@@ -880,7 +863,7 @@ class AdjustRateController extends Controller
                         $query = AdjustRate::where('code', 'LIKE', '%'.$etNumbersArray[$code-1])->first();
                         if($query){
                             $data = [
-                                'title'     => 'Penutupan Jurnal',
+                                'title'     => 'Adjust Kurs',
                                     'data'      => $query
                             ];
                             CustomHelper::addNewPrinterCounter($query->getTable(),$query->id);

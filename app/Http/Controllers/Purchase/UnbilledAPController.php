@@ -40,7 +40,7 @@ class UnbilledAPController extends Controller
         SELECT 
             gr.*,
             u.name AS account_name,
-            (SELECT 
+            IFNULL((SELECT 
                 SUM(pid.total)
                 FROM purchase_invoice_details pid
                 JOIN purchase_invoices pi
@@ -57,7 +57,7 @@ class UnbilledAPController extends Controller
                 AND pid.deleted_at IS NULL 
                 AND pi.status IN ('2','3','7') 
                 AND pi.post_date <= :date1
-            ) AS total_invoice,
+            ),0) AS total_invoice,
             IFNULL((
                 SELECT 
                     GROUP_CONCAT(DISTINCT pi.code)
@@ -105,12 +105,24 @@ class UnbilledAPController extends Controller
                     j.lookable_id = gr.id
                     AND j.lookable_type = 'good_receipts'
                     AND j.deleted_at IS NULL
-            ) AS currency_rate
+            ) AS currency_rate,
+            IFNULL((SELECT
+                ar.currency_rate
+                FROM adjust_rate_details ard
+                JOIN adjust_rates ar
+                    ON ar.id = ard.adjust_rate_id
+                WHERE 
+                    ar.post_date <= :date4
+                    AND ar.status IN ('2','3')
+                    AND ard.lookable_type = 'good_receipts'
+                    AND ard.lookable_id = gr.id
+                ORDER BY ar.post_date DESC LIMIT 1
+            ),0) AS currency_rate_adjust
             FROM good_receipts gr
             LEFT JOIN users u
                 ON u.id = gr.account_id
             WHERE 
-                gr.post_date <= :date4
+                gr.post_date <= :date5
                 AND gr.status IN ('2','3')
                 AND gr.deleted_at IS NULL;
         ", array(
@@ -118,6 +130,7 @@ class UnbilledAPController extends Controller
             'date2'     => $date,
             'date3'     => $date,
             'date4'     => $date,
+            'date5'     => $date,
         ));
 
         $totalUnbilled = 0;
@@ -137,6 +150,7 @@ class UnbilledAPController extends Controller
             }
             $balance = $row->total - ($row->total_invoice - $total_reconcile) - $row->total_return;
             if($balance > 0){
+                $currency_rate = $row->currency_rate_adjust > 0 ? $row->currency_rate_adjust : $row->currency_rate;
                 $array_filter[] = [
                     'no'            => ($key + 1),
                     'code'          => $row->code,
@@ -144,11 +158,11 @@ class UnbilledAPController extends Controller
                     'post_date'     => date('d/m/Y',strtotime($row->post_date)),
                     'delivery_no'   => $row->delivery_no,
                     'note'          => $row->note,
-                    'total_received'=> number_format($row->total * $row->currency_rate,2,',','.'),
-                    'total_invoice' => number_format(($row->total_invoice - $total_reconcile) * $row->currency_rate,2,',','.'),
-                    'total_balance' => number_format($balance * $row->currency_rate,2,',','.'),
+                    'total_received'=> number_format($row->total * $currency_rate,2,',','.'),
+                    'total_invoice' => number_format(($row->total_invoice - $total_reconcile) * $currency_rate,2,',','.'),
+                    'total_balance' => number_format($balance * $currency_rate,2,',','.'),
                 ];
-                $totalUnbilled += $balance * $row->currency_rate;
+                $totalUnbilled += $balance * $currency_rate;
             }
         }
 

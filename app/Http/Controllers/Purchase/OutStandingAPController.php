@@ -103,6 +103,18 @@ class OutStandingAPController extends Controller
                         AND j.status IN ('2','3')
                         AND jd.deleted_at IS NULL
                 ),0) AS total_journal,
+                IFNULL((SELECT
+                    ar.currency_rate
+                    FROM adjust_rate_details ard
+                    JOIN adjust_rates ar
+                        ON ar.id = ard.adjust_rate_id
+                    WHERE 
+                        ar.post_date <= :date5
+                        AND ar.status IN ('2','3')
+                        AND ard.lookable_type = 'purchase_invoices'
+                        AND ard.lookable_id = pi.id
+                    ORDER BY ar.post_date DESC LIMIT 1
+                ),0) AS currency_rate_adjust,
                 u.name AS account_name,
                 u.employee_no AS account_code,
                 pi.code,
@@ -118,7 +130,7 @@ class OutStandingAPController extends Controller
                 LEFT JOIN users u
                     ON u.id = pi.account_id
                 WHERE 
-                    pi.post_date <= :date5
+                    pi.post_date <= :date6
                     AND pi.balance > 0
                     AND pi.status IN ('2','3','7')
                     AND pi.deleted_at IS NULL
@@ -128,6 +140,7 @@ class OutStandingAPController extends Controller
             'date3' => $date,
             'date4' => $date,
             'date5' => $date,
+            'date6' => $date,
         ));
 
         $results2 = DB::select("
@@ -171,6 +184,18 @@ class OutStandingAPController extends Controller
                         AND pr.payment_type = '5'
                         AND prd.deleted_at IS NULL
                 ),0) AS total_reconcile,
+                IFNULL((SELECT
+                    ar.currency_rate
+                    FROM adjust_rate_details ard
+                    JOIN adjust_rates ar
+                        ON ar.id = ard.adjust_rate_id
+                    WHERE 
+                        ar.post_date <= :date4
+                        AND ar.status IN ('2','3')
+                        AND ard.lookable_type = 'purchase_down_payments'
+                        AND ard.lookable_id = pi.id
+                    ORDER BY ar.post_date DESC LIMIT 1
+                ),0) AS currency_rate_adjust,
                 u.name AS account_name,
                 u.employee_no AS account_code,
                 pi.code,
@@ -186,7 +211,7 @@ class OutStandingAPController extends Controller
                 LEFT JOIN users u
                     ON u.id = pi.account_id
                 WHERE 
-                    pi.post_date <= :date4
+                    pi.post_date <= :date5
                     AND pi.grandtotal > 0
                     AND pi.status IN ('2','3','7')
                     AND pi.deleted_at IS NULL
@@ -195,6 +220,7 @@ class OutStandingAPController extends Controller
             'date2' => $date,
             'date3' => $date,
             'date4' => $date,
+            'date5' => $date,
         ));
 
         $totalAll = 0;
@@ -203,6 +229,7 @@ class OutStandingAPController extends Controller
             foreach($results as $row){
                 $totalPayed = $row->total_payment + $row->total_memo + $row->total_reconcile + $row->total_journal;
                 $balance = $row->balance - $totalPayed;
+                $currency_rate = $row->currency_rate_adjust > 0 ? $row->currency_rate_adjust : $row->currency_rate;
                 $data_tempura = [
                     'code'      => $row->code,
                     'vendor'    => $row->account_name,
@@ -210,16 +237,16 @@ class OutStandingAPController extends Controller
                     'rec_date'  => date('d/m/Y',strtotime($row->received_date)),
                     'due_date'  => date('d/m/Y',strtotime($row->due_date)),
                     'top'       => '-',
-                    'total'     => number_format($row->total * $row->currency_rate,2,',','.'),
-                    'tax'       => number_format($row->tax * $row->currency_rate,2,',','.'),
-                    'wtax'      => number_format($row->wtax * $row->currency_rate,2,',','.'),
-                    'grandtotal'=> number_format($row->balance * $row->currency_rate,2,',','.'),
-                    'payed'     => number_format($totalPayed * $row->currency_rate,2,',','.'),
-                    'sisa'      => number_format($balance * $row->currency_rate,2,',','.'),
+                    'total'     => number_format($row->total * $currency_rate,2,',','.'),
+                    'tax'       => number_format($row->tax * $currency_rate,2,',','.'),
+                    'wtax'      => number_format($row->wtax * $currency_rate,2,',','.'),
+                    'grandtotal'=> number_format($row->balance * $currency_rate,2,',','.'),
+                    'payed'     => number_format($totalPayed * $currency_rate,2,',','.'),
+                    'sisa'      => number_format($balance * $currency_rate,2,',','.'),
                 ];
                 
                 if($balance > 0){
-                    $totalAll += ($balance * $row->currency_rate);
+                    $totalAll += ($balance * $currency_rate);
                     $array_filter[] = $data_tempura;
                 }
             }
@@ -227,6 +254,7 @@ class OutStandingAPController extends Controller
             foreach($results2 as $row){
                 $totalPayed = $row->total_payment + $row->total_memo + $row->total_reconcile;
                 $balance = $row->grandtotal - $totalPayed;
+                $currency_rate = $row->currency_rate_adjust > 0 ? $row->currency_rate_adjust : $row->currency_rate;
                 $data_tempura = [
                     'code'      => $row->code,
                     'vendor'    => $row->account_name,
@@ -234,16 +262,16 @@ class OutStandingAPController extends Controller
                     'rec_date'  => date('d/m/Y',strtotime($row->document_date)),
                     'due_date'  => date('d/m/Y',strtotime($row->due_date)),
                     'top'       => '-',
-                    'total'     => number_format($row->total * $row->currency_rate,2,',','.'),
-                    'tax'       => number_format($row->tax * $row->currency_rate,2,',','.'),
-                    'wtax'      => number_format($row->wtax * $row->currency_rate,2,',','.'),
-                    'grandtotal'=> number_format($row->grandtotal * $row->currency_rate,2,',','.'),
-                    'payed'     => number_format($totalPayed * $row->currency_rate,2,',','.'),
-                    'sisa'      => number_format($balance * $row->currency_rate,2,',','.'),
+                    'total'     => number_format($row->total * $currency_rate,2,',','.'),
+                    'tax'       => number_format($row->tax * $currency_rate,2,',','.'),
+                    'wtax'      => number_format($row->wtax * $currency_rate,2,',','.'),
+                    'grandtotal'=> number_format($row->grandtotal * $currency_rate,2,',','.'),
+                    'payed'     => number_format($totalPayed * $currency_rate,2,',','.'),
+                    'sisa'      => number_format($balance * $currency_rate,2,',','.'),
                 ];
                 
                 if($balance > 0){
-                    $totalAll += ($balance * $row->currency_rate);
+                    $totalAll += ($balance * $currency_rate);
                     $array_filter[] = $data_tempura;
                 }
             }

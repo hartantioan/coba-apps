@@ -445,6 +445,33 @@ class PurchaseInvoice extends Model
         return $total;
     }
 
+    public function balancePaymentRequestByDate($date){
+        $total = $this->balance;
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query) use ($date){
+            $query->whereHas('outgoingPayment',function ($query) use ($date){
+                $query->whereDate('pay_date','<=',$date);
+            });
+
+        })->get() as $rowpayment){
+            $total -= $rowpayment->nominal;
+        }
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query) use($date){
+            $query->where('payment_type','5')->whereIn('status',['2','3'])->whereDoesntHave('outgoingPayment')->whereNull('coa_source_id')->whereDate('post_date','<=',$date);
+        })->get() as $rowpayment){
+            $total -= $rowpayment->nominal;
+        }
+        $totalPayByJournal = JournalDetail::whereHas('coa',function($query){
+            $query->where('code','200.01.03.01.01');
+        })->whereHas('journal',function($query)use($date){
+            $query->whereDate('post_date','<=',$date)
+                ->whereIn('status',['2','3']);
+        })->where('note','VOID*'.$this->code)->sum('nominal');
+
+        $total -= $totalPayByJournal;
+
+        return $total;
+    }
+
     public function getTotalPaidByDate($date){
         $total = $this->balance;
         $totalAfterMemo = $total - $this->totalMemoByDate($date);
@@ -538,5 +565,31 @@ class PurchaseInvoice extends Model
     public function printCounter()
     {
         return $this->hasMany('App\Models\PrintCounter','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
+    public function adjustRateDetail(){
+        return $this->hasMany('App\Models\AdjustRateDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('adjustRate',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function latestCurrencyRate(){
+        $currency_rate = $this->currency_rate;
+        foreach($this->adjustRateDetail()->whereHas('adjustRate',function($query){
+            $query->orderBy('post_date');
+        })->get() as $row){
+            $currency_rate = $row->adjustRate->currency_rate;
+        }
+        return $currency_rate;
+    }
+
+    public function latestCurrencyRateByDate($date){
+        $currency_rate = $this->currency_rate;
+        foreach($this->adjustRateDetail()->whereHas('adjustRate',function($query)use($date){
+            $query->where('post_date','<=',$date)->orderBy('post_date');
+        })->get() as $row){
+            $currency_rate = $row->adjustRate->currency_rate;
+        }
+        return $currency_rate;
     }
 }

@@ -79,6 +79,19 @@
                                                     <i class="material-icons center">view_list</i>
                                                 </a>
                                             </div>
+                                            <div class="col m4 s6 ">
+                                                <label for="is_closing_journal" style="font-size:1rem;">Jurnal Closing</label>
+                                                <div class="input-field">
+                                                    <div class="switch mb-1">
+                                                        <label>
+                                                            Tampilkan
+                                                            <input type="checkbox" id="is_closing_journal" name="is_closing_journal" value="1">
+                                                            <span class="lever"></span>
+                                                            Sembunyikan
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </li>

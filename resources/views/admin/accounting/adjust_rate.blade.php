@@ -197,6 +197,7 @@
                             <table class="bordered" id="table-detail">
                                 <thead>
                                     <tr>
+                                        <th class="center">Hapus</th>
                                         <th class="center">No.</th>
                                         <th class="center">Nomor</th>
                                         <th class="center">Tipe</th>
@@ -209,7 +210,7 @@
                                 </thead>
                                 <tbody id="body-detail">
                                     <tr id="empty-detail">
-                                        <td colspan="8" class="center">
+                                        <td colspan="9" class="center">
                                             Tekan Ambil Data untuk melihat...
                                         </td>
                                     </tr>
@@ -529,6 +530,16 @@
 
         $('#body-detail').on('click', '.delete-data-detail', function() {
             $(this).closest('tr').remove();
+            countAll();
+            if($('.row_detail').length == 0){
+                $('#body-detail').append(`
+                    <tr id="empty-detail">
+                        <td colspan="9" class="center">
+                            Tekan Ambil Data untuk melihat...
+                        </td>
+                    </tr>
+                `);
+            }
         });
     });
 
@@ -593,7 +604,7 @@
         });
         $('#body-detail').empty().append(`
             <tr id="empty-detail">
-                <td colspan="8" class="center">
+                <td colspan="9" class="center">
                     Tekan Ambil Data untuk melihat...
                 </td>
             </tr>
@@ -636,6 +647,11 @@
                                         <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
                                         <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
                                         <td class="center">
+                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                                <i class="material-icons">delete</i>
+                                            </a>
+                                        </td>
+                                        <td class="center">
                                             ` + (i + 1) + `
                                         </td>
                                         <td>
@@ -664,7 +680,7 @@
                             });
                             $('#body-detail').append(`
                                 <tr>
-                                    <th class="right-align" colspan="7">TOTAL</th>
+                                    <th class="right-align" colspan="8">TOTAL</th>
                                     <th class="right-align" id="total_balance">0,00</th>
                                 </tr>
                             `);
@@ -1124,6 +1140,11 @@
                             <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
                             <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
                             <td class="center">
+                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                    <i class="material-icons">delete</i>
+                                </a>
+                            </td>
+                            <td class="center">
                                 ` + (i + 1) + `
                             </td>
                             <td>
@@ -1152,7 +1173,7 @@
                 });
                 $('#body-detail').append(`
                     <tr>
-                        <th class="right-align" colspan="7">TOTAL</th>
+                        <th class="right-align" colspan="8">TOTAL</th>
                         <th class="right-align" id="total_balance">` + response.total + `</th>
                     </tr>
                 `);

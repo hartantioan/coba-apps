@@ -91,6 +91,18 @@ class AgingAPController extends Controller
                         AND j.status IN ('2','3')
                         AND jd.deleted_at IS NULL
                 ),0) AS total_journal,
+                IFNULL((SELECT
+                    ar.currency_rate
+                    FROM adjust_rate_details ard
+                    JOIN adjust_rates ar
+                        ON ar.id = ard.adjust_rate_id
+                    WHERE 
+                        ar.post_date <= :date5
+                        AND ar.status IN ('2','3')
+                        AND ard.lookable_type = 'purchase_invoices'
+                        AND ard.lookable_id = pi.id
+                    ORDER BY ar.post_date DESC LIMIT 1
+                ),0) AS currency_rate_adjust,
                 u.name AS account_name,
                 u.employee_no AS account_code,
                 pi.code,
@@ -106,7 +118,7 @@ class AgingAPController extends Controller
                 LEFT JOIN users u
                     ON u.id = pi.account_id
                 WHERE 
-                    pi.post_date <= :date5
+                    pi.post_date <= :date6
                     AND pi.balance > 0
                     AND pi.status IN ('2','3','7')
                     AND pi.deleted_at IS NULL
@@ -116,6 +128,7 @@ class AgingAPController extends Controller
             'date3' => $date,
             'date4' => $date,
             'date5' => $date,
+            'date6' => $date,
         ));
 
         $results2 = DB::select("
@@ -159,6 +172,18 @@ class AgingAPController extends Controller
                         AND pr.payment_type = '5'
                         AND prd.deleted_at IS NULL
                 ),0) AS total_reconcile,
+                IFNULL((SELECT
+                    ar.currency_rate
+                    FROM adjust_rate_details ard
+                    JOIN adjust_rates ar
+                        ON ar.id = ard.adjust_rate_id
+                    WHERE 
+                        ar.post_date <= :date4
+                        AND ar.status IN ('2','3')
+                        AND ard.lookable_type = 'purchase_down_payments'
+                        AND ard.lookable_id = pi.id
+                    ORDER BY ar.post_date DESC LIMIT 1
+                ),0) AS currency_rate_adjust,
                 u.name AS account_name,
                 u.employee_no AS account_code,
                 pi.code,
@@ -174,7 +199,7 @@ class AgingAPController extends Controller
                 LEFT JOIN users u
                     ON u.id = pi.account_id
                 WHERE 
-                    pi.post_date <= :date4
+                    pi.post_date <= :date5
                     AND pi.grandtotal > 0
                     AND pi.status IN ('2','3','7')
                     AND pi.deleted_at IS NULL
@@ -183,6 +208,7 @@ class AgingAPController extends Controller
             'date2' => $date,
             'date3' => $date,
             'date4' => $date,
+            'date5' => $date,
         ));
 
         $countPeriod = 1;
@@ -218,15 +244,16 @@ class AgingAPController extends Controller
 
         foreach($results as $row){
             $balance = $row->balance - $row->total_payment - $row->total_memo - $row->total_reconcile - $row->total_journal;
+            $currency_rate = $row->currency_rate_adjust > 0 ? $row->currency_rate_adjust : $row->currency_rate;
             if($balance > 0){
                 $daysDiff = $this->dateDiffInDays($row->due_date,$date);
                 $index = $this->findDuplicate($row->account_code,$newData);
                 if($index >= 0){
                     foreach($newData[$index]['data'] as $key => $rowdata){
                         if($daysDiff <= $rowdata['end'] && $daysDiff >= $rowdata['start']){
-                            $newData[$index]['data'][$key]['balance'] += $balance * $row->currency_rate;
-                            $newData[$index]['total'] += $balance * $row->currency_rate;
-                            $arrColumn[$key]['total'] += $balance * $row->currency_rate;
+                            $newData[$index]['data'][$key]['balance'] += $balance * $currency_rate;
+                            $newData[$index]['total'] += $balance * $currency_rate;
+                            $arrColumn[$key]['total'] += $balance * $currency_rate;
                             $newData[$index]['data'][$key]['list_invoice'][] = $row->code;
                         }
                     }
@@ -238,10 +265,10 @@ class AgingAPController extends Controller
                                 'name'          => $rowcolumn['name'],
                                 'start'         => $rowcolumn['start'],
                                 'end'           => $rowcolumn['end'],
-                                'balance'       => $balance * $row->currency_rate,
+                                'balance'       => $balance * $currency_rate,
                                 'list_invoice'  => array($row->code),
                             ];
-                            $arrColumn[$key]['total'] += $balance * $row->currency_rate;
+                            $arrColumn[$key]['total'] += $balance * $currency_rate;
                         }else{
                             $arrDetail[] = [
                                 'name'          => $rowcolumn['name'],
@@ -256,7 +283,7 @@ class AgingAPController extends Controller
                         'supplier_code'         => $row->account_code,
                         'supplier_name'         => $row->account_name,
                         'data'                  => $arrDetail,
-                        'total'                 => $balance * $row->currency_rate,
+                        'total'                 => $balance * $currency_rate,
                     ];
                 }
             }
@@ -265,15 +292,16 @@ class AgingAPController extends Controller
         foreach($results2 as $row){
             $balance = $row->grandtotal - $row->total_payment - $row->total_memo - $row->total_reconcile;
             $due_date = $row->due_date ? $row->due_date : date('Y-m-d', strtotime($row->post_date. ' + '.$row->topdp.' day'));
+            $currency_rate = $row->currency_rate_adjust > 0 ? $row->currency_rate_adjust : $row->currency_rate;
             if($balance > 0){
                 $daysDiff = $this->dateDiffInDays($due_date,$date);
                 $index = $this->findDuplicate($row->account_code,$newData);
                 if($index >= 0){
                     foreach($newData[$index]['data'] as $key => $rowdata){
                         if($daysDiff <= $rowdata['end'] && $daysDiff >= $rowdata['start']){
-                            $newData[$index]['data'][$key]['balance'] += $balance * $row->currency_rate;
-                            $newData[$index]['total'] += $balance * $row->currency_rate;
-                            $arrColumn[$key]['total'] += $balance * $row->currency_rate;
+                            $newData[$index]['data'][$key]['balance'] += $balance * $currency_rate;
+                            $newData[$index]['total'] += $balance * $currency_rate;
+                            $arrColumn[$key]['total'] += $balance * $currency_rate;
                             $newData[$index]['data'][$key]['list_invoice'][] = $row->code;
                         }
                     }
@@ -285,10 +313,10 @@ class AgingAPController extends Controller
                                 'name'          => $rowcolumn['name'],
                                 'start'         => $rowcolumn['start'],
                                 'end'           => $rowcolumn['end'],
-                                'balance'       => $balance * $row->currency_rate,
+                                'balance'       => $balance * $currency_rate,
                                 'list_invoice'  => array($row->code),
                             ];
-                            $arrColumn[$key]['total'] += $balance * $row->currency_rate;
+                            $arrColumn[$key]['total'] += $balance * $currency_rate;
                         }else{
                             $arrDetail[] = [
                                 'name'          => $rowcolumn['name'],
@@ -303,7 +331,7 @@ class AgingAPController extends Controller
                         'supplier_code'         => $row->account_code,
                         'supplier_name'         => $row->account_name,
                         'data'                  => $arrDetail,
-                        'total'                 => $balance * $row->currency_rate,
+                        'total'                 => $balance * $currency_rate,
                     ];
                 }
             }
@@ -436,6 +464,18 @@ class AgingAPController extends Controller
                         AND j.status IN ('2','3')
                         AND jd.deleted_at IS NULL
                 ),0) AS total_journal,
+                IFNULL((SELECT
+                    ar.currency_rate
+                    FROM adjust_rate_details ard
+                    JOIN adjust_rates ar
+                        ON ar.id = ard.adjust_rate_id
+                    WHERE 
+                        ar.post_date <= :date5
+                        AND ar.status IN ('2','3')
+                        AND ard.lookable_type = 'purchase_invoices'
+                        AND ard.lookable_id = pi.id
+                    ORDER BY ar.post_date DESC LIMIT 1
+                ),0) AS currency_rate_adjust,
                 u.name AS account_name,
                 u.employee_no AS account_code,
                 pi.code,
@@ -451,7 +491,7 @@ class AgingAPController extends Controller
                 LEFT JOIN users u
                     ON u.id = pi.account_id
                 WHERE 
-                    pi.post_date <= :date5
+                    pi.post_date <= :date6
                     AND pi.balance > 0
                     AND pi.status IN ('2','3','7')
                     AND pi.deleted_at IS NULL
@@ -461,6 +501,7 @@ class AgingAPController extends Controller
             'date3' => $date,
             'date4' => $date,
             'date5' => $date,
+            'date6' => $date,
         ));
 
         $results2 = DB::select("
@@ -504,6 +545,18 @@ class AgingAPController extends Controller
                         AND pr.payment_type = '5'
                         AND prd.deleted_at IS NULL
                 ),0) AS total_reconcile,
+                IFNULL((SELECT
+                    ar.currency_rate
+                    FROM adjust_rate_details ard
+                    JOIN adjust_rates ar
+                        ON ar.id = ard.adjust_rate_id
+                    WHERE 
+                        ar.post_date <= :date4
+                        AND ar.status IN ('2','3')
+                        AND ard.lookable_type = 'purchase_down_payments'
+                        AND ard.lookable_id = pi.id
+                    ORDER BY ar.post_date DESC LIMIT 1
+                ),0) AS currency_rate_adjust,
                 u.name AS account_name,
                 u.employee_no AS account_code,
                 pi.code,
@@ -519,7 +572,7 @@ class AgingAPController extends Controller
                 LEFT JOIN users u
                     ON u.id = pi.account_id
                 WHERE 
-                    pi.post_date <= :date4
+                    pi.post_date <= :date5
                     AND pi.grandtotal > 0
                     AND pi.status IN ('2','3','7')
                     AND pi.deleted_at IS NULL
@@ -528,6 +581,7 @@ class AgingAPController extends Controller
             'date2' => $date,
             'date3' => $date,
             'date4' => $date,
+            'date5' => $date,
         ));
 
         $countPeriod = 1;
@@ -563,6 +617,7 @@ class AgingAPController extends Controller
 
         foreach($results as $row){
             $balance = $row->balance - $row->total_payment - $row->total_memo - $row->total_reconcile - $row->total_journal;
+            $currency_rate = $row->currency_rate_adjust > 0 ? $row->currency_rate_adjust : $row->currency_rate;
             if($balance > 0){
                 $daysDiff = $this->dateDiffInDays($row->due_date,$date);
                 $arrDetail = [];
@@ -572,9 +627,9 @@ class AgingAPController extends Controller
                             'name'          => $rowcolumn['name'],
                             'start'         => $rowcolumn['start'],
                             'end'           => $rowcolumn['end'],
-                            'balance'       => $balance * $row->currency_rate,
+                            'balance'       => $balance * $currency_rate,
                         ];
-                        $arrColumn[$key]['total'] += $balance * $row->currency_rate;
+                        $arrColumn[$key]['total'] += $balance * $currency_rate;
                     }else{
                         $arrDetail[] = [
                             'name'          => $rowcolumn['name'],
@@ -589,7 +644,7 @@ class AgingAPController extends Controller
                     'supplier_name'         => $row->account_name,
                     'invoice'               => $row->code,
                     'data'                  => $arrDetail,
-                    'total'                 => $balance * $row->currency_rate,
+                    'total'                 => $balance * $currency_rate,
                 ];
             }
         }
@@ -597,6 +652,7 @@ class AgingAPController extends Controller
         foreach($results2 as $row){
             $balance = $row->grandtotal - $row->total_payment - $row->total_memo - $row->total_reconcile;
             $due_date = $row->due_date ? $row->due_date : date('Y-m-d', strtotime($row->post_date. ' + '.$row->topdp.' day'));
+            $currency_rate = $row->currency_rate_adjust > 0 ? $row->currency_rate_adjust : $row->currency_rate;
             if($balance > 0){
                 $daysDiff = $this->dateDiffInDays($due_date,$date);
                 $arrDetail = [];
@@ -606,9 +662,9 @@ class AgingAPController extends Controller
                             'name'          => $rowcolumn['name'],
                             'start'         => $rowcolumn['start'],
                             'end'           => $rowcolumn['end'],
-                            'balance'       => $balance * $row->currency_rate,
+                            'balance'       => $balance * $currency_rate,
                         ];
-                        $arrColumn[$key]['total'] += $balance * $row->currency_rate;
+                        $arrColumn[$key]['total'] += $balance * $currency_rate;
                     }else{
                         $arrDetail[] = [
                             'name'          => $rowcolumn['name'],
@@ -623,7 +679,7 @@ class AgingAPController extends Controller
                     'supplier_name'         => $row->account_name,
                     'invoice'               => $row->code,
                     'data'                  => $arrDetail,
-                    'total'                 => $balance * $row->currency_rate,
+                    'total'                 => $balance * $currency_rate,
                 ];
             }
         }
@@ -711,6 +767,7 @@ class AgingAPController extends Controller
                     $paid = $dp->totalPaidByDate($date);
                     $balance = $dp->grandtotal - $memo - $paid;
                     $due_date = $dp->due_date ? $dp->due_date : date('Y-m-d', strtotime($dp->post_date. ' + '.$dp->top.' day'));
+                    $currency_rate = $dp->latestCurrencyRateByDate($request->date);
                     $results[] = [
                         'code'          => $dp->code,
                         'vendor'        => $dp->supplier->name,
@@ -718,12 +775,12 @@ class AgingAPController extends Controller
                         'rec_date'      => '-',
                         'due_date'      => $due_date,
                         'due_days'      => $this->dateDiffInDays($due_date,$date),
-                        'grandtotal'    => number_format($dp->grandtotal * $dp->currency_rate,2,',','.'),
-                        'memo'          => number_format($memo * $dp->currency_rate,2,',','.'),
-                        'paid'          => number_format($paid * $dp->currency_rate,2,',','.'),
-                        'balance'       => number_format($balance * $dp->currency_rate,2,',','.'),
+                        'grandtotal'    => number_format($dp->grandtotal * $currency_rate,2,',','.'),
+                        'memo'          => number_format($memo * $currency_rate,2,',','.'),
+                        'paid'          => number_format($paid * $currency_rate,2,',','.'),
+                        'balance'       => number_format($balance * $currency_rate,2,',','.'),
                     ];
-                    $grandtotal += $balance * $dp->currency_rate;
+                    $grandtotal += $balance * $currency_rate;
                 }
             }else{
                 $pi = PurchaseInvoice::where('code',$row)->first();
@@ -731,6 +788,7 @@ class AgingAPController extends Controller
                     $memo = $pi->totalMemoByDate($date);
                     $paid = $pi->getTotalPaidDate($date);
                     $balance = $pi->balance - $memo - $paid;
+                    $currency_rate = $pi->latestCurrencyRateByDate($request->date);
                     $results[] = [
                         'code'          => $pi->code,
                         'vendor'        => $pi->account->name,
@@ -738,12 +796,12 @@ class AgingAPController extends Controller
                         'rec_date'      => date('d/m/Y',strtotime($pi->received_date)),
                         'due_date'      => date('d/m/Y',strtotime($pi->due_date)),
                         'due_days'      => $this->dateDiffInDays($pi->due_date,$date),
-                        'grandtotal'    => number_format($pi->balance * $pi->currency_rate,2,',','.'),
-                        'memo'          => number_format($memo * $pi->currency_rate,2,',','.'),
-                        'paid'          => number_format($paid * $pi->currency_rate,2,',','.'),
-                        'balance'       => number_format($balance * $pi->currency_rate,2,',','.'),
+                        'grandtotal'    => number_format($pi->balance * $currency_rate,2,',','.'),
+                        'memo'          => number_format($memo * $currency_rate,2,',','.'),
+                        'paid'          => number_format($paid * $currency_rate,2,',','.'),
+                        'balance'       => number_format($balance * $currency_rate,2,',','.'),
                     ];
-                    $grandtotal += ($balance * $pi->currency_rate);
+                    $grandtotal += ($balance * $currency_rate);
                 }
             }
         }

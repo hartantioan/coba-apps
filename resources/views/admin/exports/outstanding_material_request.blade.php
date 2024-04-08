@@ -25,8 +25,6 @@
             <th class="center-align">Satuan</th>
             <th class="center-align">Qty Pr</th>
             <th class="center-align">Satuan Pr</th>
-            <th class="center-align">Qty GI</th>
-            <th class="center-align">Satuan GI</th>
             <th class="center-align">Qty Sisa</th>
             <th class="center-align">Tanggal Dipakai</th>
             <th class="center-align">Gudang</th>
@@ -64,8 +62,7 @@
                 <td>{{ $row['satuan'] }}</td>
                 <td>{{ $row['qty_pr'] }}</td>
                 <td>{{ $row['satuan'] }}</td>
-                <td>{{ $row['qty_gi'] }}</td>
-                <td>{{ $row['satuan'] }}</td>
+      
                 <td>{{ $row['qty_balance'] }}</td>
                 <td>{{ $row['required_date'] }}</td>
                 <td>{{ $row['warehouse'] }}</td>

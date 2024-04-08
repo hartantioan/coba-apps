@@ -554,6 +554,7 @@ class PurchaseInvoiceController extends Controller
                     }
                     $info .= 'Diterima '.$rowdetail->qty.' '.$rowdetail->itemUnit->unit->code.' dari '.$rowdetail->purchaseOrderDetail->qty.' '.$rowdetail->itemUnit->unit->code;
                 }
+                $currency_rate = $datagr->latestCurrencyRate();
                 foreach($datagr->goodReceiptDetail as $rowdetail){
                     if($rowdetail->balanceTotalInvoice() > 0){
                         $price = round($rowdetail->total / $rowdetail->qty,2);
@@ -606,7 +607,7 @@ class PurchaseInvoiceController extends Controller
                             'spk_no'        => '',
                             'invoice_no'    => '',
                             'header_note'   => $datagr->note,
-                            'currency_rate' => number_format($rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate,2,',','.'),
+                            'currency_rate' => number_format($currency_rate,2,',','.'),
                             'currency_id'   => $rowdetail->purchaseOrderDetail->purchaseOrder->currency_id,
                             'rounding'      => number_format($rowdetail->purchaseOrderDetail->purchaseOrder->rounding,2,',','.'),
                         ];

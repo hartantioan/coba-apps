@@ -1367,6 +1367,10 @@ class CustomHelper {
 				}
 			}
 
+			$ip->update([
+				'status'	=> '3'
+			]);
+
 		}elseif($table_name == 'payment_requests'){
 			
 			$pr = PaymentRequest::find($table_id);

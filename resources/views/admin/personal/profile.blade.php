@@ -119,16 +119,16 @@
                                                     <div id="validation_alert" style="display:none;"></div>
                                                 </div>
                                                 <div class="col s12">
-                                                    <div class="input-field col s6">
+                                                    <div class="input-field col s12">
                                                         <input id="name" name="name" type="text" placeholder="Nama Alat" value="{{ $data->name }}">
                                                         <label class="active" for="name">Nama</label>
                                                     </div>
                                                     
-                                                    <div class="input-field col s6">
+                                                    <div class="input-field col s12">
                                                         <input id="address" name="address" type="text" placeholder="Alamat" value="{{ $data->address }}">
                                                         <label class="active" for="address">Alamat</label>
                                                     </div>
-                                                    <div class="input-field col s6">
+                                                    <div class="input-field col s12">
                                                         <select class="browser-default" id="province_id" name="province_id">
                                                             @if($data->province_id)
                                                             <option value="{{ $data->province_id }}">{{ $data->province->name }}</option>
@@ -136,7 +136,7 @@
                                                         </select>
                                                         <label class="active" for="province_id">Provinsi</label>
                                                     </div>
-                                                    <div class="input-field col s6">
+                                                    <div class="input-field col s12">
                                                         <select class="browser-default" id="city_id" name="city_id">
                                                             @if($data->city_id)
                                                             <option value="{{ $data->city_id }}">{{ $data->city->name }}</option>
@@ -144,23 +144,23 @@
                                                         </select>
                                                         <label class="active" for="city_id">Kota/Kabupaten</label>
                                                     </div>
-                                                    <div class="input-field col s6">
+                                                    <div class="input-field col s12">
                                                         <input id="phone" name="phone" type="text" placeholder="HP" value="{{ $data->phone }}">
                                                         <label class="active" for="phone">HP</label>
                                                     </div>
-                                                    <div class="input-field col s6">
+                                                    <div class="input-field col s12">
                                                         <input id="id_card" name="id_card" type="text" placeholder="KTP / SIM / No. Identitas" value="{{ $data->id_card }}">
                                                         <label class="active" for="id_card">KTP / SIM / No. Identitas</label>
                                                     </div>
-                                                    <div class="input-field col s6">
+                                                    <div class="input-field col s12">
                                                         <input id="old_password" name="old_password" type="password" placeholder="(Kosongkan jika tidak dirubah)">
                                                         <label class="active" for="old_password">Old Password</label>
                                                     </div>
-                                                    <div class="input-field col s6">
+                                                    <div class="input-field col s12">
                                                         <input id="new_password" name="new_password" type="password" placeholder="(Kosongkan jika tidak dirubah)">
                                                         <label class="active" for="new_password">New Password</label>
                                                     </div>
-                                                    <div class="file-field input-field col s6">
+                                                    <div class="file-field input-field col s12">
                                                         <div class="btn">
                                                             <span>Pilih Foto</span>
                                                             <input type="file" name="file" id="file" accept="image/x-png,image/jpg,image/jpeg">
@@ -170,7 +170,7 @@
                                                             <label class="" for="">Rekomendasi ukuran 1:1</label>
                                                         </div>
                                                     </div>
-                                                    <div class="input-field col s6 center-align">
+                                                    <div class="input-field col s12 center-align">
                                                         <div class="input-field" id="previewImg">
                                                             <img id="previewImage" src="{{ url('website/empty.png') }}" alt="..." width="150px">
                                                         </div>

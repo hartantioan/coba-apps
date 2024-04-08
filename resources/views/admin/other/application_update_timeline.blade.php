@@ -60,11 +60,11 @@
                                                 <div class="card-content">
                                                     <div style="display:-webkit-box;">
                                                         {!!$log->user->profilePicture()!!}
-                                                        <h5 class="card-title activator grey-text text-darken-4 mt-1 ml-3">{{$log->user->name}}</h5>
+                                                        <h5 class="card-title activator grey-text text-darken-4 mt-1 ml-3" style="margin-right: 1em;">{{$log->user->name}}</h5>
                                                     </div>
                                                     <p><i class="material-icons profile-card-i">restore</i><b>Version:</b> {{$log->version}}</p>
                                                     <p><i class="material-icons profile-card-i">date_range</i>{{date('d/m/Y',strtotime($log->release_date))}}</p>
-                                                    <p style="position:absolute;right:10px;bottom:0;">Diupdate Tgl. {{ date('d/m/Y H:i:s',strtotime($log->updated_at)) }}</p>
+                                                    <p class="right-align" style="position: static;text-align: end;right:10px;bottom: 0;margin-top: 1em;">Diupdate Tgl. {{ date('d/m/Y H:i:s',strtotime($log->updated_at)) }}</p>
                                                 </div>
                                             </div>
                                         </div>

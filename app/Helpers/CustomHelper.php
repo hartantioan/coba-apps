@@ -3506,8 +3506,8 @@ class CustomHelper {
 				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
 				'lookable_type'	=> $table_name,
 				'lookable_id'	=> $table_id,
-				'currency_id'	=> isset($data->currency_id) ? $data->currency_id : NULL,
-				'currency_rate'	=> isset($data->currency_rate) ? $data->currency_rate : NULL,
+				'currency_id'	=> $pi->currency_id,
+				'currency_rate'	=> $pi->currency_rate,
 				'post_date'		=> $data->post_date,
 				'note'			=> $data->note,
 				'status'		=> '3'

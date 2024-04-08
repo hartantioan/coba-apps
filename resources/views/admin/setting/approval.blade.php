@@ -46,7 +46,7 @@
                                     <h4 class="card-title">List Data</h4>
                                     <div class="row">
                                         <div class="col s12">
-                                            <table id="datatable_serverside" class="display responsive-table wrap">
+                                            <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>

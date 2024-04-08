@@ -20,6 +20,30 @@ WE WILL RELEASE FUTURE UPDATES SO IN ORDER TO NOT OVERWRITE YOUR STYLES IT'S BET
 	background-color:rgba(255,255,255,0.6);
 }
 
+@media screen and (max-width: 768px) {
+	.modal {
+		width: 100% !important;
+		left: 0em !important;/* Set width to 100% for mobile devices */
+		margin-top: 4em;
+	}
+	.modal-footer{
+		margin-bottom:4em;
+	}
+	.dtfc-fixed-right{
+		position: unset !important;
+	}
+	.attendance-list{
+		display: none !important;
+	}
+	.dtfc-fixed-left{
+		position: unset !important;
+	}
+	.btn-panduan{
+		display: none !important;
+	}
+}
+
+
 .preloader-wrapper {
 	margin-left: auto; 
 	margin-right: auto;

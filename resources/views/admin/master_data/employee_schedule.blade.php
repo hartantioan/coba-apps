@@ -113,7 +113,7 @@
                                                 <span class="hide-on-small-onl">Refresh</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
-                                            <table id="datatable_serverside" class="display responsive-table wrap">
+                                            <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
@@ -305,7 +305,7 @@
                                                     <div class="row">
                                                         <div class="col s12">
                                                             <div id="datatable_buttons_schedule"></div>
-                                                            <table id="datatable_schedule" class="display responsive-table wrap" style="width: 100%;">
+                                                            <table id="datatable_schedule"  style="width: 100%;">
                                                                 <thead style="width: 100%">
                                                                     <tr>
                                                                         <th>No</th>

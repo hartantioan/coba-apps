@@ -39,7 +39,7 @@
                                     <div class="row">
                                         <div class="col s12">
                                             <div id="datatable_buttons_request"></div>
-                                            <table id="datatable_serverside_request" class="display responsive-table wrap">
+                                            <table id="datatable_serverside_request" >
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
@@ -67,7 +67,7 @@
                                                 <span class="hide-on-small-onl">Refresh</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
-                                            <table id="datatable_serverside" class="display responsive-table wrap">
+                                            <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
@@ -180,7 +180,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn waves-effect waves-light purple" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+        <button class="btn waves-effect waves-light purple btn-panduan" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>

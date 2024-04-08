@@ -112,7 +112,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="col s12 mt-3">
-                                                        <button class="btn waves-effect waves-light purple" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+                                                        <button class="btn waves-effect waves-light purple btn-panduan" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
                                                         <button class="btn waves-effect waves-light right submit step6" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                                                     </div>
                                                 </div>
@@ -148,7 +148,7 @@
                                                 <span class="hide-on-small-onl">Refresh</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
-                                            <table id="datatable_serverside" class="display responsive-table wrap">
+                                            <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>

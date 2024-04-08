@@ -31,19 +31,19 @@
                         <div class="col s12 m6 l12">
                             
                             <div class="card padding-2 animate fadeLeft row">
-                                 <div class="col s4 m6 l4">
+                                 <div class="col s12 m6 l4">
                                     <h6 class="pl-2 pt-1">Absensi {{$start_date}} - {{$end_date}}</h6>
                                  </div>
-                                 <div class="col s4 m6 l4">
+                                 <div class="col s12 m6 l4">
                                  </div>
-                                 <div class="col s4 m6 l4">
+                                 <div class="col s12 m6 l4">
                                     <label class="" for="period_id">Period</label>
                                     <select class="browser-default" id="period_id" name="period_id" onchange="periodChange()"></select>
                                     
                                  </div>
                                  
                                  
-                                 <div class="col s8 m6 l8">
+                                 <div class="col s12 m6 l8">
                                        
                                        <div class="row">
                                           <div class="col s12 m6 l4">
@@ -147,8 +147,8 @@
                                           </div>
                                        </div>
                                  </div>
-                                 <div class="col s4 m6 l4 ">
-                                       <div class="app-todo">
+                                 <div class="col s12 m6 l4 ">
+                                       <div class="app-todo attendance-list">
                                           <div class="content-area" style="margin-top:0%; width:100%">
                                              <div class="app-wrapper">
                                              

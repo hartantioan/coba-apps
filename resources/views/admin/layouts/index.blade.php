@@ -13,7 +13,7 @@
                     <p style="margin: 0;">UNDONE TASK</p>
                     </div>
                 </div>
-                <table id="table_reminder" class="display responsive-table wrap">
+                <table id="table_reminder" >
                     <thead>
                         <tr>
                             

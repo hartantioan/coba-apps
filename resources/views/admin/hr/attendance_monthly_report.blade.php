@@ -86,7 +86,7 @@
                                                 <span class="hide-on-small-onl">Refresh</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
-                                        <table id="datatable_serverside" class="display responsive-table wrap">
+                                        <table id="datatable_serverside" >
                                             <thead id="thead_shift">
                                                 <tr>
                                                     <th>#</th>
@@ -313,7 +313,7 @@
                                                 <span class="hide-on-small-onl">Refresh</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
-                <table id="datatable_serverside" class="display responsive-table wrap">
+                <table id="datatable_serverside" >
                     <thead id="thead_shift">
                         
                     </thead>

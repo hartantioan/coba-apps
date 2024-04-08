@@ -9,7 +9,13 @@
     *::-webkit-scrollbar-track {
         background: orange;
     }
-
+    @media screen and (max-width: 768px) {
+        .modal {
+            width: 100% !important;
+            left: 0em !important;/* Set width to 100% for mobile devices */
+            top: 1em !important;
+        }
+    }
     *::-webkit-scrollbar-thumb {
         background-color: blue;
         border-radius: 20px;

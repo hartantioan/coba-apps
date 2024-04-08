@@ -117,7 +117,7 @@
                                                 <span class="hide-on-small-onl">Export</span>
                                                 <i class="material-icons right">view_headline</i>
                                             </a>
-                                            <table id="datatable_serverside" class="display responsive-table wrap">
+                                            <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
@@ -319,7 +319,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn waves-effect waves-light purple mr-1" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+        <button class="btn waves-effect waves-light purple mr-1 btn-panduan" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
         <button class="btn waves-effect waves-light step7 mr-1" onclick="save();">Simpan <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat">Tutup</a>
     </div>

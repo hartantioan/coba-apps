@@ -74,32 +74,36 @@
                                     <h4 class="card-title">List Data</h4>
                                     <div class="row">
                                         <div class="col s12">
-                                            <div id="datatable_buttons"></div>
-                                            <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
-                                                <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
-                                                <i class="material-icons right">refresh</i>
-                                            </a>
-                                            <table id="datatable_serverside" class="display responsive-table wrap">
-                                                <thead>
-                                                    <tr>
-                                                        <th rowspan="2">#</th>
-                                                        <th rowspan="2">Code</th>
-                                                        <th rowspan="2">Nama</th>
-                                                        <th rowspan="2">Alamat</th>
-                                                        <th rowspan="2">Provinsi</th>
-                                                        <th rowspan="2">Kota</th>
-                                                        <th colspan="3" class="center">NPWP</th>
-                                                        <th rowspan="2">Status</th>
-                                                        <th rowspan="2">Action</th>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Nomor</th>
-                                                        <th>Nama</th>
-                                                        <th>Alamat</th>
-                                                    </tr>
-                                                </thead>
-                                            </table>
+                                            <div class="container">
+                                                <div class="section section-data-tables">
+                                                <div id="datatable_buttons"></div>
+                                                <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
+                                                    <i class="material-icons hide-on-med-and-up">refresh</i>
+                                                    <span class="hide-on-small-onl">Refresh</span>
+                                                    <i class="material-icons right">refresh</i>
+                                                </a>
+                                                <table id="datatable_serverside">
+                                                    <thead>
+                                                        <tr>
+                                                            <th rowspan="2">#</th>
+                                                            <th rowspan="2">Code</th>
+                                                            <th rowspan="2">Nama</th>
+                                                            <th rowspan="2">Alamat</th>
+                                                            <th rowspan="2">Provinsi</th>
+                                                            <th rowspan="2">Kota</th>
+                                                            <th colspan="3" class="center">NPWP</th>
+                                                            <th rowspan="2">Status</th>
+                                                            <th rowspan="2">Action</th>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Nomor</th>
+                                                            <th>Nama</th>
+                                                            <th>Alamat</th>
+                                                        </tr>
+                                                    </thead>
+                                                </table>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

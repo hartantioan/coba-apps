@@ -70,7 +70,7 @@
                                     <div class="row">
                                         <div class="col s12">
                                             <div id="datatable_buttons"></div>
-                                            <table id="datatable_serverside" class="display responsive-table wrap">
+                                            <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>

@@ -326,7 +326,7 @@ class ApprovalController extends Controller
                     $val->status == '1' && !in_array($val->approvalSource->lookable_type,$special) ? '<span class="pick" data-id="'.CustomHelper::encrypt($val->code).'">'.$nomor.'</span>' : $nomor,
                     $val->approvalSource->getAccountInfo(),
                     date('d M Y H:i:s',strtotime($val->date_request)),
-                    $val->approvalSource->user->name,
+                    $val->approvalSource->user->name ?? '',
                     $val->approvalSource->lookable->code??'asdfas',
                     $val->approvalSource->note,
                     $val->status == '1' ? '

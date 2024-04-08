@@ -56,7 +56,7 @@
                                                 <span class="hide-on-small-onl">Download</span>
                                                 <i class="material-icons right">file_download</i>
                                             </a>
-                                            <table id="datatable_serverside" class="display responsive-table wrap">
+                                            <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>

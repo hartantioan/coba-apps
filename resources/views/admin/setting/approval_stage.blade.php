@@ -55,7 +55,7 @@
                                     </h4>
                                     <div class="row mt-3">
                                         <div class="col s12">
-                                            <table id="datatable_serverside" class="display responsive-table wrap">
+                                            <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>

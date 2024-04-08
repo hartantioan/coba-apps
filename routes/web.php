@@ -2392,7 +2392,6 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [IncomingPaymentController::class, 'show']);
                     Route::post('get_code', [IncomingPaymentController::class, 'getCode']);
                     Route::post('print',[IncomingPaymentController::class, 'print']);
-                    Route::post('done',[IncomingPaymentController::class, 'done'])->middleware('operation.access:incoming_payment,update');
                     Route::post('print_by_range',[IncomingPaymentController::class, 'printByRange']);
                     Route::get('print_individual/{id}',[IncomingPaymentController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('export',[IncomingPaymentController::class, 'export']);

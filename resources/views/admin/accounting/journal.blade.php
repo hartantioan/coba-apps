@@ -1619,7 +1619,7 @@
                             <td class="disable-class">
                                 <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" ` + attributeDisable + `></select>
                             </td>
-                            <td class="disable-class">
+                            <td>
                                 <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" ` + attributeDisable + `>
                                     <option value="">--Kosong--</option>
                                     @foreach ($place as $row)
@@ -1627,7 +1627,7 @@
                                     @endforeach
                                 </select>
                             </td>
-                            <td class="disable-class">
+                            <td>
                                 <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);" ` + attributeDisable + `>
                                     <option value="">--Kosong--</option>
                                     @foreach ($line as $rowline)
@@ -1635,7 +1635,7 @@
                                     @endforeach
                                 </select>    
                             </td>
-                            <td class="disable-class">
+                            <td>
                                 <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);" ` + attributeDisable + `>
                                     <option value="">--Kosong--</option>
                                     @foreach ($machine as $row)
@@ -1643,7 +1643,7 @@
                                     @endforeach    
                                 </select>
                             </td>
-                            <td class="disable-class">
+                            <td>
                                 <select class="browser-default" id="arr_department` + count + `" name="arr_department[]" ` + attributeDisable + `>
                                     <option value="">--Kosong--</option>
                                     @foreach ($department as $row)
@@ -1651,7 +1651,7 @@
                                     @endforeach
                                 </select>
                             </td>
-                            <td class="disable-class">
+                            <td>
                                 <select class="browser-default" id="arr_project` + count + `" name="arr_project[]" ` + attributeDisable + `></select>
                             </td>
                             <td>

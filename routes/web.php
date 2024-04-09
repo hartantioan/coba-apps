@@ -1405,26 +1405,6 @@ Route::prefix('admin')->group(function () {
                         Route::post('filter_by_date',[OutStandingAPController::class, 'filterByDate']);
                         Route::get('export',[OutStandingAPController::class, 'export']);
                     });
-
-                    Route::prefix('aging_ap')->middleware('operation.access:aging_ap,view')->group(function () {
-                        Route::get('/',[AgingAPController::class, 'index']);
-                        Route::post('filter',[AgingAPController::class, 'filter']);
-                        Route::post('filter_detail',[AgingAPController::class, 'filterDetail']);
-                        Route::post('show_detail',[AgingAPController::class, 'showDetail']);
-                        Route::get('export',[AgingAPController::class, 'export']);
-                    });
-
-                    Route::prefix('down_payment')->middleware('operation.access:down_payment,view')->group(function () {
-                        Route::get('/',[DownPaymentController::class, 'index']);
-                        Route::post('filter',[DownPaymentController::class, 'filter']);
-                        Route::get('export',[DownPaymentController::class, 'export']);
-                    });
-
-                    Route::prefix('unbilled_ap')->middleware('operation.access:unbilled_ap,view')->group(function () {
-                        Route::get('/',[UnbilledAPController::class, 'index']);
-                        Route::post('filter_by_date',[UnbilledAPController::class, 'filterByDate']);
-                        Route::get('export',[UnbilledAPController::class, 'export']);
-                    });
                 });
 
                 Route::prefix('purchase_order')->middleware(['operation.access:purchase_order,view','lockacc'])->group(function () {
@@ -2332,6 +2312,24 @@ Route::prefix('admin')->group(function () {
                         Route::get('datatable',[CashBankController::class, 'datatable']);
                         Route::get('row_detail',[CashBankController::class, 'rowDetail']);
                         Route::get('export', [CashBankController::class, 'export']);
+                    });
+                    Route::prefix('aging_ap')->middleware('operation.access:aging_ap,view')->group(function () {
+                        Route::get('/',[AgingAPController::class, 'index']);
+                        Route::post('filter',[AgingAPController::class, 'filter']);
+                        Route::post('filter_detail',[AgingAPController::class, 'filterDetail']);
+                        Route::post('show_detail',[AgingAPController::class, 'showDetail']);
+                        Route::get('export',[AgingAPController::class, 'export']);
+                    });
+                    Route::prefix('down_payment')->middleware('operation.access:down_payment,view')->group(function () {
+                        Route::get('/',[DownPaymentController::class, 'index']);
+                        Route::post('filter',[DownPaymentController::class, 'filter']);
+                        Route::get('export',[DownPaymentController::class, 'export']);
+                    });
+
+                    Route::prefix('unbilled_ap')->middleware('operation.access:unbilled_ap,view')->group(function () {
+                        Route::get('/',[UnbilledAPController::class, 'index']);
+                        Route::post('filter_by_date',[UnbilledAPController::class, 'filterByDate']);
+                        Route::get('export',[UnbilledAPController::class, 'export']);
                     });
                 });
 

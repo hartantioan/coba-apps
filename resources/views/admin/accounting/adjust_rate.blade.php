@@ -725,7 +725,7 @@
             let rowfc = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
             let rowrp = parseFloat($('input[name^="arr_nominal_rp[]"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
             let rownew = rowfc * currency_rate;
-            let rowbalance = rowrp - rownew;
+            let rowbalance = rownew - rowrp;
             $('input[name^="arr_nominal_new[]"]').eq(index).val(
                 (rownew >= 0 ? '' : '-') + formatRupiahIni(rownew.toFixed(2).toString().replace('.',','))
             );

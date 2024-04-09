@@ -71,19 +71,32 @@ class DownPaymentController extends Controller
                         AND pm.post_date <= :date2
                         AND pm.status IN ('2','3','7')
                 ),0) AS total_memo,
+                IFNULL((SELECT
+                    ar.currency_rate
+                    FROM adjust_rate_details ard
+                    JOIN adjust_rates ar
+                        ON ar.id = ard.adjust_rate_id
+                    WHERE 
+                        ar.post_date <= :date3
+                        AND ar.status IN ('2','3')
+                        AND ard.lookable_type = 'purchase_down_payments'
+                        AND ard.lookable_id = pdp.id
+                    ORDER BY ar.post_date DESC LIMIT 1
+                ),0) AS currency_rate_adjust,
                 u.name AS account_name,
                 u.employee_no AS account_code
                 FROM purchase_down_payments pdp
                 LEFT JOIN users u
                     ON u.id = pdp.account_id
                 WHERE 
-                    pdp.post_date <= :date3
+                    pdp.post_date <= :date4
                     AND pdp.grandtotal > 0
                     AND pdp.status IN ('2','3','7')
             ",array(
                 'date1' => $date,
                 'date2' => $date,
                 'date3' => $date,
+                'date4' => $date,
             ));
 
         $results = [];
@@ -91,7 +104,8 @@ class DownPaymentController extends Controller
         $totalbalance = 0;
 
         foreach($data as $row){
-            $balance = ($row->grandtotal - $row->total_used - $row->total_memo) * $row->currency_rate;
+            $balance = $row->grandtotal - $row->total_used - $row->total_memo;
+            $currency_rate = $row->currency_rate_adjust > 0 ? $row->currency_rate_adjust : $row->currency_rate;
             if($balance > 0){
                 $results[] = [
                     'code'          => $row->code,
@@ -100,14 +114,14 @@ class DownPaymentController extends Controller
                     'post_date'     => date('d/m/Y',strtotime($row->post_date)),
                     'due_date'      => date('d/m/Y',strtotime($row->due_date)),
                     'note'          => $row->note,
-                    'subtotal'      => number_format($row->subtotal * $row->currency_rate,2,',','.'),
-                    'discount'      => number_format($row->discount * $row->currency_rate,2,',','.'),
-                    'total'         => number_format($row->total * $row->currency_rate,2,',','.'),
-                    'used'          => number_format($row->total_used * $row->currency_rate,2,',','.'),
-                    'memo'          => number_format($row->total_memo * $row->currency_rate,2,',','.'),
+                    'subtotal'      => number_format($row->subtotal * $currency_rate,2,',','.'),
+                    'discount'      => number_format($row->discount * $currency_rate,2,',','.'),
+                    'total'         => number_format($row->total * $currency_rate,2,',','.'),
+                    'used'          => number_format($row->total_used * $currency_rate,2,',','.'),
+                    'memo'          => number_format($row->total_memo * $currency_rate,2,',','.'),
                     'balance'       => number_format($balance,2,',','.'),
                 ];
-                $totalbalance += $balance;
+                $totalbalance += ($balance * $currency_rate);
             }
         }
 

@@ -439,7 +439,7 @@ class AdjustRateController extends Controller
                         $latest_currency_rate = str_replace(',','.',str_replace('.','',$request->arr_latest_rate[$key]));
                         $nominal_rp = str_replace(',','.',str_replace('.','',$row)) * $latest_currency_rate;
                         $nominal_new = str_replace(',','.',str_replace('.','',$row)) * $new_currency_rate;
-                        $balance = $nominal_rp - $nominal_new;
+                        $balance = $nominal_new - $nominal_rp;
                         AdjustRateDetail::create([
                             'adjust_rate_id'        => $query->id,
                             'lookable_type'         => $request->arr_lookable_type[$key],

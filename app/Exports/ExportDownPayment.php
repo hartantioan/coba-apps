@@ -29,7 +29,7 @@ class ExportDownPayment implements FromView , WithEvents
         $array_filter = [];
         $query_data = DB::select("
                     SELECT 
-                    pdp.*,
+                    *,
                     pdp.type as typepdp,
                     IFNULL((SELECT 
                         SUM(nominal) 
@@ -52,6 +52,18 @@ class ExportDownPayment implements FromView , WithEvents
                             AND pm.post_date <= :date2
                             AND pm.status IN ('2','3','7')
                     ),0) AS total_memo,
+                    IFNULL((SELECT
+                        ar.currency_rate
+                        FROM adjust_rate_details ard
+                        JOIN adjust_rates ar
+                            ON ar.id = ard.adjust_rate_id
+                        WHERE 
+                            ar.post_date <= :date3
+                            AND ar.status IN ('2','3')
+                            AND ard.lookable_type = 'purchase_down_payments'
+                            AND ard.lookable_id = pdp.id
+                        ORDER BY ar.post_date DESC LIMIT 1
+                    ),0) AS currency_rate_adjust,
                     u.name AS account_name,
                     u.employee_no AS account_code,
                     uvoid.name AS void_name,
@@ -64,17 +76,19 @@ class ExportDownPayment implements FromView , WithEvents
                     LEFT JOIN users udelete
                         ON udelete.id = pdp.void_id
                     WHERE 
-                        pdp.post_date <= :date3
+                        pdp.post_date <= :date4
                         AND pdp.grandtotal > 0
                         AND pdp.status IN ('2','3','7')
                 ", array(
                     'date1' => $this->date,
                     'date2' => $this->date,
                     'date3' => $this->date,
+                    'date4' => $this->date,
                 ));
 
             foreach($query_data as $row_invoice){
-                $balance = ($row_invoice->grandtotal - $row_invoice->total_used - $row_invoice->total_memo) * $row_invoice->currency_rate;
+                $balance = $row_invoice->grandtotal - $row_invoice->total_used - $row_invoice->total_memo;
+                $currency_rate = $row_invoice->currency_rate_adjust > 0 ? $row_invoice->currency_rate_adjust : $row_invoice->currency_rate;
                 if($balance > 0){
                     $array_filter[] = [
                         'code'          => $row_invoice->code,
@@ -84,11 +98,11 @@ class ExportDownPayment implements FromView , WithEvents
                         'post_date'     => date('d/m/Y',strtotime($row_invoice->post_date)),
                         'due_date'      => date('d/m/Y',strtotime($row_invoice->due_date)),
                         'note'          => $row_invoice->note,
-                        'subtotal'      => round($row_invoice->subtotal * $row_invoice->currency_rate,2),
-                        'discount'      => round($row_invoice->discount * $row_invoice->currency_rate,2),
-                        'total'         => round($row_invoice->total * $row_invoice->currency_rate,2),
-                        'used'          => round($row_invoice->total_used * $row_invoice->currency_rate,2),
-                        'memo'          => round($row_invoice->total_memo * $row_invoice->currency_rate,2),
+                        'subtotal'      => round($row_invoice->subtotal * $currency_rate,2),
+                        'discount'      => round($row_invoice->discount * $currency_rate,2),
+                        'total'         => round($row_invoice->total * $currency_rate,2),
+                        'used'          => round($row_invoice->total_used * $currency_rate,2),
+                        'memo'          => round($row_invoice->total_memo * $currency_rate,2),
                         'balance'       => round($balance,2),
                         'status'        => $this->getStatus($row_invoice->status),
                         'void_name'     => $row_invoice->void_name,
@@ -99,7 +113,7 @@ class ExportDownPayment implements FromView , WithEvents
                         'delete_date'   => date('d/m/Y',strtotime($row_invoice->deleted_at)),
                         'references'    => PurchaseDownPayment::getReference($row_invoice->code),
                     ];
-                    $totalbalance += $balance;
+                    $totalbalance += ($balance * $currency_rate);
                 }
             }  
         return view('admin.exports.down_payment', [

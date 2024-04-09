@@ -133,7 +133,7 @@ class CustomHelper {
 	}
 
 	public static function sendCogs($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null, $area_id = null, $shading = null){
-		$old_data = ItemCogs::where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->whereDate('date','<=',$date)->orderByDesc('date')->orderByDesc('id')->first();
+		$old_data = ItemCogs::where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->whereDate('date','<=',$date)->where('area_id',$area_id)->where('item_shading_id',$shading)->orderByDesc('date')->orderByDesc('id')->first();
 		if($type == 'IN'){
 			ItemCogs::create([
 				'lookable_type'		=> $lookable_type,
@@ -4122,6 +4122,7 @@ class CustomHelper {
 				]);
 				
 				$coaselisihkurs = Coa::where('code','700.01.01.01.03')->where('company_id',$ar->company_id)->first();
+				$coauangmukapembelian = Coa::where('code','100.01.07.01.01')->where('company_id',$ar->company_id)->first();
 
 				foreach($ar->adjustRateDetail as $row){
 					$nominal = abs($row->nominal);
@@ -4143,10 +4144,27 @@ class CustomHelper {
 						]);
 					}
 					if($row->type == '2'){
+						if($row->lookable_type == 'purchase_down_payments'){
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $coauangmukapembelian->id,
+								'type'			=> $row->nominal > 0 ? '1' : '2',
+								'account_id'	=> $coauangmukapembelian->bp_journal ? ($row->lookable->account_id ?? NULL) : NULL,
+								'nominal'		=> $nominal,
+								'nominal_fc'	=> 0,
+							]);
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $coaselisihkurs->id,
+								'type'			=> $row->nominal > 0 ? '2' : '1',
+								'nominal'		=> $nominal,
+								'nominal_fc'	=> 0,
+							]);
+						}
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $row->coa_id,
-							'type'			=> $row->nominal > 0 ? '1' : '2',
+							'type'			=> $row->nominal > 0 ? '2' : '1',
 							'account_id'	=> $row->coa->bp_journal ? ($row->lookable->account_id ?? NULL) : NULL,
 							'nominal'		=> $nominal,
 							'nominal_fc'	=> 0,
@@ -4154,7 +4172,7 @@ class CustomHelper {
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $coaselisihkurs->id,
-							'type'			=> $row->nominal > 0 ? '2' : '1',
+							'type'			=> $row->nominal > 0 ? '1' : '2',
 							'nominal'		=> $nominal,
 							'nominal_fc'	=> 0,
 						]);
@@ -4385,6 +4403,7 @@ class CustomHelper {
 
 		if($data){
 			foreach($data as $row){
+				$company_id = $row->company_id;
 				$item_id = $row->item_id;
 				$place_id = $row->place_id;
 				$warehouse_id = $row->warehouse_id;
@@ -4393,11 +4412,9 @@ class CustomHelper {
 				$qty = $row->qty_in ? $row->qty_in : $row->qty_out;
 				$type = $row->qty_in ? 'IN' : 'OUT';
 				
-				$row->delete();
-
-				/* ResetCogs::dispatch($row->date,$place_id,$item_id);
-				ResetStock::dispatch($place_id,$warehouse_id,$area_id,$item_id,$item_shading_id,$qty,$type); */
+				/* ResetCogs::dispatch($row->date,$company_id,$place_id,$item_id,$area_id,$item_shading_id); */
 				self::resetStock($place_id,$warehouse_id,$area_id,$item_id,$item_shading_id,$qty,$type);
+				$row->delete();
 			}
 		}
 	}

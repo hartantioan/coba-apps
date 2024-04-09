@@ -287,16 +287,16 @@
                                         <label class="active" for="user_bank_id">Pilih Dari Daftar</label>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        <input id="name_account" name="name_account" type="text" placeholder="Rekening atas nama">
-                                        <label class="active" for="name_account">Rekening Penerima</label>
+                                        <input id="bank_account" name="bank_account" type="text" placeholder="Bank Tujuan">
+                                        <label class="active" for="bank_account">Bank Tujuan</label>
                                     </div>
                                     <div class="input-field col m3 s12">
                                         <input id="no_account" name="no_account" type="text" placeholder="Rekening atas nama">
                                         <label class="active" for="no_account">No. Rek. Penerima</label>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        <input id="bank_account" name="bank_account" type="text" placeholder="Bank Tujuan">
-                                        <label class="active" for="bank_account">Bank Tujuan</label>
+                                        <input id="name_account" name="name_account" type="text" placeholder="Rekening atas nama">
+                                        <label class="active" for="name_account">Rekening Penerima</label>
                                     </div>
                                 </div>
                                 <div class="col m12">

@@ -2253,6 +2253,7 @@
                                                         <option value="` + val.project_id + `">` + val.project_name + `</value>
                                                     `);
                                                 }
+                                                $('#due_date').val(val.due_date);
                                             }else{
                                                 $('#last-row-detail').before(`
                                                     <tr class="row_detail">

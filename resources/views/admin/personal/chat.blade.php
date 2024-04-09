@@ -60,8 +60,9 @@
               <div class="content-area content-right">
                 <div class="app-wrapper">
                   <!-- Sidebar menu for small screen -->
+                  <button type="button"  data-target="chat-sidenav" class=" sidenav-trigger hide-on-large-only btn-floating mb-1 btn-flat purple accent-2 white-text btn-small"><i class="material-icons dp48">account_box</i></button>
                   <a href="#" data-target="chat-sidenav" class="sidenav-trigger hide-on-large-only">
-                    <i class="material-icons">menu</i>
+                    <i class="material-icons dp-48">account_box</i>
                   </a>
                   <!--/ Sidebar menu for small screen -->
 

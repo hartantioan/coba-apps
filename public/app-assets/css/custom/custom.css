@@ -32,6 +32,9 @@ WE WILL RELEASE FUTURE UPDATES SO IN ORDER TO NOT OVERWRITE YOUR STYLES IT'S BET
 	.dtfc-fixed-right{
 		position: unset !important;
 	}
+	.chat-content-head {
+		margin-bottom: 10em;
+	}
 	.attendance-list{
 		display: none !important;
 	}

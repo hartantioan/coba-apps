@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Auth;
 use App\Helpers\CustomHelper;
 use App\Mail\SendMail;
+use Detection\MobileDetect;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use App\Http\Controllers\Controller;
+use App\Models\AccessDevice;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -62,6 +64,20 @@ class AuthController extends Controller
                 $token = md5(uniqid());
 
                 User::where('employee_no', $request->id_card)->where('type','1')->where('status','1')->update([ 'token' => $token ]);
+                $detect = new MobileDetect();
+                $isMobile = $detect->isMobile();
+                $isTablet = $detect->isTablet();
+                $isComputer = !$isMobile && !$isTablet;
+                AccessDevice::create([
+                    'user_agent'	=> $detect->getUserAgent(),
+                    'user_id'		=> session('bo_id'),
+                    'is_mobile'     => $isMobile,
+                    'is_computer'   => $isComputer,
+                    'ip'            => $request->ip(),
+                
+                ]);
+
+
                 Auth::login($user);
 
                 activity()

@@ -1399,12 +1399,6 @@ Route::prefix('admin')->group(function () {
                         Route::post('print',[PriceHistoryPOController::class, 'print']);
                         Route::get('export',[PriceHistoryPOController::class, 'export']);
                     });
-
-                    Route::prefix('outstanding_ap')->middleware('operation.access:outstanding_ap,view')->group(function () {
-                        Route::get('/',[OutStandingAPController::class, 'index']);
-                        Route::post('filter_by_date',[OutStandingAPController::class, 'filterByDate']);
-                        Route::get('export',[OutStandingAPController::class, 'export']);
-                    });
                 });
 
                 Route::prefix('purchase_order')->middleware(['operation.access:purchase_order,view','lockacc'])->group(function () {
@@ -2330,6 +2324,12 @@ Route::prefix('admin')->group(function () {
                         Route::get('/',[UnbilledAPController::class, 'index']);
                         Route::post('filter_by_date',[UnbilledAPController::class, 'filterByDate']);
                         Route::get('export',[UnbilledAPController::class, 'export']);
+                    });
+
+                    Route::prefix('outstanding_ap')->middleware('operation.access:outstanding_ap,view')->group(function () {
+                        Route::get('/',[OutStandingAPController::class, 'index']);
+                        Route::post('filter_by_date',[OutStandingAPController::class, 'filterByDate']);
+                        Route::get('export',[OutStandingAPController::class, 'export']);
                     });
                 });
 

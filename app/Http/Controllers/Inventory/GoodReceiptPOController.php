@@ -911,7 +911,7 @@ class GoodReceiptPOController extends Controller
                 }
                 return response()->json([
                     'status'  => 500,
-                    'message' => 'Mohon maaf Good Recive tidak dapat di void karena item stock saat ini kurang dari 0. Daftar Item : '.implode(', ',$arrError),
+                    'message' => 'Mohon maaf GRPO tidak dapat di void karena item stock saat ini kurang dari 0. Daftar Item : '.implode(', ',$arrError),
                 ]);
             }
 
@@ -926,29 +926,29 @@ class GoodReceiptPOController extends Controller
                     'message' => 'Data telah digunakan pada Landed Cost / A/P Invoice.'
                 ];
             }else{
-                // $query->update([
-                //     'status'    => '5',
-                //     'void_id'   => session('bo_id'),
-                //     'void_note' => $request->msg,
-                //     'void_date' => date('Y-m-d H:i:s')
-                // ]);
+                $query->update([
+                    'status'    => '5',
+                    'void_id'   => session('bo_id'),
+                    'void_note' => $request->msg,
+                    'void_date' => date('Y-m-d H:i:s')
+                ]);
 
-                // $query->updateRootDocumentStatusProcess();
+                $query->updateRootDocumentStatusProcess();
 
-                // foreach($query->goodReceiptDetail as $row){
-                //     $row->itemSerial()->delete();
-                // }
+                foreach($query->goodReceiptDetail as $row){
+                    $row->itemSerial()->delete();
+                }
 
-                // CustomHelper::removeJournal('good_receipts',$query->id);
-                // CustomHelper::removeCogs('good_receipts',$query->id);
-                // CustomHelper::sendNotification('good_receipts',$query->id,'Goods Receipt No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
-                // CustomHelper::removeApproval('good_receipts',$query->id);
+                CustomHelper::removeJournal('good_receipts',$query->id);
+                CustomHelper::removeCogs('good_receipts',$query->id);
+                CustomHelper::sendNotification('good_receipts',$query->id,'Goods Receipt No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::removeApproval('good_receipts',$query->id);
     
-                // activity()
-                //     ->performedOn(new GoodReceipt())
-                //     ->causedBy(session('bo_id'))
-                //     ->withProperties($query)
-                //     ->log('Void the good receipt data');
+                activity()
+                    ->performedOn(new GoodReceipt())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Void the good receipt data');
                 
                 $response = [
                     'status'  => 200,

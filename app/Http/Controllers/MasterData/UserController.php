@@ -665,7 +665,7 @@ class UserController extends Controller
                         'pic'                   => $request->pic ? $request->pic : NULL,
                         'pic_no'                => $request->pic_no ? $request->pic_no : NULL,
                         'office_no'             => $request->office_no ? $request->office_no : NULL,
-                        'limit_credit'          => $request->limit_credit ? str_replace(',','.',str_replace('.','',$request->limit_credit)) : NULL,
+                        'limit_credit'          => $request->limit_credit ? str_replace(',','.',str_replace('.','',$request->limit_credit)) : 0,
                         'count_limit_credit'    => 0,
                         'top'                   => $request->top ? $request->top : NULL,
                         'top_internal'          => $request->top_internal ? $request->top_internal : NULL,

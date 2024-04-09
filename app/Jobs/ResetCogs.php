@@ -26,16 +26,20 @@ class ResetCogs implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
     
-    protected $date,$place_id,$item_id;
+    protected $company_id, $date,$place_id,$item_id,$area_id,$item_shading_id;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(string $date = null, int $place_id = null)
+    public function __construct(string $date = null, int $company_id = null, int $place_id = null, int $item_id = null, int $area_id = null, int $item_shading_id = null)
     {
+		$this->company_id = $company_id;
         $this->date = $date;
         $this->place_id = $place_id;
+		$this->item_id = $item_id;
+		$this->area_id = $area_id;
+		$this->item_shading_id = $item_shading_id;
     }
 
     /**
@@ -45,100 +49,51 @@ class ResetCogs implements ShouldQueue
      */
     public function handle()
     {
-		/* $itemcogs = ItemCogs::where('post_date','>=',$this->date)->where('place_id',$this->place_id)->get();
+		$itemcogs = ItemCogs::where('date','>=',$this->date)->where('company_id',$this->company_id)->where('place_id',$this->place_id)->where('item_id',$this->item_id)->where('area_id',$this->area_id)->where('item_shading_id',$this->item_shading_id)->orderBy('date')->orderBy('id')->get();
+		$old_data = ItemCogs::where('date','<',$this->date)->where('company_id',$this->company_id)->where('place_id',$this->place_id)->where('item_id',$this->item_id)->where('area_id',$this->area_id)->where('item_shading_id',$this->item_shading_id)->orderByDesc('date')->orderByDesc('id')->first();
+		$total_final = 0;
+		$qty_final = 0;
+		$price_final = 0;
+		foreach($itemcogs as $key => $row){
+			if($key == 0){
+				if($old_data){
+					if($row->type == 'IN'){
+						$total_final = $old_data->total_final + $row->total_in;
+						$qty_final = $old_data->qty_final + $row->qty_in;
+					}elseif($row->type == 'OUT'){
+						$total_final = $old_data->total_final - $row->total_out;
+						$qty_final = $old_data->qty_final - $row->qty_out;
+					}
 
-		foreach($itemcogs as $row){
-			$journal = Journal::where('lookable_type',$row->lookable_type)->where('lookable_id',$row->lookable_id)->get();
-			if($journal){
-				foreach($journal as $rowjournal){
-					$rowjournal->journalDetail()->delete();
-					$rowjournal->delete;
+					$price_final = $total_final / $qty_final;
+					
+					$row->update([
+						'price_final'	=> $price_final,
+						'qty_final'		=> $qty_final,
+						'total_final'	=> $total_final,
+					]);
+				}else{
+					$total_final = $row->total_final;
+					$qty_final = $row->qty_final;
 				}
+			}else{
+
+				if($row->type == 'IN'){
+					$total_final += $row->total_in;
+					$qty_final += $row->qty_in;
+				}elseif($row->type == 'OUT'){
+					$total_final -= $row->total_out;
+					$qty_final -= $row->qty_out;
+				}
+
+				$price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
+
+				$row->update([
+					'price_final'	=> $price_final,
+					'qty_final'		=> $qty_final,
+					'total_final'	=> $total_final,
+				]);
 			}
-			$qty = $row->type == 'IN' ? $row->qty_in : $row->qty_out;
-			CustomHelper::resetStock($row->place_id,$row->warehouse_id,$row->area_id,$row->item_id,$row->item_shading_i,$qty,$row->type);
-			$row->delete();
 		}
-
-		$gr = GoodReceipt::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
-		$grcv = GoodReceive::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
-		$lc = LandedCost::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
-		$gi = GoodIssue::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
-		$grt = GoodReturnPO::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
-		$gri = GoodReturnIssue::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
-		$pm = PurchaseMemo::whereIn('status',['2','3'])->whereDate('post_date','>=',$this->date)->get();
-
-		$data = [];
-
-		foreach($gr as $row){
-			$data[] = [
-				'type'          => 0,
-				'date'          => $row->post_date,
-				'lookable_type' => $row->getTable(),
-				'lookable_id'   => $row->id,
-			];
-		}
-
-		foreach($grt as $row){
-			$data[] = [
-				'type'          => 1,
-				'date'          => $row->post_date,
-				'lookable_type' => $row->getTable(),
-				'lookable_id'   => $row->id,
-			];
-		}
-
-		foreach($grcv as $row){
-			$data[] = [
-				'type'          => 0,
-				'date'          => $row->post_date,
-				'lookable_type' => $row->getTable(),
-				'lookable_id'   => $row->id,
-			];
-		}
-
-		foreach($lc as $row){
-			$data[] = [
-				'type'          => 1,
-				'date'          => $row->post_date,
-				'lookable_type' => $row->getTable(),
-				'lookable_id'   => $row->id,
-			];
-		}
-
-		foreach($gi as $row){
-			$data[] = [
-				'type'          => 2,
-				'date'          => $row->post_date,
-				'lookable_type' => $row->getTable(),
-				'lookable_id'   => $row->id,
-			];
-		}
-
-		foreach($gri as $row){
-			$data[] = [
-				'type'          => 3,
-				'date'          => $row->post_date,
-				'lookable_type' => $row->getTable(),
-				'lookable_id'   => $row->id,
-			];
-		}
-
-		foreach($pm as $row){
-			$data[] = [
-				'type'          => 4,
-				'date'          => $row->post_date,
-				'lookable_type' => $row->getTable(),
-				'lookable_id'   => $row->id,
-			];
-		}
-
-		$collection = collect($data)->sortBy(function($item) {
-						return [$item['date'], $item['type']];
-					})->values();
-
-		foreach($collection as $row){
-			CustomHelper::sendCogsFromReset($row['lookable_type'],$row['lookable_id']);
-		} */
     }
 }

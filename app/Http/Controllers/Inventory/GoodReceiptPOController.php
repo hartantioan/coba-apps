@@ -920,13 +920,13 @@ class GoodReceiptPOController extends Controller
                     'status'  => 500,
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
                 ];
-            }elseif($query->hasChildDocument()){
+            /* }elseif($query->hasChildDocument()){
                 $response = [
                     'status'  => 500,
                     'message' => 'Data telah digunakan pada Landed Cost / A/P Invoice.'
-                ];
+                ]; */
             }else{
-                $query->update([
+                /* $query->update([
                     'status'    => '5',
                     'void_id'   => session('bo_id'),
                     'void_note' => $request->msg,
@@ -937,12 +937,12 @@ class GoodReceiptPOController extends Controller
 
                 foreach($query->goodReceiptDetail as $row){
                     $row->itemSerial()->delete();
-                }
+                } */
 
-                CustomHelper::removeJournal('good_receipts',$query->id);
+                /* CustomHelper::removeJournal('good_receipts',$query->id); */
                 CustomHelper::removeCogs('good_receipts',$query->id);
-                CustomHelper::sendNotification('good_receipts',$query->id,'Goods Receipt No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
-                CustomHelper::removeApproval('good_receipts',$query->id);
+                /* CustomHelper::sendNotification('good_receipts',$query->id,'Goods Receipt No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::removeApproval('good_receipts',$query->id); */
     
                 activity()
                     ->performedOn(new GoodReceipt())

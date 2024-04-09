@@ -666,7 +666,7 @@ class InventoryTransferInController extends Controller
                     $row->itemSerialIn()->delete();
                 }
 
-                if(in_array($query->status,['2','3','4','5'])){
+                if(in_array($query->status,['2','3'])){
                     CustomHelper::removeJournal('inventory_transfer_ins',$query->id);
                     CustomHelper::removeCogs('inventory_transfer_ins',$query->id);
                 }

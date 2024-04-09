@@ -4412,7 +4412,7 @@ class CustomHelper {
 				$qty = $row->qty_in ? $row->qty_in : $row->qty_out;
 				$type = $row->qty_in ? 'IN' : 'OUT';
 				
-				/* ResetCogs::dispatch($row->date,$company_id,$place_id,$item_id,$area_id,$item_shading_id); */
+				ResetCogs::dispatch($row->date,$company_id,$place_id,$item_id,$area_id,$item_shading_id);
 				self::resetStock($place_id,$warehouse_id,$area_id,$item_id,$item_shading_id,$qty,$type);
 				$row->delete();
 			}

@@ -514,7 +514,11 @@
         if (file) {
         const reader = new FileReader();
         const fileType = file.type.split('/')[0]; 
-       
+        const maxSize = 10 * 1024 * 1024;
+        if (file.size > maxSize) {
+            alert('File size exceeds the maximum limit of 10 MB.');
+            return;
+        }
 
         reader.onload = () => {
            

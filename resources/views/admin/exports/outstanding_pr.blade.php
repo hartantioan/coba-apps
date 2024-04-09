@@ -10,8 +10,11 @@
             <th class="center-align">Tgl.Post</th>
             <th class="center-align">Keterangan</th>
             <th class="center-align">Status</th>
+            <th class="center-align">Grup Item</th>
             <th class="center-align">Kode Item</th>
             <th class="center-align">Nama Item</th>
+            <th class="center-align">Keterangan 1</th>
+            <th class="center-align">Keterangan 2</th>
             <th class="center-align">Satuan</th>
             <th class="center-align">Qty Req.</th>
             <th class="center-align">Qty PO</th>
@@ -28,8 +31,11 @@
                 <td>{{ $row['post_date'] }}</td>
                 <td>{{ $row['note'] }}</td>
                 <td>{{ $row['status'] }}</td>
+                <td>{{ $row['group_item'] }}</td>
                 <td>{{ $row['item_code'] }}</td>
                 <td>{{ $row['item_name'] }}</td>
+                <td>{{ $row['note1'] }}</td>
+                <td>{{ $row['note2'] }}</td>
                 <td>{{ $row['satuan'] }}</td>
                 <td>{{ $row['qty'] }}</td>
                 <td>{{ $row['qty_po'] }}</td>

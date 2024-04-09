@@ -26,8 +26,13 @@ class ExportOutstandingPO implements FromView,ShouldAutoSize
             $entry["nama_supp"]=$row->purchaseOrder->supplier->name;
             $entry["note"] = $row->purchaseOrder->note;
             $entry["status"] = $row->purchaseOrder->statusRaw();
+            $entry["user_name"] = $row->purchaseOrder->user->name ?? '';
+            $entry["group_item"] = $row->item->itemGroup->name;
             $entry["item_code"] = $row->item->code;
             $entry["item_name"] = $row->item->name;
+            $entry["note1"] = $row->note;
+            $entry["note2"] = $row->note2;
+            $entry["shipping_type"] = $row->purchaseOrder->shippingType();
             $entry["satuan"] =$row->itemUnit->unit->code;
             $entry["qty"] = $row->qty;
             $entry["qty_gr"] = $row->qtyGR();

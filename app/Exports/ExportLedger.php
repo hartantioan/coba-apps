@@ -15,15 +15,16 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
     * @return \Illuminate\Support\Collection
     */
 
-    protected $start_date, $end_date, $coa_id, $company_id, $search;
+    protected $start_date, $end_date, $coa_id, $company_id, $search, $closing_journal;
 
-    public function __construct(string $start_date, string $end_date, string $coa_id, string $company_id, string $search)
+    public function __construct(string $start_date, string $end_date, string $coa_id, string $company_id, string $search,string $closing_journal)
     {
         $this->start_date = $start_date ?? '';
 		$this->end_date = $end_date ?? '';
         $this->coa_id = $coa_id ?? '';
         $this->company_id = $company_id ?? '';
         $this->search = $search ?? '';
+        $this->closing_journal = $closing_journal ?? '';
     }
 
 
@@ -80,11 +81,25 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
             $balance = $balance_debit - $balance_credit;
 
             $ending_debit  = $row->journalDebit()->whereHas('journal',function($query)use($periode){
-                $query->whereRaw($periode);
+                $query->whereRaw($periode)
+                    ->where(function($query){
+                        if($this->closing_journal){
+                            $query->where('lookable_type','!=','closing_journals')
+                                ->orWhereNull('lookable_type');
+                        }
+                    });
             })->sum('nominal');
+            
             $ending_credit = $row->journalCredit()->whereHas('journal',function($query)use($periode){
-                $query->whereRaw($periode);
+                $query->whereRaw($periode)
+                    ->where(function($query){
+                        if($this->closing_journal){
+                            $query->where('lookable_type','!=','closing_journals')
+                                ->orWhereNull('lookable_type');
+                        }
+                    });
             })->sum('nominal');
+
             $ending_total  = $balance + $ending_debit - $ending_credit;
 
             $arr[] = [

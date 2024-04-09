@@ -503,7 +503,7 @@ class UserController extends Controller
             ]);
         }else{
             $validation = Validator::make($request->all(), [
-                'name' 				=> 'required|uppercase',
+                'name' 				=> $request->temp ? ['required','uppercase', Rule::unique('users', 'name')->ignore($request->temp)] : 'required|uppercase|unique:users,name',
                 'phone'		        => $request->temp ? ['required', Rule::unique('users', 'phone')->ignore($request->temp)] : 'required|unique:users,phone',
                 'employee_no'		=> $request->employee_no ? ($request->temp ? [Rule::unique('users', 'employee_no')->ignore($request->temp)] : 'unique:users,employee_no') : '',
                 /* 'email'             => $request->temp ? ['required', Rule::unique('users', 'email')->ignore($request->temp)] : 'required|unique:users,email', */
@@ -521,6 +521,7 @@ class UserController extends Controller
             ], [
                 'name.required' 	            => 'Nama tidak boleh kosong.',
                 'name.uppercase' 	            => 'Nama harus menggunakan huruf kapital.',
+                'name.unique'                   => 'Nama telah terpakai.',
                 'phone.required'                => 'Telepon tidak boleh kosong.',
                 'phone.unique'                  => 'Telepon telah terpakai.',
                 'employee_no.unique'            => 'Kode BP / NIK telah terpakai.',

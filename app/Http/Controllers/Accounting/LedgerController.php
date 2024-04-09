@@ -102,11 +102,23 @@ class LedgerController extends Controller
 
                 $balance = $balance_debit - $balance_credit;
 
-                $ending_debit  = $val->journalDebit()->whereHas('journal',function($query)use($periode){
-                    $query->whereRaw($periode);
+                $ending_debit  = $val->journalDebit()->whereHas('journal',function($query)use($periode,$request){
+                    $query->whereRaw($periode)
+                        ->where(function($query)use($request){
+                            if($request->is_closing_journal){
+                                $query->where('lookable_type','!=','closing_journals')
+                                    ->orWhereNull('lookable_type');
+                            }
+                        });
                 })->sum('nominal');
-                $ending_credit = $val->journalCredit()->whereHas('journal',function($query)use($periode){
-                    $query->whereRaw($periode);
+                $ending_credit = $val->journalCredit()->whereHas('journal',function($query)use($periode,$request){
+                    $query->whereRaw($periode)
+                        ->where(function($query)use($request){
+                            if($request->is_closing_journal){
+                                $query->where('lookable_type','!=','closing_journals')
+                                    ->orWhereNull('lookable_type');
+                            }
+                        });
                 })->sum('nominal');
                 $ending_total  = $balance + $ending_debit - $ending_credit;
 
@@ -191,6 +203,12 @@ class LedgerController extends Controller
                 $query->whereDate('post_date', '>=', date('Y-m-d'))
                     ->whereDate('post_date', '<=', $request->finish_date);
             }
+            $query->where(function($query)use($request){
+                if($request->is_closing_journal){
+                    $query->where('lookable_type','!=','closing_journals')
+                        ->orWhereNull('lookable_type');
+                }
+            });
         })->get()->sortBy(function($query){
            $query->journal->post_date;
         }) as $key => $row){
@@ -230,7 +248,8 @@ class LedgerController extends Controller
         $coa_id = $request->coa_id ? $request->coa_id : '';
         $company_id = $request->company_id ? $request->company_id : '';
         $search = $request->search ? $request->search : '';
+        $closing_journal = $request->closing_journal ? $request->closing_journal : '';
 
-		return Excel::download(new ExportLedger($start_date,$end_date,$coa_id,$company_id,$search), 'ledger_'.uniqid().'.xlsx');
+		return Excel::download(new ExportLedger($start_date,$end_date,$coa_id,$company_id,$search,$closing_journal), 'ledger_'.uniqid().'.xlsx');
     }
 }

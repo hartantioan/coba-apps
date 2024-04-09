@@ -85,7 +85,7 @@
                                                     <div class="switch mb-1">
                                                         <label>
                                                             Tampilkan
-                                                            <input type="checkbox" id="is_closing_journal" name="is_closing_journal" value="1">
+                                                            <input type="checkbox" id="is_closing_journal" name="is_closing_journal" value="1" onclick="loadDataTable();">
                                                             <span class="lever"></span>
                                                             Sembunyikan
                                                         </label>
@@ -200,14 +200,15 @@
     });
 
     function exportExcel(){
-        var start_date = $('#start_date').val(), finish_date = $('#finish_date').val(), coa_id = ($('#coa').val() ? $('#coa').val() : ''), company_id = ($('#company').val() ? $('#company').val() : ''), search = window.table.search();
-        window.location = "{{ Request::url() }}/export?start_date=" + start_date + "&end_date=" + finish_date + "&coa_id=" + coa_id + "&company_id=" + company_id + "&search=" + search;
+        var start_date = $('#start_date').val(), finish_date = $('#finish_date').val(), coa_id = ($('#coa').val() ? $('#coa').val() : ''), company_id = ($('#company').val() ? $('#company').val() : ''), search = window.table.search(), is_closing_journal = ($('#is_closing_journal').is(':checked') ? $('#is_closing_journal').val() : '');
+        window.location = "{{ Request::url() }}/export?start_date=" + start_date + "&end_date=" + finish_date + "&coa_id=" + coa_id + "&company_id=" + company_id + "&search=" + search + "&closing_journal=" + is_closing_journal;
     }
 
     function reset(){
         $('#company').val($("#company option:first").val()).formSelect();
         $('#coa').empty();
         $('#start_date,#finish_date').val('{{ date("Y-m-d") }}');
+        $('#is_closing_journal').prop('checked', false);
         loadDataTable();
     }
 
@@ -231,6 +232,7 @@
                     company : $('#company').val(),
                     start_date : $('#start_date').val(),
                     finish_date : $('#finish_date').val(),
+                    is_closing_journal : ($('#is_closing_journal').is(':checked') ? $('#is_closing_journal').val() : ''),
                 },
                 beforeSend: function() {
                     loadingOpen('#datatable_serverside');
@@ -301,6 +303,7 @@
                 id: data,
                 start_date: $('#start_date').val(),
                 finish_date: $('#finish_date').val(),
+                is_closing_journal : ($('#is_closing_journal').is(':checked') ? $('#is_closing_journal').val() : ''),
             },
             success: function(response) {
                 $('#modal2').modal('open');

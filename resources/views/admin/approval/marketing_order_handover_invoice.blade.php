@@ -216,12 +216,12 @@
                                 <td>
                                         
                                         
-                                        <div>{{ $row->approvalTemplateStage->approvalStage->approval->document_text }}
+                                       <div>{{ $row->approvalTemplateStage->approvalStage->approval->document_text }}
                                             {{ $row->user->name }} 
                                             @if ($row->user->position()->exists())
                                             {{ $row->user->position->name }}
                                             @endif
-                                            {{ ($row->date_process ? \Carbon\Carbon::parse($row->date_process)->format('d/m/Y H:i:s') : '-') }}</div>
+                                            {{ ($row->date_process ? \Carbon\Carbon::parse($row->date_process)->format('d/m/Y H:i:s') : '-').' Keterangan : '.$row->note }}</div>
                                         <div class="{{ $row->user->date_process ? '' : 'mt-2' }}"></div>
                                         
                                 </td>

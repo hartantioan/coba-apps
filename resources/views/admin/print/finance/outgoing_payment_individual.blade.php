@@ -169,7 +169,7 @@
                     <td width="33%" class="left-align" >
                         <span class="invoice-number mr-1"># {{ $data->code }}</span>
                         <br>
-                        <small style="font-size:1em"> <small>Tgl.Outgoing:</small>
+                        <small style="font-size:1em"> <small>Tgl.Dokumen:</small>
                         <small>{{ date('d/m/Y',strtotime($data->post_date)) }}</small>
                         <h2 class="indigo-text">Outgoing Payment</h2>
                     </td>
@@ -270,6 +270,15 @@
                                         <td width="1%">:</td>
                                         <td width="60%">
                                             {{ number_format($data->currency_rate,2,',','.') }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="40%">
+                                            Tgl.Outgoing
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="60%">
+                                            {{ date('d/m/Y',strtotime($data->pay_date)) }}
                                         </td>
                                     </tr>
                                 </table>

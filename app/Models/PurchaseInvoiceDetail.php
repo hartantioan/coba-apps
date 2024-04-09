@@ -143,7 +143,7 @@ class PurchaseInvoiceDetail extends Model
             'good_receipt_details'      => $this->lookable->item->code.' - '.$this->lookable->item->name,
             'landed_cost_fee_details'   => $this->lookable->landedCostFee->name,
             'purchase_order_details'    => $this->lookable->item_id ? $this->lookable->item->code.' - '.$this->lookable->item->name : $this->lookable->coa->code.' - '.$this->lookable->coa->name,
-            'coas'                      => $this->note,
+            'coas'                      => $this->lookable->name,
             default                     => '-',
         };
 

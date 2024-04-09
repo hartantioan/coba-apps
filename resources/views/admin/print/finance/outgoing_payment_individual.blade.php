@@ -238,6 +238,15 @@
                                 <table border="0" width="100%" class="tbl-info">
                                     <tr>
                                         <td width="40%">
+                                            Tgl.Outgoing
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="60%">
+                                            {{ date('d/m/Y',strtotime($data->pay_date)) }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="40%">
                                             Rekening Tujuan
                                         </td>
                                         <td width="1%">:</td>
@@ -270,15 +279,6 @@
                                         <td width="1%">:</td>
                                         <td width="60%">
                                             {{ number_format($data->currency_rate,2,',','.') }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="40%">
-                                            Tgl.Outgoing
-                                        </td>
-                                        <td width="1%">:</td>
-                                        <td width="60%">
-                                            {{ date('d/m/Y',strtotime($data->pay_date)) }}
                                         </td>
                                     </tr>
                                 </table>

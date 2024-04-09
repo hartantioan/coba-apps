@@ -606,7 +606,7 @@ class PurchaseInvoiceController extends Controller
                             'cut_date'      => '',
                             'spk_no'        => '',
                             'invoice_no'    => '',
-                            'header_note'   => $datagr->note,
+                            'header_note'   => $rowdetail->purchaseOrderDetail->purchaseOrder->note,
                             'currency_rate' => number_format($currency_rate,2,',','.'),
                             'currency_id'   => $rowdetail->purchaseOrderDetail->purchaseOrder->currency_id,
                             'rounding'      => number_format($rowdetail->purchaseOrderDetail->purchaseOrder->rounding,2,',','.'),

@@ -201,8 +201,8 @@
                                         <thead>
                                             <tr>
                                                 <th class="center">Item</th>
-                                                <th class="center">Stok (Satuan Stock)</th>
-                                                <th class="center">Outstanding Req.(Satuan Stock)</th>
+                                                <th class="center">Stok (Satuan UoM)</th>
+                                                <th class="center">Outstanding Req.(Satuan UoM)</th>
                                                 <th class="center">Qty</th>
                                                 <th class="center">Satuan</th>
                                                 <th class="center">Keterangan 1</th>

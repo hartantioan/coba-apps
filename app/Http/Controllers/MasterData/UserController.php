@@ -504,17 +504,17 @@ class UserController extends Controller
         }else{
             $validation = Validator::make($request->all(), [
                 'name' 				=> $request->temp ? ['required','uppercase', Rule::unique('users', 'name')->ignore($request->temp)] : 'required|uppercase|unique:users,name',
-                'phone'		        => $request->temp ? ['required', Rule::unique('users', 'phone')->ignore($request->temp)] : 'required|unique:users,phone',
+                /* 'phone'		        => $request->temp ? ['required', Rule::unique('users', 'phone')->ignore($request->temp)] : 'required|unique:users,phone', */
                 'employee_no'		=> $request->employee_no ? ($request->temp ? [Rule::unique('users', 'employee_no')->ignore($request->temp)] : 'unique:users,employee_no') : '',
                 /* 'email'             => $request->temp ? ['required', Rule::unique('users', 'email')->ignore($request->temp)] : 'required|unique:users,email', */
-                'address'           => 'required',
+                /* 'address'           => 'required',
                 'type'              => 'required',
-                /* 'province_id'       => 'required',
+                'province_id'       => 'required',
                 'city_id'           => 'required',
                 'district_id'       => 'required',
-                'subdistrict_id'    => 'required', */
+                'subdistrict_id'    => 'required',
                 'pic'               => 'required',
-                'pic_no'            => 'required',
+                'pic_no'            => 'required', */
                 'office_no'         => 'required',
                 'limit_credit'      => 'required',
                 'country_id'        => 'required',

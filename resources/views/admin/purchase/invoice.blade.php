@@ -329,7 +329,7 @@
                                     <label class="active" for="invoice_no">No. Invoice</label>
                                 </div>
                                 <div class="input-field col m3 s12">
-                                    <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();countAll();">
+                                    <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
                                         @foreach ($currency as $row)
                                             <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
                                         @endforeach

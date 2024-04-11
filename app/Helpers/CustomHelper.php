@@ -3526,8 +3526,6 @@ class CustomHelper {
 			$realInvoice = 0;
 			$realDownPayment = 0;
 
-			$arrNote = [];
-
 			$type = '';
 
 			foreach($pi->purchaseInvoiceDetail as $row){
@@ -3684,10 +3682,6 @@ class CustomHelper {
 						'note2'			=> $row->note2,
 					]);
 
-					if(self::checkArrayRaw($arrNote,$pod->purchaseOrder->code) < 0){
-						$arrNote[] = $pod->purchaseOrder->code;
-					}
-
 				}elseif($row->lookable_type == 'landed_cost_fee_details'){
 					$type = $pi->currency->type;
 					JournalDetail::create([
@@ -3741,12 +3735,26 @@ class CustomHelper {
 						'note'			=> $row->note,
 						'note2'			=> $row->note2,
 					]);
-
-					if(self::checkArrayRaw($arrNote,$row->lookable->landedCost->code) < 0){
-						$arrNote[] = $row->lookable->landedCost->code;
-					}
 				}else{
 					$type = $pi->currency->type;
+
+					$currency_rate = $row->lookable->goodReceipt->latestCurrencyRateByDate($pi->post_date);
+
+					$totalgrpo = $row->total * $currency_rate;
+					$totalinvoice = $row->total * $pi->currency_rate;
+					$balancegrpo = $totalgrpo - $totalinvoice;
+
+					if($balancegrpo > 0 || $balancegrpo < 0){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $coaselisihkurs->id,
+							'account_id'	=> $coaselisihkurs->bp_journal ? $pi->account_id : NULL,
+							'type'			=> $balancegrpo > 0  ? '2' : '1',
+							'nominal'		=> floatval(abs($balancegrpo)),
+							'nominal_fc'	=> 0,
+						]);
+					}
+
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $coahutangbelumditagih->id,
@@ -3757,8 +3765,8 @@ class CustomHelper {
 						'department_id'	=> $row->department_id ? $row->department_id : NULL,
 						'project_id'	=> $row->lookable->purchaseOrderDetail->project_id ? $row->lookable->purchaseOrderDetail->project_id : NULL,
 						'type'			=> '1',
-						'nominal'		=> $row->total * $pi->currency_rate,
-						'nominal_fc'	=> $type == '1' || $type == '' ? $row->total * $pi->currency_rate : $row->total,
+						'nominal'		=> $totalgrpo,
+						'nominal_fc'	=> $type == '1' || $type == '' ? $totalgrpo : $row->total,
 						'note'			=> $row->note,
 						'note2'			=> $row->note2,
 					]);
@@ -3819,10 +3827,6 @@ class CustomHelper {
 						'note'			=> $row->note,
 						'note2'			=> $row->note2,
 					]);
-
-					if(self::checkArrayRaw($arrNote,$row->lookable->goodReceipt->code) < 0){
-						$arrNote[] = $row->lookable->goodReceipt->code;
-					}
 				}
 			}
 

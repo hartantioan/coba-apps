@@ -2814,6 +2814,7 @@
                 if(percent_tax > 0 && $('#arr_include_tax' + element.data('id')).val() == '1'){
                     rowtotal = rowtotal / (1 + (percent_tax / 100));
                 }
+                rowtotal = Math.round(rowtotal * 100) / 100;
                 rowtax = Math.floor(rowtotal * (percent_tax / 100));
                 rowwtax = Math.floor(rowtotal * (percent_wtax / 100));
                 $('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val(

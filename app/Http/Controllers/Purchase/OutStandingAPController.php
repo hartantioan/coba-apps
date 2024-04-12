@@ -246,7 +246,7 @@ class OutStandingAPController extends Controller
                 ];
                 
                 if($balance > 0){
-                    $totalAll += ($balance * $currency_rate);
+                    $totalAll += $balance * $currency_rate;
                     $array_filter[] = $data_tempura;
                 }
             }
@@ -271,7 +271,7 @@ class OutStandingAPController extends Controller
                 ];
                 
                 if($balance > 0){
-                    $totalAll += ($balance * $currency_rate);
+                    $totalAll += $balance * $currency_rate;
                     $array_filter[] = $data_tempura;
                 }
             }

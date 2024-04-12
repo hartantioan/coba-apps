@@ -241,7 +241,7 @@ class AdjustRateController extends Controller
 
             foreach($datagr as $row){
                 $latest_rate = $row->latestCurrencyRateByDate($request->post_date);
-                $total = $row->balanceTotalByDate($request->post_date);
+                $total = $row->balanceTotal();
                 if($total > 0){
                     $result[] = [
                         'coa_id'        => $coahutangusahabelumditagih->id,

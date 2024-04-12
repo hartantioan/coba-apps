@@ -99,7 +99,7 @@ class ExportUnbilledAP implements FromView , WithEvents
                     AND j.deleted_at IS NULL
             ) AS currency_rate,
             IFNULL((SELECT
-                ar.currency_rate
+                SUM(ard.nominal)
                 FROM adjust_rate_details ard
                 JOIN adjust_rates ar
                     ON ar.id = ard.adjust_rate_id
@@ -108,8 +108,7 @@ class ExportUnbilledAP implements FromView , WithEvents
                     AND ar.status IN ('2','3')
                     AND ard.lookable_type = 'good_receipts'
                     AND ard.lookable_id = gr.id
-                ORDER BY ar.post_date DESC LIMIT 1
-            ),0) AS currency_rate_adjust
+            ),0) AS adjust_nominal
             FROM good_receipts gr
             LEFT JOIN users u
                 ON u.id = gr.account_id
@@ -142,7 +141,10 @@ class ExportUnbilledAP implements FromView , WithEvents
             }
             $balance = $row->total - ($row->total_invoice - $total_reconcile) - $row->total_return;
             if($balance > 0){
-                $currency_rate = $row->currency_rate_adjust > 0 ? $row->currency_rate_adjust : $row->currency_rate;
+                $currency_rate = $row->currency_rate;
+                $total_received_after_adjust = ($row->total * $currency_rate) + $row->adjust_nominal;
+                $total_invoice_after_adjust = ($row->total_invoice - $total_reconcile + $row->total_return) * $currency_rate;
+                $balance_after_adjust = $total_received_after_adjust - $total_invoice_after_adjust;
                 $array_filter[] = [
                     'no'            => ($key + 1),
                     'code'          => $row->code,
@@ -150,11 +152,11 @@ class ExportUnbilledAP implements FromView , WithEvents
                     'post_date'     => date('d/m/Y',strtotime($row->post_date)),
                     'delivery_no'   => $row->delivery_no,
                     'note'          => $row->note,
-                    'total_received'=> number_format($row->total * $currency_rate,2,',','.'),
-                    'total_invoice' => number_format(($row->total_invoice - $total_reconcile) * $currency_rate,2,',','.'),
-                    'total_balance' => number_format($balance * $currency_rate,2,',','.'),
+                    'total_received'=> number_format($total_received_after_adjust,2,',','.'),
+                    'total_invoice' => number_format($total_invoice_after_adjust,2,',','.'),
+                    'total_balance' => number_format($balance_after_adjust,2,',','.'),
                 ];
-                $totalUnbilled += $balance * $currency_rate;
+                $totalUnbilled += round($balance_after_adjust,2);
             }
         }
 

@@ -277,6 +277,18 @@ class GoodReceipt extends Model
         return $total;
     }
 
+    public function balanceTotal(){
+        $total = $this->total;
+
+        foreach($this->goodReceiptDetail()->whereHas('purchaseInvoiceDetail')->get() as $row){
+            foreach($row->purchaseInvoiceDetail as $rowinvoice){
+                $total -= $rowinvoice->total;
+            }
+        }
+
+        return $total;
+    }
+
     public function balanceQtyInvoice(){
         $qty = 0;
 

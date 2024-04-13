@@ -166,7 +166,7 @@
                         });
                         $('#detail_invoice').append(`
                             <tr>
-                                <td colspan="10" class="right-align"><h6><b>Grandtotal : `+response.totalall+`</b></h6></td>
+                                <td colspan="10" class="right-align"><h6><b>Execution Time : ` + response.execution_time + ` Grandtotal : `+response.totalall+`</b></h6></td>
                             </tr>
                         `);
                     }else{

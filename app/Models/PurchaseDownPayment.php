@@ -238,6 +238,22 @@ class PurchaseDownPayment extends Model
         return $total;
     }
 
+    public function balancePayment(){
+        $total = $this->grandtotal;
+        $totalAfterMemo = $total - $this->totalMemo();
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+            $query->whereHas('outgoingPayment');
+        })->get() as $rowpayment){
+            $totalAfterMemo -= $rowpayment->nominal;
+        }
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+            $query->where('payment_type','5')->whereIn('status',['2','3'])->whereDoesntHave('outgoingPayment')->whereNull('coa_source_id');
+        })->get() as $rowpayment){
+            $totalAfterMemo -= $rowpayment->nominal;
+        }
+        return $totalAfterMemo;
+    }
+
     public function balancePaymentRequest(){
         $total = $this->grandtotal;
         $totalAfterMemo = $total - $this->totalMemo();

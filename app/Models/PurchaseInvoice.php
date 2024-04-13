@@ -406,6 +406,29 @@ class PurchaseInvoice extends Model
         return $totalAfterMemo;
     }
 
+    public function balancePayment(){
+        $total = $this->balance;
+        $totalAfterMemo = $total - $this->totalMemo();
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+            $query->whereHas('outgoingPayment');
+        })->get() as $rowpayment){
+            $totalAfterMemo -= $rowpayment->nominal;
+        }
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+            $query->where('payment_type','5')->whereIn('status',['2','3'])->whereDoesntHave('outgoingPayment')->whereNull('coa_source_id');
+        })->get() as $rowpayment){
+            $totalAfterMemo -= $rowpayment->nominal;
+        }
+        $totalPayByJournal = JournalDetail::whereHas('coa',function($query){
+            $query->where('code','200.01.03.01.01');
+        })->whereHas('journal',function($query){
+            $query->whereIn('status',['2','3']);
+        })->where('note','VOID*'.$this->code)->sum('nominal');
+        $totalAfterMemo -= $totalPayByJournal;
+
+        return $totalAfterMemo;
+    }
+
     public function getTotalPaidExcept($prd){
         $total = $this->balance;
         $totalAfterMemo = $total - $this->totalMemo();

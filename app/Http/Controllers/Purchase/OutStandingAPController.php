@@ -104,7 +104,7 @@ class OutStandingAPController extends Controller
                         AND jd.deleted_at IS NULL
                 ),0) AS total_journal,
                 IFNULL((SELECT
-                    ar.currency_rate
+                    SUM(ard.nominal)
                     FROM adjust_rate_details ard
                     JOIN adjust_rates ar
                         ON ar.id = ard.adjust_rate_id
@@ -113,8 +113,7 @@ class OutStandingAPController extends Controller
                         AND ar.status IN ('2','3')
                         AND ard.lookable_type = 'purchase_invoices'
                         AND ard.lookable_id = pi.id
-                    ORDER BY ar.post_date DESC LIMIT 1
-                ),0) AS currency_rate_adjust,
+                ),0) AS adjust_nominal,
                 u.name AS account_name,
                 u.employee_no AS account_code,
                 pi.code,
@@ -185,7 +184,7 @@ class OutStandingAPController extends Controller
                         AND prd.deleted_at IS NULL
                 ),0) AS total_reconcile,
                 IFNULL((SELECT
-                    ar.currency_rate
+                    SUM(ard.nominal)
                     FROM adjust_rate_details ard
                     JOIN adjust_rates ar
                         ON ar.id = ard.adjust_rate_id
@@ -194,8 +193,7 @@ class OutStandingAPController extends Controller
                         AND ar.status IN ('2','3')
                         AND ard.lookable_type = 'purchase_down_payments'
                         AND ard.lookable_id = pi.id
-                    ORDER BY ar.post_date DESC LIMIT 1
-                ),0) AS currency_rate_adjust,
+                ),0) AS adjust_nominal,
                 u.name AS account_name,
                 u.employee_no AS account_code,
                 pi.code,
@@ -229,7 +227,10 @@ class OutStandingAPController extends Controller
             foreach($results as $row){
                 $totalPayed = $row->total_payment + $row->total_memo + $row->total_reconcile + $row->total_journal;
                 $balance = $row->balance - $totalPayed;
-                $currency_rate = $row->currency_rate_adjust > 0 ? $row->currency_rate_adjust : $row->currency_rate;
+                $currency_rate = $row->currency_rate;
+                $total_received_after_adjust = ($row->balance * $currency_rate) + $row->adjust_nominal;
+                $total_invoice_after_adjust = ($row->total_payment + $row->total_memo + $row->total_reconcile + $row->total_journal) * $currency_rate;
+                $balance_after_adjust = $total_received_after_adjust - $total_invoice_after_adjust;
                 $data_tempura = [
                     'code'      => $row->code,
                     'vendor'    => $row->account_name,
@@ -237,16 +238,13 @@ class OutStandingAPController extends Controller
                     'rec_date'  => date('d/m/Y',strtotime($row->received_date)),
                     'due_date'  => date('d/m/Y',strtotime($row->due_date)),
                     'top'       => '-',
-                    'total'     => number_format($row->total * $currency_rate,2,',','.'),
-                    'tax'       => number_format($row->tax * $currency_rate,2,',','.'),
-                    'wtax'      => number_format($row->wtax * $currency_rate,2,',','.'),
-                    'grandtotal'=> number_format($row->balance * $currency_rate,2,',','.'),
-                    'payed'     => number_format($totalPayed * $currency_rate,2,',','.'),
-                    'sisa'      => number_format($balance * $currency_rate,2,',','.'),
+                    'grandtotal'=> number_format($total_received_after_adjust,2,',','.'),
+                    'payed'     => number_format($total_invoice_after_adjust,2,',','.'),
+                    'sisa'      => number_format($balance_after_adjust,2,',','.'),
                 ];
                 
                 if($balance > 0){
-                    $totalAll += $balance * $currency_rate;
+                    $totalAll += $balance_after_adjust;
                     $array_filter[] = $data_tempura;
                 }
             }
@@ -254,7 +252,10 @@ class OutStandingAPController extends Controller
             foreach($results2 as $row){
                 $totalPayed = $row->total_payment + $row->total_memo + $row->total_reconcile;
                 $balance = $row->grandtotal - $totalPayed;
-                $currency_rate = $row->currency_rate_adjust > 0 ? $row->currency_rate_adjust : $row->currency_rate;
+                $currency_rate = $row->currency_rate;
+                $total_received_after_adjust = ($row->grandtotal * $currency_rate) + $row->adjust_nominal;
+                $total_invoice_after_adjust = ($row->total_payment + $row->total_memo + $row->total_reconcile) * $currency_rate;
+                $balance_after_adjust = $total_received_after_adjust - $total_invoice_after_adjust;
                 $data_tempura = [
                     'code'      => $row->code,
                     'vendor'    => $row->account_name,
@@ -262,16 +263,13 @@ class OutStandingAPController extends Controller
                     'rec_date'  => date('d/m/Y',strtotime($row->document_date)),
                     'due_date'  => date('d/m/Y',strtotime($row->due_date)),
                     'top'       => '-',
-                    'total'     => number_format($row->total * $currency_rate,2,',','.'),
-                    'tax'       => number_format($row->tax * $currency_rate,2,',','.'),
-                    'wtax'      => number_format($row->wtax * $currency_rate,2,',','.'),
-                    'grandtotal'=> number_format($row->grandtotal * $currency_rate,2,',','.'),
-                    'payed'     => number_format($totalPayed * $currency_rate,2,',','.'),
-                    'sisa'      => number_format($balance * $currency_rate,2,',','.'),
+                    'grandtotal'=> number_format($total_received_after_adjust,2,',','.'),
+                    'payed'     => number_format($total_invoice_after_adjust,2,',','.'),
+                    'sisa'      => number_format($balance_after_adjust,2,',','.'),
                 ];
                 
                 if($balance > 0){
-                    $totalAll += $balance * $currency_rate;
+                    $totalAll += $balance_after_adjust;
                     $array_filter[] = $data_tempura;
                 }
             }

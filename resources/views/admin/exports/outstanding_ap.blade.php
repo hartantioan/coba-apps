@@ -9,9 +9,6 @@
             <th class="center-align">TOP(Hari)</th>
             <th class="center-align">Tgl.Jatuh Tempo</th>
             <th class="center-align">Total</th>
-            <th class="center-align">PPN</th>
-            <th class="center-align">PPH</th>
-            <th class="center-align">Grandtotal</th>
             <th class="center-align">Dibayar</th>
             <th class="center-align">Sisa</th>   
         </tr>
@@ -26,17 +23,14 @@
                 <td class="center-align">{{ $row['rec_date'] }}</td>
                 <td class="center-align">{{ $row['top'] }}</td>
                 <td class="center-align">{{ $row['due_date'] }}</td>
-                <td class="right-align">{{ $row['total'] }}</td>
-                <td class="right-align">{{ $row['tax'] }}</td>
-                <td class="right-align">{{ $row['wtax'] }}</td>
-                <td class="right-align">{{ $row['grandtotal'] }}</td>
+\                <td class="right-align">{{ $row['grandtotal'] }}</td>
                 <td class="center-align">{{ $row['payed'] }}</td>
                 <td class="center-align">{{ $row['sisa'] }}</td>
             </tr>
         @endforeach
         @if(count($data) == 0)
             <tr>
-                <td colspan="13" align="center">
+                <td colspan="10" align="center">
                     Data tidak ditemukan
                 </td>
             </tr>
@@ -45,9 +39,6 @@
     </tbody>
     <tfoot>
         <tr>
-            <td></td>
-            <td></td>
-            <td></td>
             <td></td>
             <td></td>
             <td></td>

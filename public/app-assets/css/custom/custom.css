@@ -46,6 +46,14 @@ WE WILL RELEASE FUTURE UPDATES SO IN ORDER TO NOT OVERWRITE YOUR STYLES IT'S BET
 	}
 }
 
+@media screen and (max-width: 600px) {
+
+	#body-history-goods{
+		padding-left: 0rem !important;
+		padding-right: 0rem !important;
+	}
+}
+
 
 .preloader-wrapper {
 	margin-left: auto; 

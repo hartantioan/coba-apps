@@ -108,7 +108,7 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
                 'name'          => $row->name,
                 'company'       => $row->company->name,
                 'balance'       => $balance,
-                'ending_debit'  => $ending_debit, 2,
+                'ending_debit'  => $ending_debit,
                 'ending_credit' => $ending_credit,
                 'ending_total'  => $ending_total,
             ];

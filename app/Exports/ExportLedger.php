@@ -41,7 +41,6 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
 
     public function collection()
     {
-        info($this->coa_id);
         $query_data = Coa::where(function($query) {
             if($this->search !== '') {
                 $query->where(function($query){

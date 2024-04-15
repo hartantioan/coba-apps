@@ -2013,6 +2013,8 @@ class CustomHelper {
 						'type'			=> '1',
 						'nominal'		=> $rowtotal,
 						'nominal_fc'	=> $row->goodReceiptDetail->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? $rowtotal : $row->getRowTotal(),
+						'note'			=> $row->note,
+						'note2'			=> $row->note2,
 					]);
 				}
 
@@ -2027,6 +2029,8 @@ class CustomHelper {
 					'type'			=> '2',
 					'nominal'		=> $rowtotal,
 					'nominal_fc'	=> $row->goodReceiptDetail->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? $rowtotal : $row->getRowTotal(),
+					'note'			=> $row->note,
+					'note2'			=> $row->note2,
 				]);
 
 				self::sendCogs('good_returns',

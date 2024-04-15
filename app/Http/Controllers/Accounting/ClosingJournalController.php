@@ -214,7 +214,7 @@ class ClosingJournalController extends Controller
             $profitLoss = 0;
 
             foreach($arr as $row){
-                $profitLoss += $row['nominal'];
+                $profitLoss += round($row['nominal'],2);
             }
 
             $profitLoss = round($profitLoss,2);

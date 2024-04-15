@@ -2396,6 +2396,10 @@
                                             $('#currency_rate').val(val.currency_rate);
                                             $('#currency_id').val(val.currency_id).formSelect();
                                             $('#rounding').val(val.rounding);
+
+                                            if(!val.due_date && val.top && val.received_date){
+                                                addDays();
+                                            }
                                         });                        
                                     }else{
                                         $('.row_detail').remove();

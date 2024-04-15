@@ -309,6 +309,18 @@ class InventoryTransferOutController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
+            $item_counts = array_count_values($request->arr_item);
+
+            $duplicates = array_filter($item_counts, function($count) {
+                return $count > 1;
+            });
+
+            if (!empty($duplicates)) {
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Maaf, Item pada detail tidak boleh ada yang sama',
+                ]);
+            }
 
             $passed = true;
             $passedQtyMinus = true;

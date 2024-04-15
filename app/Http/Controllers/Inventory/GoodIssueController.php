@@ -34,6 +34,7 @@ use App\Models\Item;
 use App\Models\LandedCost;
 
 use App\Models\PaymentRequest;
+use App\Models\PersonalCloseBill;
 use App\Models\PaymentRequestCross;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
@@ -140,6 +141,7 @@ class GoodIssueController extends Controller
         $data_id_cb  =[];
         $data_id_frs  =[];
         $data_id_op=[];
+        $data_id_pcb=[];
 
         $data_id_mo=[];
         $data_id_mo_delivery = [];
@@ -175,6 +177,7 @@ class GoodIssueController extends Controller
             $finished_data_id_gir=[];
             $finished_data_id_cb=[];
             $finished_data_id_frs=[];
+            $finished_data_id_pcb=[];
             $added = true;
             while($added){
                
@@ -344,7 +347,32 @@ class GoodIssueController extends Controller
                             if(!in_array($row_bill_detail->outgoingPayment->id, $data_id_op)){
                                 $data_id_op[]= $row_bill_detail->outgoingPayment->id; 
                                 $added = true; 
-                            } 
+                            }
+                            
+                            if($row_bill_detail->personalCloseBill()->exists()){
+                                $data_pcb = [
+                                    'key'   => $row_bill_detail->personalCloseBill->code,
+                                    "name"  => $row_bill_detail->personalCloseBill->code,
+                                    
+                                    'properties'=> [
+                                        ['name'=> "Tanggal: ".date('d/m/Y',strtotime($row_bill_detail->personalCloseBill->post_date))],
+                                        ['name'=> "Nominal: Rp".number_format($row_bill_detail->personalCloseBill->grandtotal,2,',','.')]
+                                    ],
+                                    'url'   =>request()->root()."/admin/finance/personal_close_bill?code=".CustomHelper::encrypt($row_bill_detail->personalCloseBill->code),
+                                    "title" => $row_bill_detail->personalCloseBill->code,
+                                ];
+                                $data_go_chart[]=$data_pcb;
+
+                                $data_link[]=[
+                                    'from'=>$row_bill_detail->personalCloseBill->code,
+                                    'to'=>$query->code,
+                                    'string_link'=>$row_bill_detail->personalCloseBill->code.$query->code,
+                                ];
+                                if(!in_array($row_bill_detail->personalCloseBill->id, $data_id_pcb)){
+                                    $data_id_pcb[]= $row_bill_detail->personalCloseBill->id; 
+                                    $added = true; 
+                                }
+                            }
                                 
                         }
 
@@ -1423,6 +1451,67 @@ class GoodIssueController extends Controller
                     }
                 }
 
+                foreach($data_id_pcb as $pcb_id){
+                    if(!in_array($pcb_id, $finished_data_id_pcb)){
+                        $finished_data_id_pcb[]=$pcb_id;
+                        $query_pcb = PersonalCloseBill::find($pcb_id);
+
+                        foreach($query_pcb->personalCloseBillDetail as $row_pcbd){
+                            if($row_pcbd->fundRequest()->exists()){
+                                $data_fund_tempura=[
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :".$row_pcbd->fundRequest->code],
+                                        ['name'=> "User :".$row_pcbd->fundRequest->account->name],
+                                        ['name'=> "Nominal :".formatNominal($row_pcbd->fundRequest).number_format($row_pcbd->fundRequest->grandtotal,2,',','.')]
+                                    ],
+                                    "key" => $row_pcbd->fundRequest->code,
+                                    "name" => $row_pcbd->fundRequest->code,
+                                    'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pcbd->fundRequest->code), 
+                                ];
+                            
+                                $data_go_chart[]=$data_fund_tempura;
+                                $data_link[]=[
+                                    'from'=>$row_pcbd->fundRequest->code,
+                                    'to'=>$query_pcb->code,
+                                    'string_link'=>$row_pcbd->fundRequest->code.$query_pcb->code,
+                                ];
+
+                                if(!in_array($row_pcbd->fundRequest->id, $data_id_frs)){
+                                    $data_id_frs[] = $row_pcbd->fundRequest->id;
+                                    $added = true; 
+                                } 
+                            }
+                        }
+
+                        if($query_pcb->closebillDetail()->exists()){
+                            foreach($query_pcb->closebillDetail as $row_cbd){
+                                $data_cb_tempura=[
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :".$row_cbd->closeBill->code],
+                                        ['name'=> "User :".$row_cbd->closeBill->account->name],
+                                        ['name'=> "Nominal :".formatNominal($row_cbd->closeBill).number_format($row_cbd->closeBill->grandtotal,2,',','.')]
+                                    ],
+                                    "key" => $row_cbd->closeBill->code,
+                                    "name" => $row_cbd->closeBill->code,
+                                    'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_cbd->closeBill->code), 
+                                ];
+                            
+                                $data_go_chart[]=$data_cb_tempura;
+                                $data_link[]=[
+                                    'from'=>$row_cbd->closeBill->code,
+                                    'to'=>$row_cbd->code,
+                                    'string_link'=>$row_cbd->closeBill->code.$row_cbd->code,
+                                ];
+
+                                if(!in_array($row_cbd->closeBill->id, $data_id_cb)){
+                                    $data_id_cb[] = $row_cbd->closeBill->id;
+                                    $added = true; 
+                                } 
+                            }
+                        }
+                    }
+                }
+
                 foreach($data_id_frs as $fr_id){
                     if(!in_array($fr_id, $finished_data_id_frs)){
                         $finished_data_id_frs[]=$fr_id;
@@ -1502,6 +1591,54 @@ class GoodIssueController extends Controller
                                         $added = true;
                                     } 
                                 }
+                            }
+                        }
+                        if($query_fr->hasPaymentRequestDetail()->exists()){
+                            foreach($query_fr->hasPaymentRequestDetail as $row_pyr_detail){
+                                $data_pyr_tempura=[
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
+                                        ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
+                                    ],
+                                    "key" => $row_pyr_detail->paymentRequest->code,
+                                    "name" => $row_pyr_detail->paymentRequest->code,
+                                    'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
+                                ];
+                                $data_go_chart[]=$data_pyr_tempura;
+                                $data_link[]=[
+                                    'from'=>$query_fr->code,
+                                    'to'=>$row_pyr_detail->paymentRequest->code,
+                                    'string_link'=>$query_fr->code.$row_pyr_detail->paymentRequest->code,
+                                ];
+                                if(!in_array($row_pyr_detail->paymentRequest->id,$data_id_pyrs)){
+                                    $data_id_pyrs[] = $row_pyr_detail->paymentRequest->id;
+                                    $added = true;
+                                } 
+                               
+                            }
+                        }
+                        if($query_fr->personalCloseBillDetail()->exists()){
+
+                            foreach($query_fr->personalCloseBillDetail as $row_pcbd){
+                                $data_pcb_tempura=[
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :".$row_pcbd->personalCloseBill->post_date],
+                                        ['name'=> "Nominal :".formatNominal($row_pcbd->personalCloseBill).number_format($row_pcbd->personalCloseBill->grandtotal,2,',','.')]
+                                    ],
+                                    "key" => $row_pcbd->personalCloseBill->code,
+                                    "name" => $row_pcbd->personalCloseBill->code,
+                                    'url'=>request()->root()."/admin/finance/personal_close_bill?code=".CustomHelper::encrypt($row_pcbd->personalCloseBill->code),
+                                ];
+                                $data_go_chart[]=$data_pcb_tempura;
+                                $data_link[]=[
+                                    'from'=>$query_fr->code,
+                                    'to'=>$row_pcbd->personalCloseBill->code,
+                                    'string_link'=>$query_fr->code.$row_pcbd->personalCloseBill->code,
+                                ];
+                                if(!in_array($row_pcbd->personalCloseBill->id,$data_id_pcb)){
+                                    $data_id_pcb[] = $row_pcbd->personalCloseBill->id;
+                                    $added = true;
+                                } 
                             }
                         }
 
@@ -2092,18 +2229,47 @@ class GoodIssueController extends Controller
                 $passedQtyMinus = true;
                 $arrItemNotPassed = [];
                 $passedZeroQty = true;
+                $arr_item_stock = $request->arr_item_stock;
+                $arr_qty = $request->arr_qty;
 
-                foreach($request->arr_item_stock as $key => $row){
-                    if(str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) <= 0){
+
+                $keys = array_keys($arr_item_stock);
+
+                
+                array_multisort($arr_item_stock, SORT_ASC, $arr_qty, $keys);
+                $cumulative_qty = [];
+                
+                $x=0;
+                foreach ($arr_item_stock as $key_arr => $row_stock) {
+                    // Remove commas and convert qty to int
+                    $qty = str_replace(',','.',str_replace('.','',$arr_qty[$key_arr]));
+                    $qty = (int)$qty;
+                    
+                    // If the current item matches the previous one, accumulate the quantity
+                    if ($key_arr > 0 && $row_stock == $arr_item_stock[$key_arr - 1]) {
+                        $cumulative_qty[$x] = $cumulative_qty[$x] + $qty;
+                    } else { // Otherwise, set the quantity directly
+                        if($key_arr>0){
+                            $x++; 
+                        }
+                        $cumulative_qty[$x] = $qty;
+                    }
+                }
+                $unique_array = array_unique($arr_item_stock);
+                $unique_array = array_values($unique_array);
+                
+                
+                foreach($unique_array as $key => $row){
+                    if(str_replace(',','.',str_replace('.','',$cumulative_qty[$key])) <= 0){
                         $passedZeroQty = false;
                     }
                     $rowprice = NULL;
                     $item_stock = ItemStock::find(intval($row));
                     $rowprice = $item_stock->priceNow();
-                    $grandtotal += round($rowprice * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),2);
+                    $grandtotal += round($rowprice * str_replace(',','.',str_replace('.','',$cumulative_qty[$key])),2);
                     if($item_stock){
 
-                        $qtyout = str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
+                        $qtyout = str_replace(',','.',str_replace('.','',$cumulative_qty[$key]));
 
                         $itemCogsBefore = ItemCogs::where('place_id',$item_stock->place_id)->where('warehouse_id',$item_stock->warehouse_id)->where('item_id',$item_stock->item_id)->whereDate('date','<=',$request->post_date)->orderByDesc('date')->orderByDesc('id')->first();
                         $itemCogsAfter = ItemCogs::where('place_id',$item_stock->place_id)->where('warehouse_id',$item_stock->warehouse_id)->where('item_id',$item_stock->item_id)->whereDate('date','>',$request->post_date)->orderBy('date')->orderBy('id')->get();
@@ -2122,6 +2288,7 @@ class GoodIssueController extends Controller
                                     }
                                     if($startqty < 0){
                                         $passedQtyMinus = false;
+                                       
                                     }
                                 }
                             }

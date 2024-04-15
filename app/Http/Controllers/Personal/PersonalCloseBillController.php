@@ -4,6 +4,23 @@ namespace App\Http\Controllers\Personal;
 use App\Http\Controllers\Controller;
 use App\Models\ApprovalMatrix;
 use App\Models\ApprovalSource;
+use App\Models\CloseBill;
+use App\Models\CloseBillDetail;
+use App\Models\CostDistribution;
+use App\Models\GoodReceipt;
+use App\Models\GoodReturnPO;
+use App\Models\LandedCost;
+use App\Models\InventoryTransferOut;
+use App\Models\GoodScale;
+use App\Models\GoodIssue;
+use App\Models\PaymentRequest;
+use App\Models\PaymentRequestCross;
+use App\Models\PurchaseDownPayment;
+use App\Models\PurchaseInvoice;
+use App\Models\PurchaseMemo;
+use App\Models\PurchaseOrder;
+use App\Models\MaterialRequest;
+use App\Models\PurchaseRequest;
 use App\Models\Menu;
 use App\Models\PersonalCloseBillCost;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -1573,20 +1590,20 @@ class PersonalCloseBillController extends Controller
                 return "Rp.";
             }
         }
-        $query = FundRequest::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = PersonalCloseBill::where('code',CustomHelper::decrypt($request->id))->first();
         $data_go_chart = [];
         $data_link = [];
-        $fr = [
+        $pcb = [
                 'key'   => $query->code,
                 "name"  => $query->code,
                 "color" => "lightblue",
                 'properties'=> [
                      ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query->post_date))],
                   ],
-                'url'   =>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($query->code),
+                'url'   =>request()->root()."/admin/finance/personal_close_bill?code=".CustomHelper::encrypt($query->code),
                 "title" =>$query->code,
             ];
-        $data_go_chart[]=$fr;
+        $data_go_chart[]=$pcb;
         
         $data_id_good_scale = [];
         $data_id_good_issue = [];
@@ -1606,6 +1623,7 @@ class PersonalCloseBillController extends Controller
         $data_id_cb  =[];
         $data_id_frs  =[];
         $data_id_op=[];
+        $data_id_pcb=[];
 
         $data_id_mo=[];
         $data_id_mo_delivery = [];
@@ -1620,84 +1638,8 @@ class PersonalCloseBillController extends Controller
         $data_id_hand_over_receipt=[];
 
         if($query) {
-
-            //Pengambilan Main Branch beserta id terkait
-            foreach($query->fundRequestDetail as $row_fr_detail){
-                if($row_fr_detail->hasPaymentRequestDetail()->exists()){
-                    foreach($row_fr_detail->hasPaymentRequestDetail as $row_pyr_detail){
-                        $data_pyr_tempura=[
-                            'properties'=> [
-                                ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
-                                ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
-                            ],
-                            "key" => $row_pyr_detail->paymentRequest->code,
-                            "name" => $row_pyr_detail->paymentRequest->code,
-                            'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
-                        ];
-                        $data_go_chart[]=$data_pyr_tempura;
-                        $data_link[]=[
-                            'from'=>$query->code,
-                            'to'=>$row_pyr_detail->paymentRequest->code,
-                            'string_link'=>$query->code.$row_pyr_detail->paymentRequest->code,
-                        ];
-                        if(!in_array($row_pyr_detail->paymentRequest->id,$data_id_pyrs)){
-                            $data_id_pyrs[] = $row_pyr_detail->paymentRequest->id;
-                            $added = true;
-                        } 
-                       
-                    }
-                }
-                
-                if($row_fr_detail->purchaseInvoiceDetail()->exists()){
-                    foreach($row_fr_detail->purchaseInvoiceDetail as $row_invoice_detail){
-                        $data_invoices_tempura = [
-                            'key'   => $row_invoice_detail->purchaseInvoice->code,
-                            "name"  => $row_invoice_detail->purchaseInvoice->code,
-                        
-                            'properties'=> [
-                                ['name'=> "Tanggal: ".$row_invoice_detail->purchaseInvoice->post_date],
-                                ['name'=> "Nominal :".formatNominal($row_invoice_detail->purchaseInvoice).number_format($row_invoice_detail->purchaseInvoice->grandtotal,2,',','.')]
-                            ],
-                            'url'   =>request()->root()."/admin/finance/purchase_invoice?code=".CustomHelper::encrypt($row_invoice_detail->purchaseInvoice->code),
-                        ];
-                        $data_go_chart[]=$data_invoices_tempura;
-                        $data_link[]=[
-                            'from'  =>  $query->code,
-                            'to'    =>  $row_invoice_detail->purchaseInvoice->code,
-                            'string_link'=>$query->code.$row_invoice_detail->purchaseInvoice->code
-                        ];
-                        if(!in_array($row_invoice_detail->purchaseInvoice->id,$data_id_invoice)){
-                            $data_id_invoice[]=$row_invoice_detail->purchaseInvoice->id;
-                            $added = true;
-                        }
-                    }
-                }
-
-                if($row_fr_detail->purchaseDownPaymentDetail()->exists()){
-                    foreach($row_fr_detail->purchaseDownPaymentDetail as $row_dp_detail){
-                        $data_apdp_tempura = [
-                            'key'   => $row_dp_detail->purchaseDownPayment->code,
-                            "name"  => $row_dp_detail->purchaseDownPayment->code,
-                        
-                            'properties'=> [
-                                ['name'=> "Tanggal: ".$row_dp_detail->purchaseDownPayment->post_date],
-                                ['name'=> "Vendor  : ".$row_dp_detail->purchaseDownPayment->name],
-                            ],
-                            'url'   =>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_dp_detail->purchaseDownPayment->code),
-                        ];
-                        $data_go_chart[]=$data_apdp_tempura;
-                        $data_link[]=[
-                            'from'  =>  $query->code,
-                            'to'    =>  $row_dp_detail->purchaseDownPayment->code,
-                            'string_link'=>$query->code.$row_dp_detail->purchaseDownPayment->code,
-                        ];
-                        if(!in_array($row_dp_detail->purchaseDownPayment->id,$data_id_dp)){
-                            $data_id_dp[]=$row_dp_detail->purchaseDownPayment->id;
-                            $added = true;
-                        } 
-                    }
-                }
-            }
+            $data_id_pcb[] = $query->id;
+            
 
             $finished_data_id_gr=[];
             $finished_data_id_gscale=[];
@@ -1716,6 +1658,7 @@ class PersonalCloseBillController extends Controller
             $finished_data_id_gir=[];
             $finished_data_id_cb=[];
             $finished_data_id_frs=[];
+            $finished_data_id_pcb=[];
             $added = true;
            
             while($added){
@@ -1886,7 +1829,32 @@ class PersonalCloseBillController extends Controller
                             if(!in_array($row_bill_detail->outgoingPayment->id, $data_id_op)){
                                 $data_id_op[]= $row_bill_detail->outgoingPayment->id; 
                                 $added = true; 
-                            } 
+                            }
+                            
+                            if($row_bill_detail->personalCloseBill()->exists()){
+                                $data_pcb = [
+                                    'key'   => $row_bill_detail->personalCloseBill->code,
+                                    "name"  => $row_bill_detail->personalCloseBill->code,
+                                    
+                                    'properties'=> [
+                                        ['name'=> "Tanggal: ".date('d/m/Y',strtotime($row_bill_detail->personalCloseBill->post_date))],
+                                        ['name'=> "Nominal: Rp".number_format($row_bill_detail->personalCloseBill->grandtotal,2,',','.')]
+                                    ],
+                                    'url'   =>request()->root()."/admin/finance/personal_close_bill?code=".CustomHelper::encrypt($row_bill_detail->personalCloseBill->code),
+                                    "title" => $row_bill_detail->personalCloseBill->code,
+                                ];
+                                $data_go_chart[]=$data_pcb;
+
+                                $data_link[]=[
+                                    'from'=>$row_bill_detail->personalCloseBill->code,
+                                    'to'=>$query->code,
+                                    'string_link'=>$row_bill_detail->personalCloseBill->code.$query->code,
+                                ];
+                                if(!in_array($row_bill_detail->personalCloseBill->id, $data_id_pcb)){
+                                    $data_id_pcb[]= $row_bill_detail->personalCloseBill->id; 
+                                    $added = true; 
+                                }
+                            }
                                 
                         }
 
@@ -2325,7 +2293,7 @@ class PersonalCloseBillController extends Controller
                     if(!in_array($payment_request_id, $finished_data_id_pyrs)){
                         $finished_data_id_pyrs[]=$payment_request_id;
                         $query_pyr = PaymentRequest::find($payment_request_id);
-                        
+                       
                         if($query_pyr->outgoingPayment()->exists()){
                             $outgoing_payment = [
                                 'properties'=> [
@@ -2694,8 +2662,8 @@ class PersonalCloseBillController extends Controller
                                     'string_link'=>$query_dp->code.$row_pyr_detail->paymentRequest->code,
                                 ];
 
-                                if(!in_array($query_dp->id, $data_id_dp)){
-                                    $data_id_dp[] = $query_dp->id;
+                                if(!in_array($row_pyr_detail->paymentRequest->id, $data_id_pyrs)){
+                                    $data_id_pyrs[] = $row_pyr_detail->paymentRequest->id;
                                     $added=true;
                                 }
                             }
@@ -2965,6 +2933,67 @@ class PersonalCloseBillController extends Controller
                     }
                 }
 
+                foreach($data_id_pcb as $pcb_id){
+                    if(!in_array($pcb_id, $finished_data_id_pcb)){
+                        $finished_data_id_pcb[]=$pcb_id;
+                        $query_pcb = PersonalCloseBill::find($pcb_id);
+
+                        foreach($query_pcb->personalCloseBillDetail as $row_pcbd){
+                            if($row_pcbd->fundRequest()->exists()){
+                                $data_fund_tempura=[
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :".$row_pcbd->fundRequest->code],
+                                        ['name'=> "User :".$row_pcbd->fundRequest->account->name],
+                                        ['name'=> "Nominal :".formatNominal($row_pcbd->fundRequest).number_format($row_pcbd->fundRequest->grandtotal,2,',','.')]
+                                    ],
+                                    "key" => $row_pcbd->fundRequest->code,
+                                    "name" => $row_pcbd->fundRequest->code,
+                                    'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pcbd->fundRequest->code), 
+                                ];
+                            
+                                $data_go_chart[]=$data_fund_tempura;
+                                $data_link[]=[
+                                    'from'=>$row_pcbd->fundRequest->code,
+                                    'to'=>$query_pcb->code,
+                                    'string_link'=>$row_pcbd->fundRequest->code.$query_pcb->code,
+                                ];
+
+                                if(!in_array($row_pcbd->fundRequest->id, $data_id_frs)){
+                                    $data_id_frs[] = $row_pcbd->fundRequest->id;
+                                    $added = true; 
+                                } 
+                            }
+                        }
+
+                        if($query_pcb->closebillDetail()->exists()){
+                            foreach($query_pcb->closebillDetail as $row_cbd){
+                                $data_cb_tempura=[
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :".$row_cbd->closeBill->code],
+                                        ['name'=> "User :".$row_cbd->closeBill->account->name],
+                                        ['name'=> "Nominal :".formatNominal($row_cbd->closeBill).number_format($row_cbd->closeBill->grandtotal,2,',','.')]
+                                    ],
+                                    "key" => $row_cbd->closeBill->code,
+                                    "name" => $row_cbd->closeBill->code,
+                                    'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_cbd->closeBill->code), 
+                                ];
+                            
+                                $data_go_chart[]=$data_cb_tempura;
+                                $data_link[]=[
+                                    'from'=>$row_cbd->closeBill->code,
+                                    'to'=>$row_cbd->code,
+                                    'string_link'=>$row_cbd->closeBill->code.$row_cbd->code,
+                                ];
+
+                                if(!in_array($row_cbd->closeBill->id, $data_id_cb)){
+                                    $data_id_cb[] = $row_cbd->closeBill->id;
+                                    $added = true; 
+                                } 
+                            }
+                        }
+                    }
+                }
+
                 foreach($data_id_frs as $fr_id){
                     if(!in_array($fr_id, $finished_data_id_frs)){
                         $finished_data_id_frs[]=$fr_id;
@@ -3044,6 +3073,54 @@ class PersonalCloseBillController extends Controller
                                         $added = true;
                                     } 
                                 }
+                            }
+                        }
+                        if($query_fr->hasPaymentRequestDetail()->exists()){
+                            foreach($query_fr->hasPaymentRequestDetail as $row_pyr_detail){
+                                $data_pyr_tempura=[
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
+                                        ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
+                                    ],
+                                    "key" => $row_pyr_detail->paymentRequest->code,
+                                    "name" => $row_pyr_detail->paymentRequest->code,
+                                    'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
+                                ];
+                                $data_go_chart[]=$data_pyr_tempura;
+                                $data_link[]=[
+                                    'from'=>$query_fr->code,
+                                    'to'=>$row_pyr_detail->paymentRequest->code,
+                                    'string_link'=>$query_fr->code.$row_pyr_detail->paymentRequest->code,
+                                ];
+                                if(!in_array($row_pyr_detail->paymentRequest->id,$data_id_pyrs)){
+                                    $data_id_pyrs[] = $row_pyr_detail->paymentRequest->id;
+                                    $added = true;
+                                } 
+                               
+                            }
+                        }
+                        if($query_fr->personalCloseBillDetail()->exists()){
+
+                            foreach($query_fr->personalCloseBillDetail as $row_pcbd){
+                                $data_pcb_tempura=[
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :".$row_pcbd->personalCloseBill->post_date],
+                                        ['name'=> "Nominal :".formatNominal($row_pcbd->personalCloseBill).number_format($row_pcbd->personalCloseBill->grandtotal,2,',','.')]
+                                    ],
+                                    "key" => $row_pcbd->personalCloseBill->code,
+                                    "name" => $row_pcbd->personalCloseBill->code,
+                                    'url'=>request()->root()."/admin/finance/personal_close_bill?code=".CustomHelper::encrypt($row_pcbd->personalCloseBill->code),
+                                ];
+                                $data_go_chart[]=$data_pcb_tempura;
+                                $data_link[]=[
+                                    'from'=>$query_fr->code,
+                                    'to'=>$row_pcbd->personalCloseBill->code,
+                                    'string_link'=>$query_fr->code.$row_pcbd->personalCloseBill->code,
+                                ];
+                                if(!in_array($row_pcbd->personalCloseBill->id,$data_id_pcb)){
+                                    $data_id_pcb[] = $row_pcbd->personalCloseBill->id;
+                                    $added = true;
+                                } 
                             }
                         }
 
@@ -3287,7 +3364,7 @@ class PersonalCloseBillController extends Controller
                                         ],
                                         'key'=>$good_issue_detail->goodIssue->code,
                                         'name'=>$good_issue_detail->goodIssue->code,
-                                        'url'=>request()->root()."/admin/inventory/good_issue_request?code=".CustomHelper::encrypt($good_issue_detail->goodIssue->code),
+                                        'url'=>request()->root()."/admin/inventory/good_issue?code=".CustomHelper::encrypt($good_issue_detail->goodIssue->code),
                                     ];
         
                                     $data_go_chart[]=$good_issue_tempura;
@@ -3369,7 +3446,7 @@ class PersonalCloseBillController extends Controller
                         }
                     }
                 }
-            }   
+            }  
             function unique_key($array,$keyname){
 
                 $new_array = array();

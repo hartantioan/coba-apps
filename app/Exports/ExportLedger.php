@@ -80,6 +80,9 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
 
             $balance = $balance_debit - $balance_credit;
 
+            $total_debit = 0;
+            $total_credit = 0;
+
             $ending_debit  = $row->journalDebit()->whereHas('journal',function($query)use($periode){
                 $query->whereRaw($periode)
                     ->where(function($query){
@@ -88,7 +91,7 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
                                 ->orWhereNull('lookable_type');
                         }
                     });
-            })->sum('nominal');
+            })->get();
             
             $ending_credit = $row->journalCredit()->whereHas('journal',function($query)use($periode){
                 $query->whereRaw($periode)
@@ -98,9 +101,17 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
                                 ->orWhereNull('lookable_type');
                         }
                     });
-            })->sum('nominal');
+            })->get();
 
-            $ending_total  = $balance + $ending_debit - $ending_credit;
+            foreach($ending_debit as $row){
+                $total_debit += round($row->nominal,2);
+            }
+
+            foreach($ending_credit as $row){
+                $total_credit += round($row->nominal,2);
+            }
+
+            $ending_total  = $balance + $total_debit - $total_credit;
 
             $arr[] = [
                 'id'            => ($key + 1),
@@ -108,8 +119,8 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
                 'name'          => $row->name,
                 'company'       => $row->company->name,
                 'balance'       => number_format($balance, 2, ',', '.'),
-                'ending_debit'  => number_format($ending_debit, 2, ',', '.'),
-                'ending_credit' => number_format($ending_credit, 2, ',', '.'),
+                'ending_debit'  => number_format($total_debit, 2, ',', '.'),
+                'ending_credit' => number_format($total_credit, 2, ',', '.'),
                 'ending_total'  => number_format($ending_total, 2, ',', '.'),
             ];
         }

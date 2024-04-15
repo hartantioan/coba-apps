@@ -390,7 +390,7 @@
                                         </li>
                                     </ul>
                                 </div>
-                                <div class="col m12 s12" id="cost-tab">
+                                <div class="col m12 s12 hide" id="cost-tab">
                                     <h6>Daftar Pembiayaan BS Karyawan - Dokumen Lengkap</h6>
                                     <p class="mt-2 mb-2">
                                         <div style="overflow:scroll;width:100% !important;">

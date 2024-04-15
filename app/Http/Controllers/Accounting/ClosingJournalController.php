@@ -202,12 +202,12 @@ class ClosingJournalController extends Controller
                         'coa_id'    => $row->coa_id,
                         'coa_code'  => $row->coa->code,
                         'coa_name'  => $row->coa->name,
-                        'nominal'   => $row->type == '1' ? $row->nominal : -1 * $row->nominal,
-                        'nominal_fc'=> $row->type == '1' ? $row->nominal_fc : -1 * $row->nominal_fc,
+                        'nominal'   => $row->type == '1' ? round($row->nominal,2) : round(-1 * $row->nominal,2),
+                        'nominal_fc'=> $row->type == '1' ? round($row->nominal_fc,2) : round(-1 * $row->nominal_fc,2),
                     ];
                 }else{
-                    $arr[$cekIndex]['nominal'] += $row->type == '1' ? $row->nominal : -1 * $row->nominal;
-                    $arr[$cekIndex]['nominal_fc'] += $row->type == '1' ? $row->nominal_fc : -1 * $row->nominal_fc;
+                    $arr[$cekIndex]['nominal'] += $row->type == '1' ? round($row->nominal,2) : round(-1 * $row->nominal,2);
+                    $arr[$cekIndex]['nominal_fc'] += $row->type == '1' ? round($row->nominal_fc,2) : round(-1 * $row->nominal_fc,2);
                 }
             }
 

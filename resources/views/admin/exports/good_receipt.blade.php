@@ -71,7 +71,7 @@
                 <td align="center">{{ $rowdetail->qty * $rowdetail->qty_conversion }}</td>
                 <td align="center">{{ $rowdetail->item->uomUnit->code }}</td>
                 <td align="center">{{ $rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate }}</td>
-                <td align="center">{{ $rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate * $rowdetail->total }}</td>
+                <td align="center">{{ round($rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate * $rowdetail->total,2) }}</td>
                 <td align="center">{{ $rowdetail->line->name ?? ''  }}</td>
                 <td align="center">{{ $rowdetail->machine->name ?? ''  }}</td>
                 <td align="center">{{ $rowdetail->department->name ?? ''  }}</td>

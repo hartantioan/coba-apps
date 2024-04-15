@@ -1248,6 +1248,7 @@ class FundRequestController extends Controller
                         'grandtotal'    => str_replace(',','.',str_replace('.','',$request->grandtotal)),
                         'document_status'   => $request->document_status,
                         'status'        => '1',
+                        /* 'balance_status'=> $request->document_status == '2' ? '1' : NULL, */
                     ]);
 
                     /* DB::commit();

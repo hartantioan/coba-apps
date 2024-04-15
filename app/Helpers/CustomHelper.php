@@ -1521,6 +1521,11 @@ class CustomHelper {
 					}elseif($row->lookable_type == 'fund_requests'){
 						$mustpay = $row->nominal;
 						$balanceReal = $row->nominal * $op->currency_rate;
+						if($row->lookable->document_status == '2'){
+							$row->lookable->update([
+								'balance_status'	=> '1'
+							]);
+						}
 					}elseif($row->lookable_type == 'fund_request_details'){
 						$mustpay = $row->nominal;
 						$balanceReal = $row->nominal * $op->currency_rate;

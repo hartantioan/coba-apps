@@ -27,6 +27,7 @@
             <th>Satuan</th>
             <th>Qty. Konversi</th>
             <th>Satuan</th>
+            <th>Kurs</th>
             <th>Total</th>
             <th>Line</th>
             <th>Mesin</th>
@@ -69,6 +70,7 @@
                 <td align="center">{{ $rowdetail->itemUnit->unit->code }}</td>
                 <td align="center">{{ $rowdetail->qty * $rowdetail->qty_conversion }}</td>
                 <td align="center">{{ $rowdetail->item->uomUnit->code }}</td>
+                <td align="center">{{ $rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate }}</td>
                 <td align="center">{{ $rowdetail->total }}</td>
                 <td align="center">{{ $rowdetail->line->name ?? ''  }}</td>
                 <td align="center">{{ $rowdetail->machine->name ?? ''  }}</td>
@@ -83,7 +85,7 @@
         @endforeach
         @if(count($data) == 0)
             <tr>
-                <td colspan="18" align="center">
+                <td colspan="19" align="center">
                     Data tidak ditemukan
                 </td>
             </tr>

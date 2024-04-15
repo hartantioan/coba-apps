@@ -1192,7 +1192,7 @@ class ClosingJournalController extends Controller
                     'date'              => date('d/m/Y',strtotime($row->date)),
                     'code'              => $row->lookable->code,
                     'note'              => $row->lookable->note ? $row->lookable->note : '',
-                    'balance'           => CustomHelper::formatConditionalQty($row->qty_final,2,',','.'),
+                    'balance'           => CustomHelper::formatConditionalQty($row->qty_final),
                 ];
             }
         }

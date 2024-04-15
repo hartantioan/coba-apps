@@ -190,6 +190,7 @@
                 dataType: 'JSON',
                 data: {
                     'status[]' : $('#filter_status').val(),
+                    'modedata' : '{{ $modedata }}',
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

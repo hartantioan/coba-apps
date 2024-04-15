@@ -103,12 +103,12 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
                     });
             })->get();
 
-            foreach($ending_debit as $row){
-                $total_debit += round($row->nominal,2);
+            foreach($ending_debit as $rowdebit){
+                $total_debit += round($rowdebit->nominal,2);
             }
 
-            foreach($ending_credit as $row){
-                $total_credit += round($row->nominal,2);
+            foreach($ending_credit as $rowcredit){
+                $total_credit += round($rowcredit->nominal,2);
             }
 
             $ending_total  = $balance + $total_debit - $total_credit;

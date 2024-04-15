@@ -63,7 +63,7 @@ class ExportSubsidiaryLedger implements  FromView,ShouldAutoSize
                         $additional_ref = ($detail['data']->note ? ' - ' : '').$detail['data']->journal->lookable->paymentRequest->code;
                     }
 
-                    $balance += ($detail['data']->type == '1' ? $detail['data']->nominal : -1 * $detail['data']->nominal);
+                    $balance += ($detail['data']->type == '1' ? round($detail['data']->nominal,2) : round(-1 * $detail['data']->nominal,2));
                     $currencySymbol = $detail['data']->journal->currency()->exists() ? $detail['data']->journal->currency->symbol : '';
                     $nominalCurrency = $detail['data']->journal->currency()->exists() ? ($detail['data']->journal->currency->type == '1' ? '' : '1') : '';
 

@@ -101,8 +101,9 @@ class LedgerController extends Controller
                 })->sum('nominal');
 
                 $balance = $balance_debit - $balance_credit;
-
-                $ending_debit  = $val->journalDebit()->whereHas('journal',function($query)use($periode,$request){
+                $total_debit = 0;
+                $total_credit = 0;
+                $ending_debit = $val->journalDebit()->whereHas('journal',function($query)use($periode,$request){
                     $query->whereRaw($periode)
                         ->where(function($query)use($request){
                             if($request->is_closing_journal){
@@ -110,7 +111,7 @@ class LedgerController extends Controller
                                     ->orWhereNull('lookable_type');
                             }
                         });
-                })->sum('nominal');
+                })->get();
                 $ending_credit = $val->journalCredit()->whereHas('journal',function($query)use($periode,$request){
                     $query->whereRaw($periode)
                         ->where(function($query)use($request){
@@ -119,16 +120,25 @@ class LedgerController extends Controller
                                     ->orWhereNull('lookable_type');
                             }
                         });
-                })->sum('nominal');
-                $ending_total  = $balance + $ending_debit - $ending_credit;
+                })->get();
+
+                foreach($ending_debit as $rowdebit){
+                    $total_debit += round($rowdebit->nominal,2);
+                }
+    
+                foreach($ending_credit as $rowcredit){
+                    $total_credit += round($rowcredit->nominal,2);
+                }
+
+                $ending_total  = $balance + $total_debit - $total_credit;
 
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" style="padding: 0 0 !important;" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code.' - '.$val->name,
                     $val->company->name,
                     number_format($balance, 2, ',', '.'),
-                    number_format($ending_debit, 2, ',', '.'),
-                    number_format($ending_credit, 2, ',', '.'),
+                    number_format($total_debit, 2, ',', '.'),
+                    number_format($total_credit, 2, ',', '.'),
                     number_format($ending_total, 2, ',', '.')
                 ];
 

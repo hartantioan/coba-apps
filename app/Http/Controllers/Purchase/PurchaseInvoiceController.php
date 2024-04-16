@@ -1684,7 +1684,7 @@ class PurchaseInvoiceController extends Controller
                 'qty_received'  => 0,
                 'qty_returned'  => 0,
                 'qty_balance'   => CustomHelper::formatConditionalQty($row->qty),
-                'price'         => number_format($row->price,5,',','.'),
+                'price'         => number_format($row->price,2,',','.'),
                 'buy_unit'      => $row->getUnitCode(),
                 'rawcode'       => $row->getHeaderCode(),
                 'post_date'     => $row->getPostDate(),

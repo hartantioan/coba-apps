@@ -98,14 +98,14 @@ class ExportDownPayment implements FromView , WithEvents
                         'post_date'     => date('d/m/Y',strtotime($row_invoice->post_date)),
                         'due_date'      => date('d/m/Y',strtotime($row_invoice->due_date)),
                         'note'          => $row_invoice->note,
-                        'subtotal'      => round($row_invoice->subtotal * $currency_rate,2),
-                        'discount'      => round($row_invoice->discount * $currency_rate,2),
-                        'total'         => round($row_invoice->total * $currency_rate,2),
-                        'total_fc'      => round($row_invoice->total,2),
-                        'used'          => round($row_invoice->total_used * $currency_rate,2),
-                        'memo'          => round($row_invoice->total_memo * $currency_rate,2),
-                        'balance'       => round($balance * $currency_rate,2),
-                        'balance_fc'    => round($balance,2),
+                        'subtotal'      => number_format($row_invoice->subtotal * $currency_rate,2,',','.'),
+                        'discount'      => number_format($row_invoice->discount * $currency_rate,2,',','.'),
+                        'total'         => number_format($row_invoice->total * $currency_rate,2,',','.'),
+                        'total_fc'      => number_format($row_invoice->total,2,',','.'),
+                        'used'          => number_format($row_invoice->total_used * $currency_rate,2,',','.'),
+                        'memo'          => number_format($row_invoice->total_memo * $currency_rate,2,',','.'),
+                        'balance'       => number_format($balance * $currency_rate,2,',','.'),
+                        'balance_fc'    => number_format($balance,2,',','.'),
                         'status'        => $this->getStatus($row_invoice->status),
                         'void_name'     => $row_invoice->void_name,
                         'void_date'     => date('d/m/Y',strtotime($row_invoice->void_date)),
@@ -115,7 +115,7 @@ class ExportDownPayment implements FromView , WithEvents
                         'delete_date'   => date('d/m/Y',strtotime($row_invoice->deleted_at)),
                         'references'    => PurchaseDownPayment::getReference($row_invoice->code),
                     ];
-                    $totalbalance += round($balance * $currency_rate,2);
+                    $totalbalance += ($balance * $currency_rate);
                 }
             }  
         return view('admin.exports.down_payment', [

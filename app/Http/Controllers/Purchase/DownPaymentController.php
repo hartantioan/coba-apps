@@ -114,15 +114,15 @@ class DownPaymentController extends Controller
                     'post_date'     => date('d/m/Y',strtotime($row->post_date)),
                     'due_date'      => date('d/m/Y',strtotime($row->due_date)),
                     'note'          => $row->note,
-                    'subtotal'      => number_format(round($row->subtotal * $currency_rate,2),2,',','.'),
-                    'discount'      => number_format(round($row->discount * $currency_rate,2),2,',','.'),
-                    'total'         => number_format(round($row->total * $currency_rate,2),2,',','.'),
-                    'used'          => number_format(round($row->total_used * $currency_rate,2),2,',','.'),
-                    'memo'          => number_format(round($row->total_memo * $currency_rate,2),2,',','.'),
-                    'balance'       => number_format(round($balance * $currency_rate,2),2,',','.'),
+                    'subtotal'      => number_format($row->subtotal * $currency_rate,2,',','.'),
+                    'discount'      => number_format($row->discount * $currency_rate,2,',','.'),
+                    'total'         => number_format($row->total * $currency_rate,2,',','.'),
+                    'used'          => number_format($row->total_used * $currency_rate,2,',','.'),
+                    'memo'          => number_format($row->total_memo * $currency_rate,2,',','.'),
+                    'balance'       => number_format($balance * $currency_rate,2,',','.'),
                     'balance_fc'    => number_format($balance,2,',','.'),
                 ];
-                $totalbalance += round($balance * $currency_rate,2);
+                $totalbalance += ($balance * $currency_rate);
             }
         }
 

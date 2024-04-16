@@ -327,13 +327,24 @@ class Coa extends Model
     }
 
     public function getBalanceFromDate($date){
-        $totalDebit = $this->journalDebit()->whereHas('journal',function($query)use($date){
-            $query->whereDate('post_date','<',$date);
-        })->sum('nominal');
+        $totalDebit = 0;
+        $totalCredit = 0;
 
-        $totalCredit = $this->journalCredit()->whereHas('journal',function($query)use($date){
+        $dataDebit = $this->journalDebit()->whereHas('journal',function($query)use($date){
             $query->whereDate('post_date','<',$date);
-        })->sum('nominal');
+        })->get();
+
+        $dataCredit = $this->journalCredit()->whereHas('journal',function($query)use($date){
+            $query->whereDate('post_date','<',$date);
+        })->get();
+
+        foreach($dataDebit as $row){
+            $totalDebit += round($row->nominal,2);
+        }
+
+        foreach($dataCredit as $row){
+            $totalCredit += round($row->nominal,2);
+        }
 
         return $totalDebit - $totalCredit;
     }

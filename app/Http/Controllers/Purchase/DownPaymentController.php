@@ -120,7 +120,7 @@ class DownPaymentController extends Controller
                     'used'          => number_format($row->total_used * $currency_rate,2,',','.'),
                     'memo'          => number_format($row->total_memo * $currency_rate,2,',','.'),
                     'balance'       => number_format($balance * $currency_rate,2,',','.'),
-                    'balance_fc'     => number_format($balance,2,',','.'),
+                    'balance_fc'    => number_format($balance,2,',','.'),
                 ];
                 $totalbalance += ($balance * $currency_rate);
             }

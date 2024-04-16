@@ -106,7 +106,8 @@ class ExportOutstandingAP implements FromView , WithEvents
                 pi.tax,
                 pi.wtax,
                 pi.balance,
-                pi.currency_rate
+                pi.currency_rate,
+                pi.note
                 FROM purchase_invoices pi
                 LEFT JOIN users u
                     ON u.id = pi.account_id
@@ -186,7 +187,8 @@ class ExportOutstandingAP implements FromView , WithEvents
                 pi.tax,
                 pi.wtax,
                 pi.grandtotal,
-                pi.currency_rate
+                pi.currency_rate,
+                pi.note
                 FROM purchase_down_payments pi
                 LEFT JOIN users u
                     ON u.id = pi.account_id
@@ -223,6 +225,7 @@ class ExportOutstandingAP implements FromView , WithEvents
                     'sisa'      => number_format($balance_after_adjust,2,',','.'),
                     'kurs'      => number_format($total_received_after_adjust / $balance,2,',','.'),
                     'real'      => number_format($balance,2,',','.'),
+                    'note'      => $row->note
                 ];
                 $totalAll += $balance_after_adjust;
                 $array_filter[] = $data_tempura;
@@ -249,6 +252,7 @@ class ExportOutstandingAP implements FromView , WithEvents
                     'sisa'      => number_format($balance_after_adjust,2,',','.'),
                     'kurs'      => number_format($total_received_after_adjust / $balance,2,',','.'),
                     'real'      => number_format($balance,2,',','.'),
+                    'note'      => $row->note
                 ];
                 $totalAll += $balance_after_adjust;
                 $array_filter[] = $data_tempura;

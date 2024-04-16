@@ -103,13 +103,21 @@ class Coa extends Model
         $totalCredit = 0;
         foreach($child as $row){
 
-            $totalBalanceBeforeDebit += $row->journalDebit()->whereHas('journal',function($query)use($month){
+            $dataBalanceBeforeDebit = $row->journalDebit()->whereHas('journal',function($query)use($month){
                 $query->whereIn('status',['2','3'])->whereRaw("post_date < '$month-01'");
-            })->sum('nominal');
+            })->get();
 
-            $totalBalanceBeforeCredit += $row->journalCredit()->whereHas('journal',function($query)use($month){
+            $dataBalanceBeforeCredit = $row->journalCredit()->whereHas('journal',function($query)use($month){
                 $query->whereIn('status',['2','3'])->whereRaw("post_date < '$month-01'");
-            })->sum('nominal');
+            })->get();
+
+            foreach($dataBalanceBeforeDebit as $row){
+                $totalBalanceBeforeDebit += round($row->nominal,2);
+            }
+
+            foreach($dataBalanceBeforeCredit as $row){
+                $totalBalanceBeforeCredit += round($row->nominal,2);
+            }       
 
             $dataDebit = $row->journalDebit()->whereHas('journal',function($query)use($month){
                 $query->whereIn('status',['2','3'])->whereRaw("post_date LIKE '$month%'");
@@ -156,41 +164,57 @@ class Coa extends Model
         $totalDebit = 0;
         $totalCredit = 0;
         foreach($child as $row){
-            $totalBalanceBeforeDebit += $row->journalDebit()->whereHas('journal',function($query)use($month){
+            $dataBalanceBeforeDebit = $row->journalDebit()->whereHas('journal',function($query)use($month){
                 $query->whereIn('status',['2','3'])
                     ->whereRaw("post_date < '$month-01'")
                     ->where(function($query){
                         $query->where('lookable_type','!=','closing_journals')
                             ->orWhereNull('lookable_type');
                     });
-            })->sum('nominal');
+            })->get();
 
-            $totalBalanceBeforeCredit += $row->journalCredit()->whereHas('journal',function($query)use($month){
+            $dataBalanceBeforeCredit = $row->journalCredit()->whereHas('journal',function($query)use($month){
                 $query->whereIn('status',['2','3'])
                     ->whereRaw("post_date < '$month-01'")
                     ->where(function($query){
                         $query->where('lookable_type','!=','closing_journals')
                             ->orWhereNull('lookable_type');
                     });
-            })->sum('nominal');
+            })->get();
 
-            $totalDebit += $row->journalDebit()->whereHas('journal',function($query)use($month){
+            foreach($dataBalanceBeforeDebit as $row){
+                $totalBalanceBeforeDebit += round($row->nominal,2);
+            }
+
+            foreach($dataBalanceBeforeCredit as $row){
+                $totalBalanceBeforeCredit += round($row->nominal,2);
+            }
+
+            $dataDebit = $row->journalDebit()->whereHas('journal',function($query)use($month){
                 $query->whereIn('status',['2','3'])
                     ->whereRaw("post_date LIKE '$month%'")
                     ->where(function($query){
                         $query->where('lookable_type','!=','closing_journals')
                             ->orWhereNull('lookable_type');
                     });
-            })->sum('nominal');
+            })->get();
 
-            $totalCredit += $row->journalCredit()->whereHas('journal',function($query)use($month){
+            $dataCredit = $row->journalCredit()->whereHas('journal',function($query)use($month){
                 $query->whereIn('status',['2','3'])
                     ->whereRaw("post_date LIKE '$month%'")
                     ->where(function($query){
                         $query->where('lookable_type','!=','closing_journals')
                             ->orWhereNull('lookable_type');
                     });
-            })->sum('nominal');
+            })->get();
+
+            foreach($dataDebit as $row){
+                $totalDebit += round($row->nominal,2);
+            }
+
+            foreach($dataCredit as $row){
+                $totalCredit += round($row->nominal,2);
+            }
         }
 
         $arr = [
@@ -221,15 +245,23 @@ class Coa extends Model
         $totalDebit = 0;
         $totalCredit = 0;
         foreach($child as $row){
-            $totalBalanceBeforeDebit += $row->journalDebit()->whereHas('journal',function($query)use($month){
+            $dataBalanceBeforeDebit = $row->journalDebit()->whereHas('journal',function($query)use($month){
                 $query->whereIn('status',['2','3'])
                     ->whereRaw("post_date < '$month-01'");
-            })->sum('nominal');
+            })->get();
+            
+            foreach($dataBalanceBeforeDebit as $row){
+                $totalBalanceBeforeDebit += round($row->nominal,2);
+            }
 
-            $totalBalanceBeforeCredit += $row->journalCredit()->whereHas('journal',function($query)use($month){
+            $dataBalanceBeforeCredit = $row->journalCredit()->whereHas('journal',function($query)use($month){
                 $query->whereIn('status',['2','3'])
                     ->whereRaw("post_date < '$month-01'");
-            })->sum('nominal');
+            })->get();
+
+            foreach($dataBalanceBeforeCredit as $row){
+                $totalBalanceBeforeCredit += round($row->nominal,2);
+            }
 
             $dataDebit = $row->journalDebit()->whereHas('journal',function($query)use($month){
                 $query->whereIn('status',['2','3'])

@@ -86,6 +86,7 @@
                                                     <tr>
                                                         <th rowspan="2">#</th>
                                                         <th rowspan="2">Code</th>
+                                                        <th rowspan="2">Partner Bisnis</th>
                                                         <th rowspan="2">Tgl.Post</th>
                                                         <th colspan="2" class="center-align">Mata Uang</th>
                                                         <th rowspan="2">Keterangan</th>
@@ -157,6 +158,10 @@
                                         @endforeach
                                     </select>
                                     <label class="" for="company_id">Perusahaan</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <select class="browser-default" id="account_id" name="account_id"></select>
+                                    <label class="active" for="account_id">Partner Bisnis</label>
                                 </div>
                                 <div class="input-field col m3 s12">
                                     <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="loadCurrency();">
@@ -553,6 +558,8 @@
             $(this).closest('tr').remove();
             countAll();
         });
+
+        select2ServerSide('#account_id', '{{ url("admin/select2/employee") }}');
     });
 
     function checkRow(code){
@@ -597,14 +604,22 @@
                     success: function(response) {
                         loadingClose('.modal-content');
                         $('#empty-detail').remove();
-                        $('.row_op').remove();
+                        $('.data-used[data-account!="' + $('#account_id').val() + '"]').each(function(i, val){
+                            $(this).trigger('click');
+                        });
+                        $('.row_op[data-account!="' + $('#account_id').val() + '"]').each(function(i, val){
+                            $(this).remove();
+                        });
+                        $('.row_item[data-account!="' + $('#account_id').val() + '"]').each(function(i, val){
+                            $(this).remove();
+                        });
                         if(response.details.length > 0){
                             $.each(response.details, function(i, val) {
                                 var count = makeid(10);
                                 $('#list-used-data').append(`
                                     <div class="chip purple darken-4 gradient-shadow white-text">
                                         ` + val.code + `
-                                        <i class="material-icons close data-used" onclick="removeUsedData('` + val.type + `',` + val.id + `)">close</i>
+                                        <i class="material-icons close data-used" onclick="removeUsedData('` + val.type + `',` + val.id + `)" data-account="` + $('#account_id').val() + `">close</i>
                                     </div>
                                 `);
                                 $('#document_date').val(val.document_date);
@@ -617,7 +632,7 @@
                                 $('#document_no').val(val.document_no);
                                 $('#note').val(val.note);
                                 $('#body-detail-op').append(`
-                                    <tr class="row_op" data-id="` + val.id + `">
+                                    <tr class="row_op" data-id="` + val.id + `" data-account="` + $('#account_id').val() + `">
                                         <input type="hidden" name="arr_type[]" value="` + val.type + `" id="arr_type` + count + `">
                                         <input type="hidden" name="arr_id[]" value="` + val.id + `" id="arr_id` + count + `">
                                         <td>
@@ -649,7 +664,7 @@
                                 $.each(val.detail, function(i, valdetail) {
                                     let countdetail = makeid(10);
                                     $('#last-row-item').before(`
-                                        <tr class="row_item" data-id="` + val.id + `">
+                                        <tr class="row_item" data-id="` + val.id + `" data-account="` + $('#account_id').val() + `">
                                             <input type="hidden" name="arr_percent_tax[]" value="` + valdetail.percent_tax + `" id="arr_percent_tax` + countdetail + `">
                                             <input type="hidden" name="arr_percent_wtax[]" value="` + valdetail.percent_wtax + `" id="arr_percent_wtax` + countdetail + `">
                                             <input type="hidden" name="arr_tax[]" value="` + valdetail.tax + `" id="arr_tax` + countdetail + `">
@@ -739,7 +754,9 @@
                                     $('#arr_tax_id' + countdetail).val(valdetail.tax_id);
                                     $('#arr_wtax_id' + countdetail).val(valdetail.wtax_id);
                                     $('#arr_is_include_tax' + countdetail).val(valdetail.is_include_tax);
-                                    $('#arr_place' + countdetail).val(valdetail.place_id);
+                                    if(valdetail.place_id){
+                                        $('#arr_place' + countdetail).val(valdetail.place_id);
+                                    }                                    
                                     $('#arr_line' + countdetail).val(valdetail.line_id);
                                     $('#arr_machine' + countdetail).val(valdetail.machine_id);
                                     $('#arr_division' + countdetail).val(valdetail.division_id);
@@ -835,71 +852,80 @@
     }
 
     function getData(){
-        $.ajax({
-            url: '{{ Request::url() }}/get_data',
-            type: 'POST',
-            dataType: 'JSON',
-            data: {
-                id: $('#fund_request_id').val()
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                loadingOpen('#modal1');
-            },
-            success: function(response) {
-                loadingClose('#modal1');
-                if(response.status == 500){
+        if($('#account_id').val()){
+            $.ajax({
+                url: '{{ Request::url() }}/get_data',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    id: $('#fund_request_id').val(),
+                    account_id: $('#account_id').val(),
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('#modal1');
+                },
+                success: function(response) {
+                    loadingClose('#modal1');
+                    if(response.status == 500){
+                        swal({
+                            title: 'Ups!',
+                            text: response.message,
+                            icon: 'warning'
+                        });
+                    }else{
+                        $('#modal5').modal('open');
+
+                        if(response.data.length > 0){
+                            $.each(response.data, function(i, val) {
+                                $('#body-detail-multi').append(`
+                                    <tr data-type="` + val.type + `" data-id="` + val.id + `">
+                                        <td>
+                                            ` + val.code + `
+                                        </td>
+                                        <td>
+                                            ` + val.post_date + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.total + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.used + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.balance + `
+                                        </td>
+                                        <td class="">
+                                            ` + val.note + `
+                                        </td>
+                                    </tr>
+                                `);
+                            });
+                        }
+                        
+                        $('.modal-content').scrollTop(0);
+                        M.updateTextFields();
+                    }
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('#modal1');
                     swal({
                         title: 'Ups!',
-                        text: response.message,
-                        icon: 'warning'
+                        text: 'Check your internet connection.',
+                        icon: 'error'
                     });
-                }else{
-                    $('#modal5').modal('open');
-
-                    if(response.data.length > 0){
-                        $.each(response.data, function(i, val) {
-                            $('#body-detail-multi').append(`
-                                <tr data-type="` + val.type + `" data-id="` + val.id + `">
-                                    <td>
-                                        ` + val.code + `
-                                    </td>
-                                    <td>
-                                        ` + val.post_date + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.total + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.used + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.balance + `
-                                    </td>
-                                    <td class="">
-                                        ` + val.note + `
-                                    </td>
-                                </tr>
-                            `);
-                        });
-                    }
-                    
-                    $('.modal-content').scrollTop(0);
-                    M.updateTextFields();
                 }
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('#modal1');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
-        });
+            });
+        }else{
+            swal({
+                title: 'Ups!',
+                text: 'Silahkan pilih Partner Bisnis.',
+                icon: 'error'
+            });
+        }
     }
 
     var printService = new WebSocketPrinter({
@@ -1202,6 +1228,7 @@
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
+                { name: 'account_id', className: '' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'currency_id', className: 'center-align' },
                 { name: 'currency_rate', className: 'center-align' },
@@ -1406,7 +1433,7 @@
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
                         $('#last-row-item').before(`
-                            <tr class="row_item" data-id="">
+                            <tr class="row_item" data-id="" data-account="` + val.account_id + `">
                                 <input type="hidden" name="arr_percent_tax[]" value="` + val.percent_tax + `" id="arr_percent_tax` + count + `">
                                 <input type="hidden" name="arr_percent_wtax[]" value="` + val.percent_wtax + `" id="arr_percent_wtax` + count + `">
                                 <input type="hidden" name="arr_tax[]" value="` + val.tax + `" id="arr_tax` + count + `">
@@ -1528,7 +1555,7 @@
                     $.each(response.docs, function(i, val) {
                         var count = makeid(10);
                         $('#body-detail-op').append(`
-                            <tr class="row_op" data-id="` + val.id + `">
+                            <tr class="row_op" data-id="` + val.id + `" data-id="" data-account="` + val.account_id + `">
                                 <input type="hidden" name="arr_type[]" value="` + val.type + `" id="arr_type` + count + `">
                                 <input type="hidden" name="arr_id[]" value="` + val.id + `" id="arr_id` + count + `">
                                 <td>

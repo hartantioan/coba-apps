@@ -606,7 +606,7 @@ class PaymentRequestController extends Controller
 
                             if($data->document_status == '2'){
                                 foreach($data->fundRequestDetail as $rowdetail){
-                                    if($rowdetail->total > 0){
+                                    if($rowdetail->total > 0 || $rowdetail->total < 0){
                                         $listDetails[] = [
                                             'note'          => $rowdetail->note,
                                             'nominal'       => number_format($rowdetail->total,2,',','.'),

@@ -65,7 +65,7 @@ class PersonalCloseBillController extends Controller
         $this->datauser = $user;
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
         $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
-        $this->menu = Menu::where('url', 'personal_close_bill')->first();
+        $this->menu = Menu::where('url', 'close_bill_personal')->first();
     }
 
     public function index(Request $request)
@@ -93,6 +93,7 @@ class PersonalCloseBillController extends Controller
             'id',
             'code',
             'user_id',
+            'account_id',
             'post_date',
             'currency_id',
             'currency_rate',
@@ -128,7 +129,15 @@ class PersonalCloseBillController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('required_date', 'like', "%$search%")
-                            ->orWhere('note', 'like', "%$search%");
+                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhereHas('user',function($query) use ($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('account',function($query) use ($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            });
                     });
                 }
 
@@ -152,7 +161,15 @@ class PersonalCloseBillController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('required_date', 'like', "%$search%")
-                            ->orWhere('note', 'like', "%$search%");
+                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhereHas('user',function($query) use ($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('account',function($query) use ($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            });
                     });
                 }
 
@@ -175,6 +192,7 @@ class PersonalCloseBillController extends Controller
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->user->name,
+                    $val->account()->exists() ? $val->account->name : '-',
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->currency->code,
                     number_format($val->currency_rate,2,',','.'),
@@ -302,18 +320,7 @@ class PersonalCloseBillController extends Controller
                                 <th class="right-align">'.number_format($data->grandtotal,2,',','.').'</th>
                             </tr>
                         </tfoot>
-                        </table></div><div class="col s12 mt-2"><h6>Daftar Lampiran</h6>';
-
-        foreach($menu->checklistDocument as $row){
-            $rowceklist = $row->checkDocument($data->getTable(),$data->id);
-            $string .= '<label style="margin: 0 5px 0 0;">
-            <input class="validate" required="" type="checkbox" value="{{ $row->id }}" '.($rowceklist ? 'checked' : '').'>
-            <span>'.$row->title.' ('.$row->type().')'.'</span>
-            '.($rowceklist ? $rowceklist->note : '').'
-            </label>';
-        }
-
-        $string .= '</div>';
+                        </table></div>';
 
         $string .= '<div class="col s12 mt-1"><table style="max-width:800px;">
                         <thead>
@@ -829,6 +836,7 @@ class PersonalCloseBillController extends Controller
         $column = [
             'id',
             'code',
+            'account_id',
             'post_date',
             'currency_id',
             'currency_rate',
@@ -859,8 +867,11 @@ class PersonalCloseBillController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
-                            ->orWhere('required_date', 'like', "%$search%")
-                            ->orWhere('note', 'like', "%$search%");
+                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhereHas('account',function($query) use ($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            });
                     });
                 }
 
@@ -879,8 +890,11 @@ class PersonalCloseBillController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
-                            ->orWhere('required_date', 'like', "%$search%")
-                            ->orWhere('note', 'like', "%$search%");
+                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhereHas('account',function($query) use ($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            });
                     });
                 }
 
@@ -898,6 +912,7 @@ class PersonalCloseBillController extends Controller
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
+                    $val->account()->exists() ? $val->account->name : '-',
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->currency->code,
                     number_format($val->currency_rate,2,',','.'),
@@ -947,7 +962,7 @@ class PersonalCloseBillController extends Controller
             $query->whereHas('paymentRequest',function($query){
                 $query->whereHas('outgoingPayment');
             });
-        })->whereDoesntHave('used')->where('account_id',session('bo_id'))->get();
+        })->whereDoesntHave('used')->where('account_id',$request->account_id)->get();
 
         foreach($data as $row){
             $totalReceivable = $row->totalReceivable();
@@ -1048,6 +1063,7 @@ class PersonalCloseBillController extends Controller
         $validation = Validator::make($request->all(), [
             'code'                      => 'required',
             'code_place_id'             => 'required',
+            'account_id'                => 'required',
             'company_id'                => 'required',
 			'post_date' 				=> 'required',
             'note'		                => 'required',
@@ -1064,6 +1080,7 @@ class PersonalCloseBillController extends Controller
             'code.required' 	                => 'Kode tidak boleh kosong.',
             'code_place_id.required'            => 'Plant Tidak boleh kosong',
             'company_id.required'               => 'Perusahaan tidak boleh kosong',
+            'account_id.required'               => 'Partner Bisnis tidak boleh kosong',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
 			'note.required'				        => 'Keterangan tidak boleh kosong',
             'currency_id.required'				=> 'Mata uang tidak boleh kosong',
@@ -1126,6 +1143,7 @@ class PersonalCloseBillController extends Controller
                     $query->code = $request->code;
                     $query->user_id = session('bo_id');
                     $query->company_id = $request->company_id;
+                    $query->account_id = $request->account_id;
                     $query->post_date = $request->post_date;
                     $query->currency_id = $request->currency_id;
                     $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
@@ -1156,14 +1174,14 @@ class PersonalCloseBillController extends Controller
                 }
 			}else{
                 
-                $lastSegment = $request->lastsegment;
-                $menu = Menu::where('url', $lastSegment)->first();
+                $menu = Menu::where('url', 'close_bill_personal')->first();
                 $newCode=PersonalCloseBill::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                 
                 $query = PersonalCloseBill::create([
                     'code'			    => $newCode,
                     'user_id'		    => session('bo_id'),
                     'company_id'        => $request->company_id,
+                    'account_id'        => $request->account_id,
                     'post_date'         => $request->post_date,
                     'currency_id'       => $request->currency_id,
                     'currency_rate'     => str_replace(',','.',str_replace('.','',$request->currency_rate)),
@@ -1444,12 +1462,15 @@ class PersonalCloseBillController extends Controller
 
         $arr = [];
         $arrDoc = [];
+        $account_id = 0;
 
         foreach($fr->personalCloseBillDetail as $row){
             $totalReceivable = $row->fundRequest->totalReceivable();
             $totalReceivableUsed = $row->fundRequest->totalReceivableUsedPaid();
             $balance = $totalReceivable - $totalReceivableUsed;
+            $account_id = $row->fundRequest->account_id;
             $arrDoc[] = [
+                'account_id'    => $row->fundRequest->account_id,
                 'type'          => $row->fundRequest->getTable(),
                 'id'            => $row->fundRequest->id,
                 'code'          => $row->fundRequest->code,
@@ -1464,6 +1485,7 @@ class PersonalCloseBillController extends Controller
 
         foreach($fr->personalCloseBillCost as $row){
             $arr[] = [
+                'account_id'        => $account_id,
                 'item'              => $row->note,
                 'qty'               => CustomHelper::formatConditionalQty($row->qty),
                 'unit_id'           => $row->unit_id,

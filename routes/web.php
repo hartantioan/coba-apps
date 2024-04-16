@@ -2402,7 +2402,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('export_from_page',[IncomingPaymentController::class, 'exportFromTransactionPage']);
                 });
 
-                Route::prefix('personal_close_bill')->middleware(['operation.access:personal_close_bill,view','lockacc'])->group(function () {
+                Route::prefix('close_bill_personal')->middleware(['operation.access:close_bill_personal,view','lockacc'])->group(function () {
                     Route::get('/',[PersonalCloseBillController::class, 'index']);
                     Route::post('datatable',[PersonalCloseBillController::class, 'datatable']);
                     Route::post('print',[PersonalCloseBillController::class, 'print']);

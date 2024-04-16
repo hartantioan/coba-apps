@@ -111,13 +111,21 @@ class Coa extends Model
                 $query->whereIn('status',['2','3'])->whereRaw("post_date < '$month-01'");
             })->sum('nominal');
 
-            $totalDebit += $row->journalDebit()->whereHas('journal',function($query)use($month){
+            $dataDebit = $row->journalDebit()->whereHas('journal',function($query)use($month){
                 $query->whereIn('status',['2','3'])->whereRaw("post_date LIKE '$month%'");
-            })->sum('nominal');
+            })->get();
     
-            $totalCredit += $row->journalCredit()->whereHas('journal',function($query)use($month){
+            $dataCredit = $row->journalCredit()->whereHas('journal',function($query)use($month){
                 $query->whereIn('status',['2','3'])->whereRaw("post_date LIKE '$month%'");
-            })->sum('nominal');
+            })->get();
+
+            foreach($dataDebit as $row){
+                $totalDebit += round($row->nominal,2);
+            }
+
+            foreach($dataCredit as $row){
+                $totalCredit += round($row->nominal,2);
+            }
         }
 
         $arr = [
@@ -223,23 +231,31 @@ class Coa extends Model
                     ->whereRaw("post_date < '$month-01'");
             })->sum('nominal');
 
-            $totalDebit += $row->journalDebit()->whereHas('journal',function($query)use($month){
+            $dataDebit = $row->journalDebit()->whereHas('journal',function($query)use($month){
                 $query->whereIn('status',['2','3'])
                     ->whereRaw("post_date LIKE '$month%'")
                     ->where(function($query){
                         $query->where('lookable_type','!=','closing_journals')
                             ->orWhereNull('lookable_type');
                     });
-            })->sum('nominal');
+            })->get();
 
-            $totalCredit += $row->journalCredit()->whereHas('journal',function($query)use($month){
+            $dataCredit = $row->journalCredit()->whereHas('journal',function($query)use($month){
                 $query->whereIn('status',['2','3'])
                     ->whereRaw("post_date LIKE '$month%'")
                     ->where(function($query){
                         $query->where('lookable_type','!=','closing_journals')
                             ->orWhereNull('lookable_type');
                     });
-            })->sum('nominal');
+            })->get();
+
+            foreach($dataDebit as $row){
+                $totalDebit += round($row->nominal,2);
+            }
+
+            foreach($dataCredit as $row){
+                $totalCredit += round($row->nominal,2);
+            }
         }
 
         $arr = [

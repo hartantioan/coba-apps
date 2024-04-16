@@ -265,7 +265,7 @@
                 <tbody>
                     @foreach($data->purchaseOrderDetail as $key => $row)
                     <tr>
-                        <td class="center-align" rowspan="3">{{ ($key + 1) }}</td>
+                        <td class="center-align" rowspan="4">{{ ($key + 1) }}</td>
                         <td class="center-align">{{ $row->item_id ? $row->item->code.' - '.$row->item->name : $row->coa->code.' - '.$row->coa->name }}</td>
                         <td class="center-align">{{ $row->item_id ? $row->item->itemGroup->name : '-' }}</td>
                         <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
@@ -281,6 +281,9 @@
                     </tr>
                     <tr>
                         <td colspan="10">Keterangan 2: {{ $row->note2 }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="10">Referensi: {{ $row->purchaseRequestDetail()->exists() ? $row->purchaseRequestDetail->purchaseRequest->code : '-' }}</td>
                     </tr>
                     @endforeach
                     <tr>

@@ -82,6 +82,7 @@
                                                         <th rowspan="2">#</th>
                                                         <th rowspan="2">Code</th>
                                                         <th rowspan="2">Pengguna</th>
+                                                        <th rowspan="2">Partner Bisnis</th>
                                                         <th rowspan="2">Tgl.Post</th>
                                                         <th colspan="2" class="center-align">Mata Uang</th>
                                                         <th rowspan="2">Keterangan</th>
@@ -246,6 +247,7 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'user_id', className: 'center-align' },
+                { name: 'account_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'currency_id', className: 'center-align' },
                 { name: 'currency_rate', className: 'center-align' },

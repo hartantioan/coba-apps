@@ -191,7 +191,9 @@ class PurchaseOrderController extends Controller
                                 $query->whereHas('item',function($query) use ($search, $request){
                                     $query->where('code','like',"%$search%")
                                         ->orWhere('name','like',"%$search%");
-                                });
+                                })
+                                ->orWhereHas('note','like',"%$search%")
+                                ->orWhereHas('note2','like',"%$search%");
                             });
                     });
                 }
@@ -291,7 +293,9 @@ class PurchaseOrderController extends Controller
                                 $query->whereHas('item',function($query) use ($search, $request){
                                     $query->where('code','like',"%$search%")
                                         ->orWhere('name','like',"%$search%");
-                                });
+                                })
+                                ->orWhereHas('note','like',"%$search%")
+                                ->orWhereHas('note2','like',"%$search%");
                             });
                     });
                 }

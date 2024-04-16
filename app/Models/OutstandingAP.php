@@ -19,6 +19,6 @@ class OutstandingAP extends Model
 
     public function outstandingApDetail()
     {
-        return $this->hasMany('App\Models\OutstandingAPDetail');
+        return $this->hasMany('App\Models\OutstandingAPDetail','outstanding_ap_id','id');
     }
 }

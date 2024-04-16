@@ -320,18 +320,7 @@ class PersonalCloseBillController extends Controller
                                 <th class="right-align">'.number_format($data->grandtotal,2,',','.').'</th>
                             </tr>
                         </tfoot>
-                        </table></div><div class="col s12 mt-2"><h6>Daftar Lampiran</h6>';
-
-        foreach($menu->checklistDocument as $row){
-            $rowceklist = $row->checkDocument($data->getTable(),$data->id);
-            $string .= '<label style="margin: 0 5px 0 0;">
-            <input class="validate" required="" type="checkbox" value="{{ $row->id }}" '.($rowceklist ? 'checked' : '').'>
-            <span>'.$row->title.' ('.$row->type().')'.'</span>
-            '.($rowceklist ? $rowceklist->note : '').'
-            </label>';
-        }
-
-        $string .= '</div>';
+                        </table></div>';
 
         $string .= '<div class="col s12 mt-1"><table style="max-width:800px;">
                         <thead>

@@ -278,7 +278,7 @@ class GenerateReport extends Command
                     'paid'                  => $total_invoice_after_adjust,
                     'balance'               => $balance_after_adjust,
                 ]);
-                $totalAll += $balance_after_adjust;
+                $totalAll += round($balance_after_adjust,2);
             }
 
             foreach($results2 as $row){
@@ -298,7 +298,7 @@ class GenerateReport extends Command
                     'balance'               => $balance_after_adjust,
                 ]);
                 
-                $totalAll += $balance_after_adjust;
+                $totalAll += round($balance_after_adjust,2);
             }
 
             $query->update([

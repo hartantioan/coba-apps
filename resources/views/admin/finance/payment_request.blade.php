@@ -1883,9 +1883,11 @@
                         success: function(response) {
                             loadingClose('.modal-content');
 
-                            $('#empty-detail').remove();
-                            $('.row_detail_cost').remove();
-                            $('#body-detail').empty();
+                            if(!$('#temp').val()){
+                                $('#empty-detail').remove();
+                                $('.row_detail_cost').remove();
+                                $('#body-detail').empty();
+                            }
                             if(response.details.length > 0){
                                 $.each(response.details, function(i, val) {
                                     $('.row_detail[data-account!="' + val.account_code + '"]').remove();
@@ -2805,7 +2807,7 @@
                                     <input id="arr_pay` + count + `" name="arr_pay[]" data-grandtotal="` + val.balance + `" onfocus="emptyThis(this);" class="browser-default" type="text" value=" `+ val.nominal + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
                                 </td>
                                 <td class="center">
-                                    <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:350px;" value="` + val.note + `">
+                                    <input id="arr_note` + count + `" name="arr_note[]" type="text" style="width:350px;" value="` + val.note + `">
                                 </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">

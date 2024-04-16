@@ -8,9 +8,10 @@
             <th class="center-align">Tgl.Terima</th>
             <th class="center-align">TOP(Hari)</th>
             <th class="center-align">Tgl.Jatuh Tempo</th>
+            <th class="center-align">Kurs</th>
             <th class="center-align">Total</th>
             <th class="center-align">Dibayar</th>
-            <th class="center-align">Sisa</th>   
+            <th class="center-align">Sisa</th>
         </tr>
     </thead>
     <tbody>
@@ -23,6 +24,7 @@
                 <td class="center-align">{{ $row['rec_date'] }}</td>
                 <td class="center-align">{{ $row['top'] }}</td>
                 <td class="center-align">{{ $row['due_date'] }}</td>
+                <td class="center-align">{{ $row['kurs'] }}</td>
                 <td class="right-align">{{ $row['grandtotal'] }}</td>
                 <td class="center-align">{{ $row['payed'] }}</td>
                 <td class="center-align">{{ $row['sisa'] }}</td>
@@ -30,7 +32,7 @@
         @endforeach
         @if(count($data) == 0)
             <tr>
-                <td colspan="10" align="center">
+                <td colspan="11" align="center">
                     Data tidak ditemukan
                 </td>
             </tr>
@@ -39,6 +41,7 @@
     </tbody>
     <tfoot>
         <tr>
+            <td></td>
             <td></td>
             <td></td>
             <td></td>

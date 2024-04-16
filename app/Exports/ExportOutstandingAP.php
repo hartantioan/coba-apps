@@ -247,6 +247,8 @@ class ExportOutstandingAP implements FromView , WithEvents
                 'grandtotal'=> number_format($total_received_after_adjust,2,',','.'),
                 'payed'     => number_format($total_invoice_after_adjust,2,',','.'),
                 'sisa'      => number_format($balance_after_adjust,2,',','.'),
+                'kurs'      => number_format($total_received_after_adjust / $row->balance,2,',','.'),
+                'real'      => number_format($balance,2,',','.'),
             ];
             
             if($balance > 0){

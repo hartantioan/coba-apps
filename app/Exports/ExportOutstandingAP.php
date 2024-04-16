@@ -210,21 +210,20 @@ class ExportOutstandingAP implements FromView , WithEvents
             $total_received_after_adjust = ($row->balance * $currency_rate) + $row->adjust_nominal;
             $total_invoice_after_adjust = ($row->total_payment + $row->total_memo + $row->total_reconcile + $row->total_journal) * $currency_rate;
             $balance_after_adjust = $total_received_after_adjust - $total_invoice_after_adjust;
-            $data_tempura = [
-                'code'      => $row->code,
-                'vendor'    => $row->account_name,
-                'post_date' => date('d/m/Y',strtotime($row->post_date)),
-                'rec_date'  => date('d/m/Y',strtotime($row->received_date)),
-                'due_date'  => date('d/m/Y',strtotime($row->due_date)),
-                'top'       => '-',
-                'grandtotal'=> number_format($total_received_after_adjust,2,',','.'),
-                'payed'     => number_format($total_invoice_after_adjust,2,',','.'),
-                'sisa'      => number_format($balance_after_adjust,2,',','.'),
-                'kurs'      => number_format($total_received_after_adjust / $balance,2,',','.'),
-                'real'      => number_format($balance,2,',','.'),
-            ];
-            
             if($balance > 0){
+                $data_tempura = [
+                    'code'      => $row->code,
+                    'vendor'    => $row->account_name,
+                    'post_date' => date('d/m/Y',strtotime($row->post_date)),
+                    'rec_date'  => date('d/m/Y',strtotime($row->received_date)),
+                    'due_date'  => date('d/m/Y',strtotime($row->due_date)),
+                    'top'       => '-',
+                    'grandtotal'=> number_format($total_received_after_adjust,2,',','.'),
+                    'payed'     => number_format($total_invoice_after_adjust,2,',','.'),
+                    'sisa'      => number_format($balance_after_adjust,2,',','.'),
+                    'kurs'      => number_format($total_received_after_adjust / $balance,2,',','.'),
+                    'real'      => number_format($balance,2,',','.'),
+                ];
                 $totalAll += $balance_after_adjust;
                 $array_filter[] = $data_tempura;
             }
@@ -237,21 +236,20 @@ class ExportOutstandingAP implements FromView , WithEvents
             $total_received_after_adjust = ($row->grandtotal * $currency_rate) + $row->adjust_nominal;
             $total_invoice_after_adjust = ($row->total_payment + $row->total_memo + $row->total_reconcile) * $currency_rate;
             $balance_after_adjust = $total_received_after_adjust - $total_invoice_after_adjust;
-            $data_tempura = [
-                'code'      => $row->code,
-                'vendor'    => $row->account_name,
-                'post_date' => date('d/m/Y',strtotime($row->post_date)),
-                'rec_date'  => date('d/m/Y',strtotime($row->document_date)),
-                'due_date'  => date('d/m/Y',strtotime($row->due_date)),
-                'top'       => '-',
-                'grandtotal'=> number_format($total_received_after_adjust,2,',','.'),
-                'payed'     => number_format($total_invoice_after_adjust,2,',','.'),
-                'sisa'      => number_format($balance_after_adjust,2,',','.'),
-                'kurs'      => number_format($total_received_after_adjust / $balance,2,',','.'),
-                'real'      => number_format($balance,2,',','.'),
-            ];
-            
             if($balance > 0){
+                $data_tempura = [
+                    'code'      => $row->code,
+                    'vendor'    => $row->account_name,
+                    'post_date' => date('d/m/Y',strtotime($row->post_date)),
+                    'rec_date'  => date('d/m/Y',strtotime($row->document_date)),
+                    'due_date'  => date('d/m/Y',strtotime($row->due_date)),
+                    'top'       => '-',
+                    'grandtotal'=> number_format($total_received_after_adjust,2,',','.'),
+                    'payed'     => number_format($total_invoice_after_adjust,2,',','.'),
+                    'sisa'      => number_format($balance_after_adjust,2,',','.'),
+                    'kurs'      => number_format($total_received_after_adjust / $balance,2,',','.'),
+                    'real'      => number_format($balance,2,',','.'),
+                ];
                 $totalAll += $balance_after_adjust;
                 $array_filter[] = $data_tempura;
             }

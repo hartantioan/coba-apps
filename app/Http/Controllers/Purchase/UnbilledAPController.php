@@ -164,7 +164,7 @@ class UnbilledAPController extends Controller
                     'total_invoice' => number_format($total_invoice_after_adjust,2,',','.'),
                     'total_balance' => number_format($balance_after_adjust,2,',','.'),
                 ];
-                $totalUnbilled += round($balance_after_adjust,2);
+                $totalUnbilled += $balance_after_adjust;
             }
         }
 

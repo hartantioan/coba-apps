@@ -7,9 +7,11 @@
             <th align="center">Tgl.Post</th>
             <th align="center">No.Surat Jalan</th>
             <th align="center">Keterangan</th>
+            <th align="center">Kurs</th>
+            <th align="center">Total Sisa FC</th>
             <th align="center">Total Diterima</th>
             <th align="center">Total Invoice</th>
-            <th align="center">Total Sisa</th>
+            <th align="center">Total Sisa RP</th>
         </tr>
     </thead>
     <tbody id="detail_invoice">
@@ -21,13 +23,15 @@
                 <td align="center">{{ $row['post_date'] }}</td>
                 <td>{{ $row['delivery_no'] }}</td>
                 <td>{{ $row['note'] }}</td>
+                <td align="right">{{ $row['kurs'] }}</td>
+                <td align="right">{{ $row['real'] }}</td>
                 <td align="right">{{ $row['total_received'] }}</td>
                 <td align="right">{{ $row['total_invoice'] }}</td>
                 <td align="right">{{ $row['total_balance'] }}</td>
             </tr>
         @endforeach
         <tr>
-            <td colspan="9" align="right">
+            <td colspan="11" align="right">
                 <h6><b>Total : {{ $total }}</b></h6>
             </td>
         </tr>

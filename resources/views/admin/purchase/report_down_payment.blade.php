@@ -94,7 +94,8 @@
                                                         <th class="center-align">Grandtotal</th>
                                                         <th class="center-align">Dipakai</th>
                                                         <th class="center-align">Memo</th>
-                                                        <th class="center-align">Sisa</th>
+                                                        <th class="center-align">Sisa RP</th>
+                                                        <th class="center-align">Sisa FC</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="detail-result">
@@ -171,24 +172,25 @@
                                     <td class="right-align">` + val.used + `</td>
                                     <td class="right-align">` + val.memo + `</td>
                                     <td class="right-align">` + val.balance + `</td>
+                                    <td class="right-align">` + val.balance_fc + `</td>
                                 </tr>
                             `);
                         });
                         $('#detail-result').append(`
                             <tr id="text-grandtotal">
-                                <td class="right-align" colspan="12">Total</td>
+                                <td class="right-align" colspan="13">Total</td>
                                 <td class="right-align">` + response.totalbalance + `</td>
                             </tr>
                         `);
                         $('#detail-result').append(`
                             <tr id="text-grandtotal">
-                                <td class="center-align" colspan="13">Waktu proses : ` + response.execution_time  + ` detik</td>
+                                <td class="center-align" colspan="14">Waktu proses : ` + response.execution_time  + ` detik</td>
                             </tr>
                         `);
                     }else{
                         $('#detail-result').append(`
                             <tr>
-                                <td class="center-align" colspan="13">Data tidak ditemukan.</td>
+                                <td class="center-align" colspan="14">Data tidak ditemukan.</td>
                             </tr>
                         `);
                     }

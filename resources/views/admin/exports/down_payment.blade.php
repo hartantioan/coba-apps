@@ -8,10 +8,10 @@
             <th class="center-align">Nama Supplier</th>
             <th class="center-align">Tipe</th>
             <th class="center-align">Keterangan</th>
-            <th class="center-align">Subtotal</th>
-            <th class="center-align">Diskon</th>
             <th class="center-align">Total RP</th>
             <th class="center-align">Total FC</th>
+            <th class="center-align">Sisa RP</th>
+            <th class="center-align">Sisa FC</th>
             <th class="center-align">Based On</th>   
         </tr>
     </thead>
@@ -25,10 +25,10 @@
                 <td>{{ $row['supplier_name'] }}</td>
                 <td>{{ $row['type'] }}</td>
                 <td>{{ $row['note'] }}</td>
-                <td class="right-align">{{ $row['subtotal'] }}</td>
-                <td class="right-align">{{ $row['discount'] }}</td>
                 <td class="right-align">{{ $row['total'] }}</td>
                 <td class="right-align">{{ $row['total_fc'] }}</td>
+                <td class="right-align">{{ $row['balance'] }}</td>
+                <td class="right-align">{{ $row['balance_fc'] }}</td>
                 <td class="right-align">{{ $row['references'] }}</td>
             </tr>
         @endforeach

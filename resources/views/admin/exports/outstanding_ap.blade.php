@@ -23,7 +23,7 @@
                 <td class="center-align">{{ $row['rec_date'] }}</td>
                 <td class="center-align">{{ $row['top'] }}</td>
                 <td class="center-align">{{ $row['due_date'] }}</td>
-\                <td class="right-align">{{ $row['grandtotal'] }}</td>
+                <td class="right-align">{{ $row['grandtotal'] }}</td>
                 <td class="center-align">{{ $row['payed'] }}</td>
                 <td class="center-align">{{ $row['sisa'] }}</td>
             </tr>

@@ -34,7 +34,7 @@
         @endforeach
         @if(count($data) == 0)
             <tr>
-                <td colspan="11" align="center">
+                <td colspan="12" align="center">
                     Data tidak ditemukan
                 </td>
             </tr>
@@ -43,6 +43,7 @@
     </tbody>
     <tfoot>
         <tr>
+            <td></td>
             <td></td>
             <td></td>
             <td></td>

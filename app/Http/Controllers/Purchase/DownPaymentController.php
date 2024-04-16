@@ -122,7 +122,7 @@ class DownPaymentController extends Controller
                     'balance'       => number_format($balance * $currency_rate,2,',','.'),
                     'balance_fc'    => number_format($balance,2,',','.'),
                 ];
-                $totalbalance += ($balance * $currency_rate);
+                $totalbalance += round($balance * $currency_rate,2);
             }
         }
 

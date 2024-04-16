@@ -115,7 +115,7 @@ class ExportDownPayment implements FromView , WithEvents
                         'delete_date'   => date('d/m/Y',strtotime($row_invoice->deleted_at)),
                         'references'    => PurchaseDownPayment::getReference($row_invoice->code),
                     ];
-                    $totalbalance += ($balance * $currency_rate);
+                    $totalbalance += round($balance * $currency_rate,2);
                 }
             }  
         return view('admin.exports.down_payment', [

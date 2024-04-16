@@ -178,8 +178,9 @@
                         });
                         $('#detail-result').append(`
                             <tr id="text-grandtotal">
-                                <td class="right-align" colspan="13">Total</td>
+                                <td class="right-align" colspan="12">Total</td>
                                 <td class="right-align">` + response.totalbalance + `</td>
+                                <td class="right-align"></td>
                             </tr>
                         `);
                         $('#detail-result').append(`

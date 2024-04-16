@@ -765,7 +765,6 @@ class EmployeeController extends Controller
             ->whereDate('date', '>=', $start_date)
             ->whereDate('date', '<=', $end_date)
             ->get();
-            info($query_schedule);
             if($query_schedule){
                 foreach($request->arr_employee as $employee_id){
                    

@@ -33,8 +33,6 @@ class ExportOutstandingDP implements FromView,ShouldAutoSize
             }
         }
         
-        info($array);
-        
         return view('admin.exports.outstanding_down_payment', [
             'data' => $array,
             

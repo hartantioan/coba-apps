@@ -23,7 +23,6 @@ class ExportDeadStock implements FromView,ShouldAutoSize
     }
     public function view(): View
     {
-        info($this->date);
         $query_data = ItemCogs::whereIn('id', function ($query) {            
             $query->selectRaw('MAX(id)')
                 ->from('item_cogs')
@@ -48,7 +47,6 @@ class ExportDeadStock implements FromView,ShouldAutoSize
             }
         })
         ->get();
-        info($query_data);
         $array_filter = [];
         foreach($query_data as $row){
            

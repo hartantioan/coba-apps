@@ -256,7 +256,6 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
             }
            
         }
-        info($array_detail);
         return view('admin.exports.purchase_progress_report', [
             'data' => $array_detail,
             'type' => $this->type,

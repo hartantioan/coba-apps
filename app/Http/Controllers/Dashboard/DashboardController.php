@@ -1030,7 +1030,6 @@ class DashboardController extends Controller
                             //                     if($pembanding > $time_in && $pembanding <= Carbon::parse($time_in)->addMinutes($query_late_punishment[0]->minutes)->format('H:i:s')){
                             //                         if (($max_punish_id != null && $limit_temp > 0 && $max_punish_id != $tipe_punish_counter[$query_late_punishment[$key]->code]['punish_id']&&($key_id_punish!=null && $key <= $key_id_punish))) {
                             //                             $limit_temp--;
-                            //                             info($pembanding);
                             //                             foreach ($exact_in as $key_in => $row_ins) {
                             //                                 $exact_in[$key_in] = 1;
                             //                             }
@@ -1479,7 +1478,6 @@ class DashboardController extends Controller
                 $date->addDay();
             }
         }
-        info($attendance_per_day);
         $response = [
             'status'    => 200,
             'message'   => $attendance_per_day,

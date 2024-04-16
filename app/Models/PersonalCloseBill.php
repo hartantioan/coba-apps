@@ -18,6 +18,7 @@ class PersonalCloseBill extends Model
     protected $fillable = [
         'code',
         'user_id',
+        'account_id',
         'company_id',
         'post_date',
         'note',
@@ -77,6 +78,11 @@ class PersonalCloseBill extends Model
     public function user()
     {
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
+    }
+
+    public function account()
+    {
+        return $this->belongsTo('App\Models\User', 'account_id', 'id')->withTrashed();
     }
 
     public function voidUser()

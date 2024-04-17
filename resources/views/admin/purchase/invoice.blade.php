@@ -2922,6 +2922,7 @@
             $('input[name^="arr_wtax[]"]').each(function(index){
                 let bobot = parseFloat($('input[name^="arr_total[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) / total;
                 let rowwtax = bobot * wtax;
+                rowwtax = Math.floor(rowwtax);
                 $(this).val(
                     (rowwtax >= 0 ? '' : '-') + formatRupiahIni(rowwtax.toFixed(2).toString().replace('.',','))
                 );

@@ -285,14 +285,26 @@
                             </thead>
                             <tbody>
                                 @foreach($data->closeBillDetail as $key => $row)
-                                <tr>
-                                    <td align="center">{{ ($key + 1) }}</td>
-                                    <td align="center">{{ $row->outgoingPayment->code }}</td>
-                                    <td align="center">{{ $row->outgoingPayment->account->employee_no.' - '.$row->outgoingPayment->account->name }}</td>
-                                    <td align="center">{{ date('d/m/Y',strtotime($row->outgoingPayment->pay_date)) }}</td>
-                                    <td>{{ $row->note }}</td>
-                                    <td align="right">{{ number_format($row->nominal,2,',','.') }}</td>
-                                </tr>
+                                    @if($row->outgoingPayment()->exists())
+                                    <tr>
+                                        <td align="center">{{ ($key + 1) }}</td>
+                                        <td align="center">{{ $row->outgoingPayment->code }}</td>
+                                        <td align="center">{{ $row->outgoingPayment->account->employee_no.' - '.$row->outgoingPayment->account->name }}</td>
+                                        <td align="center">{{ date('d/m/Y',strtotime($row->outgoingPayment->pay_date)) }}</td>
+                                        <td>{{ $row->note }}</td>
+                                        <td align="right">{{ number_format($row->nominal,2,',','.') }}</td>
+                                    </tr>
+                                    @endif
+                                    @if($row->personalCloseBill()->exists())
+                                    <tr>
+                                        <td align="center">{{ ($key + 1) }}</td>
+                                        <td align="center">{{ $row->personalCloseBill->code }}</td>
+                                        <td align="center">{{ $row->personalCloseBill->user->employee_no.' - '.$row->personalCloseBill->user->name }}</td>
+                                        <td align="center">{{ date('d/m/Y',strtotime($row->personalCloseBill->post_date)) }}</td>
+                                        <td>{{ $row->note }}</td>
+                                        <td align="right">{{ number_format($row->nominal,2,',','.') }}</td>
+                                    </tr>
+                                    @endif
                                 @endforeach
                             </tbody>
                         </table>

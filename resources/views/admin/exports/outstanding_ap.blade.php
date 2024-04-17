@@ -1,37 +1,37 @@
-<table border="1" cellpadding="2" cellspacing="0" style="width:100%; font-size:13px;border-collapse: collapse;">
+<table>
     <thead>
-        <tr align="center">
-            <th class="center-align">No.</th>
-            <th class="center-align">No Invoice</th>
-            <th class="center-align">Supplier/Vendor</th>
-            <th class="center-align">Tgl.Post</th>
-            <th class="center-align">Tgl.Terima</th>
-            <th class="center-align">TOP(Hari)</th>
-            <th class="center-align">Tgl.Jatuh Tempo</th>
-            <th class="center-align">Keterangan</th>
-            <th class="center-align">Kurs</th>
-            <th class="center-align">Sisa FC</th>
-            <th class="center-align">Total</th>
-            <th class="center-align">Dibayar</th>
-            <th class="center-align">Sisa RP</th>
+        <tr>
+            <th align="center">No.</th>
+            <th align="center">No Invoice</th>
+            <th align="center">Supplier/Vendor</th>
+            <th align="center">Tgl.Post</th>
+            <th align="center">Tgl.Terima</th>
+            <th align="center">TOP(Hari)</th>
+            <th align="center">Tgl.Jatuh Tempo</th>
+            <th align="center">Keterangan</th>
+            <th align="center">Kurs</th>
+            <th align="center">Sisa FC</th>
+            <th align="center">Total</th>
+            <th align="center">Dibayar</th>
+            <th align="center">Sisa RP</th>
         </tr>
     </thead>
     <tbody>
         @foreach($data as $key => $row)
-            <tr align="center" style="background-color:#eee;">
+            <tr>
                 <td>{{ $key+1 }}</td>
                 <td>{{ $row['code'] }}</td>
                 <td>{{ $row['vendor'] }}</td>
-                <td class="center-align">{{ $row['post_date'] }}</td>
-                <td class="center-align">{{ $row['rec_date'] }}</td>
-                <td class="center-align">{{ $row['top'] }}</td>
-                <td class="center-align">{{ $row['due_date'] }}</td>
-                <td class="center-align">{{ $row['note'] }}</td>
-                <td class="center-align">{{ $row['kurs'] }}</td>
-                <td class="center-align">{{ $row['real'] }}</td>
-                <td class="right-align">{{ $row['grandtotal'] }}</td>
-                <td class="center-align">{{ $row['payed'] }}</td>
-                <td class="center-align">{{ $row['sisa'] }}</td>
+                <td align="center">{{ $row['post_date'] }}</td>
+                <td align="center">{{ $row['rec_date'] }}</td>
+                <td align="center">{{ $row['top'] }}</td>
+                <td align="center">{{ $row['due_date'] }}</td>
+                <td align="center">{{ $row['note'] }}</td>
+                <td align="center">{{ $row['kurs'] }}</td>
+                <td align="center">{{ $row['real'] }}</td>
+                <td align="right">{{ $row['grandtotal'] }}</td>
+                <td align="center">{{ $row['payed'] }}</td>
+                <td align="center">{{ $row['sisa'] }}</td>
             </tr>
         @endforeach
         @if(count($data) == 0)

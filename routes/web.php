@@ -2329,6 +2329,7 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('outstanding_ap')->middleware('operation.access:outstanding_ap,view')->group(function () {
                         Route::get('/',[OutStandingAPController::class, 'index']);
                         Route::post('filter_by_date',[OutStandingAPController::class, 'filterByDate']);
+                        Route::post('sync_report',[OutStandingAPController::class, 'syncReport']);
                         Route::get('export',[OutStandingAPController::class, 'export']);
                     });
                 });

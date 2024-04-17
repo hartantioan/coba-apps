@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Models\OutstandingAP;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
 use Illuminate\View\View;
@@ -26,7 +27,7 @@ class ExportOutstandingAP implements FromView , WithEvents
     }
     public function view(): View
     {
-        $totalAll=0;
+        /* $totalAll=0;
         $array_filter = [];
         
         $results = DB::select("
@@ -262,7 +263,39 @@ class ExportOutstandingAP implements FromView , WithEvents
         return view('admin.exports.outstanding_ap', [
             'data' => $array_filter,
             'totalall' =>number_format($totalAll,2,',','.')
-        ]);
+        ]); */
+
+        $date = $this->date;
+
+        $array_filter = [];
+
+        $results = OutstandingAP::where('post_date',$date)->first();
+
+        if($results){
+            if($results->status){
+                foreach($results->outstandingApDetail as $row){
+                    $data_tempura = [
+                        'code'      => $row->code,
+                        'vendor'    => $row->account,
+                        'post_date' => date('d/m/Y',strtotime($row->post_date)),
+                        'rec_date'  => date('d/m/Y',strtotime($row->received_date)),
+                        'due_date'  => date('d/m/Y',strtotime($row->due_date)),
+                        'top'       => $row->top,
+                        'grandtotal'=> number_format($row->total,2,',','.'),
+                        'payed'     => number_format($row->paid,2,',','.'),
+                        'sisa'      => number_format($row->balance,2,',','.'),
+                        'kurs'      => number_format($row->currency_rate,2,',','.'),
+                        'real'      => number_format($row->balance_fc,2,',','.'),
+                        'note'      => $row->note
+                    ];
+                    $array_filter[] = $data_tempura;
+                }
+                return view('admin.exports.outstanding_ap', [
+                    'data'      => $array_filter,
+                    'totalall'  =>number_format($results->total,2,',','.')
+                ]);
+            }
+        }
     }
 
     public function registerEvents(): array

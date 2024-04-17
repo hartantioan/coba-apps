@@ -23,6 +23,9 @@ class OutstandingAPDetail extends Model
         'total',
         'paid',
         'balance',
+        'currency_rate',
+        'balance_fc',
+        'note',
     ];
 
     public function outstandingAp(){

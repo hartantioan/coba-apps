@@ -16,7 +16,7 @@ class GenerateReport extends Command
      *
      * @var string
      */
-    protected $signature = 'report:generate';
+    protected $signature = 'report:generate {--date=}';
 
     /**
      * The console command description.
@@ -31,14 +31,19 @@ class GenerateReport extends Command
     public function handle()
     {
         #outstanding ap
-        $date = date('Y-m-d');
+        $date = $this->option('date') ?? date('Y-m-d');
 
-        $querycek = OutstandingAP::where('post_date', $date)->first();
+        $query = OutstandingAP::where('post_date', $date)->first();
         
-        if($querycek){
-            $querycek->outstandingApDetail()->delete();
-            $querycek->update([
+        if($query){
+            $query->outstandingApDetail()->delete();
+            $query->update([
                 'status'    => NULL
+            ]);
+        }else{
+            $query = OutstandingAP::create([
+                'post_date' => $date,
+                'total'     => 0,
             ]);
         }
 
@@ -59,7 +64,8 @@ class GenerateReport extends Command
                 rs.total_payment,
                 rs.total_memo,
                 rs.total_reconcile,
-                rs.total_journal
+                rs.total_journal,
+                rs.note
             FROM
                 (SELECT 
                     IFNULL((SELECT 
@@ -136,7 +142,8 @@ class GenerateReport extends Command
                     pi.tax,
                     pi.wtax,
                     pi.balance,
-                    pi.currency_rate
+                    pi.currency_rate,
+                    pi.note
                     FROM purchase_invoices pi
                     LEFT JOIN users u
                         ON u.id = pi.account_id
@@ -176,7 +183,8 @@ class GenerateReport extends Command
                 rs.adjust_nominal,
                 rs.total_payment,
                 rs.total_memo,
-                rs.total_reconcile
+                rs.total_reconcile,
+                rs.note
             FROM
                 (SELECT
                     pi.top AS topdp,
@@ -238,7 +246,8 @@ class GenerateReport extends Command
                     pi.tax,
                     pi.wtax,
                     pi.grandtotal,
-                    pi.currency_rate
+                    pi.currency_rate,
+                    pi.note
                     FROM purchase_down_payments pi
                     LEFT JOIN users u
                         ON u.id = pi.account_id
@@ -260,12 +269,9 @@ class GenerateReport extends Command
         $totalAll = 0;
 
         if($results || $results2){
-            $query = OutstandingAP::create([
-                'post_date' => $date,
-                'total'     => 0,
-            ]);
-
             foreach($results as $row){
+                $totalPayed = $row->total_payment + $row->total_memo + $row->total_reconcile + $row->total_journal;
+                $balance = $row->balance - $totalPayed;
                 $total_received_after_adjust = ($row->balance * $row->currency_rate) + $row->adjust_nominal;
                 $total_invoice_after_adjust = ($row->total_payment + $row->total_memo + $row->total_reconcile + $row->total_journal) * $row->currency_rate;
                 $balance_after_adjust = $total_received_after_adjust - $total_invoice_after_adjust;
@@ -280,11 +286,16 @@ class GenerateReport extends Command
                     'total'                 => $total_received_after_adjust,
                     'paid'                  => $total_invoice_after_adjust,
                     'balance'               => $balance_after_adjust,
+                    'currency_rate'         => round($balance_after_adjust / $balance,2),
+                    'balance_fc'            => $balance,
+                    'note'                  => $row->note
                 ]);
                 $totalAll += round($balance_after_adjust,2);
             }
 
             foreach($results2 as $row){
+                $totalPayed = $row->total_payment + $row->total_memo + $row->total_reconcile;
+                $balance = $row->grandtotal - $totalPayed;
                 $total_received_after_adjust = ($row->grandtotal * $row->currency_rate) + $row->adjust_nominal;
                 $total_invoice_after_adjust = ($row->total_payment + $row->total_memo + $row->total_reconcile) * $row->currency_rate;
                 $balance_after_adjust = $total_received_after_adjust - $total_invoice_after_adjust;
@@ -299,14 +310,21 @@ class GenerateReport extends Command
                     'total'                 => $total_received_after_adjust,
                     'paid'                  => $total_invoice_after_adjust,
                     'balance'               => $balance_after_adjust,
+                    'currency_rate'         => round($balance_after_adjust / $balance,2),
+                    'balance_fc'            => $balance,
+                    'note'                  => $row->note
                 ]);
                 
                 $totalAll += round($balance_after_adjust,2);
             }
 
-            $query->update([
-                'total'     => $totalAll,
-            ]);
+            $data = OutstandingAP::where('post_date', $date)->first();
+            if($data){
+                $data->update([
+                    'total'     => $totalAll,
+                    'status'    => '1',
+                ]);
+            }
         }
     }
 }

@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Purchase;
 
 use App\Exports\ExportOutstandingAP;
 use App\Http\Controllers\Controller;
+use App\Models\OutstandingAP;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
 
@@ -29,7 +31,7 @@ class OutStandingAPController extends Controller
     }
 
     public function filterByDate(Request $request){
-        $array_filter = [];
+        /* $array_filter = [];
         
         $start_time = microtime(true);
 
@@ -308,12 +310,82 @@ class OutStandingAPController extends Controller
                 'message' =>'Data error'
             ];
         }
+        return response()->json($response); */
+
+        $array_filter = [];
+        
+        $start_time = microtime(true);
+
+        $date = $request->date;
+
+        $results = OutstandingAP::where('post_date',$date)->first();
+
+        if($results){
+            if($results->status){
+                foreach($results->outstandingApDetail as $row){
+                    $data_tempura = [
+                        'code'      => $row->code,
+                        'vendor'    => $row->account,
+                        'post_date' => date('d/m/Y',strtotime($row->post_date)),
+                        'rec_date'  => date('d/m/Y',strtotime($row->received_date)),
+                        'due_date'  => date('d/m/Y',strtotime($row->due_date)),
+                        'top'       => $row->top,
+                        'grandtotal'=> number_format($row->total,2,',','.'),
+                        'payed'     => number_format($row->paid,2,',','.'),
+                        'sisa'      => number_format($row->balance,2,',','.'),
+                    ];
+                    $array_filter[] = $data_tempura;
+                }
+
+                $end_time = microtime(true);
+            
+                $execution_time = ($end_time - $start_time);
+
+                $response =[
+                    'status'        => 200,
+                    'message'       => $array_filter,
+                    'totalall'      => number_format($results->total,2,',','.'),
+                    'execution_time'=> $execution_time,
+                    'updated_at'    => date('d/m/Y H:i:s',strtotime($results->updated_at)),
+                ];
+            }else{
+                $response =[
+                    'status'  => 500,
+                    'message' => 'Laporan masih dalam proses sinkronisasi. Mohon ditunggu.'
+                ];
+            }
+        }else{
+            $response =[
+                'status'    => 500,
+                'message'   => 'Laporan tanggal '.date('d/m/Y',strtotime($date)).' masih belum tersedia.'
+            ];
+        }
+
         return response()->json($response);
     }
 
+    public function syncReport(Request $request){
+        Artisan::call('report:generate',[
+            '--date' => $request->date,
+        ]);
+        return response()->json([
+            'status'        => 200
+        ]);
+    }
+
     public function export(Request $request){
-        ob_end_clean(); // this
-        ob_start(); // and this
-		return Excel::download(new ExportOutstandingAP($request->date), 'outstanding_ap_'.uniqid().'.xlsx');
+        $results = OutstandingAP::where('post_date',$request->date)->first();
+
+        if($results){
+            if($results->status){
+                ob_end_clean(); // this
+                ob_start(); // and this
+                return Excel::download(new ExportOutstandingAP($request->date), 'outstanding_ap_'.uniqid().'.xlsx');
+            }else{
+                return back()->withErrors(['error' => 'Laporan masih dalam proses sinkronisasi. Mohon ditunggu.']);
+            }
+        }else{
+            return back()->withErrors(['error' => 'Laporan tanggal '.date('d/m/Y',strtotime($request->date)).' masih belum tersedia.']);
+        }
     }
 }

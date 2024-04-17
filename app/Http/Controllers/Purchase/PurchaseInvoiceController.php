@@ -1067,8 +1067,8 @@ class PurchaseInvoiceController extends Controller
             $balance = $grandtotal - $downpayment;
 
             if($request->temp){
-                DB::beginTransaction();
-                try {
+                /* DB::beginTransaction();
+                try { */
                     $query = PurchaseInvoice::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     if($query->journal()->exists()){
@@ -1155,16 +1155,16 @@ class PurchaseInvoiceController extends Controller
                             $row->delete();
                         }
 
-                        DB::commit();
+                        /* DB::commit(); */
                     }else{
                         return response()->json([
                             'status'  => 500,
                             'message' => 'Status purchase order sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                }catch(\Exception $e){
+                /* }catch(\Exception $e){
                     DB::rollback();
-                }
+                } */
             }else{
                 /* DB::beginTransaction();
                 try { */

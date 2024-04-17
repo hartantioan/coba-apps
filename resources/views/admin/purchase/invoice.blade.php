@@ -2919,27 +2919,16 @@
                 (balance_convert >= 0 ? '' : '-') + formatRupiahIni(balance_convert.toFixed(2).toString().replace('.',','))
             );
 
-            $('input[name^="arr_wtax[]"]').each(function(index){
-                let bobot = parseFloat($('input[name^="arr_total[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) / total;
-                let rowwtax = bobot * wtax;
-                rowwtax = Math.floor(rowwtax);
-                $(this).val(
-                    (rowwtax >= 0 ? '' : '-') + formatRupiahIni(rowwtax.toFixed(2).toString().replace('.',','))
-                );
-                $('#row_wtax' + $(this).data('id')).text(
-                    (rowwtax >= 0 ? '' : '-') + formatRupiahIni(rowwtax.toFixed(2).toString().replace('.',','))
-                );
-            });
-
             $('input[name^="arr_code"]').each(function(){
                 let element = $(this);
-                var rowgrandtotal = 0, rowtotal = 0, rowtax = 0, rowwtax = parseFloat($('input[name^="arr_wtax[]"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), percent_tax = parseFloat($('select[name^="arr_percent_tax"][data-id="' + element.data('id') + '"]').val()), percent_wtax = parseFloat($('select[name^="arr_percent_wtax"][data-id="' + element.data('id') + '"]').val()), rowprice = parseFloat($('input[name^="arr_price"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), rowqty = parseFloat($('input[name^="arr_qty"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
+                var rowgrandtotal = 0, rowtotal = 0, rowtax = 0, rowwtax = 0, percent_tax = parseFloat($('select[name^="arr_percent_tax"][data-id="' + element.data('id') + '"]').val()), percent_wtax = parseFloat($('select[name^="arr_percent_wtax"][data-id="' + element.data('id') + '"]').val()), rowprice = parseFloat($('input[name^="arr_price"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), rowqty = parseFloat($('input[name^="arr_qty"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
                 rowtotal = rowprice * rowqty;
                 if(percent_tax > 0 && $('#arr_include_tax' + element.data('id')).val() == '1'){
                     rowtotal = rowtotal / (1 + (percent_tax / 100));
                 }
                 rowtotal = Math.round(rowtotal * 100) / 100;
                 rowtax = Math.floor(rowtotal * (percent_tax / 100));
+                rowwtax = Math.floor(rowtotal * (percent_wtax / 100));
                 $('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val(
                     (rowtotal >= 0 ? '' : '-') + formatRupiahIni(rowtotal.toFixed(2).toString().replace('.',','))
                 );
@@ -2953,6 +2942,9 @@
                     (rowtax >= 0 ? '' : '-') + formatRupiahIni(rowtax.toFixed(2).toString().replace('.',','))
                 );
                 $('input[name^="arr_wtax"][data-id="' + element.data('id') + '"]').val(
+                    (rowwtax >= 0 ? '' : '-') + formatRupiahIni(rowwtax.toFixed(2).toString().replace('.',','))
+                );
+                $('#row_wtax' + element.data('id')).text(
                     (rowwtax >= 0 ? '' : '-') + formatRupiahIni(rowwtax.toFixed(2).toString().replace('.',','))
                 );
                 rowgrandtotal = rowtotal + rowtax - rowwtax;

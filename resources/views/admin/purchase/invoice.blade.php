@@ -2940,7 +2940,6 @@
                 }
                 rowtotal = Math.round(rowtotal * 100) / 100;
                 rowtax = Math.floor(rowtotal * (percent_tax / 100));
-                rowwtax = Math.floor(rowtotal * (percent_wtax / 100));
                 $('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val(
                     (rowtotal >= 0 ? '' : '-') + formatRupiahIni(rowtotal.toFixed(2).toString().replace('.',','))
                 );

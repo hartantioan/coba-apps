@@ -272,11 +272,11 @@
                         <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
                             <thead>
                                 <tr>
-                                    <th align="center" colspan="6">Daftar Outgoing Payment (BS)</th>
+                                    <th align="center" colspan="6">Daftar Dokumen Terpakai</th>
                                 </tr>
                                 <tr>
                                     <th align="center">No.</th>
-                                    <th align="center">OP No.</th>
+                                    <th align="center">OP/CREQ No.</th>
                                     <th align="center">Partner Bisnis</th>
                                     <th align="center">Tgl.Bayar</th>
                                     <th align="center">Keterangan</th>

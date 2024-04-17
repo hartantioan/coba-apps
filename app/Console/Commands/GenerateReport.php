@@ -37,8 +37,11 @@ class GenerateReport extends Command
         
         if($querycek){
             $querycek->outstandingApDetail()->delete();
-            $querycek->delete();
+            $querycek->update([
+                'status'    => NULL
+            ]);
         }
+
         $results = DB::select("
             SELECT 
                 rs.account_name,

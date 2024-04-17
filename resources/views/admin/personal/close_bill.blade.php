@@ -1412,6 +1412,9 @@
                 $('#post_date').val(response.post_date);
                 $('#company_id').val(response.company_id).formSelect();
                 $('#document_no').val(response.document_no);
+                $('#account_id').empty().append(`
+                    <option value="` + response.account_id + `">` + response.account_name + `</option>
+                `);
                 $('#document_date').val(response.document_date);
                 $('#tax_no').val(response.tax_no);
                 $('#tax_cut_no').val(response.tax_cut_no);

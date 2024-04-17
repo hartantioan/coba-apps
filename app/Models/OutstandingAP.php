@@ -15,6 +15,7 @@ class OutstandingAP extends Model
     protected $fillable = [
         'post_date',
         'total',
+        'status',
     ];
 
     public function outstandingApDetail()

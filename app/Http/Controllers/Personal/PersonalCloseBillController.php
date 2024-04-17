@@ -1455,6 +1455,7 @@ class PersonalCloseBillController extends Controller
         $fr = PersonalCloseBill::where('code',CustomHelper::decrypt($request->id))->first();
         $fr['code_place_id'] = substr($fr->code,7,2);
         $fr['currency_rate'] = number_format($fr->currency_rate,2,',','.');
+        $fr['account_name'] = $fr->account->employee_no.' - '.$fr->account->name;
         $fr['total'] = number_format($fr->total,2,',','.');
         $fr['tax'] = number_format($fr->tax,2,',','.');
         $fr['wtax'] = number_format($fr->wtax,2,',','.');

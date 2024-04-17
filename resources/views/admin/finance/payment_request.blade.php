@@ -2426,6 +2426,7 @@
                 { name: 'note', className: '' },
                 { name: 'is_reimburse', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'cash_bank_out', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],

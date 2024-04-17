@@ -357,7 +357,7 @@ class OutStandingAPController extends Controller
         }else{
             $response =[
                 'status'    => 500,
-                'message'   => 'Laporan tanggal '.date('d/m/Y',strtotime($date)).' masih belum tersedia.'
+                'message'   => 'Laporan tanggal '.date('d/m/Y',strtotime($date)).' masih belum tersedia. Silahkan jalankan SYNC.'
             ];
         }
 
@@ -385,7 +385,7 @@ class OutStandingAPController extends Controller
                 return back()->withErrors(['error' => 'Laporan masih dalam proses sinkronisasi. Mohon ditunggu.']);
             }
         }else{
-            return back()->withErrors(['error' => 'Laporan tanggal '.date('d/m/Y',strtotime($request->date)).' masih belum tersedia.']);
+            return back()->withErrors(['error' => 'Laporan tanggal '.date('d/m/Y',strtotime($request->date)).' masih belum tersedia. Silahkan jalankan SYNC.']);
         }
     }
 }

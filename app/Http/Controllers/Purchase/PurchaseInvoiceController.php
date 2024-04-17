@@ -1166,8 +1166,8 @@ class PurchaseInvoiceController extends Controller
                     DB::rollback();
                 }
             }else{
-                DB::beginTransaction();
-                try {
+                /* DB::beginTransaction();
+                try { */
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=PurchaseInvoice::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
@@ -1202,10 +1202,10 @@ class PurchaseInvoiceController extends Controller
                         'invoice_no'                => $request->invoice_no
                     ]);
 
-                    DB::commit();
+                    /* DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
-                }
+                } */
             }
             
             if($query) {

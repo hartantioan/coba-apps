@@ -150,6 +150,7 @@
                                                         <th>Catatan Internal</th>
                                                         <th>Catatan Eksternal</th>
                                                         <th>Status</th>
+                                                        <th>By</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
@@ -1228,7 +1229,8 @@ document.addEventListener('focusin', function (event) {
                 { name: 'delivery_date', className: '' },
                 { name: 'note_internal', className: '' },
                 { name: 'note_external', className: '' },
-                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+              { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
         });
@@ -1776,23 +1778,24 @@ document.addEventListener('focusin', function (event) {
     }
 
     function done(id){
+        var msg = '';
         swal({
             title: "Apakah anda yakin ingin menyelesaikan dokumen ini?",
             text: "Data yang sudah terupdate tidak dapat dikembalikan.",
             icon: 'warning',
             dangerMode: true,
-            buttons: {
-            cancel: 'Tidak, jangan!',
-            delete: 'Ya, lanjutkan!'
-            }
-        }).then(function (willDelete) {
-            if (willDelete) {
+            buttons: true,
+            content: "input",
+        })
+        .then(message => {
+            if (message != "" && message != null) {
                 $.ajax({
                     url: '{{ Request::url() }}/done',
                     type: 'POST',
                     dataType: 'JSON',
                     data: {
-                        id: id
+                        id: id,
+                        msg : message
                     },
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

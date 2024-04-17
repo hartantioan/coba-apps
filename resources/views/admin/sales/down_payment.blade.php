@@ -188,6 +188,7 @@
                                                         <th rowspan="2">PPN</th>
                                                         <th rowspan="2">Grandtotal</th>
                                                         <th rowspan="2">Status</th>
+                                                        <th rowspan="2">By</th>
                                                         <th rowspan="2">Action</th>
                                                     </tr>
                                                     <tr>
@@ -1570,7 +1571,8 @@
                 { name: 'total', className: 'right-align' },
                 { name: 'tax', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
-                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+              { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
         });
@@ -2126,23 +2128,24 @@
     }
 
     function done(id){
+        var msg = '';
         swal({
             title: "Apakah anda yakin ingin menyelesaikan dokumen ini?",
             text: "Data yang sudah terupdate tidak dapat dikembalikan.",
             icon: 'warning',
             dangerMode: true,
-            buttons: {
-            cancel: 'Tidak, jangan!',
-            delete: 'Ya, lanjutkan!'
-            }
-        }).then(function (willDelete) {
-            if (willDelete) {
+            buttons: true,
+            content: "input",
+        })
+        .then(message => {
+            if (message != "" && message != null) {
                 $.ajax({
                     url: '{{ Request::url() }}/done',
                     type: 'POST',
                     dataType: 'JSON',
                     data: {
-                        id: id
+                        id: id,
+                        msg : message
                     },
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

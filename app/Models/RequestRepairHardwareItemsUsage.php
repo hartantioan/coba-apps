@@ -26,7 +26,10 @@ class RequestRepairHardwareItemsUsage extends Model
         'void_note',
         'void_date',
         'delete_id',
-        'delete_note', 
+        'delete_note',
+        'done_id',
+        'done_date',
+        'done_note', 
     ];
 
     

@@ -57,6 +57,8 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                     'ir_date'      => $row_item_request->post_date,
                     'ir_qty'       => $row_item_request_detail->qty,
                     'status'    => $row_item_request->statusRaw(),
+                    'done_user'    => ($row_item_request->status == 3 && is_null($row_item_request->done_id)) ? 'sistem' : (($row_item_request->status == 3 && !is_null($row_item_request->done_id)) ? $row_item_request->doneUser->name : ''),
+                    'done_date'    => $row_item_request->done_date,
                 ];
                 $max_count_pr = 1;
             
@@ -76,6 +78,8 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                             'pr_date'      => $row_pr_detail->purchaseRequest->post_date,
                             'pr_qty'       => $row_pr_detail->qty,
                             'status'       => $row_pr_detail->purchaseRequest->statusRaw(),
+                            'done_user'    => ($row_pr_detail->purchaseRequest->status == 3 && is_null($row_pr_detail->purchaseRequest->done_id)) ? 'sistem' : (($row_pr_detail->purchaseRequest->status == 3 && !is_null($row_pr_detail->purchaseRequest->done_id)) ? $row_pr_detail->purchaseRequest->doneUser->name : ''),
+                            'done_date'    => $row_pr_detail->purchaseRequest->done_date,
                         ];
                         if($row_pr_detail->purchaseOrderDetail()->exists()){
                             if($max_count<count($row_pr_detail->purchaseOrderDetail)){
@@ -93,6 +97,8 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                                     'po_date'      => $row_po_detail->purchaseOrder->post_date,
                                     'po_qty'       => $row_po_detail->qty,
                                     'status'       => $row_po_detail->purchaseOrder->statusRaw(),
+                                    'done_user'    => ($row_po_detail->purchaseOrder->status == 3 && is_null($row_po_detail->purchaseOrder->done_id)) ? 'sistem' : (($row_po_detail->purchaseOrder->status == 3 && !is_null($row_po_detail->purchaseOrder->done_id)) ? $row_po_detail->purchaseOrder->doneUser->name : ''),
+                                    'done_date'    => $row_po_detail->purchaseOrder->done_date,
                                 ];
                                 if($row_po_detail->goodReceiptDetail()->exists()){
                                     
@@ -104,6 +110,8 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                                             'grpo_qty'     => $row_grpo_detail->qty,
                                             'outstanding'  => $row_po_detail->getBalanceReceipt(),
                                             'status'       => $row_grpo_detail->goodReceipt->statusRaw(),
+                                            'done_user'    => ($row_grpo_detail->goodReceipt->status == 3 && is_null($row_grpo_detail->goodReceipt->done_id)) ? 'sistem' : (($row_grpo_detail->goodReceipt->status == 3 && !is_null($row_grpo_detail->goodReceipt->done_id)) ? $row_grpo_detail->goodReceipt->doneUser->name : ''),
+                                            'done_date'    => $row_grpo_detail->goodReceipt->done_date,
                                         ];
                                         $total_grpo++;
                                         $po['grpo'][]=$grpo;
@@ -142,6 +150,8 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                                         'grpo_date'    => '',
                                         'grpo_qty'     => '',
                                         'status'       => '',
+                                        'done_user'    => '',
+                                        'done_date'    => '',
                                         'outstanding'  => '',
                                     ];
                                     $pr['po'][]=$po;
@@ -174,16 +184,22 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                             'grpo_date'    => '',
                             'grpo_qty'     => '',
                             'status'       => '',
+                            'done_user'    => '',
+                            'done_date'    => '',
                             'outstanding'  => ''];
                             $po=['po_code'      => '',
                             'po_date'      => '',
                             'po_qty'       => '',
+                            'done_user'    => '',
+                            'done_date'    => '',
                             'status'       => '',];
                             $pr=[
                                 'pr_code'      => $row_pr_detail->purchaseRequest->code,
                                 'pr_date'      => $row_pr_detail->purchaseRequest->post_date,
                                 'pr_qty'       => $row_pr_detail->qty,
                                 'status'       => $row_pr_detail->purchaseRequest->statusRaw(),
+                                'done_user'    => '',
+                                'done_date'    => '',
                             ];
                             $po['grpo'][]=$grpo;
                             $pr['po'][]=$po;
@@ -217,16 +233,22 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                             'grpo_date'    => '',
                             'grpo_qty'     => '',
                             'status'       => '',
+                            'done_user'    => '',
+                            'done_date'    => '',
                             'outstanding'  => ''];
                     $po=['po_code'      => '',
                     'po_date'      => '',
                     'po_qty'       => '',
-                    'status'       => '',];
+                    'status'       => '',
+                    'done_user'    => '',
+                    'done_date'    => '',];
                     $pr=[
                         'pr_code'      => '',
                         'pr_date'      => '',
                         'pr_qty'       => '',
                         'status'       => '',
+                        'done_user'    => '',
+                        'done_date'    => '',
                     ];
                     $po['grpo'][]=$grpo;
                     $pr['po'][]=$po;

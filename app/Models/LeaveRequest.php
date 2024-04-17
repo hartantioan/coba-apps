@@ -33,6 +33,9 @@ class LeaveRequest extends Model
         'void_note',
         'delete_id',
         'delete_note',
+        'done_id',
+        'done_date',
+        'done_note',
         'status',
     ];
 

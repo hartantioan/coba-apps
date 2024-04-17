@@ -64,6 +64,11 @@ class OutgoingPayment extends Model
         return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
     }
 
+    public function doneUser()
+    {
+        return $this->belongsTo('App\Models\User', 'done_id', 'id')->withTrashed();
+    }
+
     public function account(){
         return $this->belongsTo('App\Models\User','account_id','id')->withTrashed();
     }

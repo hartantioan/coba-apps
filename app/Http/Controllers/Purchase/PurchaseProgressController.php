@@ -83,7 +83,9 @@ class PurchaseProgressController extends Controller
                     'ir_code'      => $row_item_request->code,
                     'ir_date'      => $row_item_request->post_date,
                     'ir_qty'       => CustomHelper::formatConditionalQty($row_item_request_detail->qty),
-                    'status'    => $row_item_request->status(),
+                    'status'       => $row_item_request->status(),
+                    'done_user'    => ($row_item_request->status == 3 && is_null($row_item_request->done_id)) ? 'sistem' : (($row_item_request->status == 3 && !is_null($row_item_request->done_id)) ? $row_item_request->doneUser->name : ''),
+                    'done_date'    => $row_item_request->done_date,
                 ];
                 $max_count_pr = 1;
             
@@ -103,6 +105,8 @@ class PurchaseProgressController extends Controller
                             'pr_date'      => $row_pr_detail->purchaseRequest->post_date,
                             'pr_qty'       => CustomHelper::formatConditionalQty($row_pr_detail->qty),
                             'status'       => $row_pr_detail->purchaseRequest->status(),
+                            'done_user'    => ($row_pr_detail->purchaseRequest->status == 3 && is_null($row_pr_detail->purchaseRequest->done_id)) ? 'sistem' : (($row_pr_detail->purchaseRequest->status == 3 && !is_null($row_pr_detail->purchaseRequest->done_id)) ? $row_pr_detail->purchaseRequest->doneUser->name : ''),
+                            'done_date'    => $row_pr_detail->purchaseRequest->done_date,
                         ];
                         if($row_pr_detail->purchaseOrderDetail()->exists()){
                             if($max_count<count($row_pr_detail->purchaseOrderDetail)){
@@ -120,6 +124,8 @@ class PurchaseProgressController extends Controller
                                     'po_date'      => $row_po_detail->purchaseOrder->post_date,
                                     'po_qty'       => CustomHelper::formatConditionalQty($row_po_detail->qty),
                                     'status'       => $row_po_detail->purchaseOrder->status(),
+                                    'done_user'    => ($row_po_detail->purchaseOrder->status == 3 && is_null($row_po_detail->purchaseOrder->done_id)) ? 'sistem' : (($row_po_detail->purchaseOrder->status == 3 && !is_null($row_po_detail->purchaseOrder->done_id)) ? $row_po_detail->purchaseOrder->doneUser->name : ''),
+                                    'done_date'    => $row_po_detail->purchaseOrder->done_date,
                                 ];
                                 if($row_po_detail->goodReceiptDetail()->exists()){
                                     
@@ -131,6 +137,8 @@ class PurchaseProgressController extends Controller
                                             'grpo_qty'     => CustomHelper::formatConditionalQty($row_grpo_detail->qty),
                                             'outstanding'  => $row_po_detail->getBalanceReceipt(),
                                             'status'       => $row_grpo_detail->goodReceipt->status(),
+                                            'done_user'    => ($row_grpo_detail->goodReceipt->status == 3 && is_null($row_grpo_detail->goodReceipt->done_id)) ? 'sistem' : (($row_grpo_detail->goodReceipt->status == 3 && !is_null($row_grpo_detail->goodReceipt->done_id)) ? $row_grpo_detail->goodReceipt->doneUser->name : ''),
+                                            'done_date'    => $row_grpo_detail->goodReceipt->done_date,
                                         ];
                                         $total_grpo++;
                                         $po['grpo'][]=$grpo;
@@ -170,6 +178,8 @@ class PurchaseProgressController extends Controller
                                         'grpo_qty'     => '',
                                         'status'       => '',
                                         'outstanding'  => '',
+                                        'done_user'    => '',
+                                        'done_date'    => '',
                                     ];
                                     $pr['po'][]=$po;
                                     $pr['rowspan']=$max_count_pr;
@@ -201,16 +211,22 @@ class PurchaseProgressController extends Controller
                             'grpo_date'    => '',
                             'grpo_qty'     => '',
                             'status'       => '',
-                            'outstanding'  => ''];
+                            'outstanding'  => '',
+                            'done_user'    => '',
+                            'done_date'    => '',];
                             $po=['po_code'      => '',
                             'po_date'      => '',
                             'po_qty'       => '',
-                            'status'       => '',];
+                            'status'       => '',
+                            'done_user'    => '',
+                            'done_date'    => '',];
                             $pr=[
                                 'pr_code'      => $row_pr_detail->purchaseRequest->code,
                                 'pr_date'      => $row_pr_detail->purchaseRequest->post_date,
                                 'pr_qty'       => CustomHelper::formatConditionalQty($row_pr_detail->qty),
                                 'status'       => $row_pr_detail->purchaseRequest->status(),
+                                'done_user'    => '',
+                                'done_date'    => '',
                             ];
                             $po['grpo'][]=$grpo;
                             $pr['po'][]=$po;
@@ -244,16 +260,22 @@ class PurchaseProgressController extends Controller
                             'grpo_date'    => '',
                             'grpo_qty'     => '',
                             'status'       => '',
-                            'outstanding'  => ''];
+                            'outstanding'  => '',
+                            'done_user'    => '',
+                            'done_date'    => '',];
                     $po=['po_code'      => '',
                     'po_date'      => '',
                     'po_qty'       => '',
-                    'status'       => '',];
+                    'status'       => '',
+                    'done_user'    => '',
+                    'done_date'    => '',];
                     $pr=[
                         'pr_code'      => '',
                         'pr_date'      => '',
                         'pr_qty'       => '',
                         'status'       => '',
+                        'done_user'    => '',
+                        'done_date'    => '',
                     ];
                     $po['grpo'][]=$grpo;
                     $pr['po'][]=$po;
@@ -305,18 +327,26 @@ class PurchaseProgressController extends Controller
         $tableHtml .= '<th>IR Date</th>';
         $tableHtml .= '<th>IR Qty</th>';
         $tableHtml .= '<th>IR Status</th>';
+        $tableHtml .= '<th>IR Done User</th>';
+        $tableHtml .= '<th>IR Tanggal Done</th>';
         $tableHtml .= '<th>PR Code</th>';
         $tableHtml .= '<th>PR Date</th>';
         $tableHtml .= '<th>PR Qty</th>';
         $tableHtml .= '<th>PR Status</th>';
+        $tableHtml .= '<th>PR Done User</th>';
+        $tableHtml .= '<th>PR Tanggal Done</th>';
         $tableHtml .= '<th>PO Code</th>';
         $tableHtml .= '<th>PO Date</th>';
         $tableHtml .= '<th>PO Qty</th>';
         $tableHtml .= '<th>PO Status</th>';
+        $tableHtml .= '<th>PO Done User</th>';
+        $tableHtml .= '<th>PO Tanggal Done</th>';
         $tableHtml .= '<th>GRPO Code</th>';
         $tableHtml .= '<th>GRPO Date</th>';
         $tableHtml .= '<th>GRPO Qty</th>';
         $tableHtml .= '<th>GRPO Status</th>';
+        $tableHtml .= '<th>GRPO Done User</th>';
+        $tableHtml .= '<th>GRPO Tanggal Done</th>';
         $tableHtml .= '<th>Outstanding</th>';
         $tableHtml .= '</tr>';
         $tableHtml .= '</thead>';
@@ -361,23 +391,31 @@ class PurchaseProgressController extends Controller
                                 $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['ir_date'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['ir_qty'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['status'] . '</td>';
+                                $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['done_user'] . '</td>';
+                                $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['done_date'] . '</td>';
                             }
                             if ($poIndex === 0 && $grpoIndex === 0) {
                                 $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['pr_code'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['pr_date'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['pr_qty'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['status'] . '</td>';
+                                $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['done_user'] . '</td>';
+                                $tableHtml .= '<td rowspan="' . $max_count_pr . '">' . $pr['done_date'] . '</td>';
                             }
                             if ($grpoIndex === 0) {
                                 $tableHtml .= '<td rowspan="' . $grpoCount . '">' . $po['po_code'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $grpoCount . '">' . $po['po_date'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $grpoCount . '">' . $po['po_qty'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $grpoCount . '">' . $po['status'] . '</td>';
+                                $tableHtml .= '<td rowspan="' . $grpoCount . '">' . $po['done_user'] . '</td>';
+                                $tableHtml .= '<td rowspan="' . $grpoCount . '">' . $po['done_date'] . '</td>';
                             }
                             $tableHtml .= '<td>' . $grpo['grpo_code'] . '</td>';
                             $tableHtml .= '<td>' . $grpo['grpo_date'] . '</td>';
                             $tableHtml .= '<td>' . $grpo['grpo_qty'] . '</td>';
                             $tableHtml .= '<td>' . $grpo['status'] . '</td>';
+                            $tableHtml .= '<td>' . $grpo['done_user'] . '</td>';
+                            $tableHtml .= '<td>' . $grpo['done_date'] . '</td>';
                             $tableHtml .= '<td>' . $grpo['outstanding'] . '</td>';
                             $tableHtml .= '</tr>';
                         }

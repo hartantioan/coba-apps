@@ -193,6 +193,21 @@ class GoodScaleController extends Controller
                     $val->image_in ? '<a href="'.$val->imageIn().'" target="_blank"><i class="material-icons">camera_front</i></a>' : '<i class="material-icons">hourglass_empty</i>',
                     $val->image_out ? '<a href="'.$val->imageOut().'" target="_blank"><i class="material-icons">camera_rear</i></a>' : '<i class="material-icons">hourglass_empty</i>',
                     $val->status(),
+                    (
+                        ($val->status == 3 && is_null($val->done_id)) ? 'sistem' :
+                        (
+                            ($val->status == 3 && !is_null($val->done_id)) ? $val->doneUser->name :
+                            (
+                                ($val->status != 3 && !is_null($val->void_id) && !is_null($val->void_date)) ? $val->voidUser->name :
+                                (
+                                    ($val->status != 3 && is_null($val->void_id) && !is_null($val->void_date)) ? 'sistem' :
+                                    (
+                                        ($val->status != 3 && is_null($val->void_id) && is_null($val->void_date)) ? null : null
+                                    )
+                                )
+                            )
+                        )
+                    ),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
@@ -510,6 +525,9 @@ class GoodScaleController extends Controller
         if (isset($data->void_date)) {
             $voidUser = $data->voidUser ? $data->voidUser->employee_no . '-' . $data->voidUser->name : 'Sistem';
             $x .= '<span style="color: red;">|| Tanggal Void: ' . $data->void_date .  ' || Void User: ' . $voidUser.' || Note:' . $data->void_note.'</span>' ;
+        }if($data->status == 3){
+            $doneUser = $data->done_id ? $data->doneUser->employee_no . '-' . $data->doneUser->name : 'Sistem';
+            $x .= '<span style="color: blue;">|| Tanggal Done: ' . $data->done_date .  ' || Done User: ' . $doneUser;
         }
         $string = '<div class="row pt-1 pb-1 lighten-4">
                     <div class="col s12">'.$data->code.$x.'</div>
@@ -1234,7 +1252,9 @@ class GoodScaleController extends Controller
 
             if(in_array($query_done->status,['1','2'])){
                 $query_done->update([
-                    'status'    => '3'
+                    'status'     => '3',
+                    'done_id'    => session('bo_id'),
+                    'done_date'  => date('Y-m-d H:i:s'),
                 ]);
     
                 activity()

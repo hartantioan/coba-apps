@@ -24,7 +24,10 @@ class ShiftRequest extends Model
         'void_date',
         'void_note',
         'delete_id',
-        'delete_note', 
+        'delete_note',
+        'done_id',
+        'done_date',
+        'done_note', 
         'status',
     ];
 

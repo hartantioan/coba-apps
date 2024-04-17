@@ -23,7 +23,10 @@ class ReceptionHardwareItemsUsage extends Model
         'status',
         'location',
         'delete_id',
-        'delete_note', 
+        'delete_note',
+        'done_id',
+        'done_date',
+        'done_note', 
     ];
 
     public function status(){

@@ -28,6 +28,9 @@ class InventoryRevaluation extends Model
         'void_date',
         'delete_id',
         'delete_note',
+        'done_id',
+        'done_date',
+        'done_note',
     ];
 
     public function deleteUser()

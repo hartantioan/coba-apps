@@ -190,6 +190,21 @@ class ProductionOrderController extends Controller
                     $val->productionScheduleDetail->warehouse->name,
                     $val->area()->exists() ? $val->area->name : '-',
                     $val->status(),
+                    (
+                        ($val->status == 3 && is_null($val->done_id)) ? 'sistem' :
+                        (
+                            ($val->status == 3 && !is_null($val->done_id)) ? $val->doneUser->name :
+                            (
+                                ($val->status != 3 && !is_null($val->void_id) && !is_null($val->void_date)) ? $val->voidUser->name :
+                                (
+                                    ($val->status != 3 && is_null($val->void_id) && !is_null($val->void_date)) ? 'sistem' :
+                                    (
+                                        ($val->status != 3 && is_null($val->void_id) && is_null($val->void_date)) ? null : null
+                                    )
+                                )
+                            )
+                        )
+                    ),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
@@ -1750,7 +1765,9 @@ class ProductionOrderController extends Controller
 
             if(in_array($query_done->status,['1','2'])){
                 $query_done->update([
-                    'status'    => '3'
+                    'status'     => '3',
+                    'done_id'    => session('bo_id'),
+                    'done_date'  => date('Y-m-d H:i:s'),
                 ]);
     
                 activity()

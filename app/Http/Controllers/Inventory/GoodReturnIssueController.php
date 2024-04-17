@@ -214,6 +214,21 @@ class GoodReturnIssueController extends Controller
                     $val->note,
                       $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->status(),
+                    (
+                        ($val->status == 3 && is_null($val->done_id)) ? 'sistem' :
+                        (
+                            ($val->status == 3 && !is_null($val->done_id)) ? $val->doneUser->name :
+                            (
+                                ($val->status != 3 && !is_null($val->void_id) && !is_null($val->void_date)) ? $val->voidUser->name :
+                                (
+                                    ($val->status != 3 && is_null($val->void_id) && !is_null($val->void_date)) ? 'sistem' :
+                                    (
+                                        ($val->status != 3 && is_null($val->void_id) && is_null($val->void_date)) ? null : null
+                                    )
+                                )
+                            )
+                        )
+                    ),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
@@ -419,6 +434,9 @@ class GoodReturnIssueController extends Controller
         if (isset($data->void_date)) {
             $voidUser = $data->voidUser ? $data->voidUser->employee_no . '-' . $data->voidUser->name : 'Sistem';
             $x .= '<span style="color: red;">|| Tanggal Void: ' . $data->void_date .  ' || Void User: ' . $voidUser.' || Note:' . $data->void_note.'</span>' ;
+        }if($data->status == 3){
+            $doneUser = $data->done_id ? $data->doneUser->employee_no . '-' . $data->doneUser->name : 'Sistem';
+            $x .= '<span style="color: blue;">|| Tanggal Done: ' . $data->done_date .  ' || Done User: ' . $doneUser;
         }
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.$x.'</div><div class="col s12">
                     <table style="min-width:100%;max-width:100%;">

@@ -99,5 +99,10 @@ class RequestSparepart extends Model
         return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
     }
 
+    public function doneUser()
+    {
+        return $this->belongsTo('App\Models\User', 'done_id', 'id')->withTrashed();
+    }
+
 
 }

@@ -32,6 +32,9 @@ class MarketingOrderHandoverReceipt extends Model
         'void_date',
         'delete_id',
         'delete_note',
+        'done_id',
+        'done_date',
+        'done_note',
     ];
 
     public function deleteUser()
@@ -69,6 +72,11 @@ class MarketingOrderHandoverReceipt extends Model
     public function voidUser()
     {
         return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
+    }
+
+    public function doneUser()
+    {
+        return $this->belongsTo('App\Models\User', 'done_id', 'id')->withTrashed();
     }
 
     public function company()

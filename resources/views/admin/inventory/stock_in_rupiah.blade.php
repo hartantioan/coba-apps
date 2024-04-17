@@ -133,7 +133,7 @@
                     </div>
                     
                 </div>
-                <div class="row">
+                <div class="row" id="table_laporan">
                     <table class="bordered" style="font-size:10px;">
                         <thead id="t_head">
                             <tr>

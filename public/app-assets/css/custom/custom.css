@@ -44,6 +44,10 @@ WE WILL RELEASE FUTURE UPDATES SO IN ORDER TO NOT OVERWRITE YOUR STYLES IT'S BET
 	.btn-panduan{
 		display: none !important;
 	}
+	#table_laporan{
+		width: 100%;
+		overflow-x: scroll;
+	}
 }
 
 @media screen and (max-width: 600px) {

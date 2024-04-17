@@ -1431,27 +1431,31 @@ class OutgoingPaymentController extends Controller
                         $finished_data_id_cb[]= $cb_id; 
                         $query_cb = CloseBill::find($cb_id);
                         foreach($query_cb->closeBillDetail as $row_bill_detail){
-                            $outgoingpaymnet = [
-                                'key'   => $row_bill_detail->outgoingPayment->code,
-                                "name"  => $row_bill_detail->outgoingPayment->code,
-                                
-                                'properties'=> [
-                                    ['name'=> "Tanggal: ".date('d/m/Y',strtotime($row_bill_detail->outgoingPayment->post_date))],
-                                    ['name'=> "Nominal: Rp".number_format($row_bill_detail->outgoingPayment->grandtotal,2,',','.')]
-                                ],
-                                'url'   =>request()->root()."/admin/finance/outgoing_payment?code=".CustomHelper::encrypt($row_bill_detail->outgoingPayment->code),
-                                "title" => $row_bill_detail->outgoingPayment->code,
-                            ];
-                            $data_go_chart[]=$outgoingpaymnet;
-                            $data_link[]=[
-                                'from'=>$row_bill_detail->outgoingPayment->code,
-                                'to'=>$query->code,
-                                'string_link'=>$row_bill_detail->outgoingPayment->code.$query->code,
-                            ];
-                            if(!in_array($row_bill_detail->outgoingPayment->id, $data_id_op)){
-                                $data_id_op[]= $row_bill_detail->outgoingPayment->id; 
-                                $added = true; 
+                            if($row_bill_detail->outgoingPayment()->exists()){
+                              
+                                $outgoingpaymnet = [
+                                    'key'   => $row_bill_detail->outgoingPayment->code,
+                                    "name"  => $row_bill_detail->outgoingPayment->code,
+                                    
+                                    'properties'=> [
+                                        ['name'=> "Tanggal: ".date('d/m/Y',strtotime($row_bill_detail->outgoingPayment->post_date))],
+                                        ['name'=> "Nominal: Rp".number_format($row_bill_detail->outgoingPayment->grandtotal,2,',','.')]
+                                    ],
+                                    'url'   =>request()->root()."/admin/finance/outgoing_payment?code=".CustomHelper::encrypt($row_bill_detail->outgoingPayment->code),
+                                    "title" => $row_bill_detail->outgoingPayment->code,
+                                ];
+                                $data_go_chart[]=$outgoingpaymnet;
+                                $data_link[]=[
+                                    'from'=>$row_bill_detail->outgoingPayment->code,
+                                    'to'=>$query_cb->code,
+                                    'string_link'=>$row_bill_detail->outgoingPayment->code.$query_cb->code,
+                                ];
+                                if(!in_array($row_bill_detail->outgoingPayment->id, $data_id_op)){
+                                    $data_id_op[]= $row_bill_detail->outgoingPayment->id; 
+                                    $added = true; 
+                                }
                             }
+                            
                             
                             if($row_bill_detail->personalCloseBill()->exists()){
                                 $data_pcb = [
@@ -1469,8 +1473,8 @@ class OutgoingPaymentController extends Controller
 
                                 $data_link[]=[
                                     'from'=>$row_bill_detail->personalCloseBill->code,
-                                    'to'=>$query->code,
-                                    'string_link'=>$row_bill_detail->personalCloseBill->code.$query->code,
+                                    'to'=>$query_cb->code,
+                                    'string_link'=>$row_bill_detail->personalCloseBill->code.$query_cb->code,
                                 ];
                                 if(!in_array($row_bill_detail->personalCloseBill->id, $data_id_pcb)){
                                     $data_id_pcb[]= $row_bill_detail->personalCloseBill->id; 
@@ -2540,9 +2544,9 @@ class OutgoingPaymentController extends Controller
 
                                 $data_go_chart[]=$lc_tempura;
                                 $data_link[]=[
-                                    'from'=>$query->code,
+                                    'from'=>$query_inventory_transfer_out->code,
                                     'to'=>$row_transfer_out_detail->landedCostDetail->landedCost->code,
-                                    'string_link'=>$query->code.$row_transfer_out_detail->landedCostDetail->landedCost->code,
+                                    'string_link'=>$query_inventory_transfer_out->code.$row_transfer_out_detail->landedCostDetail->landedCost->code,
                                 ];
                                 if(!in_array($row_transfer_out_detail->landedCostDetail->landedCost->id,$data_id_lc)){
                                     $data_id_lc[] = $row_transfer_out_detail->landedCostDetail->landedCost->id;
@@ -2592,7 +2596,6 @@ class OutgoingPaymentController extends Controller
                                 $data_cb_tempura=[
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row_cbd->closeBill->code],
-                                        ['name'=> "User :".$row_cbd->closeBill->account->name],
                                         ['name'=> "Nominal :".formatNominal($row_cbd->closeBill).number_format($row_cbd->closeBill->grandtotal,2,',','.')]
                                     ],
                                     "key" => $row_cbd->closeBill->code,
@@ -2602,9 +2605,9 @@ class OutgoingPaymentController extends Controller
                             
                                 $data_go_chart[]=$data_cb_tempura;
                                 $data_link[]=[
-                                    'from'=>$row_cbd->closeBill->code,
-                                    'to'=>$row_cbd->code,
-                                    'string_link'=>$row_cbd->closeBill->code.$row_cbd->code,
+                                    'from'=>$query_pcb->code,
+                                    'to'=>$row_cbd->closeBill->code,
+                                    'string_link'=>$query_pcb->code.$row_cbd->closeBill->code,
                                 ];
 
                                 if(!in_array($row_cbd->closeBill->id, $data_id_cb)){
@@ -3068,7 +3071,7 @@ class OutgoingPaymentController extends Controller
                         }
                     }
                 }
-            }             
+            }              
             function unique_key($array,$keyname){
 
                 $new_array = array();

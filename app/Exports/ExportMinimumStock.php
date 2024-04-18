@@ -8,6 +8,7 @@ use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use App\Helpers\CustomHelper;
 
 class ExportMinimumStock implements FromView,ShouldAutoSize
 {
@@ -63,7 +64,7 @@ class ExportMinimumStock implements FromView,ShouldAutoSize
                 'minimum'=>number_format($row->item->min_stock),
                 'needed'=>number_format($row->item->min_stock-$row->qty),
                 'maximum'=>number_format($row->item->max_stock),
-                'final'=>number_format($row->qty,3,',','.'),
+                'final'=>CustomHelper::formatConditionalQty($row->qty),
                 'satuan'=>$row->item->uomUnit->code,
  
             ];

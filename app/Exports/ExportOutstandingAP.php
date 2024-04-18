@@ -8,11 +8,11 @@ use App\Models\PurchaseInvoice;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromView;
-use Maatwebsite\Excel\Concerns\WithEvents;
-use Maatwebsite\Excel\Events\AfterSheet;
-use Illuminate\Support\Facades\DB;
 
-class ExportOutstandingAP implements FromView , WithEvents
+use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+
+class ExportOutstandingAP implements FromView ,ShouldAutoSize
 {
     /**
     * @return \Illuminate\Support\Collection
@@ -292,22 +292,11 @@ class ExportOutstandingAP implements FromView , WithEvents
                 }
                 return view('admin.exports.outstanding_ap', [
                     'data'      => $array_filter,
-                    'totalall'  =>number_format($results->total,2,',','.')
+                    'totalall'  => number_format($results->total,2,',','.')
                 ]);
             }
         } */
     }
 
-    public function registerEvents(): array
-    {
-        return [
-            AfterSheet::class => function(AfterSheet $event) {
-                // Auto-fit columns A to Z
-                $event->sheet->getDelegate()->getStyle('A:Z')->getAlignment()->setWrapText(true);
-                $event->sheet->getDelegate()->getStyle('A:Z')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
-                $event->sheet->autoSize();
-                $event->sheet->freezePane("A1");
-            }
-        ];
-    }
+    
 }

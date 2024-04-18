@@ -828,7 +828,7 @@ class AgingAPController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportAgingAP($request->date,$request->interval,$request->column,$request->type), 'aging_ap_'.uniqid().'.xls');
+		return Excel::download(new ExportAgingAP($request->date,$request->interval,$request->column,$request->type), 'aging_ap_'.uniqid().'.xlsx');
     }
 
     function findDuplicate($value,$array){

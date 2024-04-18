@@ -1623,7 +1623,7 @@ class PersonalCloseBillController extends Controller
                 'properties'=> [
                      ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query->post_date))],
                   ],
-                'url'   =>request()->root()."/admin/finance/personal_close_bill?code=".CustomHelper::encrypt($query->code),
+                'url'   =>request()->root()."/admin/finance/close_bill_personal?code=".CustomHelper::encrypt($query->code),
                 "title" =>$query->code,
             ];
         $data_go_chart[]=$pcb;
@@ -1867,7 +1867,7 @@ class PersonalCloseBillController extends Controller
                                         ['name'=> "Tanggal: ".date('d/m/Y',strtotime($row_bill_detail->personalCloseBill->post_date))],
                                         ['name'=> "Nominal: Rp".number_format($row_bill_detail->personalCloseBill->grandtotal,2,',','.')]
                                     ],
-                                    'url'   =>request()->root()."/admin/finance/personal_close_bill?code=".CustomHelper::encrypt($row_bill_detail->personalCloseBill->code),
+                                    'url'   =>request()->root()."/admin/finance/close_bill_personal?code=".CustomHelper::encrypt($row_bill_detail->personalCloseBill->code),
                                     "title" => $row_bill_detail->personalCloseBill->code,
                                 ];
                                 $data_go_chart[]=$data_pcb;
@@ -3135,7 +3135,7 @@ class PersonalCloseBillController extends Controller
                                     ],
                                     "key" => $row_pcbd->personalCloseBill->code,
                                     "name" => $row_pcbd->personalCloseBill->code,
-                                    'url'=>request()->root()."/admin/finance/personal_close_bill?code=".CustomHelper::encrypt($row_pcbd->personalCloseBill->code),
+                                    'url'=>request()->root()."/admin/finance/close_bill_personal?code=".CustomHelper::encrypt($row_pcbd->personalCloseBill->code),
                                 ];
                                 $data_go_chart[]=$data_pcb_tempura;
                                 $data_link[]=[

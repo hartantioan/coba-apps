@@ -7,10 +7,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromView;
-use Maatwebsite\Excel\Concerns\WithEvents;
-use Maatwebsite\Excel\Events\AfterSheet;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class ExportAgingAP implements FromView , WithEvents
+class ExportAgingAP implements FromView, ShouldAutoSize
 {
     /**
     * @return \Illuminate\Support\Collection
@@ -435,18 +434,6 @@ class ExportAgingAP implements FromView , WithEvents
         }
     }
 
-    public function registerEvents(): array
-    {
-        return [
-            AfterSheet::class => function(AfterSheet $event) {
-                // Auto-fit columns A to Z
-                $event->sheet->getDelegate()->getStyle('A:Z')->getAlignment()->setWrapText(true);
-                $event->sheet->getDelegate()->getStyle('A:Z')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
-                $event->sheet->autoSize();
-                $event->sheet->freezePane("A1");
-            }
-        ];
-    }
 
     function findDuplicate($value,$array){
         $index = -1;

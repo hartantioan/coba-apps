@@ -51,8 +51,17 @@ function formatRupiah(angka){
 		separator = sisa ? '.' : '';
 		rupiah += separator + ribuan.join('.');
 	}
+
+	if(split[1] != undefined){
+		if(split[1].length > 2){
+			rupiah = rupiah + ',' + split[1].slice(0,2);
+		}else{
+			rupiah = rupiah + ',' + split[1];
+		}
+	}else{
+		rupiah = rupiah;
+	}
  
-	rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
 	angka.value = sign == '-' ? sign + rupiah : rupiah;
 }
 
@@ -69,7 +78,15 @@ function formatRupiahNoMinus(angka){
 		rupiah += separator + ribuan.join('.');
 	}
  
-	rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+	if(split[1] != undefined){
+		if(split[1].length > 2){
+			rupiah = rupiah + ',' + split[1].slice(0,2);
+		}else{
+			rupiah = rupiah + ',' + split[1];
+		}
+	}else{
+		rupiah = rupiah;
+	}
 	angka.value = rupiah;
 }
 
@@ -85,7 +102,15 @@ function formatRupiahIni(angka){
 		rupiah += separator + ribuan.join('.');
 	}
  
-	rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+	if(split[1] != undefined){
+		if(split[1].length > 2){
+			rupiah = rupiah + ',' + split[1].slice(0,2);
+		}else{
+			rupiah = rupiah + ',' + split[1];
+		}
+	}else{
+		rupiah = rupiah;
+	}
 	
 	return rupiah;
 }

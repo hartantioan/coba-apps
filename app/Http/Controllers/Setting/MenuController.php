@@ -55,13 +55,34 @@ class MenuController extends Controller
             ]);
         } */
 
-        $data = [
+        /* $data = [
             'title'     => 'Menu',
             'menus'     => Menu::whereNull('parent_id')->get(),
             'content'   => 'admin.setting.menu'
         ];
 
-        return view('admin.layouts.index', ['data' => $data]);
+        return view('admin.layouts.index', ['data' => $data]); */
+
+        $dp = PurchaseDownPayment::whereIn('status',['2','3'])->whereHas('purchaseDownPaymentDetail',function($query){
+            $query->whereHas('fundRequestDetail');
+        })->get();
+        
+        foreach($dp as $row){
+            if($row->balanceInvoice() <= 0){
+                foreach($row->purchaseDownPaymentDetail as $rowdetail){
+                    $rowdetail->fundRequestDetail->fundRequest->update([
+                        'balance_status'    => '1'
+                    ]);
+                }
+            }
+            if($row->getTotalPaid() <= 0){
+                foreach($row->purchaseDownPaymentDetail as $rowdetail){
+                    $rowdetail->fundRequestDetail->fundRequest->update([
+                        'status'    => '3'
+                    ]);
+                }
+            }
+        }
 
         /* $pr = PurchaseRequest::whereIn('code',['1-OPB23060004','1-OPB23070007','1-OPB23070016','1-OPB23070019','1-OPB23070029','1-OPB23070031','1-OPB23080001','1-OPB23080002','1-OPB23080006','1-OPB23080010','1-OPB23080011','1-OPB23090004','1-OPB23090006','1-OPB23100006','1-OPB23100008','1-OPB23100010','1-OPB23100014','1-OPB23100016','1-OPB23100017','1-OPB23100019','1-OPB23110001','1-OPB23110004','1-OPB23110009','1-OPB23110012','1-OPB23110017','1-OPB23110019','1-OPB23110020','1-OPB23110024','1-OPB23110025','1-OPB23110026','1-OPB23110027','1-OPB23110028','1-OPB23110029','1-OPB23110030','1-OPB23110031','1-OPB23120002','1-OPB23120003','1-OPB23120004','1-OPB23120007','1-OPB23120008','1-OPB23120009','1-OPB23120010','1-OPB23120012','1-OPB23120013','1-OPB23120014','1-OPB23120015','1-OPB23120016','1-OPB23120017','1-OPB23120018','1-OPB23120019','1-OPB23120022','1-OPB23120023','1-OPB23120024','1-OPB23120026','1-OPB23120028','1-OPB23120029','1-OPB24010002','1-OPB24010008','1-OPB24010013','1-OPB24010015','1-OPB24010016','1-OPB24010017','1-OPB24010018','1-OPB24010021','PRQS-24P1-00000002','PRQS-24P1-00000009','PRQS-24P1-00000012','PRQS-24P1-00000013','PRQS-24P1-00000018','PRQS-24P1-00000019','PRQS-24P1-00000023','PRQS-24P1-00000029','PRQS-24P1-00000033','PRQS-24P1-00000038','PRQS-24P1-00000039','PRQS-24P1-00000040','PRQS-24P1-00000082','PRQS-24P1-00000085','PRQS-24P1-00000090','PRQS-24P1-00000148','PRQS-24P1-00000162','PRQS-24P1-00000178','PRQS-24P1-00000182'])->get();
 

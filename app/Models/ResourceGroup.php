@@ -11,7 +11,7 @@ class ResourceGroup extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'item_groups';
+    protected $table = 'resource_groups';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [

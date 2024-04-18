@@ -23,7 +23,7 @@ use Maatwebsite\Excel\Validators\ValidationException;
 use App\Exports\ExportAsset;
 use App\Models\Resource;
 
-class AssetController extends Controller
+class ResourceController extends Controller
 {
 
     protected $dataplaces;
@@ -51,8 +51,8 @@ class AssetController extends Controller
             'id',
             'code',
             'name',
-            'asset_group_id',
-            'date',
+            'other_name',
+            'resource_group_i',
             'nominal',
             'accumulation_total',
             'book_balance',

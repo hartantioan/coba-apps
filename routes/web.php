@@ -82,6 +82,8 @@ use App\Http\Controllers\MasterData\CoaController;
 use App\Http\Controllers\MasterData\CurrencyController;
 use App\Http\Controllers\MasterData\AssetController;
 use App\Http\Controllers\MasterData\AssetGroupController;
+use App\Http\Controllers\MasterData\ResourceGroupController;
+use App\Http\Controllers\MasterData\ResourceController;
 use App\Http\Controllers\MasterData\UnitController;
 use App\Http\Controllers\MasterData\BankController;
 use App\Http\Controllers\MasterData\ProjectController;
@@ -752,6 +754,16 @@ Route::prefix('admin')->group(function () {
                         Route::get('export',[MachineController::class, 'export']);
                         Route::post('create',[MachineController::class, 'create'])->middleware('operation.access:machine,update');
                         Route::post('destroy', [MachineController::class, 'destroy'])->middleware('operation.access:machine,delete');
+                    });
+
+                    Route::prefix('resource_group')->middleware('operation.access:resource_group,view')->group(function () {
+                        Route::get('/',[ResourceGroupController::class, 'index']);
+                        Route::get('datatable',[ResourceGroupController::class, 'datatable']);
+                        Route::post('show', [ResourceGroupController::class, 'show']);
+                        Route::post('print',[ResourceGroupController::class, 'print']);
+                        Route::get('export',[ResourceGroupController::class, 'export']);
+                        Route::post('create',[ResourceGroupController::class, 'create'])->middleware('operation.access:resource_group,update');
+                        Route::post('destroy', [ResourceGroupController::class, 'destroy'])->middleware('operation.access:resource_group,delete');
                     });
 
                     Route::prefix('bom')->middleware('operation.access:bom,view')->group(function () {

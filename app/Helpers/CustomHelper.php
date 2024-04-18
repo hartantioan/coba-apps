@@ -1512,6 +1512,7 @@ class CustomHelper {
 								if($rowinvoicedetail->fundRequestDetail()->exists()){
 									if(!$rowinvoicedetail->fundRequestDetail->fundRequest->hasBalanceInvoice()){
 										$rowinvoicedetail->fundRequestDetail->fundRequest->update([
+											'status'			=> '3',
 											'balance_status'	=> '1'
 										]);
 									}

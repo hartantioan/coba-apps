@@ -1545,7 +1545,7 @@ class CustomHelper {
 							foreach($row->lookable->purchaseDownPaymentDetail as $rowdpdetail){
 								if($rowdpdetail->fundRequestDetail()->exists()){
 									$rowdpdetail->fundRequestDetail->fundRequest->update([
-										'balance_status'	=> '1'
+										'status'	=> '3'
 									]);
 								}
 							}
@@ -3884,6 +3884,16 @@ class CustomHelper {
 					]);
 					$realDownPayment += $row->nominal * $row->purchaseDownPayment->currency_rate;
 					$realInvoice += $row->nominal * $pi->currency_rate;
+					
+					if($row->purchaseDownPayment->balanceInvoice() <= 0){
+						foreach($row->purchaseDownPayment->purchaseDownPaymentDetail as $rowdpdetail){
+							if($rowdpdetail->fundRequestDetail()->exists()){
+								$rowdpdetail->fundRequestDetail->fundRequest->update([
+									'balance_status'	=> '1'
+								]);
+							}
+						}
+					}
 				}
 
 				$balanceKurs = $realDownPayment - $realInvoice;

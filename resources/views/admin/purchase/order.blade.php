@@ -3516,7 +3516,7 @@
 
     function formatRupiahNominal(angka){
         let val = angka.value ? angka.value : '';
-        var number_string = val.replace(/[^,\d]/g, '').toString()
+        var number_string = val.replace(/[^,\d]/g, '').toString(),
         sign = val.charAt(0),
         split   		= number_string.toString().split(','),
         sisa     		= parseFloat(split[0]).toString().length % 3,

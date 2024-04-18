@@ -52,14 +52,10 @@ class ResourceController extends Controller
             'code',
             'name',
             'other_name',
-            'resource_group_i',
-            'nominal',
-            'accumulation_total',
-            'book_balance',
-            'count_balance',
-            'method',
-            'note',
-            'status',
+            'resource_group_id',
+            'uom_unit',
+            'qty',
+            'cost',
             'place_id',
         ];
 
@@ -69,28 +65,19 @@ class ResourceController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = Asset::count();
+        $total_data = Resource::count();
         
-        $query_data = Asset::where(function($query) use ($search, $request) {
+        $query_data = Resource::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('name', 'like', "%$search%")
-                            ->orWhere('nominal','like', "%$search%")
-                            ->orWhere('note','like',"%$search%");
+                            ->orWhere('other_name','like',"%$search%");
                     });
                 }
 
                 if($request->status){
                     $query->where('status', $request->status);
-                }
-
-                if($request->balance){
-                    if($request->balance == '1'){
-                        $query->where('book_balance', '>', 0)->whereNotNull('book_balance');
-                    }elseif($request->balance == '2'){
-                        $query->where('book_balance', '=', 0)->whereNotNull('book_balance');
-                    }
                 }
             })
             ->offset($start)
@@ -98,26 +85,17 @@ class ResourceController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = Asset::where(function($query) use ($search, $request) {
+        $total_filtered = Resource::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('name', 'like', "%$search%")
-                            ->orWhere('nominal','like', "%$search%")
-                            ->orWhere('note','like',"%$search%");
+                            ->orWhere('other_name','like',"%$search%");
                     });
                 }
 
                 if($request->status){
                     $query->where('status', $request->status);
-                }
-
-                if($request->balance){
-                    if($request->balance == '1'){
-                        $query->where('book_balance', '>', 0)->whereNotNull('book_balance');
-                    }elseif($request->balance == '2'){
-                        $query->where('book_balance', '=', 0)->whereNotNull('book_balance');
-                    }
                 }
             })
             ->count();
@@ -131,16 +109,13 @@ class ResourceController extends Controller
                     $nomor,
                     $val->code,
                     $val->name,
-                    $val->assetGroup->name,
-                    $val->date ? date('d/m/Y',strtotime($val->date)) : '<span class=""><div class="chip red white-text z-depth-4">Belum dikapitalisasi.</div></span>',
-                    $val->nominal > 0 ? number_format($val->nominal,2,',','.') : '<span class=""><div class="chip red white-text z-depth-4">Belum dikapitalisasi.</div></span>',
-                    $val->nominal > 0 ? number_format($val->accumulation_total,2,',','.') : '<span class=""><div class="chip red white-text z-depth-4">Belum dikapitalisasi.</div></span>',
-                    number_format($val->book_balance,2,',','.'),
-                    number_format($val->count_balance,0,',','.'),
-                    $val->method(),
-                    $val->note,
-                    $val->status(),
+                    $val->other_name,
+                    $val->resourceGroup->name,
+                    number_format($val->qty,3,',','.'),
+                    $val->uomUnit->code,
+                    number_format($val->cost,0,',','.'),
                     $val->place()->exists() ? $val->place->code : '-',
+                    $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>

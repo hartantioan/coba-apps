@@ -1,11 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\MasterData;
-use App\Exports\ExportAssetGroup;
+use App\Exports\ExportResourceGroup;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Foundation\Validation\ValidatesRequests;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
@@ -307,6 +304,6 @@ class ResourceGroupController extends Controller
         $search = $request->search ? $request->search : '';
         $status = $request->status ? $request->status : '';
 		
-		return Excel::download(new ExportAssetGroup($search,$status), 'asset_group_'.uniqid().'.xlsx');
+		return Excel::download(new ExportResourceGroup($search,$status), 'asset_group_'.uniqid().'.xlsx');
     }
 }

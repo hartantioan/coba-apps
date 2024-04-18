@@ -757,13 +757,23 @@ Route::prefix('admin')->group(function () {
                     });
 
                     Route::prefix('resource_group')->middleware('operation.access:resource_group,view')->group(function () {
+                        Route::get('/',[ResourceController::class, 'index']);
+                        Route::get('datatable',[ResourceController::class, 'datatable']);
+                        Route::post('show', [ResourceController::class, 'show']);
+                        Route::post('print',[ResourceController::class, 'print']);
+                        Route::get('export',[ResourceController::class, 'export']);
+                        Route::post('create',[ResourceController::class, 'create'])->middleware('operation.access:resource_group,update');
+                        Route::post('destroy', [ResourceController::class, 'destroy'])->middleware('operation.access:resource_group,delete');
+                    });
+
+                    Route::prefix('resource')->middleware('operation.access:resource,view')->group(function () {
                         Route::get('/',[ResourceGroupController::class, 'index']);
                         Route::get('datatable',[ResourceGroupController::class, 'datatable']);
                         Route::post('show', [ResourceGroupController::class, 'show']);
                         Route::post('print',[ResourceGroupController::class, 'print']);
                         Route::get('export',[ResourceGroupController::class, 'export']);
-                        Route::post('create',[ResourceGroupController::class, 'create'])->middleware('operation.access:resource_group,update');
-                        Route::post('destroy', [ResourceGroupController::class, 'destroy'])->middleware('operation.access:resource_group,delete');
+                        Route::post('create',[ResourceGroupController::class, 'create'])->middleware('operation.access:resource,update');
+                        Route::post('destroy', [ResourceGroupController::class, 'destroy'])->middleware('operation.access:resource,delete');
                     });
 
                     Route::prefix('bom')->middleware('operation.access:bom,view')->group(function () {

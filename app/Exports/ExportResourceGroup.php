@@ -33,11 +33,12 @@ class ExportResourceGroup implements FromCollection, WithTitle, WithHeadings, Wi
 
     public function collection()
     {
-        $data = AssetGroup::where(function ($query) {
+        $data = ResourceGroup::where(function ($query) {
             if ($this->search) {
                 $query->where(function ($query) {
                     $query->where('code', 'like', "%$this->search%")
-                        ->orWhere('name', 'like', "%$this->search%");
+                        ->orWhere('name', 'like', "%$this->search%")
+                        ->orWhere('other_name','like', "%$this->search%");
                 });
             }
             if($this->status){
@@ -52,8 +53,9 @@ class ExportResourceGroup implements FromCollection, WithTitle, WithHeadings, Wi
                 'id'        => $row->id,
                 'code'      => $row->code,
                 'name'      => $row->name,
+                'other_name'=> $row->other_name,
                 'parent'    => $row->parentSub()->exists() ? $row->parentSub->name : 'is Parent',
-                'coa'       => $row->coa->code.' - '.$row->coa->name,
+                'coa'       => $row->coa()->exists() ? $row->coa->code.' - '.$row->coa->name : '-',
             ];
         }
 
@@ -62,7 +64,7 @@ class ExportResourceGroup implements FromCollection, WithTitle, WithHeadings, Wi
 
     public function title(): string
     {
-        return 'Laporan Grup Aset';
+        return 'Laporan Grup Resource';
     }
 
     public function startCell(): string

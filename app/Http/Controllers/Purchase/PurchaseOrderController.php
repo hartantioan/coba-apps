@@ -64,15 +64,16 @@ class PurchaseOrderController extends Controller
 
     public function __construct(){
         $user = User::find(session('bo_id'));
-        $this->subordinate = $user ? $user->getAllSubordinates() : []; 
-        $this->array_subordinate_id=[];
-        foreach($this->subordinate as $row){
-            $this->array_subordinate_id[]= $row->id;
+        if($user){
+            $this->subordinate = $user ? $user->getAllSubordinates() : []; 
+            $this->array_subordinate_id=[];
+            foreach($this->subordinate as $row){
+                $this->array_subordinate_id[]= $row->id;
+            }
+            $this->array_subordinate_id[]=$user->id;
+            $this->dataplaces = $user ? $user->userPlaceArray() : [];
+            $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
         }
-        $this->array_subordinate_id[]=$user->id;
-        $this->dataplaces = $user ? $user->userPlaceArray() : [];
-        $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
-
     }
     public function index(Request $request)
     {

@@ -142,6 +142,7 @@ class OutStandingAPController extends Controller
                         AND pi.deleted_at IS NULL
                 ) AS rs
             WHERE (rs.balance - rs.total_payment - rs.total_memo - rs.total_reconcile - rs.total_journal) > 0
+            ORDER BY rs.post_date
         ", array(
             'date1' => $date,
             'date2' => $date,
@@ -244,6 +245,7 @@ class OutStandingAPController extends Controller
                         AND pi.deleted_at IS NULL
                 ) AS rs
                 WHERE (rs.grandtotal - rs.total_payment - rs.total_memo - rs.total_reconcile) > 0
+                ORDER BY rs.post_date
         ", array(
             'date1' => $date,
             'date2' => $date,

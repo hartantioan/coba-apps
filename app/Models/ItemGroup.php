@@ -111,7 +111,9 @@ class ItemGroup extends Model
           '1' => 'SFG-1',
           '2' => 'SFG-2',
           '3' => 'SFG-3',
-          '4' => 'FG',
+          '4' => 'SFG-4',
+          '5' => 'SFG-5',
+          '6' => 'FG',
           default => ' Tidak',
         };
 

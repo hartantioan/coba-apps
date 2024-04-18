@@ -164,7 +164,9 @@
                                 <option value="1">SFG-1</option>
                                 <option value="2">SFG-2</option>
                                 <option value="3">SFG-3</option>
-                                <option value="4">FG</option>
+                                <option value="4">SFG-4</option>
+                                <option value="5">SFG-5</option>
+                                <option value="6">FG</option>
                             </select>
                             <label class="active" for="production_type">Item Hasil Produksi</label>
                         </div>

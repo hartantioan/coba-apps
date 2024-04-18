@@ -236,7 +236,7 @@ class AssetGroupController extends Controller
                 ->performedOn(new AssetGroup())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the item group data');
+                ->log('Delete the asset group data');
 
             $response = [
                 'status'  => 200,

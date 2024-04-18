@@ -56,17 +56,17 @@
                                                             <span class="hide-on-small-onl">Excel</span>
                                                             <i class="material-icons right">view_list</i>
                                                         </a>
-                                                        <a class="btn btn-small red waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="syncReport();">
+                                                        {{-- <a class="btn btn-small red waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="syncReport();">
                                                             <span class="hide-on-small-onl">Sync</span>
                                                             <i class="material-icons right">cloud_upload</i>
-                                                        </a>
+                                                        </a> --}}
                                                     </div>
                                                     <div class="col m4 s12 pt-2">
                                                         <b style="font-size:1rem;" id="sync-time"></b>
                                                     </div>
-                                                    <div class="col m12 s12">
+                                                    {{-- <div class="col m12 s12">
                                                         Silahkan gunakan tombol <b>SYNC</b> untuk menarik data terbaru. Fitur <b>SYNC</b> akan memakan waktu. Silahkan tunggu proses ini akan memakan waktu. Jika data sudah ditarik, silahkan gunakan tombol <b>FILTER</b> untuk menampilkannya dengan cepat karena data diambil dari hasil <b>SYNC</b> pada tanggal terpilih. 
-                                                    </div>
+                                                    </div> --}}
                                                 </div>
                                             </div>
                                             
@@ -177,7 +177,7 @@
                                 <td colspan="10" class="right-align"><h6><b>Execution Time : ` + response.execution_time + ` Grandtotal : `+response.totalall+`</b></h6></td>
                             </tr>
                         `);
-                        $('#sync-time').text('Waktu sinkronisasi terakhir : ' + response.updated_at);
+                        /* $('#sync-time').text('Waktu sinkronisasi terakhir : ' + response.updated_at); */
                     }else{
                         $('#detail_invoice').append(`
                             <tr>
@@ -238,7 +238,7 @@
                 <td class="center-align" colspan="10">Silahkan pilih tanggal dan tekan tombol filter.</td>
             </tr>
         `);
-        $('#sync-time').text('');
+        /* $('#sync-time').text(''); */
     }
 
     function resetKeepDate(){
@@ -247,7 +247,7 @@
                 <td class="center-align" colspan="10">Silahkan pilih tanggal dan tekan tombol filter.</td>
             </tr>
         `);
-        $('#sync-time').text('');
+        /* $('#sync-time').text(''); */
     }
 
     $(function() {

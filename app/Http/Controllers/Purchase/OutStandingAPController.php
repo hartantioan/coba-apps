@@ -31,7 +31,7 @@ class OutStandingAPController extends Controller
     }
 
     public function filterByDate(Request $request){
-        /* $array_filter = [];
+        $array_filter = [];
         
         $start_time = microtime(true);
 
@@ -310,9 +310,9 @@ class OutStandingAPController extends Controller
                 'message' =>'Data error'
             ];
         }
-        return response()->json($response); */
+        return response()->json($response);
 
-        $array_filter = [];
+        /* $array_filter = [];
         
         $start_time = microtime(true);
 
@@ -361,7 +361,7 @@ class OutStandingAPController extends Controller
             ];
         }
 
-        return response()->json($response);
+        return response()->json($response); */
     }
 
     public function syncReport(Request $request){
@@ -374,18 +374,18 @@ class OutStandingAPController extends Controller
     }
 
     public function export(Request $request){
-        $results = OutstandingAP::where('post_date',$request->date)->first();
+        /* $results = OutstandingAP::where('post_date',$request->date)->first();
 
         if($results){
-            if($results->status){
+            if($results->status){ */
                 ob_end_clean(); // this
                 ob_start(); // and this
                 return Excel::download(new ExportOutstandingAP($request->date), 'outstanding_ap_'.uniqid().'.xlsx');
-            }else{
+            /* }else{
                 return back()->withErrors(['error' => 'Laporan masih dalam proses sinkronisasi. Mohon ditunggu.']);
             }
         }else{
             return back()->withErrors(['error' => 'Laporan tanggal '.date('d/m/Y',strtotime($request->date)).' masih belum tersedia. Silahkan jalankan SYNC.']);
-        }
+        } */
     }
 }

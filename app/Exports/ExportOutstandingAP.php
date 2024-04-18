@@ -27,7 +27,7 @@ class ExportOutstandingAP implements FromView , WithEvents
     }
     public function view(): View
     {
-        /* $totalAll=0;
+        $totalAll=0;
         $array_filter = [];
         
         $results = DB::select("
@@ -263,9 +263,9 @@ class ExportOutstandingAP implements FromView , WithEvents
         return view('admin.exports.outstanding_ap', [
             'data' => $array_filter,
             'totalall' =>number_format($totalAll,2,',','.')
-        ]); */
+        ]);
 
-        $date = $this->date;
+        /* $date = $this->date;
 
         $array_filter = [];
 
@@ -295,7 +295,7 @@ class ExportOutstandingAP implements FromView , WithEvents
                     'totalall'  =>number_format($results->total,2,',','.')
                 ]);
             }
-        }
+        } */
     }
 
     public function registerEvents(): array

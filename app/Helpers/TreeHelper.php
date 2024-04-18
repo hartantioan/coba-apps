@@ -9,6 +9,7 @@ use App\Models\GoodScale;
 use App\Models\InventoryTransferOut;
 use App\Models\GoodIssueRequest;
 use App\Models\Line;
+use App\Models\OutgoingPayment;
 use App\Models\LandedCost;
 use App\Models\PurchaseRequest;
 use App\Models\MaterialRequest;
@@ -29,7 +30,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 class TreeHelper {
-    public static function treeLoop1($data_go_chart = [] , $data_link = []){
+    public static function treeLoop1($data_go_chart = [] , $data_link = [], $data_id = '', $id = null){
         function formatNominal($model) {
             if ($model->currency) {
                 return $model->currency->symbol;
@@ -87,6 +88,17 @@ class TreeHelper {
         $finished_data_id_cb=[];
         $finished_data_id_frs=[];
         $finished_data_id_pcb=[];
+        $finished_data_id_op=[];
+
+      
+
+        if (!isset($$data_id) || !is_array($$data_id)) {
+            
+            $$data_id = [];
+        }
+    
+        $$data_id[] = $id;
+
         $added = true;
         while($added){
             
@@ -97,10 +109,11 @@ class TreeHelper {
                     $finished_data_id_gr[]= $gr_id; 
                     $query_gr = GoodReceipt::where('id',$gr_id)->first();
                     foreach($query_gr->goodReceiptDetail as $good_receipt_detail){
+                        $name = $good_receipt_detail->purchaseOrderDetail->purchaseOrder->supplier->name ?? null;
                         $po = [
                             'properties'=> [
                                 ['name'=> "Tanggal: ".$good_receipt_detail->purchaseOrderDetail->purchaseOrder->post_date],
-                                ['name'=> "Vendor  : ".$good_receipt_detail->purchaseOrderDetail->purchaseOrder->supplier->name],
+                                ['name'=> "Vendor  : ". ($name !== null ? $name : ' ')],
                                 ['name'=> "Nominal :".formatNominal($good_receipt_detail->purchaseOrderDetail->purchaseOrder).number_format($good_receipt_detail->purchaseOrderDetail->purchaseOrder->grandtotal,2,',','.')]
                             ],
                             'key'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,
@@ -206,10 +219,11 @@ class TreeHelper {
                         }
 
                         if($good_receipt_detail->goodScaleDetail()->exists()){
+                            $name = $good_receipt_detail->goodScaleDetail->goodScale->supplier->name ?? null;
                             $data_gscale = [
                                     'properties'=> [
                                         ['name'=> "Tanggal: ".$good_receipt_detail->goodScaleDetail->goodScale->post_date],
-                                        ['name'=> "Vendor  : ".$good_receipt_detail->goodScaleDetail->goodScale->supplier->name],
+                                        ['name'=> "Vendor  : ".($name !== null ? $name : ' ')],
                                         ['name'=> "Nominal :".formatNominal($good_receipt_detail->goodScaleDetail->goodScale).number_format($good_receipt_detail->goodScaleDetail->goodScale->grandtotal,2,',','.')]
                                     ],
                                     'key'=>$good_receipt_detail->goodScaleDetail->goodScale->code,
@@ -229,6 +243,82 @@ class TreeHelper {
                     }
                 }
                 
+            }
+
+            foreach($data_id_op as $op_id){
+                if(!in_array($op_id, $finished_data_id_op)){
+                    $finished_data_id_op[]= $op_id;
+                    $query = OutgoingPayment::where('id',$op_id)->first();
+                    if($query->paymentRequest()->exists()){
+                        foreach($query->paymentRequest->paymentRequestDetail as $row_pyr_detail){
+                            $data_pyr_tempura=[
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
+                                    ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
+                                ],
+                                "key" => $row_pyr_detail->paymentRequest->code,
+                                "name" => $row_pyr_detail->paymentRequest->code,
+                                'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
+                            ];
+            
+                            $data_go_chart[]=$data_pyr_tempura;
+                            $data_link[]=[
+                                'from'=>$row_pyr_detail->paymentRequest->code,
+                                'to'=>$query->code,
+                                'string_link'=>$row_pyr_detail->paymentRequest->code.$query->code,
+                            ]; 
+                            $data_id_pyrs[]= $row_pyr_detail->paymentRequest->id;  
+                                
+                            
+                            if($row_pyr_detail->fundRequest()){
+                            
+                                $data_fund_tempura=[
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :".$row_pyr_detail->lookable->code],
+                                        ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                    ],
+                                    "key" => $row_pyr_detail->lookable->code,
+                                    "name" => $row_pyr_detail->lookable->code,
+                                    'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
+                                ];
+                                
+                                $data_go_chart[]=$data_fund_tempura;
+                                $data_link[]=[
+                                    'from'=>$row_pyr_detail->lookable->code,
+                                    'to'=>$row_pyr_detail->paymentRequest->code,
+                                    'string_link'=>$row_pyr_detail->lookable->code.$row_pyr_detail->paymentRequest->code,
+                                ]; 
+                                $data_id_frs[]= $row_pyr_detail->lookable->id;  
+                                    
+                                
+                                
+                            }
+                            foreach($row_pyr_detail->paymentRequest->paymentRequestDetail as $row_pyrd){
+                                if($row_pyrd->purchaseDownPayment()){
+                                
+                                    $data_downp_tempura = [
+                                        'properties'=> [
+                                            ['name'=> "Tanggal :".$row_pyrd->lookable->post_date],
+                                            ['name'=> "Nominal :".formatNominal($row_pyrd->lookable).number_format($row_pyrd->lookable->grandtotal,2,',','.')]
+                                        ],
+                                        "key" => $row_pyrd->lookable->code,
+                                        "name" => $row_pyrd->lookable->code,
+                                        'url'=>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_pyrd->lookable->code),  
+                                    ];
+        
+                                    $data_go_chart[]=$data_downp_tempura;
+                                    $data_link[]=[
+                                        'from'=>$row_pyrd->lookable->code,
+                                        'to'=>$row_pyrd->paymentRequest->code,
+                                        'string_link'=>$row_pyrd->lookable->code.$row_pyrd->paymentRequest->code,
+                                    ]; 
+                                    $data_id_dp[]= $row_pyrd->lookable->id;  
+        
+                                }  
+                            }
+                        }
+                    }
+                }
             }
 
             foreach($data_id_cb as $cb_id){
@@ -299,10 +389,11 @@ class TreeHelper {
                     
                     foreach($query_gs->goodScaleDetail as $data_gs){
                         if($data_gs->goodReceiptDetail->exists()){
+                            $name = $data_gs->goodReceiptDetail->goodReceipt->supplier->name ?? null;
                             $gr = [
                                 'properties'=> [
                                     ['name'=> "Tanggal: ".$data_gs->goodReceiptDetail->goodReceipt->post_date],
-                                    ['name'=> "Vendor  : ".$data_gs->goodReceiptDetail->goodReceipt->supplier->name],
+                                    ['name'=> "Vendor  : ".($name !== null ? $name : ' ')],
                                     
                                 ],
                                 'key'=>$data_gs->goodReceiptDetail->goodReceipt->code,
@@ -367,13 +458,14 @@ class TreeHelper {
                     $query_invoice = PurchaseInvoice::where('id',$invoice_id)->first();
                     foreach($query_invoice->purchaseInvoiceDetail as $row){
                         if($row->purchaseOrderDetail()){
+                            $name = $row_po->supplier->name ?? null;
                             $row_po=$row->lookable->purchaseOrder;
                                 $po =[
                                     "name"=>$row_po->code,
                                     "key" => $row_po->code,
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row_po->post_date],
-                                        ['name'=> "Vendor  : ".$row_po->supplier->name],
+                                        ['name'=> "Vendor  : ".($name !== null ? $name : ' ')],
                                         ['name'=> "Nominal :".formatNominal($row_po).number_format($row_po->grandtotal,2,',','.')]
                                     ],
                                     'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($row_po->code),           
@@ -481,12 +573,13 @@ class TreeHelper {
                         }
 
                         if($row->fundRequestDetail()->exists()){
+                            $name = $row->fundRequestDetail->fundRequest->account->name ?? null;
                             $fr=[
                                 "name"=>$row->fundRequestDetail->fundRequest->code,
                                 "key" => $row->fundRequestDetail->fundRequest->code,
                                 'properties'=> [
                                     ['name'=> "Tanggal :".$row->fundRequestDetail->fundRequest->post_date],
-                                    ['name'=> "User :".$row->fundRequestDetail->fundRequest->account->name],
+                                    ['name'=> "User :".$name],
                                     ['name'=> "Nominal :".formatNominal($row->fundRequestDetail->fundRequest).number_format($row->fundRequestDetail->fundRequest->grandtotal,2,',','.')],
                                 ],
                                 'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row->fundRequestDetail->fundRequest->code),
@@ -620,8 +713,9 @@ class TreeHelper {
                             }
                         }
                     }
-                    if($query_invoice->hasPaymentRequestDetail()->exists()){
-                        foreach($query_invoice->hasPaymentRequestDetail as $row_pyr_detail){
+                    if($query_invoice->realPaymentRequestDetail()->exists()){
+                        info('sdf');
+                        foreach($query_invoice->realPaymentRequestDetail as $row_pyr_detail){
                             $data_pyr_tempura=[
                                 'properties'=> [
                                     ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
@@ -924,12 +1018,13 @@ class TreeHelper {
                     
                     foreach($query_dp->purchaseDownPaymentDetail as $row){
                         if($row->purchaseOrder()->exists()){
+                            $name = $row->purchaseOrder->supplier->name ?? null;
                             $po=[
                                 "name"=>$row->purchaseOrder->code,
                                 "key" => $row->purchaseOrder->code,
                                 'properties'=> [
                                     ['name'=> "Tanggal :".$row->purchaseOrder->post_date],
-                                    ['name'=> "Vendor  : ".$row->purchaseOrder->supplier->name],
+                                    ['name'=> "Vendor  : ".($name !== null ? $name : ' ')],
                                     ['name'=> "Nominal :".formatNominal($row->purchaseOrder).number_format($row->purchaseOrder->grandtotal,2,',','.')],
                                 ],
                                 'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($row->purchaseOrder->code),
@@ -1003,12 +1098,13 @@ class TreeHelper {
                         }
                         
                         if($row->fundRequestDetail()->exists()){
+                            $name = $row->fundRequestDetail->fundRequest->account->name ?? null;
                             $fr=[
                                 "name"=>$row->fundRequestDetail->fundRequest->code,
                                 "key" => $row->fundRequestDetail->fundRequest->code,
                                 'properties'=> [
                                     ['name'=> "Tanggal :".$row->fundRequestDetail->fundRequest->post_date],
-                                    ['name'=> "User :".$row->fundRequestDetail->fundRequest->account->name],
+                                    ['name'=> "User :".($name !== null ? $name : ' ')],
                                     ['name'=> "Nominal :".formatNominal($row->fundRequestDetail->fundRequest).number_format($row->fundRequestDetail->fundRequest->grandtotal,2,',','.')],
                                 ],
                                 'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row->fundRequestDetail->fundRequest->code),
@@ -1730,10 +1826,11 @@ class TreeHelper {
                         if($purchase_request_detail->purchaseOrderDetail()->exists()){
                         
                             foreach($purchase_request_detail->purchaseOrderDetail as $purchase_order_detail){
+                                $name = $purchase_order_detail->purchaseOrder->supplier->name ?? null;
                                 $po_tempura = [
                                     'properties'=> [
                                         ['name'=> "Tanggal : ".$purchase_order_detail->purchaseOrder->post_date],
-                                        ['name'=> "Vendor  : ".$purchase_order_detail->purchaseOrder->supplier->name],
+                                        ['name'=> "Vendor  : ".($name !== null ? $name : ' ')],
                                     ],
                                     'key'=>$purchase_order_detail->purchaseOrder->code,
                                     'name'=>$purchase_order_detail->purchaseOrder->code,
@@ -1757,7 +1854,7 @@ class TreeHelper {
                             $mr=[
                                 'properties'=> [
                                     ['name'=> "Tanggal : ".$purchase_request_detail->lookable->materialRequest->post_date],
-                                    ['name'=> "Vendor  : ".$purchase_request_detail->lookable->materialRequest->user->name],
+                                    ['name'=> "Vendor  : ".$purchase_request_detail->lookable->materialRequest->user->name ?? ' '],
                                 ],
                                 'key'=>$purchase_request_detail->lookable->materialRequest->code,
                                 'name'=>$purchase_request_detail->lookable->materialRequest->code,
@@ -1826,7 +1923,7 @@ class TreeHelper {
                                 $pr_tempura = [
                                     'properties'=> [
                                         ['name'=> "Tanggal : ".$row_purchase_request_detail->purchaseRequest->post_date],
-                                        ['name'=> "Vendor  : ".$row_purchase_request_detail->purchaseRequest->user->name],
+                                        ['name'=> "Vendor  : ".$row_purchase_request_detail->purchaseRequest->user->name ?? ' '],
                                     ],
                                     'key'=>$row_purchase_request_detail->purchaseRequest->code,
                                     'name'=>$row_purchase_request_detail->purchaseRequest->code,
@@ -1852,7 +1949,7 @@ class TreeHelper {
                                 $good_issue_tempura = [
                                     'properties'=> [
                                         ['name'=> "Tanggal : ".$good_issue_detail->goodIssue->post_date],
-                                        ['name'=> "User  : ".$good_issue_detail->goodIssue->user->name],
+                                        ['name'=> "User  : ".$good_issue_detail->goodIssue->user->name ?? ' '],
                                     ],
                                     'key'=>$good_issue_detail->goodIssue->code,
                                     'name'=>$good_issue_detail->goodIssue->code,

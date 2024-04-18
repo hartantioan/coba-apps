@@ -174,6 +174,7 @@
                                                         <th rowspan="2" class="center-align">Dokumen</th>
                                                         <th rowspan="2" class="center-align">Keterangan</th>
                                                         <th rowspan="2" class="center-align">Status</th>
+                                                        <th rowspan="2" class="center-align">By</th>
                                                         <th rowspan="2" class="center-align">Action</th>
                                                     </tr>
                                                     <tr>
@@ -1528,6 +1529,7 @@
                 { name: 'document', className: 'center-align' },
                 { name: 'note', className: '' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',

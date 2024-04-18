@@ -3527,7 +3527,7 @@
             separator = sisa ? '.' : '';
             rupiah += separator + ribuan.join('.');
         }
-    
+
         if(split[1] != undefined){
             if(split[1].length > 2){
                 rupiah = rupiah + ',' + split[1].slice(0,2);
@@ -3537,6 +3537,7 @@
         }else{
             rupiah = rupiah;
         }
+    
         angka.value = sign == '-' ? sign + rupiah : rupiah;
     }
 </script>

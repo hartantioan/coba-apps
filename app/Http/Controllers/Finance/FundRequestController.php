@@ -252,7 +252,7 @@ class FundRequestController extends Controller
                     number_format($totalReceivableBalance,2,',','.'),
                     number_format($val->totalPaymentRequest(),2,',','.'),
                     number_format($val->totalOutgoingPayment(),2,',','.'),
-                    $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'KOSONG',
+                    $val->attachments(),
                     '
                         <select class="browser-default" onfocus="updatePrevious(this);" onchange="updateDocumentStatus(`'.CustomHelper::encrypt($val->code).'`,this)" style="width:150px;">
                             <option value="1" '.($val->document_status == '1' ? 'selected' : '').'>MENUNGGU</option>
@@ -1018,7 +1018,7 @@ class FundRequestController extends Controller
                     number_format($val->grandtotal,2,',','.'),
                     number_format($totalReceivableUsed,2,',','.'),
                     number_format($totalReceivableBalance,2,',','.'),
-                      $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
+                    $val->attachments(),
                     $val->documentStatus(),
                     $val->additional_note,
                     $val->additional_note_pic,
@@ -1175,14 +1175,26 @@ class FundRequestController extends Controller
                     }
                     if(in_array($query->status,['1','2','6'])){
                         if($request->has('file')) {
-                            if($query->document){
-                                if(Storage::exists($query->document)){
-                                    Storage::delete($query->document);
+
+                            if($query->document_po){
+                                $arrFile = explode(',',$query->document_po);
+                                foreach($arrFile as $row){
+                                    if(Storage::exists($row)){
+                                        Storage::delete($row);
+                                    }
                                 }
                             }
-                            $document = $request->file('file')->store('public/fund_requests');
+
+                            $arrFile = [];
+
+                            foreach($request->file('file') as $key => $file)
+                            {
+                                $arrFile[] = $file->store('public/fund_requests');
+                            }
+
+                            $document = implode(',',$arrFile);
                         } else {
-                            $document = $query->document;
+                            $document = $query->document_po;
                         }
                         
                         $query->code = $request->code;
@@ -1237,7 +1249,16 @@ class FundRequestController extends Controller
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=FundRequest::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
-                    
+                    $fileUpload = '';
+
+                    if($request->file('file')){
+                        $arrFile = [];
+                        foreach($request->file('file') as $key => $file)
+                        {
+                            $arrFile[] = $file->store('public/fund_requests');
+                        }
+                        $fileUpload = implode(',',$arrFile);
+                    }
                     $query = FundRequest::create([
                         'code'			=> $newCode,
                         'user_id'		=> session('bo_id'),
@@ -1261,7 +1282,7 @@ class FundRequestController extends Controller
                         'name_account'  => $request->name_account,
                         'no_account'    => $request->no_account,
                         'bank_account'  => $request->bank_account,
-                        'document'      => $request->file('file') ? $request->file('file')->store('public/fund_requests') : NULL,
+                        'document'      => $fileUpload ? $fileUpload : NULL,
                         'total'         => str_replace(',','.',str_replace('.','',$request->total)),
                         'tax'           => str_replace(',','.',str_replace('.','',$request->tax)),
                         'wtax'          => str_replace(',','.',str_replace('.','',$request->wtax)),

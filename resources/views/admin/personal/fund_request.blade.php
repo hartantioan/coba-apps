@@ -211,15 +211,7 @@
                                     <input id="required_date" name="required_date" max="{{ date('9999'.'-12-31') }}" type="date" placeholder="Tgl. posting">
                                     <label class="active" for="required_date">Tgl. Request Pembayaran</label>
                                 </div>
-                                <div class="file-field input-field col m3 s12">
-                                    <div class="btn">
-                                        <span>Lampiran</span>
-                                        <input type="file" name="file" id="file" accept="image/*,.pdf">
-                                    </div>
-                                    <div class="file-path-wrapper">
-                                        <input class="file-path validate" type="text">
-                                    </div>
-                                </div>
+                                
                                 <div class="input-field col m3 s12">
                                     <select class="form-control" id="payment_type" name="payment_type">
                                         <option value="2">Transfer</option>
@@ -243,6 +235,15 @@
                                 <div class="input-field col m3 s12">
                                     <input id="cut_date" name="cut_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Bukti potong">
                                     <label class="active" for="cut_date">Tgl. Bukti Potong (Opsional)</label>
+                                </div>
+                                <div class="file-field input-field col m12 s12">
+                                    <div class="btn">
+                                        <span>Lampiran</span>
+                                        <input type="file" name="file[]" id="file" multiple accept=".pdf, .xlsx, .xls, .jpeg, .jpg, .png, .gif, .word">
+                                    </div>
+                                    <div class="file-path-wrapper">
+                                        <input class="file-path validate" type="text">
+                                    </div>
                                 </div>
                                 <div class="input-field col m3 s12">
                                     <input id="spk_no" name="spk_no" type="text" placeholder="Nomor SPK...">
@@ -1039,106 +1040,128 @@
                 /* if(grandtotal > limit && $('#type').val() == '1'){
                     passedLimit = false;
                 } */
+                let passedUpload = true;
+                var files = document.getElementById('file');
 
-                if(passedLimit){
-                    var path = window.location.pathname;
-                    path = path.replace(/^\/|\/$/g, '');
-
-                    var segments = path.split('/');
-                    var lastSegment = segments[segments.length - 1];
-                
-                    formData.append('lastsegment',lastSegment.toString().replace('personal_',''));
-                    formData.delete("arr_project[]");
-                    formData.delete("arr_checklist_box[]");
-                    formData.delete("arr_checklist_note[]");
-
-                    $('select[name^="arr_project[]"]').each(function(index){
-                        formData.append('arr_project[]',($(this).val() ? $(this).val() : ''));
-                    });
-
-                    $('input[name^="arr_checklist_box[]"]').each(function(index){
-                        if($(this).is(':checked')){
-                            formData.append('arr_checklist_box[]',$(this).val());
-                            formData.append('arr_checklist_note[]',$('input[name^="arr_checklist_note[]"]').eq(index).val());
+                if(files.files.length > 0){
+                    for (var i = 0; i < files.files.length; i++) {
+                        var imageSize = files.files[i].size;
+                        if(Math.round(imageSize/1024) >= 7168){
+                            passedUpload = false;
                         }
-                    });
-                    
-                    $.ajax({
-                        url: '{{ Request::url() }}/create',
-                        type: 'POST',
-                        dataType: 'JSON',
-                        data: formData,
-                        contentType: false,
-                        processData: false,
-                        cache: true,
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        beforeSend: function() {
-                            $('#validation_alert').hide();
-                            $('#validation_alert').html('');
-                            loadingOpen('#modal1');
-                        },
-                        success: function(response) {
-                            loadingClose('#modal1');
-                            $('input').css('border', 'none');
-                            $('input').css('border-bottom', '0.5px solid black');
-                            if(response.status == 200) {
-                                success();
-                                M.toast({
-                                    html: response.message
-                                });
-                            } else if(response.status == 422) {
-                                $('#validation_alert').show();
-                                $('.modal-content').scrollTop(0);
-                                $.each(response.error, function(field, errorMessage) {
-                                    $('#' + field).addClass('error-input');
-                                    $('#' + field).css('border', '1px solid red');
-                                    
-                                });
-                                swal({
-                                    title: 'Ups! Validation',
-                                    text: 'Check your form.',
-                                    icon: 'warning'
-                                });
+                    }
+                }
+                if(passedUpload){
 
-                                $.each(response.error, function(i, val) {
-                                    $.each(val, function(i, val) {
-                                        $('#validation_alert').append(`
-                                            <div class="card-alert card red">
-                                                <div class="card-content white-text">
-                                                    <p>` + val + `</p>
-                                                </div>
-                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                    <span aria-hidden="true">×</span>
-                                                </button>
-                                            </div>
-                                        `);
+                    if(passedLimit){
+                        var path = window.location.pathname;
+                        path = path.replace(/^\/|\/$/g, '');
+
+                        var segments = path.split('/');
+                        var lastSegment = segments[segments.length - 1];
+                    
+                        formData.append('lastsegment',lastSegment.toString().replace('personal_',''));
+                        formData.delete("arr_project[]");
+                        formData.delete("arr_checklist_box[]");
+                        formData.delete("arr_checklist_note[]");
+
+                        $('select[name^="arr_project[]"]').each(function(index){
+                            formData.append('arr_project[]',($(this).val() ? $(this).val() : ''));
+                        });
+
+                        $('input[name^="arr_checklist_box[]"]').each(function(index){
+                            if($(this).is(':checked')){
+                                formData.append('arr_checklist_box[]',$(this).val());
+                                formData.append('arr_checklist_note[]',$('input[name^="arr_checklist_note[]"]').eq(index).val());
+                            }
+                        });
+                        
+                        $.ajax({
+                            url: '{{ Request::url() }}/create',
+                            type: 'POST',
+                            dataType: 'JSON',
+                            data: formData,
+                            contentType: false,
+                            processData: false,
+                            cache: true,
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            beforeSend: function() {
+                                $('#validation_alert').hide();
+                                $('#validation_alert').html('');
+                                loadingOpen('#modal1');
+                            },
+                            success: function(response) {
+                                loadingClose('#modal1');
+                                $('input').css('border', 'none');
+                                $('input').css('border-bottom', '0.5px solid black');
+                                if(response.status == 200) {
+                                    success();
+                                    M.toast({
+                                        html: response.message
                                     });
-                                });
-                            } else {
-                                M.toast({
-                                    html: response.message
+                                } else if(response.status == 422) {
+                                    $('#validation_alert').show();
+                                    $('.modal-content').scrollTop(0);
+                                    $.each(response.error, function(field, errorMessage) {
+                                        $('#' + field).addClass('error-input');
+                                        $('#' + field).css('border', '1px solid red');
+                                        
+                                    });
+                                    swal({
+                                        title: 'Ups! Validation',
+                                        text: 'Check your form.',
+                                        icon: 'warning'
+                                    });
+
+                                    $.each(response.error, function(i, val) {
+                                        $.each(val, function(i, val) {
+                                            $('#validation_alert').append(`
+                                                <div class="card-alert card red">
+                                                    <div class="card-content white-text">
+                                                        <p>` + val + `</p>
+                                                    </div>
+                                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                        <span aria-hidden="true">×</span>
+                                                    </button>
+                                                </div>
+                                            `);
+                                        });
+                                    });
+                                } else {
+                                    M.toast({
+                                        html: response.message
+                                    });
+                                }
+                            },
+                            error: function() {
+                                $('.modal-content').scrollTop(0);
+                                loadingClose('#modal1');
+                                swal({
+                                    title: 'Ups!',
+                                    text: 'Check your internet connection.',
+                                    icon: 'error'
                                 });
                             }
-                        },
-                        error: function() {
-                            $('.modal-content').scrollTop(0);
-                            loadingClose('#modal1');
-                            swal({
-                                title: 'Ups!',
-                                text: 'Check your internet connection.',
-                                icon: 'error'
-                            });
-                        }
-                    });
-                }else{
+                        });
+                    }else{
+                        swal({
+                            title: 'Ups! Maaf.',
+                            text: 'Nominal grandtotal melebihi batas nominal pengajuan BS.',
+                            icon: 'warning'
+                        });
+                    }
+
+                }
+                else{
                     swal({
-                        title: 'Ups! Maaf.',
-                        text: 'Nominal grandtotal melebihi batas nominal pengajuan BS.',
-                        icon: 'warning'
+                        title: 'Ups!',
+                        text: 'Ukuran masing-masing file adalah maksimal 7 Mb.',
+                        icon: 'error'
                     });
                 }
+                
             }
         });
     }

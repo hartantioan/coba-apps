@@ -453,6 +453,23 @@ class FundRequest extends Model
 
         return $document;
     }
+    public function attachments() 
+    {
+        if($this->document){
+            $arr = explode(',',$this->document);
+            $arrDoc = [];
+            foreach($arr as $key => $row){
+                if(Storage::exists($row)){
+                    $arrDoc[] = '<a href="'.asset(Storage::url($row)).'" target="_blank">Lampiran '.($key + 1).'</a>';
+                }
+            }
+            $document = implode(' ',$arrDoc);
+        }else{
+            $document = 'Tidak ada';
+        }
+
+        return $document;
+    }
 
     public function deleteFile(){
 		if(Storage::exists($this->document)) {

@@ -1085,13 +1085,37 @@ class ProductionIssueReceiveController extends Controller
     public function viewStructureTree(Request $request){
         $query = MarketingOrderPlan::where('code',CustomHelper::decrypt($request->id))->first();
         
+        $data_id_good_scale = [];
+        $data_id_good_issue = [];
+        $data_id_mr = [];
+        $data_id_dp=[];
+        $data_id_po = [];
+        $data_id_gr = [];
+        $data_id_invoice=[];
+        $data_id_pyrs=[];
+        $data_id_lc=[];
+        $data_id_inventory_transfer_out=[];
+        $data_id_greturns=[];
+        $data_id_pr=[];
+        $data_id_memo=[];
+        $data_id_pyrcs=[];
+        $data_id_gir = [];
+        $data_id_cb  =[];
+        $data_id_frs  =[];
+        $data_id_op=[];
+        $data_id_pcb=[];
+    
         $data_id_mo=[];
         $data_id_mo_delivery = [];
         $data_id_mo_dp=[];
+        $data_id_hand_over_invoice = [];
         $data_id_mo_return=[];
         $data_id_mo_invoice=[];
         $data_id_mo_memo=[];
+        $data_id_mo_delivery_process=[];
+        $data_id_mo_receipt = [];
         $data_incoming_payment=[];
+        $data_id_hand_over_receipt=[];
 
         $data_go_chart=[];
         $data_link=[];

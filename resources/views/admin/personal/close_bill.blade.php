@@ -579,6 +579,7 @@
         if(nil > max){
             $('#arr_nominal' + code).val($('#arr_nominal' + code).data('max'));
         }
+        countAll();
     }
 
     function applyDocuments(){

@@ -179,7 +179,7 @@
                                 Lampiran
                             </td>
                             <td width="60%">
-                                <a href="{{ $data->attachment() }}" target="_blank"><i class="material-icons">attachment</i></a>
+                                {!! $data->attachments() !!}
                             </td>
                         </tr>
                         <tr>

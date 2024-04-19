@@ -342,7 +342,7 @@ class CloseBillController extends Controller
                             $listDetails = [];
 
                             foreach($op->personalCloseBillCost as $rowdetail){
-                                if($rowdetail->total > 0){
+                                if($rowdetail->total > 0 || $rowdetail->total < 0){
                                     $listDetails[] = [
                                         'note'          => $rowdetail->note,
                                         'nominal'       => number_format($rowdetail->total,2,',','.'),
@@ -358,7 +358,7 @@ class CloseBillController extends Controller
                                     ];
                                 }
 
-                                if($rowdetail->tax > 0){
+                                if($rowdetail->tax > 0 || $rowdetail->tax < 0){
                                     $listDetails[] = [
                                         'note'          => $rowdetail->note,
                                         'nominal'       => number_format($rowdetail->tax,2,',','.'),
@@ -374,7 +374,7 @@ class CloseBillController extends Controller
                                     ];
                                 }
 
-                                if($rowdetail->wtax > 0){
+                                if($rowdetail->wtax > 0 || $rowdetail->wtax < 0){
                                     $listDetails[] = [
                                         'note'          => $rowdetail->note,
                                         'nominal'       => number_format($rowdetail->wtax,2,',','.'),

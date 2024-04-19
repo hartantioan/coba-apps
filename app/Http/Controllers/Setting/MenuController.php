@@ -55,13 +55,27 @@ class MenuController extends Controller
             ]);
         } */
 
-        $data = [
+        /* $data = [
             'title'     => 'Menu',
             'menus'     => Menu::whereNull('parent_id')->get(),
             'content'   => 'admin.setting.menu'
         ];
 
-        return view('admin.layouts.index', ['data' => $data]);
+        return view('admin.layouts.index', ['data' => $data]); */
+
+        $pyr = PaymentRequest::whereHas('outgoingPayment')->whereIn('status',['2','3'])->get();
+
+        foreach($pyr as $row){
+            foreach($row->paymentRequestDetail as $rowdetail){
+                if($rowdetail->lookable_type == 'fund_requests'){
+                    if($rowdetail->lookable->document_status == '2'){
+                        $rowdetail->lookable->update([
+                            'balance_status'	=> '1'
+                        ]);
+                    }
+                }
+            }
+        }
 
         /* $dp = PurchaseInvoice::whereIn('status',['2','3'])->whereHas('purchaseInvoiceDetail',function($query){
             $query->whereHas('fundRequestDetail');

@@ -68,7 +68,7 @@ class MenuController extends Controller
         })->get();
         
         foreach($dp as $row){
-            if($row->getTotalPaid()  <= 0){
+            if($row->getTotalPaid() <= 0){
                 foreach($row->purchaseInvoiceDetail as $rowdetail){
                     if($rowdetail->fundRequestDetail()->exists()){
                         if(!$rowdetail->fundRequestDetail->fundRequest->hasBalanceInvoice()){

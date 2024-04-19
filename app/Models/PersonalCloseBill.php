@@ -195,6 +195,22 @@ class PersonalCloseBill extends Model
         });
     }
 
+    public function totalSource(){
+        $total = 0;
+        foreach($this->personalCloseBillDetail as $row){
+            $total += $row->nominal;
+        }
+        return $total;
+    }
+
+    public function totalBalance(){
+        $total = $this->grandtotal;
+        foreach($this->personalCloseBillDetail as $row){
+            $total -= floatval($row->nominal);
+        }
+        return $total;
+    }
+
     public function balanceCloseBill(){
         $total = $this->grandtotal;
         foreach($this->closeBillDetail as $row){

@@ -317,34 +317,46 @@
                             <legend>4. Konfirmasi</legend>
                             <div class="row">
                                 <div class="col m12 s12 row">
-                                    <div class="input-field col m9 s12">
+                                    <div class="input-field col m8 s12">
                                         
                                     </div>
-                                    <div class="input-field col m3 s12">
+                                    <div class="input-field col m4 s12">
                                         <table width="100%" class="bordered">
                                             <thead>
                                                 <tr>
-                                                    <td>Total</td>
+                                                    <td>Total Biaya</td>
                                                     <td class="right-align">
-                                                        <input class="browser-default" id="total" name="total" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
+                                                        <input class="browser-default" id="total" name="total" type="text" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <td>PPN</td>
+                                                    <td>PPN Biaya</td>
                                                     <td class="right-align">
-                                                        <input class="browser-default" id="tax" name="tax" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
+                                                        <input class="browser-default" id="tax" name="tax" type="text" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <td>PPh</td>
+                                                    <td>PPh Biaya</td>
                                                     <td class="right-align">
-                                                        <input class="browser-default" id="wtax" name="wtax" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
+                                                        <input class="browser-default" id="wtax" name="wtax" type="text" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <td>Grandtotal</td>
+                                                    <td>Grandtotal Biaya</td>
                                                     <td class="right-align">
-                                                        <input class="browser-default" id="grandtotal" name="grandtotal" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
+                                                        <input class="browser-default" id="grandtotal" name="grandtotal" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Total Sumber</td>
+                                                    <td class="right-align">
+                                                        <input class="browser-default" id="source" name="source" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Selisih</td>
+                                                    <td class="right-align">
+                                                        <input class="browser-default" id="balance" name="balance" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
                                                     </td>
                                                 </tr>
                                             </thead>
@@ -797,7 +809,11 @@
     }
     
     function countAll(){
-        let totalall = 0, grandtotalall = 0, taxall = 0, wtaxall = 0;
+        let totalall = 0, grandtotalall = 0, taxall = 0, wtaxall = 0, source = 0, balance = 0;
+        $('input[name^="arr_nominal"]').each(function(index){
+            let rownominal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+            source += rownominal;
+        });
         $('input[name^="arr_qty"]').each(function(index){
             let row_percent_tax = 0, row_percent_wtax = 0, row_total = 0, row_tax = 0, row_wtax = 0, row_grandtotal = 0;
             let qty = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
@@ -848,6 +864,16 @@
         );
         $('#grandtotal').val(
             (grandtotalall >= 0 ? '' : '-') + formatRupiahIni(grandtotalall.toFixed(2).toString().replace('.',','))
+        );
+
+        balance = grandtotalall - source;
+
+        $('#source').val(
+            (source >= 0 ? '' : '-') + formatRupiahIni(source.toFixed(2).toString().replace('.',','))
+        );
+
+        $('#balance').val(
+            (balance >= 0 ? '' : '-') + formatRupiahIni(balance.toFixed(2).toString().replace('.',','))
         );
     }
 
@@ -942,7 +968,11 @@
     });
 
     function count(){
-        let totalall = 0, grandtotalall = 0, taxall = 0, wtaxall = 0;
+        let totalall = 0, grandtotalall = 0, taxall = 0, wtaxall = 0, source = 0, balance = 0;
+        $('input[name^="arr_nominal"]').each(function(index){
+            let rownominal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+            source += rownominal;
+        });
         $('input[name^="arr_qty"]').each(function(index){
             let row_percent_tax = 0, row_percent_wtax = 0, row_total = 0, row_tax = 0, row_wtax = 0, row_grandtotal = 0;
             let qty = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
@@ -993,6 +1023,16 @@
         );
         $('#grandtotal').val(
             (grandtotalall >= 0 ? '' : '-') + formatRupiahIni(grandtotalall.toFixed(2).toString().replace('.',','))
+        );
+        
+        balance = grandtotalall - source;
+
+        $('#source').val(
+            (source >= 0 ? '' : '-') + formatRupiahIni(source.toFixed(2).toString().replace('.',','))
+        );
+
+        $('#balance').val(
+            (balance >= 0 ? '' : '-') + formatRupiahIni(balance.toFixed(2).toString().replace('.',','))
         );
     }
 
@@ -1427,6 +1467,8 @@
                 $('#tax').val(response.tax);
                 $('#wtax').val(response.wtax);
                 $('#grandtotal').val(response.grandtotal);
+                $('#source').val(response.source);
+                $('#balance').val(response.balance);
 
                 if(response.details.length > 0){
                     $('.row_item').each(function(){

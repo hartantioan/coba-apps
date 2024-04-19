@@ -1460,6 +1460,8 @@ class PersonalCloseBillController extends Controller
         $fr['total'] = number_format($fr->total,2,',','.');
         $fr['tax'] = number_format($fr->tax,2,',','.');
         $fr['wtax'] = number_format($fr->wtax,2,',','.');
+        $fr['source'] = number_format($fr->totalSource(),2,',','.');
+        $fr['balance'] = number_format($fr->totalBalance(),2,',','.');
         $fr['grandtotal'] = number_format($fr->grandtotal,2,',','.');
 
         $arr = [];

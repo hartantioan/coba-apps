@@ -1669,6 +1669,7 @@ class PurchaseDownPaymentController extends Controller
                     'status'     => '3',
                     'done_id'    => session('bo_id'),
                     'done_date'  => date('Y-m-d H:i:s'),
+                    'done_note'  => $request->msg,
                 ]);
     
                 activity()

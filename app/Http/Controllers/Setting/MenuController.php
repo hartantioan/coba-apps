@@ -55,15 +55,15 @@ class MenuController extends Controller
             ]);
         } */
 
-        /* $data = [
+        $data = [
             'title'     => 'Menu',
             'menus'     => Menu::whereNull('parent_id')->get(),
             'content'   => 'admin.setting.menu'
         ];
 
-        return view('admin.layouts.index', ['data' => $data]); */
+        return view('admin.layouts.index', ['data' => $data]);
 
-        $dp = PurchaseInvoice::whereIn('status',['2','3'])->whereHas('purchaseInvoiceDetail',function($query){
+        /* $dp = PurchaseInvoice::whereIn('status',['2','3'])->whereHas('purchaseInvoiceDetail',function($query){
             $query->whereHas('fundRequestDetail');
         })->get();
         
@@ -85,7 +85,7 @@ class MenuController extends Controller
                     }
                 }
             }
-        }
+        } */
 
         /* $dp = PurchaseDownPayment::whereIn('status',['2','3'])->whereHas('purchaseDownPaymentDetail',function($query){
             $query->whereHas('fundRequestDetail');

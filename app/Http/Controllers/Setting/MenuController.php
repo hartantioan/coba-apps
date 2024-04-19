@@ -55,34 +55,37 @@ class MenuController extends Controller
             ]);
         } */
 
-        $data = [
+        /* $data = [
             'title'     => 'Menu',
             'menus'     => Menu::whereNull('parent_id')->get(),
             'content'   => 'admin.setting.menu'
         ];
 
-        return view('admin.layouts.index', ['data' => $data]);
+        return view('admin.layouts.index', ['data' => $data]); */
 
-        /* $dp = PurchaseInvoice::whereIn('status',['2','3'])->whereHas('purchaseDownPaymentDetail',function($query){
+        $dp = PurchaseInvoice::whereIn('status',['2','3'])->whereHas('purchaseInvoiceDetail',function($query){
             $query->whereHas('fundRequestDetail');
         })->get();
         
         foreach($dp as $row){
-            if($row->balanceInvoice() <= 0){
-                foreach($row->purchaseDownPaymentDetail as $rowdetail){
-                    $rowdetail->fundRequestDetail->fundRequest->update([
-                        'balance_status'    => '1'
-                    ]);
+            if($row->getTotalPaid()  <= 0){
+                foreach($row->purchaseInvoiceDetail as $rowdetail){
+                    if($rowdetail->fundRequestDetail()->exists()){
+                        if(!$rowdetail->fundRequestDetail->fundRequest->hasBalanceInvoice()){
+                            $rowdetail->fundRequestDetail->fundRequest->update([
+                                'status'			=> '3',
+                                'balance_status'	=> '1'
+                            ]);
+                        }else{
+                            $rowdetail->fundRequestDetail->fundRequest->update([
+                                'status'			=> '2',
+                                'balance_status'	=> NULL
+                            ]);
+                        }
+                    }
                 }
             }
-            if($row->getTotalPaid() <= 0){
-                foreach($row->purchaseDownPaymentDetail as $rowdetail){
-                    $rowdetail->fundRequestDetail->fundRequest->update([
-                        'status'    => '3'
-                    ]);
-                }
-            }
-        } */
+        }
 
         /* $dp = PurchaseDownPayment::whereIn('status',['2','3'])->whereHas('purchaseDownPaymentDetail',function($query){
             $query->whereHas('fundRequestDetail');

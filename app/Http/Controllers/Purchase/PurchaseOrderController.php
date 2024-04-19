@@ -1026,6 +1026,10 @@ class PurchaseOrderController extends Controller
                     DB::rollback();
                 }
 
+                if($request->temp){
+                    $query->updateRootDocumentStatusProcess();
+                }
+
                 CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Purchase Order No. '.$query->code,$query->note,session('bo_id'));
 

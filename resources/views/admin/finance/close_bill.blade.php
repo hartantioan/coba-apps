@@ -263,14 +263,14 @@
                                             <thead>
                                                 <tr>
                                                     <th class="center">Coa</th>
+                                                    <th class="center">Ket.1</th>
+                                                    <th class="center">Ket.2</th>
                                                     <th class="center">Dist.Biaya</th>
                                                     <th class="center">Plant</th>
                                                     <th class="center">Line</th>
                                                     <th class="center">Mesin</th>
                                                     <th class="center">Divisi</th>
                                                     <th class="center">Proyek</th>
-                                                    <th class="center">Ket.1</th>
-                                                    <th class="center">Ket.2</th>
                                                     <th class="center">Debit FC</th>
                                                     <th class="center">Kredit FC</th>
                                                     <th class="center">Debit Rp</th>
@@ -1071,6 +1071,12 @@
                                                 <td class="">
                                                     <select class="browser-default" id="arr_coa` + countdetail + `" name="arr_coa[]"></select>
                                                 </td>
+                                                <td>
+                                                    <input type="text" name="arr_note[]" placeholder="Keterangan 1..." data-id="` + countdetail + `" value="` + value.note + `">
+                                                </td>
+                                                <td>
+                                                    <input type="text" name="arr_note2[]" placeholder="Keterangan 2..." data-id="` + countdetail + `" value="` + value.note + `">
+                                                </td>
                                                 <td class="center">
                                                     <select class="browser-default" id="arr_cost_distribution_cost` + countdetail + `" name="arr_cost_distribution_cost[]"></select> 
                                                 </td>
@@ -1107,12 +1113,6 @@
                                                 </td>
                                                 <td class="center">
                                                     <select class="browser-default" id="arr_project` + countdetail + `" name="arr_project[]"></select>
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="arr_note[]" placeholder="Keterangan 1..." data-id="` + countdetail + `" value="` + value.note + `">
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="arr_note2[]" placeholder="Keterangan 2..." data-id="` + countdetail + `" value="` + value.note + `">
                                                 </td>
                                                 <td class="center">
                                                     <input class="browser-default" type="text" name="arr_nominal_debit_fc[]" value="` + (value.type == '1' ? value.nominal : '0,00') + `" data-id="` + countdetail + `" onkeyup="formatRupiah(this);countAll();">
@@ -1192,6 +1192,12 @@
                 <td class="">
                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                 </td>
+                <td>
+                    <input type="text" name="arr_note[]" placeholder="Keterangan 1..." data-id="` + count + `">
+                </td>
+                <td>
+                    <input type="text" name="arr_note2[]" placeholder="Keterangan 2..." data-id="` + count + `">
+                </td>
                 <td class="center">
                     <select class="browser-default" id="arr_cost_distribution_cost` + count + `" name="arr_cost_distribution_cost[]"></select> 
                 </td>
@@ -1228,12 +1234,6 @@
                 </td>
                 <td class="center">
                     <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
-                </td>
-                <td>
-                    <input type="text" name="arr_note[]" placeholder="Keterangan 1..." data-id="` + count + `">
-                </td>
-                <td>
-                    <input type="text" name="arr_note2[]" placeholder="Keterangan 2..." data-id="` + count + `">
                 </td>
                 <td class="center">
                     <input class="browser-default" type="text" name="arr_nominal_debit_fc[]" value="0,00" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
@@ -1473,6 +1473,12 @@
                                     <td class="">
                                         <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                                     </td>
+                                    <td>
+                                        <input type="text" name="arr_note[]" placeholder="Keterangan 1..." value="` + val.note + `" data-id="` + count + `">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="arr_note2[]" placeholder="Keterangan 2..." value="` + val.note2 + `" data-id="` + count + `">
+                                    </td>
                                     <td class="center">
                                         <select class="browser-default" id="arr_cost_distribution_cost` + count + `" name="arr_cost_distribution_cost[]"></select> 
                                     </td>
@@ -1509,12 +1515,6 @@
                                     </td>
                                     <td class="center">
                                         <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="arr_note[]" placeholder="Keterangan 1..." value="` + val.note + `" data-id="` + count + `">
-                                    </td>
-                                    <td>
-                                        <input type="text" name="arr_note2[]" placeholder="Keterangan 2..." value="` + val.note2 + `" data-id="` + count + `">
                                     </td>
                                     <td class="center">
                                         <input class="browser-default" type="text" name="arr_nominal_debit_fc[]" value="` + val.nominal_debit_fc + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">

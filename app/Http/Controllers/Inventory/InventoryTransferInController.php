@@ -266,15 +266,15 @@ class InventoryTransferInController extends Controller
                     $val->inventoryTransferOut->warehouseTo->name,
                     $val->status(),
                     (
-                        ($val->status == 3 && is_null($val->done_id)) ? 'sistem' :
+                        ($val->status == 3 && is_null($val->done_id)) ? 'SYSTEM' :
                         (
                             ($val->status == 3 && !is_null($val->done_id)) ? $val->doneUser->name :
                             (
                                 ($val->status != 3 && !is_null($val->void_id) && !is_null($val->void_date)) ? $val->voidUser->name :
                                 (
-                                    ($val->status != 3 && is_null($val->void_id) && !is_null($val->void_date)) ? 'sistem' :
+                                    ($val->status != 3 && is_null($val->void_id) && !is_null($val->void_date)) ? 'SYSTEM' :
                                     (
-                                        ($val->status != 3 && is_null($val->void_id) && is_null($val->void_date)) ? null : null
+                                        ($val->status != 3 && is_null($val->void_id) && is_null($val->void_date)) ? 'SYSTEM' : 'SYSTEM'
                                     )
                                 )
                             )
@@ -1126,7 +1126,6 @@ class InventoryTransferInController extends Controller
                     'status'     => '3',
                     'done_id'    => session('bo_id'),
                     'done_date'  => date('Y-m-d H:i:s'),
-                    'done_note'  => $request->msg,
                 ]);
     
                 activity()

@@ -330,15 +330,15 @@ class PaymentRequestController extends Controller
                     $val->isReimburse(),
                     $val->status(),
                     (
-                        ($val->status == 3 && is_null($val->done_id)) ? 'sistem' :
+                        ($val->status == 3 && is_null($val->done_id)) ? 'SYSTEM' :
                         (
                             ($val->status == 3 && !is_null($val->done_id)) ? $val->doneUser->name :
                             (
                                 ($val->status != 3 && !is_null($val->void_id) && !is_null($val->void_date)) ? $val->voidUser->name :
                                 (
-                                    ($val->status != 3 && is_null($val->void_id) && !is_null($val->void_date)) ? 'sistem' :
+                                    ($val->status != 3 && is_null($val->void_id) && !is_null($val->void_date)) ? 'SYSTEM' :
                                     (
-                                        ($val->status != 3 && is_null($val->void_id) && is_null($val->void_date)) ? null : null
+                                        ($val->status != 3 && is_null($val->void_id) && is_null($val->void_date)) ? 'SYSTEM' : 'SYSTEM'
                                     )
                                 )
                             )

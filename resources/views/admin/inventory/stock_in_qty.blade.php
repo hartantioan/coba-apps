@@ -2,6 +2,13 @@
     .select-wrapper, .select2-container {
         height:3.7rem !important;
     }
+    .select2-selection--multiple{
+        overflow-y: scroll !important;
+        height: auto !important;
+    }
+    .select2{
+        height: fit-content !important;
+    }
 </style>
 <div id="main">
     <div class="row">
@@ -60,6 +67,8 @@
                                                 
                                             </select>
                                             <label class="active" for="item_id">ITEM</label>
+                                        </div>
+                                        <div class="col m12 s12">
                                         </div>
                                         <div class="input-field col m6 s12">
                                             <label for="filter_group" class="active" style="font-size:1rem;">Filter Group :</label>

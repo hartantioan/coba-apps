@@ -2,6 +2,13 @@
     .modal {
         top:0px !important;
     }
+    .select2-selection--multiple{
+        overflow-y: scroll !important;
+        height: auto !important;
+    }
+    .select2{
+        height: fit-content !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -41,15 +48,15 @@
                                         </div>
                                         <div class="col s12">
                                             <div class="row">
-                                                <div class="input-field col m3 s12">
+                                                <div class="input-field col m4 s12">
                                                     <input id="start_date" name="start_date" type="date" placeholder="Tgl. posting" value="{{ date('Y-m').'-01' }}">
                                                     <label class="active" for="start_date">Tanggal Awal</label>
                                                 </div>
-                                                <div class="input-field col m3 s12">
+                                                <div class="input-field col m4 s12">
                                                     <input id="end_date" name="end_date" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                                     <label class="active" for="end_date">Tanggal Akhir</label>
                                                 </div>
-                                                <div class="input-field col m3 s12">
+                                                <div class="input-field col m4 s12">
                                                     
                                                     <select class="form-control" id="type" name="type" onchange="loadDataTable()">
                                                         <option value="all">Semua</option>
@@ -57,7 +64,9 @@
                                                     </select>
                                                     <label for="type" style="font-size:1rem;">Tipe :</label>
                                                 </div>
-                                                <div class="input-field  col m6 s12 ">
+                                                <div class="col m12 s12">
+                                                </div>
+                                                <div class="input-field  col m12 s12 ">
                                                     <label for="filter_group" class="active" style="font-size:1rem;">Filter Group :</label>
                                                     
                                                     <select class="select2 browser-default" multiple="multiple" id="filter_group" name="filter_group[]" onchange="loadDataTable()">
@@ -100,9 +109,9 @@
                                                     @endforeach
                                                     </select>
                                                 </div>
-                                                <div class="col m3 s12">
-                                                    <button class="btn waves-effect waves-light right submit" onclick="exportExcel();">Export <i class="material-icons right">file_download</i></button>
-                                                    <button class="btn waves-effect waves-light right cyan submit" onclick="filter();">Process <i class="material-icons right">list</i></button>
+                                                <div class="col m6 s12">
+                                                    <button class="btn waves-effect waves-light  submit" onclick="exportExcel();">Export <i class="material-icons right">file_download</i></button>
+                                                    <button class="btn waves-effect waves-light  cyan submit" onclick="filter();">Process <i class="material-icons right">list</i></button>
                                                 </div>
                                             </div>
                                         </div>

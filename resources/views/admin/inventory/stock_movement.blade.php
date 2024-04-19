@@ -2,6 +2,13 @@
     .select-wrapper, .select2-container {
         height:3.7rem !important;
     }
+    .select2-selection--multiple{
+        overflow-y: scroll !important;
+        height: auto !important;
+    }
+    .select2{
+        height: fit-content !important;
+    }
 </style>
 <div id="main">
     <div class="row">
@@ -37,22 +44,24 @@
                                 </div>
                                 <div class="col s12">
                                     <div class="row">
-                                        <div class="input-field col m3 s12">
+                                        <div class="input-field col m4 s12">
                                             <select class="form-control" id="type" name="type">
                                                 <option value="all">DENGAN MUTASI</option>
                                                 <option value="final">TANPA MUTASI (FINAL)</option>
                                             </select>
                                             <label class="" for="type">Tipe</label>
                                         </div>
-                                        <div class="input-field col m3 s12">
+                                        <div class="input-field col m4 s12">
                                             <input id="start_date" name="start_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. posting" value="{{ date('Y-m').'-01' }}">
                                             <label class="active" for="start_date">Tanggal Awal</label>
                                         </div>
-                                        <div class="input-field col m3 s12">
+                                        <div class="input-field col m4 s12">
                                             <input id="finish_date" name="finish_date"  type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                             <label class="active" for="finish_date">Tanggal Akhir</label>
                                         </div>
-                                        <div class="input-field col m3 s12">
+                                        <div class="col m12 s12">
+                                        </div>
+                                        <div class="input-field col m4 s12">
                                             <select class="form-control" id="plant" name="plant">
                                                 @foreach ($place as $row)
                                                     <option value="{{ $row->id }}">{{ $row->name }}</option>
@@ -60,7 +69,7 @@
                                             </select>
                                             <label class="" for="plant"></label>
                                         </div>
-                                        <div class="input-field col m3 s12">
+                                        <div class="input-field col m4 s12">
                                             <select class="form-control" id="warehouse" name="warehouse">
                                                 <option value="all">SEMUA</option>
                                                 @foreach ($warehouse as $row)
@@ -69,13 +78,15 @@
                                             </select>
                                             <label class="" for="warehouse">WareHouse</label>
                                         </div>
-                                        <div class="input-field col m3 s12">
+                                        <div class="input-field col m4 s12">
                                             <select class="select2 browser-default" id="item_id" name="item_id">
                                                 
                                             </select>
                                             <label class="active" for="item">ITEM</label>
                                         </div>
-                                        <div class="input-field col m6 s12 ">
+                                        <div class="col m12 s12">
+                                        </div>
+                                        <div class="input-field col m12 s12 ">
                                             <label for="filter_group" class="active" style="font-size:1rem;">Filter Group :</label>
                                             
                                                 <select class="select2 browser-default" multiple="multiple" id="filter_group" name="filter_group[]">

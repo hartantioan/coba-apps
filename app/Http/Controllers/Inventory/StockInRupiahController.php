@@ -135,6 +135,8 @@ class StockInRupiahController extends Controller
         $previousId = null;
         $array_last_item = [];
         $array_first_item = [];
+        $all_total = 0;
+    
         foreach($query_data as $row){
             
             if($row->type=='IN'){
@@ -146,7 +148,10 @@ class StockInRupiahController extends Controller
                 $cum_qty=$row->qty_out * -1;
                 $cum_val=$row->total_out * -1;
             }
-            
+        
+            if($request->type == "final"){
+                $all_total += $row->total_final;
+            }
             $data_tempura = [
                 'item_id'      => $row->item->id,
                 'perlu'        => 0,
@@ -307,13 +312,15 @@ class StockInRupiahController extends Controller
         $end_time = microtime(true);
        
         $execution_time = ($end_time - $start_time);
+        info($all_total);
         $response =[
             'status'=>200,
             'message'       => $combinedArray,
             'latest'        => $array_last_item,
             'first'         => $array_first_item,
             'perlu'         => $perlu,
-            'time'          => " Waktu proses : ".$execution_time." detik"
+            'time'          => " Waktu proses : ".$execution_time." detik",
+            'alltotal'      => number_format($all_total,2,',','.'),
         ];
         return response()->json($response);
     }

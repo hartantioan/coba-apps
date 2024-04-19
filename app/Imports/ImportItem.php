@@ -35,10 +35,10 @@ class ImportItem implements OnEachRow, WithHeadingRow, WithBatchInserts,WithMult
             $check = Item::where('code',$row['code'])->first();
             
             if(!$check){
-                $item_group_code = explode('#',$row['item_group_id'])[0];
+                $item_group_code = explode('#',$row['item_group'])[0];
                 $item_group_id = ItemGroup::where('code',$item_group_code)->first();
                 
-                $item_unit_code = explode('#',$row['uom_unit'])[0];
+                $item_unit_code = explode('#',$row['unit'])[0];
                 $item_unit_id= Unit::where('code',$item_unit_code)->first();
                 
                 $query = Item::create([
@@ -46,12 +46,14 @@ class ImportItem implements OnEachRow, WithHeadingRow, WithBatchInserts,WithMult
                     'name' => $row['name'],
                     'item_group_id' =>$item_group_id->id,
                     'uom_unit' => $item_unit_id->id,
-                    'tolerance_gr' => $row['tolerance_gr'],
-                    'is_inventory_item' => $row['is_inventory_item'],
+                    'tolerance_gr' => $row['toleransi_gr'],
+                    'is_inventory_item' => $row['is_invent_item'],
                     'is_sales_item' => $row['is_sales_item'],
-                    'is_purchase_item' => $row['is_purchase_item'],
+                    'is_purchase_item' => $row['is_purchase'],
                     'is_service' => $row['is_service'],
                     'note' => $row['note'],
+                    'min_stock' => $row['min_stock'],
+                    'max_stock' => $row['max_stock'],
                     'status' => '1',
                 ]);
 
@@ -71,6 +73,12 @@ class ImportItem implements OnEachRow, WithHeadingRow, WithBatchInserts,WithMult
                     'is_buy_unit'   => '1',
                     'is_default'    => '1',
                 ]);
+
+                activity()
+                    ->performedOn(new Item())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Add / edit from excel item data.');
             }
         }
     }

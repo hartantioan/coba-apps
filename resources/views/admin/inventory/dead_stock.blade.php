@@ -1,3 +1,15 @@
+<style>
+    .select-wrapper, .select2-container {
+        height:3.7rem !important;
+    }
+    .select2-selection--multiple{
+        overflow-y: scroll !important;
+        height: auto !important;
+    }
+    .select2{
+        height: fit-content !important;
+    }
+</style>
 <div id="main">
     <div class="row">
         <div class="pt-3 pb-1" id="breadcrumbs-wrapper">
@@ -84,6 +96,7 @@
                                             </select>
                                             <label class="" for="plant">Plant</label>
                                         </div>
+                                        
                                         <div class="input-field col m3 s12">
                                             <select class="form-control" id="warehouse" name="warehouse">
                                                 <option value="all">Semua</option>
@@ -93,7 +106,8 @@
                                             </select>
                                             <label class="" for="warehouse">WareHouse</label>
                                         </div>
-                                        
+                                        <div class="col m12 s12">
+                                        </div>
                                         <div class="input-field col m3 s12">
                                             <input id="date" name="date"  type="date" max="{{ date('9999'.'-12-31') }}" placeholder="" value="{{ date('Y-m-d') }}">
                                             <label class="active" for="date">Masukkan Tanggal</label>

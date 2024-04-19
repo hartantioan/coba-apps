@@ -20,7 +20,7 @@ class ImportUser implements ToModel,WithHeadingRow, WithValidation,WithBatchInse
 {
     public function model(array $row)
     {
-        return new User([
+        $arr = [
             'employee_no'       => User::generateCode($row['type'],$row['employee_type'],$row['plant_id']),
             'name'              => $row['name'],
             'password'          => bcrypt($row['password']),
@@ -55,7 +55,14 @@ class ImportUser implements ToModel,WithHeadingRow, WithValidation,WithBatchInse
             'country_id'        => $row['country_id'],
             'employee_type'     => $row['type'] == '1' ? $row['employee_type'] : NULL,
             'place_id'          => $row['plant_id'],
-        ]);
+        ];
+        
+        activity()
+            ->performedOn(new User())
+            ->causedBy(session('bo_id'))
+            ->withProperties($arr)
+            ->log('Add / edit from excel user.');
+        return new User($arr);
     }
     public function rules(): array
     {

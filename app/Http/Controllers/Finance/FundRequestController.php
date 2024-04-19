@@ -1176,8 +1176,8 @@ class FundRequestController extends Controller
                     if(in_array($query->status,['1','2','6'])){
                         if($request->has('file')) {
 
-                            if($query->document_po){
-                                $arrFile = explode(',',$query->document_po);
+                            if($query->document){
+                                $arrFile = explode(',',$query->document);
                                 foreach($arrFile as $row){
                                     if(Storage::exists($row)){
                                         Storage::delete($row);
@@ -1194,7 +1194,7 @@ class FundRequestController extends Controller
 
                             $document = implode(',',$arrFile);
                         } else {
-                            $document = $query->document_po;
+                            $document = $query->document;
                         }
                         
                         $query->code = $request->code;

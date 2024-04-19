@@ -23,6 +23,7 @@ class ImportAsset implements OnEachRow, WithHeadingRow, WithValidation, WithBatc
     }
     public function onRow(Row $row)
     {
+        
         $place = Place::where('code',$row['place_id'])->first();
         $asset_group_code=explode('#',$row['asset_group_id'])[0];
         $asset_group = AssetGroup::where('code',$asset_group_code)->first();
@@ -38,6 +39,11 @@ class ImportAsset implements OnEachRow, WithHeadingRow, WithValidation, WithBatc
             'note' => $row['note'],
             'status' => '1',
         ]);
+        activity()
+            ->performedOn(new Asset())
+            ->causedBy(session('bo_id'))
+            ->withProperties($query)
+            ->log('From excel asset to database.');
     }
 
     public function rules(): array
@@ -53,21 +59,21 @@ class ImportAsset implements OnEachRow, WithHeadingRow, WithValidation, WithBatc
         ];
     }
 
-    public function onFailure(Failure ...$failures)
-    {
-        $errors = [];
+    // public function onFailure(Failure ...$failures)
+    // {
+    //     $errors = [];
 
-        foreach ($failures as $failure) {
-            $errors[] = [
-                'row' => $failure->row(),
-                'attribute' => $failure->attribute(),
-                'errors' => $failure->errors(),
-                'values' => $failure->values(),
-            ];
-        }
+    //     foreach ($failures as $failure) {
+    //         $errors[] = [
+    //             'row' => $failure->row(),
+    //             'attribute' => $failure->attribute(),
+    //             'errors' => $failure->errors(),
+    //             'values' => $failure->values(),
+    //         ];
+    //     }
 
-        throw new ValidationException(null, null, $errors);
-    }
+    //     throw new ValidationException(null, null, $errors);
+    // }
 
     public function batchSize(): int
     {

@@ -2,6 +2,13 @@
     .select-wrapper, .select2-container {
         height:3.7rem !important;
     }
+    .select2-selection--multiple{
+        overflow-y: scroll !important;
+        height: auto !important;
+    }
+    .select2{
+        height: fit-content !important;
+    }
 </style>
 <div id="main">
     <div class="row">
@@ -76,7 +83,7 @@
                                             </select>
                                             <label class="active" for="item_id">ITEM</label>
                                         </div>
-                                        <div class="input-field  col m6 s12 ">
+                                        <div class="input-field  col m12 s12 ">
                                             <label for="filter_group" class="active" style="font-size:1rem;">Filter Group :</label>
                                             
                                             <select class="select2 browser-default" multiple="multiple" id="filter_group" name="filter_group[]" onchange="loadDataTable()">
@@ -237,6 +244,13 @@
                                     </tr>
                                 `);
                             });
+                            $('#table_body').append(`
+                                <tr>
+                                    <td class="center-align" colspan="6"></td>     
+                                    <td class="center-align">Total</td>
+                                    <td class="right-align">`+response.alltotal+`</td>
+                                </tr>
+                            `);
                         }else{
                             var processedItems = [];
                             $('#t_head').empty();
@@ -292,7 +306,7 @@
                                             <td class="right-align">`+val.final+`</td>
                                             <td class="right-align">`+val.total+`</td>
                                             <td class="right-align">`+val.cum_qty+`</td>
-                                            <td class="right-align">`+val.cum_val+`</td>
+                                            <td class="right-align">`+val.cum_val+` adx</td>
                                         </tr>
                                     `);
                                 }         

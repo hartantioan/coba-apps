@@ -166,4 +166,12 @@ class CloseBill extends Model
     {
         return $this->hasMany('App\Models\PrintCounter','lookable_id','id')->where('lookable_type',$this->table);
     }
+
+    public function totalDocument(){
+        $total = 0;
+        foreach($this->closeBillDetail as $row){
+            $total += $row->nominal;
+        }
+        return $total;
+    }
 }

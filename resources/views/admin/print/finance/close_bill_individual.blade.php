@@ -306,6 +306,10 @@
                                     </tr>
                                     @endif
                                 @endforeach
+                                <tr>
+                                    <td align="right" colspan="5">TOTAL</td>
+                                    <td align="right">{{ number_format($data->totalDocument(),2,',','.') }}</td>
+                                </tr>
                             </tbody>
                         </table>
                         <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
@@ -328,6 +332,12 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @php
+                                    $total_debit_fc = 0;
+                                    $total_credit_fc = 0;
+                                    $total_debit = 0;
+                                    $total_credit = 0;
+                                @endphp
                                 @foreach($data->closeBillCost as $key => $row)
                                 <tr>
                                     <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
@@ -348,7 +358,20 @@
                                 <tr>
                                     <td colspan="11">Ket 2 : {{ $row->note2 }}</td>
                                 </tr>
+                                    @php
+                                        $total_debit_fc += $row->nominal_debit_fc;
+                                        $total_credit_fc += $row->nominal_credit_fc;
+                                        $total_debit += $row->nominal_debit;
+                                        $total_credit += $row->nominal_credit;
+                                    @endphp
                                 @endforeach
+                                <tr>
+                                    <td align="right" colspan="7">TOTAL</td>
+                                    <td align="right">{{ number_format($total_debit_fc,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($total_credit_fc,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($total_debit,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($total_credit,2,',','.') }}</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>

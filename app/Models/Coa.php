@@ -250,8 +250,8 @@ class Coa extends Model
                     ->whereRaw("post_date < '$month-01'");
             })->get();
             
-            foreach($dataBalanceBeforeDebit as $row){
-                $totalBalanceBeforeDebit += round($row->nominal,2);
+            foreach($dataBalanceBeforeDebit as $rowbefore){
+                $totalBalanceBeforeDebit += round($rowbefore->nominal,2);
             }
 
             $dataBalanceBeforeCredit = $row->journalCredit()->whereHas('journal',function($query)use($month){
@@ -259,8 +259,8 @@ class Coa extends Model
                     ->whereRaw("post_date < '$month-01'");
             })->get();
 
-            foreach($dataBalanceBeforeCredit as $row){
-                $totalBalanceBeforeCredit += round($row->nominal,2);
+            foreach($dataBalanceBeforeCredit as $rowbefore){
+                $totalBalanceBeforeCredit += round($rowbefore->nominal,2);
             }
 
             $dataDebit = $row->journalDebit()->whereHas('journal',function($query)use($month){
@@ -281,12 +281,12 @@ class Coa extends Model
                     });
             })->get();
 
-            foreach($dataDebit as $row){
-                $totalDebit += round($row->nominal,2);
+            foreach($dataDebit as $rownow){
+                $totalDebit += round($rownow->nominal,2);
             }
 
-            foreach($dataCredit as $row){
-                $totalCredit += round($row->nominal,2);
+            foreach($dataCredit as $rownow){
+                $totalCredit += round($rownow->nominal,2);
             }
         }
 

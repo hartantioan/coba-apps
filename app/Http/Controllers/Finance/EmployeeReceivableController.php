@@ -51,6 +51,9 @@ class EmployeeReceivableController extends Controller
                     $query->whereDate('post_date','<=',$date);
                 });
             });
+        })
+        ->whereHas('account',function($query){
+            $query->where('type','1');
         })->get();
 
         $results = [];

@@ -34,4 +34,13 @@ class PurchaseDownPaymentDetail extends Model
     public function fundRequestDetail(){
         return $this->belongsTo('App\Models\FundRequestDetail','fund_request_detail_id','id')->withTrashed();
     }
+
+    public function fundRequestBalanceUsed(){
+        $total = $this->nominal;
+        $totalDP = $this->purchaseDownPayment->grandtotal;
+        $totalUsed = $this->purchaseDownPayment->balanceInvoice();
+        $bobot = $total / $totalDP;
+        $totalreturn = $bobot * $totalUsed;
+        return $totalreturn;
+    }
 }

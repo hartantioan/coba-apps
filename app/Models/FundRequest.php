@@ -241,13 +241,27 @@ class FundRequest extends Model
     public function totalReceivableUsedPaid(){
         $total = 0;
         if($this->document_status == '3'){
-            foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
-                $query->whereHas('outgoingPayment');
-            })->get() as $row){
-                $total += $row->totalOutgoingUsedWeight() + $row->totalIncomingUsedWeight();
+            if($this->account->type == '1'){
+                foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+                    $query->whereHas('outgoingPayment');
+                })->get() as $row){
+                    $total += $row->totalOutgoingUsedWeight() + $row->totalIncomingUsedWeight();
+                }
+                foreach($this->personalCloseBillDetail as $row){
+                    $total += $row->nominal;
+                }
+            }else{
+                $total += $this->totalUsedPurchaseDownPayment();
             }
-            foreach($this->personalCloseBillDetail as $row){
-                $total += $row->nominal;
+        }
+        return $total;
+    }
+
+    public function totalUsedPurchaseDownPayment(){
+        $total = 0;
+        foreach($this->fundRequestDetail as $row){
+            if($row->purchaseDownPaymentDetail()->exists()){
+                $total += $row->purchaseDownPaymentDetail->fundRequestBalanceUsed();
             }
         }
         return $total;
@@ -284,6 +298,15 @@ class FundRequest extends Model
                 });
             })->get() as $row){
                 $total += $row->totalOutgoingUsedWeightByDate($date) + $row->totalIncomingUsedWeightByDate($date);
+            }
+            foreach($this->personalCloseBillDetail()->whereHas('personalCloseBill',function($query)use($date){
+                $query->whereHas('closeBillDetail',function($query)use($date){
+                    $query->whereHas('closeBill',function($query)use($date){
+                        $query->whereIn('status',['2','3'])->whereDate('post_date','<=',$date);
+                    });
+                });
+            })->get() as $row){
+                $total += $row->nominal;
             }
         }
         return $total;
@@ -530,8 +553,6 @@ class FundRequest extends Model
 
         return $ada;
     }
-
-    
 
     public function hasChildDocument(){
         $hasRelation = false;

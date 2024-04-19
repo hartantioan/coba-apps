@@ -56,6 +56,32 @@ function formatRupiah(angka){
 	angka.value = sign == '-' ? sign + rupiah : rupiah;
 }
 
+function formatRupiahTwoDecimal(angka){
+	let val = angka.value ? angka.value : '';
+	var number_string = val.replace(/[^,\d]/g, '').toString(),
+	sign = val.charAt(0),
+	split   		= number_string.toString().split(','),
+	sisa     		= parseFloat(split[0]).toString().length % 3,
+	rupiah     		= parseFloat(split[0]).toString().substr(0, sisa),
+	ribuan     		= parseFloat(split[0]).toString().substr(sisa).match(/\d{3}/gi);
+ 
+	if(ribuan){
+		separator = sisa ? '.' : '';
+		rupiah += separator + ribuan.join('.');
+	}
+ 
+	if(split[1] != undefined){
+		if(split[1].length > 2){
+			rupiah = rupiah + ',' + split[1].slice(0,2);
+		}else{
+			rupiah = rupiah + ',' + split[1];
+		}
+	}else{
+		rupiah = rupiah;
+	}
+	angka.value = sign == '-' ? sign + rupiah : rupiah;
+}
+
 function formatRupiahNoMinus(angka){
 	let val = angka.value ? angka.value : '';
 	var number_string = val.replace(/[^,\d]/g, '').toString(),

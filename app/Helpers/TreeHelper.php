@@ -318,6 +318,33 @@ class TreeHelper {
                             }
                         }
                     }
+                    if($query->paymentRequestCross()){
+                       
+                        foreach($query->paymentRequestCross as $row_pyr_cross){
+                                
+                            $data_pyrc_tempura = [
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$row_pyr_cross->lookable->post_date],
+                                    ['name'=> "Nominal :".formatNominal($row_pyr_cross->lookable).number_format($row_pyr_cross->lookable->grandtotal,2,',','.')]
+                                ],
+                                "key" => $row_pyr_cross->lookable->code,
+                                "name" => $row_pyr_cross->lookable->code,
+                                'url'=>request()->root()."/admin/finance/outgoing_payment?code=".CustomHelper::encrypt($row_pyr_cross->lookable->code),  
+                            ];
+                
+                            $data_go_chart[]=$data_pyrc_tempura;
+                            $data_link[]=[
+                                'from'=>$row_pyr_cross->lookable->code,
+                                'to'=>$query->code,
+                                'string_link'=>$row_pyr_cross->lookable->code.$query->code,
+                            ];
+                          
+                            if(!in_array($row_pyr_cross->id, $data_id_pyrcs)){
+                                $data_id_pyrcs[] = $row_pyr_cross->id;
+                                
+                            }
+                        }
+                    }
                 }
             }
 
@@ -714,7 +741,7 @@ class TreeHelper {
                         }
                     }
                     if($query_invoice->realPaymentRequestDetail()->exists()){
-                        info('sdf');
+                      
                         foreach($query_invoice->realPaymentRequestDetail as $row_pyr_detail){
                             $data_pyr_tempura=[
                                 'properties'=> [
@@ -835,7 +862,11 @@ class TreeHelper {
                             'from'=>$query_pyr->code,
                             'to'=>$query_pyr->outgoingPayment->code,
                             'string_link'=>$query_pyr->code.$query_pyr->outgoingPayment->code,
-                        ]; 
+                        ];
+                        if(!in_array($query_pyr->outgoingPayment->id, $data_id_op)){
+                            $data_id_op[]= $query_pyr->outgoingPayment->id; 
+                            $added = true; 
+                        }
                         
                     }
                     
@@ -852,22 +883,30 @@ class TreeHelper {
                         ];
                     
                         if($row_pyr_detail->fundRequest()){
-                            
+                            $x= '';
+                            $color = ['color' => 'lightgrey'];
+                            if($row_pyr_detail->lookable->code == $row_pyr_detail->paymentRequest->code){
+                                $x = ' (FR)';
+                                if($data_go_chart[0]['key'] == $row_pyr_detail->lookable->code){
+                                    unset($data_go_chart[0]);
+                                    $color = ['color' => 'lightblue'];
+                                }
+                            }
                             $data_fund_tempura=[
                                 'properties'=> [
                                     ['name'=> "Tanggal :".$row_pyr_detail->lookable->code],
                                     ['name'=> "User :".$row_pyr_detail->lookable->account->name],
                                     ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
                                 ],
-                                "key" => $row_pyr_detail->lookable->code,
-                                "name" => $row_pyr_detail->lookable->code,
+                                "key" => $row_pyr_detail->lookable->code.$x,
+                                "name" => $row_pyr_detail->lookable->code . $x,
                                 'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
-                            ];
+                            ]+$color;
                         
                             
                             $data_go_chart[]=$data_fund_tempura;
                             $data_link[]=[
-                                'from'=>$row_pyr_detail->lookable->code,
+                                'from'=>$row_pyr_detail->lookable->code.$x,
                                 'to'=>$row_pyr_detail->paymentRequest->code,
                                 'string_link'=>$row_pyr_detail->lookable->code.$row_pyr_detail->paymentRequest->code,
                             ];
@@ -987,8 +1026,39 @@ class TreeHelper {
                             $data_id_pyrs[] = $query_pyrc->paymentRequest->id;
                             $added=true;
                         }
+                        foreach($query_pyrc->paymentRequest->paymentRequestDetail as $row_pyr_detail){
+                            if($row_pyr_detail->fundRequest()){
+                            
+                                $data_fund_tempura=[
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :".$row_pyr_detail->lookable->code],
+                                        ['name'=> "User :".$row_pyr_detail->lookable->account->name],
+                                        ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                    ],
+                                    "key" => $row_pyr_detail->lookable->code,
+                                    "name" => $row_pyr_detail->lookable->code,
+                                    'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
+                                ];
+                            
+                                
+                                $data_go_chart[]=$data_fund_tempura;
+                                $data_link[]=[
+                                    'from'=>$row_pyr_detail->lookable->code,
+                                    'to'=>$row_pyr_detail->paymentRequest->code,
+                                    'string_link'=>$row_pyr_detail->lookable->code.$row_pyr_detail->paymentRequest->code,
+                                ];
+    
+                                if(!in_array($row_pyr_detail->lookable->id, $data_id_frs)){
+                                    $data_id_frs[] = $row_pyr_detail->lookable->id;
+                                    $added = true; 
+                                } 
+                                
+                            }
+                        }
+                        
                     }
                     if($query_pyrc->outgoingPayment()){
+                       
                         $outgoing_tempura = [
                             'properties'=> [
                                 ['name'=> "Tanggal :".$query_pyrc->lookable->post_date],
@@ -1005,6 +1075,10 @@ class TreeHelper {
                             'to'=>$query_pyrc->paymentRequest->code,
                             'string_link'=>$query_pyrc->lookable->code.$query_pyrc->paymentRequest->code,
                         ];
+                        if(!in_array($query_pyrc->lookable->id, $data_id_op)){
+                            $data_id_op[]= $query_pyrc->lookable->id; 
+                            $added = true; 
+                        }
                     }
                 }
             }
@@ -1524,24 +1598,28 @@ class TreeHelper {
                 if(!in_array($fr_id, $finished_data_id_frs)){
                     $finished_data_id_frs[]=$fr_id;
                     $query_fr = FundRequest::find($fr_id);
-
+                   
                     foreach($query_fr->fundRequestDetail as $row_fr_detail){
                         if($row_fr_detail->hasPaymentRequestDetail()->exists()){
                             foreach($row_fr_detail->hasPaymentRequestDetail as $row_pyr_detail){
+                                $x= '';
+                                if($row_pyr_detail->paymentRequest->code == $row_pyr_detail->paymentRequest->code){
+                                    $x = ' (PYR)';
+                                }
                                 $data_pyr_tempura=[
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
                                         ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
                                     ],
-                                    "key" => $row_pyr_detail->paymentRequest->code,
-                                    "name" => $row_pyr_detail->paymentRequest->code,
+                                    "key" => $row_pyr_detail->paymentRequest->code . $x,
+                                    "name" => $row_pyr_detail->paymentRequest->code . $x,
                                     'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
                                 ];
                                 $data_go_chart[]=$data_pyr_tempura;
                                 $data_link[]=[
                                     'from'=>$query_fr->code,
-                                    'to'=>$row_pyr_detail->paymentRequest->code,
-                                    'string_link'=>$query_fr->code.$row_pyr_detail->paymentRequest->code,
+                                    'to'=>$row_pyr_detail->paymentRequest->code. $x,
+                                    'string_link'=>$query_fr->code.$row_pyr_detail->paymentRequest->code.$x,
                                 ];
                                 if(!in_array($row_pyr_detail->paymentRequest->id,$data_id_pyrs)){
                                     $data_id_pyrs[] = $row_pyr_detail->paymentRequest->id;
@@ -1974,7 +2052,19 @@ class TreeHelper {
                 }
             }
         }
-         
+        function filterDuplicates(array $array): array {
+            $filteredArray = [];
+        
+            foreach ($array as $item) {
+                if ($item['from'] !== $item['to']) {
+                    $filteredArray[] = $item;
+                }
+            }
+        
+            return $filteredArray;
+        }
+        $data_link = filterDuplicates($data_link);
+        
         return [$data_go_chart, $data_link];
     }
 

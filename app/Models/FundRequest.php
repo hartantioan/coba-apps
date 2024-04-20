@@ -259,9 +259,9 @@ class FundRequest extends Model
 
     public function totalUsedPurchaseDownPayment(){
         $total = 0;
-        foreach($this->fundRequestDetail as $row){
-            if($row->purchaseDownPaymentDetail()->exists()){
-                $total += $row->purchaseDownPaymentDetail->fundRequestBalanceUsed();
+        foreach($this->fundRequestDetail()->whereHas('purchaseDownPaymentDetail')->get() as $row){
+            foreach($row->purchaseDownPaymentDetail as $rowdp){
+                $total += $rowdp->fundRequestBalanceUsed();
             }
         }
         return $total;

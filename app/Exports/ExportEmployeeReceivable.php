@@ -15,6 +15,9 @@ class ExportEmployeeReceivable implements FromView , WithEvents
     /**
     * @return \Illuminate\Support\Collection
     */
+
+    protected $date;
+
     public function __construct(string $date)
     {
         $this->date = $date ? $date : '';
@@ -38,7 +41,6 @@ class ExportEmployeeReceivable implements FromView , WithEvents
                 $results[] = [
                     'code'          => $row->code,
                     'employee_name' => $row->account->name,
-                    'plant'         => $row->place->code,
                     'post_date'     => date('d/m/Y',strtotime($row->post_date)),
                     'required_date' => date('d/m/Y',strtotime($row->required_date)),
                     'note'          => $row->note,

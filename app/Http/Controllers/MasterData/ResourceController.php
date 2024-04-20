@@ -22,6 +22,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Validators\ValidationException;
 use App\Exports\ExportAsset;
 use App\Models\Resource;
+use App\Models\Unit;
 
 class ResourceController extends Controller
 {
@@ -41,6 +42,7 @@ class ResourceController extends Controller
             'content'       => 'admin.master_data.resource',
             'place'         => Place::where('status','1')->get(),
             'group'         => ResourceGroup::where('status','1')->get(),
+            'unit'          => Unit::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -141,18 +143,22 @@ class ResourceController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code' 				    => $request->temp ? ['required', Rule::unique('assets', 'code')->ignore($request->temp)] : 'required|unique:assets,code',
+            'code' 				    => $request->temp ? ['required', Rule::unique('resources', 'code')->ignore($request->temp)] : 'required|unique:resources,code',
             'name'                  => 'required',
-            'nominal'               => 'required',
-            'method'                => 'required',
-            'asset_group_id'        => 'required',
+            'place_id'              => 'required',
+            'uom_unit'              => 'required',
+            'qty'                   => 'required',
+            'cost'                  => 'required',
+            'resource_group_id'     => 'required',
         ], [
             'code.required' 	            => 'Kode tidak boleh kosong.',
             'code.unique'                   => 'Kode telah terpakai.',
             'name.required'                 => 'Nama tidak boleh kosong.',
-            'nominal.required'              => 'Nominal tidak boleh kosong.',
-            'method.required'               => 'Metode hitung tidak boleh kosong.',
-            'asset_group_id.required'       => 'Grup aset tidak boleh kosong.'
+            'place_id.required'             => 'Plant tidak boleh kosong.',
+            'uom_unit.required'             => 'Satuan tidak boleh kosong.',
+            'qty.required'                  => 'Jumlah qty tidak boleh kosong.',
+            'cost.required'                 => 'Biaya tidak boleh kosong.',
+            'resource_group_id.required'    => 'Grup Resource tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {
@@ -164,17 +170,16 @@ class ResourceController extends Controller
 			if($request->temp){
                 DB::beginTransaction();
                 try {
-                    $query = Asset::find($request->temp);
-                    $query->code            = $request->code;
-                    $query->user_id	        = session('bo_id');
-                    $query->place_id        = $request->place_id ? $request->place_id : NULL;
-                    $query->name	        = $request->name;
-                    $query->asset_group_id	= $request->asset_group_id;
-                    $query->date	        = $request->date;
-                    $query->nominal	        = str_replace(',','.',str_replace('.','',$request->nominal));
-                    $query->method          = $request->method;
-                    $query->note            = $request->note;
-                    $query->status          = $request->status ? $request->status : '2';
+                    $query = Resource::find($request->temp);
+                    $query->code                = $request->code;
+                    $query->place_id            = $request->place_id ? $request->place_id : NULL;
+                    $query->name	            = $request->name;
+                    $query->other_name	        = $request->other_name;
+                    $query->resource_group_id	= $request->resource_group_id;
+                    $query->uom_unit	        = $request->uom_unit;
+                    $query->qty	                = str_replace(',','.',str_replace('.','',$request->qty));
+                    $query->cost	            = str_replace(',','.',str_replace('.','',$request->cost));
+                    $query->status              = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
                 }catch(\Exception $e){
@@ -183,17 +188,16 @@ class ResourceController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
-                    $query = Asset::create([
-                        'code'              => $request->code,
-                        'user_id'			=> session('bo_id'),
-                        'place_id'          => $request->place_id ? $request->place_id : NULL,
-                        'name'              => $request->name,
-                        'asset_group_id'    => $request->asset_group_id,
-                        'date'              => $request->date,
-                        'nominal'           => str_replace(',','.',str_replace('.','',$request->nominal)),
-                        'method'            => $request->method,
-                        'note'              => $request->note,
-                        'status'            => $request->status ? $request->status : '2'
+                    $query = Resource::create([
+                        'code'                      => $request->code,
+                        'place_id'                  => $request->place_id ? $request->place_id : NULL,
+                        'name'	                    => $request->name,
+                        'other_name'	            => $request->other_name,
+                        'resource_group_id'	        => $request->resource_group_id,
+                        'uom_unit'	                => $request->uom_unit,
+                        'qty'	                    => str_replace(',','.',str_replace('.','',$request->qty)),
+                        'cost'	                    => str_replace(',','.',str_replace('.','',$request->cost)),
+                        'status'                    => $request->status ? $request->status : '2',
                     ]);
                     DB::commit();
                 }catch(\Exception $e){
@@ -204,10 +208,10 @@ class ResourceController extends Controller
 			if($query) {
 
                 activity()
-                    ->performedOn(new Asset())
+                    ->performedOn(new Resource())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit asset.');
+                    ->log('Add / edit resource.');
 
 				$response = [
 					'status'  => 200,
@@ -225,21 +229,22 @@ class ResourceController extends Controller
     }
 
     public function show(Request $request){
-        $asset = Asset::find($request->id);
-        $asset['nominal'] = number_format($asset->nominal,2,',','.');
+        $resource = Resource::find($request->id);
+        $resource['cost'] = number_format($resource->cost,2,',','.');
+        $resource['qty'] = number_format($resource->qty,3,',','.');
         				
-		return response()->json($asset);
+		return response()->json($resource);
     }
 
     public function destroy(Request $request){
-        $query = Asset::find($request->id);
+        $query = Resource::find($request->id);
 		
         if($query->delete()) {
             activity()
-                ->performedOn(new Asset())
+                ->performedOn(new Resource())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the asset data');
+                ->log('Delete the resource data');
 
             $response = [
                 'status'  => 200,

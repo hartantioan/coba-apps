@@ -1,5 +1,17 @@
 <!-- BEGIN: Page Main-->
 <style>
+    .modal {
+        top:0px !important;
+    }
+
+    .select2-container--default .select2-selection--multiple, .select2-container--default.select2-container--focus .select2-selection--multiple {
+        height: auto !important;
+    }
+
+    .select-wrapper, .select2-container {
+        height:3.6rem !important;
+    }
+
     body.tab-active input:focus {
         outline: 2px solid green !important; /* Adjust the color and style as needed */
         border-radius: 5px !important;
@@ -95,7 +107,7 @@
                                                         <th>Grup</th>
                                                         <th>Qty</th>
                                                         <th>Satuan</th>
-                                                        <th>Nominal</th>
+                                                        <th>Biaya Rp / 1 Qty</th>
                                                         <th>Plant</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
@@ -117,7 +129,7 @@
 </div>
 
 
-<div id="modal1" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;width:80%;">
+<div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
@@ -127,12 +139,12 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col m4 s6">
+                        <div class="input-field col m3 s6">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" placeholder="Kode">
                             <label class="active" for="code">Kode</label>
                         </div>
-                        <div class="input-field col m4 s6">
+                        <div class="input-field col m3 s6">
                             <select class="form-control" id="place_id" name="place_id">
                                 <option value="">--Kosong--</option>
                                 @foreach ($place as $rowplace)
@@ -141,12 +153,34 @@
                             </select>
                             <label class="" for="place_id">Plant</label>
                         </div>
-                        <div class="input-field col m4 s6">
+                        <div class="input-field col m3 s6">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">Nama</label>
                         </div>
-                        <div class="input-field col m4 s6">
-                            <select class="select2 browser-default" id="asset_group_id" name="asset_group_id">
+                        <div class="input-field col m3 s6">
+                            <input id="other_name" name="other_name" type="text" placeholder="Nama Lain">
+                            <label class="active" for="other_name">Nama Lain</label>
+                        </div>
+                        <div class="input-field col m3 s6">
+                            <select class="browser-default" id="uom_unit" name="uom_unit" onchange="getUnitStock();">
+                                <option value="">--Silahkan pilih--</option>
+                                @foreach ($unit as $row)
+                                    <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' - '.$row->name }}</option>
+                                @endforeach
+                            </select>
+                            <label class="active" for="uom_unit">Satuan</label>
+                        </div>
+                        <div class="input-field col m3 s6">
+                            <input name="qty" id="qty" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);">
+                            <div class="form-control-feedback stock-unit">-</div>
+                            <label class="active" for="qty">Qty</label>
+                        </div>
+                        <div class="input-field col m3 s6">
+                            <input name="cost" id="cost" type="text" value="0,00" onkeyup="formatRupiahTwoDecimal(this);">
+                            <label class="active" for="cost">Biaya Rp / 1 Qty</label>
+                        </div>
+                        <div class="input-field col m3 s6">
+                            <select class="select2 browser-default" id="resource_group_id" name="resource_group_id">
                                 @foreach($group->whereNull('parent_id') as $c)
                                         @if(!$c->childSub()->exists())
                                             <option value="{{ $c->id }}"> - {{ $c->name }}</option>
@@ -185,28 +219,9 @@
                                         @endif
                                 @endforeach
                             </select>
-                            <label class="active" for="asset_group_id">Grup Aset</label>
+                            <label class="active" for="resource_group_id">Grup Resource</label>
                         </div>
-                        <div class="input-field col m4 s12">
-                            <select class="form-control" id="method" name="method">
-                                <option value="1">Straight Line</option>
-                                <option value="2">Declining Balance</option>
-                            </select>
-                            <label class="" for="method">Metode Hitung</label>
-                        </div>
-                        <div class="input-field col m4 s6">
-                            <input id="date" name="date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. kapitalisasi" readonly>
-                            <label class="active" for="date">Tgl. Kapitalisasi (Dari form kapitalisasi)</label>
-                        </div>
-                        <div class="input-field col m4 s6">
-                            <input id="nominal" name="nominal" type="text" placeholder="Nominal Kapitalisasi" value="0" onkeyup="formatRupiah(this)" readonly>
-                            <label class="active" for="nominal">Nominal Awal (Dari form kapitalisasi)</label>
-                        </div>
-                        <div class="input-field col m4 s12">
-                            <textarea id="note" name="note" placeholder="Catatan / Keterangan" rows="1" class="materialize-textarea"></textarea>
-                            <label class="active" for="note">Keterangan</label>
-                        </div>
-                        <div class="input-field col m4 s12">
+                        <div class="input-field col m3 s12">
                             <div class="switch mb-1">
                                 <label for="status">Status</label>
                                 <label>
@@ -417,7 +432,7 @@
                 
             },
             onOpenEnd: function(modal, trigger) { 
-                $('#name').focus();
+                $('#code').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
@@ -425,7 +440,8 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                $('#asset_group_id').val($('#asset_group_id option:eq(0)').val()).trigger('change');
+                $("#resource_group_id").val($("#resource_group_id option:first").val()).trigger('change');
+                $("#uom_unit").val($("#uom_unit option:first").val()).trigger('change');
                 M.updateTextFields();
             }
         });
@@ -445,11 +461,21 @@
 
         $('#place_id').val("{{ session('bo_place_id') }}").formSelect();
         
-        $("#asset_group_id").select2({
+        $("#uom_unit,#resource_group_id").select2({
             dropdownAutoWidth: true,
             width: '100%',
         });
+
+        $('.stock-unit').text('-');
     });
+
+    function getUnitStock(){
+        if($('#uom_unit').val()){
+            $('.stock-unit').text($("#uom_unit").select2().find(":selected").data("code"));
+        }else{
+            $('.stock-unit').text('-');
+        }
+    }
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
@@ -632,12 +658,12 @@
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
+                $('#other_name').val(response.other_name);
                 $('#place_id').val(response.place_id).formSelect();
-                $('#asset_group_id').val(response.asset_group_id).trigger('change');
-                $('#date').val(response.date);
-                $('#nominal').val(response.nominal);
-                $('#method').val(response.method).formSelect();
-                $('#note').val(response.note);
+                $('#resource_group_id').val(response.resource_group_id).trigger('change');
+                $('#uom_unit').val(response.uom_unit).trigger('change');
+                $('#qty').val(response.qty);
+                $('#cost').val(response.cost);
 
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);

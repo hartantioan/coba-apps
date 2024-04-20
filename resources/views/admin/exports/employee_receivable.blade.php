@@ -4,7 +4,6 @@
             <th class="center-align">No.</th>
             <th class="center-align">No.FREQ</th>
             <th class="center-align">Karyawan</th>
-            <th class="center-align">Plant</th>
             <th class="center-align">Tgl.Pengajuan</th>
             <th class="center-align">Tgl.Req.Bayar</th>
             <th class="center-align">Keterangan</th>
@@ -23,7 +22,6 @@
                 <td class="center-align">{{ $key + 1 }}</td>
                 <td>{{ $row['code'] }}</td>
                 <td>{{ $row['employee_name'] }}</td>
-                <td>{{ $row['plant'] }}</td>
                 <td>{{ $row['post_date'] }}</td>
                 <td>{{ $row['required_date'] }}</td>
                 <td>{{ $row['note'] }}</td>
@@ -38,7 +36,7 @@
         @endforeach
         @if(count($data) == 0)
             <tr>
-                <td colspan="14" align="center">
+                <td colspan="13" align="center">
                     Data tidak ditemukan
                 </td>
             </tr>
@@ -47,7 +45,7 @@
     </tbody>
     <tfoot>
         <tr>
-            <td colspan="13">Total</td>
+            <td colspan="12">Total</td>
             <td align="right">{{ $totalall }}</td>
         </tr>
     </tfoot>

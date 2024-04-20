@@ -261,7 +261,7 @@ class FundRequest extends Model
         $total = 0;
         foreach($this->fundRequestDetail as $row){
             if($row->purchaseDownPaymentDetail()->exists()){
-                $total += $row->purchaseDownPaymentDetail->fundRequestBalanceUsed();
+                $total += $row->fundRequestBalanceUsed();
             }
         }
         return $total;

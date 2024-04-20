@@ -215,10 +215,14 @@ class FundRequest extends Model
     public function totalReceivable(){
         $total = 0;
         if($this->document_status == '3'){
-            foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
-                $query->whereHas('outgoingPayment');
-            })->get() as $row){
-                $total += $row->nominal;
+            if($this->account->type == '1'){
+                foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+                    $query->whereHas('outgoingPayment');
+                })->get() as $row){
+                    $total += $row->nominal;
+                }
+            }else{
+                $total = $this->grandtotal;
             }
         }
         return $total;

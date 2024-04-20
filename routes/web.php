@@ -44,6 +44,7 @@ use App\Http\Controllers\Purchase\PriceHistoryPOController;
 use App\Http\Controllers\Purchase\PurchasePaymentHistoryController;
 use App\Http\Controllers\Purchase\PurchaseReportController;
 use App\Http\Controllers\Setting\ChangeLogController;
+use App\Http\Controllers\Setting\UsedDataController;
 use App\Http\Controllers\Usage\ReceptionHardwareItemUsageController;
 use App\Http\Controllers\Usage\ReturnHardwareItemUsageController;
 use App\Http\Controllers\Usage\RequestRepairHardwareItemUsageController;
@@ -1159,6 +1160,14 @@ Route::prefix('admin')->group(function () {
                     Route::post('create',[ApprovalController::class, 'create'])->middleware('operation.access:approval,update');
                     Route::post('show', [ApprovalController::class, 'show']);
                     Route::post('destroy', [ApprovalController::class, 'destroy'])->middleware('operation.access:approval,delete');
+                });
+
+                Route::prefix('used_data')->middleware('operation.access:used_data,view')->group(function () {
+                    Route::get('/',[UsedDataController::class, 'index']);
+                    Route::get('datatable',[UsedDataController::class, 'datatable']);
+                    Route::post('create',[UsedDataController::class, 'create'])->middleware('operation.access:used_data,update');
+                    Route::post('show', [UsedDataController::class, 'show']);
+                    Route::post('destroy', [UsedDataController::class, 'destroy'])->middleware('operation.access:used_data,delete');
                 });
 
                 Route::prefix('approval_stage')->middleware('operation.access:approval_stage,view')->group(function () {

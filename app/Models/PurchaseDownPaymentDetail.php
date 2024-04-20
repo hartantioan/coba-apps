@@ -38,7 +38,7 @@ class PurchaseDownPaymentDetail extends Model
     public function fundRequestBalanceUsed(){
         $total = $this->nominal;
         $totalDP = $this->purchaseDownPayment->grandtotal;
-        $totalUsed = $this->purchaseDownPayment->balanceInvoice();
+        $totalUsed = $this->purchaseDownPayment->totalInvoice();
         $bobot = $total / $totalDP;
         $totalreturn = $bobot * $totalUsed;
         return $totalreturn;

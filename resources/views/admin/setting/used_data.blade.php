@@ -103,6 +103,7 @@
                                                         <th>Code</th>
                                                         <th>Nama</th>
                                                         <th>Ref</th>
+                                                        <th>Terakhir Diperbarui</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
@@ -496,6 +497,7 @@
                 { name: 'code', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'place', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'updated_at', searchable: false, orderable: true, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',

@@ -260,7 +260,7 @@ class TreeHelper {
                                 "name" => $row_pyr_detail->paymentRequest->code,
                                 'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
                             ];
-            
+                           
                             $data_go_chart[]=$data_pyr_tempura;
                             $data_link[]=[
                                 'from'=>$row_pyr_detail->paymentRequest->code,
@@ -271,7 +271,7 @@ class TreeHelper {
                                 
                             
                             if($row_pyr_detail->fundRequest()){
-                            
+                                
                                 $data_fund_tempura=[
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row_pyr_detail->lookable->code],
@@ -321,7 +321,7 @@ class TreeHelper {
                     if($query->paymentRequestCross()){
                        
                         foreach($query->paymentRequestCross as $row_pyr_cross){
-                                
+                           
                             $data_pyrc_tempura = [
                                 'properties'=> [
                                     ['name'=> "Tanggal :".$row_pyr_cross->lookable->post_date],
@@ -329,7 +329,7 @@ class TreeHelper {
                                 ],
                                 "key" => $row_pyr_cross->lookable->code,
                                 "name" => $row_pyr_cross->lookable->code,
-                                'url'=>request()->root()."/admin/finance/outgoing_payment?code=".CustomHelper::encrypt($row_pyr_cross->lookable->code),  
+                                'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_cross->lookable->code),  
                             ];
                 
                             $data_go_chart[]=$data_pyrc_tempura;
@@ -978,7 +978,7 @@ class TreeHelper {
                                     ],
                                     "key" => $row_pyr_cross->lookable->code,
                                     "name" => $row_pyr_cross->lookable->code,
-                                    'url'=>request()->root()."/admin/finance/outgoing_payment?code=".CustomHelper::encrypt($row_pyr_cross->lookable->code),  
+                                    'url'=>request()->root()."/admin/finance/payment_requests?code=".CustomHelper::encrypt($row_pyr_cross->lookable->code),  
                                 ];
                     
                                 $data_go_chart[]=$data_pyrc_tempura;
@@ -1012,7 +1012,7 @@ class TreeHelper {
                             'properties'=> [
                                 ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query_pyrc->paymentRequest->post_date))],
                             ],
-                            'url'   =>request()->root()."/admin/finance/outgoing_payment?code=".CustomHelper::encrypt($query_pyrc->paymentRequest->code),
+                            'url'   =>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($query_pyrc->paymentRequest->code),
                             "title" =>$query_pyrc->paymentRequest->code,
                         ];
                         $data_go_chart[]=$data_pyr_tempura;

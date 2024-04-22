@@ -191,7 +191,6 @@
                                 </div>
                                 <div class="input-field col m3 s12">
                                     <select class="form-control" id="document_status" name="document_status">
-                                        <option value="1">Menunggu</option>
                                         <option value="2">Lengkap</option>
                                         <option value="3">Tidak Lengkap</option>
                                     </select>

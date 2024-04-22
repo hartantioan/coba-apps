@@ -101,6 +101,9 @@ class LockPeriodController extends Controller
                 if($request->status){
                     $query->whereIn('status', $request->status);
                 }
+                if($request->status_closing){
+                    $query->whereIn('status_closing', $request->status_closing);
+                }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->offset($start)
@@ -127,6 +130,10 @@ class LockPeriodController extends Controller
 
                 if($request->status){
                     $query->whereIn('status', $request->status);
+                }
+
+                if($request->status_closing){
+                    $query->whereIn('status_closing', $request->status_closing);
                 }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")

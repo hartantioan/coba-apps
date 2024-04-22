@@ -79,6 +79,17 @@
                                                     <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
+                                            <div class="col m12 s12 "></div>
+                                            <div class="col m4 s6 ">
+                                                <label for="filter_status_closing" style="font-size:1rem;">Status Closing:</label>
+                                                <div class="input-field">
+                                                    <select class="form-control" id="filter_status_closing" onchange="loadDataTable()" multiple>
+                                                        <option value="1">Buka</option>
+                                                        <option value="2">Tutup</option>
+                                                        <option value="3">Kunci</option>
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>  
                                     </div>
                                 </li>
@@ -419,6 +430,7 @@
                     'status' : $('#filter_status').val(),
                     start_date : $('#start_date').val(),
                     finish_date : $('#finish_date').val(),
+                    'status_closing' : $('#filter_status_closing').val(),
                 },
                 beforeSend: function() {
                     loadingOpen('#datatable_serverside');

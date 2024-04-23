@@ -129,7 +129,6 @@ class PersonalCloseBillController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
-                            ->orWhere('required_date', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
@@ -161,7 +160,6 @@ class PersonalCloseBillController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
-                            ->orWhere('required_date', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")

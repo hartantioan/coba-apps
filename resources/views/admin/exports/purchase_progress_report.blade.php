@@ -89,26 +89,26 @@
             <th>IR Date</th>
             <th>IR Qty</th>
             <th>IR Status</th>
-            <th>IR Done User</th>
-            <th>IR Done Date</th>
+            <th>IR Updated By</th>
+            {{-- <th>IR Done Date</th> --}}
             <th>PR Code</th>
             <th>PR Date</th>
             <th>PR Qty</th>
             <th>PR Status</th>
-            <th>PR Done User</th>
-            <th>PR Done Date</th>
+            <th>PR Updated By</th>
+            {{-- <th>PR Done Date</th> --}}
             <th>PO Code</th>
             <th>PO Date</th>
             <th>PO Qty</th>
             <th>PO Status</th>
-            <th>PO Done User</th>
-            <th>PO Done Date</th>
+            <th>PO Updated By</th>
+            {{-- <th>PO Done Date</th> --}}
             <th>GRPO Code</th>
             <th>GRPO Date</th>
             <th>GRPO Qty</th>
             <th>GRPO Status</th>
-            <th>GRPO Done User</th>
-            <th>GRPO Done Date</th>
+            <th>GRPO Updated By</th>
+            {{-- <th>GRPO Done Date</th> --}}
             <th>Outstanding</th>
         </tr>
     </thead>
@@ -147,14 +147,14 @@
                                     <td>{{ $row['ir_qty'] }}</td>
                                     <td>{{ $row['status'] }}</td>
                                     <td>{{ $row['done_user'] }}</td>
-                                    <td>{{ $row['done_date'] }}</td>
+                                    {{-- <td>{{ $row['done_date'] }}</td> --}}
                              
                                     <td>{{ $pr['pr_code'] }}</td>
                                     <td>{{ $pr['pr_date'] }}</td>
                                     <td>{{ $pr['pr_qty'] }}</td>
                                     <td>{{ $pr['status'] }}</td>
                                     <td>{{ $pr['done_user'] }}</td>
-                                    <td>{{ $pr['done_date'] }}</td>
+                                    {{-- <td>{{ $pr['done_date'] }}</td> --}}
                                 
                             
                                     <td >{{ $po['po_code'] }}</td>
@@ -162,14 +162,14 @@
                                     <td >{{ $po['po_qty'] }}</td>
                                     <td >{{ $po['status'] }}</td>
                                     <td>{{ $po['done_user'] }}</td>
-                                    <td>{{ $po['done_date'] }}</td>
+                                    {{-- <td>{{ $po['done_date'] }}</td> --}}
                            
                                 <td>{{ $grpo['grpo_code'] }}</td>
                                 <td>{{ $grpo['grpo_date'] }}</td>
                                 <td>{{ $grpo['grpo_qty'] }}</td>
                                 <td>{{ $grpo['status'] }}</td>
                                 <td>{{ $grpo['done_user'] }}</td>
-                                <td>{{ $grpo['done_date'] }}</td>
+                                {{-- <td>{{ $grpo['done_date'] }}</td> --}}
                                 <td>{{ $grpo['outstanding'] }}</td>
                             </tr>
                         @endif

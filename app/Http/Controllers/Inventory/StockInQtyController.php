@@ -48,7 +48,8 @@ class StockInQtyController extends Controller
         $start_time = microtime(true);
 
         $array_filter=[];
-       
+        $query_item = Item::whereDoesntHave('itemStock')->get();
+        
         // $query_data = Item::where(function($query) use ($request) {
         //     if ($request->item_id) {
         //         $query->where('id', $request->item_id);
@@ -66,7 +67,7 @@ class StockInQtyController extends Controller
         // })->get();
         $query_data = ItemStock::join('items', 'item_stocks.item_id', '=', 'items.id')
         ->where(function ($query) use ($request) {
-            $query->where('items.status', 1);
+            $query->whereIn('items.status',['1','2']);
             
             if ($request->item_id) {
                 $query->where('item_stocks.item_id', $request->item_id);
@@ -93,18 +94,22 @@ class StockInQtyController extends Controller
         
         foreach($query_data as $row){
             if($row->item()->exists()){
-                $data_tempura = [
-                    'item_id' => CustomHelper::encrypt($row->code),
-                    'plant' => $row->place->code,
-                    'gudang' => $row->warehouse->name ?? '',
-                    'kode' => $row->item->code,
-                    'item' => $row->item->name,
-                    'final'=>CustomHelper::formatConditionalQty($row->qty),
-                    'satuan'=>$row->item->uomUnit->code,
-                    'perlu' =>1,
-                ];
+                if($row->qty > 0){
+                    $data_tempura = [
+                        'item_id' => CustomHelper::encrypt($row->code),
+                        'plant' => $row->place->code,
+                        'gudang' => $row->warehouse->name ?? '',
+                        'kode' => $row->item->code,
+                        'item' => $row->item->name,
+                        'final'=>CustomHelper::formatConditionalQty($row->qty),
+                        'satuan'=>$row->item->uomUnit->code,
+                        'perlu' =>1,
+                    ];
+                    $array_filter[]=$data_tempura;
+                }
+                
             
-                $array_filter[]=$data_tempura;
+                
             }
         }
         

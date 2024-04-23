@@ -95,7 +95,7 @@ class StockMovementController extends Controller
             $perlu = 1;
             $query_data = ItemCogs::where(function($query) use ( $request) {
                 $query->whereHas('item',function($query){
-                    $query->where('status',1);
+                    $query->whereIn('status',['1','2']);
                 });
                 if($request->start_date && $request->finish_date) {
                     $query->whereDate('date', '>=', $request->start_date)

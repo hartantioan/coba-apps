@@ -335,6 +335,11 @@ class Item extends Model
         return $this->hasMany('App\Models\ItemStock','item_id','id');
     }
 
+    public function itemCogs()
+    {
+        return $this->hasMany('App\Models\ItemCogs','item_id','id');
+    }
+
     public function itemBuffer()
     {
         return $this->hasMany('App\Models\ItemBuffer','item_id','id');

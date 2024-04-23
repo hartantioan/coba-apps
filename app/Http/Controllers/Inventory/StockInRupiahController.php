@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\DB;
 use App\Exports\ExportStockInRupiah;
 use App\Http\Controllers\Controller;
 use App\Models\ItemCogs;
+use App\Models\Item;
 use App\Models\ItemGroup;
 use App\Models\Place;
 use App\Models\Warehouse;
@@ -44,6 +45,37 @@ class StockInRupiahController extends Controller
     
     public function filter(Request $request){
         $start_time = microtime(true);
+        
+        // $query_item = Item::whereDoesntHave('itemCogs')->get();
+        // $query_item2 = Item::whereHas('itemCogs')->get();
+        // $query_items = Item::whereIn('status',['1','2'])->get();
+        // info(count($query_items));
+        // info(count($query_item2));
+        // foreach($query_item as $row_item){
+           
+           
+        //     $data_tempura = [
+        //         'item_id'      => $row_item->id,
+        //         'perlu'        => 1,
+        //         'plant' => $row_item->place->code ?? null,
+        //         'warehouse' => $row_item->warehouse->name ?? '',
+        //         'item' => $row_item->name,
+        //         'satuan' => $row_item->uomUnit->code,
+        //         'kode' => $row_item->code??'',
+        //         'final'=>   0,
+        //         'total'=>   0,
+        //         'qty' =>    0,
+        //         'date' =>  'no date',
+        //         'document' => 'no document',
+        //         'cum_qty' => 0,
+        //         'cum_val' => 0,
+        //         'last_nominal' => 0,
+        //         'last_qty' => 0,
+
+        //     ];
+        //     $array_filter[]=$data_tempura;
+        // }
+        
         DB::statement("SET SQL_MODE=''");
         if($request->type == 'final'){
             $perlu = 0 ;
@@ -126,10 +158,9 @@ class StockInRupiahController extends Controller
             ->orderBy('date')
             ->get();
         }
-      
         $cum_qty = 0;
         $cum_val = 0 ;
-        $array_filter=[];
+        
         $firstDate = null;
         $uom_unit = null;
         $previousId = null;
@@ -293,6 +324,7 @@ class StockInRupiahController extends Controller
         foreach ($array_first_item as $item) {
             $combinedArray[] = $item;
         }
+        
         usort($combinedArray, function ($a, $b) {
             // First, sort by 'kode' in ascending order
             $kodeComparison = strcmp($a['kode'], $b['kode']);
@@ -308,11 +340,11 @@ class StockInRupiahController extends Controller
         if($request->type == 'final'){
             $combinedArray=$array_filter;
         }
-        
+      
         $end_time = microtime(true);
        
         $execution_time = ($end_time - $start_time);
-        info($all_total);
+       
         $response =[
             'status'=>200,
             'message'       => $combinedArray,

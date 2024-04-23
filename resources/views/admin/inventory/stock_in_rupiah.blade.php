@@ -306,7 +306,7 @@
                                             <td class="right-align">`+val.final+`</td>
                                             <td class="right-align">`+val.total+`</td>
                                             <td class="right-align">`+val.cum_qty+`</td>
-                                            <td class="right-align">`+val.cum_val+` adx</td>
+                                            <td class="right-align">`+val.cum_val+`</td>
                                         </tr>
                                     `);
                                 }         

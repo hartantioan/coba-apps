@@ -143,6 +143,12 @@ class PurchaseOrderDetail extends Model
         });
     }
 
+    public function goodReceiptDetailProgressReport(){
+        return $this->hasMany('App\Models\GoodReceiptDetail','purchase_order_detail_id','id')->whereHas('goodReceipt',function($query){
+            $query->whereIn('status',['1','2','3','4','5','6']);
+        });
+    }
+
     public function priceAfterDiscount(){
         $total = 0;
         $rowprice = 0;

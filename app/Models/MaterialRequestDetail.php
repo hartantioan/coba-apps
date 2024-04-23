@@ -92,6 +92,13 @@ class MaterialRequestDetail extends Model
         });
     }
 
+    public function purchaseRequestDetailProgressReport()
+    {
+        return $this->hasMany('App\Models\PurchaseRequestDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('purchaseRequest',function($query){
+            $query->whereIn('status',['1','2','3','4','5','6']);
+        });
+    }
+
     public function goodIssueDetail()
     {
         return $this->hasMany('App\Models\GoodIssueDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('goodIssue',function($query){

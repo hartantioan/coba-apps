@@ -24,7 +24,7 @@ class ExportStockInQty implements FromView,ShouldAutoSize
     {
         $query_data = ItemStock::join('items', 'item_stocks.item_id', '=', 'items.id')
         ->where(function ($query) {
-            $query->where('items.status', 1);
+            $query->whereIn('items.status', ['1','2']);
             if ($this->item) {
                 $query->where('item_stocks.item_id', $this->item);
             }
@@ -52,19 +52,19 @@ class ExportStockInQty implements FromView,ShouldAutoSize
         $array_filter = [];
        
         foreach($query_data as $row){
+            if($row->qty > 0){
+                $data_tempura = [
+                    'plant' => $row->place->code,
+                    'gudang' => $row->warehouse->name ?? '',
+                    'kode' => $row->item->code,
+                    'item' => $row->item->name,
+                    'final'=> $row->qty,
+                    'satuan'=>$row->item->uomUnit->code,
+                    'perlu' =>1,
+                ];
             
-            $data_tempura = [
-                'plant' => $row->place->code,
-                'gudang' => $row->warehouse->name ?? '',
-                'kode' => $row->item->code,
-                'item' => $row->item->name,
-                'final'=> $row->qty,
-                'satuan'=>$row->item->uomUnit->code,
-                'perlu' =>1,
-            ];
-        
-            $array_filter[]=$data_tempura;
-            
+                $array_filter[]=$data_tempura;
+            }
             
         }
       

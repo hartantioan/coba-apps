@@ -45,8 +45,8 @@
                         <td align="center">{{$row['item']}}</td>
                         <td align="center">{{$row['satuan']}}</td>
                         <td align="center">{{$row['document']}}</td>
-                        <td align="center">{{$row['qty']}}</td>
-                        <td align="center">{{$row['cum_qty']}}</td>
+                        <td align="right">{{$row['qty']}}</td>
+                        <td align="right">{{$row['cum_qty']}}</td>
                     </tr>
                     
                 @endif

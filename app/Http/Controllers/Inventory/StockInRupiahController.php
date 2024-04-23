@@ -45,7 +45,7 @@ class StockInRupiahController extends Controller
     
     public function filter(Request $request){
         $start_time = microtime(true);
-        
+        $array_filter = [];
         // $query_item = Item::whereDoesntHave('itemCogs')->get();
         // $query_item2 = Item::whereHas('itemCogs')->get();
         // $query_items = Item::whereIn('status',['1','2'])->get();

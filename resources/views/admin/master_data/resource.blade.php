@@ -256,7 +256,7 @@
                     @csrf
                     <div class="file-field input-field col m6 s12">
                         <div class="btn">
-                            <span>Dokumen PO</span>
+                            <span>Dokumen</span>
                             <input type="file" class="form-control-file" id="fileExcel" name="file">
                         </div>
                         <div class="file-path-wrapper">
@@ -801,9 +801,8 @@
     function exportExcel(){
         var search = window.table.search();
         var status = $('#filter_status').val();
-        var balance = $('#filter_balance').val();
         
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&balance=" + balance;
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status;
     }
 
     var printService = new WebSocketPrinter({
@@ -821,12 +820,11 @@
     });
 
     function print(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), account = $('#filter_account').val();
+        var search = window.table.search(), status = $('#filter_status').val();
         arr_id_temp=[];
         $.map(window.table.rows('.selected').nodes(), function (item) {
             var poin = $(item).find('td:nth-child(2)').text().trim();
             arr_id_temp.push(poin);
-           
         });
         
         $.ajax({

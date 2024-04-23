@@ -773,6 +773,8 @@ Route::prefix('admin')->group(function () {
                         Route::post('show', [ResourceController::class, 'show']);
                         Route::post('print',[ResourceController::class, 'print']);
                         Route::get('export',[ResourceController::class, 'export']);
+                        Route::get('get_import_excel',[ResourceController::class, 'getImportExcel']);
+                        Route::post('import',[ResourceController::class, 'import'])->middleware('operation.access:resource,update');
                         Route::post('create',[ResourceController::class, 'create'])->middleware('operation.access:resource,update');
                         Route::post('destroy', [ResourceController::class, 'destroy'])->middleware('operation.access:resource,delete');
                     });

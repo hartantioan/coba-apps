@@ -254,7 +254,7 @@
                     @csrf
                     <div class="file-field input-field col m6 s12">
                         <div class="btn">
-                            <span>Dokumen PO</span>
+                            <span>File Upload</span>
                             <input type="file" class="form-control-file" id="fileExcel" name="file">
                         </div>
                         <div class="file-path-wrapper">

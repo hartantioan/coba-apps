@@ -21,6 +21,9 @@ use App\Imports\ImportAsset;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Validators\ValidationException;
 use App\Exports\ExportAsset;
+use App\Exports\ExportResource;
+use App\Exports\ExportTemplateMasterResource;
+use App\Imports\ImportResource;
 use App\Models\Resource;
 use App\Models\Unit;
 
@@ -285,7 +288,7 @@ class ResourceController extends Controller
         }
 
         try {
-            Excel::import(new ImportAsset, $request->file('file'));
+            Excel::import(new ImportResource, $request->file('file'));
 
             return response()->json([
                 'status'    => 200,
@@ -320,7 +323,7 @@ class ResourceController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportAsset($request->search,$request->status,$request->balance,$this->dataplaces), 'asset_'.uniqid().'.xlsx');
+		return Excel::download(new ExportResource($request->search,$request->status), 'resource_'.uniqid().'.xlsx');
     }
 
     public function print(Request $request){
@@ -328,7 +331,7 @@ class ResourceController extends Controller
         $validation = Validator::make($request->all(), [
             'arr_id'                => 'required',
         ], [
-            'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
+            'arr_id.required'       => 'Tolong pilih baris yang ingin di print terlebih dahulu.',
         ]);
         
         if($validation->fails()) {
@@ -341,11 +344,10 @@ class ResourceController extends Controller
             $currentDateTime = Date::now();
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             foreach($request->arr_id as $key =>$row){
-                $pr[]= Asset::where('code',$row)->first();
-
+                $pr[] = Resource::where('code',$row)->first();
             }
             $data = [
-                'title'     => 'Master BOM',
+                'title'     => 'Master Resource',
                 'data'      => $pr
             ];  
             $img_path = 'website/logo_web_fix.png';
@@ -354,7 +356,7 @@ class ResourceController extends Controller
             $img_base_64 = base64_encode($image_temp);
             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
             $data["image"]=$path_img;
-            $pdf = Pdf::loadView('admin.print.master_data.asset', $data)->setPaper('a5', 'landscape');
+            $pdf = Pdf::loadView('admin.print.master_data.resource', $data)->setPaper('a5', 'landscape');
             $pdf->render();
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -385,6 +387,6 @@ class ResourceController extends Controller
     }
 
     public function getImportExcel(){
-        return Excel::download(new ExportTemplateMasterAsset(), 'format_master_asset'.uniqid().'.xlsx');
+        return Excel::download(new ExportTemplateMasterResource(), 'format_master_resource'.uniqid().'.xlsx');
     }
 }

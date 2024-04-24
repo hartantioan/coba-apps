@@ -244,8 +244,9 @@ class EmployeeScheduleController extends Controller
                 }
             ]
         ]);
-
+        
         if ($validator->fails()) {
+          
             $response = [
                 'status' => 432,
                 'error'  => $validator->errors()
@@ -253,7 +254,7 @@ class EmployeeScheduleController extends Controller
             return response()->json($response);
         }
 
-        try {
+        // try {
             Excel::import(new ImportEmployeeSchedule, $request->file('file'));
 
             return response()->json([
@@ -261,31 +262,32 @@ class EmployeeScheduleController extends Controller
                 'message'   => 'Import sukses!'
             ]);
             
-        } catch (ValidationException $e) {
-            $failures = $e->failures();
+        // } catch (ValidationException $e) {
+            // $failures = $e->failures();
+          
+            // $errors = [];
+            // foreach ($failures as $failure) {
+            //     $errors[] = [
+            //         'row' => $failure->row(),
+            //         'attribute' => $failure->attribute(),
+            //         'errors' => $failure->errors(),
+            //         'values' => $failure->values(),
+            //     ];
+            // }
+            // $response = [
+            //     'status' => 422,
+            //     'error'  => $errors
+            // // ];
 
-            $errors = [];
-            foreach ($failures as $failure) {
-                $errors[] = [
-                    'row' => $failure->row(),
-                    'attribute' => $failure->attribute(),
-                    'errors' => $failure->errors(),
-                    'values' => $failure->values(),
-                ];
-            }
-            $response = [
-                'status' => 422,
-                'error'  => $errors
-            ];
-
-            return response()->json($response);
-        } catch (\Exception $e) {
+            // return response()->json($response);
+        // } catch (\Exception $e) {
             $response = [
                 'status'  => 500,
                 'message' => "Data failed to save"
             ];
+            info('asw');
             return response()->json($response);
-        }
+        // }
     }
 
     public function createMulti(Request $request)

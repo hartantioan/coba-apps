@@ -214,6 +214,7 @@ class ItemController extends Controller
                     $val->status(),
                     $btnShading.
                     '
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-text btn-small" data-popup="tooltip" title="Document Relasi" onclick="documentRelation(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">device_hub</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
 					'
@@ -948,6 +949,126 @@ class ItemController extends Controller
 
     public function getImportExcel(){
         return Excel::download(new ExportTemplateMasterItem(), 'format_master_item'.uniqid().'.xlsx');
+    }
+
+    public function documentRelation(Request $request)
+    {
+        $data   = Item::where('code',CustomHelper::decrypt($request->id))->first();
+
+        $string = '<div class="row pt-1 pb-1"> <div class="col s12">'.$data->code.'-'.$data->name.'</div><div class="col s12"><table style="min-width:100%;max-width:100%;">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="16">Daftar Item (Stok yang tampil adalah stok realtime pada saat dokumen dibuat)</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">No.</th>
+                                <th class="center-align">Dokumen</th>
+                                <th class="center-align">Qty Dokumen</th>
+                                <th class="center-align">Qty Outstanding</th>
+                                <th class="center-align">Satuan</th>
+                                <th class="center-align">Status Dokumen</th>
+                            </tr>
+                        </thead><tbody>';
+        $no = 1; 
+        if($data->materialRequestDetail()->exists()){
+         
+            foreach($data->materialRequestDetail as $row_mr_d){
+                if($row_mr_d->deleted_at == null){
+                    $string .= '<tr>
+                        <td class="center-align">'.$no.'</td>
+                        <td>'.$row_mr_d->materialRequest->code.'</td>
+                        <td>'.CustomHelper::formatConditionalQty($row_mr_d->qty).'</td>
+                        <td>'.CustomHelper::formatConditionalQty($row_mr_d->balancePr()).'</td>
+                        <td class="center-align">'.$data->uomUnit->code.'</td>
+                        <td class="center-align">'.$row_mr_d->materialRequest->status().'</td>
+                    </tr>';
+                    $no++;
+                }
+                
+               
+            }
+        }
+        if($data->purchaseRequestDetail()->exists()){
+            foreach($data->purchaseRequestDetail as $row_pr_d){
+                if($row_pr_d->deleted_at == null){
+                    $string .= '<tr>
+                        <td class="center-align">'.$no.'</td>
+                        <td>'.$row_pr_d->purchaseRequest->code.'</td>
+                        <td>'.CustomHelper::formatConditionalQty($row_pr_d->qty).'</td>
+                        <td>'.CustomHelper::formatConditionalQty($row_pr_d->qtyBalance()).'</td>
+                        <td class="center-align">'.$data->uomUnit->code.'</td>
+                        <td class="center-align">'.$row_pr_d->purchaseRequest->status().'</td>
+                    </tr>';
+                    $no++;
+                }
+            }
+        }
+        if($data->purchaseOrderDetail()->exists()){
+            foreach($data->purchaseOrderDetail as $row_po_d){
+                if($row_po_d->deleted_at == null){
+                    $string .= '<tr>
+                        <td class="center-align">'.$no.'</td>
+                        <td>'.$row_po_d->purchaseOrder->code.'</td>
+                        <td>'.CustomHelper::formatConditionalQty($row_po_d->qty).'</td>
+                        <td>'.CustomHelper::formatConditionalQty($row_po_d->getBalanceReceipt()).'</td>
+                        <td class="center-align">'.$data->uomUnit->code.'</td>
+                        <td class="center-align">'.$row_po_d->purchaseOrder->status().'</td>
+                    </tr>';
+                    $no++;
+                }
+            }
+        }
+        if($data->goodReceiptDetail()->exists()){
+            foreach($data->goodReceiptDetail as $row_gr_d){
+                if($row_gr_d->deleted_at == null){
+                    $string .= '<tr>
+                        <td class="center-align">'.$no.'</td>
+                        <td>'.$row_gr_d->goodReceipt->code.'</td>
+                        <td>'.CustomHelper::formatConditionalQty($row_gr_d->qty).'</td>
+                        <td>'.CustomHelper::formatConditionalQty($row_gr_d->balanceQtyInvoice()).'</td>
+                        <td class="center-align">'.$data->uomUnit->code.'</td>
+                        <td class="center-align">'.$row_gr_d->goodReceipt->status().'</td>
+                    </tr>';
+                    $no++;
+                }
+            }
+        }
+
+        if($data->goodIssueRequestDetail()->exists()){
+            foreach($data->goodIssueRequestDetail as $row_gir_d){
+                if($row_gir_d->deleted_at == null){
+                    $string .= '<tr>
+                        <td class="center-align">'.$no.'</td>
+                        <td>'.$row_gir_d->goodIssue->code.'</td>
+                        <td>'.CustomHelper::formatConditionalQty($row_gir_d->qty).'</td>
+                        <td>'.CustomHelper::formatConditionalQty($row_gir_d->qtyBalanceReturn()).'</td>
+                        <td class="center-align">'.$data->uomUnit->code.'</td>
+                        <td class="center-align">'.$row_gir_d->goodIssue->status().'</td>
+                    </tr>';
+                    $no++;
+                }
+            }
+        }
+
+        if($data->landedCostDetail()->exists()){
+            foreach($data->landedCostDetail as $row_lc_d){
+                if($row_lc_d->deleted_at == null){
+                    $string .= '<tr>
+                        <td class="center-align">'.$no.'</td>
+                        <td>'.$row_lc_d->landedCost->code.'</td>
+                        <td>'.$row_lc_d->qty.'</td>
+                        <td>-</td>
+                        <td class="center-align">'.$data->uomUnit->code.'</td>
+                        <td class="center-align">'.$row_lc_d->landedCost->status().'</td>
+                    </tr>';
+                    $no++;
+                }
+            }
+        }
+
+        $string .= '</tbody></table></div>';
+		
+        return response()->json($string);
     }
     
 }

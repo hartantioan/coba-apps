@@ -695,6 +695,7 @@ Route::prefix('admin')->group(function () {
                         Route::post('create_shading',[ItemController::class, 'createShading'])->middleware('operation.access:item,update');
                         Route::post('destroy', [ItemController::class, 'destroy'])->middleware('operation.access:item,delete');
                         Route::post('destroy_shading', [ItemController::class, 'destroyShading'])->middleware('operation.access:item,delete');
+                        Route::get('document_relation',[ItemController::class, 'documentRelation']);
                     });
 
                     Route::prefix('warehouse')->middleware('operation.access:warehouse,view')->group(function () {

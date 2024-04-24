@@ -85,6 +85,7 @@
     <thead>
         <tr>
             <th>Item</th>
+            <th>Created</th>
             <th>IR Code</th>
             <th>IR Date</th>
             <th>IR Qty</th>
@@ -142,6 +143,7 @@
                             <tr>
                                 
                                     <td>{{ $row['item'] }}</td>
+                                    <td>{{ $row['user'] }}</td>
                                     <td>{{ $row['ir_code'] }}</td>
                                     <td>{{ $row['ir_date'] }}</td>
                                     <td>{{ $row['ir_qty'] }}</td>

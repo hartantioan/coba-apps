@@ -435,6 +435,28 @@
                             <li>Pihak supplier tidak diperbolehkan memberikan uang dan/atau hadiah dalam bentuk apapun kepada karyawan/staff {{ $data->company->name }}. Jika melanggar akan diproses secara hukum dan seluruh sisa tagihan dianggap lunas.</li>
                         </ol>
                     </div>
+                    <table class="table-bot1" width="100%" border="0">
+                        <tr>
+                            @if($data->approval())
+                                @foreach ($data->approval() as $detail)
+                                    @foreach ($detail->approvalMatrix()->where('status','2')->get() as $row)
+                                        <td class="center-align">
+                                            {{ $row->approvalTemplateStage->approvalStage->approval->document_text }}
+                                            @if($row->user->signature)
+                                                <div>{!! $row->user->signature() !!}</div>
+                                            @else
+                                                <div style="margin-top: 6em"></div>
+                                            @endif
+                                            <div class="{{ $row->user->signature ? '' : 'mt-5' }}">{{ $row->user->name }}</div>
+                                            @if ($row->user->position()->exists())
+                                    <div class="mt-1">{{ $row->user->position->Level->name.' - '.$row->user->position->division->name }}</div>
+                                @endif
+                                        </td>
+                                    @endforeach
+                                @endforeach
+                            @endif
+                        </tr>
+                    </table>
                 </div>
             </div>
         </main>

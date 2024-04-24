@@ -53,6 +53,7 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                 $array_item_req = [
                     'item'         => $row_item_request_detail->item->name,
                     'item_code'    => $row_item_request_detail->item->code,
+                    'user'         => $row_item_request->user->name ?? '',
                     'ir_code'      => $row_item_request->code,
                     'ir_date'      => $row_item_request->post_date,
                     'ir_qty'       => $row_item_request_detail->qty,

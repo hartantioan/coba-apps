@@ -83,6 +83,7 @@ class PurchaseProgressController extends Controller
                     'item'         => $row_item_request_detail->item->name,
                     'item_code'    => $row_item_request_detail->item->code,
                     'ir_code'      => $row_item_request->code,
+                    'user'         => $row_item_request->user->name ?? '-',
                     'ir_date'      => $row_item_request->post_date,
                     'ir_qty'       => CustomHelper::formatConditionalQty($row_item_request_detail->qty),
                     'status'       => $row_item_request->status(),
@@ -100,10 +101,7 @@ class PurchaseProgressController extends Controller
                   
                     $total_pr = 0; $total_grpo_satuan_max = 0;$total_po_satuan_max = 0;
                     foreach($row_item_request_detail->purchaseRequestDetailProgressReport as $row_pr_detail){
-                        if($row_item_request_detail->item->name == 'BOX PERKAKAS'){
-                            info($row_pr_detail->purchaseRequest->code);
-                            
-                        }
+                       
                         $total_pr++;
                         
                         $pr=[
@@ -261,16 +259,12 @@ class PurchaseProgressController extends Controller
                     if($max_count<$total_pr){
                         $max_count=$total_pr;
                     }
-                    if($total_pr > 1 && $max_count == $total_pr){
-                        $max_count=$total_pr+1;
-                    }
+                   
                     
                     // if($max_count==$total_pr){
                     //     $max_count=$total_pr+1;
                     // }
-                    if($row_item_request_detail->item->name == 'TANG KECIL LANCIP 6 INCH'){
-                        info($max_count);
-                    }
+                   
                 
                 }else{
                     $grpo=[ 'grpo_code'    => '',
@@ -342,6 +336,7 @@ class PurchaseProgressController extends Controller
         $tableHtml .= '<thead>';
         $tableHtml .= '<tr>';
         $tableHtml .= '<th>Item</th>';
+        $tableHtml .= '<th>Created</th>';
         $tableHtml .= '<th>IR Code</th>';
         $tableHtml .= '<th>IR Date</th>';
         $tableHtml .= '<th>IR Qty</th>';
@@ -402,14 +397,13 @@ class PurchaseProgressController extends Controller
                     }else{
                         $masuk = 1;
                     }
-                    if($row['item']== 'BOX PERKAKAS'){
-                        info($max_count_pr);
-                    }
+                    
                     foreach ($po['grpo'] as $grpoIndex => $grpo) {
                         $tableHtml .= '<tr>';
                         if($masuk == 1){
                             if ($prIndex === 0 && $poIndex === 0 && $grpoIndex === 0) {
                                 $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['item'] . '</td>';
+                                $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['user'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['ir_code'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['ir_date'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['ir_qty'] . '</td>';

@@ -1754,9 +1754,17 @@
     function countRow(id){
         if($('#arr_item' + id).val()){
             var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")),
-                conversion = parseFloat($('#arr_satuan' + id).find(':selected').data('conversion'));
+            conversion = parseFloat($('#arr_satuan' + id).find(':selected').data('conversion'));
             let qtyConversion = qty * conversion;
-            $('#qty_stock' + id).text(formatRupiahIni(qtyConversion.toFixed(3).toString().replace('.',',')));
+
+            var qtyString = qtyConversion.toString().replace('.', ',');
+
+            var splitQty = qtyString.split(',');
+            if (splitQty[1] && splitQty[1].length > 3) {
+                $('#qty_stock' + id).text(formatRupiahIni(qtyConversion.toFixed(3).toString().replace('.',',')));
+            }else{
+                $('#qty_stock' + id).text(formatRupiahIni(qtyConversion.toString().replace('.',',')));
+            }     
         }
     }
 

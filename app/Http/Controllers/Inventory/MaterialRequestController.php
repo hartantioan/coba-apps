@@ -330,7 +330,7 @@ class MaterialRequestController extends Controller
         }
         $string .= '<tr>
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2"> Total </td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqty, 3, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . CustomHelper::formatConditionalQty($totalqty). '</td>
             </tr>  
         ';
         

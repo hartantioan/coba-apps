@@ -4720,13 +4720,15 @@ class CustomHelper {
 	}
 
 	public static function formatConditionalQty($qty){
-		$arr = explode('.',strval($qty));
+		$arr = explode('.',$qty);
 		$value = 0;
 		if(count($arr) > 1){
-			if(floatval($arr[1]) > 0){
+			$trimmed_number = rtrim((string)$arr[1], '0');
+			$trimmed_length = strlen($trimmed_number);
+			if($trimmed_length > 3){
 				$value = number_format(floatval($arr[0].'.'.$arr[1]),3,',','.');
 			}else{
-				$value = number_format(floatval($arr[0]),0,',','.');
+				$value = number_format(floatval($arr[0].'.'.$arr[1]),$trimmed_length,',','.');
 			}
 		}else{
 			$value = number_format(floatval($arr[0]),0,',','.');

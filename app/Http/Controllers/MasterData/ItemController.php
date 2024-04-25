@@ -958,7 +958,7 @@ class ItemController extends Controller
         $string = '<div class="row pt-1 pb-1"> <div class="col s12">'.$data->code.'-'.$data->name.'</div><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="16">Daftar Item (Stok yang tampil adalah stok realtime pada saat dokumen dibuat)</th>
+                                <th class="center-align" colspan="6"> Stock Item Saat Ini : '.$data->getStockAll().'</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -1039,11 +1039,11 @@ class ItemController extends Controller
                 if($row_gir_d->deleted_at == null){
                     $string .= '<tr>
                         <td class="center-align">'.$no.'</td>
-                        <td>'.$row_gir_d->goodIssue->code.'</td>
+                        <td>'.$row_gir_d->goodIssueRequest->code.'</td>
                         <td>'.CustomHelper::formatConditionalQty($row_gir_d->qty).'</td>
                         <td>'.CustomHelper::formatConditionalQty($row_gir_d->qtyBalanceReturn()).'</td>
                         <td class="center-align">'.$data->uomUnit->code.'</td>
-                        <td class="center-align">'.$row_gir_d->goodIssue->status().'</td>
+                        <td class="center-align">'.$row_gir_d->goodIssueRequest->status().'</td>
                     </tr>';
                     $no++;
                 }

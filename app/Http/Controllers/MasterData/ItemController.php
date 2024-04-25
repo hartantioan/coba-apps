@@ -1041,7 +1041,7 @@ class ItemController extends Controller
                         <td class="center-align">'.$no.'</td>
                         <td>'.$row_gir_d->goodIssueRequest->code.'</td>
                         <td>'.CustomHelper::formatConditionalQty($row_gir_d->qty).'</td>
-                        <td>'.CustomHelper::formatConditionalQty($row_gir_d->qtyBalanceReturn()).'</td>
+                        <td>'.CustomHelper::formatConditionalQty($row_gir_d->balanceGi()).'</td>
                         <td class="center-align">'.$data->uomUnit->code.'</td>
                         <td class="center-align">'.$row_gir_d->goodIssueRequest->status().'</td>
                     </tr>';

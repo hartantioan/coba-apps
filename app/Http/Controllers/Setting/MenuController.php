@@ -22,6 +22,7 @@ use App\Models\Approval;
 use App\Models\User;
 use App\Models\Position;
 use App\Models\Department;
+use App\Models\FundRequest;
 use App\Models\GoodIssue;
 use App\Models\GoodIssueDetail;
 use App\Models\GoodReceipt;
@@ -55,13 +56,36 @@ class MenuController extends Controller
             ]);
         } */
 
-        $data = [
+        /* $data = [
             'title'     => 'Menu',
             'menus'     => Menu::whereNull('parent_id')->get(),
             'content'   => 'admin.setting.menu'
         ];
 
-        return view('admin.layouts.index', ['data' => $data]);
+        return view('admin.layouts.index', ['data' => $data]); */
+
+        User::where('type','1')->update([
+            'count_limit_credit'    => 0,
+        ]);
+
+        $fr = FundRequest::whereIn('status',['1','2','3'])->whereHas('account',function($query){
+            $query->where('type','1');
+        })->where('type','1')->get();
+
+        foreach($fr as $row){
+            $row->account->update([
+                'count_limit_credit' => $row->account->count_limit_credit + $row->grandtotal,
+            ]);
+            $totalpaid = $row->totalOutgoingPayment();
+            if($totalpaid > 0){
+                $user = User::find($row->account_id);
+                if($user){
+                    $user->update([
+                        'count_limit_credit' => $row->account->count_limit_credit - $totalpaid,
+                    ]);
+                }
+            }
+        }
 
         /* $pyr = PaymentRequest::whereHas('outgoingPayment')->whereIn('status',['2','3'])->get();
 

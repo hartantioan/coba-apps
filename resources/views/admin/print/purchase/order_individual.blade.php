@@ -1,5 +1,6 @@
 @php
     use App\Helpers\CustomHelper;
+    use Carbon\Carbon;
 @endphp
 <!doctype html>
 <html lang="en">
@@ -175,7 +176,7 @@
                                         </td>
                                         <td width="1%">:</td>
                                         <td>
-                                            {{ $data->supplier->name }}
+                                            {{ $data->supplier->name ?? ''}}
                                         </td>
                                     </tr>
                                     <tr>
@@ -436,26 +437,27 @@
                         </ol>
                     </div>
                     <table class="table-bot1" width="100%" border="0">
-                        <tr>
+                        
                             @if($data->approval())
                                 @foreach ($data->approval() as $detail)
                                     @foreach ($detail->approvalMatrix()->where('status','2')->get() as $row)
+                                    <tr>
                                         <td class="center-align">
-                                            {{ $row->approvalTemplateStage->approvalStage->approval->document_text }}
-                                            @if($row->user->signature)
-                                                <div>{!! $row->user->signature() !!}</div>
-                                            @else
-                                                <div style="margin-top: 6em"></div>
-                                            @endif
-                                            <div class="{{ $row->user->signature ? '' : 'mt-5' }}">{{ $row->user->name }}</div>
-                                            @if ($row->user->position()->exists())
-                                    <div class="mt-1">{{ $row->user->position->Level->name.' - '.$row->user->position->division->name }}</div>
-                                @endif
+                                            @php
+                                                $carbonInstance = Carbon::parse($row->updated_at);
+                                                $dayName = $carbonInstance->format('l');
+                                                $hour = $carbonInstance->hour;
+                                                $minute = $carbonInstance->minute;
+                                                $date = $carbonInstance->format('d/m/Y');
+                                            @endphp
+                                            <div>{{ $row->approvalTemplateStage->approvalStage->approval->document_text }}<span style="font-weight: bold">{{ $row->user->name }}</span> Hari <span style="font-weight: bold">{{CustomHelper::hariIndo($dayName)}}</span> jam <span style="font-weight: bold">{{$hour}}:{{$minute}}</span>  tanggal <span style="font-weight: bold">{{$date}}</span></div>
+                                      
                                         </td>
+                                    </tr>
                                     @endforeach
                                 @endforeach
                             @endif
-                        </tr>
+                        
                     </table>
                 </div>
             </div>

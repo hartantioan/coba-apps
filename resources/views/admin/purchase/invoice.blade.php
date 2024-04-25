@@ -321,7 +321,7 @@
                                     <input id="spk_no" name="spk_no" type="text" placeholder="Nomor SPK...">
                                     <label class="active" for="spk_no">No. SPK</label>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m3 s12 stepdokumen">
                                     <input id="document_no" name="document_no" type="text" placeholder="Nomor Dokumen...">
                                     <label class="active" for="document_no">No. Dokumen</label>
                                 </div>
@@ -329,7 +329,7 @@
                                     <input id="invoice_no" name="invoice_no" type="text" placeholder="Nomor Invoice dari Suppplier/Vendor">
                                     <label class="active" for="invoice_no">No. Invoice</label>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m3 s12 stepcurrency">
                                     <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
                                         @foreach ($currency as $row)
                                             <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
@@ -337,7 +337,7 @@
                                     </select>
                                     <label class="" for="currency_id">Mata Uang</label>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m3 s12 stepconversion">
                                     <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this);countAll();">
                                     <label class="active" for="currency_rate">Konversi</label>
                                 </div>
@@ -379,6 +379,8 @@
                                                                         <tr>
                                                                             <th class="center">Hapus</th>
                                                                             <th class="center">GR/LC/PO/Coa No.</th>
+                                                                            <th class="center">Keterangan 1</th>
+                                                                            <th class="center">Keterangan 2</th>
                                                                             <th class="center">NO.PO/GRPO/FR</th>
                                                                             <th class="center">No.SJ</th>
                                                                             <th class="center">Item / Coa Jasa</th>
@@ -398,8 +400,7 @@
                                                                             <th class="center">PPh (%)</th>
                                                                             <th class="center">PPh (Rp)</th>
                                                                             <th class="center">Grandtotal</th>
-                                                                            <th class="center">Keterangan 1</th>
-                                                                            <th class="center">Keterangan 2</th>
+                                                                            
                                                                             <th class="center">Plant</th>
                                                                             <th class="center">Line</th>
                                                                             <th class="center">Mesin</th>
@@ -566,7 +567,7 @@
     </div>
     <div class="modal-footer">
         <button class="btn waves-effect waves-light purple mr-1" onclick="startIntro1();">Panduan <i class="material-icons right">help_outline</i></button>
-        <button class="btn waves-effect waves-light step15 mr-1 step24" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+        <button class="btn waves-effect waves-light mr-1 step24" onclick="save();">Simpan <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -1308,6 +1309,12 @@
                                                 <td class="center">
                                                     ` + val.rawcode + `
                                                 </td>
+                                                <td>
+                                                    <input type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
+                                                </td>
+                                                <td>
+                                                    <input type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
+                                                </td>
                                                 <td class="center">
                                                     ` + val.purchase_no + `
                                                 </td>
@@ -1378,12 +1385,7 @@
                                                 <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
                                                     ` + val.grandtotal + `
                                                 </td>
-                                                <td>
-                                                    <input type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
-                                                </td>
+                                                
                                                 <td class="center">
                                                     ` + val.place_name + `
                                                 </td>
@@ -2119,6 +2121,12 @@
                                                         <td class="center">
                                                             ` + val.rawcode + `
                                                         </td>
+                                                        <td>
+                                                            <input type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" name="arr_note2[]" value="-" data-id="` + count + `">
+                                                        </td>
                                                         <td class="center">
                                                             -
                                                         </td>
@@ -2186,12 +2194,7 @@
                                                         <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
                                                             ` + val.grandtotal + `
                                                         </td>
-                                                        <td>
-                                                            <input type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
-                                                        </td>
-                                                        <td>
-                                                            <input type="text" name="arr_note2[]" value="-" data-id="` + count + `">
-                                                        </td>
+                                                        
                                                         <td class="center">
                                                             <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                                                                 @foreach ($place as $rowplace)
@@ -2280,6 +2283,12 @@
                                                         <td class="center">
                                                             ` + val.rawcode + `
                                                         </td>
+                                                        <td>
+                                                            <input type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" name="arr_note2[]" value="-" data-id="` + count + `">
+                                                        </td>
                                                         <td class="center">
                                                             ` + val.purchase_no + `
                                                         </td>
@@ -2350,12 +2359,7 @@
                                                         <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
                                                             ` + val.grandtotal + `
                                                         </td>
-                                                        <td>
-                                                            <input type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
-                                                        </td>
-                                                        <td>
-                                                            <input type="text" name="arr_note2[]" value="-" data-id="` + count + `">
-                                                        </td>
+                                                        
                                                         <td class="center">
                                                             ` + val.place_name + `
                                                         </td>
@@ -2667,6 +2671,12 @@
                 <td class="center">
                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                 </td>
+                <td>
+                    <input type="text" name="arr_note[]" value="Keterangan 1..." data-id="` + count + `">
+                </td>
+                <td>
+                    <input type="text" name="arr_note2[]" value="Keterangan 2..." data-id="` + count + `">
+                </td>
                 <td class="center">
                     -
                 </td>
@@ -2737,12 +2747,7 @@
                 <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
                     0
                 </td>
-                <td>
-                    <input type="text" name="arr_note[]" value="Keterangan 1..." data-id="` + count + `">
-                </td>
-                <td>
-                    <input type="text" name="arr_note2[]" value="Keterangan 2..." data-id="` + count + `">
-                </td>
+                
                 <td class="center">
                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                         @foreach ($place as $rowplace)
@@ -3597,6 +3602,12 @@
                                     <td class="center">
                                         <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                                     </td>
+                                    <td>
+                                        <input type="text" name="arr_note[]" value="` + val.info + `" data-id="` + count + `">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
+                                    </td>
                                     <td class="center">
                                         -
                                     </td>
@@ -3667,12 +3678,7 @@
                                     <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
                                         ` + val.grandtotal + `
                                     </td>
-                                    <td>
-                                        <input type="text" name="arr_note[]" value="` + val.info + `" data-id="` + count + `">
-                                    </td>
-                                    <td>
-                                        <input type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
-                                    </td>
+                                    
                                     <td class="center">
                                         <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                                             @foreach ($place as $rowplace)
@@ -3759,6 +3765,12 @@
                                     <td class="center">
                                         ` + val.rawcode + `
                                     </td>
+                                    <td>
+                                        <input type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
+                                    </td>
                                     <td class="center">
                                         ` + val.purchase_no + `
                                     </td>
@@ -3829,12 +3841,7 @@
                                     <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
                                         ` + val.grandtotal + `
                                     </td>
-                                    <td>
-                                        <input type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
-                                    </td>
-                                    <td>
-                                        <input type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
-                                    </td>
+                                    
                                     <td class="center">
                                         ` + val.place_name + `
                                     </td>
@@ -4181,8 +4188,23 @@
                     intro : ' Merupakan nomor perintah kerja dari dokumen (jika ada)' 
                 },
                 {
+                    title : 'No Dokumen',
+                    element : document.querySelector('.stepdokumen'),
+                    intro : 'No Dokumen berkaitan dengan form ini' 
+                },
+                {
                     title : 'No Invoice',
                     element : document.querySelector('.step16'),
+                    intro : ' Nomor Invoice terkait yang berasal dari vendor atau supplier(harap diisi jika ada)' 
+                },
+                {
+                    title : 'Mata Uang',
+                    element : document.querySelector('.stepcurrency'),
+                    intro : 'Mata uang, silahkan pilih mata uang lain, untuk mata uang asing.' 
+                },
+                {
+                    title : 'Konversi',
+                    element : document.querySelector('.stepconversion'),
                     intro : ' Nomor Invoice terkait yang berasal dari vendor atau supplier(harap diisi jika ada)' 
                 },
                 {

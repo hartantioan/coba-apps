@@ -3928,7 +3928,9 @@ class CustomHelper {
 
 			if($pi->balance == 0){
 				$pi->update([
-					'status'	=> '3'
+					'status'	=> '3',
+					'done_date'	=> date('Y-m-d H:i:s'),
+					'done_note'	=> 'DITUTUP OLEH SISTEM'
 				]);
 			}
 

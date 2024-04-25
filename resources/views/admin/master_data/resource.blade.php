@@ -107,7 +107,7 @@
                                                         <th>Grup</th>
                                                         <th>Qty</th>
                                                         <th>Satuan</th>
-                                                        <th>Biaya Rp / 1 Qty</th>
+                                                        <th>Biaya Rp / Qty</th>
                                                         <th>Plant</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
@@ -177,7 +177,7 @@
                         </div>
                         <div class="input-field col m3 s6">
                             <input name="cost" id="cost" type="text" value="0,00" onkeyup="formatRupiahTwoDecimal(this);">
-                            <label class="active" for="cost">Biaya Rp / 1 Qty</label>
+                            <label class="active" for="cost">Biaya Rp / Qty</label>
                         </div>
                         <div class="input-field col m3 s6">
                             <select class="select2 browser-default" id="resource_group_id" name="resource_group_id">

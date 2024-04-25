@@ -446,6 +446,17 @@
                                     </label>
                                 </div>
                             </div>
+                            <div class="input-field col s12" style="margin:0 0 0 0 !important;">
+                                <div class="switch">
+                                    <label for="is_production">Item untuk Produksi</label>
+                                    <label class="right">
+                                        Tidak
+                                        <input type="checkbox" id="is_production" name="is_production" value="1">
+                                        <span class="lever"></span>
+                                        Ya
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                         <div class="col s7 row">
                             <div class="col s12">
@@ -1535,6 +1546,12 @@
                     $('#is_service').prop( "checked", true);
                 }else{
                     $('#is_service').prop( "checked", false);
+                }
+
+                if(response.is_production == '1'){
+                    $('#is_production').prop( "checked", true);
+                }else{
+                    $('#is_production').prop( "checked", false);
                 }
 
                 if(response.status == '1'){

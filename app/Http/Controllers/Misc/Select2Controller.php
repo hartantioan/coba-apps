@@ -70,6 +70,7 @@ use App\Models\ItemSerial;
 use App\Models\Journal;
 use App\Models\Pattern;
 use App\Models\ProductionOrder;
+use App\Models\Resource;
 use App\Models\Size;
 use App\Models\Type;
 use App\Models\UserBank;
@@ -303,6 +304,31 @@ class Select2Controller extends Controller {
                 'is_sales_item'     => $d->is_sales_item ? $d->is_sales_item : '',
                 'list_shading'      => $d->arrShading(),
                 'is_activa'         => $d->itemGroup->is_activa ? $d->itemGroup->is_activa : '',
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function resource(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;   
+        $data = Resource::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%")
+                        ->orWhere('other_name', 'like', "%$search%");
+                })->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
+                'code'              => $d->code,
+                'name'              => $d->name,
+                'uom'               => $d->uomUnit->code,
+                'qty'               => $d->qty,
+                'cost'              => $d->cost,
             ];
         }
 

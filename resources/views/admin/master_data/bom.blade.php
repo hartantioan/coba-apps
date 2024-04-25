@@ -103,9 +103,14 @@
                                                         <th>Nama</th>
                                                         <th>Item</th>
                                                         <th>Plant</th>
+                                                        <th>Gudang</th>
+                                                        <th>Line</th>
+                                                        <th>Mesin</th>
                                                         <th>Qty Output</th>
                                                         <th>Qty Rencana</th>
                                                         <th>Type</th>
+                                                        <th>Valid Dari</th>
+                                                        <th>Valid Sampai</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -134,30 +139,30 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s4">
+                        <div class="input-field col s4 m3">
                             <input type="hidden" id="temp" name="temp">
                             <select class="browser-default" id="item_id" name="item_id" onchange="getCodeAndName();"></select>
-                            <label class="active" for="item_id">Item</label>
+                            <label class="active" for="item_id">Item Input (Target)</label>
                         </div>
-                        <div class="input-field col s4">
+                        <div class="input-field col s4 m3">
                             <input id="code" name="code" type="text" placeholder="Kode Bill Of Material">
                             <label class="active" for="code">Kode</label>
                         </div>
-                        <div class="input-field col s4">
+                        <div class="input-field col s4 m3">
                             <input id="name" name="name" type="text" placeholder="Nama Bill Of Material">
                             <label class="active" for="name">Nama</label>
                         </div>
-                        <div class="input-field col s4">
+                        <div class="input-field col s4 m3">
                             <input id="qty_output" name="qty_output" type="text" placeholder="Qty Output" onkeyup="formatRupiah(this)">
                             <label class="active" for="qty_output">Qty Output (Satuan Produksi)</label>
                             <div class="form-control-feedback production-unit">-</div>
                         </div>
-                        <div class="input-field col s4">
+                        <div class="input-field col s4 m3">
                             <input id="qty_planned" name="qty_planned" type="text" placeholder="Rata-rata Qty Produksi" onkeyup="formatRupiah(this)">
                             <label class="active" for="qty_planned">Rata-rata Qty Produksi (Satuan Produksi)</label>
                             <div class="form-control-feedback production-unit">-</div>
                         </div>
-                        <div class="input-field col s4">
+                        <div class="input-field col s4 m3">
                             <select class="form-control" id="type" name="type">
                                 <option value="">-- Pilih salah satu --</option>
                                 <option value="1">Perakitan</option>
@@ -167,15 +172,49 @@
                             </select>
                             <label class="" for="type">Tipe</label>
                         </div>
-                        <div class="input-field col s4">
-                            <select class="form-control" id="place_id" name="place_id">
+                        <div class="input-field col s4 m3">
+                            <select class="form-control" id="place_id" name="place_id" onchange="changeLineMachine(this);">
                                 @foreach($place as $b)
                                     <option value="{{ $b->id }}">{{ $b->code }}</option>
                                 @endforeach
                             </select>
                             <label class="" for="place_id">Plant</label>
                         </div>
-                        <div class="input-field col s4">
+                        <div class="input-field col s4 m3">
+                            <select class="form-control" id="line_id" name="line_id" onchange="changePlace(this);">
+                                <option value="" data-place="">--Kosong--</option>
+                                @foreach($line as $b)
+                                    <option value="{{ $b->id }}" data-place="{{ $b->place_id }}">{{ $b->name }}</option>
+                                @endforeach
+                            </select>
+                            <label class="" for="line_id">Line</label>
+                        </div>
+                        <div class="input-field col s4 m3">
+                            <select class="form-control" id="machine_id" name="machine_id" onchange="changeLine(this);">
+                                <option value="" data-line="">--Kosong--</option>
+                                @foreach($machine as $b)
+                                    <option value="{{ $b->id }}" data-line="{{ $b->line_id }}">{{ $b->name }}</option>
+                                @endforeach
+                            </select>
+                            <label class="" for="machine_id">Mesin</label>
+                        </div>
+                        <div class="input-field col s4 m3">
+                            <select class="form-control" id="warehouse_id" name="warehouse_id">
+                                @foreach($warehouse as $b)
+                                    <option value="{{ $b->id }}">{{ $b->name }}</option>
+                                @endforeach
+                            </select>
+                            <label class="" for="warehouse_id">Gudang</label>
+                        </div>
+                        <div class="input-field col s4 m3">
+                            <input id="valid_from" name="valid_from" type="date" value="{{ date('Y-m-d') }}">
+                            <label class="active" for="valid_from">Valid Dari</label>
+                        </div>
+                        <div class="input-field col s4 m3">
+                            <input id="valid_to" name="valid_to" type="date" value="{{ date('Y-m-d') }}">
+                            <label class="active" for="valid_to">Valid Hingga</label>
+                        </div>
+                        <div class="input-field col s4 m3">
                             <div class="switch mb-1">
                                 <label for="status">Status</label>
                                 <label class="right">
@@ -187,24 +226,12 @@
                             </div>
                         </div>
                         <div class="col s12">
-                            <h6>Bahan & Biaya</h6>
-                            <div class="col s12 center">
-                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addDetail('items')" href="javascript:void(0);">
-                                    <i class="material-icons left">add</i> Bahan
-                                </a>
-                                <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addDetail('coas')" href="javascript:void(0);">
-                                    <i class="material-icons left">add</i> Biaya
-                                </a>
-                                <div>
-                                    <i>
-                                        Untuk detail tipe bahan, harga 0, karena perhitungan diambil dari rata-rata stok berjalan.
-                                    </i>
-                                </div>
-                            </div>
+                            <h6>Item & Resource Output</h6>
                             <table class="bordered mt-2">
                                 <thead>
                                     <tr>
-                                        <th class="center">Bahan/Biaya</th>
+                                        <th class="center">Tipe</th>
+                                        <th class="center">Item/Resource</th>
                                         <th class="center">Qty</th>
                                         <th class="center">Satuan (Produksi)</th>
                                         <th class="center">Nominal</th>
@@ -215,12 +242,25 @@
                                 </thead>
                                 <tbody id="body-detail">
                                     <tr id="empty-row-detail">
-                                        <td colspan="7" class="center">
-                                            <i>Silahkan tambahkan bahan / biaya...</i>
+                                        <td colspan="8" class="center">
+                                            <i>Silahkan tambahkan item / resource...</i>
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
+                            <div class="col s12 center mt-1">
+                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addDetail('items')" href="javascript:void(0);">
+                                    <i class="material-icons left">add</i> Bahan
+                                </a>
+                                <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addDetail('resources')" href="javascript:void(0);">
+                                    <i class="material-icons left">add</i> Resource
+                                </a>
+                                <div>
+                                    <i>
+                                        Untuk detail tipe item, harga 0, karena perhitungan diambil dari rata-rata stok berjalan.
+                                    </i>
+                                </div>
+                            </div>
                         </div>
                         <div class="col s12 mt-3">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
@@ -333,8 +373,8 @@
             if($('.row_detail').length == 0){
                 $('#body-detail').append(`
                     <tr id="empty-row-detail">
-                        <td colspan="7" class="center">
-                            <i>Silahkan tambahkan bahan / biaya...</i>
+                        <td colspan="8" class="center">
+                            <i>Silahkan tambahkan item / resource...</i>
                         </td>
                     </tr>
                 `);
@@ -349,8 +389,8 @@
         if($('.row_detail').length == 0 && $('#empty-row-detail').length == 0){
             $('#body-detail').append(`
                 <tr id="empty-row-detail">
-                    <td colspan="7" class="center">
-                        <i>Silahkan tambahkan bahan / biaya...</i>
+                    <td colspan="8" class="center">
+                        <i>Silahkan tambahkan item / resource...</i>
                     </td>
                 </tr>
             `);
@@ -378,19 +418,22 @@
             <tr class="row_detail">
                 <input name="arr_type[]" value="` + param + `" type="hidden">
                 <td>
-                    <select class="browser-default" name="arr_detail[]" id="arr_detail` + count + `" onchange="getRowUnit('` + count + `')"></select>
+                    ` + (param == 'items' ? 'Item' : 'Resource') + `
                 </td>
                 <td>
-                    <input name="arr_qty[]" type="` + (param == 'coas' ? 'hidden' : 'text') + `" value="` + (param == 'items' ? '0' : '1') + `" onkeyup="formatRupiah(this);countAll();">
+                    <select class="browser-default" name="arr_detail[]" id="arr_detail` + count + `" onchange="getRowUnit('` + count + `','` + param + `')"></select>
+                </td>
+                <td>
+                    <input name="arr_qty[]" id="arr_qty` + count + `" type="text" value="0,000" onkeyup="formatRupiah(this);countAll();">
                 </td>
                 <td class="center">
                     <span id="arr_satuan` + count + `">-</span>
                 </td>
                 <td>
-                    <input name="arr_nominal[]" type="` + (param == 'items' ? 'hidden' : 'text') + `" value="0" onkeyup="formatRupiah(this);countAll();">
+                    <input name="arr_nominal[]" id="arr_nominal` + count + `" type="text" value="0,00" readonly>
                 </td>
                 <td>
-                    <input name="arr_total[]" type="` + (param == 'items' ? 'hidden' : 'text') + `" value="0" onkeyup="formatRupiah(this);" readonly>
+                    <input name="arr_total[]" id="arr_total` + count + `" type="text" value="0,00" readonly>
                 </td>
                 <td>
                     <input name="arr_description[]" type="text" placeholder="Deskripsi item material">
@@ -404,14 +447,19 @@
         `);
         if(param == 'items'){
             select2ServerSide('#arr_detail' + count, '{{ url("admin/select2/item") }}');
-        }else if(param == 'coas'){
-            select2ServerSide('#arr_detail' + count, '{{ url("admin/select2/coa") }}');
+        }else if(param == 'resources'){
+            select2ServerSide('#arr_detail' + count, '{{ url("admin/select2/resource") }}');
         }
     }
 
-    function getRowUnit(val){
+    function getRowUnit(val,param){
         if($("#arr_detail" + val).val()){
-            $('#arr_satuan' + val).text($("#arr_detail" + val).select2('data')[0].production);
+            $('#arr_satuan' + val).text($("#arr_detail" + val).select2('data')[0].uom);
+            if(param == 'resources'){
+                $('#arr_nominal' + val).val(formatRupiahIni(parseFloat($("#arr_detail" + val).select2('data')[0].cost).toFixed(2).toString().replace('.',',')));
+                $('#arr_qty' + val).val(formatRupiahIni(parseFloat($("#arr_detail" + val).select2('data')[0].qty).toFixed(3).toString().replace('.',',')));
+                countAll();
+            }
         }else{
             $('#arr_satuan' + val).text('-');
         }
@@ -421,13 +469,12 @@
         if($("#item_id").val()){
             $('#code').val($("#item_id").select2('data')[0].code);
             $('#name').val($("#item_id").select2('data')[0].name);
-            $('.production-unit').text($("#item_id").select2('data')[0].production);
+            $('.production-unit').text($("#item_id").select2('data')[0].uom);
         }else{
             $('#code').val('');
             $('#name').val('');
             $('.production-unit').text('-');
         }
-        
     }
 
     function rowDetail(data) {
@@ -495,9 +542,14 @@
                 { name: 'name', className: 'center-align' },
                 { name: 'item', className: 'center-align' },
                 { name: 'place', className: 'center-align' },
+                { name: 'warehouse', className: 'center-align' },
+                { name: 'line', className: 'center-align' },
+                { name: 'machine', className: 'center-align' },
                 { name: 'qty_output', className: 'center-align' },
                 { name: 'qty_convert', className: 'center-align' },
                 { name: 'type', searchable: false, className: 'center-align' },
+                { name: 'valid_from', searchable: false, className: 'center-align' },
+                { name: 'valid_to', searchable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -617,6 +669,23 @@
         });
     }
 
+    function changePlace(element){
+        if($(element).val()){
+            $('#place_id').val($(element).find(':selected').data('place'));
+            $('#machine_id option[data-line!="' + $(element).val() + '"]').hide();
+        }else{
+            $('#place_id').val($('#place_id option:first').val()).formSelect();
+        }
+    }
+
+    function changeLine(element){
+        if($(element).val()){
+            $('#line_id').val($(element).find(':selected').data('line')).formSelect().trigger('change');
+        }else{
+            $('#line_id').val($('#line_id option:first').val()).formSelect().trigger('change');
+        }
+    }
+
     function success(){
         loadDataTable();
         $('#modal1').modal('close');
@@ -670,6 +739,9 @@
                         <tr class="row_detail">
                             <input name="arr_type[]" value="` + val.lookable_type + `" type="hidden">
                             <td>
+                                ` + (val.lookable_type == 'items' ? 'Item' : 'Resource') + `
+                            </td>
+                            <td>
                                 <select class="browser-default" name="arr_detail[]" id="arr_detail` + count + `" onchange="getRowUnit('` + count + `')"></select>
                             </td>
                             <td>
@@ -699,8 +771,8 @@
                     `);
                     if(val.lookable_type == 'items'){
                         select2ServerSide('#arr_detail' + count, '{{ url("admin/select2/item") }}');
-                    }else if(val.lookable_type == 'coas'){
-                        select2ServerSide('#arr_detail' + count, '{{ url("admin/select2/coa") }}');
+                    }else if(val.lookable_type == 'resources'){
+                        select2ServerSide('#arr_detail' + count, '{{ url("admin/select2/resource") }}');
                     }
                 });
 

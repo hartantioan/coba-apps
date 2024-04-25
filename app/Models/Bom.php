@@ -21,9 +21,14 @@ class Bom extends Model
         'user_id',
         'item_id',
         'place_id',
+        'warehouse_id',
+        'line_id',
+        'machine_id',
         'qty_output',
         'qty_planned',
         'type',
+        'valid_from',
+        'valid_to',
         'status'
     ];
 
@@ -37,6 +42,18 @@ class Bom extends Model
 
     public function place(){
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
+    }
+
+    public function warehouse(){
+        return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
+    }
+
+    public function line(){
+        return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();
+    }
+
+    public function machine(){
+        return $this->belongsTo('App\Models\Machine', 'machine_id', 'id')->withTrashed();
     }
 
     public function bomDetail(){

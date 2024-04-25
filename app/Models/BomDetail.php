@@ -31,6 +31,16 @@ class BomDetail extends Model
         return $this->morphTo();
     }
 
+    public function type(){
+        $type = match ($this->lookable_type) {
+            'items'     => 'ITEM',
+            'resources' => 'RESOURCE',
+            default     => 'INVALID',
+        };
+  
+        return $type;
+    }
+
 
     public function item(){
         if($this->lookable_type == 'items'){
@@ -43,6 +53,14 @@ class BomDetail extends Model
     public function coa(){
         if($this->lookable_type == 'coas'){
             return $this->belongsTo('App\Models\Coa', 'lookable_id', 'id')->withTrashed();
+        }else{
+            return $this->where('id',-1);
+        }
+    }
+
+    public function resource(){
+        if($this->lookable_type == 'resources'){
+            return $this->belongsTo('App\Models\Resource', 'lookable_id', 'id')->withTrashed();
         }else{
             return $this->where('id',-1);
         }

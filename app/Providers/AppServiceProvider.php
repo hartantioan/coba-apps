@@ -97,6 +97,7 @@ class AppServiceProvider extends ServiceProvider
             'good_return_issues'                    => 'App\Models\GoodReturnIssue',
             'personal_close_bills'                  => 'App\Models\PersonalCloseBill',
             'adjust_rates'                          => 'App\Models\AdjustRate',
+            'resources'                             => 'App\Models\Resource',
         ]);
     }
 }

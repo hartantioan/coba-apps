@@ -329,6 +329,7 @@ class ItemController extends Controller
                     $query->is_sales_item       = $request->is_sales_item ? $request->is_sales_item : NULL;
                     $query->is_purchase_item    = $request->is_purchase_item ? $request->is_purchase_item : NULL;
                     $query->is_service          = $request->is_service ? $request->is_service : NULL;
+                    $query->is_production       = $request->is_production ? $request->is_production : NULL;
                     $query->note                = $request->note;
                     $query->status              = $request->status ? $request->status : '2';
                     $query->type_id             = $request->type_id ? $request->type_id : NULL;
@@ -362,6 +363,7 @@ class ItemController extends Controller
                         'is_sales_item'     => $request->is_sales_item ? $request->is_sales_item : NULL,
                         'is_purchase_item'  => $request->is_purchase_item ? $request->is_purchase_item : NULL,
                         'is_service'        => $request->is_service ? $request->is_service : NULL,
+                        'is_production'     => $request->is_production ? $request->is_production : NULL,
                         'note'              => $request->note,
                         'status'            => $request->status ? $request->status : '2',
                         'type_id'           => $request->type_id ? $request->type_id : NULL,
@@ -599,6 +601,10 @@ class ItemController extends Controller
                             <tr>
                                 <th>Item Service</th>
                                 <th>'.($data->is_service ? '&#10003;' : '&#10005;').'</th>
+                            </tr>
+                            <tr>
+                                <th>Item Produksi</th>
+                                <th>'.($data->is_production ? '&#10003;' : '&#10005;').'</th>
                             </tr>
                             <tr>
                                 <th>Gudang</th>

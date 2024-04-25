@@ -15,6 +15,9 @@ use App\Models\Place;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportBom;
+use App\Models\Line;
+use App\Models\Machine;
+use App\Models\Warehouse;
 use Illuminate\Support\Str;
 class BomController extends Controller
 {
@@ -24,6 +27,9 @@ class BomController extends Controller
             'title'     => 'Bill of Material',
             'content'   => 'admin.master_data.bom',
             'place'     => Place::where('status','1')->get(),
+            'warehouse' => Warehouse::where('status','1')->get(),
+            'line'      => Line::where('status','1')->get(),
+            'machine'   => Machine::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -36,9 +42,14 @@ class BomController extends Controller
             'name',
             'item_id',
             'place_id',
+            'warehouse_id',
+            'line_id',
+            'machine_id',
             'qty_output',
             'qty_planned',
             'type',
+            'valid_from',
+            'valid_to',
             'status'
         ];
 
@@ -111,10 +122,15 @@ class BomController extends Controller
                     $val->code,
                     $val->name,
                     $val->item->name,
-                    $val->place->name,
-                    CustomHelper::formatConditionalQty($val->qty_output).' Satuan '.$val->item->productionUnit->code,
-                    CustomHelper::formatConditionalQty($val->qty_planned).' Satuan '.$val->item->productionUnit->code,
+                    $val->place->code,
+                    $val->warehouse->name,
+                    $val->line->code,
+                    $val->machine->name,
+                    CustomHelper::formatConditionalQty($val->qty_output).' Satuan '.$val->item->uomUnit->code,
+                    CustomHelper::formatConditionalQty($val->qty_planned).' Satuan '.$val->item->uomUnit->code,
                     $val->type(),
+                    date('d/m/Y',strtotime($val->valid_from)),
+                    date('d/m/Y',strtotime($val->valid_to)),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -149,6 +165,11 @@ class BomController extends Controller
             'qty_planned'               => 'required',
             'type'                      => 'required',
             'place_id'                  => 'required',
+            'line_id'                   => 'required',
+            'machine_id'                => 'required',
+            'warehouse_id'              => 'required',
+            'valid_from'                => 'required',
+            'valid_to'                  => 'required',
             'arr_type'                  => 'required|array',
             'arr_detail'                => 'required|array',
             'arr_qty'                   => 'required|array',
@@ -164,6 +185,11 @@ class BomController extends Controller
             'qty_planned.required'          => 'Jumlah rata-rata produksi tidak boleh kosong',
             'type.required'                 => 'Tipe bill of material tidak boleh kosong',
             'place_id.required'             => 'Plant tidak boleh kosong',
+            'line_id.required'              => 'Line tidak boleh kosong',
+            'machine_id.required'           => 'Mesin tidak boleh kosong',
+            'warehouse_id.required'         => 'Gudang tidak boleh kosong',
+            'valid_from.required'           => 'Tanggal valid mulai tidak boleh kosong',
+            'valid_to.required'             => 'Tanggal valid hingga tidak boleh kosong',
             'arr_type.required'             => 'Tipe tidak boleh kosong',
             'arr_type.array'                => 'Tipe haruslah dalam bentuk array',
             'arr_detail.required'           => 'Detail item/biaya tidak boleh kosong',
@@ -193,6 +219,11 @@ class BomController extends Controller
                     $query->user_id             = session('bo_id');
                     $query->item_id             = $request->item_id;
                     $query->place_id            = $request->place_id;
+                    $query->line_id             = $request->line_id;
+                    $query->machine_id          = $request->machine_id;
+                    $query->warehouse_id        = $request->warehouse_id;
+                    $query->valid_from          = $request->valid_from;
+                    $query->valid_to            = $request->valid_to;
                     $query->qty_output          = str_replace(',','.',str_replace('.','',$request->qty_output));
                     $query->qty_planned         = str_replace(',','.',str_replace('.','',$request->qty_planned));
                     $query->type                = $request->type;
@@ -214,6 +245,11 @@ class BomController extends Controller
                         'user_id'           => session('bo_id'),
                         'item_id'           => $request->item_id,
                         'place_id'          => $request->place_id,
+                        'line_id'           => $request->line_id,
+                        'machine_id'        => $request->machine_id,
+                        'warehouse_id'      => $request->warehouse_id,
+                        'valid_from'        => $request->valid_from,
+                        'valid_to'          => $request->valid_to,
                         'qty_output'        => str_replace(',','.',str_replace('.','',$request->qty_output)),
                         'qty_planned'       => str_replace(',','.',str_replace('.','',$request->qty_planned)),
                         'type'              => $request->type,
@@ -275,7 +311,8 @@ class BomController extends Controller
                                 </tr>
                                 <tr>
                                     <th class="center">No</th>
-                                    <th class="center">Bahan/Biaya</th>
+                                    <th class="center">Tipe</th>
+                                    <th class="center">Item/Resource</th>
                                     <th class="center">Deskripsi</th>
                                     <th class="center">Qty</th>
                                     <th class="center">Satuan</th>
@@ -288,10 +325,11 @@ class BomController extends Controller
         foreach($data->bomDetail as $key => $m){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
+                <td>'.$m->type().'</td>
                 <td>'.$m->lookable->code.' - '.$m->lookable->name.'</td>
-                <td>'.$m->description.' - '.($m->item()->exists() ? 'ADA' : 'TIDAK').'</td>
+                <td>'.$m->description.'</td>
                 <td class="right-align">'.CustomHelper::formatConditionalQty($m->qty).'</td>
-                <td class="center-align">'.($m->lookable_type == 'items' ? $m->lookable->productionUnit->code : '-').'</td>
+                <td class="center-align">'.$m->lookable->uomUnit->code.'</td>
                 <td class="right-align">'.number_format($m->nominal,2,',','.').'</td>
                 <td class="right-align">'.number_format($m->total,2,',','.').'</td>
             </tr>';

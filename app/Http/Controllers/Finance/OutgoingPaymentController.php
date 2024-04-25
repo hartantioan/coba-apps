@@ -759,6 +759,16 @@ class OutgoingPaymentController extends Controller
                             }
                         }
                     }
+                    if($row->lookable_type == 'fund_requests'){
+                        if($row->lookable->document_status == '2'){
+							$row->lookable->update([
+								'balance_status'	=> NULL
+							]);
+						}
+						if($row->lookable->account->type == '1' && $row->lookable->type == '1'){
+							CustomHelper::addCountLimitCredit($row->lookable->account_id,$row->nominal);
+						}
+                    }
                 }
     
                 activity()

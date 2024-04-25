@@ -1610,6 +1610,9 @@ class CustomHelper {
 								'balance_status'	=> '1'
 							]);
 						}
+						if($row->lookable->account->type == '1' && $row->lookable->type == '1'){
+							CustomHelper::removeCountLimitCredit($row->lookable->account_id,$mustpay);
+						}
 					}
 				}
 

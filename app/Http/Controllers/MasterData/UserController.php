@@ -548,7 +548,7 @@ class UserController extends Controller
             ];
         } else {
 
-            if($request->type == '3' || $request->type == '4'){
+            /* if($request->type == '3' || $request->type == '4'){
                 $arrUserAllowedSupplierVendor = ['323020','323002','112005','323004','323014','324001'];
                 if(!in_array(session('bo_employee_no'),$arrUserAllowedSupplierVendor)){
                     return response()->json([
@@ -566,7 +566,7 @@ class UserController extends Controller
                         'message' => 'Mohon maaf, untuk user anda tidak boleh memasukkan data customer dan pegawai.',
                     ]);
                 }
-            }
+            } */
 
             $passed = true;
 

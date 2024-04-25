@@ -3926,6 +3926,12 @@ class CustomHelper {
 
 			$pi->updateRootDocumentStatusDone();
 
+			if($pi->balance == 0){
+				$pi->update([
+					'status'	=> '3'
+				]);
+			}
+
 		}elseif($table_name == 'marketing_order_down_payments'){
 
 			$modp = MarketingOrderDownPayment::find($table_id);

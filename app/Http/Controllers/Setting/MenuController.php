@@ -56,15 +56,15 @@ class MenuController extends Controller
             ]);
         } */
 
-        /* $data = [
+        $data = [
             'title'     => 'Menu',
             'menus'     => Menu::whereNull('parent_id')->get(),
             'content'   => 'admin.setting.menu'
         ];
 
-        return view('admin.layouts.index', ['data' => $data]); */
+        return view('admin.layouts.index', ['data' => $data]);
 
-        User::where('type','1')->update([
+        /* User::where('type','1')->update([
             'count_limit_credit'    => 0,
         ]);
 
@@ -85,7 +85,7 @@ class MenuController extends Controller
                     ]);
                 }
             }
-        }
+        } */
 
         /* $pyr = PaymentRequest::whereHas('outgoingPayment')->whereIn('status',['2','3'])->get();
 

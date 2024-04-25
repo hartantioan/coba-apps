@@ -450,7 +450,7 @@
                                                 $minute = $carbonInstance->minute;
                                                 $date = $carbonInstance->format('d/m/Y');
                                             @endphp
-                                            <div>{{ $row->approvalTemplateStage->approvalStage->approval->document_text }}<span style="font-weight: bold">{{ $row->user->name }}</span> Hari <span style="font-weight: bold">{{CustomHelper::hariIndo($dayName)}}</span> jam <span style="font-weight: bold">{{$hour}}:{{$minute}}</span>  tanggal <span style="font-weight: bold">{{$date}}</span></div>
+                                            <div>{{ $row->approvalTemplateStage->approvalStage->approval->document_text }}<span style="font-weight: bold">{{ $row->user->name }}</span> Hari <span style="font-weight: bold">{{CustomHelper::hariIndo($dayName)}}</span>  tanggal <span style="font-weight: bold">{{$date}}</span>  jam <span style="font-weight: bold">{{$hour}}:{{$minute}}</span></div>
                                       
                                         </td>
                                     </tr>

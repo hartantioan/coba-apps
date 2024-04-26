@@ -1153,8 +1153,8 @@ class FundRequestController extends Controller
             }
                     
 			if($request->temp){
-                /* DB::beginTransaction();
-                try { */
+                DB::beginTransaction();
+                try {
                     $query = FundRequest::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     if($query->hasChildDocument()){
@@ -1233,19 +1233,19 @@ class FundRequestController extends Controller
                             $row->delete();
                         }
 
-                        /* DB::commit(); */
+                        DB::commit();
                     }else{
                         return response()->json([
                             'status'  => 500,
 					        'message' => 'Status purchase request sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                /* }catch(\Exception $e){
+                }catch(\Exception $e){
                     DB::rollback();
-                } */
+                }
 			}else{
-                /* DB::beginTransaction();
-                try { */
+                DB::beginTransaction();
+                try {
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=FundRequest::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
@@ -1292,15 +1292,15 @@ class FundRequestController extends Controller
                         /* 'balance_status'=> $request->document_status == '2' ? '1' : NULL, */
                     ]);
 
-                    /* DB::commit();
+                    DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
-                } */
+                }
 			}
 			
 			if($query) {
-                /* DB::beginTransaction();
-                try { */
+                DB::beginTransaction();
+                try {
                     foreach($request->arr_item as $key => $row){
                         FundRequestDetail::create([
                             'fund_request_id'       => $query->id,
@@ -1336,10 +1336,10 @@ class FundRequestController extends Controller
                             ]);
                         }
                     }
-                    /* DB::commit();
+                    DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
-                } */
+                }
 
                 if($query->type == '1' && $query->account->type == '1'){
                     CustomHelper::addCountLimitCredit($request->account_id,$query->grandtotal);

@@ -424,7 +424,7 @@
                             <td style="vertical-align:top;" width="25%">
                                 TTD : 
                                 @if($data->user->signature)
-                                    {{-- <span style="float: right;margin-right:50px;margin-top:-15px;">{!! $data->user->signature() !!}</span> --}}
+                                    <span style="float: right;margin-right:50px;margin-top:-15px;">{!! $data->user->signature() !!}</span>
                                 @else
                                     _______________
                                 @endif

@@ -6,7 +6,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
         <style>
-            html
+            *
             {
                 font-family: DejaVu Sans, sans-serif;
             }

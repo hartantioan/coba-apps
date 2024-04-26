@@ -144,8 +144,8 @@
                 min-height: auto;
             }
 
-            @page { margin: 5em 3em 6em 3em; }
-            header { position: fixed; top: -64px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
+            @page { margin: 10em 3em 7em 3em; }
+            header { position: fixed; top: -144px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
                 
 
         
@@ -188,53 +188,54 @@
                 </tr>
                 
             </table>
-            <hr style="border-top: 3px solid black; margin-top:-2%">
+            <table border="0" width="100%" class="tbl-info" style="margin-top:-15px">
+                <tr>
+                    <td width="33%" class="left-align">
+                        <table border="0" width="100%">
+                            <tr>
+                                <td >
+                                    <span class="invoice-number mr-1" style="font-size:0.6em !important">Name: {{ $data->user->name }}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="invoice-number mr-1" style="font-size:0.6em !important">Posisi: {{ $data->user->position()->exists() ? $data->user->position->name : '-' }}</span>
+                                </td>
+                                
+                            </tr>
+                            <tr>
+                                <td >
+                                    <span class="invoice-number mr-1" style="font-size:0.6em !important">Depart. {{ $data->user->position()->exists() ? $data->user->position->division->name : ''}}</span>
+                                </td>
+                                
+                            </tr>
+                        </table>
+                    </td>
+                    <td width="33%" class="left-align">
+
+                    </td>
+                    <td width="33%" class="left-align">
+                        <table border="0" width="100%">
+                            <tr>
+                                <td align="center">
+                                    <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:80%;" height="15%" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="center">
+                                    <span class="invoice-number mr-1" style="font-size:0.8em !important">{{ $data->code }}</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            <hr style="border-top: 3px solid black; margin-top:1%">
         </header>
         <main>
             <div class="card">
                 <div class="card-content invoice-print-area">
-                    <table border="0" width="100%" class="tbl-info">
-                        <tr>
-                            <td width="33%" class="left-align">
-                                <table border="0" width="100%">
-                                    <tr>
-                                        <td>
-                                            Name: {{ $data->user->name }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Posisi: {{ $data->user->position()->exists() ? $data->user->position->name : '-' }}
-                                        </td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <td >
-                                            Depart. {{ $data->user->position()->exists() ? $data->user->position->division->name : ''}}
-                                        </td>
-                                        
-                                    </tr>
-                                </table>
-                            </td>
-                            <td width="33%" class="left-align">
- 
-                            </td>
-                            <td width="33%" class="left-align">
-                                <table border="0" width="100%">
-                                    <tr>
-                                        <td align="center">
-                                            <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:80%;" height="5%" />
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td align="center">
-                                            <h3>{{ $data->code }}</h3>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </table>
+                    
                 
                     <!-- product details table-->
                     <div class="invoice-product-details">

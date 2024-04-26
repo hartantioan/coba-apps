@@ -8,7 +8,7 @@
         <style>
             html
             {
-                font-family: Tahoma, "Trebuchet MS", sans-serif;
+                font-family: DejaVu Sans, sans-serif;
             }
 
             .break-row {

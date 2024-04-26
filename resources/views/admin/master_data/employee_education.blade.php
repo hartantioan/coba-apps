@@ -120,20 +120,20 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <input id="school_name" name="school_name" type="text" placeholder="Nama">
                             <label class="school_name" for="name">Nama Intitusi</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="major" name="major" type="text" placeholder="">
                             <label class="major" for="major">Jurusan</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="final_score" name="final_score" type="number" placeholder="">
                             <label class="final_score" for="final_score">IPK/Skor Akhir</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select id="stage" name="stage">
                                 <option value="1">SD</option>
                                 <option value="2">SMP</option>
@@ -148,11 +148,11 @@
                             </select>
                             <label for="stage">Tingkat</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="year_start" name="year_start" type="number" placeholder="Tahun Masuk">
                             <label class="year_start" for="note">Tahun Masuk</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="year_end" name="year_end" type="number" placeholder="Tahun Lulus">
                             <label class="year_end" for="note">Tahun Selesai</label>
                         </div>

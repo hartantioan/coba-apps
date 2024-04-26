@@ -117,20 +117,20 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="browser-default" id="item_id" name="item_id">&nbsp;</select>
                             <label class="active" for="item_id">Pilih Item dari inventory</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="browser-default" id="item_group_id" name="item_group_id" onchange="getDepartment()">&nbsp;</select>
                             <label class="active" for="item_group_id">Group Departement</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" placeholder="Kode">
                             <label class="active" for="code">Kode</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="form-control" id="place_id" name="place_id">
                                 @foreach ($place as $rowplace)
                                     <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
@@ -138,20 +138,20 @@
                             </select>
                             <label class="" for="place_id">Lokasi</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="ip_address" name="ip_address" type="text" placeholder="192.168.0.1">
                             <label class="active" for="ip_address">IP Address(bila ada)</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="nominal" name="nominal" type="text" placeholder="Nominal" onkeyup="formatRupiah(this);">
                             <label class="active" for="nominal">Nominal</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="info" name="info" type="text" placeholder="Keterangan">
                             <label class="active" for="info">info</label>
                         </div>
                         
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <div class="switch mb-1">
                                 <label for="order">Status</label>
                                 <label>

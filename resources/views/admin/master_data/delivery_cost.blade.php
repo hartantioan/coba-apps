@@ -137,20 +137,20 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" placeholder="Kode">
                             <label class="active" for="code">Kode</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">Nama</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="valid_from" name="valid_from" type="date" max="{{ date('Y-m-d') }}">
                             <label class="active" for="valid_from">Valid Dari</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="valid_to" name="valid_to" type="date" max="{{ date('9999'.'-12-31') }}" min="{{ date('Y-m-d') }}">
                             <label class="active" for="valid_to">Valid Sampai</label>
                         </div>
@@ -192,7 +192,7 @@
                             <input id="nominal" name="nominal" type="text" placeholder="Nominal" onkeyup="formatRupiah(this)" value="0">
                             <label class="active" for="nominal">Nominal</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <div class="switch mb-1">
                                 <label for="status">Status</label>
                                 <label>

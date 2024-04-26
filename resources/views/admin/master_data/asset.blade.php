@@ -140,12 +140,12 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col m4 s6">
+                        <div class="input-field col m4 s12">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" placeholder="Kode">
                             <label class="active" for="code">Kode</label>
                         </div>
-                        <div class="input-field col m4 s6">
+                        <div class="input-field col m4 s12">
                             <select class="form-control" id="place_id" name="place_id">
                                 <option value="">--Kosong--</option>
                                 @foreach ($place as $rowplace)
@@ -154,11 +154,11 @@
                             </select>
                             <label class="" for="place_id">Plant</label>
                         </div>
-                        <div class="input-field col m4 s6">
+                        <div class="input-field col m4 s12">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">Nama</label>
                         </div>
-                        <div class="input-field col m4 s6">
+                        <div class="input-field col m4 s12">
                             <select class="select2 browser-default" id="asset_group_id" name="asset_group_id">
                                 @foreach($group->whereNull('parent_id') as $c)
                                         @if(!$c->childSub()->exists())
@@ -207,11 +207,11 @@
                             </select>
                             <label class="" for="method">Metode Hitung</label>
                         </div>
-                        <div class="input-field col m4 s6">
+                        <div class="input-field col m4 s12">
                             <input id="date" name="date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. kapitalisasi" readonly>
                             <label class="active" for="date">Tgl. Kapitalisasi (Dari form kapitalisasi)</label>
                         </div>
-                        <div class="input-field col m4 s6">
+                        <div class="input-field col m4 s12">
                             <input id="nominal" name="nominal" type="text" placeholder="Nominal Kapitalisasi" value="0" onkeyup="formatRupiah(this)" readonly>
                             <label class="active" for="nominal">Nominal Awal (Dari form kapitalisasi)</label>
                         </div>

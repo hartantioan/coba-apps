@@ -118,24 +118,24 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" placeholder="Kode">
                             <label class="active" for="code">Kode</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">Nama Bank</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="account_name" name="account_name" type="text" placeholder="Atas Nama">
                             <label class="active" for="account_name">Atas Nama</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="account_no" name="account_no" type="text" placeholder="No. Rekening">
                             <label class="active" for="account_no">No. Rekening</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="form-control" id="company_id" name="company_id">
                                 @foreach($company as $b)
                                     <option value="{{ $b->id }}">{{ $b->code.' - '.$b->name }}</option>
@@ -143,11 +143,11 @@
                             </select>
                             <label class="" for="company_id">Perusahaan</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="branch" name="branch" type="text" placeholder="Nama Cabang">
                             <label class="active" for="branch">Cabang</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <div class="switch mb-1">
                                 <label for="order">Tampilkan di Dokumen</label>
                                 <label>
@@ -158,7 +158,7 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <div class="switch mb-1">
                                 <label for="order">Status</label>
                                 <label>

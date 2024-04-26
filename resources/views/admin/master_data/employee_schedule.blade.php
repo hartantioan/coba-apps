@@ -161,17 +161,17 @@
                             
                             <div class="col s12">
                                 <input type="hidden" id="temp" name="temp">
-                                <div class="input-field col s6" >
+                                <div class="input-field col s12 m6" >
                                     <select class="select2 browser-default" id="employee_id_detail" name="employee_id_detail">
                                       
                                     </select>
                                     <label class="active" for="employee_id_detail">Select Employee</label>
                                 </div>
-                                <div class="input-field col s6" >
+                                <div class="input-field col s12 m6" >
                                     <input id="date_detail" name="date_detail" type="date" placeholder="Tanggal Post">
                                     <label class="active" for="date_detail">Tanggal</label>
                                 </div>
-                                <div class="input-field col s6">
+                                <div class="input-field col s12 m6">
                                     <select class="select2 browser-default" id="shift_id_detail" name="shift_id_detail">
                                         
                                     </select>
@@ -227,17 +227,17 @@
                             
                             <div class="col s12">
                                 
-                                <div class="input-field col s6" >
+                                <div class="input-field col s12 m6" >
                                     <select class="select2 browser-default" id="employee_id" name="employee_id">
                                         <option value="">--Pilih ya--</option>
                                     </select>
                                     <label class="active" for="employee_id">Select Employee</label>
                                 </div>
-                                <div class="input-field col s6" >
+                                <div class="input-field col s12 m6" >
                                     <input id="date" name="date" type="date" placeholder="Tanggal Post">
                                     <label class="active" for="date">Tanggal</label>
                                 </div>
-                                <div class="input-field col s6">
+                                <div class="input-field col s12 m6">
                                     <select class="select2 browser-default" id="shift_id" name="shift_id">
                                         <option value="">--Pilih ya--</option>
                                     </select>

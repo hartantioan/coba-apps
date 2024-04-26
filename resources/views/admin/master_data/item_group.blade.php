@@ -114,16 +114,16 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" placeholder="Kode group">
                             <label class="active" for="code">Kode</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="name" name="name" type="text" placeholder="Nama Group">
                             <label class="active" for="name">Nama</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="select2 browser-default" id="parent_id" name="parent_id" onchange="getCoaParent();">
                                 <option value="">Parent (Utama)</option>
                                 @foreach($parent as $m)
@@ -141,7 +141,7 @@
                             </select>
                             <label class="active" for="parent_id">Parent Menu</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="select2 browser-default" id="coa_id" name="coa_id">
                                 <option value="">-- Kosong --</option>
                                 @foreach($coa as $c)
@@ -150,7 +150,7 @@
                             </select>
                             <label class="active" for="coa_id">Coa</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="select2 browser-default" multiple="multiple" id="warehouse_id" name="warehouse_id[]">
                                 @foreach ($warehouse as $row)
                                     <option value="{{ $row->id }}">{{ $row->name }}</option>
@@ -158,7 +158,7 @@
                             </select>
                             <label class="active" for="warehouse_id">Gudang</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="browser-default" id="production_type" name="production_type">
                                 <option value="">Bukan Hasil Produksi</option>
                                 <option value="1">SFG-1</option>
@@ -170,7 +170,7 @@
                             </select>
                             <label class="active" for="production_type">Item Hasil Produksi</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <div class="switch mb-1">
                                 <label for="is_activa">Item Aktiva</label>
                                 <label>
@@ -181,7 +181,7 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <div class="switch mb-1">
                                 <label for="order">Status</label>
                                 <label>

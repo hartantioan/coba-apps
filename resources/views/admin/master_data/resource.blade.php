@@ -139,12 +139,12 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col m3 s6">
+                        <div class="input-field col m3 s12 ">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" placeholder="Kode">
                             <label class="active" for="code">Kode</label>
                         </div>
-                        <div class="input-field col m3 s6">
+                        <div class="input-field col m3 s12 ">
                             <select class="form-control" id="place_id" name="place_id">
                                 <option value="">--Kosong--</option>
                                 @foreach ($place as $rowplace)
@@ -153,15 +153,15 @@
                             </select>
                             <label class="" for="place_id">Plant</label>
                         </div>
-                        <div class="input-field col m3 s6">
+                        <div class="input-field col m3 s12 ">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">Nama</label>
                         </div>
-                        <div class="input-field col m3 s6">
+                        <div class="input-field col m3 s12 ">
                             <input id="other_name" name="other_name" type="text" placeholder="Nama Lain">
                             <label class="active" for="other_name">Nama Lain</label>
                         </div>
-                        <div class="input-field col m3 s6">
+                        <div class="input-field col m3 s12 ">
                             <select class="browser-default" id="uom_unit" name="uom_unit" onchange="getUnitStock();">
                                 <option value="">--Silahkan pilih--</option>
                                 @foreach ($unit as $row)
@@ -170,16 +170,16 @@
                             </select>
                             <label class="active" for="uom_unit">Satuan</label>
                         </div>
-                        <div class="input-field col m3 s6">
+                        <div class="input-field col m3 s12 ">
                             <input name="qty" id="qty" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);">
                             <div class="form-control-feedback stock-unit">-</div>
                             <label class="active" for="qty">Qty</label>
                         </div>
-                        <div class="input-field col m3 s6">
+                        <div class="input-field col m3 s12 ">
                             <input name="cost" id="cost" type="text" value="0,00" onkeyup="formatRupiahTwoDecimal(this);">
                             <label class="active" for="cost">Biaya Rp / Qty</label>
                         </div>
-                        <div class="input-field col m3 s6">
+                        <div class="input-field col m3 s12 ">
                             <select class="select2 browser-default" id="resource_group_id" name="resource_group_id">
                                 @foreach($group->whereNull('parent_id') as $c)
                                         @if(!$c->childSub()->exists())

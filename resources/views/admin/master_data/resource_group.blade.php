@@ -124,20 +124,20 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col m3 s3">
+                        <div class="input-field col m3 s12 ">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" placeholder="Kode grup">
                             <label class="active" for="code">Kode</label>
                         </div>
-                        <div class="input-field col m3 s3">
+                        <div class="input-field col m3 s12 ">
                             <input id="name" name="name" type="text" placeholder="Nama grup">
                             <label class="active" for="name">Nama</label>
                         </div>
-                        <div class="input-field col m3 s3">
+                        <div class="input-field col m3 s12 ">
                             <input id="other_name" name="other_name" type="text" placeholder="Nama Lain">
                             <label class="active" for="name">Nama Lain</label>
                         </div>
-                        <div class="input-field col m3 s3">
+                        <div class="input-field col m3 s12 ">
                             <select class="select2 browser-default" id="parent_id" name="parent_id">
                                 <option value="">Parent (Utama)</option>
                                 @foreach($parent as $m)
@@ -155,7 +155,7 @@
                             </select>
                             <label class="active" for="parent_id">Parent Menu</label>
                         </div>
-                        <div class="input-field col m3 s3">
+                        <div class="input-field col m3 s12 ">
                             <select class="select2 browser-default" id="coa_id" name="coa_id">
                                 <option value="">-- Pilih Coa --</option>
                                 @foreach($coa as $c)
@@ -166,7 +166,7 @@
                         </div>
                         <div class="col m12 s12">
                         </div>
-                        <div class="input-field col m3 s3">
+                        <div class="input-field col m3 s12 ">
                             <div class="switch mb-1">
                                 <label for="order">Status</label>
                                 <label>

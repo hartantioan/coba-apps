@@ -110,42 +110,42 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6" >
+                        <div class="input-field col s12 m6" >
                             <select class="select2 browser-default" id="user_id" name="user_id">
                                 
                             </select>
                             <label class="active" for="user_id">Select Employee</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">Nama Super</label>
                         </div>
                         <input type="hidden" id="temp" name="temp">
                         
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="type" name="type" type="number" placeholder="Menit" >
                             <label class="active" for="type">Tipe</label>
                         </div>
-                        <div class="input-field col s6" style="min-height: 4rem">
+                        <div class="input-field col s12 m6" style="min-height: 4rem">
                             <input id="limit" name="limit" type="number" placeholder="Berapa Kali (Tidak ada berarti Tidak ada limit)" >
                             <label class="active" for="limit">Limit</label>
                         </div>
-                        <div class="input-field col s6" >
+                        <div class="input-field col s12 m6" >
                             <input id="start_date" name="start_date" type="date" placeholder="Tanggal Awal">
                             <label class="active" for="start_date">Tanggal Awal</label>
                         </div>
-                        <div class="input-field col s6" >
+                        <div class="input-field col s12 m6" >
                             <input id="end_date" name="end_date" type="date" placeholder="Tanggal Akhir">
                             <label class="active" for="end_date">Tanggal Akhir</label>
                         </div>
                        
-                        <div class="input-field col s6 employee_inputs">
+                        <div class="input-field col s12 m6 employee_inputs">
                             <select class="browser-default item-array" id="punishment_id" name="punishment_id">
                                
                             </select>
                             <label class="active" for="punishment_id">Batas Maksimal Hukuman</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <div class="switch mb-1">
                                 <label for="order">Status</label>
                                 <label>

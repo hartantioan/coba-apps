@@ -123,20 +123,20 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" placeholder="Kode unik site...">
                             <label class="active" for="code">Kode</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">Nama</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="address" name="address" type="text" placeholder="Alamat">
                             <label class="active" for="address">Alamat</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="form-control" id="company_id" name="company_id">
                                 @foreach ($company as $row)
                                     <option value="{{ $row->id }}">{{ $row->name }}</option>
@@ -144,14 +144,14 @@
                             </select>
                             <label class="" for="company_id">Perusahaan</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="browser-default" id="type" name="type">
                                 <option value="1">Kantor/Office</option>
                                 <option value="2">Pabrik/Plant</option>
                             </select>
                             <label class="active" for="type">Tipe</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="browser-default select2" id="province_id" name="province_id">
                                 <option value="">--Silahkan pilih--</option>
                                 @foreach($province as $row)
@@ -160,23 +160,23 @@
                             </select>
                             <label class="active" for="province_id">Provinsi</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="browser-default" id="city_id" name="city_id"></select>
                             <label class="active" for="city_id">Kota/Kabupaten</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="browser-default" id="district_id" name="district_id"></select>
                             <label class="active" for="district_id">Kecamatan</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="browser-default" id="subdistrict_id" name="subdistrict_id"></select>
                             <label class="active" for="subdistrict_id">Kelurahan</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="capacity" name="capacity" type="text" placeholder="Kapasitas" onkeyup="formatRupiah(this);" value="0,000">
                             <label class="active" for="capacity">Kapasitas satuan terkecil (M<sup>2</sup>)</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <div class="switch mb-1">
                                 <label for="status">Status</label>
                                 <label>

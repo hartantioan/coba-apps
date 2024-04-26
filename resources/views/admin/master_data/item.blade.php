@@ -96,7 +96,7 @@
                                     <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
                                     <div class="collapsible-body">
                                         <div class="row">
-                                            <div class="col m4 s6 ">
+                                            <div class="col m4 s12 ">
                                                 <label for="filter_status" style="font-size:1rem;">Filter Status :</label>
                                                 <div class="input-field col s12">
                                                     <select class="form-control" id="filter_status" onchange="loadDataTable()">
@@ -106,7 +106,7 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="col m4 s6 ">
+                                            <div class="col m4 s12 ">
                                                 <label for="filter_type" style="font-size:1rem;">Filter Tipe :</label>
                                                 <div class="input-field col s12">
                                                     <select class="select2 browser-default" multiple="multiple" id="filter_type" name="filter_type" onchange="loadDataTable()">
@@ -118,7 +118,7 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="col m4 s6 ">
+                                            <div class="col m4 s12 ">
                                                 <label for="filter_group" style="font-size:1rem;">Filter Group :</label>
                                                 <div class="input-field col s12">
                                                     <select class="select2 browser-default" multiple="multiple" id="filter_group" name="filter_group" onchange="loadDataTable()">
@@ -271,7 +271,7 @@
                                     <div class="input-field col m2 s2">
                                         <h6>Daftar Shading</h6>
                                     </div>
-                                    <div class="input-field col m6 s6" id="list-shading">
+                                    <div class="input-field col m6 s12" id="list-shading">
                                     </div>
                                 </div>
                             </div>

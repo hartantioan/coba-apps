@@ -38,7 +38,7 @@
                             </li>
                         </ol>
                     </div>
-                    <div class="col s4 m6 l6">
+                    <div class="col s12 m6 l6">
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="print();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
                             <span class="hide-on-small-onl">Print</span>
@@ -139,30 +139,30 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s4 m3">
+                        <div class="input-field col s12 m3">
                             <input type="hidden" id="temp" name="temp">
                             <select class="browser-default" id="item_id" name="item_id" onchange="getCodeAndName();"></select>
                             <label class="active" for="item_id">Item Input (Target)</label>
                         </div>
-                        <div class="input-field col s4 m3">
+                        <div class="input-field col s12 m3">
                             <input id="code" name="code" type="text" placeholder="Kode Bill Of Material">
                             <label class="active" for="code">Kode</label>
                         </div>
-                        <div class="input-field col s4 m3">
+                        <div class="input-field col s12 m3">
                             <input id="name" name="name" type="text" placeholder="Nama Bill Of Material">
                             <label class="active" for="name">Nama</label>
                         </div>
-                        <div class="input-field col s4 m3">
+                        <div class="input-field col s12 m3">
                             <input id="qty_output" name="qty_output" type="text" placeholder="Qty Output" onkeyup="formatRupiah(this)">
                             <label class="active" for="qty_output">Qty Output (Satuan Produksi)</label>
                             <div class="form-control-feedback production-unit">-</div>
                         </div>
-                        <div class="input-field col s4 m3">
+                        <div class="input-field col s12 m3">
                             <input id="qty_planned" name="qty_planned" type="text" placeholder="Rata-rata Qty Produksi" onkeyup="formatRupiah(this)">
                             <label class="active" for="qty_planned">Rata-rata Qty Produksi (Satuan Produksi)</label>
                             <div class="form-control-feedback production-unit">-</div>
                         </div>
-                        <div class="input-field col s4 m3">
+                        <div class="input-field col s12 m3">
                             <select class="form-control" id="type" name="type">
                                 <option value="">-- Pilih salah satu --</option>
                                 <option value="1">Perakitan</option>
@@ -172,7 +172,7 @@
                             </select>
                             <label class="" for="type">Tipe</label>
                         </div>
-                        <div class="input-field col s4 m3">
+                        <div class="input-field col s12 m3">
                             <select class="form-control" id="place_id" name="place_id" onchange="changeLineMachine(this);">
                                 @foreach($place as $b)
                                     <option value="{{ $b->id }}">{{ $b->code }}</option>
@@ -180,7 +180,7 @@
                             </select>
                             <label class="" for="place_id">Plant</label>
                         </div>
-                        <div class="input-field col s4 m3">
+                        <div class="input-field col s12 m3">
                             <select class="form-control" id="line_id" name="line_id" onchange="changePlace(this);">
                                 <option value="" data-place="">--Kosong--</option>
                                 @foreach($line as $b)
@@ -189,7 +189,7 @@
                             </select>
                             <label class="" for="line_id">Line</label>
                         </div>
-                        <div class="input-field col s4 m3">
+                        <div class="input-field col s12 m3">
                             <select class="form-control" id="machine_id" name="machine_id" onchange="changeLine(this);">
                                 <option value="" data-line="">--Kosong--</option>
                                 @foreach($machine as $b)
@@ -198,7 +198,7 @@
                             </select>
                             <label class="" for="machine_id">Mesin</label>
                         </div>
-                        <div class="input-field col s4 m3">
+                        <div class="input-field col s12 m3">
                             <select class="form-control" id="warehouse_id" name="warehouse_id">
                                 @foreach($warehouse as $b)
                                     <option value="{{ $b->id }}">{{ $b->name }}</option>
@@ -206,15 +206,15 @@
                             </select>
                             <label class="" for="warehouse_id">Gudang</label>
                         </div>
-                        <div class="input-field col s4 m3">
+                        <div class="input-field col s12 m3">
                             <input id="valid_from" name="valid_from" type="date" value="{{ date('Y-m-d') }}">
                             <label class="active" for="valid_from">Valid Dari</label>
                         </div>
-                        <div class="input-field col s4 m3">
+                        <div class="input-field col s12 m3">
                             <input id="valid_to" name="valid_to" type="date" value="{{ date('Y-m-d') }}">
                             <label class="active" for="valid_to">Valid Hingga</label>
                         </div>
-                        <div class="input-field col s4 m3">
+                        <div class="input-field col s12 m3">
                             <div class="switch mb-1">
                                 <label for="status">Status</label>
                                 <label class="right">

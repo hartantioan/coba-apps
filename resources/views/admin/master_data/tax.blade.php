@@ -106,35 +106,35 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" placeholder="Kode">
                             <label class="active" for="code">Kode</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">Nama</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="browser-default" id="coa_purchase_id" name="coa_purchase_id"></select>
                             <label class="active" for="coa_purchase_id">Coa Beli</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="browser-default" id="coa_sale_id" name="coa_sale_id"></select>
                             <label class="active" for="coa_sale_id">Coa Jual</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="percentage" name="percentage" type="text" onkeyup="formatRupiah(this)">
                             <label class="active" for="prosentase">Prosentase</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="form-control" id="type" name="type">
                                 <option value="+">Penambah</option>
                                 <option value="-">Pengurang</option>
                             </select>
                             <label class="" for="type">Tipe</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <div class="switch mb-1">
                                 <label for="is_default_ppn">Default PPN</label>
                                 <label>
@@ -145,7 +145,7 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <div class="switch mb-1">
                                 <label for="is_default_pph">Default PPh</label>
                                 <label>
@@ -156,7 +156,7 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <div class="switch mb-1">
                                 <label for="status">Status</label>
                                 <label>

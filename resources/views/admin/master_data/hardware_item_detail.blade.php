@@ -105,20 +105,20 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <input id="specification" name="specification" type="text" placeholder="ram">
                             <label class="active" for="specification">Spesifikasi</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="info" name="info" type="text" placeholder="blabla ... bla">
                             <label class="active" for="info">Info</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="browser-default" id="hardware_item_id" name="hardware_item_id">&nbsp;</select>
                             <label class="active" for="hardware_item_id">Pilih Item dari inventory</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <div class="switch mb-1">
                                 <label for="order">Status</label>
                                 <label>

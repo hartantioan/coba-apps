@@ -116,12 +116,12 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <input id="name" name="name" type="text" placeholder="Nama Alat">
                             <label class="active" for="name">Nama Alat</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select id="place_id" name="place_id">
                                 @foreach($place as $row)
                                     <option value="{{ $row->id }}">{{ $row->code }}</option>
@@ -129,7 +129,7 @@
                             </select>
                             <label for="plant_id">Plant</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select id="area_id" name="area_id">
                                 @foreach($area as $row)
                                     <option value="{{ $row->id }}">{{ $row->name }}</option>
@@ -137,15 +137,15 @@
                             </select>
                             <label for="area_id">Area</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="browser-default" id="item_id" name="item_id"></select>
                             <label class="active" for="item_id">Item (Jika ada)</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="note" name="note" type="text" placeholder="Catatan tambahan">
                             <label class="active" for="note">Catatan</label>
                         </div>
-                        <div class="file-field input-field col s6">
+                        <div class="file-field input-field col s12 m6">
                             <div class="btn">
                                 <span>File</span>
                                 <input type="file" name="file" id="file">
@@ -154,7 +154,7 @@
                                 <input class="file-path validate" type="text">
                             </div>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <div class="switch mb-1">
                                 <label for="order">Status</label>
                                 <label>

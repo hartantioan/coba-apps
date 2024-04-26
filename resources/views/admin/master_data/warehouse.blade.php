@@ -112,16 +112,16 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <input type="hidden" id="temp" name="temp">
                             <input id="name" name="name" type="text" placeholder="Nama Gudang">
                             <label class="active" for="name">Nama</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <input id="note" name="note" type="text" placeholder="Keterangan">
                             <label class="active" for="note">Keterangan</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <div class="switch mb-1">
                                 <label for="is_transit_warehouse">Gudang Transit</label>
                                 <label class="right">
@@ -132,7 +132,7 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <div class="switch mb-1">
                                 <label for="status">Status</label>
                                 <label class="right">

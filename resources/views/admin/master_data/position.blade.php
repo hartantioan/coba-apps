@@ -112,16 +112,16 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" placeholder="Kode">
                             <label class="active" for="code">Kode</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">Nama</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="form-control" id="division_id" name="division_id">
                                 @foreach ($divisi as $row)
                                     <option value="{{ $row->id }}">{{ $row->name }}</option>
@@ -129,7 +129,7 @@
                             </select>
                             <label class="" for="division_id">Divisi</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="form-control" id="level_id" name="level_id">
                                 @foreach ($level as $row)
                                     <option value="{{ $row->id }}">{{ $row->name }}</option>
@@ -137,7 +137,7 @@
                             </select>
                             <label class="" for="level_id">Level</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <div class="switch mb-1">
                                 <label for="order">Status</label>
                                 <label>

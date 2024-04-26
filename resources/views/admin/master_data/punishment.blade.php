@@ -115,24 +115,24 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" placeholder="Kode">
                             <label class="active" for="code">Kode</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">Nama</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="price" name="price" type="number" placeholder="Nominal Rp">
                             <label class="active" for="price">Nominal</label>
                         </div>
-                        <div class="input-field col s6" style="min-height: 4rem">
+                        <div class="input-field col s12 m6" style="min-height: 4rem">
                             <input id="minute" name="minute" type="number" placeholder="Menit" >
                             <label class="active" for="minute">Menit</label>
                         </div>
-                        <div class="input-field col s6 employee_inputs">
+                        <div class="input-field col s12 m6 employee_inputs">
                             <select class="form-control" id="place_id" name="place_id">
                                 @foreach ($place as $rowplace)
                                     <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
@@ -140,13 +140,13 @@
                             </select>
                             <label class="" for="place_id">Plant </label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="select2 browser-default" id="shift_id" name="shift_id">
                                 
                             </select>
                             <label class="active" for="shift_id">Select Shift</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="form-control" id="type" name="type" onchange="seeType()">
                                 <option value="">-</option>
                                 <option value="1">Terlambat</option>
@@ -155,7 +155,7 @@
                             </select>
                             <label for="type" style="font-size:1.2rem;">Tipe Denda :</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <div class="switch mb-1">
                                 <label for="order">Status</label>
                                 <label>

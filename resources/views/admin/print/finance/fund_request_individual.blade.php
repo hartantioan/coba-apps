@@ -10,11 +10,6 @@
                 font-family: SimHei;
                 src: url('{{ url("app-assets/fonts/SimHei.ttf") }}');
             }
-            html
-            {
-                /* font-family: Tahoma, "Trebuchet MS", sans-serif; */
-                font-family: Tahoma;
-            }
 
             .break-row {
                 page-break-inside: avoid;

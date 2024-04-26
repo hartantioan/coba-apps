@@ -9,7 +9,7 @@
             body
             {
                 /* font-family: Tahoma, "Trebuchet MS", sans-serif; */
-                font-family: kaibold;
+                font-family: SimHei;
             }
 
             .break-row {

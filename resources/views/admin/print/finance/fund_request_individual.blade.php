@@ -9,7 +9,7 @@
             html
             {
                 /* font-family: Tahoma, "Trebuchet MS", sans-serif; */
-                font-family: KaiBold;
+                font-family: kaibold;
             }
 
             .break-row {

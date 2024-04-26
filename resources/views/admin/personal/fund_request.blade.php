@@ -624,10 +624,10 @@
                 if($('select[name^="arr_is_include_tax"]').eq(index).val() == '1'){
                     row_total = row_total / (1 + (row_percent_tax / 100));
                 }
-                row_tax = Math.floor(row_total * (row_percent_tax / 100));
+                row_tax = Math.floor((row_total * (row_percent_tax / 100)).toFixed(2));
             }
             if(row_percent_wtax > 0){
-                row_wtax = Math.floor(row_total * (row_percent_wtax / 100));
+                row_wtax = Math.floor((row_total * (row_percent_wtax / 100)).toFixed(2));
             }
             row_grandtotal = row_total + row_tax - row_wtax;
             $('input[name^="arr_percent_tax"]').eq(index).val(row_percent_tax);

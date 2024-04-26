@@ -1681,9 +1681,11 @@ class Select2Controller extends Controller {
         $itemIdsWithConnection = HardwareItem::pluck('item_id')->toArray();
         $data = Item::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
-                        ->orWhere('name', 'like', "%$search%");
+                        ->orWhere('name', 'like', "%$search%")
+                        ->WhereHas('itemGroup',function($query){
+                            $query->where('is_activa', '1');
+                        });
                 })->where('status','1')
-                ->whereNotIn('id', $itemIdsWithConnection)
                 ->get();
 
         foreach($data as $d) {

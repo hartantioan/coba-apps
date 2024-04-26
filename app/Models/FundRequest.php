@@ -175,6 +175,19 @@ class FundRequest extends Model
         });
     }
 
+    public function listPaymentRequest(){
+        $arr = [];
+        foreach($this->hasPaymentRequestDetail as $row){
+            $arr[] = $row->paymentRequest->code;
+        }
+        foreach($this->fundRequestDetail as $row){
+            foreach($row->hasPaymentRequestDetail as $rowdetail){
+                $arr[] = $rowdetail->paymentRequest->code;
+            }
+        }
+        return implode(', ',$arr);
+    }
+
     public function personalCloseBillDetail(){
         return $this->hasMany('App\Models\PersonalCloseBillDetail','fund_request_id','id')->whereHas('personalCloseBill',function($query){
             $query->whereIn('status',['1','2','3']);

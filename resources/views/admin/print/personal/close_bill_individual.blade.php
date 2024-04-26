@@ -291,7 +291,7 @@
                                 @foreach($data->personalCloseBillDetail as $key => $row)
                                 <tr>
                                     <td class="center-align">{{ $key + 1 }}</td>
-                                    <td>{{ $row->fundRequest->code }}</td>
+                                    <td>{{ $row->fundRequest->code.' - '.$row->fundRequest->listPaymentRequest() }}</td>
                                     <td>{{ $row->note }}</td>
                                     <td class="right-align">{{ number_format($row->nominal,2,',','.') }}</td>
                                 </tr>

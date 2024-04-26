@@ -6,14 +6,9 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
         <style>
-            @font-face {
-                font-family: 'Firefly Sung';
-                font-style: normal;
-                font-weight: 400;
-                src: url(http://eclecticgeek.com/dompdf/fonts/cjk/fireflysung.ttf) format('truetype');
-            }
-            * {
-                font-family: Firefly Sung, DejaVu Sans, sans-serif;
+            html
+            {
+                font-family: Tahoma, "Trebuchet MS", sans-serif;
             }
 
             .break-row {

@@ -6,13 +6,9 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
         <style>
-            @font-face {
-                font-family: SimHei;
-                src: url('{{ public_path("app-assets/fonts/SimHei.ttf") }}');
-            }
-
-            html {
-                font-family: SimHei;
+            html
+            {
+                font-family: Tahoma, "Trebuchet MS", sans-serif;
             }
 
             .break-row {

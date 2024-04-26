@@ -8,7 +8,7 @@
         <style>
             @font-face {
                 font-family: SimHei;
-                src: url('{{ url("app-assets/fonts/SimHei.ttf") }}');
+                src: url('{{ public_path("app-assets/fonts/SimHei.ttf") }}');
             }
 
             .break-row {

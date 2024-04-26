@@ -1161,7 +1161,7 @@ class UserController extends Controller
         $user['province_name'] = $user->province()->exists() ? $user->province->code.' - '.$user->province->name : '';
         $user['city_name'] = $user->city()->exists() ? $user->city->code.' - '.$user->city->name : '';
         $user['country_name'] = $user->country()->exists() ? $user->country->name : '';
-        $user['limit_credit'] = $user->limit_credit ? number_format($user->limit_credit, 0, ',', '.') : '';
+        $user['limit_credit'] = number_format($user->limit_credit, 0, ',', '.');
         $user['cities'] = $user->province()->exists() ? $user->province->getCity() : '';
         $user['has_document'] = $user->hasDocument() ? '1' : '';
 

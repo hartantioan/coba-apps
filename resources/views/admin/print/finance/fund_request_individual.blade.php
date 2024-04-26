@@ -11,6 +11,10 @@
                 src: url('{{ public_path("app-assets/fonts/SimHei.ttf") }}');
             }
 
+            html {
+                font-family: SimHei;
+            }
+
             .break-row {
                 page-break-inside: avoid;
             }

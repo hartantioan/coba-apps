@@ -119,7 +119,7 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <select class="form-control" id="company_id" name="company_id">
                                 @foreach ($company as $row)
@@ -128,41 +128,41 @@
                             </select>
                             <label class="" for="company_id">Perusahaan</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="npwp" name="npwp" type="text">
                             <label class="active" for="npwp">NPWP</label>
                         </div>
                         <div class="col m12 s12 l12"></div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="djp_letter_no" name="djp_letter_no" type="text">
                             <label class="active" for="djp_letter_no">No.Surat Pemberitahuan DJP</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="pkp_letter_no" name="pkp_letter_no" type="text">
                             <label class="active" for="pkp_letter_no">No.Surat Permohonan PKP</label>
                         </div>
                         
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="start_date" name="start_date" type="date" max="{{ date('9999'.'-12-31') }}">
                             <label class="active" for="start_date">Tgl.Mulai Berlaku</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="end_date" name="end_date" type="date" max="{{ date('9999'.'-12-31') }}">
                             <label class="active" for="end_date">Tgl.Berakhir Berlaku</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="start_no" name="start_no" type="text">
                             <label class="active" for="start_no">Nomor Awal</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="end_no" name="end_no" type="text">
                             <label class="active" for="end_no">Nomor Akhir</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="year" name="year" type="text">
                             <label class="active" for="year">Tahun berlaku</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <textarea class="materialize-textarea" id="note" name="note"></textarea>
                             <label class="active" for="note">Catatan</label>
                         </div>
@@ -185,7 +185,7 @@
                             <img src="" alt="Preview" id="imagePreview" style="display: none;">
                         </div>
                         <div class="col m12 s12 l12"></div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <div class="switch mb-1">
                                 <label for="status">Status</label>
                                 <label>

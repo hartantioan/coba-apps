@@ -105,24 +105,24 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <input type="hidden" id="temp" name="temp">
                             <select class="browser-default" id="vendor_id" name="vendor_id"></select>
                             <label class="active" for="name">vendor_id</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <input id="date" name="date" type="date" placeholder="Tanggal">
                             <label class="active" for="date">Tanggal</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <input id="document_no" name="document_no" type="text" placeholder="Nomor Dokumen">
                             <label class="active" for="document_no">Nomor Dokumen</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <input id="note" name="note" type="text" placeholder="Keterangan">
                             <label class="active" for="note">Keterangan</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <div class="switch mb-1">
                                 <label for="order">Status</label>
                                 <label>

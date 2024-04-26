@@ -128,36 +128,36 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">Nama</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="address" name="address" type="text" placeholder="Alamat">
                             <label class="active" for="address">Alamat</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="browser-default" id="province_id" name="province_id"></select>
                             <label class="active" for="province_id">Provinsi</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="browser-default" id="city_id" name="city_id"></select>
                             <label class="active" for="city_id">Kota/Kabupaten</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="npwp_no" name="npwp_no" type="text" placeholder="Nomor NPWP" class="npwp">
                             <label class="active" for="npwp_no">Nomor NPWP</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="npwp_name" name="npwp_name" type="text" placeholder="Nama NPWP">
                             <label class="active" for="npwp_name">Nama NPWP</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="npwp_address" name="npwp_address" type="text" placeholder="Alamat NPWP">
                             <label class="active" for="npwp_address">Alamat NPWP</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <div class="switch mb-1">
                                 <label for="order">Status</label>
                                 <label>

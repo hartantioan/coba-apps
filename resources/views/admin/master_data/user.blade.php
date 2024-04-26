@@ -177,7 +177,7 @@
                     </div>
                     <div class="col s12">
 
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <select id="type" name="type" onchange="changeMode(this);refreshGroup();">
                                 <option value="1">Pegawai</option>
                                 <option value="2">Customer</option>
@@ -186,62 +186,62 @@
                             </select>
                             <label for="type">Tipe Partner Bisnis</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <input type="hidden" id="temp" name="temp">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">Nama</label>
                         </div>
-                        <div class="input-field col s3 employee_inputs">
+                        <div class="input-field col s12 m3 employee_inputs">
                             <input id="username" name="username" type="text" placeholder="Username">
                             <label class="active" for="username">Username</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <input id="employee_no" name="employee_no" type="text" placeholder="Kode BP...">
                             <label class="active" for="employee_no">Kode/NIK (Kosongkan untuk autogenerate)</label>
                         </div>
                         <div class="col s12"></div>
-                        <div class="input-field col s3 employee_inputs">
+                        <div class="input-field col s12 m3 employee_inputs">
                             <input id="password" name="password" type="password" placeholder="Password">
                             <label class="active" for="password">Password</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <input id="phone" name="phone" type="text" placeholder="Phone">
                             <label class="active" for="phone">Telepon</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <input id="email" name="email" type="text" placeholder="Email">
                             <label class="active" for="email">Email</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <input id="address" name="address" type="text" placeholder="Alamat">
                             <label class="active" for="address">Alamat</label>
                         </div>
                         <div class="col s12"></div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <input id="id_card" name="id_card" type="text" placeholder="No KTP" class="ktp">
                             <label class="active" for="id_card">No KTP / Identitas</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <input id="id_card_address" name="id_card_address" type="text" placeholder="Alamat KTP">
                             <label class="active" for="id_card_address">Alamat KTP / Identitas</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <input id="tax_id" name="tax_id" type="text" placeholder="No. NPWP" class="npwp">
                             <label class="active" for="tax_id">No. NPWP</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <input id="tax_name" name="tax_name" type="text" placeholder="Nama di NPWP">
                             <label class="active" for="tax_name">Nama NPWP</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <input id="tax_address" name="tax_address" type="text" placeholder="Alamat di NPWP">
                             <label class="active" for="tax_address">Alamat NPWP</label>
                         </div>
-                        <div class="input-field col s6 step5" id="manager_select">
+                        <div class="input-field col s12 m6 step5" id="manager_select">
                             
                         </div>
                         <div class="col s12"></div>
-                        <div class="input-field col s3 employee_inputs">
+                        <div class="input-field col s12 m3 employee_inputs">
                             <select id="married_status" name="married_status">
                                 <option value="1">Single</option>
                                 <option value="2">Menikah</option>
@@ -249,15 +249,15 @@
                             </select>
                             <label for="married_status">Status Pernikahan</label>
                         </div>
-                        <div class="input-field col s3 employee_inputs">
+                        <div class="input-field col s12 m3 employee_inputs">
                             <input id="married_date" name="married_date" type="date">
                             <label class="active" for="married_date">Tgl.Pernikahan</label>
                         </div>
-                        <div class="input-field col s3 employee_inputs">
+                        <div class="input-field col s12 m3 employee_inputs">
                             <input id="children" name="children" type="number" value="0">
                             <label class="active" for="children">Jumlah Anak</label>
                         </div>
-                        <div class="input-field col s3 employee_inputs" id="company_select">
+                        <div class="input-field col s12 m3 employee_inputs" id="company_select">
                             <select id="company_id" name="company_id">
                                 @foreach($company as $row)
                                     <option value="{{ $row->id }}">{{ $row->name }}</option>
@@ -265,7 +265,7 @@
                             </select>
                             <label for="company_id">Perusahaan</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <select id="gender" name="gender">
                                 <option value="1">Laki-laki</option>
                                 <option value="2">Wanita</option>
@@ -273,68 +273,68 @@
                             </select>
                             <label for="gender">Jenis Kelamin</label>
                         </div>
-                        <div class="input-field col s3 other_inputs" style="display:none;">
+                        <div class="input-field col s12 m3 other_inputs" style="display:none;">
                             <input id="pic" name="pic" type="text" placeholder="PIC">
                             <label class="active" for="pic">PIC</label>
                         </div>
-                        <div class="input-field col s3 other_inputs" style="display:none;">
+                        <div class="input-field col s12 m3 other_inputs" style="display:none;">
                             <input id="pic_no" name="pic_no" type="text" placeholder="Kontak PIC">
                             <label class="active" for="pic_no">Kontak PIC</label>
                         </div>
-                        <div class="input-field col s3 other_inputs" style="display:none;">
+                        <div class="input-field col s12 m3 other_inputs" style="display:none;">
                             <input id="office_no" name="office_no" type="text" placeholder="Kontak Kantor">
                             <label class="active" for="office_no">Kontak Kantor</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <input id="limit_credit" name="limit_credit" type="text" value="0" placeholder="Limit Kredit" onkeyup="formatRupiah(this)">
                             <label class="active" for="limit_credit">Limit Kredit Supplier / BS Karyawan</label>
                         </div>
-                        <div class="input-field col s3 other_inputs" style="display:none;">
+                        <div class="input-field col s12 m3 other_inputs" style="display:none;">
                             <input id="top" name="top" type="number" min="0" step="1" value="0">
                             <label class="active" for="top">TOP (Tempo Pembayaran)</label>
                         </div>
-                        <div class="input-field col s3 other_inputs" style="display:none;">
+                        <div class="input-field col s12 m3 other_inputs" style="display:none;">
                             <input id="top_internal" name="top_internal" type="number" min="0" step="1" value="0">
                             <label class="active" for="top_internal">TOP Internal</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <select class="browser-default" id="province_id" name="province_id" onchange="getCity();"></select>
                             <label class="active" for="province_id">Provinsi</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <select class="select2 browser-default" id="city_id" name="city_id" onchange="getDistrict();">
                                 <option value="">--Pilih ya--</option>
                             </select>
                             <label class="active" for="city_id">Kota/Kabupaten</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <select class="select2 browser-default" id="district_id" name="district_id" onchange="getSubdistrict();">
                                 <option value="">--Pilih ya--</option>
                             </select>
                             <label class="active" for="district_id">Kecamatan</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <select class="select2 browser-default" id="subdistrict_id" name="subdistrict_id">
                                 <option value="">--Pilih ya--</option>
                             </select>
                             <label class="active" for="subdistrict_id">Kelurahan</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <select class="browser-default" id="country_id" name="country_id"></select>
                             <label class="active" for="country_id">Negara Asal</label>
                         </div>
-                        <div class="input-field col s3" id="group_select">
+                        <div class="input-field col s12 m3" id="group_select">
                             <select id="group_id" name="group_id"></select>
                             <label for="group_id">Kelompok Partner Bisnis</label>
                         </div>
-                        <div class="input-field col s3 employee_inputs">
+                        <div class="input-field col s12 m3 employee_inputs">
                             <select id="employee_type" name="employee_type">
                                 <option value="1">Staff</option>
                                 <option value="2">Non-Staff</option>
                             </select>
                             <label for="employee_type">Tipe Pegawai</label>
                         </div>
-                        <div class="input-field col s3 employee_inputs">
+                        <div class="input-field col s12 m3 employee_inputs">
                             <select class="form-control" id="place_id" name="place_id">
                                 @foreach ($place as $rowplace)
                                     <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
@@ -343,7 +343,7 @@
                             <label class="" for="place_id">Plant (Untuk nomor pegawai)</label>
                         </div>
                         <div class="col s12 mt-1">
-                            <div class="input-field col s3 customer_inputs" style="display:none;">
+                            <div class="input-field col s12 m3 customer_inputs" style="display:none;">
                                 <div class="switch mb-1">
                                     <label for="is_ar_invoice">Auto Generate SJ -> AR Invoice</label>
                                     <label>
@@ -354,7 +354,7 @@
                                     </label>
                                 </div>
                             </div>
-                            <div class="input-field col s3 employee_inputs">
+                            <div class="input-field col s12 m3 employee_inputs">
                                 <div class="switch mb-1">
                                     <label for="is_special_lock_user">Spesial (Kunci Periode)</label>
                                     <label>
@@ -365,7 +365,7 @@
                                     </label>
                                 </div>
                             </div>
-                            <div class="input-field col s3">
+                            <div class="input-field col s12 m3">
                                 <div class="switch mb-1">
                                     <label for="status">Status</label>
                                     <label>
@@ -1421,7 +1421,7 @@
 				if(response.length > 0){
 					$.each(response, function(i, val) {
 						$('#list-images').append(`
-							<div class="col s3 center" id="picture` + val.code + `">
+							<div class="col s12 m3 center" id="picture` + val.code + `">
 								` + val.image + `
 								<p class="mt-3">
                                     <h6>` + val.name + `</h6>

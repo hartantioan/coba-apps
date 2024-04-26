@@ -117,7 +117,7 @@
                             <div class="col s12">
                                 <fieldset>
                                     <legend>1. Informasi Utama</legend>
-                                    <div class="input-field col s3">
+                                    <div class="input-field col s12 m3">
                                         <select class="form-control" id="company_id" name="company_id">
                                             @foreach ($company as $rowcompany)
                                                 <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
@@ -125,24 +125,24 @@
                                         </select>
                                         <label class="" for="company_id">Perusahaan</label>
                                     </div>
-                                    <div class="input-field col s3">
+                                    <div class="input-field col s12 m3">
                                         <input type="hidden" id="temp" name="temp">
                                         <select class="browser-default" id="account_id" name="account_id"></select>
                                         <label class="active" for="account_id">Customer</label>
                                     </div>
-                                    <div class="input-field col s3">
+                                    <div class="input-field col s12 m3">
                                         <select class="browser-default" id="outlet_id" name="outlet_id"></select>
                                         <label class="active" for="outlet_id">Outlet</label>
                                     </div>
-                                    <div class="input-field col s3">
+                                    <div class="input-field col s12 m3">
                                         <input id="date" name="date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl.posting" value="{{ date('Y-m-d') }}">
                                         <label class="active" for="date">Tgl. Posting</label>
                                     </div>
-                                    <div class="input-field col s3">
+                                    <div class="input-field col s12 m3">
                                         <input id="note" name="note" type="text" placeholder="Keterangan">
                                         <label class="active" for="note">Keterangan</label>
                                     </div>
-                                    <div class="input-field col s3">
+                                    <div class="input-field col s12 m3">
                                         <div class="switch mb-1">
                                             <label for="status">Status</label>
                                             <label>

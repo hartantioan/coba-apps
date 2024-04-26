@@ -133,24 +133,24 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <input id="company_name" name="company_name" type="text" placeholder="Nama Perusahaan">
                             <label class="active" for="company_name">Nama Perusahaan</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="position" name="position" type="text" placeholder="Posisi">
                             <label class="active" for="position">Posisi</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="month_start" name="month_start" type="month" placeholder="Bulan & Tahun Masuk">
                             <label class="active" for="month_start">Bulan & Tahun Masuk</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="month_end" name="month_end" type="month" placeholder="Bulan & Tahun Keluar">
                             <label class="active" for="month_end">Bulan & Tahun Keluar</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="job_description" name="job_description" type="text" placeholder="">
                             <label class="active" for="job_description">Deskripsi Pekerjaan</label>
                         </div>

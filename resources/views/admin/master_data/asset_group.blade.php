@@ -114,16 +114,16 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" placeholder="Kode grup">
                             <label class="active" for="code">Kode</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="name" name="name" type="text" placeholder="Nama grup">
                             <label class="active" for="name">Nama</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="select2 browser-default" id="parent_id" name="parent_id">
                                 <option value="">Parent (Utama)</option>
                                 @foreach($parent as $m)
@@ -141,7 +141,7 @@
                             </select>
                             <label class="active" for="parent_id">Parent Menu</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="select2 browser-default" id="coa_id" name="coa_id">
                                 <option value="">-- Pilih Coa --</option>
                                 @foreach($coa as $c)
@@ -150,7 +150,7 @@
                             </select>
                             <label class="active" for="coa_id">Coa Pengakuan Aset (Kapitalisasi)</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="select2 browser-default" id="depreciation_coa_id" name="depreciation_coa_id">
                                 <option value="">-- Pilih Coa --</option>
                                 @foreach($coa as $c)
@@ -159,15 +159,15 @@
                             </select>
                             <label class="active" for="depreciation_coa_id">Coa Akumulasi Penyusutan</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="depreciation_period" name="depreciation_period" type="number" step="1" value="0">
                             <label class="active" for="depreciation_period">Periode Penyusutan (Bulan)</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="browser-default" id="cost_coa_id" name="cost_coa_id"></select>
                             <label class="active" for="cost_coa_id">Coa Biaya</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <div class="switch mb-1">
                                 <label for="order">Status</label>
                                 <label>

@@ -123,12 +123,12 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="name" for="name">Nama</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="form-control" id="relation" name="relation">
                                 <option value="1">Suami</option>
                                 <option value="2">Istri</option>
@@ -145,20 +145,20 @@
                             </select>
                             <label for="relation">Relasi</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="emergency_contact" name="emergency_contact" type="number" placeholder="">
                             <label class="emergency_contact" for="emergency_contact">Kontak</label>
                         </div>
                        
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="address" name="address" type="text" placeholder="">
                             <label class="address" for="address">Alamat</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="id_number" name="id_number" type="number" placeholder="No Induk KTP">
                             <label class="id_number" for="id_number">NIK</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="form-control" id="marriage_status" name="marriage_status">
                                 <option value="1">Single</option>
                                 <option value="2">Married</option>
@@ -167,11 +167,11 @@
                             </select>
                             <label for="marriage_status">Status</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="job" name="job" type="text" placeholder="Pekerjaan">
                             <label class="job" for="job">Pekerjaan</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="form-control" id="religion" name="religion">
                                 <option value="1">Kristen</option>
                                 <option value="2">Islam</option>
@@ -184,7 +184,7 @@
                             <label for="religion">Agama</label>
                         </div>
                         
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="birth_date" name="birth_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="mm/dd/yyyy">
                             <label class="birth_date" for="birth_date">Tanggal Lahir</label>
                         </div>

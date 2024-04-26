@@ -102,12 +102,12 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <select class="browser-default" id="item_id" name="item_id"></select>
                             <label class="active" for="item_id">Item</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select id="place_id" name="place_id">
                                 @foreach($place as $row)
                                     <option value="{{ $row->id }}">{{ $row->code }}</option>
@@ -115,11 +115,11 @@
                             </select>
                             <label for="plant_id" class="">Plant</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="price" name="price" type="text" onkeyup="formatRupiah(this)" value="0">
                             <label class="active" for="price">Harga Satuan Stock</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <div class="switch mb-1">
                                 <label for="status">Status</label>
                                 <label>

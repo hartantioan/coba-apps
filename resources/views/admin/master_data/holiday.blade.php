@@ -66,7 +66,7 @@
                                     <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
                                     <div class="collapsible-body">
                                         <div class="row">
-                                            <div class="col m4 s6 ">
+                                            <div class="col m4 s12 m6 ">
                                                 <label for="filter_status" style="font-size:1rem;">Filter Status :</label>
                                                 <div class="input-field col s12">
                                                     <select class="form-control" id="filter_status" onchange="loadDataTable()">
@@ -76,7 +76,7 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="col m4 s6 ">
+                                            <div class="col m4 s12 m6 ">
                                                 <label for="filter_type" style="font-size:1rem;">Filter Tipe :</label>
                                                 <div class="input-field col s12">
                                                     <select class="select2 browser-default" multiple="multiple" id="filter_type" name="filter_type" onchange="loadDataTable()">
@@ -139,12 +139,12 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <input id="note" name="note" type="text" placeholder="Keterangan Libur">
                             <label class="active" for="note">Keterangan</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="date" name="date" type="date" placeholder="mm/dd/yyyy">
                             <label class="active" for="date">Tanggal</label>
                         </div>

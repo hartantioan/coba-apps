@@ -113,26 +113,26 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <input type="hidden" id="tempEq" name="tempEq" value="{{ $equipmentpart->id }}">
                             <select class="browser-default" id="item_id" name="item_id" onchange="getCodeAndName();"></select>
                             <label class="active" for="item_id">Item</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="qty" name="qty" type="text" placeholder="Jumlah satuan" onkeyup="formatRupiah(this)">
                             <label class="active" for="qty">Jumlah</label>
                             <div class="form-control-feedback uom-unit">-</div>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="specification" name="specification" type="text" placeholder="Spesifikasi">
                             <label class="active" for="specification">Spesifikasi</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="description" name="description" type="text" placeholder="Deskripsi">
                             <label class="active" for="description">Deskripsi</label>
                         </div>
-                        <div class="file-field input-field col s6">
+                        <div class="file-field input-field col s12 m6">
                             <div class="btn">
                                 <span>File</span>
                                 <input type="file" name="file" id="file">
@@ -141,7 +141,7 @@
                                 <input class="file-path validate" type="text">
                             </div>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <div class="switch mb-1">
                                 <label for="order">Status</label>
                                 <label>

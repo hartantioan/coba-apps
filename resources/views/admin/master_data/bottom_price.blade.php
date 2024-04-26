@@ -107,16 +107,16 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <select class="browser-default" id="item_id" name="item_id"></select>
                             <label class="active" for="item_id">Item</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="browser-default" id="place_id" name="place_id"></select>
                             <label class="active" for="place_id">Plant</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="nominal" name="nominal" type="text" value="0,00" onkeyup="formatRupiah(this)">
                             <label class="active" for="nominal">Nominal</label>
                         </div>

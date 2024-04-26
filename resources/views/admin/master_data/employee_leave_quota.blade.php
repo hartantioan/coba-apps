@@ -118,7 +118,7 @@
                             </select>
                             <label class="active" for="user_id">Select Employee</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="form-control" id="leave_type_id" name="leave_type_id"> 
                                 <option value="1">Cuti</option>
                                 <option value="2">Sakit</option>
@@ -132,17 +132,17 @@
                             </select>
                             <label class="" for="leave_type_id">Tipe</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             
                             <input id="paid_leave_quotas" name="paid_leave_quotas" type="number" placeholder="Total Days / Shift">
                             <label class="active" for="paid_leave_quotas">Kuota Cuti Shift / Hari</label>
                         </div>
                        
-                        <div class="input-field col s6" >
+                        <div class="input-field col s12 m6" >
                             <input id="start_date" name="start_date"  type="date" placeholder="Tanggal Mulai" onchange="resetSchedule()">
                             <label class="active" for="start_date">Tanggal Awal</label>
                         </div>
-                        <div class="input-field col s6" id="end_date_field">
+                        <div class="input-field col s12 m6" id="end_date_field">
                             <input id="end_date" name="end_date"   type="date" placeholder="Tanggal Akhir">
                             <label class="active" for="end_date">Tanggal Akhir</label>
                         </div>

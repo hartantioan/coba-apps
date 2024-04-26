@@ -154,20 +154,20 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="prefix" name="prefix" type="text" placeholder="Kode Prefix">
                             <label class="active" for="prefix">Prefix</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" placeholder="Kode">
                             <label class="active" for="code">Kode</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="code">Nama</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="" id="company_id" name="company_id">
                                 @foreach($company as $m)
                                     <option value="{{ $m->id }}">{{ $m->code.' '.$m->name }}</option>
@@ -175,16 +175,16 @@
                             </select>
                             <label class="" for="company_id">Perusahaan</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="level" name="level" type="number" placeholder="Level" step="1" value="1" min="1">
                             <label class="active" for="level">Level</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="browser-default" id="parent_id" name="parent_id"></select>
                             <label class="active" for="parent_id">Parent Coa</label>
                         </div>
                         <div class="col s12"></div>
-                        <div class="col s6 row">
+                        <div class="col s12 m6 row">
                             <div class="input-field col s12">
                                 <div class="switch mb-1">
                                     <label for="is_cash_account">Akun Kas</label>
@@ -206,7 +206,7 @@
                                 <label class="active" for="currency_id">Mata Uang</label>
                             </div>
                         </div>
-                        <div class="col s6 row">
+                        <div class="col s12 m6 row">
                             <div class="input-field col s12">
                                 <div class="switch mb-1">
                                     <label for="show_journal">Muncul di Jurnal</label>

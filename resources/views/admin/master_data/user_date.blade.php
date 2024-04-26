@@ -134,7 +134,7 @@
                             </div>
                         </div>
                         <div class="col s12">
-                            <div class="col s6">
+                            <div class="col s12 m6">
                                 <h6 class="center-align">Daftar Menu</h6>
                                 <table class="bordered" id="table-menu">
                                     <thead style="position:sticky;top: -25px !important;background-color:rgb(176, 212, 212) !important;">
@@ -165,7 +165,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="col s6">
+                            <div class="col s12 m6">
                                 <h6 class="center-align">Daftar Pegawai</h6>
                                 <table class="bordered" id="table-menu">
                                     <thead style="position:sticky;top: -25px !important;background-color:rgb(176, 212, 212) !important;">

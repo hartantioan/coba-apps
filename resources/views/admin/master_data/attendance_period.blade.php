@@ -63,7 +63,7 @@
                             </li>
                         </ol>
                     </div>
-                    <div class="col s4 m6 l6">
+                    <div class="col s12 m6 l6">
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="print();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
                             <span class="hide-on-small-onl">Print</span>
@@ -142,16 +142,16 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s4">
+                        <div class="input-field col s12">
                             <input id="code" name="code" type="text" placeholder="Nama Periode">
                             <label class="active" for="code">Code</label>
                         </div>
-                        <div class="input-field col s4">
+                        <div class="input-field col s12">
                             <input type="hidden" id="temp" name="temp">
                             <input id="name" name="name" type="text" placeholder="Nama Periode">
                             <label class="active" for="name">Nama</label>
                         </div>
-                        <div class="input-field col s4">
+                        <div class="input-field col s12">
                             <select id="plant_id" name="plant_id">
                                 @foreach($place as $row)
                                     <option value="{{ $row->id }}">{{ $row->code }}</option>

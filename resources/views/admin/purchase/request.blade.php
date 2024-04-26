@@ -2797,15 +2797,16 @@
                     element : document.querySelector('.step4'),
                     intro : 'Tanggal jatuh tempo digunakan untuk menentukan masa berlaku dokumen hingga tanggal ini ditentukan.' 
                 },
-                {
-                    title : 'File Lampiran',
-                    element : document.querySelector('.step6'),
-                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
-                },
+                
                 {
                     title : 'Perusahaan',
                     element : document.querySelector('.step7'),
                     intro : 'Perusahaan dimana dokumen ini dibuat.' 
+                },
+                {
+                    title : 'File Lampiran',
+                    element : document.querySelector('.step6'),
+                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
                 },
                
                 {

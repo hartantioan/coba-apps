@@ -2798,11 +2798,7 @@
                     element : document.querySelector('.step7'),
                     intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
                 },
-                {
-                    title : 'File Lampiran',
-                    element : document.querySelector('.step8'),
-                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
-                },
+               
                 {
                     title : 'Mata Uang',
                     element : document.querySelector('.step9'),
@@ -2812,6 +2808,11 @@
                     title : 'Konversi',
                     element : document.querySelector('.step10'),
                     intro : 'Nilai konversi rupiah pada saat dokumen dibuat. Nilai konversi secara otomatis diisi ketika form tambah baru dibuka pertama kali dan data diambil dari situs exchangerate.host. Pastikan kode mata uang benar di master data agar nilai konversi tidak error.'
+                },
+                {
+                    title : 'File Lampiran',
+                    element : document.querySelector('.step8'),
+                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
                 },
                 {
                     title : 'Nomor Referensi',

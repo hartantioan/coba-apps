@@ -388,7 +388,7 @@
                                         </div>
                                     </p>
                                 </div>
-                                <div class="col m3 s3 step20" id="sj-show" style="display:none;">
+                                <div class="col m3 s3 stepsj" id="sj-show" style="display:none;">
                                     <p class="mt-2 mb-2">
                                         <h5>Surat Jalan / Penjualan</h5>
                                         <div class="row">
@@ -3234,6 +3234,11 @@
                     title : 'Good Issue / Barang Keluar',
                     element : document.querySelector('.step20'),
                     intro : 'Pilih ini jika ingin menarik data dari Good Issue / Barang Keluar aktif yang ingin menerbitkan barang baru dengan status REPAIR. Gunakan untuk produk yang keluar karena diperbaiki.' 
+                },
+                {
+                    title : 'Surat Jalan',
+                    element : document.querySelector('.stepsj'),
+                    intro : 'Pilih ini jika ingin menarik data dari Marketing Order Delivery Process / Surat Jalan aktif .' 
                 },
                 {
                     title : 'PR/GI Terpakai',

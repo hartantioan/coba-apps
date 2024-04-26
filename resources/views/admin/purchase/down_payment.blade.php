@@ -2308,11 +2308,7 @@
                     element : document.querySelector('.step7'),
                     intro : 'Tanggal berlaku hingga, dari dokumen ini.' 
                 },
-                {
-                    title : 'File Lampiran',
-                    element : document.querySelector('.step8'),
-                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
-                },
+                
                
                 {
                     title : 'Mata Uang',
@@ -2325,15 +2321,20 @@
                     intro : 'Nilai konversi rupiah pada saat dokumen dibuat. Nilai konversi secara otomatis diisi ketika form tambah baru dibuka pertama kali dan data diambil dari situs exchangerate.host. Pastikan kode mata uang benar di master data agar nilai konversi tidak error.'
                 },
                 {
-                    title : 'PPN',
-                    element : document.querySelector('.step11'),
-                    intro : 'Disini pengguna dapat memilih berapa ppn yang akan dikenakan pada down payment disini dan dapat memilih tidak terdapat ppn jika memang tidak ada ppn.'
+                    title : 'File Lampiran',
+                    element : document.querySelector('.step8'),
+                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
                 },
-                {
-                    title : 'Termasuk PPN',
-                    element : document.querySelector('.step12'),
-                    intro : 'Disini user dapat memilih apakah down payment ini sudah / belum termasuk dalam hitungan ppn.'
-                },
+                // {
+                //     title : 'PPN',
+                //     element : document.querySelector('.step11'),
+                //     intro : 'Disini pengguna dapat memilih berapa ppn yang akan dikenakan pada down payment disini dan dapat memilih tidak terdapat ppn jika memang tidak ada ppn.'
+                // },
+                // {
+                //     title : 'Termasuk PPN',
+                //     element : document.querySelector('.step12'),
+                //     intro : 'Disini user dapat memilih apakah down payment ini sudah / belum termasuk dalam hitungan ppn.'
+                // },
                 {
                     title : 'Detail Purchase Order',
                     element : document.querySelector('.step13'),

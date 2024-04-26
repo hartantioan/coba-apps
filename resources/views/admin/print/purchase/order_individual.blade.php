@@ -185,7 +185,7 @@
                                         </td>
                                         <td width="1%">:</td>
                                         <td>
-                                            {{ $data->supplier->address }}
+                                            {{ $data->supplier->address ?? '' }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -194,7 +194,7 @@
                                         </td>
                                         <td width="1%">:</td>
                                         <td>
-                                            {{ $data->supplier->phone.' / '.$data->supplier->office_no }}
+                                            {{ $data->supplier->phone ?? '' .' / '.$data->supplier->office_no ?? '' }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -409,18 +409,13 @@
                                     Jumlah Print, {{ $data->printCounter()->count() }}
                                 </td> --}}
                                 <td style="vertical-align:top;" width="25%">
-                                    Dibuat oleh, {{ $data->user->name }}
+                                    
                                 </td>
                                 <td style="vertical-align:top;" width="25%">
-                                    Tgl : {{ date('d/m/Y') }}
+                                   
                                 </td>
                                 <td style="vertical-align:top;" width="25%">
-                                    TTD : 
-                                    @if($data->user->signature)
-                                        <span style="float: right;margin-right:50px;margin-top:-15px;">{!! $data->user->signature() !!}</span>
-                                    @else
-                                        _______________
-                                    @endif
+                                   
                                 </td>
                                 <td style="vertical-align:top;" width="25%">
                                     Supplier : _______________
@@ -437,7 +432,20 @@
                         </ol>
                     </div>
                     <table class="table-bot1" width="100%" border="0">
-                        
+                            <tr>
+                                <td class="center-align">
+                                    @php
+                                        $carbonInstance = Carbon::parse($row->created_at);
+                                        $dayName = $carbonInstance->format('l');
+                                        $hour = $carbonInstance->hour;
+                                        $minute = $carbonInstance->minute;
+                                        $date = $carbonInstance->format('d/m/Y');
+                                        $formattedHour = sprintf('%02d', $hour);
+                                        $formattedMinute = sprintf('%02d', $minute);
+                                    @endphp
+                                    <div>Dibuat oleh,<span style="font-weight: bold"> {{ $data->user->name }}</span> Hari <span style="font-weight: bold">{{CustomHelper::hariIndo($dayName)}}</span>  tanggal <span style="font-weight: bold">{{$date}}</span>  jam <span style="font-weight: bold">{{$formattedHour}}:{{$formattedMinute}}</span></div>
+                                </td>
+                            </tr>
                             @if($data->approval())
                                 @foreach ($data->approval() as $detail)
                                     @foreach ($detail->approvalMatrix()->where('status','2')->get() as $row)
@@ -449,8 +457,10 @@
                                                 $hour = $carbonInstance->hour;
                                                 $minute = $carbonInstance->minute;
                                                 $date = $carbonInstance->format('d/m/Y');
+                                                $formattedHour = sprintf('%02d', $hour);
+                                                $formattedMinute = sprintf('%02d', $minute);
                                             @endphp
-                                            <div>{{ $row->approvalTemplateStage->approvalStage->approval->document_text }}<span style="font-weight: bold">{{ $row->user->name }}</span> Hari <span style="font-weight: bold">{{CustomHelper::hariIndo($dayName)}}</span>  tanggal <span style="font-weight: bold">{{$date}}</span>  jam <span style="font-weight: bold">{{$hour}}:{{$minute}}</span></div>
+                                            <div>{{ $row->approvalTemplateStage->approvalStage->approval->document_text }} <span style="font-weight: bold">{{ $row->user->name }}</span> Hari <span style="font-weight: bold">{{CustomHelper::hariIndo($dayName)}}</span>  tanggal <span style="font-weight: bold">{{$date}}</span>  jam <span style="font-weight: bold">{{$formattedHour}}:{{$formattedMinute}}</span></div>
                                       
                                         </td>
                                     </tr>

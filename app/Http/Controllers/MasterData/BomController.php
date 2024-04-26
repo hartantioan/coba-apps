@@ -354,7 +354,7 @@ class BomController extends Controller
                 'lookable_id'   => $m->lookable_id,
                 'detail_text'   => $m->lookable->code.' - '.$m->lookable->name,    
                 'qty'           => CustomHelper::formatConditionalQty($m->qty),
-                'uom_unit'      => $m->lookable_type == 'items' ? $m->lookable->uomUnit->code : '-',
+                'uom_unit'      => $m->lookable->uomUnit->code,
                 'nominal'       => number_format($m->nominal,2,',','.'),
                 'total'         => number_format($m->total,2,',','.'),
                 'description'   => $m->description,

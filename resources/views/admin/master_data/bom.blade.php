@@ -430,7 +430,7 @@
                     <span id="arr_satuan` + count + `">-</span>
                 </td>
                 <td>
-                    <input name="arr_nominal[]" id="arr_nominal` + count + `" type="text" value="0,00" readonly>
+                    <input name="arr_nominal[]" id="arr_nominal` + count + `" type="text" value="0,00">
                 </td>
                 <td>
                     <input name="arr_total[]" id="arr_total` + count + `" type="text" value="0,00" readonly>
@@ -513,6 +513,10 @@
             "deferRender": true,
             "destroy": true,
             "iDisplayInLength": 10,
+            "fixedColumns": {
+                left: 2,
+                right: 1
+            },
             "order": [[0, 'desc']],
             ajax: {
                 url: '{{ Request::url() }}/datatable',
@@ -616,10 +620,10 @@
                     beforeSend: function() {
                         $('#validation_alert').hide();
                         $('#validation_alert').html('');
-                        loadingOpen('.modal-content');
+                        loadingOpen('#modal1');
                     },
                     success: function(response) {
-                        loadingClose('.modal-content');
+                        loadingClose('#modal1');
                         if(response.status == 200) {
                             success();
                             M.toast({
@@ -657,7 +661,7 @@
                     },
                     error: function() {
                         $('.modal-content').scrollTop(0);
-                        loadingClose('.modal-content');
+                        loadingClose('#modal1');
                         swal({
                             title: 'Ups!',
                             text: 'Check your internet connection.',
@@ -718,6 +722,11 @@
                 `);
                 $('#company_id').val(response.company_id).formSelect();
                 $('#place_id').val(response.place_id).formSelect();
+                $('#line_id').val(response.line_id).formSelect();
+                $('#warehouse_id').val(response.warehouse_id).formSelect();
+                $('#machine_id').val(response.machine_id).formSelect();
+                $('#valid_from').val(response.valid_from);
+                $('#valid_to').val(response.valid_to);
                 $('#qty_output').val(response.qty_output);
                 $('#qty_planned').val(response.qty_planned);
                 $('#type').val(response.type).formSelect();
@@ -742,19 +751,19 @@
                                 ` + (val.lookable_type == 'items' ? 'Item' : 'Resource') + `
                             </td>
                             <td>
-                                <select class="browser-default" name="arr_detail[]" id="arr_detail` + count + `" onchange="getRowUnit('` + count + `')"></select>
+                                <select class="browser-default" name="arr_detail[]" id="arr_detail` + count + `" onchange="getRowUnit('` + count + `','` + val.lookable_type + `')"></select>
                             </td>
                             <td>
-                                <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);countAll();">
+                                <input name="arr_qty[]" id="arr_qty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);countAll();">
                             </td>
                             <td class="center">
                                 <span id="arr_satuan` + count + `">` + val.uom_unit + `</span>
                             </td>
                             <td>
-                                <input name="arr_nominal[]" type="text" value="` + val.nominal + `" onkeyup="formatRupiah(this);countAll();" ` + (val.lookable_type == 'items' ? 'readonly' : '') + `>
+                                <input name="arr_nominal[]" id="arr_nominal` + count + `" type="text" value="` + val.nominal + `">
                             </td>
                             <td>
-                                <input name="arr_total[]" type="text" value="` + val.total + `" onkeyup="formatRupiah(this);" readonly>
+                                <input name="arr_total[]" id="arr_total` + count + `" type="text" value="` + val.total + `" readonly>
                             </td>
                             <td>
                                 <input name="arr_description[]" type="text" placeholder="Deskripsi item material" value="` + val.description + `">

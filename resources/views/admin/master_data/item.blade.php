@@ -204,6 +204,11 @@
                                                     <p>Info 2 : Item yang terpakai pada transaksi, Satuan tidak akan bisa dirubah.</p>
                                                 </div>
                                             </div>
+                                            <div class="card-alert card purple">
+                                                <div class="card-content white-text">
+                                                    <p>Info 3 : Silahkan tekan tombol <a href="javascript:void(0);" type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-text btn-small" data-popup="tooltip" title="Document Relasi"><i class="material-icons dp48">device_hub</i></a> untuk melihat relasi dokumen pada item terpilih.</p>
+                                                </div>
+                                            </div>
                                             {{-- <div class="card-alert card blue">
                                                 <div class="card-content white-text">
                                                     <p>Info : Khusus untuk Item Penjualan, pengguna harus menentukan <b>Tipe, Ukuran, Jenis, Motif, Warna, Grade, dan Brand </b>, dimana Kode Item dan Nama Item akan otomatis diambil dari gabungan 7 komponen tersebut.</p>

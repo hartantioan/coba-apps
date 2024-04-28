@@ -337,6 +337,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('marketing_order_down_payment', [Select2Controller::class, 'marketingOrderDownPayment']);
                 Route::get('marketing_order_down_payment_paid', [Select2Controller::class, 'marketingOrderDownPaymentPaid']);
                 Route::get('marketing_order_invoice', [Select2Controller::class, 'marketingOrderInvoice']);
+                Route::get('marketing_order_form_plan', [Select2Controller::class, 'marketingOrderFormPlan']);
                 Route::get('transportation', [Select2Controller::class, 'transportation']);
                 Route::get('outlet', [Select2Controller::class, 'outlet']);
                 Route::get('position', [Select2Controller::class, 'position']);
@@ -1905,6 +1906,8 @@ Route::prefix('admin')->group(function () {
                     Route::post('get_code', [MarketingOrderPlanController::class, 'getCode']);
                     Route::post('print',[MarketingOrderPlanController::class, 'print']);
                     Route::post('done',[MarketingOrderPlanController::class, 'done'])->middleware('operation.access:marketing_order_production,update');
+                    Route::post('send_used_data',[MarketingOrderPlanController::class, 'sendUsedData'])->middleware('operation.access:marketing_order_production,update');
+                    Route::post('remove_used_data', [MarketingOrderPlanController::class, 'removeUsedData']);
                     Route::post('print_by_range',[MarketingOrderPlanController::class, 'printByRange']);
                     Route::get('export',[MarketingOrderPlanController::class, 'export']);
                     Route::get('viewstructuretree',[MarketingOrderPlanController::class, 'viewStructureTree']);

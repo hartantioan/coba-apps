@@ -30,9 +30,11 @@ use App\Models\UserData;
 use Illuminate\Http\Request;
 use App\Models\Currency;
 use App\Helpers\CustomHelper;
+use App\Models\ItemUnit;
 use App\Models\User;
 use App\Models\Tax;
 use App\Models\Menu;
+use App\Models\MenuUser;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -58,6 +60,7 @@ class MarketingOrderController extends Controller
         $lastSegment = request()->segment(count(request()->segments()));
        
         $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
             'title'         => 'Sales Order',
             'content'       => 'admin.sales.order',
@@ -70,7 +73,8 @@ class MarketingOrderController extends Controller
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
             'newcode'       => $menu->document_code.date('y'),
-            'menucode'      => $menu->document_code
+            'menucode'      => $menu->document_code,
+            'modedata'      => $menuUser->mode ? $menuUser->mode : '',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -405,6 +409,7 @@ class MarketingOrderController extends Controller
             'arr_tax_nominal'           => 'required|array',
             'arr_grandtotal'            => 'required|array',
             'arr_item'                  => 'required|array',
+            'arr_unit'                  => 'required|array',
             'arr_item_stock'            => 'required|array',
             'arr_qty'                   => 'required|array',
             'arr_price'                 => 'required|array',
@@ -466,6 +471,8 @@ class MarketingOrderController extends Controller
             'arr_grandtotal.array'              => 'Grandtotal baris harus array.',
             'arr_item.required'                 => 'Item baris tidak boleh kosong.',
             'arr_item.array'                    => 'item baris harus array.',
+            'arr_unit.required'                 => 'Satuan tidak boleh kosong.',
+            'arr_unit.array'                    => 'Satuan harus array.',
             'arr_item_stock.required'           => 'Stok item tidak boleh kosong.',
             'arr_item_stock.array'              => 'Stok item harus array.',
             'arr_qty.required'                  => 'Baris qty tidak boleh kosong.',
@@ -691,10 +698,14 @@ class MarketingOrderController extends Controller
                 try {
                     
                     foreach($request->arr_item as $key => $row){
+                        $itemUnit = ItemUnit::find(intval($request->arr_unit[$key]));
+                        
                         MarketingOrderDetail::create([
                             'marketing_order_id'            => $query->id,
                             'item_id'                       => $row,
                             'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                            'item_unit_id'                  => $itemUnit->id,
+                            'qty_conversion'                => $itemUnit->conversion,
                             'price'                         => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
                             'margin'                        => str_replace(',','.',str_replace('.','',$request->arr_margin[$key])),
                             'is_include_tax'                => $request->arr_is_include_tax[$key],
@@ -708,11 +719,11 @@ class MarketingOrderController extends Controller
                             'total'                         => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
                             'tax'                           => $request->arr_tax_nominal[$key],
                             'grandtotal'                    => $request->arr_grandtotal[$key],
-                            'note'                          => $request->arr_note[$key] ? $request->arr_note[$key] : NULL,
-                            'item_stock_id'                 => $request->arr_item_stock[$key] ? $request->arr_item_stock[$key] : NULL,
+                            'note'                          => $request->arr_note[$key] ?? NULL,
+                            'item_stock_id'                 => $request->arr_item_stock[$key] ?? NULL,
                             'place_id'                      => $request->arr_place[$key],
                             'warehouse_id'                  => $request->arr_warehouse[$key],
-                            'area_id'                       => $request->arr_area[$key],
+                            'area_id'                       => $request->arr_area[$key] ?? NULL,
                         ]);
                     }
 
@@ -775,7 +786,7 @@ class MarketingOrderController extends Controller
                 'item_id'               => $row->item_id,
                 'item_name'             => $row->item->code.' - '.$row->item->name,
                 'qty'                   => CustomHelper::formatConditionalQty($row->qty),
-                'unit'                  => $row->item->sellUnit->code,
+                'unit'                  => $row->itemUnit->unit->code,
                 'price'                 => number_format($row->price,2,',','.'),
                 'margin'                => number_format($row->margin,2,',','.'),
                 'is_include_tax'        => $row->is_include_tax ? $row->is_include_tax : '',
@@ -792,13 +803,16 @@ class MarketingOrderController extends Controller
                 'note'                  => $row->note,
                 'item_stock_id'         => $row->item_stock_id,
                 'item_stock_name'       => $row->itemStock->place->code.' - '.$row->itemStock->warehouse->code,
-                'item_stock_qty'        => CustomHelper::formatConditionalQty($row->itemStock->qty / $row->item->sell_convert),
+                'item_stock_qty'        => CustomHelper::formatConditionalQty($row->itemStock->qty),
                 'list_stock'            => $row->item->currentStockSales($this->dataplaces,$this->datawarehouses),
                 'place_id'              => $row->place_id,
                 'warehouse_id'          => $row->warehouse_id,
                 'area_id'               => $row->area_id,
-                'area_name'             => $row->area->name,
+                'area_name'             => $row->area()->exists() ? $row->area->name : '',
                 'list_warehouse'        => $row->item->warehouseList(),
+                'item_unit_id'          => $row->item_unit_id,
+                'sell_units'            => $row->item->arrSellUnits(),
+                'uom'                   => $row->item->uomUnit->code,
             ];
         }
 
@@ -878,14 +892,14 @@ class MarketingOrderController extends Controller
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
                 <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
-                <td class="center-align">'.$row->item->sellUnit->code.'</td>
+                <td class="center-align">'.$row->itemUnit->unit->code.'</td>
                 <td class="right-align">'.number_format($row->price,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->margin,2,',','.').'</td>
                 <td class="center-align">'.number_format($row->percent_discount_1,2,',','.').'</td>
                 <td class="center-align">'.number_format($row->percent_discount_2,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->discount_3,2,',','.').'</td>
                 <td class="">'.$row->note.'</td>
-                <td class="center-align">'.$row->place->code.' - '.$row->warehouse->name.' - '.$row->area->name.'</td>
+                <td class="center-align">'.$row->place->code.' - '.$row->warehouse->name.' - '.($row->area()->exists() ? $row->area->name : '').'</td>
                 <td class="right-align">'.number_format($row->other_fee,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->price_after_discount,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->total,2,',','.').'</td>

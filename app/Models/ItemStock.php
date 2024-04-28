@@ -89,6 +89,7 @@ class ItemStock extends Model
         });
     }
 
+    #PERBAIKI
     public function totalQtyUnapproved(){
         $total = 0;
         foreach($this->marketingOrderDeliveryDetailUnapproved as $row){

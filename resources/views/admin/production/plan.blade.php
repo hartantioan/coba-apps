@@ -104,6 +104,11 @@
                                     </h4>
                                     <div class="row mt-2">
                                         <div class="col s12">
+                                            <div class="card-alert card green">
+                                                <div class="card-content white-text">
+                                                    <p>Info : Satuan yang digunakan pada form ini adalah satuan terkecil (UoM). Jika data diambil dari SO/MO dan qty barang bukan satuan terkecil (satuan penjualan) maka qty akan dikalikan dengan nilai konversi qty item SO/MO terpilih.</p>
+                                                </div>
+                                            </div>
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
@@ -123,8 +128,11 @@
                                                         <th>Pengguna</th>
                                                         <th>Perusahaan</th>
                                                         <th>Plant</th>
+                                                        <th>Line</th>
                                                         <th>Tgl.Post</th>
                                                         <th>Tipe</th>
+                                                        <th>Tgl.Mulai</th>
+                                                        <th>Tgl.Selesai</th>
                                                         <th>Dokumen</th>
                                                         <th>Status</th>
                                                         <th>By</th>
@@ -184,10 +192,19 @@
                                     <div class="input-field col m3 s12 step4">
                                         <select class="form-control" id="place_id" name="place_id" onchange="getCapacity();">
                                             @foreach ($place as $row)
-                                                <option value="{{ $row->id }}" data-capacity="{{ CustomHelper::formatConditionalQty($row->capacity) }}">{{ $row->name }}</option>
+                                                <option value="{{ $row->id }}" data-capacity="{{ CustomHelper::formatConditionalQty($row->capacity) }}">{{ $row->code }}</option>
                                             @endforeach
                                         </select>
                                         <label class="" for="place_id">Plant</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="form-control" id="line_id" name="line_id">
+                                            <option value="">--Kosong--</option>
+                                            @foreach ($line as $row)
+                                                <option value="{{ $row->id }}">{{ $row->code }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="" for="line_id">Line</label>
                                     </div>
                                     <div class="input-field col m3 s12 step5">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
@@ -210,6 +227,24 @@
                                             <input class="file-path validate" type="text">
                                         </div>
                                     </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="start_date" name="start_date" min="{{ $minDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                                        <label class="active" for="start_date">Tgl.Mulai Proses</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="end_date" name="end_date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Valid">
+                                        <label class="active" for="end_date">Tgl.Selesai Proses</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="browser-default" id="marketing_order_id" name="marketing_order_id"></select>
+                                        <label class="active" for="marketing_order_id">Sales Order / Marketing Order</label>
+                                    </div>
+                                    <div class="col m3 s12">
+                                        <a class="waves-effect waves-light cyan btn-small mt-5 mr-1" onclick="getMarketingOrder();" href="javascript:void(0);">
+                                            <i class="material-icons left">add</i> Tambah SO/MO
+                                        </a>
+                                    </div>
+                                    <div class="col m12 s12"></div>
                                     <div class="input-field col m3 s12 right-align" style="font-size:15px !important;font-weight:800;">
                                         Kapasitas Plant :
                                     </div>
@@ -218,6 +253,9 @@
                                     </div>
                                     <div class="input-field col m1 s12" style="font-size:15px !important;font-weight:800;">
                                         M<sup>2</sup>
+                                    </div>
+                                    <div class="col m12 s12">
+                                        <h6><b>SO/MO Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                                     </div>
                                 </fieldset>
                             </div>
@@ -231,60 +269,30 @@
                                             <table class="bordered" id="table-detail">
                                                 <thead>
                                                     <tr>
-                                                        <th class="center">Item</th>
-                                                        <th class="center">Qty (Satuan Jual)</th>
+                                                        <th class="center">Item Code</th>
+                                                        <th class="center">Item Name</th>
+                                                        <th class="center">Qty (Satuan UoM)</th>
                                                         <th class="center">Satuan</th>
                                                         <th class="center">Keterangan</th>
                                                         <th class="center">Tgl.Request</th>
-                                                        <th class="center">Urgent</th>
+                                                        <th class="center">Prioritas</th>
                                                         <th class="center">Hapus</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-item">
-                                                    <tr class="row_item">
-                                                        <td>
-                                                            <select class="browser-default item-array" id="arr_item0" name="arr_item[]" onchange="getRowUnit(0)" required></select>
-                                                        </td>
-                                                        <td>
-                                                            <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="0" onkeyup="formatRupiahNoMinus(this);count();" required>
-                                                        </td>
-                                                        <td class="center">
-                                                            <span id="arr_satuan0">-</span>
-                                                        </td>
-                                                        <td>
-                                                            <input name="arr_note[]" type="text" placeholder="Keterangan barang..." value="-" required>
-                                                        </td>
-                                                        <td>
-                                                            <input name="arr_request_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}" required>
-                                                        </td>
-                                                        <td>
-                                                            <div class="switch mb-1">
-                                                                <label>
-                                                                    <input type="checkbox" id="arr_urgent0" name="arr_urgent[]" value="1">
-                                                                    <span class="lever"></span>
-                                                                </label>
-                                                            </div>
-                                                        </td>
-                                                        <td class="center">
-                                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                                                                <i class="material-icons">delete</i>
-                                                            </a>
-                                                        </td>
-                                                    </tr>
                                                     <tr id="last-row-item" style="font-size:17px !important;font-weight:800;">
-                                                        <td class="right-align">
+                                                        <td class="right-align" colspan="2">
                                                             TOTAL MOP
                                                         </td>
                                                         <td class="right-align" id="total-mop">
                                                             0,000
                                                         </td>
                                                         <td class="left-align" colspan="5">
-                                                            {{-- M<sup>2</sup> --}}
-                                                            Box
+                                                            M<sup>2</sup>
                                                         </td>
                                                     </tr>
-                                                    <tr>
-                                                        <td colspan="7">
+                                                    <tr id="custom-add">
+                                                        <td colspan="8">
                                                             <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                                 <i class="material-icons left">add</i> Tambah
                                                             </a>
@@ -485,6 +493,7 @@
             activeSelect2.classList.remove('tab-active');
         }
     });
+
     $(function() {
 
         $("#table-detail th").resizable({
@@ -566,6 +575,11 @@
                 $('#validation_alert').html('');
                 M.updateTextFields();
                 window.onbeforeunload = function() {
+                    if($('.data-used').length > 0){
+                        $('.data-used').trigger('click');
+                    }else{
+                        $('.row_item').remove();
+                    }
                     return 'You will lose all changes made since your last save';
                 };
                 getCapacity();
@@ -581,6 +595,11 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
+                if($('.data-used').length > 0){
+                    $('.data-used').trigger('click');
+                }else{
+                    $('.row_item').remove();
+                }
                 $('#total-mop').text('0,000');
             }
         });
@@ -591,7 +610,115 @@
 
         $('#arr_place0,#arr_department0').formSelect();
         select2ServerSide('#arr_item0', '{{ url("admin/select2/sales_item") }}');
+        select2ServerSide('#marketing_order_id', '{{ url("admin/select2/marketing_order_form_plan") }}');
     });
+
+    function getMarketingOrder(){
+        $('.row_item').remove();
+        if($('#marketing_order_id').val()){
+            sendUsedData($('#marketing_order_id').val(),$("#marketing_order_id").select2('data')[0].table_name);
+            $.each($("#marketing_order_id").select2('data')[0].details, function(i, value) {
+                var count = makeid(10);
+                $('#last-row-item').before(`
+                    <tr class="row_item" data-id="` + $('#marketing_order_id').val() + `">
+                        <input type="hidden" name="arr_marketing_order_detail[]" value="` + value.id + `">
+                        <input type="hidden" name="arr_item[]" value="` + value.item_id + `">
+                        <td>
+                            ` + value.item_code + `
+                        </td>
+                        <td>
+                            ` + value.item_name + `
+                        </td>
+                        <td>
+                            <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + value.qty + `" onkeyup="formatRupiahNoMinus(this);count();" required>
+                        </td>
+                        <td class="center">
+                            <span id="arr_satuan` + count + `">` + value.uom + `</span>
+                        </td>
+                        <td>
+                            <input name="arr_note[]" type="text" placeholder="Keterangan barang..." value="` + value.note + `" required>
+                        </td>
+                        <td>
+                            <input name="arr_request_date[]" type="date" value="` + value.request_date + `" min="{{ date('Y-m-d') }}" required>
+                        </td>
+                        <td>
+                            <input name="arr_priority[]" type="number" value="0" min="0" step="1">
+                        </td>
+                        <td class="center">
+                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                <i class="material-icons">delete</i>
+                            </a>
+                        </td>
+                    </tr>
+                `);
+            });
+        }else{
+            
+        }
+        $('#marketing_order_id').empty();
+    }
+
+    function sendUsedData(id,type){
+        $.ajax({
+            url: '{{ Request::url() }}/send_used_data',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id,
+                type: type,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+            },
+            success: function(response) {
+                if(response.status == 500){
+                    M.toast({
+                        html: response.message
+                    });
+                }else{
+                    $('#list-used-data').append(`
+                        <div class="chip purple darken-4 gradient-shadow white-text">
+                            ` + response.code + `
+                            <i class="material-icons close data-used" onclick="removeUsedData('` + type + `','` + id + `')">close</i>
+                        </div>
+                    `);
+                }
+            },
+            error: function() {
+                
+            }
+        });
+    }
+
+    function removeUsedData(type,id){
+        $.ajax({
+            url: '{{ Request::url() }}/remove_used_data',
+            type: 'POST',
+            dataType: 'JSON',
+            data: { 
+                id : id,
+                type : type,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                
+            },
+            success: function(response) {
+                $('.row_item[data-id="' + id + '"]').remove();
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
 
     function makeTreeOrg(data,link){
         var $ = go.GraphObject.make;
@@ -928,8 +1055,11 @@
                 { name: 'user_id', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
                 { name: 'place_id', className: 'center-align' },
+                { name: 'line_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'type', className: '' },
+                { name: 'start_date', className: 'center-align' },
+                { name: 'end_date', className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
               { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
@@ -1019,10 +1149,12 @@
                 
                 var formData = new FormData($('#form_data')[0]);
 
-                formData.delete('arr_urgent[]');
+                formData.delete('arr_marketing_order_detail[]');
+                formData.delete('arr_priority[]');
 
-                $('input[name^="arr_urgent[]"]').each(function(index){
-                    formData.append('arr_urgent[]',($(this).is(':checked') ? $(this).val() : '' ));
+                $('input[name^="arr_priority[]"]').each(function(index){
+                    formData.append('arr_priority[]',($(this).val() ? $(this).val() : '0' ));
+                    formData.append('arr_marketing_order_detail[]',($('input[name^="arr_marketing_order_detail[]"]').eq(index).val() ? $('input[name^="arr_marketing_order_detail[]"]').eq(index).val() : '' ));
                 });
                 var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
@@ -1047,10 +1179,10 @@
                     beforeSend: function() {
                         $('#validation_alert').hide();
                         $('#validation_alert').html('');
-                        loadingOpen('.modal-content');
+                        loadingOpen('#modal1');
                     },
                     success: function(response) {
-                        loadingClose('.modal-content');
+                        loadingClose('#modal1');
                         $('input').css('border', 'none');
                         $('input').css('border-bottom', '0.5px solid black');
                         if(response.status == 200) {
@@ -1094,7 +1226,7 @@
                     },
                     error: function() {
                         $('.modal-content').scrollTop(0);
-                        loadingClose('.modal-content');
+                        loadingClose('#modal1');
                         swal({
                             title: 'Ups!',
                             text: 'Check your internet connection.',
@@ -1134,7 +1266,10 @@
                 $('#post_date').val(response.post_date);
                 $('#company_id').val(response.company_id).formSelect();
                 $('#place_id').val(response.place_id).formSelect();
+                $('#line_id').val(response.line_id).formSelect();
                 $('#type').val(response.type).formSelect();
+                $('#start_date').val(response.start_date);
+                $('#end_date').val(response.end_date);
 
                 if(response.details.length > 0){
                     $('.row_item').each(function(){
@@ -1145,9 +1280,16 @@
                         var count = makeid(10);
                         $('#last-row-item').before(`
                             <tr class="row_item">
-                                <td>
-                                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" required></select>
-                                </td>
+                                <input type="hidden" name="arr_marketing_order_detail[]" value="` + val.id + `">
+                                ` + (val.id ? `<input type="hidden" name="arr_item[]" value="` + val.item_id + `">` : `` ) + `
+                                ` + (val.id ? 
+                                        `<td>` + val.item_code + `</td><td>` + val.item_name + `</td>` 
+                                        : 
+                                        `<td colspan="2">
+                                            <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" required></select>
+                                        </td>`
+                                    ) 
+                                + `
                                 <td>
                                     <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);count();" required>
                                 </td>
@@ -1161,12 +1303,7 @@
                                     <input name="arr_request_date[]" type="date" value="` + val.request_date + `" min="{{ date('Y-m-d') }}" required>
                                 </td>
                                 <td>
-                                    <div class="switch mb-1">
-                                        <label>
-                                            <input type="checkbox" id="arr_urgent` + count + `" name="arr_urgent[]" value="1">
-                                            <span class="lever"></span>
-                                        </label>
-                                    </div>
+                                    <input name="arr_priority[]" type="number" value="` + val.priority + `" min="0" step="1">
                                 </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -1175,12 +1312,11 @@
                                 </td>
                             </tr>
                         `);
-                        $('#arr_item' + count).append(`
-                            <option value="` + val.item_id + `">` + val.item_name + `</option>
-                        `);
-                        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
-                        if(val.is_urgent){
-                            $('#arr_urgent' + count).prop( "checked", true);
+                        if(!val.id){
+                            $('#arr_item' + count).append(`
+                                <option value="` + val.item_id + `">` + val.item_name + `</option>
+                            `);
+                            select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
                         }
                     });
                 }
@@ -1317,7 +1453,7 @@
 
     function getRowUnit(val){
         if($("#arr_item" + val).val()){
-            $('#arr_satuan' + val).text($("#arr_item" + val).select2('data')[0].sell_unit);
+            $('#arr_satuan' + val).text($("#arr_item" + val).select2('data')[0].uom);
         }else{
             $('#arr_satuan' + val).text('-');
         }
@@ -1368,7 +1504,8 @@
         var count = makeid(10);
         $('#last-row-item').before(`
             <tr class="row_item">
-                <td>
+                <input type="hidden" name="arr_marketing_order_detail[]" value="">
+                <td colspan="2">
                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" required></select>
                 </td>
                 <td>
@@ -1384,12 +1521,7 @@
                     <input name="arr_request_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}" required>
                 </td>
                 <td>
-                    <div class="switch mb-1">
-                        <label>
-                            <input type="checkbox" id="arr_urgent` + count + `" name="arr_urgent[]" value="1">
-                            <span class="lever"></span>
-                        </label>
-                    </div>
+                    <input name="arr_priority[]" type="number" value="0" min="0" step="1">
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">

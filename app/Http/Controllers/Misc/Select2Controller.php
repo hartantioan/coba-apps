@@ -683,12 +683,12 @@ class Select2Controller extends Controller {
                 'code'              => $d->code,
                 'name'              => $d->name,
                 'uom'               => $d->uomUnit->code,
-                'sell_unit'         => $d->sellUnit->code,
                 'old_prices'        => $d->oldSalePrices($this->dataplaces),
                 'stock_list'        => $d->currentStockSales($this->dataplaces,$this->datawarehouses),
                 'list_warehouse'    => $d->warehouseList(),
                 'list_outletprice'  => $d->listOutletPrice(),
                 'list_area'         => Area::where('status','1')->get(),
+                'sell_units'        => $d->arrSellUnits(),
             ];
         }
 
@@ -2437,6 +2437,39 @@ class Select2Controller extends Controller {
                     'grandtotal'    => number_format($d->grandtotal,2,',','.'),
                 ];
             }
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function marketingOrderFormPlan(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = MarketingOrder::where(function($query) use($search){
+            $query->where('code', 'like', "%$search%")
+                ->orWhere('note_internal','like',"%$search%")
+                ->orWhere('note_external','like',"%$search%")
+                ->orWhereHas('user',function($query) use ($search){
+                    $query->where('name','like',"%$search%")
+                        ->orWhere('employee_no','like',"%$search%");
+                })
+                ->orWhereHas('account',function($query) use ($search){
+                    $query->where('name','like',"%$search%")
+                        ->orWhere('employee_no','like',"%$search%");
+                });
+        })
+        ->whereDoesntHave('used')
+        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+        ->whereIn('status',['2','3'])->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code,
+                'details'       => $d->details(),
+                'table_name'    => $d->getTable(),
+            ];
         }
 
         return response()->json(['items' => $response]);

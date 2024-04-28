@@ -15,6 +15,7 @@ use App\Models\MarketingOrderDownPayment;
 use App\Models\MarketingOrderInvoice;
 use App\Models\User;
 use App\Helpers\TreeHelper;
+use App\Models\Line;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -46,6 +47,7 @@ class MarketingOrderPlanController extends Controller
             'content'       => 'admin.production.plan',
             'company'       => Company::where('status','1')->get(),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+            'line'          => Line::where('status','1')->whereIn('place_id',$this->dataplaces)->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
@@ -54,6 +56,32 @@ class MarketingOrderPlanController extends Controller
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+    }
+
+    public function sendUsedData(Request $request){
+
+        $data = MarketingOrder::find($request->id);
+       
+        if(!$data->used()->exists()){
+            CustomHelper::sendUsedData($request->type,$request->id,'Form Marketing Order Production / Marketing Order Plan');
+            return response()->json([
+                'status'    => 200,
+                'code'      => $data->code,
+            ]);
+        }else{
+            return response()->json([
+                'status'    => 500,
+                'message'   => 'Dokumen no. '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.'
+            ]);
+        }
+    }
+
+    public function removeUsedData(Request $request){
+        CustomHelper::removeUsedData($request->type,$request->id);
+        return response()->json([
+            'status'    => 200,
+            'message'   => ''
+        ]);
     }
 
     public function getCode(Request $request){
@@ -171,10 +199,13 @@ class MarketingOrderPlanController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->company->name,
-                    $val->place->name,
+                    $val->place->code,
+                    $val->line->code,
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->type(),
-                      $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
+                    date('d/m/Y',strtotime($val->start_date)),
+                    date('d/m/Y',strtotime($val->end_date)),
+                    $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->status(),
                     (
                         ($val->status == 3 && is_null($val->done_id)) ? 'SYSTEM' :
@@ -224,27 +255,28 @@ class MarketingOrderPlanController extends Controller
         
         $validation = Validator::make($request->all(), [
             'code'                      => 'required',
-            'code'			            => $request->temp ? ['required', Rule::unique('marketing_order_plans', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_plans,code',
             'code_place_id'             => 'required',
             'company_id'			    => 'required',
             'place_id'		            => 'required',
+            'line_id'                   => 'required',
             'post_date'		            => 'required',
             'type'                      => 'required',
+            'start_date'                => 'required',
+            'end_date'                  => 'required',
             'arr_item'                  => 'required|array',
             'arr_qty'                   => 'required|array',
             'arr_request_date'          => 'required|array',
             'arr_note'                  => 'required|array',
         ], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
-            /* 'code.string'                       => 'Kode harus dalam bentuk string.',
-            'code.min'                          => 'Kode harus minimal 18 karakter.',
-            'code.unique'                       => 'Kode telah dipakai', */
             'code_place_id.required'            => 'Plant Tidak boleh kosong',
-                
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
             'place_id.required' 			    => 'Plant tidak boleh kosong.',
+            'line_id.required' 			        => 'Line tidak boleh kosong.',
             'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
             'type.required'		                => 'Tipe tidak boleh kosong.',
+            'start_date.required'               => 'Tgl. mulai tidak boleh kosong.',
+            'end_date.required'                 => 'Tgl. berakhir tidak boleh kosong.',
             'arr_item.required'                 => 'Item tidak boleh kosong.',
             'arr_item.array'                    => 'Item harus array.',
             'arr_qty.required'                  => 'Qty tidak boleh kosong.',
@@ -313,8 +345,11 @@ class MarketingOrderPlanController extends Controller
                         $query->code = $request->code;
                         $query->company_id = $request->company_id;
                         $query->place_id = $request->place_id;
+                        $query->line_id = $request->line_id;
                         $query->post_date = $request->post_date;
                         $query->type = $request->type;
+                        $query->start_date = $request->start_date;
+                        $query->end_date = $request->end_date;
                         $query->document = $document;
                         $query->status = '1';
 
@@ -346,8 +381,11 @@ class MarketingOrderPlanController extends Controller
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $request->company_id,
                         'place_id'	                => $request->place_id,
+                        'line_id'                   => $request->line_id,
                         'post_date'                 => $request->post_date,
                         'type'                      => $request->type,
+                        'start_date'                => $request->start_date,
+                        'end_date'                  => $request->end_date,
                         'document'                  => $request->file('file') ? $request->file('file')->store('public/marketing_order_plans') : NULL,
                         'status'                    => '1',
                     ]);
@@ -366,11 +404,12 @@ class MarketingOrderPlanController extends Controller
                     foreach($request->arr_item as $key => $row){
                         MarketingOrderPlanDetail::create([
                             'marketing_order_plan_id'       => $query->id,
+                            'marketing_order_detail_id'     => $request->arr_marketing_order_detail[$key] ?? NULL,
                             'item_id'                       => $row,
                             'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'request_date'                  => $request->arr_request_date[$key],
                             'note'                          => $request->arr_note[$key] ? $request->arr_note[$key] : NULL,
-                            'is_urgent'                     => $request->arr_urgent[$key] ? $request->arr_urgent[$key] : NULL,
+                            'priority'                      => $request->arr_priority[$key] ?? NULL,
                         ]);
                     }
 
@@ -379,8 +418,8 @@ class MarketingOrderPlanController extends Controller
                     DB::rollback();
                 }
 
-                CustomHelper::sendApproval('marketing_order_plans',$query->id,$query->note_internal.' - '.$query->note_external);
-                CustomHelper::sendNotification('marketing_order_plans',$query->id,'Pengajuan Marketing Order Plan No. '.$query->code,'Pengajuan Marketing Order Plan No. '.$query->code,session('bo_id'));
+                CustomHelper::sendApproval($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Marketing Order Plan No. '.$query->code,'Pengajuan Marketing Order Plan No. '.$query->code,session('bo_id'));
 
                 activity()
                     ->performedOn(new MarketingOrderPlan())
@@ -411,14 +450,14 @@ class MarketingOrderPlanController extends Controller
         
         foreach($po->marketingOrderPlanDetail as $row){
             $arr[] = [
-                'id'                    => $row->id,
+                'id'                    => $row->marketing_order_detail_id ?? '',
                 'item_id'               => $row->item_id,
                 'item_name'             => $row->item->code.' - '.$row->item->name,
                 'qty'                   => CustomHelper::formatConditionalQty($row->qty),
-                'unit'                  => $row->item->sellUnit->code,
+                'unit'                  => $row->item->uomUnit->code,
                 'request_date'          => $row->request_date,
                 'note'                  => $row->note,
-                'is_urgent'             => $row->is_urgent ? $row->is_urgent : '',
+                'priority'              => $row->priority,
             ];
         }
 
@@ -450,16 +489,17 @@ class MarketingOrderPlanController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"> <div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="7">Daftar Item</th>
+                                <th class="center-align" colspan="8">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Item</th>
+                                <th class="center-align">Referensi</th>
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
                                 <th class="center-align">Tgl.Request</th>
                                 <th class="center-align">Keterangan</th>
-                                <th class="center-align">Urgent</th>
+                                <th class="center-align">Prioritas</th>
                             </tr>
                         </thead><tbody>';
         $totalqty=0;
@@ -468,15 +508,16 @@ class MarketingOrderPlanController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
+                <td>'.($row->marketingOrderDetail()->exists() ? $row->marketingOrderDetail->marketingOrder->code : '-').'</td>
                 <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
-                <td class="center-align">'.$row->item->sellUnit->code.'</td>
+                <td class="center-align">'.$row->item->uomUnit->code.'</td>
                 <td class="center-align">'.date('d/m/Y',strtotime($row->request_date)).'</td>
                 <td class="">'.$row->note.'</td>
-                <td class="center-align">'.$row->isUrgent().'</td>
+                <td class="center-align">'.$row->priority.'</td>
             </tr>';
         }
         $string .= '<tr>
-                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2"> Total </td>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="3"> Total </td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqty, 3, ',', '.') . '</td>
             </tr>  
         ';

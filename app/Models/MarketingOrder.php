@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CustomHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -413,5 +414,23 @@ class MarketingOrder extends Model
     public function printCounter()
     {
         return $this->hasMany('App\Models\PrintCounter','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
+    public function details(){
+        $arr = [];
+        foreach($this->marketingOrderDetail as $row){
+            $arr[] = [
+                'id'            => $row->id,
+                'item_id'       => $row->item_id,
+                'item_code'     => $row->item->code,
+                'item_name'     => $row->item->name,
+                'qty'           => CustomHelper::formatConditionalQty($row->qty * $row->qty_conversion),
+                'uom'           => $row->item->uomUnit->code,
+                'note'          => $row->note,
+                'request_date'  => $this->delivery_date,
+            ];
+        }
+
+        return $arr;
     }
 }

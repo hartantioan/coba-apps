@@ -279,13 +279,13 @@ class Item extends Model
             $qtyUnapproved = $detail->totalQtyUnapproved();
             $arrData[] = [
                 'id'            => $detail->id,
-                'warehouse'     => $detail->place->name.' - '.$detail->warehouse->name,
+                'warehouse'     => $detail->place->code.' - '.$detail->warehouse->name,
                 'warehouse_id'  => $detail->warehouse_id,
                 'area'          => $detail->area()->exists() ? $detail->area->name : '',
                 'area_id'       => $detail->area_id ? $detail->area_id : '',
                 'place_id'      => $detail->place_id,
-                'qty'           => CustomHelper::formatConditionalQty(($detail->qty / $detail->item->sell_convert) - $qtyUnapproved).' '.$this->uomUnit->code,
-                'qty_raw'       => CustomHelper::formatConditionalQty(($detail->qty / $detail->item->sell_convert) - $qtyUnapproved),
+                'qty'           => CustomHelper::formatConditionalQty($detail->qty - $qtyUnapproved).' '.$this->uomUnit->code,
+                'qty_raw'       => CustomHelper::formatConditionalQty($detail->qty - $qtyUnapproved),
                 'qty_commited'  => CustomHelper::formatConditionalQty($detail->totalUndeliveredItemSales()),
             ];
         }

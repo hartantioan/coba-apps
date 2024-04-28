@@ -252,7 +252,7 @@
 													<tr>
 														<td>{{ $m->lookable->code.' - '.$m->lookable->name }}</td>
 														<td>{{ $m->description }}</td>
-														<td align="right">{{ $m->lookable_type == 'items' ? CustomHelper::formatConditionalQty($m->qty).' '.$m->lookable->uomUnit->code : CustomHelper::formatConditionalQty($m->qty) }}</td>
+														<td align="right">{{ CustomHelper::formatConditionalQty($m->qty).' '.$m->lookable->uomUnit->code }}</td>
 														<td align="right">{{ number_format($m->nominal,2,',','.') }}</td>
 														<td align="right">{{ number_format($m->total,2,',','.') }}</td>
 													</tr>

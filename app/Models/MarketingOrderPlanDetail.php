@@ -16,36 +16,26 @@ class MarketingOrderPlanDetail extends Model
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'marketing_order_plan_id',
+        'marketing_order_detail_id',
         'item_id',
         'qty',
-        'item_unit_id',
-        'qty_conversion',
         'request_date',
         'note',
-        'is_urgent',
+        'priority',
     ];
-
-    public function itemUnit()
-    {
-        return $this->belongsTo('App\Models\ItemUnit', 'item_unit_id', 'id')->withTrashed();
-    }
 
     public function marketingOrderPlan()
     {
         return $this->belongsTo('App\Models\MarketingOrderPlan', 'marketing_order_plan_id', 'id')->withTrashed();
     }
 
-    public function item(){
-        return $this->belongsTo('App\Models\Item','item_id','id')->withTrashed();
+    public function marketingOrderDetail()
+    {
+        return $this->belongsTo('App\Models\MarketingOrderDetail', 'marketing_order_detail_id', 'id')->withTrashed();
     }
 
-    public function isUrgent(){
-        $is_urgent = match ($this->is_urgent) {
-            '1' => 'Ya',
-            default => 'Tidak',
-        };
-
-        return $is_urgent;
+    public function item(){
+        return $this->belongsTo('App\Models\Item','item_id','id')->withTrashed();
     }
 
     public function totalScheduled()

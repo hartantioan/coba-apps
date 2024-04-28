@@ -18,6 +18,8 @@ class MarketingOrderDetail extends Model
         'marketing_order_id',
         'item_id',
         'qty',
+        'item_unit_id',
+        'qty_conversion',
         'price',
         'margin',
         'is_include_tax',
@@ -72,6 +74,10 @@ class MarketingOrderDetail extends Model
 
     public function item(){
         return $this->belongsTo('App\Models\Item','item_id','id')->withTrashed();
+    }
+
+    public function itemUnit(){
+        return $this->belongsTo('App\Models\ItemUnit','item_unit_id','id')->withTrashed();
     }
 
     public function itemStock(){

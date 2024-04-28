@@ -246,6 +246,17 @@
                                         </td>
                                     </tr>
                                     <tr>
+                                        <td width="29%" style="vertical-align: top;">
+                                            Line
+                                        </td>
+                                        <td width="1%" style="vertical-align: top;">
+                                            :
+                                        </td>
+                                        <td width="70%" style="vertical-align: top;">
+                                            {{ $data->line->code }}
+                                        </td>
+                                    </tr>
+                                    <tr>
                                         <td style="vertical-align: top;">
                                             Tipe
                                         </td>
@@ -281,22 +292,24 @@
                         <thead>
                             <tr>
                                 <th class="center">Item</th>
+                                <th class="center">Referensi</th>
                                 <th class="center">Jum.</th>
                                 <th class="center">Sat.</th>
                                 <th class="center">Tgl.Request</th>
                                 <th class="center">Catatan</th>
-                                <th class="center">Urgent</th>
+                                <th class="center">Prioritas</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($data->marketingOrderPlanDetail as $row)
                             <tr>
                                 <td>{{ $row->item->code.' - '.$row->item->name }}</td>
+                                <td>{{ $row->marketingOrderDetail()->exists() ? $row->marketingOrderDetail->marketingOrder->code : '-' }}</td>
                                 <td align="center">{{ $row->qty }}</td>
-                                <td align="center">{{ $row->item->sellUnit->code }}</td>
+                                <td align="center">{{ $row->item->uomUnit->code }}</td>
                                 <td align="center">{{ date('d/m/Y',strtotime($row->request_date)) }}</td>
                                 <td>{{ $row->note }}</td>
-                                <td align="center">{{ $row->isUrgent() }}</td>
+                                <td align="center">{{ $row->priority }}</td>
                             </tr>
                             @endforeach
                         </tbody>

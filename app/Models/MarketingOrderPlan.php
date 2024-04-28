@@ -20,8 +20,11 @@ class MarketingOrderPlan extends Model
         'user_id',
         'company_id',
         'place_id',
+        'line_id',
         'post_date',
         'type',
+        'start_date',
+        'end_date',
         'document',
         'status',
         'void_id',
@@ -49,6 +52,11 @@ class MarketingOrderPlan extends Model
         return $this->belongsTo('App\Models\User', 'done_id', 'id')->withTrashed();
     }
 
+    public function marketingOrder()
+    {
+        return $this->belongsTo('App\Models\MarketingOrder', 'marketing_order_id', 'id')->withTrashed();
+    }
+
     public function deleteUser()
     {
         return $this->belongsTo('App\Models\User', 'delete_id', 'id')->withTrashed();
@@ -73,6 +81,11 @@ class MarketingOrderPlan extends Model
     public function place()
     {
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
+    }
+
+    public function line()
+    {
+        return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();
     }
 
     public function marketingOrderPlanDetail()

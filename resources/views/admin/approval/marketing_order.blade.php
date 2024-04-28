@@ -325,7 +325,7 @@
                         <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
                         <td class="center-align">{{ $row->item->code.' - '.$row->item->name }}</td>
                         <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
-                        <td class="center-align">{{ $row->item->sellUnit->code }}</td>
+                        <td class="center-align">{{ $row->itemUnit->unit->code }}</td>
                         <td class="right-align">{{ number_format($row->price,2,',','.') }}</td>
                         <td class="right-align">{{ number_format($row->margin,2,',','.') }}</td>
                         <td class="center-align">{{ number_format($row->percent_discount_1,2,',','.') }}</td>
@@ -337,7 +337,7 @@
                     </tr>
                     <tr>
                         <td colspan="8">Keterangan: {{ $row->note }}</td>
-                        <td colspan="4">Ambil dari: {{ $row->place->code.' - Gudang '.$row->warehouse->code.' - Area '.$row->area->name 
+                        <td colspan="4">Ambil dari: {{ $row->place->code.' - Gudang '.$row->warehouse->code.' - Area '.($row->area()->exists() ? $row->area->name : '-') 
                         }}</td>
                     </tr>
                     

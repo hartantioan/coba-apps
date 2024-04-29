@@ -63,7 +63,7 @@ class MarketingOrderPlanController extends Controller
         $data = MarketingOrder::find($request->id);
        
         if(!$data->used()->exists()){
-            CustomHelper::sendUsedData($request->type,$request->id,'Form Marketing Order Production / Marketing Order Plan');
+            CustomHelper::sendUsedData($request->type,$request->id,'Form Marketing Order Production');
             return response()->json([
                 'status'    => 200,
                 'code'      => $data->code,
@@ -320,7 +320,7 @@ class MarketingOrderPlanController extends Controller
                     if($approved && !$revised){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Marketing Order Plan telah diapprove, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Marketing Order Produksi telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                     if(!CustomHelper::checkLockAcc($query->post_date)){
@@ -363,7 +363,7 @@ class MarketingOrderPlanController extends Controller
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status Marketing Order Plan sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+					        'message' => 'Status Marketing Order Produksi sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                 }catch(\Exception $e){
@@ -419,13 +419,13 @@ class MarketingOrderPlanController extends Controller
                 }
 
                 CustomHelper::sendApproval($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external);
-                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Marketing Order Plan No. '.$query->code,'Pengajuan Marketing Order Plan No. '.$query->code,session('bo_id'));
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Marketing Order Produksi No. '.$query->code,'Pengajuan Marketing Order Produksi No. '.$query->code,session('bo_id'));
 
                 activity()
                     ->performedOn(new MarketingOrderPlan())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit marketing order plan.');
+                    ->log('Add / edit marketing order production.');
 
 				$response = [
 					'status'    => 200,
@@ -452,7 +452,8 @@ class MarketingOrderPlanController extends Controller
             $arr[] = [
                 'id'                    => $row->marketing_order_detail_id ?? '',
                 'item_id'               => $row->item_id,
-                'item_name'             => $row->item->code.' - '.$row->item->name,
+                'item_code'             => $row->item->code,
+                'item_name'             => $row->item->name,
                 'qty'                   => CustomHelper::formatConditionalQty($row->qty),
                 'unit'                  => $row->item->uomUnit->code,
                 'request_date'          => $row->request_date,
@@ -472,7 +473,7 @@ class MarketingOrderPlanController extends Controller
                 
         if($pr){
             $data = [
-                'title'     => 'Marketing Order Plan',
+                'title'     => 'Marketing Order Produksi',
                 'data'      => $pr
             ];
 
@@ -584,7 +585,7 @@ class MarketingOrderPlanController extends Controller
                 
         if($pr){
             $data = [
-                'title'     => 'Marketing Order Plan',
+                'title'     => 'Marketing Order Produksi',
                 'data'      => $pr
             ];
 
@@ -661,9 +662,9 @@ class MarketingOrderPlanController extends Controller
                     ->performedOn(new MarketingOrderPlan())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Void the marketing order plan data');
+                    ->log('Void the marketing order production data');
     
-                CustomHelper::sendNotification($query->getTable(),$query->id,'Marketing Order Plan No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Marketing Order Produksi No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval($query->getTable(),$query->id);
 
                 $response = [
@@ -730,7 +731,7 @@ class MarketingOrderPlanController extends Controller
                 ->performedOn(new MarketingOrderPlan())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the marketing order plan data');
+                ->log('Delete the marketing order production data');
 
             $response = [
                 'status'  => 200,
@@ -767,7 +768,7 @@ class MarketingOrderPlanController extends Controller
                 
                 if($pr){
                     $data = [
-                        'title'     => 'Marketing Order Plan',
+                        'title'     => 'Marketing Order Produksi',
                         'data'      => $pr,
                       
                     ];
@@ -864,7 +865,7 @@ class MarketingOrderPlanController extends Controller
                         $query = MarketingOrderPlan::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
                             $data = [
-                                'title'     => 'Marketing Order Plan',
+                                'title'     => 'Marketing Order Produksi',
                                     'data'      => $query
                             ];
                             CustomHelper::addNewPrinterCounter($query->getTable(),$query->id);
@@ -939,7 +940,7 @@ class MarketingOrderPlanController extends Controller
                         $query = MarketingOrderPlan::where('Code', 'LIKE', '%'.$code)->first();
                         if($query){
                             $data = [
-                                'title'     => 'Marketing Order Plan',
+                                'title'     => 'Marketing Order Produksi',
                                     'data'      => $query
                             ];
                             CustomHelper::addNewPrinterCounter($query->getTable(),$query->id);
@@ -1773,7 +1774,7 @@ class MarketingOrderPlanController extends Controller
                         ->performedOn(new MarketingOrderPlan())
                         ->causedBy(session('bo_id'))
                         ->withProperties($query_done)
-                        ->log('Done the Marketing Order Plan data');
+                        ->log('Done the Marketing Order Production data');
     
                 $response = [
                     'status'  => 200,

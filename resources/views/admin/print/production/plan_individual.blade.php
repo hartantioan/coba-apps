@@ -195,44 +195,44 @@
                 <div class="card-content invoice-print-area">
                     <table border="0" width="100%" class="tbl-info">
                         <tr>
-                            <td width="25%" class="left-align">
+                            <td width="37%" class="left-align" style="vertical-align: top;">
                                 <table border="0" width="100%">
                                     <tr>
-                                        <td width="49%">
+                                        <td width="30%" style="vertical-align: top;">
                                             Name
                                         </td>
-                                        <td width="1%">
+                                        <td width="1%" style="vertical-align: top;">
                                             :
                                         </td>
-                                        <td width="50%">
+                                        <td width="70%" style="vertical-align: top;">
                                             {{ $data->user->name }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>
+                                        <td style="vertical-align: top;">
                                             Posisi
                                         </td>
-                                        <td width="1%">
+                                        <td width="1%" style="vertical-align: top;">
                                             :
                                         </td>
-                                        <td>
+                                        <td style="vertical-align: top;">
                                             {{ $data->user->position->name }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>
+                                        <td style="vertical-align: top;">
                                             Depart.
                                         </td>
-                                        <td width="1%">
+                                        <td width="1%" style="vertical-align: top;">
                                             :
                                         </td>
-                                        <td>
+                                        <td style="vertical-align: top;">
                                             {{ $data->user->position->division->department->name }}
                                         </td>
                                     </tr>
                                 </table>
                             </td>
-                            <td width="41%" class="left-align" style="vertical-align: top;">
+                            <td width="37%" class="left-align" style="vertical-align: top;">
                                 <table border="0" width="100%">
                                     <tr>
                                         <td width="29%" style="vertical-align: top;">

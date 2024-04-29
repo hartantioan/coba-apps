@@ -163,7 +163,13 @@
                     Plant
                 </div>
                 <div class="col s8">
-                    {{ $data->place->name }}
+                    {{ $data->place->code }}
+                </div>
+                <div class="col s4">
+                    Line
+                </div>
+                <div class="col s8">
+                    {{ $data->line->code }}
                 </div>
             </div>
             <div class="col s6 row mt-2">
@@ -175,6 +181,12 @@
                 </div>
                 <div class="col s8">
                     {{ date('d/m/Y',strtotime($data->post_date)) }}
+                </div>
+                <div class="col s4">
+                    Tgl.Proses
+                </div>
+                <div class="col s8">
+                    {{ date('d/m/Y',strtotime($data->start_date)).' - '.date('d/m/Y',strtotime($data->end_date)) }}
                 </div>
                 <div class="col s4">
                     Tipe

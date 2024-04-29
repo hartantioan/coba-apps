@@ -1314,7 +1314,7 @@
                         `);
                         if(!val.id){
                             $('#arr_item' + count).append(`
-                                <option value="` + val.item_id + `">` + val.item_name + `</option>
+                                <option value="` + val.item_id + `">` + val.item_code + ' - ' + val.item_name + `</option>
                             `);
                             select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
                         }
@@ -1323,6 +1323,7 @@
                 
                 $('.modal-content').scrollTop(0);
                 M.updateTextFields();
+                count();
             },
             error: function() {
                 $('.modal-content').scrollTop(0);
@@ -1375,12 +1376,13 @@
                         loadingClose('#main');
                         $('#modal1').modal('open');
                         
-                        $('#code_place_id').val(response.code_place_id).formSelect();
-                        $('#code').val(response.code);
                         $('#post_date').val(response.post_date);
                         $('#company_id').val(response.company_id).formSelect();
                         $('#place_id').val(response.place_id).formSelect();
+                        $('#line_id').val(response.line_id).formSelect();
                         $('#type').val(response.type).formSelect();
+                        $('#start_date').val(response.start_date);
+                        $('#end_date').val(response.end_date);
 
                         if(response.details.length > 0){
                             $('.row_item').each(function(){
@@ -1391,9 +1393,16 @@
                                 var count = makeid(10);
                                 $('#last-row-item').before(`
                                     <tr class="row_item">
-                                        <td>
-                                            <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" required></select>
-                                        </td>
+                                        <input type="hidden" name="arr_marketing_order_detail[]" value="` + val.id + `">
+                                        ` + (val.id ? `<input type="hidden" name="arr_item[]" value="` + val.item_id + `">` : `` ) + `
+                                        ` + (val.id ? 
+                                                `<td>` + val.item_code + `</td><td>` + val.item_name + `</td>` 
+                                                : 
+                                                `<td colspan="2">
+                                                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" required></select>
+                                                </td>`
+                                            ) 
+                                        + `
                                         <td>
                                             <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);count();" required>
                                         </td>
@@ -1407,12 +1416,7 @@
                                             <input name="arr_request_date[]" type="date" value="` + val.request_date + `" min="{{ date('Y-m-d') }}" required>
                                         </td>
                                         <td>
-                                            <div class="switch mb-1">
-                                                <label>
-                                                    <input type="checkbox" id="arr_urgent` + count + `" name="arr_urgent[]" value="1">
-                                                    <span class="lever"></span>
-                                                </label>
-                                            </div>
+                                            <input name="arr_priority[]" type="number" value="` + val.priority + `" min="0" step="1">
                                         </td>
                                         <td class="center">
                                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -1421,12 +1425,11 @@
                                         </td>
                                     </tr>
                                 `);
-                                $('#arr_item' + count).append(`
-                                    <option value="` + val.item_id + `">` + val.item_name + `</option>
-                                `);
-                                select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
-                                if(val.is_urgent){
-                                    $('#arr_urgent' + count).prop( "checked", true);
+                                if(!val.id){
+                                    $('#arr_item' + count).append(`
+                                        <option value="` + val.item_id + `">` + val.item_name + `</option>
+                                    `);
+                                    select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
                                 }
                             });
                         }
@@ -1436,6 +1439,7 @@
                         M.updateTextFields();
 
                         $('#code_place_id').val(response.code_place_id).formSelect().trigger('change');
+                        count();
                     },
                     error: function() {
                         $('.modal-content').scrollTop(0);

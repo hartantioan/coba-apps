@@ -26,6 +26,13 @@
 		background-color: green !important;
 		color:white !important;
 	}
+
+    .text-wrap{
+        white-space:normal;
+    }
+    .width-300{
+        width:300px;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -97,14 +104,14 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Kode</th>
+                                                        <th>Akun BP</th>
                                                         <th>Tgl.Request</th>
                                                         <th>Dari</th>
                                                         <th>Kode Ref.</th>
                                                         <th>Keterangan</th>
-                                                        <th>Action</th>
                                                         <th>Status</th>
                                                         <th>Catatan</th>
+                                                        <th>Action</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -312,6 +319,9 @@
             "deferRender": true,
             "destroy": true,
             "iDisplayInLength": 10,
+            "fixedColumns": {
+                right: 1
+            },
             "order": [[0, 'desc']],
             ajax: {
                 url: '{{ Request::url() }}/datatable',
@@ -337,14 +347,22 @@
             },
             columns: [
                 { name: 'id', searchable: false, className: 'center-align' },
-                { name: 'code', className: 'center-align' },
+                { name: 'code', className: '' },
                 { name: 'date_request', className: 'center-align' },
-                { name: 'user', orderable: false, className: 'center-align' },
+                { name: 'user', orderable: false, className: '' },
                 { name: 'code_ref', orderable: false, className: 'center-align' },
-                { name: 'note_ref', orderable: false, className: 'center-align' },
-                { name: 'action', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'note_ref', orderable: false, className: '' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'note', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'action', searchable: false, orderable: false, className: 'center-align' },
+            ],
+            columnDefs: [
+                {
+                    render: function (data, type, full, meta) {
+                        return "<div class='text-wrap width-300'>" + data + "</div>";
+                    },
+                    targets: 5
+                }
             ],
             "createdRow": function( row, data, dataIndex){
                 if(data[9]){

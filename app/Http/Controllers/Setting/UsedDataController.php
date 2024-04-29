@@ -67,7 +67,7 @@ class UsedDataController extends Controller
                     $val->lookable->code,
                     $val->lookable_type,
                     $val->ref,
-                    $val->updated_at,
+                    date('d/m/Y H:i:s',strtotime($val->updated_at)),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
 					'

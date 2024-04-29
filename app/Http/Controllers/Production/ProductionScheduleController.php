@@ -17,6 +17,7 @@ use App\Models\Place;
 use App\Models\ProductionScheduleTarget;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
+use App\Models\Line;
 use App\Models\User;
 use App\Models\Menu;
 use Illuminate\Support\Facades\Validator;
@@ -42,6 +43,7 @@ class ProductionScheduleController extends Controller
     public function index(Request $request)
     {
         $places = Place::where('status','1')->whereIn('id',$this->dataplaces)->get();
+        $lines = Line::where('status','1')->whereIn('place_id',$this->dataplaces)->get();
         $lastSegment = request()->segment(count(request()->segments()));
        
         $menu = Menu::where('url', $lastSegment)->first();
@@ -51,6 +53,7 @@ class ProductionScheduleController extends Controller
             'content'       => 'admin.production.schedule',
             'company'       => Company::where('status','1')->get(),
             'place'         => $places,
+            'line'          => $lines,
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
@@ -74,6 +77,7 @@ class ProductionScheduleController extends Controller
             'user_id',
             'company_id',
             'place_id',
+            'line_id',
             'post_date',
         ];
 
@@ -173,7 +177,8 @@ class ProductionScheduleController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->company->name,
-                    $val->place->name,
+                    $val->place->code,
+                    $val->line->code,
                     date('d/m/Y',strtotime($val->post_date)),
                       $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->status(),

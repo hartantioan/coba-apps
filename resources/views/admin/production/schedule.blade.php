@@ -117,6 +117,7 @@
                                                         <th>Pengguna</th>
                                                         <th>Perusahaan</th>
                                                         <th>Plant</th>
+                                                        <th>Line</th>
                                                         <th>Tgl.Post</th>
                                                         <th>Dokumen</th>
                                                         <th>Status</th>
@@ -178,10 +179,19 @@
                                         <select class="form-control" id="place_id" name="place_id">
                                             <option value="">--Pilih--</option>
                                             @foreach ($place as $rowplace)
-                                                <option value="{{ $rowplace->id }}" data-lines="{{ $rowplace->lines() }}">{{ $rowplace->code }}</option>
+                                                <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                             @endforeach
                                         </select>
                                         <label class="" for="place_id">Plant</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="form-control" id="line_id" name="line_id">
+                                            <option value="">--Pilih--</option>
+                                            @foreach ($line as $rowline)
+                                                <option value="{{ $rowline->id }}">{{ $rowline->code }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="" for="line_id">Line</label>
                                     </div>
                                     <div class="input-field col m3 s12 step5">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
@@ -229,18 +239,17 @@
                                                     <tr>
                                                         <th class="center">MOP</th>
                                                         <th class="center">Item</th>
-                                                        <th class="center">Qty (Satuan Jual)</th>
-                                                        <th class="center">Qty (Satuan Produksi)</th>
-                                                        <th class="center">Qty (Satuan Pallet)</th>
+                                                        <th class="center">Qty</th>
+                                                        <th class="center">Satuan UoM</th>
                                                         <th class="center">Remark</th>
                                                         <th class="center">Tgl.Request</th>
-                                                        <th class="center">Urgent</th>
+                                                        <th class="center">Prioritas</th>
                                                         <th class="center">Hapus</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td class="center-align" colspan="9">
+                                                        <td class="center-align" colspan="8">
                                                             Silahkan tambahkan Marketing Order Produksi...
                                                         </td>
                                                     </tr>
@@ -250,7 +259,7 @@
                                                         <td class="right-align" colspan="2">
                                                             Stok RM :
                                                         </td>
-                                                        <td class="" colspan="7" id="data-foot">
+                                                        <td class="" colspan="6" id="data-foot">
                                                             Silahkan tambahkan Marketing Order Produksi...
                                                         </td>
                                                     </tr>
@@ -266,158 +275,31 @@
                                 <fieldset style="min-width: 100%;">
                                     <legend>4. Detail Shift & Target Produksi</legend>
                                     <div class="col m12 s12 step11" style="overflow:auto;width:100% !important;">
-                                        <p class="mt-2 mb-2" id="detail-shift">
-                                            <ul class="collapsible">
-                                                <li class="active">
-                                                    <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">event_seat</i>FG</div>
-                                                    <div class="collapsible-body" style="display:block;">
-                                                        <div class="" style="overflow:auto;width:100% !important;">
-                                                            <table class="bordered" style="min-width:2000px;" id="table-detail2">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th class="center">Pilih</th>
-                                                                        <th class="center">No</th>
-                                                                        <th class="center" width="300px">Item</th>
-                                                                        <th class="center" width="200px">Qty</th>
-                                                                        <th class="center" width="200px">Satuan Produksi</th>
-                                                                        <th class="center" width="200px">Gudang</th>
-                                                                        <th class="center" width="200px">Tgl.Produksi</th>
-                                                                        <th class="center" width="300px">Shift</th>
-                                                                        <th class="center" width="200px">Line</th>
-                                                                        <th class="center" width="150px">Group</th>
-                                                                        <th class="center" width="200px">Keterangan</th>
-                                                                        <th class="center" width="75px">Hapus</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody class="body-item-detail" id="body-item-detail4" data-group="4">
-                                                                    <tr class="last-row-item-detail">
-                                                                        <td colspan="12">
-                                                                            Silahkan tambahkan shift
-                                                                        </td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                        <div class="center-align">
-                                                            <a class="waves-effect waves-light cyan btn-small mr-1 mt-1" onclick="addShift(4);" href="javascript:void(0);">
-                                                                <i class="material-icons left">add</i> Shift
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">filter_3</i>SFG-3</div>
-                                                    <div class="collapsible-body">
-                                                        <div class="" style="overflow:auto;width:100% !important;">
-                                                            <table class="bordered" style="min-width:2000px;" id="table-detail3">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th class="center">Pilih</th>
-                                                                        <th class="center">No</th>
-                                                                        <th class="center" width="300px">Item</th>
-                                                                        <th class="center" width="200px">Qty</th>
-                                                                        <th class="center" width="200px">Satuan Produksi</th>
-                                                                        <th class="center" width="200px">Gudang</th>
-                                                                        <th class="center" width="200px">Tgl.Produksi</th>
-                                                                        <th class="center" width="300px">Shift</th>
-                                                                        <th class="center" width="200px">Line</th>
-                                                                        <th class="center" width="150px">Group</th>
-                                                                        <th class="center" width="200px">Keterangan</th>
-                                                                        <th class="center" width="75px">Hapus</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody class="body-item-detail" id="body-item-detail3" data-group="3">
-                                                                    <tr class="last-row-item-detail">
-                                                                        <td colspan="12">
-                                                                            Silahkan tambahkan shift
-                                                                        </td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                        <div class="center-align">
-                                                            <a class="waves-effect waves-light cyan btn-small mr-1 mt-1" onclick="addShift(3);" href="javascript:void(0);">
-                                                                <i class="material-icons left">add</i> Shift
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">filter_2</i>SFG-2</div>
-                                                    <div class="collapsible-body">
-                                                        <div class="" style="overflow:auto;width:100% !important;">
-                                                            <table class="bordered" style="min-width:2000px;" id="table-detail4">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th class="center">Pilih</th>
-                                                                        <th class="center">No</th>
-                                                                        <th class="center" width="300px">Item</th>
-                                                                        <th class="center" width="200px">Qty</th>
-                                                                        <th class="center" width="200px">Satuan Produksi</th>
-                                                                        <th class="center" width="200px">Gudang</th>
-                                                                        <th class="center" width="200px">Tgl.Produksi</th>
-                                                                        <th class="center" width="300px">Shift</th>
-                                                                        <th class="center" width="200px">Line</th>
-                                                                        <th class="center" width="150px">Group</th>
-                                                                        <th class="center" width="200px">Keterangan</th>
-                                                                        <th class="center" width="75px">Hapus</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody class="body-item-detail" id="body-item-detail2" data-group="2">
-                                                                    <tr class="last-row-item-detail">
-                                                                        <td colspan="12">
-                                                                            Silahkan tambahkan shift
-                                                                        </td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                        <div class="center-align">
-                                                            <a class="waves-effect waves-light cyan btn-small mr-1 mt-1" onclick="addShift(2);" href="javascript:void(0);">
-                                                                <i class="material-icons left">add</i> Shift
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">filter_1</i>SFG-1</div>
-                                                    <div class="collapsible-body">
-                                                        <div class="" style="overflow:auto;width:100% !important;">
-                                                            <table class="bordered" style="min-width:2000px;" id="table-detail5">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th class="center">Pilih</th>
-                                                                        <th class="center">No</th>
-                                                                        <th class="center" width="300px">Item</th>
-                                                                        <th class="center" width="200px">Qty</th>
-                                                                        <th class="center" width="200px">Satuan Produksi</th>
-                                                                        <th class="center" width="200px">Gudang</th>
-                                                                        <th class="center" width="200px">Tgl.Produksi</th>
-                                                                        <th class="center" width="300px">Shift</th>
-                                                                        <th class="center" width="200px">Line</th>
-                                                                        <th class="center" width="150px">Group</th>
-                                                                        <th class="center" width="200px">Keterangan</th>
-                                                                        <th class="center" width="75px">Hapus</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody class="body-item-detail" id="body-item-detail1" data-group="1">
-                                                                    <tr class="last-row-item-detail">
-                                                                        <td colspan="12">
-                                                                            Silahkan tambahkan shift
-                                                                        </td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                        <div class="center-align">
-                                                            <a class="waves-effect waves-light cyan btn-small mr-1 mt-1" onclick="addShift(1);" href="javascript:void(0);">
-                                                                <i class="material-icons left">add</i> Shift
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                            </ul>
-                                        </p>
+                                        <table class="bordered" style="min-width:2000px;" id="table-detail2">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center">Pilih</th>
+                                                    <th class="center">No</th>
+                                                    <th class="center" width="300px">Item</th>
+                                                    <th class="center" width="200px">Qty</th>
+                                                    <th class="center" width="200px">Satuan Produksi</th>
+                                                    <th class="center" width="200px">Gudang</th>
+                                                    <th class="center" width="200px">Tgl.Produksi</th>
+                                                    <th class="center" width="300px">Shift</th>
+                                                    <th class="center" width="200px">Line</th>
+                                                    <th class="center" width="150px">Group</th>
+                                                    <th class="center" width="200px">Keterangan</th>
+                                                    <th class="center" width="75px">Hapus</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="body-item-detail" id="body-item-detail4" data-group="4">
+                                                <tr class="last-row-item-detail">
+                                                    <td colspan="12">
+                                                        Silahkan tambahkan shift
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </fieldset>
                             </div>
@@ -698,9 +580,6 @@
                     }
                     return 'You will lose all changes made since your last save';
                 };
-                $('.collapsible').collapsible({
-                    accordion:true
-                });
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
@@ -728,7 +607,7 @@
                 `);
                 $('#body-item').empty().append(`
                     <tr id="last-row-item">
-                        <td class="center-align" colspan="9">
+                        <td class="center-align" colspan="8">
                             Silahkan tambahkan Marketing Order Produksi...
                         </td>
                     </tr>
@@ -927,7 +806,7 @@
                 if($('.row_item').length == 0){
                     $('#body-item').empty().append(`
                         <tr id="last-row-item">
-                            <td class="center-align" colspan="9">
+                            <td class="center-align" colspan="8">
                                 Silahkan tambahkan Marketing Order Produksi...
                             </td>
                         </tr>
@@ -1465,6 +1344,7 @@
                 { name: 'user_id', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
                 { name: 'plant_id', className: 'center-align' },
+                { name: 'line_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
               { name: 'status', searchable: false, orderable: false, className: 'center-align' },

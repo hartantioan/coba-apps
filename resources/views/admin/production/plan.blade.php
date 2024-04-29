@@ -199,7 +199,7 @@
                                     </div>
                                     <div class="input-field col m3 s12">
                                         <select class="form-control" id="line_id" name="line_id">
-                                            <option value="">--Kosong--</option>
+                                            <option value="">--Pilih--</option>
                                             @foreach ($line as $row)
                                                 <option value="{{ $row->id }}">{{ $row->code }}</option>
                                             @endforeach

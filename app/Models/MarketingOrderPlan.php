@@ -93,11 +93,6 @@ class MarketingOrderPlan extends Model
         return $this->hasMany('App\Models\MarketingOrderPlanDetail');
     }
 
-    public function productionSchedule()
-    {
-        return $this->hasMany('App\Models\ProductionSchedule');
-    }
-
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }

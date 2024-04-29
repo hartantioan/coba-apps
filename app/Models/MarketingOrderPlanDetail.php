@@ -50,7 +50,7 @@ class MarketingOrderPlanDetail extends Model
     public function productionScheduleTarget()
     {
         return $this->hasMany('App\Models\ProductionScheduleTarget')->whereHas('productionSchedule',function($query){
-            $query->whereIn('status',['2','3']);
+            $query->whereIn('status',['1','2','3']);
         });
     }
 }

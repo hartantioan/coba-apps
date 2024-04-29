@@ -587,13 +587,13 @@ class PurchaseInvoice extends Model
                 }
             }
 
-            if($row->fundRequestDetail()->exists()){
+            /* if($row->fundRequestDetail()->exists()){
                 if(!$row->fundRequestDetail->fundRequest->hasBalanceInvoice()){
                     $row->fundRequestDetail->fundRequest->update([
                         'status'    => '3'
                     ]);
                 }
-            }
+            } */
         }
     }
 

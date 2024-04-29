@@ -1117,9 +1117,21 @@ class PaymentRequestController extends Controller
                             if($row == 'fund_requests'){
                                 $idDetail = FundRequest::find($request->arr_id[$key])->id;
                             }elseif($row == 'purchase_down_payments'){
-                                $idDetail = PurchaseDownPayment::find($request->arr_id[$key])->id;
+                                $apdp = PurchaseDownPayment::find($request->arr_id[$key]);
+                                $idDetail = $apdp->id;
+                                foreach($apdp->purchaseDownPaymentDetail as $rowapdp){
+                                    if($rowapdp->fundRequestDetail()->exists()){
+                                        CustomHelper::updateStatus($rowapdp->fundRequestDetail->fundRequest->getTable(),$rowapdp->fundRequestDetail->fund_request_id,'7');
+                                    }
+                                }
                             }elseif($row == 'purchase_invoices'){
-                                $idDetail = PurchaseInvoice::find($request->arr_id[$key])->id;
+                                $apin = PurchaseInvoice::find($request->arr_id[$key]);
+                                $idDetail = $apin->id;
+                                foreach($apin->purchaseInvoiceDetail as $rowapin){
+                                    if($rowapin->fundRequestDetail()->exists()){
+                                        CustomHelper::updateStatus($rowapin->fundRequestDetail->fundRequest->getTable(),$rowapin->fundRequestDetail->fund_request_id,'7');
+                                    }
+                                }
                             }elseif($row == 'marketing_order_memos'){
                                 $idDetail = MarketingOrderMemo::find($request->arr_id[$key])->id;
                             }

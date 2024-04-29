@@ -124,6 +124,17 @@ class OutgoingPayment extends Model
         foreach($this->closeBillDetail as $row){
             $total -= $row->nominal;
         }
+        foreach($this->paymentRequest->paymentRequestDetail()->where('lookable_type','fund_requests')->get() as $row){
+            foreach($row->lookable->personalCloseBillDetail()->whereHas('personalCloseBill',function($query){
+                $query->whereHas('closeBillDetail',function($query){
+                    $query->whereHas('closeBill',function($query){
+                        $query->whereIn('status',['2','3']);
+                    });
+                });
+            })->get() as $rowdetail){
+                $total -= $rowdetail->nominal;
+            }
+        }
         return $total;
     }
 
@@ -143,6 +154,18 @@ class OutgoingPayment extends Model
         foreach($this->closeBillDetail as $row){
             $total += $row->nominal;
         }
+        foreach($this->paymentRequest->paymentRequestDetail()->where('lookable_type','fund_requests')->get() as $row){
+            foreach($row->lookable->personalCloseBillDetail()->whereHas('personalCloseBill',function($query){
+                $query->whereHas('closeBillDetail',function($query){
+                    $query->whereHas('closeBill',function($query){
+                        $query->whereIn('status',['2','3']);
+                    });
+                });
+            })->get() as $rowdetail){
+                $total += $rowdetail->nominal;
+            }
+        }
+        
         return $total;
     }
 

@@ -12,6 +12,13 @@
         outline: 2px solid green !important; /* Adjust the color and style as needed */
         border-radius: 5px !important;
     }
+
+    .text-wrap{
+        white-space:normal;
+    }
+    .width-300{
+        width:300px;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -526,7 +533,7 @@
                 { name: 'date_use', className: 'center-align' },
                 { name: 'currency_id', className: 'center-align' },
                 { name: 'currency_rate', className: 'center-align' },
-                { name: 'note', className: 'center-align' },
+                { name: 'note', className: '' },
                 { name: 'payment_type', className: 'center-align' },
                 { name: 'document_no', className: '' },
                 { name: 'document_date', className: '' },
@@ -555,6 +562,14 @@
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'balance_status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
+            ],
+            columnDefs: [
+                {
+                    render: function (data, type, full, meta) {
+                        return "<div class='text-wrap width-300'>" + data + "</div>";
+                    },
+                    targets: 9
+                }
             ],
             dom: 'Blfrtip',
             buttons: [

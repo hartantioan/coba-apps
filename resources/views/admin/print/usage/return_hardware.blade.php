@@ -297,7 +297,7 @@
                                 :
                             </td>
                             <td>
-                               {{$data->receptionHardwareItem->hardwareItem->hardwareItemGroup->name}}
+                               {{$data->hardwareItem->hardwareItemGroup->name}}
                             </td>
                         </tr>
                         <tr>
@@ -308,13 +308,8 @@
                                 :
                             </td>
                             <td>
-                                {{$data->receptionHardwareItem->hardwareItem->item->name}}
-                                @if($data->receptionHardwareItem->hardwareItem->hardwareItemDetail()->exists())
-                                    ||
-                                    @foreach($data->receptionHardwareItem->hardwareItem->hardwareItemDetail as $key => $row)
-                                        {{$row->specification}}
-                                    @endforeach
-                                @endif
+                                {{$data->hardwareItem->item->name}}||{{$data->hardwareItem->detail1}} {{$data->hardwareItem->detail2}} 
+                               
                             </td>
                         </tr>
                     </table>
@@ -332,7 +327,7 @@
                                 :
                             </td>
                             <td>
-                                {{$pic->name}}
+                                {{$data->account->name}}
                             </td>
                         </tr>
                         <tr>
@@ -343,7 +338,7 @@
                                 :
                             </td>
                             <td>
-                                {{$pic->department->name}}
+                                {{$data->account->department->name}}
                             </td>
                         </tr>
                     </table>

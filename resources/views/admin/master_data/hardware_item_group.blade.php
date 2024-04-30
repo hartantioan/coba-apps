@@ -75,7 +75,6 @@
                                                         <th>#</th>
                                                         <th>Code</th>
                                                         <th>Nama</th>
-                                                        <th>Divisi</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -113,15 +112,6 @@
                         <div class="input-field col s12 m6">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">Nama</label>
-                        </div>
-                        <div class="input-field col s12 m6">
-                            <select class="browser-default" id="department_id" name="department_id">&nbsp;
-                                <option value="">--Kosong--</option>
-                                @foreach ($department as $rowdept)
-                                    <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
-                                @endforeach
-                            </select>
-                            <label class="active" for="department_id">Pilih Departemen</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <div class="switch mb-1">
@@ -239,7 +229,7 @@
                 { name: 'id', className: 'center-align' },
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
-                { name: 'department_id', className: 'center-align' },
+               
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],

@@ -46,10 +46,8 @@ class HardwareItemController extends Controller
             'item_id',
             'user_id',
             'hardware_item_group_id',
-            'location',
-            'ip_address',
-            'nominal',
-            'info',
+            'detail1',
+            'detail2',
             'status',
         ];
 
@@ -65,8 +63,8 @@ class HardwareItemController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->orWhere('name', 'like', "%$search%")
-                            ->orWhere('ip_address', 'like', "%$search%")
-                            ->orWhere('location', 'like', "%$search%");
+                            ->orWhere('detail1', 'like', "%$search%")
+                            ->orWhere('detail2', 'like', "%$search%");
                     });
                 }
 
@@ -83,8 +81,8 @@ class HardwareItemController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->orWhere('name', 'like', "%$search%")
-                        ->orWhere('ip_address', 'like', "%$search%")
-                        ->orWhere('location', 'like', "%$search%");
+                            ->orWhere('detail1', 'like', "%$search%")
+                            ->orWhere('detail2', 'like', "%$search%");
                     });
                 }
 
@@ -104,10 +102,8 @@ class HardwareItemController extends Controller
                     $val->code,
                     $val->item->name,
                     $val->hardwareItemGroup->code.' - '.$val->hardwareItemGroup->name,
-                    $val->ip_address,
-                    number_format($val->nominal,2,',','.'),
-                    $val->location,
-                    $val->info,
+                    $val->detail1,
+                    $val->detail2,
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue lighten-3 white-text btn-small" data-popup="tooltip" title="History" onclick="printBarcode(' . $val->id . ')"><i class="material-icons dp48">reorder
@@ -136,15 +132,77 @@ class HardwareItemController extends Controller
         return response()->json($response);
     }
 
+    public function Edit(Request $request){
+        $validation = Validator::make($request->all(), [
+            'item_id_edit'               => 'required',
+            'item_group_id_edit'         => 'required',
+            'detail1_edit'               => 'required',
+            'code'                       =>  $request->temp ? ['required', Rule::unique('hardware_items', 'code')->ignore($request->temp)] : 'required|unique:hardware_items,code',
+        ], [
+            'code.required' 	    => 'Kode tidak boleh kosong.',
+            'code.unique'           => 'Kode telah terpakai.',
+            'item_id_edit.required'          => 'Harap pilih Item.',
+            'detail1_edit.required'      => 'Harap isi detail item',
+            'item_group_id_edit.required'    => 'Harap pilih Group item Asset.',
+        ]);
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+			if($request->temp){
+                DB::beginTransaction();
+                try {
+                    $query = HardwareItem::find($request->temp);
+                    $query->code            = $request->code;
+                    $query->item_id	        = $request->item_id_edit;
+                    $query->hardware_item_group_id	        = $request->item_group_id_edit;
+                    $query->detail1	        = $request->detail1_edit;
+                    $query->detail2	        = $request->detail2_edit;
+                    $query->status          = $request->status ? $request->status : '2';
+                    $query->save();
+                    DB::commit();
+                }catch(\Exception $e){
+                    DB::rollback();
+                }
+			}
+			
+			if($query) {
+                
+
+                activity()
+                    ->performedOn(new HardwareItem())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Add / edit Hardware Items.');
+
+				$response = [
+					'status'  => 200,
+					'message' => 'Data successfully saved.'
+				];
+			} else {
+				$response = [
+					'status'  => 500,
+					'message' => 'Data failed to save.'
+				];
+			}
+		}
+		
+		return response()->json($response);
+    }
+
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
             'item_id'               => 'required',
             'item_group_id'         => 'required',
-            'code'                  =>  $request->temp ? ['required', Rule::unique('hardware_items', 'code')->ignore($request->temp)] : 'required|unique:hardware_items,code',
+            'arr_detail1'           => 'required',
+            'arr_code'               =>  $request->temp ? ['required', Rule::unique('hardware_items', 'code')->ignore($request->temp)] : 'required|unique:hardware_items,code',
         ], [
-            'code.required' 	        => 'Kode tidak boleh kosong.',
-            'code.unique'               => 'Kode telah terpakai.',
+            'arr_code.required' 	    => 'Kode tidak boleh kosong.',
+            'arr_code.unique'           => 'Kode telah terpakai.',
             'item_id.required'          => 'Harap pilih Item.',
+            'arr_detail1.required'      => 'Harap isi detail item',
             'item_group_id.required'    => 'Harap pilih Group item Asset.',
         ]);
 
@@ -161,10 +219,8 @@ class HardwareItemController extends Controller
                     $query->code            = $request->code;
                     $query->item_id	        = $request->item_id;
                     $query->hardware_item_group_id	        = $request->item_group_id;
-                    $query->location	    = $request->place_id;
-                    $query->ip_address	    = $request->ip_address;
-                    $query->info	        = $request->info;
-                    $query->nominal	        = str_replace(',','.',str_replace('.','',$request->nominal));
+                    $query->detail1	        = $request->detail1;
+                    $query->detail2	        = $request->detail2;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
@@ -173,31 +229,20 @@ class HardwareItemController extends Controller
                 }
 			}else{
                 DB::beginTransaction();
-                
+                foreach($request->arr_code as $key => $row){
                     $query = HardwareItem::create([
-                        'code'                      => $request->code,
+                        'code'                      => $row,
                         'item_id'			        => $request->item_id,
                         'user_id'			        => session('bo_id'),
                         'hardware_item_group_id'    => $request->item_group_id,
-                        'location'			        => $request->place_id,
-                        'ip_address'			    => $request->ip_address,
-                        'info'			            => $request->info,
-                        'nominal'			        => str_replace(',','.',str_replace('.','',$request->nominal)),
+                        'detail1'			        => $request->arr_detail1[$key],
+                        'detail2'			        => $request->arr_detail2[$key],
                         'status'                    => $request->status ? $request->status : '2'
                     ]);
-
-                    $query_reception = ReceptionHardwareItemsUsage::create([
-                        'code'                      => ReceptionHardwareItemsUsage::generateCode(),
-                        'hardware_item_id'			=> $query->id,
-                        'user_id'			        => null,
-                        'info'                      => 'Pembuatan Hardware Item'.$query->item->name,
-                        'date'                      => $query->created_at,
-                        'location'			        => $request->place_id,
-                        'status'                    => '0'
-                    ]);
+                }
                     
 
-                    DB::commit();
+                DB::commit();
                 
 			}
 			
@@ -229,14 +274,13 @@ class HardwareItemController extends Controller
         $hardwareItem = HardwareItem::find($request->id);
         $hardwareItem['item']=$hardwareItem->item;
         $hardwareItem['user']=$hardwareItem->user;
-        $hardwareItem['place_id']=$hardwareItem->location;
         $hardwareItem['group_item']=$hardwareItem->hardwareItemGroup;
 
 		return response()->json($hardwareItem);
     }
 
     public function historyUsage(Request $request){
-        $query_reception = ReceptionHardwareItemsUsage::where('hardware_item_id', $request->id)->get();
+        $query_reception = ReceptionHardwareItemsUsage::where('hardware_item_id', $request->id)->where('status_item',1)->get();
         $temp_return = [];
         $temp_reception = [];
         $title = '';
@@ -256,7 +300,7 @@ class HardwareItemController extends Controller
                 ];
                 $temp_reception[]=$temp_data_rec;
     
-                $query_return = ReturnHardwareItemsUsage::where('reception_hardware_item_usage_id',$reception->id)->get();
+                $query_return = ReceptionHardwareItemsUsage::where('hardware_item_id', $request->id)->where('status_item',2)->get();
     
                 foreach($query_return as $return){
                    
@@ -264,7 +308,7 @@ class HardwareItemController extends Controller
                         'post_date' => $return->created_at,
                         'code'      => $return->code,
                         'date'      => $return->date,
-                        'user'      => '',
+                        'user'      => $return->user_id,
                         'info'      => $return->info,
                         'action'    =>'Pengembalian'
                     ];

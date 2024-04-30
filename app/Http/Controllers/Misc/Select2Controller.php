@@ -564,6 +564,7 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			=> $d->id,
                 'text'          => $d->employee_no.' - '.$d->name.' Pos. '.($d->position()->exists() ? $d->position->name : 'N/A'),
+                'division'      => ($d->position) ? $d->position->division->name : '',
                 'limit_credit'  => $d->limit_credit,
                 'count_limit'   => $d->count_limit_credit,
                 'balance_limit' => $d->limit_credit - $d->count_limit_credit,
@@ -1669,6 +1670,8 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> $d->code.'-'.$d->item->name,
+                'detail1' 	    => $d->detail1,
+                'detail2' 	    => $d->detail2,
             ];
         }
         return response()->json(['items' => $response]);
@@ -1687,8 +1690,14 @@ class Select2Controller extends Controller {
                         });
                 })->where('status','1')
                 ->get();
+        
 
         foreach($data as $d) {
+            $hardware_item = HardwareItem::where(function($query) use($d){
+                                    $query->where('item_id',$d->id);
+                                })->where('status','1')
+                                ->get();
+            $count_hwitem = count($hardware_item);
             $response[] = [
                 'id'   			    => $d->id,
                 'text' 			    => $d->code.' - '.$d->name,
@@ -1697,6 +1706,8 @@ class Select2Controller extends Controller {
                 'uom'               => $d->uomUnit->code,
                 'price_list'        => $d->currentCogs($this->dataplaces),
                 'stock_list'        => $d->currentStock($this->dataplaces,$this->datawarehouses),
+                'total_stock'       => $d->getStockAll(),
+                'total_hw_item'     => $count_hwitem,
                 'list_warehouse'    => $d->warehouseList(),
             ];
         }

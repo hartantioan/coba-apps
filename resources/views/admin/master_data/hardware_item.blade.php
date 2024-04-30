@@ -82,12 +82,9 @@
                                                         <th>Kode</th>
                                                         <th>Item</th>
                                                         <th>Group</th>
-                                                       
-                                                        <th>IP Address</th>
-                                                        <th>Nominal</th>
-                                                        <th>Lokasi</th>
-                                                        <th>Info</th>
-                                                        
+                                                    
+                                                        <th>Detail 1</th>
+                                                        <th>Detail 2</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -118,39 +115,34 @@
                     </div>
                     <div class="col s12">
                         <div class="input-field col s12 m6">
-                            <select class="browser-default" id="item_id" name="item_id">&nbsp;</select>
+                            <select class="browser-default" id="item_id" name="item_id" onchange="itemChanged()">&nbsp;</select>
                             <label class="active" for="item_id">Pilih Item dari inventory</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <select class="browser-default" id="item_group_id" name="item_group_id" onchange="getDepartment()">&nbsp;</select>
                             <label class="active" for="item_group_id">Group Departement</label>
                         </div>
-                        <div class="input-field col s12 m6">
-                            <input type="hidden" id="temp" name="temp">
-                            <input id="code" name="code" type="text" placeholder="Kode">
-                            <label class="active" for="code">Kode</label>
+                        <div class="input-field col s12 m12">
+                        <table class="bordered"id="table-detail">
+                            <thead>
+                                <tr>
+                                    <th>Hapus</th>
+                                    <th>Kode</th>
+                                    <th>Detail 1</th>
+                                    <th>Detail 2</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-item">
+                                <tr id="last-row-item">
+                                    <td colspan="4">
+                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" id="button-add-item" onclick="addItem()" href="javascript:void(0);" disabled>
+                                            <i class="material-icons left">add</i> New Item
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                         </div>
-                        <div class="input-field col s12 m6">
-                            <select class="form-control" id="place_id" name="place_id">
-                                @foreach ($place as $rowplace)
-                                    <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
-                                @endforeach
-                            </select>
-                            <label class="" for="place_id">Lokasi</label>
-                        </div>
-                        <div class="input-field col s12 m6">
-                            <input id="ip_address" name="ip_address" type="text" placeholder="192.168.0.1">
-                            <label class="active" for="ip_address">IP Address(bila ada)</label>
-                        </div>
-                        <div class="input-field col s12 m6">
-                            <input id="nominal" name="nominal" type="text" placeholder="Nominal" onkeyup="formatRupiah(this);">
-                            <label class="active" for="nominal">Nominal</label>
-                        </div>
-                        <div class="input-field col s12 m6">
-                            <input id="info" name="info" type="text" placeholder="Keterangan">
-                            <label class="active" for="info">info</label>
-                        </div>
-                        
                         <div class="input-field col s12 m6">
                             <div class="switch mb-1">
                                 <label for="order">Status</label>
@@ -164,6 +156,62 @@
                         </div>
                         <div class="col s12 mt-3">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+    </div>
+</div>
+
+<div id="modalEdit" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <h4>Edit {{ $title }}</h4>
+                <form class="row" id="form_data_edit" onsubmit="return false;">
+                    <div class="col s12">
+                        <div id="validation_alert_edit" style="display:none;"></div>
+                    </div>
+                    <div class="col s12">
+                        <div class="input-field col s12 m6">
+                            <select class="browser-default" id="item_id_edit" name="item_id_edit">&nbsp;</select>
+                            <label class="active" for="item_id_edit">Pilih Item dari inventory</label>
+                        </div>
+                        <div class="input-field col s12 m6">
+                            <select class="browser-default" id="item_group_id_edit" name="item_group_id_edit" onchange="getDepartment()">&nbsp;</select>
+                            <label class="active" for="item_group_id_edit">Group Departement</label>
+                        </div>
+                        <div class="input-field col s12 m6">
+                            <input type="hidden" id="temp" name="temp">
+                            <input id="code" name="code" type="text" placeholder="Kode">
+                            <label class="active" for="code">Kode</label>
+                        </div>
+                        <div class="input-field col s12 m6">
+                            <input id="detail1_edit" name="detail1_edit" type="text" placeholder="Keterangan">
+                            <label class="active" for="detail1_edit">Detail 1</label>
+                        </div>
+                        <div class="input-field col s12 m6">
+                            <input id="detail2_edit" name="detail2_edit" type="text" placeholder="Keterangan">
+                            <label class="active" for="detail2_edit">Detail 2</label>
+                        </div>
+
+                        <div class="input-field col s12 m6">
+                            <div class="switch mb-1">
+                                <label for="order">Status</label>
+                                <label>
+                                    Non-Active
+                                    <input checked type="checkbox" id="status" name="status" value="1">
+                                    <span class="lever"></span>
+                                    Active
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col s12 mt-3">
+                            <button class="btn waves-effect waves-light right submit" onclick="saveEdit();">Simpan <i class="material-icons right">send</i></button>
                         </div>
                     </div>
                 </form>
@@ -263,7 +311,7 @@
                                 <th class="center-align">Code</th>
                                 <th class="center-align">Date</th>
                                 <th class="center-align">User</th>
-                                <th class="center-align">Info</th>
+                                <th class="center-align">Detail 1</th>
                                 <th class="center-align">Action</th>
                             </tr>                  
                     </thead>
@@ -287,6 +335,9 @@
 
 <!-- END: Page Main-->
 <script>
+    var itemStock = 0;
+    var itemOnAdd = 0;
+    var currentHW = 0;
     document.addEventListener('focusin', function (event) {
         const select2Container = event.target.closest('.modal-content .select2');
         const activeSelect2 = document.querySelector('.modal-content .select2.tab-active');
@@ -333,6 +384,11 @@
             }
         });
 
+        $('#body-item').on('click', '.delete-data-item', function() {
+            $(this).closest('tr').remove();
+            itemOnAdd--;
+        });
+
         $('#modal6').modal({
             onOpenStart: function(modal,trigger) {
                 
@@ -347,9 +403,59 @@
                 $('#body-history-goods1').empty();
             }
         });
+        $('#modalEdit').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) { 
+                $('#name').focus();
+                $('#validation_alert_edit').hide();
+                $('#validation_alert_edit').html('');
+                M.updateTextFields();
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#form_data_edit')[0].reset();
+                $('#temp').val('');
+                M.updateTextFields();
+            }
+        });
         select2ServerSide('#item_id', '{{ url("admin/select2/item_for_hardware_item") }}');
         select2ServerSide('#item_group_id', '{{ url("admin/select2/hardware_item_group") }}');
     });
+
+    function addItem(){
+        var count = makeid(10);
+        var totalx = currentHW + itemOnAdd;
+
+        if(itemStock > parseInt(totalx)){
+            $('#last-row-item').before(`
+                <tr class="row_item">
+                    <input type="hidden" name="arr_data[]" value="0">
+                    <input type="hidden" name="arr_type[]" value="">
+                    <td class="center">
+                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                            <i class="material-icons">delete</i>
+                        </a>
+                    </td>
+                    <td>
+                        <input name="arr_code[]" class="materialize-textarea" type="text" placeholder="Kode Barang">
+                    </td>
+                    <td>
+                        <input name="arr_detail1[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 1...">
+                    </td>
+                    <td>
+                        <input name="arr_detail2[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 2...">
+                    </td>
+                </tr>
+            `);
+            itemOnAdd++;
+        }else{
+            
+            alert("Jumlah Stock sudah sama dengan total inventaris yang akan ditambahkan");
+        }
+        
+    }
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
@@ -388,8 +494,6 @@
                 { name: 'code', className: 'center-align' },
                 { name: 'item_id', className: 'center-align' },
                 { name: 'hardware_item_group_id', className: 'center-align' },
-                { name: 'ip_address', className: 'center-align' },
-                { name: 'location', className: 'center-align' },
                 { name: 'nominal', className: 'center-align' },
                 { name: 'info', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
@@ -485,7 +589,75 @@
             }
         });
     }
+    function saveEdit(){
+			
+    var formData = new FormData($('#form_data_edit')[0]);
+    
+    $.ajax({
+        url: '{{ Request::url() }}/edit',
+        type: 'POST',
+        dataType: 'JSON',
+        data: formData,
+        contentType: false,
+        processData: false,
+        cache: true,
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        beforeSend: function() {
+            $('#validation_alert_edit').hide();
+            $('#validation_alert_edit').html('');
+            loadingOpen('.modal-content');
+        },
+        success: function(response) {
+            loadingClose('.modal-content');
+            if(response.status == 200) {
+                $('#modaledit').modal('close');
+                loadDataTable();
+                M.toast({
+                    html: response.message
+                });
+            } else if(response.status == 422) {
+                $('#validation_alert_Edit').show();
+                $('.modal-content').scrollTop(0);
+                
+                swal({
+                    title: 'Ups! Validation',
+                    text: 'Check your form.',
+                    icon: 'warning'
+                });
 
+                $.each(response.error, function(i, val) {
+                    $.each(val, function(i, val) {
+                        $('#validation_alert_edit').append(`
+                            <div class="card-alert card red">
+                                <div class="card-content white-text">
+                                    <p>` + val + `</p>
+                                </div>
+                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                        `);
+                    });
+                });
+            } else {
+                M.toast({
+                    html: response.message
+                });
+            }
+        },
+        error: function() {
+            $('.modal-content').scrollTop(0);
+            loadingClose('.modal-content');
+            swal({
+                title: 'Ups!',
+                text: 'Check your internet connection.',
+                icon: 'error'
+            });
+        }
+    });
+}
     function success(){
         loadDataTable();
         $('#modal1').modal('close');
@@ -507,20 +679,19 @@
             },
             success: function(response) {
                 loadingClose('#main');
-                $('#modal1').modal('open');
+                $('#modalEdit').modal('open');
                 $('#temp').val(id);
                 $('#code').val(response.code);
-                $('#item_id').val(response.name);
-                $('#item_id').append(`
+                $('#item_id_edit').val(response.name);
+                $('#item_id_edit').append(`
                     <option value="` + response.item.id + `">`+response.item.name+`</option>
                 `);
-                $('#item_group_id').append(`
+                $('#item_group_id_edit').append(`
                     <option value="` + response.group_item.id + `">` + response.group_item.code+`-`+response.group_item.name+`</option>
                 `);
-                $('#info').val(response.info);
-                $('#place_id').val(response.place_id).formSelect();
-                $('#ip_address').val(response.ip_address);
-                $('#nominal').val(response.nominal);
+                $('#detail1_edit').val(response.detail1);
+                $('#detail2_edit').val(response.detail2);
+               
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{
@@ -583,6 +754,29 @@
                 });
             }
         });
+    }
+
+    function itemChanged(){
+        itemStock = 0;
+        currentHW = 0;
+        itemOnAdd = 0;
+        $('#body-item').empty();
+        $('#body-item').append(`
+            <tr id="last-row-item">
+                <td colspan="4">
+                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" id="button-add-item" onclick="addItem()" href="javascript:void(0);">
+                        <i class="material-icons left">add</i> New Item
+                    </a>
+                </td>
+            </tr>
+        `);
+        if($('#item_id').val()){
+            itemStock = parseInt($('#item_id').select2('data')[0].total_stock);
+            currentHW = $('#item_id').select2('data')[0].total_hw_item;
+        }else{
+            itemStock = 0;
+            currentHW = 0;
+        }
     }
 
     function historyUsage(id){

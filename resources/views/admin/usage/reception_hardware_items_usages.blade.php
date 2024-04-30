@@ -46,9 +46,24 @@
                                         </div> --}}
                                     </div>
                                     <div class="col s12 ">
-                                        <h6 style="text-align: center;"> Idle Item</h6>
-                                        <div class="row" id="in_storage">
+                                        <div class="row">
+                                            <div class="col s4 m4"></div>
+                                            <div class="col s4 m4"><h6 style="text-align: center;"> Idle Item</h6></div>
+                                            <div class="col s4 m4 right-align">
+                                                <a class="btn-flat mb-1 waves-effect"  href="#modalbarcode">
+                                                    <i class="material-icons left">scanner</i> 
+                                                    Barcode Scanner
+                                                </a>
+                                            </div>
+                                            <div class="col s12 m12">
+                                                <div class="row" id="in_storage">
+                                                </div>
+                                            </div>
                                         </div>
+                                        
+                                            
+                                        
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -104,27 +119,39 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6 step1">
-                            <select class="browser-default" id="hardware_item_id" name="hardware_item_id">&nbsp;</select>
+                        <div class="input-field col s12 m6 step1">
+                            <select class="browser-default" id="hardware_item_id" name="hardware_item_id"  onchange="getDetail();">&nbsp;</select>
                             <label class="active" for="hardware_item_id">Pilih Item dari inventory</label>
                         </div>
-                        <div class="input-field col s6 step2">
-                            <select class="browser-default" id="user_id" name="user_id">&nbsp;</select>
+                        <div class="input-field col s12 m3 ">
+                            <input id="detail1" name="detail1" disabled></input>
+                            <label class="active" for="detail1">Detail 1</label>
+                        </div>
+                        <div class="input-field col s12 m3 ">
+                            <input id="detail2" name="detail2" disabled></input>
+                            <label class="active" for="detail2">Detail 2</label>
+                        </div>
+                        <div class="input-field col s12 m6 step2">
+                            <select class="browser-default" id="user_id" name="user_id" onchange="getDetail()">&nbsp;</select>
                             <label class="active" for="user_id">Pilih User(jika ada)</label>
                         </div>
-                        <div class="input-field col s6 step3">
+                        <div class="input-field col s12 m6 step2">
+                            <input id="division" name="division" disabled></input>
+                            <label class="active" for="division">DIVISI</label>
+                        </div>
+                        <div class="input-field col s12 m6 step3">
                             <input id="location" name="location" type="text" placeholder="Keterangan">
                             <label class="active" for="location">Lokasi</label>
                         </div>
-                        <div class="input-field col s6 step4"> 
+                        <div class="input-field col s12 m6 step4"> 
                             <input type="date" id="date" name="date" min="{{ $minDate }}">
                             <label class="active" for="date">Date(tanggal)</label>
                         </div>
                         <div class="input-field col s12 step5">
                             <input id="info" name="info" type="text" placeholder="Info">
-                            <label class="active" for="info">Info</label>
+                            <label class="active" for="info">Keterangan</label>
                         </div>
-                        <div class="input-field col s6 step6">
+                        <div class="input-field col s12 m6 step6">
                             <div class="switch mb-1">
                                 <label for="order">Status</label>
                                 <label>
@@ -159,16 +186,16 @@
                         <div id="validation_alert1" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp"> 
                             <input type="date" id="date" name="date"  onchange="loadDataTable()">
                             <label class="active" for="date">Date(tanggal)</label>
                         </div>
                         <div class="input-field col s12">
                             <input id="info" name="info" type="text" placeholder="Info">
-                            <label class="active" for="info">Info</label>
+                            <label class="active" for="info">Keterangan</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <div class="switch mb-1">
                                 <label for="order">Status</label>
                                 <label>
@@ -202,15 +229,15 @@
                         <div id="validation_alert2" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <select class="browser-default" id="user_id1" name="user_id1">&nbsp;</select>
-                            <label class="active" for="user_id1">Pilih User(jika ada)</label>
+                            <label class="active" for="user_id1" >Pilih User(jika ada)</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="location1" name="location1" type="text" placeholder="Keterangan">
                             <label class="active" for="location1">Lokasi</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input type="hidden" id="tempe" name="tempe"> 
                             <input type="date" id="date1" name="date1"  onchange="loadDataTable()">
                             <label class="active" for="date1">Date(tanggal)</label>
@@ -219,7 +246,7 @@
                             <input id="info1" name="info1" type="text" placeholder="Info">
                             <label class="active" for="info">Info</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <div class="switch mb-1">
                                 <label for="order">Status</label>
                                 <label>
@@ -234,6 +261,25 @@
                             <button class="btn waves-effect waves-light right submit" onclick="saveTargeted();">Kembalikan <i class="material-icons right">send</i></button>
                         </div>
                     </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+    </div>
+</div>
+<div id="modalbarcode" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <h4 class="card-title">Barcode Scanner</h4>
+                <div class="col s12">
+                    <div id="validation_alert_barcode" style="display:none;"></div>
+                </div>
+                <form id="barcode-form" action="{{ Request::url() }}/store_w_barcode" method="POST">
+                    @csrf
+                    <input type="text" name="barcode" id="barcode-input" autofocus>
                 </form>
             </div>
         </div>
@@ -284,6 +330,22 @@
                 M.updateTextFields();
             }
         });
+        $('#modalbarcode').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) { 
+                $('#name').focus();
+                $('#validation_alert').hide();
+                $('#validation_alert').html('');
+                M.updateTextFields();
+            },
+            onCloseEnd: function(modal, trigger){
+            
+                M.updateTextFields();
+            }
+        });
 
         $('#modal2').modal({
             dismissible: false,
@@ -323,6 +385,24 @@
 
     });
 
+    function getDetail(){
+    
+        if($('#hardware_item_id').val()){
+            let params = $('#hardware_item_id').select2('data')[0].detail1;
+            let params2 = $('#hardware_item_id').select2('data')[0].detail2;
+            $('#detail1').val(params);
+            $('#detail2').val(params2);
+        }else{
+            $('#detail1').val('');
+            $('#detail2').val('');
+        }
+        if($('#user_id').val()){
+            let paramsdivisi = $('#user_id').select2('data')[0].division;
+            $('#division').val(paramsdivisi);
+           
+        }
+    }
+
     function fetchStorage(){
         $.ajax({
             url: '{{ Request::url() }}/fetch_storage',
@@ -341,19 +421,15 @@
                 $.each(response.itemInStorage, function(i, val) {
                     $('#in_storage').append(
                         `
-                        <div class="col s12 m4 l2">
-                            <div class="card-panel border-radius-6 pt-4 pb-4 card_idle grey lighten-1" style="max-height:4em;overflow:hidden;min-height:4em;" onclick="targeted_item(`+val.item_id+`,'`+btoa(val.itemName)+`')">
-                            <div class="display-flex justify-content-between flex-wrap mt-2">
-                                <div class="display-flex align-items-center mt-1">
-                                <span class="pt-2" style="text-align:center"> `+val.itemName+`</span>
+                        <div class="col s12 m1 l1">
+                            <div class="card-panel border-radius-6 pt-4 pb-4 card_idle grey lighten-1" style="max-height:2em;overflow:hidden;min-height:2em;" onclick="targeted_item(`+val.item_id+`,'`+btoa(val.itemName)+`')">
+                                <div class="display-flex justify-content-center align-items-center" style="height: 100%;">
+                                    <span style="text-align:center;font-size:0.6em;"> `+val.itemName+`-`+val.itemCode+`</span>
                                 </div>
                             </div>
-                            </div>
                         </div>
-                       
                         `
                     );
-                    
                 });
                 
             },

@@ -19,10 +19,8 @@ class HardwareItem extends Model
         'item_id',
         'user_id',
         'hardware_item_group_id',
-        'location',
-        'ip_address',
-        'info',
-        'nominal',
+        'detail1',
+        'detail2',
         'status',
     ];
 

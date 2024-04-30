@@ -984,6 +984,7 @@ Route::prefix('admin')->group(function () {
                         Route::post('history_usage',[HardwareItemController::class, 'historyUsage']);
                         Route::get('export',[HardwareItemController::class, 'export']);
                         Route::post('create',[HardwareItemController::class, 'create'])->middleware('operation.access:hardware_item,update');
+                        Route::post('edit',[HardwareItemController::class, 'edit'])->middleware('operation.access:hardware_item,update');
                         Route::post('destroy', [HardwareItemController::class, 'destroy'])->middleware('operation.access:hardware_item,delete');
                     });
                     
@@ -1284,6 +1285,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [ReceptionHardwareItemUsageController::class, 'show']);
                     Route::get('row_detail',[ReceptionHardwareItemUsageController::class, 'rowDetail']);
                     Route::get('export',[ReceptionHardwareItemUsageController::class, 'export']);
+                    Route::post('store_w_barcode', [ReceptionHardwareItemUsageController::class, 'store_w_barcode'])->middleware('operation.access:reception_hardware_items_usages,update');
                     Route::get('viewstructuretree',[ReceptionHardwareItemUsageController::class, 'viewStructureTree']);
                     Route::get('fetch_storage',[ReceptionHardwareItemUsageController::class, 'fetchStorage']);
                     Route::post('save_targeted',[ReceptionHardwareItemUsageController::class, 'saveTargeted']);

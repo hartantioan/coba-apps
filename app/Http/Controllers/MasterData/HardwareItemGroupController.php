@@ -29,7 +29,7 @@ class HardwareItemGroupController extends Controller
             'id',
             'code',
             'name',
-            'department_id',
+          
             'status',
             'action'
         ];
@@ -83,7 +83,6 @@ class HardwareItemGroupController extends Controller
                     $val->id,
                     $val->code,
                     $val->name,
-                    $val->department->code ?? ''.'-'.$val->department->name ?? '',
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -109,9 +108,7 @@ class HardwareItemGroupController extends Controller
     }
 
     public function show(Request $request){
-        $HardwareItemGroup = HardwareItemGroup::find($request->id);
-        $HardwareItemGroup['department']=$HardwareItemGroup->department;
-        
+        $HardwareItemGroup = HardwareItemGroup::find($request->id);  
 		return response()->json($HardwareItemGroup);
     }
 
@@ -119,12 +116,11 @@ class HardwareItemGroupController extends Controller
         $validation = Validator::make($request->all(), [
             'code'              => $request->temp ? ['required', Rule::unique('hardware_item_groups', 'code')->ignore($request->temp)] : 'required|unique:hardware_item_groups,code',
             'name'              => 'required',
-            'department_id'     => 'required',
+           
         ], [
             'code.required' 	        => 'Kode tidak boleh kosong.',
             'code.unique'               => 'Kode telah terpakai.',
             'name.required'             => 'Nama tidak boleh kosong.',
-            'department_id.required'    => 'Departement tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {

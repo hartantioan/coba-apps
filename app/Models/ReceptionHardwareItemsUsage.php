@@ -17,10 +17,12 @@ class ReceptionHardwareItemsUsage extends Model
     protected $fillable = [
         'code',
         'user_id',
+        'account_id',
         'hardware_item_id',
         'info',
         'date',
         'status',
+        'status_item',
         'location',
         'delete_id',
         'delete_note',
@@ -32,10 +34,10 @@ class ReceptionHardwareItemsUsage extends Model
     public function status(){
         $status = match ($this->status) {
           '0' => '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Unassigned</span>',
-          '1' => '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Active</span>',
-          '2' => '<span class="gradient-45deg-red-pink medium-small white-text padding-3">Not Active</span>',
+          '1' => '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Penyerahan</span>',
+          '2' => '<span class="gradient-45deg-red-pink medium-small white-text padding-3">Pengembalian</span>',
           '3' => '<span class="gradient-45deg-red-pink medium-small white-text padding-3">Not Active</span>',
-          '4' => '<span class="gradient-45deg-blue-grey-blue-grey medium-small white-text padding-3">Di Gudang</span>',
+          '4' => '<span class="gradient-45deg-cyan-light-green medium-small white-text padding-3">Di Gudang || (Setelah Penyerahan)</span>',
           default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
         };
 
@@ -44,6 +46,10 @@ class ReceptionHardwareItemsUsage extends Model
 
     public function user(){
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
+    }
+
+    public function account(){
+        return $this->belongsTo('App\Models\User','account_id','id')->withTrashed();
     }
 
     public function statusRaw(){

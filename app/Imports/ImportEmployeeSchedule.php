@@ -18,7 +18,7 @@ class ImportEmployeeSchedule implements ToCollection
     public function collection(Collection $rows )
     {
         $dataFormatted = [];
-
+        
         foreach ($rows as $key => $row) {
             // Skip the first row (index 0)
             if ($key === 0) {
@@ -41,8 +41,9 @@ class ImportEmployeeSchedule implements ToCollection
             // Read from E to the last non-null column
             for ($i = 4; $i < $lastColumnIndex; $i++) {
                 $data["E-Z"][$i - 4] = $row[$i];
+               
             }
-
+           
             $dataFormatted[] = $data;
         }
         $arrayDate = $dataFormatted[0]["E-Z"];
@@ -75,6 +76,7 @@ class ImportEmployeeSchedule implements ToCollection
             
             
         }
+       
         foreach($data_shift_schedule as $data_masuk){
             $query_employee=User::where('employee_no',$data_masuk["user_code"])->first();
             $query_shift=Shift::where('code','like','%'.$data_masuk["shift_code"])->first();
@@ -93,6 +95,7 @@ class ImportEmployeeSchedule implements ToCollection
                             'status'            => '1'
                             
                         ]);
+                
                         DB::commit();
                     }catch(\Exception $e){
                         DB::rollback();

@@ -260,7 +260,7 @@
                                 :
                             </td>
                             <td>
-                                {{$data->user->name}}
+                                {{$data->user->name ?? '-'}}
                             </td>
                         </tr>
                         <tr>

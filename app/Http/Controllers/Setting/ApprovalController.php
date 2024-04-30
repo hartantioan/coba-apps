@@ -255,8 +255,8 @@ class ApprovalController extends Controller
                             ->orWhere('date_request', 'like', "%$search%")
                             ->orWhere('note','like',"%$search%")
                             ->orWhereHas('approvalSource',function($query) use($search,$request){
-                                $query->whereHasMorph('lookable',[PurchaseRequest::class,PurchaseOrder::class,PurchaseInvoice::class,PurchaseDownPayment::class,LandedCost::class,GoodReceipt::class,PurchaseInvoice::class,FundRequest::class,PaymentRequest::class,OutgoingPayment::class],function (Builder $query) use ($search) {
-                                    $query->where('code','like',"%$search%");
+                                $query->whereHas('lookable', function ($query) use ($search) {
+                                    $query->where('code','like', "%$search%");
                                 })
                                 ->orWhereHas('user',function($query) use($search,$request){
                                     $query->where('code','like',"%$search%")
@@ -291,8 +291,8 @@ class ApprovalController extends Controller
                             ->orWhere('date_request', 'like', "%$search%")
                             ->orWhere('note','like',"%$search%")
                             ->orWhereHas('approvalSource',function($query) use($search,$request){
-                                $query->whereHasMorph('lookable',[PurchaseRequest::class,PurchaseOrder::class,PurchaseInvoice::class,PurchaseDownPayment::class,LandedCost::class,GoodReceipt::class],function (Builder $query) use ($search) {
-                                    $query->where('code','like',"%$search%");
+                                $query->whereHas('lookable', function ($query) use ($search) {
+                                    $query->where('code','like', "%$search%");
                                 })
                                 ->orWhereHas('user',function($query) use($search,$request){
                                     $query->where('code','like',"%$search%")

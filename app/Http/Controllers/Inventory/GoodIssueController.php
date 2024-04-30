@@ -910,7 +910,7 @@ class GoodIssueController extends Controller
                     ->performedOn(new GoodIssue())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Void the good receive data');
+                    ->log('Void the good issue data');
     
                 CustomHelper::sendNotification('good_issues',$query->id,'Barang Keluar No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval('good_issues',$query->id);

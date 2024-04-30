@@ -216,7 +216,7 @@
                                         </td>
                                         <td width="1%">:</td>
                                         <td width="60%">
-                                            {{ $data->post_date }}
+                                            {{ date('d/m/Y',strtotime($data->post_date)) }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -225,7 +225,7 @@
                                         </td>
                                         <td width="1%">:</td>
                                         <td width="60%">
-                                            {{ $data->pay_date }}
+                                            {{ date('d/m/Y',strtotime($data->pay_date)) }}
                                         </td>
                                     </tr>
                                    
@@ -237,7 +237,7 @@
                                         <td width="40%">
                                             
                                             @if($data->outgoingPayment)
-                                                {{ $data->outgoing_payment->pay_date ?? '' }}
+                                                {{ date('d/m/Y',strtotime($data->outgoingPayment->pay_date)) }}
                                             @endif
                                         </td>
                                     </tr>

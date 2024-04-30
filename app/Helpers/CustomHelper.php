@@ -3874,13 +3874,15 @@ class CustomHelper {
 			if($pi->downpayment > 0){
 				foreach($pi->purchaseInvoiceDp as $row){
 					/* $downpayment += $row->nominal * $row->purchaseDownPayment->currency_rate; */
+					$currencydp = $row->purchaseDownPayment->latestCurrencyRate();
+
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $coahutangusaha->id,
 						'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
 						'type'			=> '1',
-						'nominal'		=> $row->nominal * $row->purchaseDownPayment->currency_rate,
-						'nominal_fc'	=> $row->purchaseDownPayment->currency->type == '1' || $row->purchaseDownPayment->currency->type == '' ? $row->nominal * $row->purchaseDownPayment->currency_rate : $row->nominal,
+						'nominal'		=> $row->nominal * $currencydp,
+						'nominal_fc'	=> $row->purchaseDownPayment->currency->type == '1' || $row->purchaseDownPayment->currency->type == '' ? $row->nominal * $currencydp : $row->nominal,
 					]);
 	
 					JournalDetail::create([
@@ -3888,10 +3890,10 @@ class CustomHelper {
 						'coa_id'		=> $coauangmukapembelian->id,
 						'account_id'	=> $coauangmukapembelian->bp_journal ? $account_id : NULL,
 						'type'			=> '2',
-						'nominal'		=> $row->nominal * $row->purchaseDownPayment->currency_rate,
-						'nominal_fc'	=> $row->purchaseDownPayment->currency->type == '1' || $row->purchaseDownPayment->currency->type == '' ? $row->nominal * $row->purchaseDownPayment->currency_rate : $row->nominal,
+						'nominal'		=> $row->nominal * $currencydp,
+						'nominal_fc'	=> $row->purchaseDownPayment->currency->type == '1' || $row->purchaseDownPayment->currency->type == '' ? $row->nominal * $currencydp : $row->nominal,
 					]);
-					$realDownPayment += $row->nominal * $row->purchaseDownPayment->currency_rate;
+					$realDownPayment += $row->nominal * $currencydp;
 					$realInvoice += $row->nominal * $pi->currency_rate;
 					
 					if($row->purchaseDownPayment->balanceInvoice() <= 0){

@@ -22,7 +22,6 @@ class ProductionOrder extends Model
         'production_schedule_id',
         'production_schedule_detail_id',
         'warehouse_id',
-        'area_id',
         'post_date',
         'note',
         'status',
@@ -35,6 +34,9 @@ class ProductionOrder extends Model
         'planned_qty',
         'completed_qty',
         'rejected_qty',
+        'total_production_time',
+        'total_additional_time',
+        'total_run_time',
         'void_id',
         'void_note',
         'void_date',
@@ -93,11 +95,6 @@ class ProductionOrder extends Model
     public function warehouse()
     {
         return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
-    }
-
-    public function area()
-    {
-        return $this->belongsTo('App\Models\Area', 'area_id', 'id')->withTrashed();
     }
 
     public function used(){

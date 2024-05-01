@@ -16,14 +16,15 @@ class ProductionScheduleDetail extends Model
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'production_schedule_id',
-        'production_date',
+        'marketing_order_plan_detail_id',
         'shift_id',
         'item_id',
         'bom_id',
         'qty',
-        'line_id',
         'group',
         'warehouse_id',
+        'start_date',
+        'end_date',
         'note',
         'status',
     ];
@@ -31,6 +32,11 @@ class ProductionScheduleDetail extends Model
     public function productionSchedule()
     {
         return $this->belongsTo('App\Models\ProductionSchedule', 'production_schedule_id', 'id')->withTrashed();
+    }
+
+    public function marketingOrderPlanDetail()
+    {
+        return $this->belongsTo('App\Models\MarketingOrderPlanDetail', 'marketing_order_plan_detail_id', 'id')->withTrashed();
     }
 
     public function shift(){
@@ -45,26 +51,19 @@ class ProductionScheduleDetail extends Model
         return $this->belongsTo('App\Models\Item','item_id','id')->withTrashed();
     }
 
-    public function line(){
-        return $this->belongsTo('App\Models\Line','line_id','id')->withTrashed();
-    }
-
     public function warehouse(){
         return $this->belongsTo('App\Models\Warehouse','warehouse_id','id')->withTrashed();
     }
 
     public function productionOrder(){
-        return $this->hasMany('App\Models\ProductionOrder','production_schedule_detail_id','id');
+        return $this->hasOne('App\Models\ProductionOrder','production_schedule_detail_id','id')->whereIn('status',['1','2','3']);
     }
 
     public function status(){
         $status = match ($this->status) {
-            '1' => 'Menunggu',
-            '2' => 'Proses',
-            '3' => 'Selesai',
-            '4' => 'Ditolak',
-            '5' => 'Ditutup',
-            '6' => 'Direvisi',
+            NULL    => 'Menunggu',
+            '1'     => 'Disetujui',
+            '2'     => 'Ditolak',
             default => 'Invalid',
         };
 

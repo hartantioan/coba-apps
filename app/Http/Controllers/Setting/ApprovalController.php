@@ -26,6 +26,7 @@ use App\Exports\ExportCoa;
 use Illuminate\Database\Eloquent\Builder;
 use App\Helpers\CustomHelper;
 use App\Models\GoodIssueRequestDetail;
+use App\Models\ProductionScheduleDetail;
 
 class ApprovalController extends Controller
 {
@@ -427,6 +428,18 @@ class ApprovalController extends Controller
                         ]);
                         foreach($request->arr_status_good_issue_request as $key => $row){
                             GoodIssueRequestDetail::find(intval($row))->update([
+                                'status'    => '1'
+                            ]);
+                        }
+                    }
+                }
+                if($query->approvalSource->lookable_type == 'production_schedules'){
+                    if($request->arr_status_production_schedule){
+                        $query->approvalSource->lookable->productionScheduleDetail()->whereNotIn('id',$request->arr_status_production_schedule)->update([
+                            'status'    => '2'
+                        ]);
+                        foreach($request->arr_status_production_schedule as $key => $row){
+                            ProductionScheduleDetail::find(intval($row))->update([
                                 'status'    => '1'
                             ]);
                         }

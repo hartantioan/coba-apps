@@ -79,6 +79,7 @@ class ProductionScheduleController extends Controller
             'place_id',
             'line_id',
             'post_date',
+            'note',
         ];
 
         $start  = $request->start;
@@ -180,7 +181,8 @@ class ProductionScheduleController extends Controller
                     $val->place->code,
                     $val->line->code,
                     date('d/m/Y',strtotime($val->post_date)),
-                      $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
+                    $val->note,
+                    $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->status(),
                     (
                         ($val->status == 3 && is_null($val->done_id)) ? 'SYSTEM' :
@@ -229,49 +231,43 @@ class ProductionScheduleController extends Controller
         
         $validation = Validator::make($request->all(), [
             'code'                      => 'required',
-           /*  'code'			            => $request->temp ? ['required', Rule::unique('production_schedules', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:production_schedules,code',
-            */ 'code_place_id'             => 'required',
+            'code_place_id'             => 'required',
             'company_id'			    => 'required',
             'place_id'		            => 'required',
-            'marketing_order_plan_id'   => 'required',
+            'line_id'                   => 'required',
             'post_date'		            => 'required',
             'arr_id'                    => 'required|array',
             'arr_qty'                   => 'required|array',
-            'arr_date'                  => 'required|array',
-            'arr_shift'                 => 'required|array',
+            'arr_detail_id'             => 'required|array',
+            'arr_detail_qty'            => 'required|array',
             'arr_item_detail_id'        => 'required|array',
-            'arr_line_id'               => 'required|array',
-            'arr_warehouse_id'          => 'required|array',
-            'arr_group'                 => 'required|array',
-            'arr_qty_detail'            => 'required|array',
+            'arr_bom'                   => 'required|array',
+            'arr_start_date'            => 'required|array',
+            'arr_end_date'              => 'required|array',
+            'arr_shift'                 => 'required|array',
         ], [
             'code_place_id.required'            => 'Plant Tidak boleh kosong',
             'code.required' 	                => 'Kode tidak boleh kosong.',
-            /* 'code.string'                       => 'Kode harus dalam bentuk string.',
-            'code.min'                          => 'Kode harus minimal 18 karakter.',
-            'code.unique'                       => 'Kode telah dipakai', */
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
             'place_id.required' 			    => 'Plant tidak boleh kosong.',
             'marketing_order_plan_id.required'  => 'MOP tidak boleh kosong.',
             'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
-            'arr_id.required'                   => 'Marketing Order Plan tidak boleh kosong.',
-            'arr_id.array'                      => 'Marketing Order Plan harus array.',
+            'arr_id.required'                   => 'Marketing Order Plan item target tidak boleh kosong.',
+            'arr_id.array'                      => 'Marketing Order Plan item target harus array.',
             'arr_qty.required'                  => 'Qty target tidak boleh kosong.',
             'arr_qty.array'                     => 'Qty target harus array.',
-            'arr_date.required'                 => 'Tgl.Produksi tidak boleh kosong.',
-            'arr_date.array'                    => 'Tgl.Produksi harus array.',
+            'arr_detail_id.required'            => 'Marketing Order Plan detail tidak boleh kosong.',
+            'arr_detail_id.array'               => 'Marketing Order Plan detail harus array.',
+            'arr_detail_qty.required'           => 'Qty detail tidak boleh kosong.',
+            'arr_detail_qty.array'              => 'Qty detail harus array.',
+            'arr_bom.required'                  => 'Bom tidak boleh kosong.',
+            'arr_bom.array'                     => 'Bom harus array.',
+            'arr_start_date.required'           => 'Tgl mulai tidak boleh kosong.',
+            'arr_start_date.array'              => 'Tgl mulai harus array.',
+            'arr_end_date.required'             => 'Tgl selesai tidak boleh kosong.',
+            'arr_end_date.array'                => 'Tgl selesai harus array.',
             'arr_shift.required'                => 'Shift tidak boleh kosong.',
             'arr_shift.array'                   => 'Shift harus array.',
-            'arr_item_detail_id.required'       => 'Item dan shift tidak boleh kosong.',
-            'arr_item_detail_id.array'          => 'Item dan shift harus array.',
-            'arr_line_id.required'              => 'Line tidak boleh kosong.',
-            'arr_line_id.array'                 => 'Line harus array.',
-            'arr_warehouse_id.required'         => 'Gudang tidak boleh kosong.',
-            'arr_warehouse_id.array'            => 'Gudang harus array.',
-            'arr_group.required'                => 'Grup tidak boleh kosong.',
-            'arr_group.array'                   => 'Grup harus array.',
-            'arr_qty_detail.required'           => 'Qty shift tidak boleh kosong.',
-            'arr_qty_detail.array'              => 'Qty shift harus array.',
         ]);
 
         if($validation->fails()) {
@@ -332,9 +328,10 @@ class ProductionScheduleController extends Controller
                         $query->code = $request->code;
                         $query->company_id = $request->company_id;
                         $query->place_id = $request->place_id;
-                        $query->marketing_order_plan_id = $request->marketing_order_plan_id;
+                        $query->line_id = $request->line_id;
                         $query->post_date = $request->post_date;
                         $query->document = $document;
+                        $query->note = $request->note;
                         $query->status = '1';
 
                         $query->save();
@@ -362,16 +359,17 @@ class ProductionScheduleController extends Controller
                 try {
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode=ProductionSchedule::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
+                    $newCode = ProductionSchedule::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                     
                     $query = ProductionSchedule::create([
                         'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $request->company_id,
                         'place_id'	                => $request->place_id,
-                        'marketing_order_plan_id'   => $request->marketing_order_plan_id,
+                        'line_id'                   => $request->line_id,
                         'post_date'                 => $request->post_date,
                         'document'                  => $request->file('file') ? $request->file('file')->store('public/production_schedules') : NULL,
+                        'note'                      => $request->note,
                         'status'                    => '1',
                     ]);
 
@@ -397,15 +395,16 @@ class ProductionScheduleController extends Controller
                     foreach($request->arr_shift as $key => $row){
                         ProductionScheduleDetail::create([
                             'production_schedule_id'        => $query->id,
-                            'production_date'               => $request->arr_date[$key],
+                            'marketing_order_plan_detail_id'=> $request->arr_detail_id[$key],
                             'shift_id'                      => $row,
                             'item_id'                       => $request->arr_item_detail_id[$key],
-                            'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty_detail[$key])),
-                            'line_id'                       => $request->arr_line_id[$key],
+                            'bom_id'                        => $request->arr_bom[$key],
+                            'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_detail_qty[$key])),
                             'group'                         => $request->arr_group[$key],
                             'warehouse_id'                  => $request->arr_warehouse_id[$key],
+                            'start_date'                    => $request->arr_start_date[$key],
+                            'end_date'                      => $request->arr_end_date[$key],
                             'note'                          => $request->arr_note[$key],
-                            'status'                        => '1',
                         ]);
                     }
 
@@ -414,7 +413,7 @@ class ProductionScheduleController extends Controller
                     DB::rollback();
                 }
 
-                CustomHelper::sendApproval($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external);
+                CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Jadwal Produksi No. '.$query->code,'Pengajuan Jadwal Produksi No. '.$query->code,session('bo_id'));
 
                 activity()
@@ -441,7 +440,6 @@ class ProductionScheduleController extends Controller
     public function show(Request $request){
         $po = ProductionSchedule::where('code',CustomHelper::decrypt($request->id))->first();
         $po['code_place_id'] = substr($po->code,7,2);
-        $po['marketing_order_plan_code'] = $po->marketingOrderPlan->code;
 
         $arr = [];
         $arrDetail = [];
@@ -451,51 +449,43 @@ class ProductionScheduleController extends Controller
         foreach($po->productionScheduleTarget as $row){
             $cekBom = $row->marketingOrderPlanDetail->item->bomPlace($po->place_id);
             $arr[] = [
-                'id'                    => $row->marketingOrderPlanDetail->marketingOrderPlan->id,
-                'code'                  => $row->marketingOrderPlanDetail->marketingOrderPlan->code,
-                'mopd_id'               => $row->marketing_order_plan_detail_id,
-                'item_id'               => $row->marketingOrderPlanDetail->item_id,
-                'item_code'             => $row->marketingOrderPlanDetail->item->code,
-                'item_name'             => $row->marketingOrderPlanDetail->item->code.' - '.$row->marketingOrderPlanDetail->item->name,
-                'qty_in_sell'           => number_format(($row->qty  * $row->marketingOrderPlanDetail->item->production_convert) / $row->marketingOrderPlanDetail->item->sell_convert),
-                'qty_in_uom'            => CustomHelper::formatConditionalQty($row->qty * $row->marketingOrderPlanDetail->item->production_convert),
-                'qty_in_production'     => CustomHelper::formatConditionalQty($row->qty),
-                'qty_in_pallet'         => CustomHelper::formatConditionalQty((($row->qty * $row->marketingOrderPlanDetail->item->production_convert) / $row->marketingOrderPlanDetail->item->sell_convert) / $row->marketingOrderPlanDetail->item->pallet_convert),
-                'unit_sell'             => $row->marketingOrderPlanDetail->item->sellUnit->code,
-                'unit_uom'              => $row->marketingOrderPlanDetail->item->uomUnit->code,
-                'unit_production'       => $row->marketingOrderPlanDetail->item->productionUnit->code,
-                'unit_pallet'           => $row->marketingOrderPlanDetail->item->palletUnit->code,
-                'sell_convert'          => $row->marketingOrderPlanDetail->item->sell_convert,
-                'production_convert'    => $row->marketingOrderPlanDetail->item->production_convert,
-                'pallet_convert'        => $row->marketingOrderPlanDetail->item->pallet_convert,
-                'request_date'          => date('d/m/Y',strtotime($row->marketingOrderPlanDetail->request_date)),
-                'note'                  => $row->marketingOrderPlanDetail->note,
-                'qty_real'              => CustomHelper::formatConditionalQty($row->marketingOrderPlanDetail->qty * $row->marketingOrderPlanDetail->item->sell_convert),
-                'bom_link'              => $cekBom->exists() ? $cekBom->orderByDesc('id')->first()->code : '',
-                'stock_check'           => $cekBom->exists() ? $row->marketingOrderPlanDetail->item->arrRawStock($po->place_id,$row->marketingOrderPlanDetail->qty * $row->MarketingOrderPlanDetail->item->sell_convert) : '',
-                'is_urgent'             => $row->marketingOrderPlanDetail->isUrgent(),
-                'group'                 => $row->marketingOrderPlanDetail->item->itemGroup->production_type,
-                'warehouses'            => $row->marketingOrderPlanDetail->item->warehouseList(),
-                'bom_id'                => $cekBom->exists() ? $cekBom->orderByDesc('id')->first()->id : '',
+                'id'                => $row->marketingOrderPlanDetail->marketing_order_plan_id,
+                'mop_code'          => $row->marketingOrderPlanDetail->marketingOrderPlan->code,
+                'mopd_id'           => $row->marketing_order_plan_detail_id,
+                'item_id'           => $row->marketingOrderPlanDetail->item_id,
+                'item_code'         => $row->marketingOrderPlanDetail->item->code,
+                'item_name'         => $row->marketingOrderPlanDetail->item->name,
+                'qty'               => CustomHelper::formatConditionalQty($row->qty),
+                'uom'               => $row->marketingOrderPlanDetail->item->uomUnit->code,
+                'request_date'      => date('d/m/Y',strtotime($row->marketingOrderPlanDetail->request_date)),
+                'note'              => $row->marketingOrderPlanDetail->note ? $row->marketingOrderPlanDetail->note : '',
+                'priority'          => $row->marketingOrderPlanDetail->priority,
+                'has_bom'           => $cekBom->exists() ? '1' : '',
+                'place_id'          => $po->place_id,
             ];
-            if($cekBom->exists()){
-                $composition[] = $cekBom->orderByDesc('id')->first()->arrAvailableComposition();
-            }
         }
 
         foreach($po->productionScheduleDetail as $row){
             $arrDetail[] = [
-                'date'              => $row->production_date,
-                'shift_id'          => $row->shift_id,
-                'shift_code'        => $row->shift->code.' - '.$row->shift->name.'|'.$row->shift->time_in.' - '.$row->shift->time_out,
+                'id'                => $row->marketingOrderPlanDetail->marketing_order_plan_id,
+                'mop_code'          => $row->marketingOrderPlanDetail->marketingOrderPlan->code,
+                'mopd_id'           => $row->marketing_order_plan_detail_id,
+                'start_date'        => $row->start_date,
+                'end_date'          => $row->end_date,
+                'bom_id'            => $row->bom_id ?? '',
+                'bom_code'          => $row->bom->code.' - '.$row->bom->name,
+                'shift_id'          => $row->shift_id ?? '',
+                'shift_code'        => $row->shift->code.' - '.$row->shift->name,
                 'item_id'           => $row->item_id,
+                'item_code'         => $row->item->code.' - '.$row->item->name,
                 'qty'               => CustomHelper::formatConditionalQty($row->qty),
-                'unit'              => $row->item->productionUnit->code,
-                'line_id'           => $row->line_id,
+                'qty_source'        => CustomHelper::formatConditionalQty($row->marketingOrderPlanDetail->qty),
+                'uom'               => $row->item->uomUnit->code,
                 'group'             => $row->group,
                 'warehouse_id'      => $row->warehouse_id,
-                'note'              => $row->note,
-                'type_production'   => $row->item->itemGroup->production_type ? $row->item->itemGroup->production_type : '',
+                'warehouse_name'    => $row->warehouse->name,
+                'note'              => $row->note ?? '',
+                'place_id'          => $po->place_id,
             ];
         }
 
@@ -525,20 +515,30 @@ class ProductionScheduleController extends Controller
     public function rowDetail(Request $request)
     {
         $data   = ProductionSchedule::where('code',CustomHelper::decrypt($request->id))->first();
+
+        $x="";
+        if (isset($data->void_date)) {
+            $voidUser = $data->voidUser ? $data->voidUser->employee_no . '-' . $data->voidUser->name : 'Sistem';
+            $x .= '<span style="color: red;">|| Tanggal Void: ' . $data->void_date .  ' || Void User: ' . $voidUser.' || Note:' . $data->void_note.'</span>' ;
+        }if($data->status == 3){
+            $doneUser = $data->done_id ? $data->doneUser->employee_no . '-' . $data->doneUser->name : 'Sistem';
+           $x .= '<span style="color: blue;">|| Tanggal Done: ' . $data->done_date .  ' || Done User: ' . $doneUser.'</span>';
+        }
         
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;">
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.$x.'</div><div class="col s12" style="overflow:auto;"><table style="min-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="8">Daftar Target Berdasarkan Marketing Order Plan</th>
+                                <th class="center-align" colspan="9">Daftar Target Produksi</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">MOP</th>
-                                <th class="center-align">Item</th>
-                                <th class="center-align">Qty Target</th>
-                                <th class="center-align">Qty MOP</th>
-                                <th class="center-align">Satuan Produksi</th>
+                                <th class="center-align">Kode Item</th>
+                                <th class="center-align">Nama Item</th>
+                                <th class="center-align">Qty</th>
+                                <th class="center-align">Satuan UoM</th>
                                 <th class="center-align">Tgl.Request</th>
+                                <th class="center-align">Prioritas</th>
                                 <th class="center-align">Keterangan</th>
                             </tr>
                         </thead><tbody>';
@@ -547,11 +547,12 @@ class ProductionScheduleController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->marketingOrderPlanDetail->marketingOrderPlan->code.'</td>
+                <td class="center-align">'.$row->marketingOrderPlanDetail->item->code.'</td>\
                 <td class="center-align">'.$row->marketingOrderPlanDetail->item->name.'</td>
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
-                <td class="right-align">'.CustomHelper::formatConditionalQty(($row->marketingOrderPlanDetail->qty * $row->marketingOrderPlanDetail->item->sell_convert) / $row->marketingOrderPlanDetail->item->production_convert).'</td>
-                <td class="center-align">'.$row->marketingOrderPlanDetail->item->productionUnit->code.'</td>
+                <td class="center-align">'.$row->marketingOrderPlanDetail->item->uomUnit->code.'</td>
                 <td class="center-align">'.date('d/m/Y',strtotime($row->marketingOrderPlanDetail->request_date)).'</td>
+                <td class="center-align">'.$row->marketingOrderPlanDetail->priority.'</td>
                 <td class="">'.$row->marketingOrderPlanDetail->note.'</td>
             </tr>';
         }
@@ -561,39 +562,45 @@ class ProductionScheduleController extends Controller
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="11">Daftar Shift & Target Produksi</th>
+                                <th class="center-align" colspan="14">Daftar Shift & Target Produksi</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
-                                <th class="center-align">Item</th>
-                                <th class="center-align">Qty</th>
-                                <th class="center-align">Satuan</th>
-                                <th class="center-align">Gudang</th>
-                                <th class="center-align">Tgl.Produksi</th>
+                                <th class="center-align">MOP</th>
                                 <th class="center-align">Shift</th>
-                                <th class="center-align">Line</th>
+                                <th class="center-align">Kode Item</th>
+                                <th class="center-align">Nama Item</th>
+                                <th class="center-align">Kode BOM</th>
+                                <th class="center-align">Qty</th>
+                                <th class="center-align">Satuan UoM</th>
                                 <th class="center-align">Grup</th>
-                                <th class="center-align">NO PDO</th>
+                                <th class="center-align">Gudang</th>
+                                <th class="center-align">Tgl.Mulai</th>
+                                <th class="center-align">Tgl.Selesai</th>
                                 <th class="center-align">Status</th>
+                                <th class="center-align">NO PDO</th>
                             </tr>
                         </thead><tbody>';
 
         foreach($data->productionScheduleDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align" rowspan="2">'.($key + 1).'</td>
-                <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
+                <td>'.$row->marketingOrderPlanDetail->marketingOrderPlan->code.'</td>
+                <td>'.$row->shift->code.' - '.$row->shift->name.'</td>
+                <td>'.$row->item->code.'</td>
+                <td>'.$row->item->name.'</td>
+                <td>'.$row->bom->code.' - '.$row->bom->name.'</td>
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
-                <td class="center-align">'.$row->item->productionUnit->code.'</td>
-                <td class="center-align">'.$row->warehouse->code.'</td>
-                <td class="center-align">'.date('d/m/Y',strtotime($row->production_date)).'</td>
-                <td class="center-align">'.$row->shift->code.'</td>
-                <td class="center-align">'.$row->line->code.'</td>
+                <td class="center-align">'.$row->item->uomUnit->code.'</td>
                 <td class="center-align">'.$row->group.'</td>
-                <td class="center-align">-</td>
-                <td class="center-align">'.$row->status().'</td>
+                <td class="center-align">'.$row->warehouse->code.'</td>
+                <td class="center-align">'.date('d/m/Y',strtotime($row->start_date)).'</td>
+                <td class="center-align">'.date('d/m/Y',strtotime($row->end_date)).'</td>
+                <td class="center-align">'.$row->status().'</td>           
+                <td class="center-align">'.($row->productionOrder()->exists() ? $row->productionOrder->code : '-').'</td>
             </tr>
             <tr>
-                <td colspan="10">Keterangan : '.$row->note.'</td>
+                <td colspan="13">Keterangan : '.$row->note.'</td>
             </tr>';
         }
 

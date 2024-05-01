@@ -365,6 +365,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('all_user_bank', [Select2Controller::class, 'allUserBank']);
                 Route::get('item_serial', [Select2Controller::class, 'itemSerial']);
                 Route::get('item_serial_return_po', [Select2Controller::class, 'itemSerialReturnPo']);
+                Route::get('bom_by_item', [Select2Controller::class, 'bomByItem']);
             });
 
             Route::prefix('dashboard')->group(function () {

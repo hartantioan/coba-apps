@@ -351,7 +351,6 @@ class ProductionOrderController extends Controller
                         $query->production_schedule_id = $request->production_schedule_id;
                         $query->production_schedule_detail_id = $request->production_schedule_detail_id;
                         $query->warehouse_id = $request->warehouse_id;
-                        $query->area_id = $request->area_id ? $request->area_id : NULL;
                         $query->post_date = $request->post_date;
                         $query->note = $request->note;
                         $query->standard_item_cost = $standardItemCost;
@@ -362,7 +361,7 @@ class ProductionOrderController extends Controller
 
                         $query->save();
                         
-                        foreach($query->marketingOrderPlanDetail as $row){
+                        foreach($query->productionOrderDetail() as $row){
                             $row->delete();
                         }
 
@@ -370,7 +369,7 @@ class ProductionOrderController extends Controller
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status Marketing Order Plan sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+					        'message' => 'Status Order Produksi sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                 }catch(\Exception $e){
@@ -390,7 +389,6 @@ class ProductionOrderController extends Controller
                         'production_schedule_id'	    => $request->production_schedule_id,
                         'production_schedule_detail_id'	=> $request->production_schedule_detail_id,
                         'warehouse_id'                  => $request->warehouse_id,
-                        'area_id'                       => $request->area_id ? $request->area_id : NULL,
                         'post_date'                     => $request->post_date,
                         'note'                          => $request->note,
                         'standard_item_cost'            => $standardItemCost,

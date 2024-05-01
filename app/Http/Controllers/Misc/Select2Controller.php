@@ -61,6 +61,7 @@ use App\Models\Equipment;
 use App\Models\WorkOrder;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Bom;
 use App\Models\Color;
 use App\Models\DeliveryCost;
 use App\Models\GoodIssueRequest;
@@ -2989,6 +2990,7 @@ class Select2Controller extends Controller {
                     'note'              => $row->note ? $row->note : '',
                     'priority'          => $row->priority,
                     'has_bom'           => $cekBom->exists() ? '1' : '',
+                    'place_id'          => $request->place_id,
                 ];
             }
             $response[] = [
@@ -2997,6 +2999,36 @@ class Select2Controller extends Controller {
                 'table'         => $d->getTable(),
                 'details'       => $details,
                 'code'          => $d->code,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function bomByItem(Request $request)
+    {
+        $response = [];
+        $search     = $request->search;
+        $item_id    = $request->item_id;
+        $place_id   = $request->place_id;
+        $data = Bom::where(function($query) use($search){
+            $query->where('code', 'like', "%$search%")
+                ->orWhere('name','like',"%$search%");
+        })
+        ->where('place_id',$place_id)
+        ->where('item_id',$item_id)
+        ->where('status','1')
+        ->whereDate('valid_from','<=',date('Y-m-d'))
+        ->whereDate('valid_to','>=',date('Y-m-d'))
+        ->orderByDesc('id')
+        ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' '.$d->name,
+                'warehouse_id'  => $d->warehouse_id,
+                'warehouse'     => $d->warehouse->name,
             ];
         }
 

@@ -171,10 +171,10 @@
                     LAIN-LAIN
                 </div>
                 <div class="col s4">
-                    MOP
+                    Line
                 </div>
                 <div class="col s8">
-                    {{ $data->marketingOrderPlan->code }}
+                    {{ $data->line->code }}
                 </div>
                 <div class="col s4">
                     Tgl.Post
@@ -182,23 +182,29 @@
                 <div class="col s8">
                     {{ date('d/m/Y',strtotime($data->post_date)) }}
                 </div>
+                <div class="col s4">
+                    Keterangan
+                </div>
+                <div class="col s8">
+                    {{ $data->note }}
+                </div>
             </div>
         </div>
         
         <div class="invoice-product-details mt-2" style="overflow:auto;">
-            <table class="bordered">
+            <table class="bordered" width="100%">
                 <thead>
                     <tr>
-                        <th colspan="7" class="center-align">Daftar Target Berdasarkan Marketing Order Plan</th>
+                        <th colspan="7" class="center-align">Daftar Target Produksi</th>
                     </tr>
                     <tr>
                         <th class="center-align">No.</th>
                         <th class="center-align">MOP</th>
                         <th class="center-align">Item</th>
-                        <th class="center-align">Qty Target</th>
-                        <th class="center-align">Qty MOP</th>
+                        <th class="center-align">Qty</th>
                         <th class="center-align">Satuan</th>
                         <th class="center-align">Tgl.Request</th>
+                        <th class="center-align">Prioritas</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -206,11 +212,11 @@
                     <tr>
                         <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
                         <td class="center-align">{{ $row->marketingOrderPlanDetail->marketingOrderPlan->code }}</td>
-                        <td class="center-align">{{ $row->marketingOrderPlanDetail->item->name }}</td>
+                        <td class="center-align">{{ $row->marketingOrderPlanDetail->item->code.' - '.$row->marketingOrderPlanDetail->item->name }}</td>
                         <td class="right-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
-                        <td class="right-align">{{ CustomHelper::formatConditionalQty($row->marketingOrderPlanDetail->qty * $row->marketingOrderPlanDetail->item->sell_convert) }}</td>
                         <td class="center-align">{{ $row->marketingOrderPlanDetail->item->uomUnit->code }}</td>
                         <td class="center-align">{{ date('d/m/Y',strtotime($row->marketingOrderPlanDetail->request_date)) }}</td>
+                        <td class="center-align">{{ $row->marketingOrderPlanDetail->priority }}</td>
                     </tr>
                     <tr>
                         <td colspan="6">Keterangan: {{ $row->marketingOrderPlanDetail->note }}</td>
@@ -220,39 +226,60 @@
             </table>
         </div>
 
-        <div class="invoice-product-details mt-2" style="overflow:auto;">
-            <table class="bordered">
+        <div class="invoice-product-details mt-2 mr-1 ml-1" style="overflow:auto;padding:1px;">
+            <table class="bordered" width="100%">
                 <thead>
                     <tr>
-                        <th colspan="9" class="center-align">Daftar Shift & Target Produksi</th>
+                        <th colspan="15" class="center-align">Daftar Jadwal Produksi</th>
                     </tr>
                     <tr>
+                        <th class="center-align">Proses</th>
                         <th class="center-align">No.</th>
-                        <th class="center-align">Tgl.Produksi</th>
-                        <th class="center-align">Shift</th>
-                        <th class="center-align">Item</th>
-                        <th class="center-align">Qty</th>
-                        <th class="center-align">Satuan</th>
-                        <th class="center-align">Line</th>
-                        <th class="center-align">Grup</th>
-                        <th class="center-align">Gudang</th>
+                        <th class="center-align" style="min-width:150px !important;">MOP</th>
+                        <th class="center-align" style="min-width:150px !important;">Shift</th>
+                        <th class="center-align" style="min-width:150px !important;">Kode Item</th>
+                        <th class="center-align" style="min-width:150px !important;">Nama Item</th>
+                        <th class="center-align" style="min-width:150px !important;">Kode BOM</th>
+                        <th class="center-align" style="min-width:150px !important;">Qty</th>
+                        <th class="center-align" style="min-width:150px !important;">Satuan UoM</th>
+                        <th class="center-align" style="min-width:150px !important;">Grup</th>
+                        <th class="center-align" style="min-width:150px !important;">Gudang</th>
+                        <th class="center-align" style="min-width:150px !important;">Tgl.Mulai</th>
+                        <th class="center-align" style="min-width:150px !important;">Tgl.Selesai</th>
+                        <th class="center-align" style="min-width:150px !important;">Status</th>
+                        <th class="center-align" style="min-width:150px !important;">NO PDO</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($data->productionScheduleDetail as $key => $row)
                     <tr>
+                        <td class="center-align" rowspan="2">
+                            @if ($row->status == '2')
+                                {!! $row->status() !!}
+                            @else
+                                <label>
+                                    <input type="checkbox" id="arr_status_production_schedule{{ $key }}" name="arr_status_production_schedule[]" value="{{ $row->id }}" {{ $row->status == '1' ? 'checked' : '' }}>
+                                    <span>Pilih</span>
+                                </label>
+                            @endif
+                        </td>
                         <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
-                        <td class="center-align">{{ date('d/m/Y',strtotime($row->production_date)) }}</td>
-                        <td class="center-align">{{ $row->shift->code }}</td>
-                        <td class="center-align">{{ $row->item->code.' - '.$row->item->name }}</td>
+                        <td>{{ $row->marketingOrderPlanDetail->marketingOrderPlan->code }}</td>
+                        <td>{{ $row->shift->code.' - '.$row->shift->name }}</td>
+                        <td>{{ $row->item->code }}</td>
+                        <td>{{ $row->item->name }}</td>
+                        <td>{{ $row->bom->code.' - '.$row->bom->name }}</td>
                         <td class="right-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                         <td class="center-align">{{ $row->item->uomUnit->code }}</td>
-                        <td class="center-align">{{ $row->line->code }}</td>
                         <td class="center-align">{{ $row->group }}</td>
                         <td class="center-align">{{ $row->warehouse->code }}</td>
+                        <td class="center-align">{{ date('d/m/Y',strtotime($row->start_date)) }}</td>
+                        <td class="center-align">{{ date('d/m/Y',strtotime($row->end_date)) }}</td>
+                        <td class="center-align">{{ $row->status() }}</td>           
+                        <td class="center-align">{{ ($row->productionOrder()->exists() ? $row->productionOrder->code : '-') }}</td>
                     </tr>
                     <tr>
-                        <td colspan="8">Keterangan : {{ $row->note }}</td>
+                        <td colspan="13">Keterangan : {{ $row->note }}</td>
                     </tr>
                     @endforeach
                 </tbody>

@@ -21,6 +21,8 @@ use App\Helpers\CustomHelper;
 use App\Models\BomDetail;
 use App\Models\Item;
 use App\Models\ItemCogs;
+use App\Models\Line;
+use App\Models\Machine;
 use App\Models\ProductionOrder;
 use App\Models\ProductionOrderDetail;
 use App\Models\User;
@@ -54,6 +56,10 @@ class ProductionIssueReceiveController extends Controller
             'content'       => 'admin.production.issue_receive',
             'company'       => Company::where('status','1')->get(),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+            'line'          => Line::where('status','1')->whereIn('place_id',$this->dataplaces)->get(),
+            'machine'       => Machine::where('status','1')->whereHas('line',function($query){
+                $query->whereIn('place_id',$this->dataplaces);
+            })->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),

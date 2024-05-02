@@ -62,6 +62,7 @@ use App\Models\ItemCogs;
 use App\Models\ItemShading;
 use App\Models\ItemStock;
 use App\Models\MaterialRequest;
+use App\Models\ProductionSchedule;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseRequest;
 use App\Models\UsedData;
@@ -4271,6 +4272,11 @@ class CustomHelper {
 			}
 		}elseif($table_name == 'journals'){
 			$je = Journal::find($table_id)->update(['status' => '3']);
+		}elseif($table_name == 'production_schedules'){
+			$ps = ProductionSchedule::find($table_id);
+			if($ps){
+				$ps->createProductionOrder();
+			}
 		}
 		/* else{
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CustomHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -21,10 +22,10 @@ class ProductionSchedule extends Model
         'company_id',
         'place_id',
         'line_id',
-        'marketing_order_plan_id',
         'post_date',
         'document',
         'status',
+        'note',
         'void_id',
         'void_note',
         'void_date',
@@ -43,11 +44,6 @@ class ProductionSchedule extends Model
     public function user()
     {
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
-    }
-
-    public function marketingOrderPlan()
-    {
-        return $this->belongsTo('App\Models\MarketingOrderPlan', 'marketing_order_plan_id', 'id')->withTrashed();
     }
 
     public function voidUser()
@@ -194,5 +190,45 @@ class ProductionSchedule extends Model
     public function printCounter()
     {
         return $this->hasMany('App\Models\PrintCounter','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
+    public function createProductionOrder(){
+        $lastSegment = 'production_order';
+        foreach($this->productionScheduleDetail()->where('status','1')->get() as $row){
+            $menu = Menu::where('url', $lastSegment)->first();
+            $newCode=ProductionOrder::generateCode($menu->document_code.date('y',strtotime($this->post_date)).substr($this->code,7,2));
+            
+            $query = ProductionOrder::create([
+                'code'			                => $newCode,
+                'user_id'		                => $this->user_id,
+                'company_id'                    => $this->company_id,
+                'production_schedule_id'	    => $this->id,
+                'production_schedule_detail_id'	=> $row->id,
+                'warehouse_id'                  => $row->warehouse_id,
+                'post_date'                     => $this->post_date,
+                'note'                          => $row->note,
+                'standard_item_cost'            => 0,
+                'standard_resource_cost'        => 0,
+                'standard_product_cost'         => 0,
+                'actual_item_cost'              => 0,
+                'actual_resource_cost'          => 0,
+                'total_product_cost'            => 0,
+                'planned_qty'                   => $row->qty,
+                'completed_qty'                 => 0,
+                'rejected_qty'                  => 0,
+                'total_production_time'         => 0,
+                'total_additional_time'         => 0,
+                'total_run_time'                => 0,
+                'status'                        => '2',
+            ]);
+
+            CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Order Produksi No. '.$query->code,'Pengajuan Order Produksi No. '.$query->code,$this->user_id);
+
+            activity()
+                    ->performedOn(new ProductionOrder())
+                    ->causedBy($this->user_id)
+                    ->withProperties($query)
+                    ->log('Add / edit production order from production schedule approval.');
+        }
     }
 }

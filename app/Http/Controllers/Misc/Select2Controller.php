@@ -61,6 +61,7 @@ use App\Models\Equipment;
 use App\Models\WorkOrder;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Bom;
 use App\Models\Color;
 use App\Models\DeliveryCost;
 use App\Models\GoodIssueRequest;
@@ -310,6 +311,29 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function itemHasBom(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Item::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%");
+                })->where('status','1')->whereHas('bom')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
+                'code'              => $d->code,
+                'name'              => $d->name,
+                'uom'               => $d->uomUnit->code,
+                'list_warehouse'    => $d->warehouseList(),
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function resource(Request $request)
     {
         $response = [];
@@ -430,6 +454,35 @@ class Select2Controller extends Controller {
                 ->where('status','1')
                 ->whereIn('company_id',$arrCompany)
                 ->whereNotNull('show_journal')
+                ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> ($d->prefix ? $d->prefix.' ' : '').''.$d->code.' - '.$d->name,
+                'uom'           => '-',
+                'code'          => CustomHelper::encrypt($d->code),
+                'type'          => $d->getTable(),
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function coaNoCash(Request $request)
+    {   
+        $arrCompany = Place::whereIn('id',$this->dataplaces)->get()->pluck('company_id');
+        $response = [];
+        $search   = $request->search;
+        $data = Coa::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%")
+                    ->orWhere('prefix', 'like', "%$search%");
+                 })->where('level',5)
+                ->where('status','1')
+                ->whereIn('company_id',$arrCompany)
+                ->whereNotNull('show_journal')
+                ->whereNull('is_cash_account')
                 ->get();
 
         foreach($data as $d) {
@@ -2989,6 +3042,8 @@ class Select2Controller extends Controller {
                     'note'              => $row->note ? $row->note : '',
                     'priority'          => $row->priority,
                     'has_bom'           => $cekBom->exists() ? '1' : '',
+                    'place_id'          => $request->place_id,
+                    'list_warehouse'    => $row->item->warehouseList(),
                 ];
             }
             $response[] = [
@@ -2997,6 +3052,36 @@ class Select2Controller extends Controller {
                 'table'         => $d->getTable(),
                 'details'       => $details,
                 'code'          => $d->code,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function bomByItem(Request $request)
+    {
+        $response = [];
+        $search     = $request->search;
+        $item_id    = $request->item_id;
+        $place_id   = $request->place_id;
+        $data = Bom::where(function($query) use($search){
+            $query->where('code', 'like', "%$search%")
+                ->orWhere('name','like',"%$search%");
+        })
+        ->where('place_id',$place_id)
+        ->where('item_id',$item_id)
+        ->where('status','1')
+        ->whereDate('valid_from','<=',date('Y-m-d'))
+        ->whereDate('valid_to','>=',date('Y-m-d'))
+        ->orderByDesc('id')
+        ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' '.$d->name,
+                'warehouse_id'  => $d->warehouse_id,
+                'warehouse'     => $d->warehouse->name,
             ];
         }
 
@@ -3682,29 +3767,11 @@ class Select2Controller extends Controller {
                 });
         })
         ->whereDoesntHave('used')
-        ->whereDoesntHave('productionIssueReceive')
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
-        ->whereIn('status',['2','3'])
+        ->whereIn('status',['2'])
         ->get();
 
         foreach($data as $d) {
-            $detail_issue = [];
-
-            foreach($d->productionOrderDetail as $row){
-                $detail_issue[] = [
-                    'id'                    => $row->id,
-                    'bom_detail_id'         => $row->bom_detail_id,
-                    'lookable_type'         => $row->lookable_type,
-                    'lookable_id'           => $row->lookable_id,
-                    'lookable_code'         => $row->lookable->code,
-                    'lookable_name'         => $row->lookable->name,
-                    'lookable_unit'         => $row->item()->exists() ? $row->item->productionUnit->code : '-',
-                    'list_stock'            => $row->item()->exists() ? $row->item->currentStockPerPlace($d->productionSchedule->place_id) : [],
-                    'qty'                   => CustomHelper::formatConditionalQty($row->qty),
-                    'nominal'               => number_format($row->nominal,2,',','.'),
-                    'total'                 => number_format($row->total,2,',','.'),
-                ];
-            }
 
             $response[] = [
                 'id'   			                => $d->id,
@@ -3714,18 +3781,14 @@ class Select2Controller extends Controller {
                 'item_receive_id'               => $d->productionScheduleDetail->item_id,
                 'item_receive_code'             => $d->productionScheduleDetail->item->code,
                 'item_receive_name'             => $d->productionScheduleDetail->item->name,
-                'item_receive_unit_production'  => $d->productionScheduleDetail->item->productionUnit->code,
                 'item_receive_unit_uom'         => $d->productionScheduleDetail->item->uomUnit->code,
-                'item_receive_unit_sell'        => $d->productionScheduleDetail->item->sellUnit->code,
-                'item_receive_unit_pallet'      => $d->productionScheduleDetail->item->palletUnit->code,
                 'item_receive_qty'              => CustomHelper::formatConditionalQty($d->productionScheduleDetail->qty),
                 'production_convert'            => $d->productionScheduleDetail->item->production_convert,
                 'sell_convert'                  => $d->productionScheduleDetail->item->sell_convert,
                 'pallet_convert'                => $d->productionScheduleDetail->item->pallet_convert,
-                'detail_issue'                  => $detail_issue,
-                'shift'                         => date('d/m/Y',strtotime($d->productionScheduleDetail->production_date)).' - '.$d->productionScheduleDetail->shift->code.' - '.$d->productionScheduleDetail->shift->name,
+                'shift'                         => 'Tgl.Produksi : '.date('d/m/Y',strtotime($d->productionScheduleDetail->start_date)).' - '.date('d/m/Y',strtotime($d->productionScheduleDetail->end_date)).', Shift : '.$d->productionScheduleDetail->shift->code.' - '.$d->productionScheduleDetail->shift->name,
                 'group'                         => $d->productionScheduleDetail->group,
-                'line'                          => $d->productionScheduleDetail->line->code,
+                'line'                          => $d->productionScheduleDetail->productionSchedule->line->code,
                 'list_shading'                  => $d->productionScheduleDetail->item->arrShading(),
             ];
         }

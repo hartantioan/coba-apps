@@ -114,6 +114,10 @@
     td {
         padding: 3px 1px;
     }
+
+    .preserveLines {
+        white-space: pre-line;
+    }
 </style>
 <div class="card">
     <div class="card-content invoice-print-area">
@@ -292,6 +296,9 @@
                             {{ $data->supplier->defaultBank() ? $data->supplier->defaultBank() : ' - ' }}
                             <div class="mt-3">
                                 Catatan : {{ $data->note }}
+                            </div>
+                            <div class="preserveLines mt-2" style="text-align:left !important;">
+                                Catatan Eksternal : {{ $data->note_external }}
                             </div>
                         </td>
                     </tr>

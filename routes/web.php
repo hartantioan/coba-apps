@@ -258,6 +258,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('province', [Select2Controller::class, 'province']);
                 Route::get('country', [Select2Controller::class, 'country']);
                 Route::get('item', [Select2Controller::class, 'item']);
+                Route::get('item_has_bom', [Select2Controller::class, 'itemHasBom']);
                 Route::get('resource', [Select2Controller::class, 'resource']);
                 Route::get('item_receive', [Select2Controller::class, 'itemReceive']);
                 Route::get('item_issue', [Select2Controller::class, 'itemIssue']);
@@ -266,6 +267,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('inventory_item', [Select2Controller::class, 'inventoryItem']);
                 Route::get('sales_item', [Select2Controller::class, 'salesItem']);
                 Route::get('coa', [Select2Controller::class, 'coa']);
+                Route::get('coa_no_cash', [Select2Controller::class, 'coaNoCash']);
                 Route::get('inventory_coa_issue', [Select2Controller::class, 'inventoryCoaIssue']);
                 Route::get('inventory_coa_receive', [Select2Controller::class, 'inventoryCoaReceive']);
                 Route::get('coa_journal', [Select2Controller::class, 'coaJournal']);
@@ -365,6 +367,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('all_user_bank', [Select2Controller::class, 'allUserBank']);
                 Route::get('item_serial', [Select2Controller::class, 'itemSerial']);
                 Route::get('item_serial_return_po', [Select2Controller::class, 'itemSerialReturnPo']);
+                Route::get('bom_by_item', [Select2Controller::class, 'bomByItem']);
             });
 
             Route::prefix('dashboard')->group(function () {

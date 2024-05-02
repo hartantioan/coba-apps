@@ -300,7 +300,6 @@
                             </tr>
                             <tr>
                                 <th align="center">No.</th>
-                                <th align="center">Tgl.Produksi</th>
                                 <th align="center">Shift</th>
                                 <th align="center">Item</th>
                                 <th align="center">Qty</th>
@@ -308,23 +307,26 @@
                                 <th align="center">Line</th>
                                 <th align="center">Grup</th>
                                 <th align="center">Gudang</th>
+                                <th align="center">Tgl.Mulai</th>
+                                <th align="center">Tgl.Selesai</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($data->productionScheduleDetail as $key => $row)
                             <tr>
                                 <td align="center" rowspan="2">{{ ($key + 1) }}</td>
-                                <td align="center">{{ date('d/m/Y',strtotime($row->production_date)) }}</td>
                                 <td align="center">{{ $row->shift->code }}</td>
                                 <td align="center">{{ $row->item->code.' - '.$row->item->name }}</td>
                                 <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                                 <td align="center">{{ $row->item->uomUnit->code }}</td>
                                 <td align="center">{{ $row->line->code }}</td>
-                                <td align="center">{{ $row->group }}</td>
-                                <td align="center">{{ $row->warehouse->code }}</td>
+                                <td align="center">'.$row->group.'</td>
+                                <td align="center">'.$row->warehouse->code.'</td>
+                                <td align="center">'.date('d/m/Y',strtotime($row->start_date)).'</td>
+                                <td align="center">'.date('d/m/Y',strtotime($row->end_date)).'</td>
                             </tr>
                             <tr>
-                                <td colspan="8">Keterangan : {{ $row->note }}</td>
+                                <td colspan="9">Keterangan : {{ $row->note }}</td>
                             </tr>
                             @endforeach
                         </tbody>

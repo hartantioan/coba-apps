@@ -119,6 +119,7 @@
                                                         <th>Plant</th>
                                                         <th>Line</th>
                                                         <th>Tgl.Post</th>
+                                                        <th>Keterangan</th>
                                                         <th>Dokumen</th>
                                                         <th>Status</th>
                                                         <th>By</th>
@@ -140,8 +141,8 @@
     </div>
 </div>
 
-<div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;">
-    <div class="modal-content">
+<div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
         <div class="row">
             <div class="col s12">
                 <h4>Tambah/Edit {{ $title }}</h4>
@@ -229,40 +230,40 @@
                         </div>
                         <div class="row">
                             <div class="col s12">
-                                <fieldset>
+                                <fieldset style="min-width: 100%;">
                                     <legend>3. Detail Target Produksi</legend>
                                     <div class="col m12 s12 step10" style="overflow:auto;width:100% !important;">
                                         <p class="mt-2 mb-2">
-                                            <table class="bordered" id="table-detail">
+                                            <table class="bordered" id="table-detail" style="min-width:100%;">
                                                 <thead>
                                                     <tr>
-                                                        <th class="center">MOP</th>
-                                                        <th class="center">Item</th>
-                                                        <th class="center">Qty</th>
-                                                        <th class="center">Satuan UoM</th>
-                                                        <th class="center">Remark</th>
-                                                        <th class="center">Tgl.Request</th>
-                                                        <th class="center">Prioritas</th>
-                                                        <th class="center">Hapus</th>
+                                                        <th class="center" style="min-width:150px;">MOP</th>
+                                                        <th class="center" style="min-width:150px;">Item</th>
+                                                        <th class="center" style="min-width:150px;">Qty MOP</th>
+                                                        <th class="center" style="min-width:150px;">Qty dalam Proses</th>
+                                                        <th class="center" style="min-width:150px;">Satuan UoM</th>
+                                                        <th class="center" style="min-width:150px;">Remark</th>
+                                                        <th class="center" style="min-width:150px;">Tgl.Request</th>
+                                                        <th class="center" style="min-width:150px;">Prioritas</th>
+                                                        <th class="center" style="min-width:75px;">Hapus</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td class="center-align" colspan="8">
+                                                        <td colspan="9">
                                                             Silahkan tambahkan Marketing Order Produksi...
                                                         </td>
                                                     </tr>
-                                                </tbody>
-                                                <tfoot>
-                                                    <tr>
+                                                    <tr id="total-row-target">
                                                         <td class="right-align" colspan="2">
-                                                            Total :
+                                                            TOTAL :
                                                         </td>
-                                                        <td class="" colspan="6" id="data-foot">
+                                                        <td class="right-align" id="data-foot">
                                                             0,000
                                                         </td>
+                                                        <td colspan="6"></td>
                                                     </tr>
-                                                </tfoot>
+                                                </tbody>
                                             </table>
                                         </p>
                                     </div>
@@ -274,38 +275,61 @@
                                 <fieldset style="min-width: 100%;">
                                     <legend>4. Jadwal Produksi</legend>
                                     <div class="col m12 s12 step11" style="overflow:auto;width:100% !important;">
-                                        <table class="bordered" style="min-width:2500px;">
-                                            <thead>
-                                                <tr>
-                                                    <th class="center">MOP</th>
-                                                    <th class="center">Item</th>
-                                                    <th class="center">Qty</th>
-                                                    <th class="center">Satuan UoM</th>
-                                                    <th class="center">BOM</th>
-                                                    <th class="center">Gudang</th>
-                                                    <th class="center">Tgl.Mulai</th>
-                                                    <th class="center">Tgl.Selesai</th>
-                                                    <th class="center">Shift</th>
-                                                    <th class="center">Group</th>
-                                                    <th class="center">Remark</th>
-                                                    <th class="center">Hapus</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody class="body-item-detail" id="body-item-detail">
-                                                <tr class="last-row-item-detail">
-                                                    <td colspan="12">
-                                                        Silahkan tambahkan shift
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                        <div class="card-alert card gradient-45deg-purple-amber">
+                                            <div class="card-content white-text">
+                                                <p>Info : Item yang muncul pada jadwal produksi dibawah adalah, daftar item yang hanya memiliki BOM yang aktif.</p>
+                                            </div>
+                                        </div>
+                                        <p class="mt-2 mb-2">
+                                            <table class="bordered" style="min-width:2500px;">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="center">Item</th>
+                                                        <th class="center">Qty</th>
+                                                        <th class="center">Satuan UoM</th>
+                                                        <th class="center">BOM</th>
+                                                        <th class="center">Gudang</th>
+                                                        <th class="center">Tgl.Mulai</th>
+                                                        <th class="center">Tgl.Selesai</th>
+                                                        <th class="center">Shift</th>
+                                                        <th class="center">Group</th>
+                                                        <th class="center">Remark</th>
+                                                        <th class="center">Hapus</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="body-item-detail" id="body-item-detail">
+                                                    <tr class="last-row-item-detail">
+                                                        <td colspan="11">
+                                                            Silahkan tambahkan Marketing Order Produksi...
+                                                        </td>
+                                                    </tr>
+                                                    <tr id="total-row-detail">
+                                                        <td class="right-align">
+                                                            TOTAL :
+                                                        </td>
+                                                        <td class="right-align" id="data-foot-detail">
+                                                            0,000
+                                                        </td>
+                                                        <td colspan="9"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="11">
+                                                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
+                                                                <i class="material-icons left">add</i> Tambah
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </p>
                                     </div>
                                 </fieldset>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step12" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                            <div class="input-field col s12 m6 l4">
+                                <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
+                                <label class="active" for="note">Keterangan</label>
                             </div>
                         </div>
                     </div>
@@ -314,7 +338,8 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn waves-effect waves-light purple btn-panduan" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+        <button class="btn waves-effect waves-light purple btn-panduan mr-1" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+        <button class="btn waves-effect waves-light mr-1 submit step12" onclick="save();">Simpan <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Tutup</a>
     </div>
 </div>
@@ -591,26 +616,36 @@
                 if($('.data-used').length > 0){
                     $('.data-used').trigger('click');
                 }
-                $('#data-foot').empty().append(`
-                    Silahkan tambahkan Marketing Order Produksi...
-                `);
                 window.onbeforeunload = function() {
                     return null;
                 };
-                $('.body-item-detail').empty().append(`
-                    <tr class="last-row-item-detail">
-                        <td colspan="12">
-                            Silahkan tambahkan shift
-                        </td>
-                    </tr>
-                `);
-                $('#body-item').empty().append(`
-                    <tr id="last-row-item">
-                        <td class="center-align" colspan="8">
-                            Silahkan tambahkan Marketing Order Produksi...
-                        </td>
-                    </tr>
-                `);
+                $('.row_item').each(function(){
+                    $(this).remove();
+                });
+
+                $('.row_item_detail').each(function(){
+                    $(this).remove();
+                });
+
+                if($('#last-row-item').length == 0){
+                    $('#total-row-target').before(`
+                        <tr id="last-row-item">
+                            <td colspan="9">
+                                Silahkan tambahkan Marketing Order Produksi...
+                            </td>
+                        </tr>
+                    `);
+                }
+                
+                if($('.last-row-item-detail').length == 0){
+                    $('#total-row-detail').before(`
+                        <tr class="last-row-item-detail">
+                            <td colspan="11">
+                                Silahkan tambahkan Marketing Order Produksi...
+                            </td>
+                        </tr>
+                    `);
+                }
                 $('#marketing_order_plan_id').empty();
             }
         });
@@ -621,10 +656,12 @@
             if($('.row_item[data-id="' + id + '"]').length == 0){
                 $('.data-used[data-id="' + id + '"]').trigger('click');
             }
+            countTarget();
         });
 
         $('.body-item-detail').on('click', '.delete-data-item-detail', function() {
             $(this).closest('tr').remove();
+            countDetail();
         });
 
         $('#marketing_order_plan_id').select2({
@@ -652,6 +689,26 @@
             }
         });
     });
+
+    function countTarget(){
+        let total = 0;
+        $('input[name^="arr_qty[]"]').each(function(){
+            total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+        });
+        $('#data-foot').text(
+            (total >= 0 ? '' : '-') + formatRupiahIni(total.toString().replace('.',','))
+        );
+    }
+
+    function countDetail(){
+        let total = 0;
+        $('input[name^="arr_detail_qty[]"]').each(function(){
+            total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+        });
+        $('#data-foot-detail').text(
+            (total >= 0 ? '' : '-') + formatRupiahIni(total.toString().replace('.',','))
+        );
+    }
 
     function makeTreeOrg(data,link){
         var $ = go.GraphObject.make;
@@ -794,7 +851,7 @@
                 if($('.row_item').length == 0){
                     $('#body-item').empty().append(`
                         <tr id="last-row-item">
-                            <td class="center-align" colspan="8">
+                            <td colspan="9">
                                 Silahkan tambahkan Marketing Order Produksi...
                             </td>
                         </tr>
@@ -815,159 +872,106 @@
         });
     }
 
-    function setRow(val){
-        if($('#arr_item_detail_id' + val).val()){
-            $('#item-unit' + val).text($('#arr_item_detail_id' + val).find(":selected").data("unit"));
-            let warehouses = $('#arr_item_detail_id' + val).find(":selected").data("warehouse");
-            let optionWarehouse = `<select class="browser-default" id="arr_warehouse_id` + val + `" name="arr_warehouse_id[]">`;
-            if(warehouses.length > 0){
-                $.each(warehouses, function(i, valkuy) {
-                    optionWarehouse += `<option value="` + valkuy['id'] + `">` + valkuy['name'] + `</option>`;
+    function getRowUnit(val){
+        $("#arr_warehouse" + val).empty();
+        $('#arr_unit' + val).empty();
+        if($("#arr_item_detail_id" + val).val()){
+            if($("#arr_item_detail_id" + val).select2('data')[0].list_warehouse.length > 0){
+                $.each($("#arr_item_detail_id" + val).select2('data')[0].list_warehouse, function(i, value) {
+                    $('#arr_warehouse' + val).append(`
+                        <option value="` + value.id + `">` + value.name + `</option>
+                    `);
                 });
             }else{
-                optionWarehouse += `<option value="">--Maaf, item ini tidak memiliki gudang--</option>`;
+                $("#arr_warehouse" + val).append(`
+                    <option value="">--Gudang tidak diatur di master data Grup Item--</option>
+                `);
             }
-
-            optionWarehouse += `</select>`;
-            $('#item-warehouse' + val).html(optionWarehouse);
-            let qtyProporsional = parseFloat($('#arr_item_detail_id' + val).find(":selected").data("proporsional").toString().replaceAll(".", "").replaceAll(",","."));
-            let itemGoal = $('#arr_item_detail_id' + val).find(":selected").data("goal");
-            let totalQty = 0;
-            if(itemGoal > 0){
-                if($('select[name^="arr_item_detail_id[]"] option[value="' + itemGoal + '"]').length > 0){
-                    let code = '';
-                    $('select[name^="arr_item_detail_id[]"] option[value="' + itemGoal + '"]').each(function(index){
-                        if($(this).is(':selected')){
-                            code = $(this).data('code');
-                            totalQty += parseFloat($('#arr_qty_detail' + code).val().replaceAll(".", "").replaceAll(",","."));
-                        }
-                    });
-                }
-                $('#arr_qty_detail' + val).val(formatRupiahIni((qtyProporsional * totalQty).toFixed(3).toString().replace('.',',')));
-            }else{
-                $('#arr_qty_detail' + val).val($('#arr_item_detail_id' + val).find(":selected").data("qty"));
-            }
+            $('#arr_unit' + val).text($("#arr_item_detail_id" + val).select2('data')[0].uom);
         }else{
-            $('#arr_qty_detail' + val).val('0,000');
-            $('#item-unit' + val).html('-');
-            $('#item-warehouse' + val).html('-');
+            $("#arr_item_detail_id" + val).empty();
+            $("#arr_warehouse" + val).append(`
+                <option value="">--Silahkan pilih item--</option>
+            `);
+            $('#arr_unit' + val).text('-');
         }
     }
 
-    function addShift(level){
-        if($('.row_item').length > 0){
+    function addItem(){
+        if($('.last-row-item-detail').length > 0){
+            $('.last-row-item-detail').remove();
+        }
+        var count = makeid(10);
+        $('#total-row-detail').before(`
+            <tr class="row_item_detail">
+                <td>
+                    <select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="getRowUnit('` + count + `')" required></select>
+                </td>
+                <td class="right-align">
+                    <input name="arr_detail_qty[]" onfocus="emptyThis(this);" id="arr_detail_qty` + count + `" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);countDetail();" required style="width:100%;text-align:right;">
+                </td>
+                <td class="center-align" id="arr_unit` + count + `">
+                    -
+                </td>
+                <td class="">
+                    <select class="browser-default" id="arr_bom` + count + `" name="arr_bom[]"></select>
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                        <option value="">--Silahkan pilih item--</option>
+                    </select>
+                </td>
+                <td class="">
+                    <input name="arr_start_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}" required>
+                </td>
+                <td class="">
+                    <input name="arr_end_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}" required>
+                </td>
+                <td class="">
+                    <select class="browser-default" id="arr_shift` + count + `" name="arr_shift[]"></select>
+                </td>
+                <td class="">
+                    <input name="arr_group[]" type="text" required>
+                </td>
+                <td class="">
+                    <input name="arr_note[]" type="text" required>
+                </td>
+                <td class="center-align">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
+            </tr>
+        `);
 
-            var count = makeid(10);
+        select2ServerSide('#arr_shift' + count, '{{ url("admin/select2/shift") }}');
+        select2ServerSide('#arr_item_detail_id' + count, '{{ url("admin/select2/item_has_bom") }}');
 
-            let line = $('#place_id').find(':selected').data('lines');
-
-            let optionLine = `<select class="browser-default" id="arr_line_id` + count + `" name="arr_line_id[]">`;
-
-            if(line.length > 0){
-                $.each(line, function(i, val) {
-                    optionLine += `<option value="` + val['id'] + `">` + val['code'] + ` - ` + val['name'] + `</option>`;
-                });
-            }else{
-                optionLine += `<option value="">--Maaf, plant ini belum memiliki Line--</option>`;
-            }
-
-            optionLine += `</select>`;
-            
-            let optionItem = `<select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="setRow('` + count + `')">`;
-            
-            optionItem += `<option value="">--Pilih item--</option>`;
-
-            $.each(listfgsfg, function(i, val) {
-                if(val.item_group == level.toString()){
-                    optionItem += `<option value="` + val['item_id'] + `" data-qty="` + val['item_qty'] + `" data-unit="` + val['item_unit'] + `" data-warehouse='` + JSON.stringify(val['item_warehouse']) + `' data-goal="` + val['item_goal'] + `" data-proporsional="` + val['item_qty_proporsional'] + `" data-code="` + count + `">` + val['item_code'] + ` - ` + val['item_name'] + `</option>`;
-                }
-            });
-            
-            optionItem += `</select>`;
-
-            if($('#body-item-detail' + level + ' > .last-row-item-detail').length > 0){
-                $('#body-item-detail' + level + ' > .last-row-item-detail').remove();
-            }
-
-            let no = $('#body-item-detail' + level + ' > .row_item_detail').length + 1;
-
-            $('#body-item-detail' + level).append(`
-                <tr class="row_item_detail">
-                    <td class="center-align">
-                        <label>
-                            <input type="checkbox" class="checkBoxSelect" name="arr_select[]" id="arr_select` + count + `" value="` + count + `">
-                            <span>&nbsp;</span>
-                        </label>
-                    </td>
-                    <td class="center-align">
-                        ` + no + `.
-                    </td>
-                    <td class="center-align">
-                        ` + optionItem + `
-                    </td>
-                    <td class="center-align">
-                        <input name="arr_qty_detail[]" onfocus="emptyThis(this);" onfocus="emptyThis(this);" onfocus="emptyThis(this);" id="arr_qty_detail` + count + `" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" required style="text-align:right;">
-                    </td>
-                    <td class="center-align" id="item-unit` + count + `">
-                        -
-                    </td>
-                    <td class="center-align" id="item-warehouse` + count + `">
-                        -
-                    </td>
-                    <td class="center-align">
-                        <input name="arr_date[]" id="arr_date` + count + `" type="date" value="{{ date('Y-m-d') }}" required>
-                    </td>
-                    <td>
-                        <select class="browser-default item-array" id="arr_shift` + count + `" name="arr_shift[]"></select>
-                    </td>
-                    <td class="center-align" id="item-line` + count + `">
-                        ` + optionLine + `
-                    </td>
-                    <td class="center-align">
-                        <input name="arr_group[]" id="arr_group` + count + `" type="text" placeholder="A / B / C / D" required>
-                    </td>
-                    <td class="center-align">
-                        <input name="arr_note[]" id="arr_note` + count + `" type="text" placeholder="Keterangan" required>
-                    </td>
-                    <td class="center-align">
-                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail" href="javascript:void(0);">
-                            <i class="material-icons">delete</i>
-                        </a>
-                    </td>
-                </tr>
-            `);
-            M.updateTextFields();
-            $('#arr_shift' + count).select2({
-                placeholder: '-- Pilih ya --',
-                minimumInputLength: 1,
-                allowClear: true,
-                cache: true,
-                width: 'resolve',
-                dropdownParent: $('body').parent(),
-                ajax: {
-                    url: '{{ url("admin/select2/shift_production") }}',
-                    type: 'GET',
-                    dataType: 'JSON',
-                    data: function(params) {
-                        return {
-                            search: params.term,
-                            place_id: $('#place_id').val(),
-                        };
-                    },
-                    processResults: function(data) {
-                        return {
-                            results: data.items
-                        }
+        $('#arr_bom' + count).select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/bom_by_item") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        item_id: $('#arr_item_detail_id' + count).val(),
+                        place_id: $('#place_id').val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
                     }
                 }
-            });
-        }else{
-            swal({
-                title: 'Ups! Hayo.',
-                text: 'Silahkan tambahkan satu atau lebih Marketing Order Produksi.',
-                icon: 'warning'
-            });
-        }
+            }
+        });
     }
 
     function getMarketingOrderPlan(){
@@ -999,8 +1003,8 @@
                         if($('#last-row-item').length > 0){
                             $('#last-row-item').remove();
                         }
-                        if($('#last-row-item-detail').length > 0){
-                            $('#last-row-item-detail').remove();
+                        if($('.last-row-item-detail').length > 0){
+                            $('.last-row-item-detail').remove();
                         }
 
                         $('#list-used-data').append(`
@@ -1013,18 +1017,15 @@
                         $.each(mop.details, function(i, val) {
                             var count = makeid(10);
 
-                            $('#body-item').append(`
+                            $('#total-row-target').before(`
                                 <tr class="row_item" data-id="` + mop.id + `">
                                     <input type="hidden" name="arr_id[]" id="arr_id` + count + `" value="` + val.mopd_id + `">
-                                    <td>
-                                        ` + mop.code + `
-                                    </td>
                                     <td>
                                         ` + val.item_code + ` - ` + val.item_name + `
                                         ` + ( val.has_bom ? '' : '<br><span style="color:red;font-weight:800;">Belum memiliki BOM.</span>' ) + `<br>
                                     </td>
                                     <td class="right-align">
-                                        <input name="arr_qty[]" onfocus="emptyThis(this);" id="arr_qty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" required style="width:75%;text-align:right;" readonly>
+                                        <input name="arr_qty[]" onfocus="emptyThis(this);" id="arr_qty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" required style="width:100%;text-align:right;" readonly>
                                     </td>
                                     <td class="center-align">
                                         ` + val.uom + `
@@ -1035,7 +1036,7 @@
                                     <td class="center-align">
                                         ` + val.request_date + `
                                     </td>
-                                    <td class="">
+                                    <td class="center-align">
                                         ` + val.priority + `
                                     </td>
                                     <td class="center-align">
@@ -1050,38 +1051,98 @@
                         $.each(mop.details, function(i, val) {
                             var count = makeid(10);
 
-                            $('#body-item-detail').append(`
-                                <tr class="row_item_detail" data-id="` + mop.id + `">
-                                    <input type="hidden" name="arr_detai_id[]" id="arr_detai_id` + count + `" value="` + val.mopd_id + `">
+                            $('#total-row-detail').before(`
+                                <tr class="row_item_detail">
                                     <td>
-                                        ` + mop.code + `
-                                    </td>
-                                    <td>
-                                        ` + val.item_code + ` - ` + val.item_name + `
+                                        <select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="getRowUnit('` + count + `')" required></select>
                                     </td>
                                     <td class="right-align">
-                                        <input name="arr_detail_qty[]" onfocus="emptyThis(this);" id="arr_detail_qty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" required style="width:75%;text-align:right;" data-max="` + val.qty + `">
+                                        <input name="arr_detail_qty[]" onfocus="emptyThis(this);" id="arr_detail_qty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countDetail();" required style="width:100%;text-align:right;">
                                     </td>
                                     <td class="center-align">
                                         ` + val.uom + `
                                     </td>
                                     <td class="">
-                                        ` + val.note + `
+                                        <select class="browser-default" id="arr_bom` + count + `" name="arr_bom[]"></select>
                                     </td>
-                                    <td class="center-align">
-                                        ` + val.request_date + `
+                                    <td>
+                                        <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                                            <option value="">--Silahkan pilih item--</option>
+                                        </select>
                                     </td>
                                     <td class="">
-                                        ` + val.priority + `
+                                        <input name="arr_start_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}" required>
+                                    </td>
+                                    <td class="">
+                                        <input name="arr_end_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}" required>
+                                    </td>
+                                    <td class="">
+                                        <select class="browser-default" id="arr_shift` + count + `" name="arr_shift[]"></select>
+                                    </td>
+                                    <td class="">
+                                        <input name="arr_group[]" type="text" required>
+                                    </td>
+                                    <td class="">
+                                        <input name="arr_note[]" type="text" required>
                                     </td>
                                     <td class="center-align">
-                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" data-id="` + mop.id + `" href="javascript:void(0);">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail" href="javascript:void(0);">
                                             <i class="material-icons">delete</i>
                                         </a>
                                     </td>
                                 </tr>
                             `);
+
+                            select2ServerSide('#arr_shift' + count, '{{ url("admin/select2/shift") }}');
+
+                            $('#arr_item_detail_id' + count).append(`
+                                <option value="` + val.item_id + `">` + val.item_code + ' - ' + val.item_name +`</option>
+                            `);
+
+                            select2ServerSide('#arr_item_detail_id' + count, '{{ url("admin/select2/item_has_bom") }}');
+
+                            $('#arr_bom' + count).select2({
+                                placeholder: '-- Kosong --',
+                                minimumInputLength: 1,
+                                allowClear: true,
+                                cache: true,
+                                width: 'resolve',
+                                dropdownParent: $('body').parent(),
+                                ajax: {
+                                    url: '{{ url("admin/select2/bom_by_item") }}',
+                                    type: 'GET',
+                                    dataType: 'JSON',
+                                    data: function(params) {
+                                        return {
+                                            search: params.term,
+                                            item_id: $('#arr_item_detail_id' + count).val(),
+                                            place_id: $('#place_id').val(),
+                                        };
+                                    },
+                                    processResults: function(data) {
+                                        return {
+                                            results: data.items
+                                        }
+                                    }
+                                }
+                            });
+
+                            $("#arr_warehouse" + count).empty();
+                            if(val.list_warehouse.length > 0){
+                                $.each(val.list_warehouse, function(i, value) {
+                                    $('#arr_warehouse' + count).append(`
+                                        <option value="` + value.id + `">` + value.name + `</option>
+                                    `);
+                                });
+                            }else{
+                                $("#arr_warehouse" + count).append(`
+                                    <option value="">--Gudang tidak diatur di master data Grup Item--</option>
+                                `);
+                            }
                         });
+
+                        countTarget();
+                        countDetail();
 
                         $('#marketing_order_plan_id').empty();
                     }
@@ -1328,8 +1389,9 @@
                 { name: 'plant_id', className: 'center-align' },
                 { name: 'line_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
+                { name: 'note', className: '' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
-              { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -1409,36 +1471,39 @@
                 
                 var formData = new FormData($('#form_data')[0]), passed = true;
 
-                formData.delete("arr_item_detail_id[]");
-                formData.delete("arr_qty_detail[]");
-                formData.delete("arr_date[]");
-                formData.delete("arr_shift[]");
-                formData.delete("arr_line_id[]");
-                formData.delete("arr_group[]");
-                formData.delete("arr_warehouse_id[]");
-                formData.delete("arr_note[]");
+                $('input[name^="arr_qty[]"]').each(function(index){
+                    if(!$(this).val()){
+                        passed = false;
+                    }
+                });
 
-                $('input[name^="arr_select[]"]').each(function(index){
-                    if($(this).is(':checked')){
-                        let code = $(this).val();
-                        formData.append('arr_item_detail_id[]',$("#arr_item_detail_id" + code).val());
-                        formData.append('arr_qty_detail[]',$("#arr_qty_detail" + code).val());
-                        formData.append('arr_date[]',$("#arr_date" + code).val());
-                        formData.append('arr_shift[]',$("#arr_shift" + code).val());
-                        formData.append('arr_line_id[]',$("#arr_line_id" + code).val());
-                        formData.append('arr_group[]',$("#arr_group" + code).val());
-                        formData.append('arr_warehouse_id[]',$("#arr_warehouse_id" + code).val());
-                        formData.append('arr_note[]',$("#arr_note" + code).val());
-                        if(!$("#arr_item_detail_id" + code).val() || !$("#arr_qty_detail" + code).val() || !$("#arr_date" + code).val() || !$("#arr_shift" + code).val() || !$("#arr_line_id" + code).val() || !$("#arr_group" + code).val() || !$("#arr_warehouse_id" + code).val()){
-                            passed = false;
-                        }
+                $('input[name^="arr_detail_qty[]"]').each(function(index){
+                    if(!$(this).val()){
+                        passed = false;
+                    }
+                    if(!$('select[name^="arr_bom[]"]').eq(index).val()){
+                        passed = false;
+                    }
+                    if(!$('select[name^="arr_item_detail_id[]"]').eq(index).val()){
+                        passed = false;
+                    }
+                    if(!$('select[name^="arr_warehouse[]"]').eq(index).val()){
+                        passed = false;
+                    }
+                    if(!$('input[name^="arr_start_date[]"]').eq(index).val()){
+                        passed = false;
+                    }
+                    if(!$('input[name^="arr_end_date[]"]').eq(index).val()){
+                        passed = false;
+                    }
+                    if(!$('select[name^="arr_shift[]"]').eq(index).val()){
+                        passed = false;
                     }
                 });
 
                 if(passed){
                     var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
-
                     
                     var segments = path.split('/');
                     var lastSegment = segments[segments.length - 1];
@@ -1459,12 +1524,12 @@
                         beforeSend: function() {
                             $('#validation_alert').hide();
                             $('#validation_alert').html('');
-                            loadingOpen('.modal-content');
+                            loadingOpen('#modal1');
                         },
                         success: function(response) {
                             $('input').css('border', 'none');
                             $('input').css('border-bottom', '0.5px solid black');
-                            loadingClose('.modal-content');
+                            loadingClose('#modal1');
                             if(response.status == 200) {
                                 success();
                                 M.toast({
@@ -1506,7 +1571,7 @@
                         },
                         error: function() {
                             $('.modal-content').scrollTop(0);
-                            loadingClose('.modal-content');
+                            loadingClose('#modal1');
                             swal({
                                 title: 'Ups!',
                                 text: 'Check your internet connection.',
@@ -1516,8 +1581,8 @@
                     });
                 }else{
                     swal({
-                        title: 'Ups!',
-                        text: 'Beberapa informasi item tidak lengkap, silahkan cek form anda.',
+                        title: 'Ups! Maaf.',
+                        text: 'Qty target produksi, qty jadwal produksi, bom, tanggal mulai produksi, tanggal selesai produksi, item, gudang, dan shift tidak boleh kosong.',
                         icon: 'error'
                     });
                 }
@@ -1552,12 +1617,9 @@
                 $('#code').val(response.code);
                 $('#post_date').val(response.post_date);
                 $('#company_id').val(response.company_id).formSelect();
-                $('#place_id').val(response.place_id).formSelect().trigger('change');
-                $('#marketing_order_plan_id').empty().append(`
-                    <option value="` + response.marketing_order_plan_id + `">` + response.marketing_order_plan_code + `</option>
-                `);
-
-                listfgsfg = [];
+                $('#place_id').val(response.place_id).formSelect();
+                $('#line_id').val(response.line_id).formSelect();
+                $('#note').val(response.note);
 
                 if(response.targets.length > 0){
                     $('.row_item').each(function(){
@@ -1572,49 +1634,25 @@
                         $('#last-row-item').remove();
                     }
 
+                    if($('.last-row-item-detail').length > 0){
+                        $('.last-row-item-detail').remove();
+                    }
+
                     $.each(response.targets, function(i, val) {
-                        var count = makeid(10), checkstok = '';
+                        var count = makeid(10);
 
-                        listfgsfg.push({
-                            item_id                 : val.item_id,
-                            item_code               : val.item_code,
-                            item_name               : val.item_name,
-                            item_qty                : val.qty_in_production,
-                            item_qty_output         : val.qty_in_production,
-                            item_unit               : val.unit_production,
-                            item_group              : val.group,
-                            item_warehouse          : val.warehouses,
-                            item_goal               : 0,
-                            item_qty_proporsional   : "1",
-                            item_bom_id             : val.bom_id,
-                        });
-
-                        $('#body-item').append(`
+                        $('#total-row-target').before(`
                             <tr class="row_item" data-id="` + val.id + `">
                                 <input type="hidden" name="arr_id[]" id="arr_id` + count + `" value="` + val.mopd_id + `">
-                                <input type="hidden" name="arr_code[]" id="arr_code` + count + `" value="` + val.code + `">
-                                <input type="hidden" name="arr_item_id[]" id="arr_item_id` + count + `" value="` + val.item_id + `">
-                                <input type="hidden" name="arr_item_name[]" id="arr_item_name` + count + `" value="` + val.item_name + `">
-                                <input type="hidden" name="arr_item_unit[]" id="arr_item_unit` + count + `" value="` + val.unit_production + `">
-                                <input type="hidden" name="arr_sell_convert[]" id="arr_sell_convert` + count + `" value="` + val.sell_convert + `">
-                                <input type="hidden" name="arr_pallet_convert[]" id="arr_pallet_convert` + count + `" value="` + val.pallet_convert + `">
-                                <input type="hidden" name="arr_bom[]" id="arr_bom` + count + `" value="` + val.bom_link + `">
-                                <td>
-                                    ` + val.code + `
-                                </td>
                                 <td>
                                     ` + val.item_code + ` - ` + val.item_name + `
-                                    ` + ( val.bom_link ? '' : '<br><span style="color:red;font-weight:800;">Belum memiliki BOM.</span>' ) + `<br>
+                                    ` + ( val.has_bom ? '' : '<br><span style="color:red;font-weight:800;">Belum memiliki BOM.</span>' ) + `<br>
                                 </td>
                                 <td class="right-align">
-                                    <b id="qty_in_sell` + count + `">` + val.qty_in_sell + `</b> ` + val.unit_sell + `
+                                    <input name="arr_qty[]" onfocus="emptyThis(this);" id="arr_qty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" required style="width:100%;text-align:right;" readonly>
                                 </td>
-                                <td class="right-align">
-                                    <input name="arr_qty[]" onfocus="emptyThis(this);" id="arr_qty` + count + `" type="text" value="` + val.qty_in_production + `" onkeyup="formatRupiahNoMinus(this);" required style="width:75%;text-align:right;" data-mopd="` + val.mopd_id + `" data-max="` + val.qty_real + `" readonly>
-                                    ` + val.unit_production + `
-                                </td>
-                                <td class="right-align">
-                                    <b id="qty_in_pallet` + count + `">` + val.qty_in_pallet + `</b> ` + val.unit_pallet + `
+                                <td class="center-align">
+                                    ` + val.uom + `
                                 </td>
                                 <td class="">
                                     ` + val.note + `
@@ -1622,8 +1660,8 @@
                                 <td class="center-align">
                                     ` + val.request_date + `
                                 </td>
-                                <td class="">
-                                    ` + val.is_urgent + `
+                                <td class="center-align">
+                                    ` + val.priority + `
                                 </td>
                                 <td class="center-align">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" data-id="` + val.id + `" href="javascript:void(0);">
@@ -1634,96 +1672,42 @@
                         `);
                     });
 
-                    $.each(response.compositions, function(i, val) {
-                        $.each(val, function(i, value) {
-                            listfgsfg.push({
-                                item_id                 : value.item_id,
-                                item_code               : value.item_code,
-                                item_name               : value.item_name,
-                                item_qty                : value.qty_in_production,
-                                item_qty_output         : value.qty_output,
-                                item_unit               : value.unit_production,
-                                item_group              : value.group,
-                                item_warehouse          : value.warehouses,
-                                item_goal               : value.item_goal,
-                                item_qty_proporsional   : value.qty_proporsional,
-                                item_bom_id             : value.bom_id,
-                            });
-                        });
-                    });
-
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
 
-                        let line = $('#place_id').find(':selected').data('lines');
-
-                        let optionLine = `<select class="browser-default" id="arr_line_id` + count + `" name="arr_line_id[]">`;
-
-                        if(line.length > 0){
-                            $.each(line, function(i, value) {
-                                optionLine += `<option value="` + value['id'] + `" ` + (value['id'] == val.line_id ? 'selected' : '' ) + `>` + value['code'] + ` - ` + value['name'] + `</option>`;
-                            });
-                        }else{
-                            optionLine += `<option value="">--Maaf, plant ini belum memiliki Line--</option>`;
-                        }
-
-                        optionLine += `</select>`;
-                        
-                        let optionItem = `<select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="setRow('` + count + `')">`;
-                        
-                        optionItem += `<option value="">--Pilih item--</option>`;
-
-                        $.each(listfgsfg, function(i, value) {
-                            if(value.item_group.toString() == val.type_production.toString()){
-                                optionItem += `<option value="` + value['item_id'] + `" data-qty="` + value['item_qty'] + `" data-unit="` + value['item_unit'] + `" data-warehouse='` + JSON.stringify(value['item_warehouse']) + `' data-goal="` + value['item_goal'] + `" data-proporsional="` + value['item_qty_proporsional'] + `" data-code="` + count + `">` + value['item_code'] + ` - ` + value['item_name'] + `</option>`;
-                            }
-                        });
-                        
-                        optionItem += `</select>`;
-
-                        if($('#body-item-detail' + val.type_production + ' > .last-row-item-detail').length > 0){
-                            $('#body-item-detail' + val.type_production + ' > .last-row-item-detail').remove();
-                        }
-
-                        let no = $('#body-item-detail' + val.type_production + ' > .row_item_detail').length + 1;
-
-                        $('#body-item-detail' + val.type_production).append(`
+                        $('#total-row-detail').before(`
                             <tr class="row_item_detail">
-                                <td class="center-align">
-                                    <label>
-                                        <input type="checkbox" class="checkBoxSelect" name="arr_select[]" id="arr_select` + count + `" value="` + count + `" checked>
-                                        <span>&nbsp;</span>
-                                    </label>
+                                <td>
+                                    <select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="getRowUnit('` + count + `')" required></select>
+                                </td>
+                                <td class="right-align">
+                                    <input name="arr_detail_qty[]" onfocus="emptyThis(this);" id="arr_detail_qty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countDetail();" required style="width:100%;text-align:right;">
                                 </td>
                                 <td class="center-align">
-                                    ` + no + `.
+                                    ` + val.uom + `
                                 </td>
-                                <td class="center-align">
-                                    ` + optionItem + `
-                                </td>
-                                <td class="center-align">
-                                    <input name="arr_qty_detail[]" onfocus="emptyThis(this);" id="arr_qty_detail` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" required style="text-align:right;">
-                                </td>
-                                <td class="center-align" id="item-unit` + count + `">
-                                    ` + val.unit + `
-                                </td>
-                                <td class="center-align" id="item-warehouse` + count + `">
-                                    -
-                                </td>
-                                <td class="center-align">
-                                    <input name="arr_date[]" id="arr_date` + count + `" type="date" value="` + val.date + `" required>
+                                <td class="">
+                                    <select class="browser-default" id="arr_bom` + count + `" name="arr_bom[]"></select>
                                 </td>
                                 <td>
-                                    <select class="browser-default item-array" id="arr_shift` + count + `" name="arr_shift[]"></select>
+                                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                                        <option value="">--Silahkan pilih item--</option>
+                                    </select>
                                 </td>
-                                <td class="center-align" id="item-line` + count + `">
-                                    ` + optionLine + `
+                                <td class="">
+                                    <input name="arr_start_date[]" type="date" value="`+ val.start_date +`" required>
                                 </td>
-                                <td class="center-align">
-                                    <input name="arr_group[]" id="arr_group` + count + `" type="text" placeholder="A / B / C / D" value="` + val.group + `" required>
+                                <td class="">
+                                    <input name="arr_end_date[]" type="date" value="` + val.end_date + `" required>
                                 </td>
-                                <td class="center-align">
-                                    <input name="arr_note[]" id="arr_note` + count + `" type="text" placeholder="Keterangan" value="` + val.note + `" required>
+                                <td class="">
+                                    <select class="browser-default" id="arr_shift` + count + `" name="arr_shift[]"></select>
+                                </td>
+                                <td class="">
+                                    <input name="arr_group[]" type="text" value="` + val.group + `" required>
+                                </td>
+                                <td class="">
+                                    <input name="arr_note[]" type="text" value="` + val.note + `" required>
                                 </td>
                                 <td class="center-align">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail" href="javascript:void(0);">
@@ -1732,21 +1716,42 @@
                                 </td>
                             </tr>
                         `);
-                        M.updateTextFields();
-                        $('#arr_shift' + count).select2({
-                            placeholder: '-- Pilih ya --',
+
+                        if(val.shift_id){
+                            $('#arr_shift' + count).append(`
+                                <option value="` + val.shift_id + `">` + val.shift_code + `</option>
+                            `);
+                        }
+
+                        select2ServerSide('#arr_shift' + count, '{{ url("admin/select2/shift") }}');
+
+                        if(val.bom_id){
+                            $('#arr_bom' + count).append(`
+                                <option value="` + val.bom_id + `">` + val.bom_code + `</option>
+                            `);
+                        }
+                        
+                        $('#arr_item_detail_id' + count).append(`
+                            <option value="` + val.item_id + `">` + val.item_code +`</option>
+                        `);
+
+                        select2ServerSide('#arr_item_detail_id' + count, '{{ url("admin/select2/item_has_bom") }}');
+
+                        $('#arr_bom' + count).select2({
+                            placeholder: '-- Kosong --',
                             minimumInputLength: 1,
                             allowClear: true,
                             cache: true,
                             width: 'resolve',
                             dropdownParent: $('body').parent(),
                             ajax: {
-                                url: '{{ url("admin/select2/shift_production") }}',
+                                url: '{{ url("admin/select2/bom_by_item") }}',
                                 type: 'GET',
                                 dataType: 'JSON',
                                 data: function(params) {
                                     return {
                                         search: params.term,
+                                        item_id: $('#arr_item_detail_id' + count).val(),
                                         place_id: $('#place_id').val(),
                                     };
                                 },
@@ -1757,13 +1762,25 @@
                                 }
                             }
                         });
-                        $('#arr_shift' + count).append(`
-                            <option value="` + val.shift_id + `">` + val.shift_code + `</option>
-                        `);
-                        $('#arr_line_id' + count).val(val.line_id);
-                        $('#arr_item_detail_id' + count).val(val.item_id).trigger('change');
-                        $('#arr_warehouse_id' + count).val(val.warehouse_id);
+
+                        $("#arr_warehouse" + count).empty();
+                        if(val.list_warehouse.length > 0){
+                            $.each(val.list_warehouse, function(i, value) {
+                                $('#arr_warehouse' + count).append(`
+                                    <option value="` + value.id + `">` + value.name + `</option>
+                                `);
+                            });
+                        }else{
+                            $("#arr_warehouse" + count).append(`
+                                <option value="">--Gudang tidak diatur di master data Grup Item--</option>
+                            `);
+                        }
+
+                        $("#arr_warehouse" + count).val(val.warehouse_id);
                     });
+
+                    countTarget();
+                    countDetail();
                 }
                 
                 $('.modal-content').scrollTop(0);

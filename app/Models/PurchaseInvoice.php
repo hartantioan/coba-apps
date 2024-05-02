@@ -255,6 +255,14 @@ class PurchaseInvoice extends Model
             $total -= $row->nominal;
         }
 
+        $totaljournal = JournalDetail::whereHas('coa',function($query){
+            $query->where('code','200.01.03.01.01');
+        })->whereHas('journal',function($query){
+            $query->whereIn('status',['2','3']);
+        })->where('note','VOID*'.$this->code)->sum('nominal_fc');
+
+        $total -= $totaljournal;
+
         return $total;
     }
 

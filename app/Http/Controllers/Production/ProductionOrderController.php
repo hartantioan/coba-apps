@@ -183,12 +183,11 @@ class ProductionOrderController extends Controller
                     $val->productionSchedule->code,
                     $val->productionScheduleDetail->item->code.' - '.$val->productionScheduleDetail->item->name,
                     CustomHelper::formatConditionalQty($val->productionScheduleDetail->qty),
-                    $val->productionScheduleDetail->item->productionUnit->code,
+                    $val->productionScheduleDetail->item->uomUnit->code,
                     $val->productionScheduleDetail->shift->code.' - '.$val->productionScheduleDetail->shift->name,
-                    $val->productionScheduleDetail->line->code,
+                    $val->productionScheduleDetail->productionSchedule->line->code,
                     $val->productionScheduleDetail->group,
                     $val->productionScheduleDetail->warehouse->name,
-                    $val->area()->exists() ? $val->area->name : '-',
                     $val->status(),
                     (
                         ($val->status == 3 && is_null($val->done_id)) ? 'SYSTEM' :
@@ -209,10 +208,8 @@ class ProductionOrderController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
-						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
 
@@ -238,44 +235,18 @@ class ProductionOrderController extends Controller
         $validation = Validator::make($request->all(), [
             'code'                      => 'required',
             'code_place_id'             => 'required',
-          /*   'code'			                => $request->temp ? ['required', Rule::unique('production_orders', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:production_orders,code',
-            'code_place_id'                 => 'required',
-             */'company_id'			        => 'required',
+            'company_id'			        => 'required',
             'post_date'		                => 'required',
             'production_schedule_id'        => 'required',
             'production_schedule_detail_id' => 'required',
-            'warehouse_id'                  => 'required',
-            'area_id'                       => $request->isSalesItem ? 'required' : '',
-            'arr_bom_detail_id'             => 'required|array',
-            'arr_lookable_id'               => 'required|array',
-            'arr_lookable_type'             => 'required|array',
-            'arr_qty'                       => 'required|array',
-            'arr_nominal'                   => 'required|array',
-            'arr_total'                     => 'required|array',
         ], [
             'code_place_id.required'            => 'Plant Tidak boleh kosong',
             'code.required' 	                        => 'Kode tidak boleh kosong.',
-            /* 'code.string'                               => 'Kode harus dalam bentuk string.',
-            'code.min'                                  => 'Kode harus minimal 18 karakter.',
-            'code.unique'                               => 'Kode telah dipakai', */
             'company_id.required' 			            => 'Perusahaan tidak boleh kosong.',
             'post_date.required' 			            => 'Tanggal posting tidak boleh kosong.',
             'production_schedule_id.required'           => 'Jadwal Produksi tidak boleh kosong.',
             'production_schedule_detail_id.required'    => 'Item target tidak boleh kosong.',
             'warehouse_id.required'                     => 'Gudang target tidak boleh kosong.',
-            'area_id.required'                          => 'Area target tidak boleh kosong.',
-            'arr_bom_detail_id.required'                => 'BOM detail tidak boleh kosong.',
-            'arr_bom_detail_id.array'                   => 'BOM detail harus array.',
-            'arr_lookable_id.required'                  => 'Detail tidak boleh kosong.',
-            'arr_lookable_id.array'                     => 'Detail harus array.',
-            'arr_lookable_type.required'                => 'Detail tidak boleh kosong.',
-            'arr_lookable_type.array'                   => 'Detail harus array.',
-            'arr_qty.required'                          => 'Qty tidak boleh kosong.',
-            'arr_qty.array'                             => 'Qty harus array.',
-            'arr_nominal.required'                      => 'Nominal tidak boleh kosong.',
-            'arr_nominal.array'                         => 'Nominal harus array.',
-            'arr_total.required'                        => 'Total tidak boleh kosong.',
-            'arr_total.array'                           => 'Total harus array.',
         ]);
 
         if($validation->fails()) {
@@ -351,7 +322,6 @@ class ProductionOrderController extends Controller
                         $query->production_schedule_id = $request->production_schedule_id;
                         $query->production_schedule_detail_id = $request->production_schedule_detail_id;
                         $query->warehouse_id = $request->warehouse_id;
-                        $query->area_id = $request->area_id ? $request->area_id : NULL;
                         $query->post_date = $request->post_date;
                         $query->note = $request->note;
                         $query->standard_item_cost = $standardItemCost;
@@ -362,7 +332,7 @@ class ProductionOrderController extends Controller
 
                         $query->save();
                         
-                        foreach($query->marketingOrderPlanDetail as $row){
+                        foreach($query->productionOrderDetail() as $row){
                             $row->delete();
                         }
 
@@ -370,7 +340,7 @@ class ProductionOrderController extends Controller
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status Marketing Order Plan sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+					        'message' => 'Status Order Produksi sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                 }catch(\Exception $e){
@@ -390,7 +360,6 @@ class ProductionOrderController extends Controller
                         'production_schedule_id'	    => $request->production_schedule_id,
                         'production_schedule_detail_id'	=> $request->production_schedule_detail_id,
                         'warehouse_id'                  => $request->warehouse_id,
-                        'area_id'                       => $request->area_id ? $request->area_id : NULL,
                         'post_date'                     => $request->post_date,
                         'note'                          => $request->note,
                         'standard_item_cost'            => $standardItemCost,
@@ -407,26 +376,6 @@ class ProductionOrderController extends Controller
 			}
 			
 			if($query) {
-
-                DB::beginTransaction();
-                try {
-                    
-                    foreach($request->arr_lookable_id as $key => $row){
-                        ProductionOrderDetail::create([
-                            'production_order_id'           => $query->id,
-                            'bom_detail_id'                 => $request->arr_bom_detail_id[$key],
-                            'lookable_type'                 => $request->arr_lookable_type[$key],
-                            'lookable_id'                   => $row,
-                            'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                            'nominal'                       => $arrDetailCost[$key],
-                            'total'                         => $arrDetailCost[$key],
-                        ]);
-                    }
-
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
-                }
 
                 CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Order Produksi No. '.$query->code,'Pengajuan Order Produksi No. '.$query->code,session('bo_id'));
@@ -452,44 +401,6 @@ class ProductionOrderController extends Controller
 		return response()->json($response);
     }
 
-    public function show(Request $request){
-        $po = ProductionOrder::where('code',CustomHelper::decrypt($request->id))->first();
-        $warehouse = Warehouse::where('status','1')->whereNotNull('is_transit_warehouse')->first();
-        $po['production_schedule_code'] = $po->productionSchedule->code.' Tgl.Post '.date('d/m/Y',strtotime($po->productionSchedule->post_date)).' - Plant : '.$po->productionSchedule->place->code;
-        $po['production_schedule_detail_code'] = $po->productionScheduleDetail->item->code.' - '.$po->productionScheduleDetail->item->name;
-        $po['warehouses'] = $po->productionScheduleDetail->item->warehouseList();
-        $po['warehouse_transit_id'] = $warehouse ? $warehouse->id : '';
-        $po['warehouse_transit_name'] = $warehouse ? $warehouse->name : '';
-        $po['qty'] = CustomHelper::formatConditionalQty($po->productionScheduleDetail->qty).' '.$po->productionScheduleDetail->item->productionUnit->code;
-        $po['shift'] = $po->productionScheduleDetail->shift->code.' - '.$po->productionScheduleDetail->shift->name;
-        $po['group'] = $po->productionScheduleDetail->group;
-        $po['line'] = $po->productionScheduleDetail->line->code;
-        $po['code_place_id'] = substr($po->code,7,2);
-        $po['is_sales_item'] = $po->productionScheduleDetail->item->is_sales_item ? $po->productionScheduleDetail->item->is_sales_item : '';
-
-        $arr = [];
-        
-        foreach($po->productionOrderDetail as $row){
-            $arr[] = [
-                'id'            => $row->bom_detail_id,
-                'lookable_id'   => $row->lookable_id,
-                'lookable_type' => $row->lookable_type,
-                'lookable_code' => $row->lookable->code,
-                'lookable_name' => $row->lookable->name,
-                'warehouse'     => $row->item()->exists() ? $row->item->getStockWarehousePlaceArea($po->productionSchedule->place_id) : '-',
-                'stock'         => $row->item()->exists() ? CustomHelper::formatConditionalQty($row->item->getStockPlace($po->productionSchedule->place_id) / $row->item->production_convert).' '.$row->item->productionUnit->code : '-',
-                'qty'           => $row->item()->exists() ? CustomHelper::formatConditionalQty($row->qty) : '0,000',
-                'unit'          => $row->item()->exists() ? $row->item->productionUnit->code : '-',
-                'nominal'       => $row->coa()->exists() ? number_format($row->nominal,2,',','.') : '0,00',
-                'total'         => $row->coa()->exists() ? number_format($row->total,2,',','.') : '0,00',
-            ];
-        }
-
-        $po['details'] = $arr;
-        				
-		return response()->json($po);
-    }
-
     public function approval(Request $request,$id){
         
         $pr = ProductionOrder::where('code',CustomHelper::decrypt($id))->first();
@@ -511,43 +422,7 @@ class ProductionOrderController extends Controller
         $data   = ProductionOrder::where('code',CustomHelper::decrypt($request->id))->first();
         
         $string = '<div class="row pt-1 pb-1 lighten-4"> <div class="col s12">'.$data->code.'</div>
-        <div class="col s12"><table style="min-width:100%;">
-                        <thead>
-                            <tr>
-                                <th class="center-align" colspan="7">Daftar Item</th>
-                            </tr>
-                            <tr>
-                                <th class="center-align">No.</th>
-                                <th class="center-align">Bahan/Biaya</th>
-                                <th class="center-align">Qty</th>
-                                <th class="center-align">Satuan (Produksi)</th>
-                                <th class="center-align">Nominal</th>
-                                <th class="center-align">Total</th>
-                            </tr>
-                        </thead><tbody>';
-        $totalqty=0;
-        $totalnominal=0;
-        $totals=0;
-        foreach($data->productionOrderDetail as $key => $row){
-            $string .= '<tr>
-                <td class="center-align">'.($key + 1).'</td>
-                <td>'.($row->item()->exists() ? $row->item->code.' - '.$row->item->name : ($row->coa()->exists() ? $row->coa->code.' - '.$row->coa->name : '')).'</td>
-                <td class="right-align">'.($row->item()->exists() ? CustomHelper::formatConditionalQty($row->qty) : '-').'</td>
-                <td class="center-align">'.($row->item()->exists() ? $row->item->productionUnit->code : '-').'</td>
-                <td class="right-align">'.($row->coa()->exists() ? number_format($row->nominal,2,',','.') : '-').'</td>
-                <td class="right-align">'.($row->coa()->exists() ? number_format($row->total,2,',','.') : '-').'</td>
-            </tr>';
-        }
-        
-        $string .= '<tr>
-                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2"> Total </td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqty, 3, ',', '.') . '</td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;"></td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalnominal, 3, ',', '.') . '</td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totals, 3, ',', '.') . '</td>
-            </tr>  
-        ';
-        $string .= '</tbody></table></div>';
+        <div class="col s12"></div>';
 
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">
                         <thead>
@@ -696,71 +571,6 @@ class ProductionOrderController extends Controller
                     'message' => 'Data closed successfully.'
                 ];
             }
-        } else {
-            $response = [
-                'status'  => 500,
-                'message' => 'Data failed to delete.'
-            ];
-        }
-
-        return response()->json($response);
-    }
-
-    public function destroy(Request $request){
-        $query = ProductionOrder::where('code',CustomHelper::decrypt($request->id))->first();
-
-        $approved = false;
-        $revised = false;
-
-        if($query->approval()){
-            foreach ($query->approval() as $detail){
-                foreach($detail->approvalMatrix as $row){
-                    if($row->approved){
-                        $approved = true;
-                    }
-
-                    if($row->revised){
-                        $revised = true;
-                    }
-                }
-            }
-        }
-
-        if($approved && !$revised){
-            return response()->json([
-                'status'  => 500,
-                'message' => 'Dokumen telah diapprove, anda tidak bisa melakukan perubahan.'
-            ]);
-        }
-
-        if(in_array($query->status,['2','3','4','5'])){
-            return response()->json([
-                'status'  => 500,
-                'message' => 'Dokumen sudah diupdate, anda tidak bisa melakukan perubahan.'
-            ]);
-        }
-        
-        if($query->delete()){
-
-            $query->update([
-                'delete_id'     => session('bo_id'),
-                'delete_note'   => $request->msg,
-            ]);
-
-            $query->productionOrderDetail()->delete();
-
-            CustomHelper::removeApproval($query->getTable(),$query->id);
-
-            activity()
-                ->performedOn(new ProductionOrder())
-                ->causedBy(session('bo_id'))
-                ->withProperties($query)
-                ->log('Delete the production order plan data');
-
-            $response = [
-                'status'  => 200,
-                'message' => 'Data deleted successfully.'
-            ];
         } else {
             $response = [
                 'status'  => 500,

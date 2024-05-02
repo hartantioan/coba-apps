@@ -477,6 +477,18 @@
                         passed = false;
                     }
                 }
+                if($('input[name^="arr_status_production_schedule[]"]').length > 0){
+                    formData.delete("arr_status_production_schedule[]");
+                    $('input[name^="arr_status_production_schedule[]"]').each(function(index){
+                        if($(this).is(':checked')){
+                            formData.append('arr_status_production_schedule[]',$(this).val());
+                            countChecked++;
+                        }
+                    });
+                    if(countChecked == 0){
+                        passed = false;
+                    }
+                }
                 if(passed){
                     $.ajax({
                         url: '{{ Request::url() }}/approve',

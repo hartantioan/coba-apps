@@ -27,7 +27,10 @@ class ReceptionHardwareItemUsageController extends Controller
 
     public function fetchStorage(Request $request){
         $InStorage = HardwareItem::where('status', '1')
-                    ->doesntHave('receptionHardwareItemsUsage')
+                    ->whereHas('receptionHardwareItemsUsage', function ($query) {
+                        $query->where('status', '1');
+                    }, '=', 0)
+                    ->orDoesntHave('receptionHardwareItemsUsage')
                     ->get();
         $item_ready=[];
         foreach ($InStorage as $item) {
@@ -67,22 +70,15 @@ class ReceptionHardwareItemUsageController extends Controller
                     'message'   => 'Barang masih belum memiliki tuan'
                 ];
             }else{
-                $query = ReceptionHardwareItemsUsage::create([
-                    'code'              => ReceptionHardwareItemsUsage::generateCode(),
-                    'user_id'           => session('bo_id'),
-                    'account_id'        => $lastInsertedData->account_id,
-                    'hardware_item_id'  => $lastInsertedData->hardwareItem->id,
-                    'date'              => date('Y-m-d H:i:s'),
-                    'info'              => 'Pengembalian Dari User '.$lastInsertedData->account->name ,
-                    'status'            => '2',
-                    'status_item'       => '2',
-                    'location'			=> '',
-                ]);
+               
+                $lastInsertedData->status = '2';
+                $lastInsertedData->status_item = '2';
+                $lastInsertedData->return_date = $request->date;
+                $lastInsertedData->user_return = session('bo_id');
+                $lastInsertedData->return_note = $request->note;
+                $lastInsertedData->save();
 
-                if($query){
-                    $lastInsertedData->update([
-                        'status'    => '4',
-                    ]);
+                if($lastInsertedData){
 
                     DB::commit();
                     $response = [
@@ -137,9 +133,10 @@ class ReceptionHardwareItemUsageController extends Controller
                 'account_id'        => $request->user_id1,
                 'hardware_item_id'  => $request->tempe,
                 'info'              => $request->info1,
-                'date'              => $request->date1,
-                'status'            => $request->status1,
-                'status_item'            => 1,
+                'date'              => now(),
+                'reception_date'    => $request->date1,
+                'status'            => 1,
+                'status_item'       => 1,
                 'location'			=> $request->location1,
             ]);
             DB::commit();
@@ -175,13 +172,15 @@ class ReceptionHardwareItemUsageController extends Controller
             'user_id',
             'hardware_item_id',
             'info',
+            'location',
             'date',
+            'info',
             'status',
-            'location'
+            'reception_date',
+            'return_date', 
+            'user_return',
         ];
 
-        
-        
         $start  = $request->start;
         $length = $request->length;
         $order  = $column[$request->input('order.0.column')];
@@ -236,13 +235,13 @@ class ReceptionHardwareItemUsageController extends Controller
                     $button = '-';
                 }if($val->status == 1 ){
                     $button = '
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown darken-2 white-text btn-small" data-popup="tooltip" title="Return" onclick="printData(' . $val->id . ')"><i class="material-icons dp48">filter_frames</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown darken-2 white-text btn-small" data-popup="tooltip" title="Return" data-item-id="'. $val->id .'" onclick="openmodal('. $val->id .')"><i class="material-icons dp48">filter_frames</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small" data-popup="tooltip" title="Return" onclick="returnItem(' . $val->id . ')"><i class="material-icons dp48">call_missed_outgoing</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
 					';
                 }if($val->status == 2 ){
                     $button = '
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown darken-2 white-text btn-small" data-popup="tooltip" title="Return" onclick="printData(' . $val->id . ')"><i class="material-icons dp48">filter_frames</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown darken-2 white-text btn-small" data-popup="tooltip" title="Return" data-item-id="'. $val->id .'" onclick="openmodal('. $val->id .')"><i class="material-icons dp48">filter_frames</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
 					';
                 }
@@ -253,6 +252,8 @@ class ReceptionHardwareItemUsageController extends Controller
                     $val->hardwareItem->item->name ?? '',
                     $val->location,
                     $val->date,
+                    $val->reception_date,
+                    $val->return_date,
                     $val->info,
                     $val->status(),
                     $button
@@ -275,10 +276,38 @@ class ReceptionHardwareItemUsageController extends Controller
         return response()->json($response);
     }
 
+    public function printModal(Request $request){
+        $reception = ReceptionHardwareItemsUsage::find($request->id);
+       
+        $string='';
+        $string.='<div class="col s12 center-align" >
+                    <h4>Print</h4>
+                    </div>
+                    <div class="col s12 m6 center-align">
+                        <button class="btn waves-effect waves-light  submit" onclick="printData(' . $request->id . ');">Penyerahan <i class="material-icons right">send</i></button>
+                    </div>
+                   ';
+        if($reception->return_date){
+            $string.=' <div class="col s12 m6 center-align">
+                <button class="btn waves-effect waves-light  submit" onclick="printDataReturn(' . $request->id . ');">Pengembalian <i class="material-icons right">send</i></button>
+            </div>';
+        }
+        $string.='</div>';
+        return response()->json($string);
+    }
+
     public function show(Request $request){
         $reception = ReceptionHardwareItemsUsage::find($request->id);
         $reception['item']=$reception->hardwareItem;
+        $reception['name']=$reception->hardwareItem->item->name;
+        $reception['detail1']=$reception->hardwareItem->detail1;
+        $reception['detail2']=$reception->hardwareItem->detail2;
         $reception['user']=$reception->user;
+		return response()->json($reception);
+    }
+    public function showItem(Request $request){
+        $reception = HardwareItem::find($request->id);
+        $reception['name']=$reception->item->name;
 		return response()->json($reception);
     }
 
@@ -299,29 +328,28 @@ class ReceptionHardwareItemUsageController extends Controller
             ];
         } else {
             DB::beginTransaction();
+            
             $user = null;
                 try {
                     $query_item= ReceptionHardwareItemsUsage::find($request->temp);
-                    $query_item->status = '4';
-                    $query_item->status_item = '1';
+                    if($request->date < $query_item->reception_date){
+                        $kambing["kambing"][]="Tanggal Pengembalian kurang dari tanggal Penyerahan";
+                        $response = [
+                            'status' => 422,
+                            'error'  => $kambing
+                        ];
+                        return response()->json($response);
+                    }
+                    $query_item->status = '2';
+                    $query_item->status_item = '2';
+                    $query_item->return_date = $request->date;
+                    $query_item->user_return = session('bo_id');
+                    $query_item->return_note = $request->note;
                     $query_item->save();
                     DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
                 }
-
-                
-                $query = ReceptionHardwareItemsUsage::create([
-                    'code'              => ReceptionHardwareItemsUsage::generateCode(),
-                    'user_id'           => session('bo_id'),
-                    'account_id'        => $query_item->user_id,
-                    'hardware_item_id'  => $query_item->id,
-                    'info'              => $request->info,
-                    'date'              => $request->date,
-                    'status'            => '2',
-                    'status_item'       => '2',
-                    'location'			=> $request->location,
-                ]);
                 DB::commit();
                 
             $response = [
@@ -375,8 +403,9 @@ class ReceptionHardwareItemUsageController extends Controller
                         'account_id'        => $request->user_id,
                         'hardware_item_id'  => $request->hardware_item_id,
                         'info'              => $request->info,
-                        'date'              => $request->date,
-                        'status'            => $request->status,
+                        'date'              => now(),
+                        'reception_date'    => $request->date,
+                        'status'            => 1,
                         'status_item'       => 1,
                         'location'			=> $request->location,
                     ]);
@@ -454,11 +483,46 @@ class ReceptionHardwareItemUsageController extends Controller
             $img_base_64 = base64_encode($image_temp);
             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
             $data["image"]=$path_img;
-            if($RH->status == 2){
-                $pdf = Pdf::loadView('admin.print.usage.return_hardware', $data)->setPaper('a4', 'portrait');
-            }else{
-                $pdf = Pdf::loadView('admin.print.usage.reception_hardware', $data)->setPaper('a4', 'portrait');
-            }
+            
+            $pdf = Pdf::loadView('admin.print.usage.reception_hardware', $data)->setPaper('a4', 'portrait');
+  
+            $content = $pdf->download()->getOriginalContent();
+            $randomString = Str::random(10); 
+
+         
+            $filePath = 'public/pdf/' . $randomString . '.pdf';
+            
+
+            Storage::put($filePath, $content);
+            
+            $document_po = asset(Storage::url($filePath));
+            $var_link=$document_po;
+
+            return $document_po;
+        }else{
+            abort(404);
+        }
+
+    }
+
+    public function printReturn( Request $request){
+
+        $RH = ReceptionHardwareItemsUsage::find($request->id);
+        if($RH){
+            $data = [
+                'title' => 'Surat Pengembalian',
+                'data' => $RH,
+                'user' => $RH->user
+            ];
+            $img_path = 'website/logo_web_fix.png';
+            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+            $image_temp = file_get_contents($img_path);
+            $img_base_64 = base64_encode($image_temp);
+            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+            $data["image"]=$path_img;
+            
+            $pdf = Pdf::loadView('admin.print.usage.return_hardware', $data)->setPaper('a4', 'portrait');
+            
 
            
             $content = $pdf->download()->getOriginalContent();

@@ -1716,7 +1716,40 @@ class Select2Controller extends Controller {
                     $query->where('name', 'like', "%$search%");
                 })
                 ->where('status', '1')
-                ->doesntHave('receptionHardwareItemsUsage')
+                ->whereHas('receptionHardwareItemsUsage')
+                ->whereHas('receptionHardwareItemsUsage', function ($query) {
+                    $query->where('status', '1');
+                }, '=', 0)
+                ->orDoesntHave('receptionHardwareItemsUsage')
+                ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.'-'.$d->item->name,
+                'detail1' 	    => $d->detail1,
+                'detail2' 	    => $d->detail2,
+            ];
+        }
+        return response()->json(['items' => $response]);
+    }
+
+    public function requestRepairHardware(Request $request)
+    {
+        $response = [];
+        
+        $search   = $request->search;
+        $data = HardwareItem::where(function ($query) use ($search) {
+                    $query->orWhere('code', 'like', "%$search%");
+                })
+                ->whereHas('item', function ($query) use ($search) {
+                    $query->where('name', 'like', "%$search%");
+                })
+                ->where('status', '1')
+                ->whereHas('receptionHardwareItemsUsage', function ($query) {
+                    $query->where('status', '2');
+                }, '=', 0)
+                ->whereHas('receptionHardwareItemsUsage')
                 ->get();
 
         foreach($data as $d) {

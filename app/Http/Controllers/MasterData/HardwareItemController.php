@@ -280,7 +280,7 @@ class HardwareItemController extends Controller
     }
 
     public function historyUsage(Request $request){
-        $query_reception = ReceptionHardwareItemsUsage::where('hardware_item_id', $request->id)->where('status_item',1)->get();
+        $query_reception = ReceptionHardwareItemsUsage::where('hardware_item_id', $request->id)->get();
         $temp_return = [];
         $temp_reception = [];
         $title = '';
@@ -293,22 +293,22 @@ class HardwareItemController extends Controller
                     'image'     => $reception->user()->exists() ?  $reception->user->profilePicture(): '',
                     'code'      => $reception->code,
                     'date'      => $reception->date,
-                    'post_date' => $reception->created_at,
+                    'post_date' => $reception->reception_date,
                     'user'      => $reception->user->name ?? '',
                     'info'      => $reception->info,
                     'action'    =>'Penyerahan'
                 ];
                 $temp_reception[]=$temp_data_rec;
     
-                $query_return = ReceptionHardwareItemsUsage::where('hardware_item_id', $request->id)->where('status_item',2)->get();
+                $query_return = ReceptionHardwareItemsUsage::where('hardware_item_id', $request->id)->where('return_date','!=',null)->get();
     
                 foreach($query_return as $return){
                    
                     $temp_data=[
-                        'post_date' => $return->created_at,
+                        'post_date' => $return->return_date,
                         'code'      => $return->code,
                         'date'      => $return->date,
-                        'user'      => $return->user_id,
+                        'user'      => $return->user->name ?? '',
                         'info'      => $return->info,
                         'action'    =>'Pengembalian'
                     ];

@@ -319,6 +319,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('hardware_item_group', [Select2Controller::class, 'groupHardwareItem']);
                 Route::get('hardware_item', [Select2Controller::class, 'hardwareItem']);
                 Route::get('hardware_item_for_reception', [Select2Controller::class, 'hardwareItemForReception']);
+                Route::get('hardware_item_for_repair', [Select2Controller::class, 'requestRepairHardware']);
                 Route::get('item_for_hardware_item', [Select2Controller::class, 'itemForHardware']);
                 Route::get('inventory_transfer_out', [Select2Controller::class, 'inventoryTransferOut']);
                 Route::get('item_stock', [Select2Controller::class, 'itemStock']);
@@ -1286,6 +1287,8 @@ Route::prefix('admin')->group(function () {
                     Route::get('datatable',[ReceptionHardwareItemUsageController::class, 'datatable']);
                     Route::post('create',[ReceptionHardwareItemUsageController::class, 'create'])->middleware('operation.access:reception_hardware_items_usages,update');
                     Route::post('show', [ReceptionHardwareItemUsageController::class, 'show']);
+                    Route::post('show_item', [ReceptionHardwareItemUsageController::class, 'showItem']);
+                    Route::post('modal_print', [ReceptionHardwareItemUsageController::class, 'printModal']);
                     Route::get('row_detail',[ReceptionHardwareItemUsageController::class, 'rowDetail']);
                     Route::get('export',[ReceptionHardwareItemUsageController::class, 'export']);
                     Route::post('store_w_barcode', [ReceptionHardwareItemUsageController::class, 'store_w_barcode'])->middleware('operation.access:reception_hardware_items_usages,update');
@@ -1295,6 +1298,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('diversion',[ReceptionHardwareItemUsageController::class, 'diversion']);
                     Route::post('delete_attachment',[ReceptionHardwareItemUsageController::class, 'deleteAttachment']);
                     Route::post('print',[ReceptionHardwareItemUsageController::class, 'print']);
+                    Route::post('print_return',[ReceptionHardwareItemUsageController::class, 'printReturn']);
                     Route::post('save_user',[ReceptionHardwareItemUsageController::class, 'saveUser']);
                     Route::post('get_pic',[ReceptionHardwareItemUsageController::class, 'getPIC']);
                     Route::get('approval/{id}',[ReceptionHardwareItemUsageController::class, 'approval'])->withoutMiddleware('direct.access');

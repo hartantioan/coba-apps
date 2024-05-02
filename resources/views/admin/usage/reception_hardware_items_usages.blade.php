@@ -89,7 +89,9 @@
                                                         <th>Item</th>
                                                         <th>Lokasi</th>
                                                         <th>Tanggal</th>
-                                                        <th>Info</th>
+                                                        <th>Tanggal Penyerahan</th>
+                                                        <th>Tanggal Pengembalian</th>
+                                                        <th>Keterangan</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -113,7 +115,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit {{ $title }}</h4>
+                <h4>{{ $title }}</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -135,7 +137,7 @@
                             <select class="browser-default" id="user_id" name="user_id" onchange="getDetail()">&nbsp;</select>
                             <label class="active" for="user_id">Pilih User(jika ada)</label>
                         </div>
-                        <div class="input-field col s12 m6 step2">
+                        <div class="input-field col s12 m6">
                             <input id="division" name="division" disabled></input>
                             <label class="active" for="division">DIVISI</label>
                         </div>
@@ -207,7 +209,7 @@
                             </div>
                         </div>
                         <div class="col s12 mt-3">
-                            <button class="btn waves-effect waves-light right submit" onclick="rReturn();">Kembalikan <i class="material-icons right">send</i></button>
+                            <button class="btn waves-effect waves-light right submit" onclick="rReturn();">SIMPAN <i class="material-icons right">send</i></button>
                         </div>
                     </div>
                 </form>
@@ -230,8 +232,24 @@
                     </div>
                     <div class="col s12">
                         <div class="input-field col s12 m6">
-                            <select class="browser-default" id="user_id1" name="user_id1">&nbsp;</select>
+                            <input id="items" name="items" disabled></input>
+                            <label class="active" for="items">Item</label>
+                        </div>
+                        <div class="input-field col s12 m3 ">
+                            <input id="detail1s" name="detail1s" disabled></input>
+                            <label class="active" for="detail1s">Detail 1</label>
+                        </div>
+                        <div class="input-field col s12 m3 ">
+                            <input id="detail2s" name="detail2s" disabled></input>
+                            <label class="active" for="detail2s">Detail 2</label>
+                        </div>
+                        <div class="input-field col s12 m6">
+                            <select class="browser-default" id="user_id1" name="user_id1" onchange="getDetail()">&nbsp;</select>
                             <label class="active" for="user_id1" >Pilih User(jika ada)</label>
+                        </div>
+                        <div class="input-field col s12 m6">
+                            <input id="division1" name="division1" disabled></input>
+                            <label class="active" for="division1">DIVISI</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <input id="location1" name="location1" type="text" placeholder="Keterangan">
@@ -258,7 +276,7 @@
                             </div>
                         </div>
                         <div class="col s12 mt-3">
-                            <button class="btn waves-effect waves-light right submit" onclick="saveTargeted();">Kembalikan <i class="material-icons right">send</i></button>
+                            <button class="btn waves-effect waves-light right submit" onclick="saveTargeted();">SIMPAN <i class="material-icons right">send</i></button>
                         </div>
                     </div>
                 </form>
@@ -288,7 +306,16 @@
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
-
+<div id="modal_print" class="modal modal-fixed-footer" style="">
+    <div class="modal-content">
+        <div class="row" id="body_print">
+            
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+    </div>
+</div>
 
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
@@ -342,7 +369,22 @@
                 M.updateTextFields();
             },
             onCloseEnd: function(modal, trigger){
-            
+                $('#hardware_item_id').empty();
+                M.updateTextFields();
+            }
+        });
+
+        $('#modal_print').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                    
+            },
+            onOpenEnd: function(modal, trigger) { 
+
+                M.updateTextFields();
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#body_print').empty();
                 M.updateTextFields();
             }
         });
@@ -401,6 +443,11 @@
             $('#division').val(paramsdivisi);
            
         }
+        if($('#user_id1').val()){
+            let paramsdivisi = $('#user_id1').select2('data')[0].division;
+            $('#division1').val(paramsdivisi);
+           
+        }
     }
 
     function fetchStorage(){
@@ -435,12 +482,34 @@
             },
         });
     }
-
+    function openmodal(id){
+        var itemId = $(this).data('item-id');
+        console.log(id);
+        $.ajax({
+            url: '{{ Request::url() }}/modal_print',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                $('#modal_print').modal('open');
+                $('#body_print').empty();
+                $('#body_print').append(
+                    response
+                );
+                
+            },
+        });
+    }
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
             "scrollCollapse": true,
             "scrollY": '400px',
-            "responsive": true,
+            "responsive": false,
             "stateSave": true,
             "serverSide": true,
             "deferRender": true,
@@ -476,6 +545,8 @@
                 { name: 'hardware_item_id', className: 'center-align' },
                 { name: 'lokasi', className: 'center-align' },
                 { name: 'info', className: 'center-align' },
+                { name: 'date', className: 'center-align' },
+                { name: 'date', className: 'center-align' },
                 { name: 'date', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
@@ -641,6 +712,36 @@
     }
 
     function targeted_item(id,name){
+        $.ajax({
+            url: '{{ Request::url() }}/show_item',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+                $('#items').val(response['name']+'-'+response['code']);
+                $('#detail1s').val(response['detail1']);
+                $('#detail2s').val(response['detail2']);
+                M.updateTextFields();
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#main');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
         $('#name_item').empty();
         $('#modal3').modal('open');
         $('#tempe').val(id);
@@ -786,9 +887,29 @@
     }
 
     function printData(id){
+        console.log(id);
          $.ajax({
             type : "POST",
             url  : '{{ Request::url() }}/print',
+            data : {
+                id:id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            cache: false,
+            success: function(data){
+               
+                window.open(data, '_blank');
+            }
+        });
+    }
+
+    function printDataReturn(id){
+        console.log(id);
+         $.ajax({
+            type : "POST",
+            url  : '{{ Request::url() }}/print_return',
             data : {
                 id:id
             },
@@ -833,7 +954,7 @@
                 },
               
                 {
-                    title : 'Info',
+                    title : 'Keterngan',
                     element : document.querySelector('.step5'),
                     intro : 'Keterangan tambahan yang akan dicantumkan pada form ini.' 
                 },

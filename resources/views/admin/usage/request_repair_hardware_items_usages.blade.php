@@ -252,7 +252,7 @@
     var rowNumber=0;
     $(function() {
         loadDataTable();
-        select2ServerSide('#hardware_item_id', '{{ url("admin/select2/hardware_item") }}');
+        select2ServerSide('#hardware_item_id', '{{ url("admin/select2/hardware_item_for_repair") }}');
 
         const addAttachmentBtn = document.getElementById('add-attachment');
         var attachmentCount = 0;

@@ -168,7 +168,7 @@
                         <tr>
                             <td style="margin-top: -2px;">
                                 <small>Diajukan:</small>
-                                <span>{{ date('d/m/Y',strtotime($data->date)) }}</span>
+                                <span>{{ date('d/m/Y',strtotime($data->return_date)) }}</span>
                                 <br>
                                 <h3 class="indigo-text">MEMO INTERNAL</h3>
                             </td>
@@ -265,13 +265,13 @@
                         </tr>
                         <tr>
                             <td>
-                                Departemen	
+                                Position	
                             </td>
                             <td>
                                 :
                             </td>
                             <td>
-                                {{$user->department->name}}
+                                {{$user->position->code}}
                             </td>
                         </tr>
                     </table>
@@ -332,13 +332,13 @@
                         </tr>
                         <tr>
                             <td>
-                                Departemen	
+                                Position	
                             </td>
                             <td>
                                 :
                             </td>
                             <td>
-                                {{$data->account->department->name}}
+                                {{$data->account->position->code}}
                             </td>
                         </tr>
                     </table>
@@ -355,7 +355,7 @@
                                 <br>
                             </td>
                             <td width:"30%" align="right" style="font-size: 0.8rem !important">
-                                {!! ucwords(strtolower($user->company->city->name)).', '.CustomHelper::tgl_indo($data->date) !!}
+                                {!! ucwords(strtolower($user->company->city->name)).', '.CustomHelper::tgl_indo($data->return_date) !!}
                             </td>
                         </tr>
                     </table>
@@ -369,7 +369,7 @@
                                         Dibuat oleh,
                                         <br><br><br><br><br>
                                         <div class="{{ $user->signature ? '' : 'mt-5' }}">{{ $user->name }}</div>
-                                        <div class="mt-1">{{ $user->position->name.' - '.$user->department->name }}</div>
+                                        <div class="mt-1">{{ $user->position->name.' - '.$user->position->division->code }}</div>
                                     </td>
                                     
                                 </tr>
@@ -384,7 +384,7 @@
                                         Dibuat oleh,
                                         <br><br><br><br><br>
                                         <div class="{{ $user->signature ? '' : 'mt-5' }}">{{ $user->name }}</div>
-                                        <div class="mt-1">{{ $user->position->name.' - '.$user->department->name }}</div>
+                                        <div class="mt-1">{{ $user->position->name.' - '.$user->position->division->code }}</div>
                                     </td>
                                 </tr>
                             </table>

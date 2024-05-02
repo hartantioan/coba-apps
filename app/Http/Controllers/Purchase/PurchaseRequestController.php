@@ -976,6 +976,8 @@ class PurchaseRequestController extends Controller
                 "verify_peer_name"=>false,
                 ),
             );
+            $options = PDF::getDomPDF()->getOptions();
+            $options->set('isFontSubsettingEnabled', true);
             CustomHelper::addNewPrinterCounter($pr->getTable(),$pr->id);
             $img_path = 'website/logo_web_fix.png';
             $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
@@ -983,12 +985,13 @@ class PurchaseRequestController extends Controller
             $img_base_64 = base64_encode($image_temp);
             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
             $data["image"]=$path_img;
-             
-            $pdf = Pdf::loadView('admin.print.purchase.request_individual', $data)->setPaper('a5', 'landscape');
+            $pdf = Pdf::setPaper('a5', 'landscape');
+            $pdf->set_option('fontDir', storage_path('fonts'));
+            $pdf->loadView('admin.print.purchase.request_individual', $data);
             $pdf->render();
     
-            $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+   
+            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}",'', 10, array(0,0,0));
             
             
             $content = $pdf->download()->getOriginalContent();

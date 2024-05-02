@@ -74,7 +74,7 @@ class ProductionOrder extends Model
 
     public function productionIssueReceive()
     {
-        return $this->hasMany('App\Models\ProductionIssueReceive')->whereIn('status',['1','2','3','6']);
+        return $this->hasMany('App\Models\ProductionIssueReceive')->whereIn('status',['1','2','3']);
     }
 
     public function voidUser()

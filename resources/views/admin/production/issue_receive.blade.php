@@ -34,7 +34,7 @@
     #sticky {
         position: -webkit-sticky;
         position: sticky;
-        top: 0;
+        top: 50px;
     }
 </style>
 <!-- BEGIN: Page Main-->
@@ -163,7 +163,7 @@
 </div>
 
 <div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;">
-    <div class="modal-content">
+    <div class="modal-content" style="overflow:auto !important;">
         <div class="row">
             <div class="col s12">
                 <h4>Tambah/Edit {{ $title }}</h4>
@@ -197,6 +197,34 @@
                                         </select>
                                         <label class="" for="company_id">Perusahaan</label>
                                     </div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="form-control" id="place_id" name="place_id">
+                                            @foreach ($place as $row)
+                                                <option value="{{ $row->id }}">{{ $row->code }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="" for="place_id">Plant</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="form-control" id="line_id" name="line_id">
+                                            @foreach ($line as $row)
+                                                <option value="{{ $row->id }}">{{ $row->code }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="" for="line_id">Line</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="form-control" id="machine_id" name="machine_id">
+                                            @foreach ($machine as $row)
+                                                <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="" for="machine_id">Mesin</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="group" name="group" type="text" placeholder="Grup">
+                                        <label class="active" for="group">Grup</label>
+                                    </div>
                                     <div class="input-field col m3 s12 step4">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                         <label class="active" for="post_date">Tgl. Post</label>
@@ -217,28 +245,33 @@
                             <div class="col s12">
                                 <fieldset>
                                     <legend>2. Order Produksi</legend>
-                                    <div class="input-field col m3 s12 step6">
-                                        <select class="browser-default" id="production_order_id" name="production_order_id"></select>
+                                    <div class="input-field col m4 s12 step6">
+                                        <select class="browser-default" id="production_order_id" name="production_order_id" onchange="getProductionOrder();"></select>
                                         <label class="active" for="production_order_id">Daftar Order Produksi</label>
                                     </div>
-                                    <div class="col m2 s12 step7">
-                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 mt-5" onclick="getProductionOrder();" href="javascript:void(0);">
-                                            <i class="material-icons left">add</i> Order Produksi
-                                        </a>
-                                    </div>
-                                    <div class="col m4 s12 step8">
+                                    <div class="col m8 s12 step8">
                                         <h6>Data Terpakai : <i id="list-used-data"></i></h6>
                                     </div>
                                     <div class="col m12">
                                         <div class="row">
-                                            <div class="col m4 s12">
+                                            <div class="col m6 s12">
                                                 Shift : <b id="output-shift">-</b>
                                             </div>
-                                            <div class="col m4 s12">
+                                            <div class="col m3 s12">
                                                 Grup : <b id="output-group">-</b>
                                             </div>
-                                            <div class="col m4 s12">
+                                            <div class="col m3 s12">
                                                 Line : <b id="output-line">-</b>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col m12 mt-1">
+                                        <div class="row">
+                                            <div class="col m4 s12">
+                                                Target Item FG : <b id="output-fg">-</b>
+                                            </div>
+                                            <div class="col m4 s12">
+                                                Qty : <b id="output-qty">-</b>
                                             </div>
                                         </div>
                                     </div>
@@ -249,75 +282,93 @@
                             <div class="col s12 step9">
                                 <fieldset style="min-width: 100%;">
                                     <legend>3. Detail Item Issue Receive</legend>
-                                    <div class="col m12 s12" style="overflow:auto;width:100% !important;">
-                                        <ul class="collapsible">
-                                            <li class="active">
-                                                <div class="collapsible-header red darken-1 text-white" style="color:white;"><i class="material-icons">file_upload</i>ISSUE</div>
-                                                <div class="collapsible-body" style="display:block;">
-                                                    <div class="" style="overflow:auto;width:100% !important;">
-                                                        <p class="mt-2 mb-2">
-                                                            <table class="bordered" style="border: 1px solid;" id="table-detail-item-issue">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th class="center">No.</th>
-                                                                        <th class="center">Item/Coa</th>
-                                                                        <th class="center">Qty Planned</th>
-                                                                        <th class="center">Qty Real</th>
-                                                                        <th class="center">Satuan Produksi</th>
-                                                                        <th class="center">Plant & Gudang</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody id="body-item-issue">
-                                                                    <tr id="last-row-item-issue">
-                                                                        <td class="center-align" colspan="6">
-                                                                            Silahkan tambahkan Order Produksi untuk memulai...
-                                                                        </td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <div class="collapsible-header green darken-1 text-white" style="color:white;"><i class="material-icons">file_download</i>RECEIVE</div>
-                                                <div class="collapsible-body">
-                                                    <div class="" style="overflow:auto;width:100% !important;">
-                                                        <p class="mt-2 mb-2">
-                                                            <table class="bordered" style="border: 1px solid;width:1750px !important;" id="table-detail-item-receive">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th class="center" width="5%">No.</th>
-                                                                        <th class="center" width="15%">Item/Coa</th>
-                                                                        <th class="center" width="10%">Qty Planned (Prod.)</th>
-                                                                        <th class="center" width="10%">Qty Real (Prod.)</th>
-                                                                        <th class="center" width="10%">Qty UoM</th>
-                                                                        <th class="center" width="10%">Qty Jual</th>
-                                                                        <th class="center" width="10%">Qty Pallet</th>
-                                                                        <th class="center" width="15%">Shading</th>
-                                                                        <th class="center" width="15%">Batch</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody id="body-item-receive">
-                                                                    <tr id="last-row-item-receive">
-                                                                        <td class="center-align" colspan="9">
-                                                                            Silahkan tambahkan Order Produksi untuk memulai...
-                                                                        </td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </li>
+                                    <div class="col m12 s12">
+                                        <div class="card-alert card gradient-45deg-purple-amber">
+                                            <div class="card-content white-text">
+                                                <p>Info : Item/Resource pada tab <b>ISSUE</b> akan diambil otomatis dari BOM item <b>RECEIVE</b>. Anda tetap bisa menambahkan manual item/resource malalui tombol yang disediakan.</p>
+                                            </div>
+                                        </div>
+                                        <ul class="tabs">
+                                            <li class="tab col m6 s12 l6"><a class="active" href="#receive">Receive</a></li>
+                                            <li class="tab col m6 s12 l6"><a href="#issue">Issue</a></li>
                                         </ul>
+                                        <div id="receive" class="col s12 active" style="overflow:auto;width:100% !important;">
+                                            <p class="mt-2 mb-2">
+                                                <table class="bordered" style="border: 1px solid;width:2000px !important;" id="table-detail-item-receive">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="center">No.</th>
+                                                            <th class="center">Item</th>
+                                                            <th class="center">Qty Planned (Prod.)</th>
+                                                            <th class="center">Qty Real (Prod.)</th>
+                                                            <th class="center">Satuan</th>
+                                                            <th class="center">Plant</th>
+                                                            <th class="center">Line</th>
+                                                            <th class="center">Gudang</th>
+                                                            <th class="center">Shading</th>
+                                                            <th class="center">Batch</th>
+                                                            <th class="center">Hapus</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="body-item-receive">
+                                                        <tr id="last-row-item-receive">
+                                                            <td class="center-align" colspan="11">
+                                                                Silahkan tambahkan Order Produksi untuk memulai...
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <th colspan="11">
+                                                                <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addSfg()" href="javascript:void(0);">
+                                                                    <i class="material-icons left">add</i> Tambah SFG
+                                                                </a>
+                                                                <a class="waves-effect waves-light green btn-small mb-1 mr-1" onclick="addFg()" href="javascript:void(0);">
+                                                                    <i class="material-icons left">add</i> Tambah FG
+                                                                </a>
+                                                            </th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </p>
+                                        </div>
+                                        <div id="issue" class="col s12" style="overflow:auto;min-width:100%;">
+                                            <p class="mt-2 mb-2">
+                                                <table class="bordered" style="border: 1px solid;" id="table-detail-item-issue">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="center">No.</th>
+                                                            <th class="center">Item/Resource</th>
+                                                            <th class="center">Qty Planned</th>
+                                                            <th class="center">Qty Real</th>
+                                                            <th class="center">Satuan Produksi</th>
+                                                            <th class="center">Plant & Gudang</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="body-item-issue">
+                                                        <tr id="last-row-item-issue">
+                                                            <td class="center-align" colspan="6">
+                                                                Silahkan tambahkan Order Produksi untuk memulai...
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <th colspan="9">
+                                                                <a class="waves-effect waves-light blue btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
+                                                                    <i class="material-icons left">add</i> Tambah Item
+                                                                </a>
+                                                                <a class="waves-effect waves-light purple btn-small mb-1 mr-1" onclick="addResource()" href="javascript:void(0);">
+                                                                    <i class="material-icons left">add</i> Tambah Resource
+                                                                </a>
+                                                            </th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </p>
+                                        </div>
                                     </div>
                                 </fieldset>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step10" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -326,7 +377,8 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn waves-effect waves-light purple btn-panduan" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+        <button class="btn waves-effect waves-light purple btn-panduan mr-1" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+        <button class="btn waves-effect waves-light mr-1 submit step10" onclick="save();">Simpan <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Tutup</a>
     </div>
 </div>
@@ -693,7 +745,7 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
-                $('#output-shift,#output-line,#output-group').text('-');
+                $('#output-shift,#output-line,#output-group,#output-fg,#output-qty').text('-');
                 $('#production_order_id').empty();
                 $('#body-item-issue').empty().append(`
                     <tr id="last-row-item-issue">
@@ -704,7 +756,7 @@
                 `);
                 $('#body-item-receive').empty().append(`
                     <tr id="last-row-item-receive">
-                        <td class="center-align" colspan="9">
+                        <td class="center-align" colspan="11">
                             Silahkan tambahkan Order Produksi untuk memulai...
                         </td>
                     </tr>
@@ -714,6 +766,64 @@
 
         select2ServerSide('#production_order_id', '{{ url("admin/select2/production_order") }}');
     });
+
+    function addSfg(){
+        let no_receive = $('.row_item_receive').length + 1;
+        var count = makeid(10);
+        $('#last-row-item-receive').remove();
+        $('#body-item-receive').append(`
+            <tr class="row_item_receive">
+                <input type="hidden" name="arr_marketing_order_detail[]" value="">
+                <td class="center-align">
+                    ` + no_receive + `
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" required></select>
+                </td>
+                <td>
+                    <input name="arr_planned_qty[]" type="text" value="0" onkeyup="formatRupiahNoMinus(this);" required>
+                </td>
+                <td>
+                    <input name="arr_real_qty[]" type="text" value="0" onkeyup="formatRupiahNoMinus(this);" required>
+                </td>
+                <td class="center">
+                    <span id="arr_satuan` + count + `">-</span>
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                        @foreach ($place as $rowplace)
+                            <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                        @endforeach
+                    </select>    
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
+                        <option value="">--Kosong--</option>
+                        @foreach ($line as $rowline)
+                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
+                        @endforeach
+                    </select>    
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                        <option value="">--Silahkan pilih item--</option>
+                    </select>
+                </td>
+                <td>
+                    <input list="list-shading` + count + `" name="arr_shading[]" class="browser-default" id="arr_shading` + count + `" type="text" placeholder="Kode Shading..." style="width:100%;" required>
+                </td>
+                <td>
+                    <input name="arr_batch[]" class="browser-default" type="text" placeholder="Nomor batch..." style="width:100%;" required>
+                </td>
+                <td class="center">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-receive" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
+            </tr>
+        `);
+        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
+    }
 
     function makeTreeOrg(data,link){
         var $ = go.GraphObject.make;
@@ -865,7 +975,7 @@
                 `);
                 $('#body-item-receive').empty().append(`
                     <tr id="last-row-item-receive">
-                        <td class="center-align" colspan="9">
+                        <td class="center-align" colspan="11">
                             Silahkan tambahkan Order Produksi untuk memulai...
                         </td>
                     </tr>
@@ -917,7 +1027,7 @@
                             </div>
                         `);
 
-                        $('.row_item_issue,.row_item_receive').remove();
+                        /* $('.row_item_issue,.row_item_receive').remove();
                         
                         $('#last-row-item-issue,#last-row-item-receive').remove();
 
@@ -1027,11 +1137,12 @@
                             </tr>
                         `);
                         no_receive++;
-                        $('#rowQty' + count).trigger('keyup');
-                        /* $('#production_order_id').empty(); */
+                        $('#rowQty' + count).trigger('keyup'); */
                         $('#output-shift').empty().text(datakuy.shift);
                         $('#output-group').empty().text(datakuy.group);
                         $('#output-line').empty().text(datakuy.line);
+                        $('#output-fg').empty().text(datakuy.item_receive_code + ' - ' + datakuy.item_receive_name);
+                        $('#output-qty').empty().text(datakuy.item_receive_qty + ' - ' + datakuy.item_receive_unit_uom);
                         M.updateTextFields();
                     }
                 },
@@ -1046,7 +1157,7 @@
                 }
             });
         }else{
-            $('#output-shift,#output-line,#output-group').text('-');
+            $('#output-shift,#output-line,#output-group,#output-fg,#output-qty').text('-');
             $('#body-item-issue').empty().append(`
                 <tr id="last-row-item-issue">
                     <td class="center-align" colspan="6">
@@ -1056,7 +1167,7 @@
             `);
             $('#body-item-receive').empty().append(`
                 <tr id="last-row-item-receive">
-                    <td class="center-align" colspan="9">
+                    <td class="center-align" colspan="11">
                         Silahkan tambahkan Order Produksi untuk memulai...
                     </td>
                 </tr>

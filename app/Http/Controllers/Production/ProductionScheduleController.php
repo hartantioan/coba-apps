@@ -395,7 +395,6 @@ class ProductionScheduleController extends Controller
                     foreach($request->arr_shift as $key => $row){
                         ProductionScheduleDetail::create([
                             'production_schedule_id'        => $query->id,
-                            'marketing_order_plan_detail_id'=> $request->arr_detail_id[$key],
                             'shift_id'                      => $row,
                             'item_id'                       => $request->arr_item_detail_id[$key],
                             'bom_id'                        => $request->arr_bom[$key],
@@ -467,9 +466,6 @@ class ProductionScheduleController extends Controller
 
         foreach($po->productionScheduleDetail as $row){
             $arrDetail[] = [
-                'id'                => $row->marketingOrderPlanDetail->marketing_order_plan_id,
-                'mop_code'          => $row->marketingOrderPlanDetail->marketingOrderPlan->code,
-                'mopd_id'           => $row->marketing_order_plan_detail_id,
                 'start_date'        => $row->start_date,
                 'end_date'          => $row->end_date,
                 'bom_id'            => $row->bom_id ?? '',
@@ -479,13 +475,13 @@ class ProductionScheduleController extends Controller
                 'item_id'           => $row->item_id,
                 'item_code'         => $row->item->code.' - '.$row->item->name,
                 'qty'               => CustomHelper::formatConditionalQty($row->qty),
-                'qty_source'        => CustomHelper::formatConditionalQty($row->marketingOrderPlanDetail->qty),
                 'uom'               => $row->item->uomUnit->code,
                 'group'             => $row->group,
                 'warehouse_id'      => $row->warehouse_id,
                 'warehouse_name'    => $row->warehouse->name,
                 'note'              => $row->note ?? '',
                 'place_id'          => $po->place_id,
+                'list_warehouse'    => $row->item->warehouseList(),
             ];
         }
 
@@ -562,11 +558,10 @@ class ProductionScheduleController extends Controller
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="14">Daftar Shift & Target Produksi</th>
+                                <th class="center-align" colspan="13">Daftar Shift & Target Produksi</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
-                                <th class="center-align">MOP</th>
                                 <th class="center-align">Shift</th>
                                 <th class="center-align">Kode Item</th>
                                 <th class="center-align">Nama Item</th>
@@ -585,7 +580,6 @@ class ProductionScheduleController extends Controller
         foreach($data->productionScheduleDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align" rowspan="2">'.($key + 1).'</td>
-                <td>'.$row->marketingOrderPlanDetail->marketingOrderPlan->code.'</td>
                 <td>'.$row->shift->code.' - '.$row->shift->name.'</td>
                 <td>'.$row->item->code.'</td>
                 <td>'.$row->item->name.'</td>
@@ -600,7 +594,7 @@ class ProductionScheduleController extends Controller
                 <td class="center-align">'.($row->productionOrder()->exists() ? $row->productionOrder->code : '-').'</td>
             </tr>
             <tr>
-                <td colspan="13">Keterangan : '.$row->note.'</td>
+                <td colspan="12">Keterangan : '.$row->note.'</td>
             </tr>';
         }
 

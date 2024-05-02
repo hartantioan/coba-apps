@@ -261,18 +261,18 @@
                                             :
                                         </td>
                                         <td width="65%">
-                                            {{ CustomHelper::formatConditionalQty($data->productionScheduleDetail->qty).' '.$data->productionScheduleDetail->item->productionUnit->code }}
+                                            {{ CustomHelper::formatConditionalQty($data->productionScheduleDetail->qty).' '.$data->productionScheduleDetail->item->uomUnit->code }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            Gudang & Area
+                                            Gudang
                                         </td>
                                         <td width="1%">
                                             :
                                         </td>
                                         <td>
-                                            {{ $data->warehouse->name.' - '.($data->area()->exists() ? $data->area->name : '-') }}
+                                            {{ $data->warehouse->name }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -316,7 +316,7 @@
                                             :
                                         </td>
                                         <td style="vertical-align: top;">
-                                            {{ $data->productionScheduleDetail->line->code }}
+                                            {{ $data->productionScheduleDetail->productionSchedule->line->code }}
                                         </td>
                                     </tr>
                                 </table>
@@ -339,36 +339,6 @@
                     </table>
                 </div>
                     <!-- product details table-->
-                <div class="invoice-product-details">
-                    <table class="bordered" border="1" width="100%" class="table-data-item" style="border-collapse:collapse">
-                        <thead>
-                            <tr>
-                                <th colspan="6" class="center-align">Daftar Komposisi dari BOM Terbaru</th>
-                            </tr>
-                            <tr>
-                                <th align="center">No.</th>
-                                <th align="center">Bahan/Biaya</th>
-                                <th align="center">Qty</th>
-                                <th align="center">Satuan (Produksi)</th>
-                                <th align="center">Nominal</th>
-                                <th align="center">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($data->productionOrderDetail as $key => $row)
-                            <tr>
-                                <td align="center">{{ ($key + 1) }}</td>
-                                <td align="">{{ $row->item()->exists() ? $row->item->code.' - '.$row->item->name : ($row->coa()->exists() ? $row->coa->code.' - '.$row->coa->name : '') }}</td>
-                                <td align="right">{{ $row->item()->exists() ? CustomHelper::formatConditionalQty($row->qty) : '-' }}</td>
-                                <td align="center">{{ $row->item()->exists() ? $row->item->productionUnit->code : '-' }}</td>
-                                <td align="right">{{ $row->coa()->exists() ? number_format($row->nominal,2,',','.') : '-' }}</td>
-                                <td align="right">{{ $row->coa()->exists() ? number_format($row->total,2,',','.') : '-' }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-
                 <!-- invoice subtotal -->
                 <div class="divider mt-3 mb-3"></div>
                     <div class="invoice-subtotal break-row">

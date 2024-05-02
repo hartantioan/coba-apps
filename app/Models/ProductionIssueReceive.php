@@ -20,6 +20,10 @@ class ProductionIssueReceive extends Model
         'user_id',
         'company_id',
         'production_order_id',
+        'place_id',
+        'shift_id',
+        'line_id',
+        'machine_id',
         'post_date',
         'document',
         'status',
@@ -61,6 +65,26 @@ class ProductionIssueReceive extends Model
     public function productionOrder()
     {
         return $this->belongsTo('App\Models\ProductionOrder', 'production_order_id', 'id')->withTrashed();
+    }
+
+    public function place()
+    {
+        return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
+    }
+    
+    public function line()
+    {
+        return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();
+    }
+
+    public function shift()
+    {
+        return $this->belongsTo('App\Models\Shift', 'shift_id', 'id')->withTrashed();
+    }
+
+    public function machine()
+    {
+        return $this->belongsTo('App\Models\Machine', 'machine_id', 'id')->withTrashed();
     }
 
     public function productionIssueReceiveDetail()

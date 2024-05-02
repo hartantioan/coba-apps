@@ -230,12 +230,11 @@
             <table class="bordered" width="100%">
                 <thead>
                     <tr>
-                        <th colspan="15" class="center-align">Daftar Jadwal Produksi</th>
+                        <th colspan="14" class="center-align">Daftar Jadwal Produksi</th>
                     </tr>
                     <tr>
                         <th class="center-align">Proses</th>
                         <th class="center-align">No.</th>
-                        <th class="center-align" style="min-width:150px !important;">MOP</th>
                         <th class="center-align" style="min-width:150px !important;">Shift</th>
                         <th class="center-align" style="min-width:150px !important;">Kode Item</th>
                         <th class="center-align" style="min-width:150px !important;">Nama Item</th>
@@ -264,7 +263,6 @@
                             @endif
                         </td>
                         <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
-                        <td>{{ $row->marketingOrderPlanDetail->marketingOrderPlan->code }}</td>
                         <td>{{ $row->shift->code.' - '.$row->shift->name }}</td>
                         <td>{{ $row->item->code }}</td>
                         <td>{{ $row->item->name }}</td>
@@ -279,7 +277,7 @@
                         <td class="center-align">{{ ($row->productionOrder()->exists() ? $row->productionOrder->code : '-') }}</td>
                     </tr>
                     <tr>
-                        <td colspan="13">Keterangan : {{ $row->note }}</td>
+                        <td colspan="12">Keterangan : {{ $row->note }}</td>
                     </tr>
                     @endforeach
                 </tbody>

@@ -16,7 +16,6 @@ class ProductionScheduleDetail extends Model
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'production_schedule_id',
-        'marketing_order_plan_detail_id',
         'shift_id',
         'item_id',
         'bom_id',
@@ -32,11 +31,6 @@ class ProductionScheduleDetail extends Model
     public function productionSchedule()
     {
         return $this->belongsTo('App\Models\ProductionSchedule', 'production_schedule_id', 'id')->withTrashed();
-    }
-
-    public function marketingOrderPlanDetail()
-    {
-        return $this->belongsTo('App\Models\MarketingOrderPlanDetail', 'marketing_order_plan_detail_id', 'id')->withTrashed();
     }
 
     public function shift(){

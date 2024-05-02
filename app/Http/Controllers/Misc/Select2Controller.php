@@ -311,6 +311,29 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function itemHasBom(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Item::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%");
+                })->where('status','1')->whereHas('bom')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
+                'code'              => $d->code,
+                'name'              => $d->name,
+                'uom'               => $d->uomUnit->code,
+                'list_warehouse'    => $d->warehouseList(),
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function resource(Request $request)
     {
         $response = [];
@@ -3020,6 +3043,7 @@ class Select2Controller extends Controller {
                     'priority'          => $row->priority,
                     'has_bom'           => $cekBom->exists() ? '1' : '',
                     'place_id'          => $request->place_id,
+                    'list_warehouse'    => $row->item->warehouseList(),
                 ];
             }
             $response[] = [

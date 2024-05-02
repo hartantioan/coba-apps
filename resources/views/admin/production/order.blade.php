@@ -126,7 +126,6 @@
                                                         <th>Line</th>
                                                         <th>Grup</th>
                                                         <th>Gudang</th>
-                                                        <th>Area</th>
                                                         <th>Status</th>
                                                         <th>By</th>
                                                         <th>Operasi</th>
@@ -211,15 +210,6 @@
                                             <option value="">Silahkan pilih Jadwal Produksi</option>
                                         </select>
                                         <label class="active" for="warehouse_id">Gudang</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step8">
-                                        <select class="browser-default" id="area_id" name="area_id">
-                                            <option value="">--kosong--</option>
-                                            @foreach ($area as $row)
-                                                <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        <label class="active" for="area_id">Area</label>
                                     </div>
                                     <div class="col m12">
                                         <div class="row">
@@ -545,7 +535,6 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
-                $('#area_id option[value!=""]').hide();
             }
         });
 
@@ -554,8 +543,6 @@
         });
 
         select2ServerSide('#production_schedule_id', '{{ url("admin/select2/production_schedule") }}');
-
-        $('#area_id option[value!=""]').hide();
 
         $('#production_schedule_detail_id').select2({
             placeholder: '-- Kosong --',
@@ -757,7 +744,6 @@
             
             if(datakuy.is_sales_item){
                 $('#isSalesItem').val(datakuy.is_sales_item);
-                $('#area_id option[value!=""]').show();
                 @if($warehouse)
                     $('#warehouse_id').append(`
                         <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
@@ -790,7 +776,6 @@
                 <option value="">Silahkan pilih Jadwal Produksi</option>
             `);
             $('#isSalesItem').val('');
-            $('#area_id option[value!=""]').hide();
         }
     }
 
@@ -1027,7 +1012,6 @@
                 { name: 'line_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'group', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'warehouse_id', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'area_id', searchable: false, orderable: false, className: 'center-align' },
               { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
@@ -1192,163 +1176,6 @@
     function success(){
         loadDataTable();
         $('#modal1').modal('close');
-    }
-
-    function show(id){
-        $.ajax({
-            url: '{{ Request::url() }}/show',
-            type: 'POST',
-            dataType: 'JSON',
-            data: {
-                id: id
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                loadingOpen('#main');
-            },
-            success: function(response) {
-                loadingClose('#main');
-                $('#modal1').modal('open');
-                $('#temp').val(id);
-                $('#code_place_id').val(response.code_place_id).formSelect();
-                $('#code').val(response.code);
-                $('#post_date').val(response.post_date);
-                $('#company_id').val(response.company_id).formSelect();
-                $('#place_id').val(response.place_id).formSelect();
-                $('#note').val(response.note);
-                $('#production_schedule_id').empty().append(`
-                    <option value="` + response.production_schedule_id + `">` + response.production_schedule_code + `</option>
-                `);
-                $('#production_schedule_detail_id').empty().append(`
-                    <option value="` + response.production_schedule_detail_id + `">` + response.production_schedule_detail_code + `</option>
-                `);
-                $('#body-item').empty();
-                $('#warehouse_id').empty();
-                $('#output-qty,#output-shift,#output-group,#output-line').text('-');
-                if(response.is_sales_item){
-                    @if($warehouse)
-                        $('#warehouse_id').append(`
-                            <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
-                        `);
-                    @else
-                        $('#warehouse_id').append(`
-                            <option value="">Gudang transit tidak ditemukan.</option>
-                        `);
-                    @endif
-                }else{
-                    $.each(response.warehouses, function(i, val) {
-                        $('#warehouse_id').append(`
-                            <option value="` + val.id + `">` + val.name + `</option>
-                        `);
-                    });
-                }
-                $('#output-qty').text(response.qty);
-                $('#output-shift').text(response.shift);
-                $('#output-group').text(response.group);
-                $('#output-line').text(response.line);
-
-                if(response.is_sales_item){
-                    $('#isSalesItem').val(response.is_sales_item);
-                    $('#area_id option[value!=""]').show();
-                    $('#area_id').val(response.area_id);
-                }
-
-                if(response.details.length > 0){
-                    $.each(response.details, function(i, val) {
-                        var count = makeid(10);
-                        let no = $('.row_item').length + 1;
-                        $('#body-item').append(`
-                            <tr class="row_item">
-                                <input type="hidden" name="arr_bom_detail_id[]" value="` + val.id + `">
-                                <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
-                                <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
-                                <input type="hidden" name="arr_qty[]" value="` + val.qty + `">
-                                <input type="hidden" name="arr_nominal[]" value="` + val.nominal + `">
-                                <input type="hidden" name="arr_total[]" value="` + val.total + `">
-                                <td class="center-align">
-                                    ` + no + `.
-                                </td>
-                                <td>
-                                    ` + val.lookable_code + ' - ' + val.lookable_name + `
-                                </td>
-                                <td class="right-align">
-                                    ` + val.qty + `
-                                </td>
-                                <td class="center-align">
-                                    ` + val.unit + `
-                                </td>
-                                <td>
-                                    ` + val.warehouse + `
-                                </td>
-                                <td class="right-align">
-                                    ` + val.stock + `
-                                </td>
-                                <td class="center">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item btn-small" href="javascript:void(0);">
-                                        <i class="material-icons">delete</i>
-                                    </a>
-                                </td>
-                            </tr>
-                        `);
-                    });
-                }
-                
-                $('.modal-content').scrollTop(0);
-                M.updateTextFields();
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('#main');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
-        });
-    }
-
-    function destroy(id){
-        var msg = '';
-        swal({
-            title: "Alasan mengapa anda menghapus!",
-            text: "Anda tidak bisa mengembalikan data yang telah dihapus.",
-            buttons: true,
-            content: "input",
-        })
-        .then(message => {
-            if (message != "" && message != null) {
-                $.ajax({
-                    url: '{{ Request::url() }}/destroy',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: { id : id, msg : message },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        loadingOpen('#main');
-                    },
-                    success: function(response) {
-                        loadingClose('#main');
-                        M.toast({
-                            html: response.message
-                        });
-                        loadDataTable();
-                    },
-                    error: function() {
-                        loadingClose('#main');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
-                        });
-                    }
-                });
-            }
-        });
     }
 
     String.prototype.replaceAt = function(index, replacement) {

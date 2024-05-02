@@ -2238,7 +2238,7 @@
                                                         </td>
                                                     </tr>
                                                 `);
-                                                select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+                                                select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa_no_cash") }}');
                                                 select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
                                                 if(val.place_id){
                                                     $('#arr_place' + count).val(val.place_id);
@@ -2791,7 +2791,7 @@
                 </td>
             </tr>
         `);
-        select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+        select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa_no_cash") }}');
         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
     }
 
@@ -3733,7 +3733,7 @@
                             $('#arr_coa' + count).append(`
                                 <option value="` + val.id + `">` + val.name + `</option>
                             `);
-                            select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+                            select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa_no_cash") }}');
                             if(val.project_id){
                                 $('#arr_project' + count).append(`
                                     <option value="` + val.project_id + `">` + val.project_name + `</option>

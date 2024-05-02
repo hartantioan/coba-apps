@@ -266,6 +266,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('inventory_item', [Select2Controller::class, 'inventoryItem']);
                 Route::get('sales_item', [Select2Controller::class, 'salesItem']);
                 Route::get('coa', [Select2Controller::class, 'coa']);
+                Route::get('coa_no_cash', [Select2Controller::class, 'coaNoCash']);
                 Route::get('inventory_coa_issue', [Select2Controller::class, 'inventoryCoaIssue']);
                 Route::get('inventory_coa_receive', [Select2Controller::class, 'inventoryCoaReceive']);
                 Route::get('coa_journal', [Select2Controller::class, 'coaJournal']);

@@ -330,25 +330,25 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12 row">
-                        <div class="col s12 row">
-                            <div class="input-field col s12">
+                        <div class="col s12 m8 row">
+                            <div class="input-field col s12 m4">
                                 <input type="hidden" id="temp" name="temp">
                                 <input id="code" name="code" type="text" placeholder="Kode Item">
                                 <label class="active" for="code">Kode</label>
                             </div>
-                            <div class="input-field col s12">
+                            <div class="input-field col s12 m4">
                                 <input id="name" name="name" type="text" placeholder="Nama Item">
                                 <label class="active" for="name">Nama</label>
                             </div>
-                            <div class="input-field col s12">
+                            <div class="input-field col s12 m4">
                                 <input id="other_name" name="other_name" type="text" placeholder="Nama Item (Ex : Spoon)">
                                 <label class="active" for="other_name">Nama Item (Bahasa Asing)</label>
                             </div>
-                            <div class="input-field col s12">
+                            <div class="input-field col s12 m4">
                                 <input id="note" name="note" type="text" placeholder="Keterangan : sparepart, aktiva, tools, etc">
                                 <label class="active" for="note">Keterangan</label>
                             </div>
-                            <div class="input-field col s12 unit-inputs">
+                            <div class="input-field col s12 m4 unit-inputs">
                                 <select class="select2 browser-default" id="item_group_id" name="item_group_id">
                                     @foreach($group->whereNull('parent_id') as $c)
                                             @if(!$c->childSub()->exists())
@@ -390,11 +390,11 @@
                                 </select>
                                 <label class="active" for="item_group_id">Grup Item</label>
                             </div>
-                            <div class="input-field col s12">
+                            <div class="input-field col s12 m4">
                                 <input id="tolerance_gr" name="tolerance_gr" type="text" value="0" onkeyup="formatRupiah(this);">
                                 <label class="active" for="tolerance_gr">Toleransi Penerimaan Qty Barang (%)</label>
                             </div>
-                            <div class="input-field col s12">
+                            <div class="input-field col s12 m4">
                                 <div class="switch mb-1">
                                     <label for="status">Status</label>
                                     <label class="right">
@@ -406,7 +406,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col s12 row">
+                        <div class="col s12 m4 row">
                             <div class="input-field col s12" style="margin:0 0 0 0 !important;">
                                 <div class="switch">
                                     <label for="is_inventory_item">Item untuk Inventori</label>
@@ -463,7 +463,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col s12 row">
+                        <div class="col s12 m7 row">
                             <div class="col s12">
                                 <div class="input-field col s12 unit-inputs">
                                     <select class="select2 browser-default" id="uom_unit" name="uom_unit" onchange="getUnitStock();">
@@ -507,7 +507,7 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="col s12">
+                        <div class="col s12 m5">
                             <div class="center">
                                 <h6>Stok Buffer (Satuan Stok/terkecil)</h6>
                             </div>
@@ -535,7 +535,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="input-field col s12" id="item-sale-show" style="display:none;">
+                        <div class="input-field col s12 m8" id="item-sale-show" style="display:none;">
                             <div class="card-alert card green">
                                 <div class="card-content white-text">
                                     <p>Info : Kode & nama item akan otomatis terbuat dari gabungan komposisi kode & nama master data dibawah ini.</p>

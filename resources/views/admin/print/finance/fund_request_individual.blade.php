@@ -10,7 +10,11 @@
             {
                 font-family: Tahoma, "Trebuchet MS", sans-serif;
             }
-
+            @font-face { font-family: 'china'; font-style: normal; src: url({{ storage_path('fonts/chinese_letter.ttf') }}) format('truetype'); }
+            body { font-family: 'china', Tahoma, Arial, sans-serif;}
+            .break-row {
+                page-break-inside: avoid;
+            }
             .break-row {
                 page-break-inside: avoid;
             }

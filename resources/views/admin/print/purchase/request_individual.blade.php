@@ -5,7 +5,10 @@
 <html lang="en">
     <head>
         <style>
-
+            @font-face { font-family: 'china'; font-style: normal; src: url({{ storage_path('fonts/chinese_letter.ttf') }}) format('truetype'); }
+            body { font-family: 'china', Tahoma, Arial, sans-serif;}
+           @font-face { font-family: 'china'; font-style: normal; src: url({{ storage_path('fonts/chinese_letter.ttf') }}) format('truetype'); }
+            body { font-family: 'china', Tahoma, Arial, sans-serif;}
             .break-row {
                 margin-top: 2%;
                 page-break-inside: avoid;

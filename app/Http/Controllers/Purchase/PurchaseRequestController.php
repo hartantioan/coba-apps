@@ -985,9 +985,10 @@ class PurchaseRequestController extends Controller
             $img_base_64 = base64_encode($image_temp);
             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
             $data["image"]=$path_img;
-            $pdf = Pdf::setPaper('a5', 'landscape');
-            $pdf->set_option('fontDir', storage_path('fonts'));
-            $pdf->loadView('admin.print.purchase.request_individual', $data);
+            // $pdf = Pdf::setPaper('a5', 'landscape');
+          
+            // $pdf->loadView('admin.print.purchase.request_individual', $data);
+            $pdf = Pdf::loadView('admin.print.purchase.request_individual', $data)->setPaper('a5', 'landscape');
             $pdf->render();
     
    

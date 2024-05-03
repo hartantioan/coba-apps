@@ -1,0 +1,11 @@
+{
+    "chineseletter": {
+        "normal": "storage\/fonts\/chinese_letter",
+        "bold": "storage\/fonts\/chinese_letter",
+        "italic": "storage\/fonts\/chinese_letter",
+        "bold_italic": "storage\/fonts\/chinese_letter"
+    },
+    "china": {
+        "normal": "china_normal_4447150958c4ffb94ada3c427e41b22a"
+    }
+}

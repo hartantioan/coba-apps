@@ -982,6 +982,13 @@ class PaymentRequestController extends Controller
                         ]);
                     } */
 
+                    if($query->hasChildDocument()){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Payment Request telah dipakai pada dokumen lain, anda tidak bisa melakukan perubahan.'
+                        ]);
+                    }
+
                     if(!CustomHelper::checkLockAcc($query->post_date)){
                         return response()->json([
                             'status'  => 500,

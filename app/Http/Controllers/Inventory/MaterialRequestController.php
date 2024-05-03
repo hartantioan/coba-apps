@@ -551,6 +551,21 @@ class MaterialRequestController extends Controller
             ];
         } else {
 
+            $passedQty = true;
+
+            foreach($request->arr_qty as $key => $row){
+                if(str_replace(',','.',str_replace('.','',$row)) == 0){
+                   $passedQty = false; 
+                }
+            }
+
+            if(!$passedQty){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Qty tidak boleh 0.'
+                ]);
+            }
+
 			if($request->temp){
                 DB::beginTransaction();
                 try {

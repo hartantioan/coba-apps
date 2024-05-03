@@ -4,12 +4,17 @@
 <!doctype html>
 <html lang="en">
     <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
         <style>
-
+            @font-face { font-family: 'Microsoft Yaheis'; font-style: normal; src: url({{ storage_path('fonts/MicrosoftYahei.ttf') }}) format('truetype'); }
+            body { font-family: 'Microsoft YaHeis', Tahoma, Arial, sans-serif;}
+            
             .break-row {
                 margin-top: 2%;
                 page-break-inside: avoid;
             }
+            /* body { font-family:Tahoma, "Trebuchet MS", sans-serif;} */
+            
 
             .row {
             margin-left:-5px;

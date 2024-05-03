@@ -10,6 +10,8 @@
                 font-family: Tahoma, "Trebuchet MS", sans-serif;
             }
 
+             @font-face { font-family: 'Microsoft Yaheis'; font-style: normal; src: url({{ storage_path('fonts/MicrosoftYahei.ttf') }}) format('truetype'); }
+            body { font-family: 'Microsoft YaHeis', Tahoma, Arial, sans-serif;}
             .break-row {
                 page-break-inside: avoid;
             }

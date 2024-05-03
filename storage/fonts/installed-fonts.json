@@ -1,0 +1,14 @@
+{
+    "wt014": {
+        "normal": "storage\/fonts\/wt014",
+        "bold": "storage\/fonts\/wt014",
+        "italic": "storage\/fonts\/wt014",
+        "bold_italic": "storage\/fonts\/wt014"
+    },
+    "wt014s": {
+        "normal": "wt014s_normal_fccfa306f5f00980bd75d91ca6af6481"
+    },
+    "microsoft yaheis": {
+        "normal": "microsoft_yaheis_normal_dd9b3917ab35a0e2b0c1bd7abc3d3ea6"
+    }
+}

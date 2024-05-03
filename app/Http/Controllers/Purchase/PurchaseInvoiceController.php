@@ -561,7 +561,7 @@ class PurchaseInvoiceController extends Controller
                 $currency_rate = $datagr->latestCurrencyRate();
                 foreach($datagr->goodReceiptDetail as $rowdetail){
                     if($rowdetail->balanceTotalInvoice() > 0){
-                        $price = round($rowdetail->total / $rowdetail->qty,2);
+                        $price = round($rowdetail->total / $rowdetail->qty,5);
                         $details[] = [
                             'type'          => 'good_receipt_details',
                             'id'            => $rowdetail->id,

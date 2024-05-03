@@ -168,11 +168,11 @@
                         <fieldset>
                             <legend>1. Informasi Utama</legend>
                             <div class="row">
-                                <div class="input-field col m2 s12">
+                                <div class="input-field col m2 s12 step1">
                                     <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                                     <label class="active" for="code">No. Dokumen</label>
                                 </div>
-                                <div class="input-field col m1 s12">
+                                <div class="input-field col m1 s12 step2">
                                     <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
                                         <option value="">--Pilih--</option>
                                         @foreach ($place as $rowplace)
@@ -180,7 +180,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m3 s12 step3">
                                     <select class="form-control" id="company_id" name="company_id">
                                         @foreach ($company as $rowcompany)
                                             <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
@@ -188,36 +188,36 @@
                                     </select>
                                     <label class="" for="company_id">Perusahaan</label>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m3 s12 step4">
                                     <select class="form-control" id="type" name="type" onchange="applyBpList();">
                                         <option value="1">Pembayaran</option>
                                         <option value="2">Pinjaman</option>
                                     </select>
                                     <label class="" for="type">Tipe Permohonan</label>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m3 s12 step5">
                                     <select class="form-control" id="document_status" name="document_status">
                                         <option value="2">Lengkap</option>
                                         <option value="3">Tidak Lengkap</option>
                                     </select>
                                     <label class="" for="type">Status Dokumen</label>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m3 s12 step6">
                                     <input type="hidden" id="temp" name="temp">
                                     <input type="hidden" id="tempLimit" value="0">
                                     <select class="browser-default" id="account_id" name="account_id" onchange="getAccountInfo();"></select>
                                     <label class="active" for="account_id">Partner Bisnis</label>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m3 s12 step7">
                                     <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);loadCurrency();">
                                     <label class="active" for="post_date">Tgl. Posting</label>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m3 s12 step8">
                                     <input id="required_date" name="required_date" max="{{ date('9999'.'-12-31') }}" type="date" placeholder="Tgl. posting">
                                     <label class="active" for="required_date">Tgl. Request Pembayaran</label>
                                 </div>
                                 
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m3 s12 step9">
                                     <select class="form-control" id="payment_type" name="payment_type">
                                         <option value="2">Transfer</option>
                                         <option value="1">Tunai</option>
@@ -225,23 +225,23 @@
                                     </select>
                                     <label class="" for="payment_type">Tipe Pembayaran</label>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m3 s12 step10">
                                     <input id="document_date" name="document_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. dokumen">
                                     <label class="active" for="document_date">Tgl. Dokumen (Opsional)</label>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m3 s12 step11">
                                     <input id="tax_no" name="tax_no" type="text" placeholder="Nomor faktur pajak...">
                                     <label class="active" for="tax_no">No. Faktur Pajak (Opsional)</label>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m3 s12 step12">
                                     <input id="tax_cut_no" name="tax_cut_no" type="text" placeholder="Nomor bukti potong...">
                                     <label class="active" for="tax_cut_no">No. Bukti Potong (Opsional)</label>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m3 s12 step13">
                                     <input id="cut_date" name="cut_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Bukti potong">
                                     <label class="active" for="cut_date">Tgl. Bukti Potong (Opsional)</label>
                                 </div>
-                                <div class="file-field input-field col m12 s12">
+                                <div class="file-field input-field col m12 s12 step14">
                                     <div class="btn">
                                         <span>Lampiran</span>
                                         <input type="file" name="file[]" id="file" multiple accept=".pdf, .xlsx, .xls, .jpeg, .jpg, .png, .gif, .word">
@@ -250,23 +250,23 @@
                                         <input class="file-path validate" type="text">
                                     </div>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m3 s12 step15">
                                     <input id="spk_no" name="spk_no" type="text" placeholder="Nomor SPK...">
                                     <label class="active" for="spk_no">No. SPK (Opsional)</label>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m3 s12 step16">
                                     <input id="document_no" name="document_no" type="text" placeholder="No. Dokumen">
                                     <label class="active" for="document_no">No. Dokumen (Opsional)</label>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m3 s12 step17">
                                     <input id="invoice_no" name="invoice_no" type="text" placeholder="Nomor Invoice dari Suppplier/Vendor">
                                     <label class="active" for="invoice_no">No. Invoice (Opsional)</label>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m3 s12 step18">
                                     <textarea id="note" name="note" class="materialize-textarea" placeholder="Ulasan singkat produk..."></textarea>
                                     <label class="active" for="note">Keterangan</label>
                                 </div>
-                                <div class="input-field col m3 s12 right-align">
+                                <div class="input-field col m3 s12 right-align step19">
                                     <h6>Limit BS : <b><span id="limit">0,00</span></b></h6>
                                 </div>
                             </div>
@@ -277,7 +277,7 @@
                             <legend>2. Rekening & Mata Uang</legend>
                             <div class="row">
                                 <div class="col m12">
-                                    <div class="input-field col m3 s12">
+                                    <div class="input-field col m3 s12 step20">
                                         <select class="form-control" id="is_reimburse" name="is_reimburse" onchange="changeReimburse()">
                                             <option value="2">Tidak</option>
                                             <option value="1">Ya</option>
@@ -286,28 +286,28 @@
                                     </div>
                                 </div>
                                 <div class="col m12">
-                                    <div class="input-field col m3 s12">
+                                    <div class="input-field col m3 s12 step21">
                                         <select class="browser-default" id="user_bank_id" name="user_bank_id" onchange="getRekening()">
                                             <option value="">--Pilih Partner Bisnis-</option>
                                         </select>
                                         <label class="active" for="user_bank_id">Pilih Dari Daftar</label>
                                     </div>
-                                    <div class="input-field col m3 s12">
+                                    <div class="input-field col m3 s12 step22">
                                         <input id="bank_account" name="bank_account" type="text" placeholder="Bank Tujuan">
                                         <label class="active" for="bank_account">Bank Tujuan</label>
                                     </div>
-                                    <div class="input-field col m3 s12">
+                                    <div class="input-field col m3 s12 step23">
                                         <input id="no_account" name="no_account" type="text" placeholder="Rekening atas nama">
                                         <label class="active" for="no_account">No. Rek. Penerima</label>
                                     </div>
-                                    <div class="input-field col m3 s12">
+                                    <div class="input-field col m3 s12 step24">
                                         <input id="name_account" name="name_account" type="text" placeholder="Rekening atas nama">
                                         <label class="active" for="name_account">Rekening Penerima</label>
                                     </div>
                                 </div>
                                 <div class="col m12">
                                     <h6>Mata Uang</h6>
-                                    <div class="input-field col m3 s12">
+                                    <div class="input-field col m3 s12 step25">
                                         <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
                                             @foreach ($currency as $row)
                                                 <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
@@ -315,7 +315,7 @@
                                         </select>
                                         <label class="" for="currency_id">Mata Uang</label>
                                     </div>
-                                    <div class="input-field col m3 s12">
+                                    <div class="input-field col m3 s12 step26">
                                         <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                                         <label class="active" for="currency_rate">Konversi</label>
                                     </div>
@@ -327,7 +327,7 @@
                         <fieldset style="min-width: 100%;overflow:auto;">
                             <legend>3. Detail Dokumen</legend>
                             <div class="row">
-                                <div class="col m12 s12">
+                                <div class="col m12 s12 step27">
                                     <p class="mt-2 mb-2">
                                         <h4>Detail Produk</h4>
                                         <table class="bordered" id="table-detail" style="width:2800px;font-size:0.9rem !important;">
@@ -370,7 +370,7 @@
                             <legend>4. Konfirmasi</legend>
                             <div class="row">
                                 <div class="col m12 s12 row">
-                                    <div class="input-field col m9 s12">
+                                    <div class="input-field col m9 s12 step28">
                                         <p class="mt-2 mb-2">
                                             <h6>Checklist Lampiran</h6>
                                             @foreach ($menu->checklistDocument as $row)
@@ -387,7 +387,7 @@
                                             @endforeach
                                         </p>
                                     </div>
-                                    <div class="input-field col m3 s12">
+                                    <div class="input-field col m3 s12 step29">
                                         <table width="100%" class="bordered">
                                             <thead>
                                                 <tr>
@@ -429,7 +429,8 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+        <button class="btn waves-effect waves-light purple btn-panduan mr-1" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+        <button class="btn waves-effect waves-light submit step30 mr-1" onclick="save();">Simpan <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-2">Close</a>
     </div>
 </div>
@@ -1584,5 +1585,167 @@
                 });
             }
         });
+    }
+
+    function startIntro(){
+        introJs().setOptions({
+            exitOnOverlayClick : false,
+            steps: [
+                {
+                    title : 'Personal Fund Reques / Permohonan Dana',
+                    intro : 'Form ini digunakan untuk mengelola permintaan dana untuk kebutuhan pelunasan supplier, down payment, dan piutang karyawan BS.'
+                },
+                {
+                    title : 'Nomor Dokumen',
+                    element : document.querySelector('.step1'),
+                    intro : 'Nomor dokumen wajib diisikan, dengan kombinasi 4 huruf kode dokumen, tahun pembuatan dokumen, kode plant, serta nomor urut. Nomor ini bersifat unik, tidak akan sama, dan nomor urut paling belakang akan ter-reset secara otomatis berdasarkan tahun tanggal post.'
+                },
+                {
+                    title : 'Kode Plant',
+                    element : document.querySelector('.step2'),
+                    intro : 'Pilih kode plant untuk nomor dokumen bisa secara otomatis ter-generate.'
+                },
+                {
+                    title : 'Perusahaan',
+                    element : document.querySelector('.step3'),
+                    intro : 'Perusahaan aktif.' 
+                },
+                {
+                    title : 'Tipe Permohonan',
+                    element : document.querySelector('.step4'),
+                    intro : 'Pilih Pembayaran untuk permohonan dana pembayaran supplier/vendor, pilih pinjaman untuk permohonan dana karyawan (BS).' 
+                },
+                {
+                    title : 'Status Dokumen',
+                    element : document.querySelector('.step5'),
+                    intro : 'Pilih Lengkap jika dokumen yang diterima lengkap (bon, bukti transfer dll), dan Tidak Lengkap jika dokumen yang anda terima dari transaksi tidak lengkap.' 
+                },
+                {
+                    title : 'Partner Bisnis',
+                    element : document.querySelector('.step6'),
+                    intro : 'Target vendor/karyawan yang akan mendapatkan dana.' 
+                },
+                {
+                    title : 'Tgl. Posting',
+                    element : document.querySelector('.step7'),
+                    intro : 'Tanggal posting dokumen.' 
+                },
+                {
+                    title : 'Tgl. Request Pembayaran',
+                    element : document.querySelector('.step8'),
+                    intro : 'Tanggal permintaan bayar / transfer sebagai informasi untuk Finance.' 
+                },
+                {
+                    title : 'Tipe pembayaran',
+                    element : document.querySelector('.step9'),
+                    intro : 'Tipe pembayaran.' 
+                },
+                {
+                    title : 'Tgl. Dokumen',
+                    element : document.querySelector('.step10'),
+                    intro : 'Tanggal dokumen terlampir.' 
+                },
+                {
+                    title : 'No. Faktur Pajak.',
+                    element : document.querySelector('.step11'),
+                    intro : 'No faktur pajak yang didapatkan dari vendor jika ada.' 
+                },
+                {
+                    title : 'No. Bukti Potong',
+                    element : document.querySelector('.step12'),
+                    intro : 'No bukti potong pajak yang didapatkan dari vendor jika ada.' 
+                },
+                {
+                    title : 'Tgl. Bukti Potong',
+                    element : document.querySelector('.step13'),
+                    intro : 'Tanggal bukti potong pajak.' 
+                },                
+                {
+                    title : 'Lampiran',
+                    element : document.querySelector('.step14'),
+                    intro : 'Silahkan lampirkan file, dalam bentuk gambar, pdf, atau file excel. Maksimal ukuran masing-masing file 7Mb.'
+                },
+                {
+                    title : 'No. SPK',
+                    element : document.querySelector('.step15'),
+                    intro : 'No. referensi dokumen surat jika ada.'
+                },
+                {
+                    title : 'No. Dokumen',
+                    element : document.querySelector('.step16'),
+                    intro : 'Nomor dokumen referensi' 
+                },
+                {
+                    title : 'No. Invoice',
+                    element : document.querySelector('.step17'),
+                    intro : 'Nomor invoice dari bukti yang diterima.' 
+                },
+                {
+                    title : 'Keterangan',
+                    element : document.querySelector('.step18'),
+                    intro : 'Keterangan tambahan untuk menjelaskan secara keseluruhan permohonan dana.' 
+                },
+                {
+                    title : 'Limit BS/Kredit',
+                    element : document.querySelector('.step19'),
+                    intro : 'Limit BS Karyawan atau limit kredit vendor.' 
+                },
+                {
+                    title : 'Apakah Reimburse?',
+                    element : document.querySelector('.step20'),
+                    intro : 'Silahkan pilih Ya, untuk menampilkan rekening seluruh partner bisnis.' 
+                },
+                {
+                    title : 'Daftar rekening',
+                    element : document.querySelector('.step21'),
+                    intro : 'Daftar rekening yang bisa ditarik untuk tujuan jika tipe pembayaran adalah transfer.' 
+                },
+                {
+                    title : 'Bank Tujuan',
+                    element : document.querySelector('.step22'),
+                    intro : 'Nama bank tujuan.' 
+                },
+                {
+                    title : 'No. Rekening Penerima',
+                    element : document.querySelector('.step23'),
+                    intro : 'Nomor rekening penerima.' 
+                },
+                {
+                    title : 'Rekening Penerima',
+                    element : document.querySelector('.step24'),
+                    intro : 'Atas nama pemilik rekening.' 
+                },
+                {
+                    title : 'Mata uang',
+                    element : document.querySelector('.step25'),
+                    intro : 'Mata uang transaksi'
+                },
+                {
+                    title : 'Konversi',
+                    element : document.querySelector('.step26'),
+                    intro : 'Nilai konversi / kurs yang otomatis terisi pada saat pengguna memilih mata uang dan tanggal posting.'
+                },
+                {
+                    title : 'Detail produk',
+                    element : document.querySelector('.step27'),
+                    intro : 'Detail produk/item/rincian biaya sesuai dokumen yang anda inginkan.'
+                },
+                {
+                    title : 'Checklist lampiran',
+                    element : document.querySelector('.step28'),
+                    intro : 'List checklist lampiran, silahkan centang sesuai dokumen yang ada.' 
+                },
+                {
+                    title : 'Total',
+                    element : document.querySelector('.step29'),
+                    intro : 'Total keseluruhan pajak PPN PPh, Grandtotal.'
+                },
+                {
+                    title : 'Tombol Simpan',
+                    element : document.querySelector('.step30'),
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                },
+            ]
+        }).start();
     }
 </script>

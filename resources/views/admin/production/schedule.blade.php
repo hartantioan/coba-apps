@@ -274,12 +274,12 @@
                             <div class="col s12">
                                 <fieldset style="min-width: 100%;">
                                     <legend>4. Jadwal Produksi</legend>
-                                    <div class="col m12 s12 step11" style="overflow:auto;width:100% !important;">
-                                        <div class="card-alert card gradient-45deg-purple-amber">
-                                            <div class="card-content white-text">
-                                                <p>Info : Item yang muncul pada jadwal produksi dibawah adalah, daftar item yang hanya memiliki BOM yang aktif.</p>
-                                            </div>
+                                    <div class="card-alert card gradient-45deg-purple-amber">
+                                        <div class="card-content white-text">
+                                            <p>Info : Item yang muncul pada jadwal produksi dibawah adalah, daftar item yang hanya memiliki BOM yang aktif.</p>
                                         </div>
+                                    </div>
+                                    <div class="col m12 s12 step11" style="overflow:auto;width:100% !important;">
                                         <p class="mt-2 mb-2">
                                             <table class="bordered" style="min-width:2500px;">
                                                 <thead>
@@ -849,17 +849,15 @@
             success: function(response) {
                 $('.row_item[data-id="' + id + '"]').remove();
                 if($('.row_item').length == 0){
-                    $('#body-item').empty().append(`
-                        <tr id="last-row-item">
-                            <td colspan="9">
-                                Silahkan tambahkan Marketing Order Produksi...
-                            </td>
-                        </tr>
-                    `);
-                    $('#marketing_order_plan_id').empty();
-                    $('#data-foot').empty().append(`
-                        Silahkan tambahkan Marketing Order Produksi...
-                    `);
+                    if($('#last-row-item').length == 0){
+                        $('#total-row-target').before(`
+                            <tr id="last-row-item">
+                                <td colspan="9">
+                                    Silahkan tambahkan Marketing Order Produksi...
+                                </td>
+                            </tr>
+                        `);
+                    }
                 }
             },
             error: function() {
@@ -1021,11 +1019,17 @@
                                 <tr class="row_item" data-id="` + mop.id + `">
                                     <input type="hidden" name="arr_id[]" id="arr_id` + count + `" value="` + val.mopd_id + `">
                                     <td>
+                                        ` + mop.code + `
+                                    </td>
+                                    <td>
                                         ` + val.item_code + ` - ` + val.item_name + `
                                         ` + ( val.has_bom ? '' : '<br><span style="color:red;font-weight:800;">Belum memiliki BOM.</span>' ) + `<br>
                                     </td>
                                     <td class="right-align">
                                         <input name="arr_qty[]" onfocus="emptyThis(this);" id="arr_qty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" required style="width:100%;text-align:right;" readonly>
+                                    </td>
+                                    <td class="right-align">
+                                        0,000
                                     </td>
                                     <td class="center-align">
                                         ` + val.uom + `
@@ -1645,11 +1649,17 @@
                             <tr class="row_item" data-id="` + val.id + `">
                                 <input type="hidden" name="arr_id[]" id="arr_id` + count + `" value="` + val.mopd_id + `">
                                 <td>
+                                    ` + val.mop_code + `
+                                </td>
+                                <td>
                                     ` + val.item_code + ` - ` + val.item_name + `
                                     ` + ( val.has_bom ? '' : '<br><span style="color:red;font-weight:800;">Belum memiliki BOM.</span>' ) + `<br>
                                 </td>
                                 <td class="right-align">
                                     <input name="arr_qty[]" onfocus="emptyThis(this);" id="arr_qty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" required style="width:100%;text-align:right;" readonly>
+                                </td>
+                                <td class="right-align">
+                                    0,000
                                 </td>
                                 <td class="center-align">
                                     ` + val.uom + `

@@ -42,6 +42,16 @@ class BomDetail extends Model
         return $type;
     }
 
+    public function name(){
+        $type = match ($this->lookable_type) {
+            'items'     => $this->lookable->code.' - '.$this->lookable->name,
+            'resources' => $this->lookable->code.' - '.$this->lookable->name,
+            default     => 'INVALID',
+        };
+  
+        return $type;
+    }
+
 
     public function item(){
         if($this->lookable_type == 'items'){

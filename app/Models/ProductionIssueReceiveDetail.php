@@ -24,9 +24,16 @@ class ProductionIssueReceiveDetail extends Model
         'qty',
         'nominal',
         'total',
+        'qty_planned',
+        'nominal_planned',
+        'total_planned',
         'type',
         'from_item_stock_id',
         'batch_no',
+        'place_id',
+        'line_id',
+        'warehouse_id',
+        'area_id',
     ];
 
     public function productionIssueReceive()
@@ -40,6 +47,22 @@ class ProductionIssueReceiveDetail extends Model
 
     public function itemStock(){
         return $this->belongsTo('App\Models\ItemStock','from_item_stock_id','id');
+    }
+
+    public function place(){
+        return $this->belongsTo('App\Models\Place','place_id','id');
+    }
+
+    public function line(){
+        return $this->belongsTo('App\Models\Line','line_id','id');
+    }
+
+    public function warehouse(){
+        return $this->belongsTo('App\Models\Warehouse','warehouse_id','id');
+    }
+
+    public function area(){
+        return $this->belongsTo('App\Models\Area','area_id','id');
     }
 
     public function bom(){

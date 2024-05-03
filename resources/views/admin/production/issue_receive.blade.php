@@ -268,7 +268,7 @@
                                     <div class="col m12 mt-1">
                                         <div class="row">
                                             <div class="col m4 s12">
-                                                Target Item FG : <b id="output-fg">-</b>
+                                                Target Item SFG/FG : <b id="output-fg">-</b>
                                             </div>
                                             <div class="col m4 s12">
                                                 Qty : <b id="output-qty">-</b>
@@ -305,30 +305,18 @@
                                                             <th class="center">Plant</th>
                                                             <th class="center">Line</th>
                                                             <th class="center">Gudang</th>
+                                                            <th class="center">Area</th>
                                                             <th class="center">Shading</th>
                                                             <th class="center">Batch</th>
-                                                            <th class="center">Hapus</th>
-                                                        </tr>
+                                                       </tr>
                                                     </thead>
                                                     <tbody id="body-item-receive">
                                                         <tr id="last-row-item-receive">
-                                                            <td class="center-align" colspan="11">
+                                                            <td colspan="11">
                                                                 Silahkan tambahkan Order Produksi untuk memulai...
                                                             </td>
                                                         </tr>
                                                     </tbody>
-                                                    <tfoot>
-                                                        <tr>
-                                                            <th colspan="11">
-                                                                <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addSfg()" href="javascript:void(0);">
-                                                                    <i class="material-icons left">add</i> Tambah SFG
-                                                                </a>
-                                                                <a class="waves-effect waves-light green btn-small mb-1 mr-1" onclick="addFg()" href="javascript:void(0);">
-                                                                    <i class="material-icons left">add</i> Tambah FG
-                                                                </a>
-                                                            </th>
-                                                        </tr>
-                                                    </tfoot>
                                                 </table>
                                             </p>
                                         </div>
@@ -756,7 +744,7 @@
                 `);
                 $('#body-item-receive').empty().append(`
                     <tr id="last-row-item-receive">
-                        <td class="center-align" colspan="11">
+                        <td colspan="11">
                             Silahkan tambahkan Order Produksi untuk memulai...
                         </td>
                     </tr>
@@ -975,7 +963,7 @@
                 `);
                 $('#body-item-receive').empty().append(`
                     <tr id="last-row-item-receive">
-                        <td class="center-align" colspan="11">
+                        <td colspan="11">
                             Silahkan tambahkan Order Produksi untuk memulai...
                         </td>
                     </tr>
@@ -1027,19 +1015,87 @@
                             </div>
                         `);
 
-                        /* $('.row_item_issue,.row_item_receive').remove();
-                        
                         $('#last-row-item-issue,#last-row-item-receive').remove();
 
-                        let no_issue = $('.row_item_issue').length + 1;
-                        let no_receive = $('.row_item_receive').length + 1;
+                        var count = makeid(10);
 
-                        $.each(datakuy.detail_issue, function(i, val) {
+                        let datalist = `<datalist id="list-shading` + count + `">`;
+                        if(datakuy.list_shading.length > 0){
+                            $.each(datakuy.list_shading, function(i, valkuy) {
+                                datalist += `<option value="` + valkuy.code + `">` + valkuy.code + `</option>`;
+                            });
+                        }
+                        datalist += `</datalist>`;
+
+                        let no_receive = $('.row_item_receive').length + 1;
+                        
+                        $('#body-item-receive').append(`
+                            <tr class="row_item_receive" data-id="` + $('#production_order_id').val() + `">
+                                <input type="hidden" name="arr_type[]" value="2">
+                                <input type="hidden" name="arr_lookable_type[]" value="items">
+                                <input type="hidden" name="arr_lookable_id[]" value="` + datakuy.item_receive_id + `">
+                                <input type="hidden" name="arr_production_order_id[]" value="` + datakuy.id + `">
+                                <input type="hidden" name="arr_bom_id[]" value="` + datakuy.bom_id + `">
+                                <input type="hidden" name="arr_nominal[]" value="0,00">
+                                <input type="hidden" name="arr_total[]" value="0,00">
+                                <input type="hidden" name="arr_place[]" value="` + datakuy.place_id + `">
+                                <input type="hidden" name="arr_line[]" value="` + datakuy.line_id + `">
+                                <input type="hidden" name="arr_warehouse[]" value="` + datakuy.warehouse_id + `">
+                                <td class="center-align">
+                                    ` + no_receive + `
+                                </td>
+                                <td>
+                                    ` + datakuy.item_receive_code + ` - ` + datakuy.item_receive_name + `
+                                </td>
+                                <td class="right-align">
+                                    ` + datakuy.item_receive_qty + `
+                                </td>
+                                <td class="center">
+                                    <div class="input-field col s10">
+                                        <input class="browser-default" name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + datakuy.item_receive_qty + `" onkeyup="formatRupiah(this);countRow(this);" style="text-align:right;min-width:100% !important;" id="rowQty`+ count +`" data-id="` + count + `" required>
+                                    </div>
+                                </td>
+                                <td class="center-align">
+                                    ` + datakuy.item_receive_unit_uom + `
+                                </td>
+                                <td class="center-align">
+                                    ` + datakuy.place_code + `
+                                </td>
+                                <td class="center-align">
+                                    ` + datakuy.line_code + `
+                                </td>
+                                <td class="center-align">
+                                    ` + datakuy.warehouse_name + `
+                                </td>
+                                <td>
+                                    ` + (datakuy.is_fg ? `<select class="browser-default" id="arr_area` + count + `" name="arr_area[]">
+                                        <option value="">--Kosong--</option>
+                                        @foreach ($area as $rowarea)
+                                            <option value="{{ $rowarea->id }}">{{ $rowarea->name }}</option>
+                                        @endforeach
+                                    </select>` : `<select class="browser-default" id="arr_area` + count + `" name="arr_area[]">
+                                        <option value="">--Kosong--</option>
+                                    </select>`) + `
+                                </td>
+                                <td class="center">
+                                    <input list="list-shading` + count + `" name="arr_shading[]" class="browser-default" id="arr_shading` + count + `" type="text" placeholder="Kode Shading..." style="width:100%;" required>
+                                    ` + datalist + `
+                                </td>
+                                <td class="center">
+                                    <input name="arr_batch[]" class="browser-default" type="text" placeholder="Nomor batch..." style="width:100%;" required>
+                                </td>
+
+                            </tr>
+                        `);
+
+                        let no_issue = $('.row_item_issue').length + 1;
+
+                        $.each(datakuy.bom_detail, function(i, val) {
                             var count = makeid(10);
                             let optionStock = `<select class="browser-default" id="arr_item_stock_id` + count + `" name="arr_item_stock_id[]">`;
                             if(val.list_stock.length > 0){
                                 $.each(val.list_stock, function(i, valkuy) {
-                                    optionStock += `<option value="` + valkuy.id + `" data-qty="` + valkuy.qty_production_raw + `">` + valkuy.warehouse + ` - ` + valkuy.qty_production + `</option>`;
+                                    optionStock += `<option value="` + valkuy.id + `" data-qty="` + valkuy.qty_raw + `">` + valkuy.warehouse + ` - ` + valkuy.qty + `</option>`;
                                 });
                             }else{
                                 optionStock += `<option value="">--Maaf, item ini tidak memiliki stock--</option>`;
@@ -1061,16 +1117,16 @@
                                         ` + no_issue + `
                                     </td>
                                     <td>
-                                        ` + val.lookable_code + ` - ` + val.lookable_name + `
+                                        ` + val.name + `
                                     </td>
                                     <td class="right-align">
-                                        ` + val.qty + `
+                                        ` + val.qty_planned + `
                                     </td>
                                     <td class="center">
-                                        ` + (val.lookable_type == 'items' ? `<input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);checkRowQty('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required>` : '-') + `
+                                        <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_planned + `" onkeyup="formatRupiah(this);checkRowQty('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required>
                                     </td>
                                     <td class="center">
-                                        ` + val.lookable_unit + `
+                                        ` + val.unit + `
                                     </td>
                                     <td class="center">
                                         ` + optionStock + `
@@ -1078,66 +1134,9 @@
                                 </tr>
                             `);
                             no_issue++;
-                            $('#rowQty' + count).trigger('keyup');
                         });
-
-                        var count = makeid(10);
-
-                        let datalist = `<datalist id="list-shading` + count + `">`;
-                        if(datakuy.list_shading.length > 0){
-                            $.each(datakuy.list_shading, function(i, valkuy) {
-                                datalist += `<option value="` + valkuy.code + `">` + valkuy.code + `</option>`;
-                            });
-                        }
-                        datalist += `</datalist>`;
-
-                        $('#body-item-receive').append(`
-                            <tr class="row_item_receive" data-id="` + $('#production_order_id').val() + `">
-                                <input type="hidden" name="arr_type[]" value="2">
-                                <input type="hidden" name="arr_lookable_type[]" value="items">
-                                <input type="hidden" name="arr_lookable_id[]" value="` + datakuy.item_receive_id + `">
-                                <input type="hidden" name="arr_production_detail_id[]" value="">
-                                <input type="hidden" name="arr_bom_detail_id[]" value="">
-                                <input type="hidden" name="arr_nominal[]" data-standard="0,00" value="0,00">
-                                <input type="hidden" name="arr_total[]" data-standard="0,00" value="0,00">                                
-                                <td class="center-align">
-                                    ` + no_receive + `
-                                </td>
-                                <td>
-                                    ` + datakuy.item_receive_code + ` - ` + datakuy.item_receive_name + `
-                                </td>
-                                <td class="right-align">
-                                    ` + datakuy.item_receive_qty + `
-                                </td>
-                                <td class="center">
-                                    <div class="input-field col s10">
-                                        <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + datakuy.item_receive_qty + `" onkeyup="formatRupiah(this);countRow(this);" style="text-align:right;width:100%;margin: 0 0 0 0 !important;height:1.25rem !important;font-size:0.9rem !important;" id="rowQty`+ count +`" data-id="` + count + `" data-production="` + datakuy.production_convert + `" data-sell="` + datakuy.sell_convert + `" data-pallet="` + datakuy.pallet_convert + `" data-qtystandard="` + datakuy.item_receive_qty + `" required>
-                                        <div class="form-control-feedback" id="production-unit` + count + `" style="right:-30px;top:-10px;">` + datakuy.item_receive_unit_production + `</div>
-                                    </div>
-                                </td>
-                                <td class="right-align">
-                                    <b id="uom-unit` + count + `">-</b>&nbsp;<b>` + datakuy.item_receive_unit_uom + `</b>
-                                </td>
-                                <td class="right-align">
-                                    <b id="sell-unit` + count + `">-</b>&nbsp;<b>` + datakuy.item_receive_unit_sell + `</b>
-                                </td>
-                                <td class="right-align">
-                                    <b id="pallet-unit` + count + `">-</b>&nbsp;<b>` + datakuy.item_receive_unit_pallet + `</b>
-                                </td>
-                                <td class="center">
-                                    <input list="list-shading` + count + `" name="arr_shading[]" class="browser-default" id="arr_shading` + count + `" type="text" placeholder="Kode Shading..." style="width:100%;" required>
-                                    ` + datalist + `
-                                </td>
-                                <td class="center">
-                                    <input name="arr_batch[]" class="browser-default" type="text" placeholder="Nomor batch..." style="width:100%;" required>
-                                    <select class="browser-default" id="arr_item_stock_id` + count + `" name="arr_item_stock_id[]" style="display:none">
-                                        <option value="">--Maaf, item ini tidak memiliki stock--</option>
-                                    </select>
-                                </td>
-                            </tr>
-                        `);
-                        no_receive++;
-                        $('#rowQty' + count).trigger('keyup'); */
+                        
+                        $('#rowQty' + count).trigger('keyup');
                         $('#output-shift').empty().text(datakuy.shift);
                         $('#output-group').empty().text(datakuy.group);
                         $('#output-line').empty().text(datakuy.line);
@@ -1167,7 +1166,7 @@
             `);
             $('#body-item-receive').empty().append(`
                 <tr id="last-row-item-receive">
-                    <td class="center-align" colspan="11">
+                    <td colspan="11">
                         Silahkan tambahkan Order Produksi untuk memulai...
                     </td>
                 </tr>
@@ -1188,29 +1187,7 @@
     }
 
     function countRow(element){
-        let val = $(element).data('id');
-        if($(element).val()){
-            let productionConvert = $(element).data('production'), sellConvert = $(element).data('sell'), palletConvert = $(element).data('pallet');
-            let qtyProduction = parseFloat($(element).val().replaceAll(".", "").replaceAll(",","."));
-            let qtyUom = qtyProduction * productionConvert;
-            let qtySell = qtyUom / sellConvert;
-            let qtyPallet = qtySell / palletConvert;
-            let qtyStandard = parseFloat($(element).data('qtystandard').replaceAll(".", "").replaceAll(",","."));
-            let bobot = qtyProduction / qtyStandard;
-            $('input[name^="arr_nominal[]"]').each(function(index){
-                let currentNominal = parseFloat($(this).data('standard').replaceAll(".", "").replaceAll(",","."));
-                $(this).val(formatRupiahIni((currentNominal * bobot).toFixed(2).toString().replace('.',',')));
-            });
-            $('input[name^="arr_total[]"]').each(function(index){
-                let currentNominal = parseFloat($(this).data('standard').replaceAll(".", "").replaceAll(",","."));
-                $(this).val(formatRupiahIni((currentNominal * bobot).toFixed(2).toString().replace('.',',')));
-            });
-            $('#uom-unit' + val).text(formatRupiahIni(qtyUom.toFixed(3).toString().replace('.',',')));
-            $('#sell-unit' + val).text(formatRupiahIni(qtySell.toFixed(3).toString().replace('.',',')));
-            $('#pallet-unit' + val).text(formatRupiahIni(qtyPallet.toFixed(3).toString().replace('.',',')));
-        }else{
-            $('#uom-unit' + val + ',#sell-unit' + val + ',#pallet-unit' + val).text('-');
-        }
+        
     }
 
     function printMultiSelect(){

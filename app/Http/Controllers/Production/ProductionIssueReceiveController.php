@@ -18,6 +18,7 @@ use App\Models\MarketingOrderPlanDetail;
 use App\Models\Place;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
+use App\Models\Area;
 use App\Models\BomDetail;
 use App\Models\Item;
 use App\Models\ItemCogs;
@@ -60,6 +61,7 @@ class ProductionIssueReceiveController extends Controller
             'machine'       => Machine::where('status','1')->whereHas('line',function($query){
                 $query->whereIn('place_id',$this->dataplaces);
             })->get(),
+            'area'          => Area::where('status','1')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),

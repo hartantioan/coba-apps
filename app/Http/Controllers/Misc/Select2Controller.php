@@ -3805,6 +3805,24 @@ class Select2Controller extends Controller {
         ->get();
 
         foreach($data as $d) {
+            $bomdetail = [];
+            $qtyBobotOutput = round($d->productionScheduleDetail->qty / $d->productionScheduleDetail->bom->qty_output,3);
+            foreach($d->productionScheduleDetail->bom->bomDetail as $row){
+                $qty_planned = $row->qty * $qtyBobotOutput;
+                $bomdetail[] = [
+                    'bom_id'            => $row->bom->id,
+                    'name'              => $row->lookable->code.' - '.$row->lookable->name,
+                    'unit'              => $row->lookable->uomUnit->code,
+                    'lookable_type'     => $row->lookable_type,
+                    'lookable_id'       => $row->lookable_id,
+                    'qty_planned'       => CustomHelper::formatConditionalQty($qty_planned),
+                    'nominal_planned'   => number_format($row->nominal,2,',','.'),
+                    'total_planned'     => number_format($row->nominal * $qty_planned,2,',','.'),
+                    'description'       => $row->description ?? '',
+                    'type'              => $row->type(),
+                    'list_stock'        => $row->lookable_type == 'items' ? $row->item->currentStockPerPlace($row->bom->place_id) : [],
+                ];
+            }
 
             $response[] = [
                 'id'   			                => $d->id,
@@ -3816,13 +3834,19 @@ class Select2Controller extends Controller {
                 'item_receive_name'             => $d->productionScheduleDetail->item->name,
                 'item_receive_unit_uom'         => $d->productionScheduleDetail->item->uomUnit->code,
                 'item_receive_qty'              => CustomHelper::formatConditionalQty($d->productionScheduleDetail->qty),
-                'production_convert'            => $d->productionScheduleDetail->item->production_convert,
-                'sell_convert'                  => $d->productionScheduleDetail->item->sell_convert,
-                'pallet_convert'                => $d->productionScheduleDetail->item->pallet_convert,
                 'shift'                         => 'Tgl.Produksi : '.date('d/m/Y',strtotime($d->productionScheduleDetail->start_date)).' - '.date('d/m/Y',strtotime($d->productionScheduleDetail->end_date)).', Shift : '.$d->productionScheduleDetail->shift->code.' - '.$d->productionScheduleDetail->shift->name,
                 'group'                         => $d->productionScheduleDetail->group,
                 'line'                          => $d->productionScheduleDetail->productionSchedule->line->code,
                 'list_shading'                  => $d->productionScheduleDetail->item->arrShading(),
+                'place_id'                      => $d->productionScheduleDetail->productionSchedule->place_id,
+                'place_code'                    => $d->productionScheduleDetail->productionSchedule->place->code,
+                'line_id'                       => $d->productionScheduleDetail->productionSchedule->line_id,
+                'line_code'                     => $d->productionScheduleDetail->productionSchedule->line->code,
+                'warehouse_id'                  => $d->productionScheduleDetail->warehouse_id,
+                'warehouse_name'                => $d->productionScheduleDetail->warehouse->name,
+                'bom_id'                        => $d->productionScheduleDetail->bom_id,
+                'is_fg'                         => $d->productionScheduleDetail->item->is_sales_item ?? '',
+                'bom_detail'                    => $bomdetail,
             ];
         }
 

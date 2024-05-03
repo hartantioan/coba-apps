@@ -323,8 +323,6 @@ class Item extends Model
                 'warehouse'             => $detail->place->code.' - '.$detail->warehouse->name.($detail->area()->exists() ? ' - '.$detail->area->code : ''),
                 'qty'                   => CustomHelper::formatConditionalQty($detail->qty).' '.$this->uomUnit->code,
                 'qty_raw'               => CustomHelper::formatConditionalQty($detail->qty),
-                'qty_production'        => CustomHelper::formatConditionalQty($detail->qty / $this->production_convert).' '.$this->productionUnit->code,
-                'qty_production_raw'    => CustomHelper::formatConditionalQty($detail->qty / $this->production_convert),
             ];
         }
         

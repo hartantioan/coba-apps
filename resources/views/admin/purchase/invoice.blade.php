@@ -3744,7 +3744,7 @@
                             $('#last-row-detail').before(`
                                 <tr class="row_detail">
                                     <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
-                                    <input type="hidden" name="arr_price[]" value="` + val.price + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_price[]" value="` + val.price_raw + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `">

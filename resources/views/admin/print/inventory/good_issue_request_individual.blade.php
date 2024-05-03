@@ -190,7 +190,7 @@
                 </tr>
                 
             </table>
-            <hr style="border-top: 3px solid black; margin-top:-2%">
+            <hr style="border-top: 1px solid black; margin-top:-0.5%">
         </header>
         <main>
             <div class="card">

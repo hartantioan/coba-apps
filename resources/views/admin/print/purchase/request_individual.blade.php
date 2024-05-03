@@ -7,8 +7,6 @@
         <style>
             @font-face { font-family: 'china'; font-style: normal; src: url({{ storage_path('fonts/chinese_letter.ttf') }}) format('truetype'); }
             body { font-family: 'china', Tahoma, Arial, sans-serif;}
-           @font-face { font-family: 'china'; font-style: normal; src: url({{ storage_path('fonts/chinese_letter.ttf') }}) format('truetype'); }
-            body { font-family: 'china', Tahoma, Arial, sans-serif;}
             .break-row {
                 margin-top: 2%;
                 page-break-inside: avoid;
@@ -192,7 +190,7 @@
                 </tr>
                 
             </table>
-            <hr style="border-top: 3px solid black; margin-top:-2%">
+            <hr style="border-top: 4px solid black; margin-top:-2%">
         </header>
         <main>
             <div class="card">

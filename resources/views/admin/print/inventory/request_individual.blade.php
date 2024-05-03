@@ -232,7 +232,7 @@
                     </td>
                 </tr>
             </table>
-            <hr style="border-top: 3px solid black; margin-top:1%">
+            <hr style="border-top: 3px solid black; margin-top:-0.5%">
         </header>
         <main>
             <div class="card">

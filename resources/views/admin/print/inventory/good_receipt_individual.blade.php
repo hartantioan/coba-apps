@@ -156,7 +156,7 @@
             }
 
             @page { margin: 6em 3em 6em 3em; }
-            header { position: fixed; top: -85px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
+            header { position: fixed; top: -95px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
                 
             td {
                 vertical-align: top !important;
@@ -181,7 +181,7 @@
                 </tr>
                 
             </table>
-            <hr style="border-top: 3px solid black; margin-top:-10px">
+            <hr style="border-top: 1px solid black; margin-top:-10px">
         </header>
         <main>
             <div class="card">

@@ -58,7 +58,8 @@ class ExportPaymentRequestTransactionPage implements FromCollection, WithTitle, 
         'Mesin',
         'Departemen',
         'Proyek',
-        'Based On'
+        'Based On',
+        'Tgl.Bayar OP'
     ];
 
     public function collection()
@@ -154,6 +155,7 @@ class ExportPaymentRequestTransactionPage implements FromCollection, WithTitle, 
                     'Departmen'             => $row_detail->department()->exists() ? $row_detail->department->name : '',
                     'proyek'                => $row_detail->project()->exists() ? $row_detail->project->name : '',
                     'basedon'               => $row_detail->getCode().' - '.$row_detail->paymentRequest->getPaymentCrossCode(),
+                    'op_date'               => $row_detail->paymentRequest->outgoingPayment()->exists() ? $row_detail->paymentRequest->outgoingPayment->pay_date : '-',
                 ];
             }
             

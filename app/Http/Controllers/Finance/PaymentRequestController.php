@@ -958,7 +958,7 @@ class PaymentRequestController extends Controller
                 try {
                     $query = PaymentRequest::where('code',CustomHelper::decrypt($request->temp))->first();
 
-                    $approved = false;
+                    /* $approved = false;
                     $revised = false;
 
                     if($query->approval()){
@@ -980,7 +980,7 @@ class PaymentRequestController extends Controller
                             'status'  => 500,
                             'message' => 'Payment Request telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
-                    }
+                    } */
 
                     if(!CustomHelper::checkLockAcc($query->post_date)){
                         return response()->json([

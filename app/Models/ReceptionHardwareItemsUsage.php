@@ -32,7 +32,7 @@ class ReceptionHardwareItemsUsage extends Model
         'reception_date',
         'return_date', 
         'user_return',
-        'reception_note',   
+        'return_note',   
     ];
 
     public function status(){

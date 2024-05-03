@@ -169,15 +169,15 @@ class ReceptionHardwareItemUsageController extends Controller
     public function datatable(Request $request){
         $column = [
             'code',
-            'user_id',
+            'account_id',
             'hardware_item_id',
-            'info',
             'location',
             'date',
-            'info',
-            'status',
             'reception_date',
+            'info',
             'return_date', 
+            'return_note',
+            'status',
             'user_return',
         ];
 
@@ -235,13 +235,13 @@ class ReceptionHardwareItemUsageController extends Controller
                     $button = '-';
                 }if($val->status == 1 ){
                     $button = '
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown darken-2 white-text btn-small" data-popup="tooltip" title="Return" data-item-id="'. $val->id .'" onclick="openmodal('. $val->id .')"><i class="material-icons dp48">filter_frames</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown darken-2 white-text btn-small" data-popup="tooltip" title="Print" data-item-id="'. $val->id .'" onclick="openmodal('. $val->id .')"><i class="material-icons dp48">filter_frames</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small" data-popup="tooltip" title="Return" onclick="returnItem(' . $val->id . ')"><i class="material-icons dp48">call_missed_outgoing</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
 					';
                 }if($val->status == 2 ){
                     $button = '
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown darken-2 white-text btn-small" data-popup="tooltip" title="Return" data-item-id="'. $val->id .'" onclick="openmodal('. $val->id .')"><i class="material-icons dp48">filter_frames</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown darken-2 white-text btn-small" data-popup="tooltip" title="Print" data-item-id="'. $val->id .'" onclick="openmodal('. $val->id .')"><i class="material-icons dp48">filter_frames</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
 					';
                 }
@@ -251,10 +251,11 @@ class ReceptionHardwareItemUsageController extends Controller
                     $val->user->name ?? '-',
                     $val->hardwareItem->item->name ?? '',
                     $val->location,
-                    $val->date,
-                    $val->reception_date,
-                    $val->return_date,
+                    date('d/m/Y',strtotime($val->date)),
+                    date('d/m/Y',strtotime($val->reception_date)),
                     $val->info,
+                    date('d/m/Y',strtotime( $val->return_date)),
+                    $val->return_note,
                     $val->status(),
                     $button
                 ];

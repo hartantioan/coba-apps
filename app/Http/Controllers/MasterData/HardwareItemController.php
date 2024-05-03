@@ -106,7 +106,7 @@ class HardwareItemController extends Controller
                     $val->detail2,
                     $val->status(),
                     '
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue lighten-3 white-text btn-small" data-popup="tooltip" title="History" onclick="printBarcode(' . $val->id . ')"><i class="material-icons dp48">reorder
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue lighten-3 white-text btn-small" data-popup="tooltip" title="Barcode" onclick="printBarcode(' . $val->id . ')"><i class="material-icons dp48">reorder
                         </i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown darken-2 white-text btn-small" data-popup="tooltip" title="History" onclick="historyUsage(' . $val->id . ')"><i class="material-icons dp48">change_history
                         </i></button>

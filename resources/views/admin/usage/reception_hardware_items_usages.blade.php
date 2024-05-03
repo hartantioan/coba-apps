@@ -90,8 +90,9 @@
                                                         <th>Lokasi</th>
                                                         <th>Tanggal</th>
                                                         <th>Tanggal Penyerahan</th>
+                                                        <th>Keterangan Penyerahan</th>
                                                         <th>Tanggal Pengembalian</th>
-                                                        <th>Keterangan</th>
+                                                        <th>Keterangan Pengembalian</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -419,7 +420,7 @@
                 M.updateTextFields();
             },
             onCloseEnd: function(modal, trigger){
-                $('#form_data')[0].reset();
+                $('#form_data2')[0].reset();
                 $('#temp').val('');
                 M.updateTextFields();
             }
@@ -545,6 +546,7 @@
                 { name: 'hardware_item_id', className: 'center-align' },
                 { name: 'lokasi', className: 'center-align' },
                 { name: 'info', className: 'center-align' },
+                { name: 'date', className: 'center-align' },
                 { name: 'date', className: 'center-align' },
                 { name: 'date', className: 'center-align' },
                 { name: 'date', className: 'center-align' },

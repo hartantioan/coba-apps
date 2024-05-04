@@ -3007,8 +3007,10 @@
                 if($('input[name^="arr_is_include_tax"]').eq(index).is(':checked')){
                     rownominal = rownominal / (1 + (percent_tax / 100));
                 }
-
+                rownominal = Math.round(rownominal * 100) / 100;
                 rowtax = rownominal * (percent_tax / 100);
+            }else{
+                rownominal = Math.round(rownominal * 100) / 100;
             }
 
             if($('select[name^="arr_wtax"]').eq(index).val() !== '0'){

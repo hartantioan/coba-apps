@@ -3023,11 +3023,11 @@
             );
 
             $('input[name^="arr_nominal_tax"]').eq(index).val(
-                (rowtax >= 0 ? '' : '-') + formatRupiahIni(rowtax.toString().replace('.',','))
+                (rowtax >= 0 ? '' : '-') + formatRupiahIni(rowtax.toFixed(2).toString().replace('.',','))
             );
 
             $('input[name^="arr_nominal_wtax"]').eq(index).val(
-                (rowwtax >= 0 ? '' : '-') + formatRupiahIni(rowwtax.toString().replace('.',','))
+                (rowwtax >= 0 ? '' : '-') + formatRupiahIni(rowwtax.toFixed(2).toString().replace('.',','))
             );
 
             rowgrandtotal = (rownominal + rowtax - rowwtax).toFixed(2);

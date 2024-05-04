@@ -416,6 +416,7 @@
                                     <table class="bordered" style="width:3800px;font-size:0.9rem !important;" id="table-detail">
                                         <thead>
                                             <tr>
+                                                <th>No.</th>
                                                 <th>Hapus</th>
                                                 <th>Item / Coa Jasa</th>
                                                 <th>Keterangan 1</th>
@@ -462,7 +463,7 @@
                                         </thead>
                                         <tbody id="body-item">
                                             <tr id="last-row-item">
-                                                <td colspan="27">
+                                                <td colspan="28">
                                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" id="button-add-item" onclick="addItem()" href="javascript:void(0);">
                                                         <i class="material-icons left">add</i> New Item
                                                     </a>
@@ -1380,10 +1381,10 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 beforeSend: function() {
-                    loadingOpen('.modal-content');
+                    loadingOpen('#modal1');
                 },
                 success: function(response) {
-                    loadingClose('.modal-content');
+                    loadingClose('#modal1');
 
                     if(response.status == 500){
                         swal({
@@ -1393,6 +1394,18 @@
                         });
                     }else{
                         if(response.details.length > 0){
+                            let countItem = $('.row_item').length + response.details.length;
+
+                            if(countItem > 50){
+                                swal({
+                                    title: 'Ups!',
+                                    text: 'Satu PO tidak boleh memiliki baris item lebih dari 50.',
+                                    icon: 'error'
+                                });
+                                removeUsedData(response.id,type);
+                                return false;
+                            }
+
                             if(type == 'sj'){
                                 $('#supplier_id').empty().append(`
                                     <option value="` + response.account_id + `">` + response.account_name + `</option>
@@ -1405,6 +1418,9 @@
                                     <i class="material-icons close data-used" onclick="removeUsedData('` + response.id + `','` + type + `')">close</i>
                                 </div>
                             `);
+
+                            let no = $('.row_item').length + 1;
+
                             $.each(response.details, function(i, val) {
                                 var count = makeid(10);
 
@@ -1413,6 +1429,9 @@
                                         <tr class="row_item" data-id="` + response.id + `">
                                             <input type="hidden" name="arr_data[]" value="` + val.reference_id + `">
                                             <input type="hidden" name="arr_type[]" value="` + type + `">
+                                            <td class="center">
+                                                ` + no + `
+                                            </td>
                                             <td class="center">
                                                 <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                                     <i class="material-icons">delete</i>
@@ -1537,6 +1556,9 @@
                                         <tr class="row_item" data-id="` + response.id + `">
                                             <input type="hidden" name="arr_data[]" value="` + val.reference_id + `">
                                             <input type="hidden" name="arr_type[]" value="` + type + `">
+                                            <td class="center">
+                                                ` + no + `
+                                            </td>
                                             <td class="center">
                                                 <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                                     <i class="material-icons">delete</i>
@@ -1707,6 +1729,8 @@
                                 }else{
                                     $('#arr_unit' + count).trigger('change');
                                 }
+
+                                no++;
                             });
                         }
                     }
@@ -1716,7 +1740,7 @@
                 },
                 error: function() {
                     $('.modal-content').scrollTop(0);
-                    loadingClose('.modal-content');
+                    loadingClose('#modal1');
                     swal({
                         title: 'Ups!',
                         text: 'Check your internet connection.',
@@ -1741,12 +1765,28 @@
     }
 
     function addItem(){
+
+        let countItem = $('.row_item').length;
+
+        if(countItem > 49){
+            swal({
+                title: 'Ups!',
+                text: 'Satu PO tidak boleh memiliki baris item lebih dari 50.',
+                icon: 'error'
+            });
+            return false;
+        }
+
         var count = makeid(10);
+        let no = $('.row_item').length + 1;
         if($('#inventory_type').val() == '1'){
             $('#last-row-item').before(`
                 <tr class="row_item">
                     <input type="hidden" name="arr_data[]" value="0">
                     <input type="hidden" name="arr_type[]" value="">
+                    <td class="center">
+                        ` + no + `
+                    </td>
                     <td class="center">
                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                             <i class="material-icons">delete</i>
@@ -1877,6 +1917,9 @@
                 <tr class="row_item">
                     <input type="hidden" name="arr_data[]" value="0">
                     <input type="hidden" name="arr_type[]" value="">
+                    <td class="center">
+                        ` + no + `
+                    </td>
                     <td class="center">
                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                             <i class="material-icons">delete</i>
@@ -2520,6 +2563,9 @@
                                     <input type="hidden" name="arr_data[]" value="` + val.reference_id + `">
                                     <input type="hidden" name="arr_type[]" value="` + val.type + `">
                                     <td class="center">
+                                        ` + (i + 1) + `
+                                    </td>
+                                    <td class="center">
                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" onclick="removeUsedData('` + val.id + `')">
                                             <i class="material-icons">delete</i>
                                         </a>
@@ -2670,6 +2716,9 @@
                                 <tr class="row_item">
                                     <input type="hidden" name="arr_data[]" value="` + val.reference_id + `">
                                     <input type="hidden" name="arr_type[]" value="` + val.type + `">
+                                    <td class="center">
+                                        ` + (i + 1) + `
+                                    </td>
                                     <td class="center">
                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                             <i class="material-icons">delete</i>

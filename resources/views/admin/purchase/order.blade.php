@@ -3009,9 +3009,9 @@
                 }
                 rownominal = Math.round(rownominal * 100) / 100;
                 rowtax = rownominal * (percent_tax / 100);
-            }else{
-                rownominal = Math.round(rownominal * 100) / 100;
             }
+
+            rownominal = Math.round(rownominal * 100) / 100;
 
             if($('select[name^="arr_wtax"]').eq(index).val() !== '0'){
                 let percent_wtax = parseFloat($('select[name^="arr_wtax"]').eq(index).val());
@@ -3031,8 +3031,6 @@
             );
 
             rowgrandtotal = (rownominal + rowtax - rowwtax).toFixed(2);
-
-            rowgrandtotal = Math.round(rowgrandtotal * 100) / 100;
 
             $('input[name^="arr_nominal_grandtotal"]').eq(index).val(
                 (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(rowgrandtotal.toString().replace('.',','))

@@ -1922,7 +1922,6 @@ class PurchaseOrderController extends Controller
 
     public function removeUsedData(Request $request){
         if($request->type == 'po'){
-            info('kambing');
             CustomHelper::removeUsedData('purchase_requests',$request->id);
         }elseif($request->type == 'gi'){
             CustomHelper::removeUsedData('good_issues',$request->id);

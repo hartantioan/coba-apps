@@ -2907,7 +2907,7 @@
 
     function countGrandtotal(){
         if($('#type_detail').val() == '1'){
-            let total = parseFloat($('#total').text().replaceAll(".", "").replaceAll(",",".")), tax = parseFloat($('#tax').text().replaceAll(".", "").replaceAll(",",".")), wtax = parseFloat($('#wtax').val().replaceAll(".", "").replaceAll(",",".")), downpayment = 0, balance = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",",".")), currency_rate = parseFloat($('#currency_rate').val().replaceAll(".", "").replaceAll(",","."));
+            let total = parseFloat($('#total').text().replaceAll(".", "").replaceAll(",",".")), tax = parseFloat($('#tax').text().replaceAll(".", "").replaceAll(",",".")), wtax = parseFloat($('#wtax').val().replaceAll(".", "").replaceAll(",",".")), downpayment = 0, balance = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",",".")), currency_rate = parseFloat($('#currency_rate').val().replaceAll(".", "").replaceAll(",",".")), rounding_convert = rounding * currency_rate;
             
             let grandtotal = total + tax - wtax + rounding;
 
@@ -2918,6 +2918,10 @@
             balance = grandtotal - downpayment;
 
             let balance_convert = balance * currency_rate;
+
+            $('#rounding_convert').text(
+                (rounding_convert >= 0 ? '' : '-') + formatRupiahIni(rounding_convert.toFixed(2).toString().replace('.',','))
+            );
 
             $('#balance').text(
                 (balance >= 0 ? '' : '-') + formatRupiahIni(balance.toFixed(2).toString().replace('.',','))

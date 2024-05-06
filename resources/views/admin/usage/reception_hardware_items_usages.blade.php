@@ -510,6 +510,7 @@
 		window.table = $('#datatable_serverside').DataTable({
             "scrollCollapse": true,
             "scrollY": '400px',
+            "scrollX": true,
             "responsive": false,
             "stateSave": true,
             "serverSide": true,

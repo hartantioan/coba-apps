@@ -2375,6 +2375,7 @@ class PaymentRequestController extends Controller
                 "color" => "lightblue",
                 'properties'=> [
                      ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query->post_date))],
+                     ['name'=> "Nominal :".formatNominal($query).number_format($query->grandtotal,2,',','.')]
                   ],
                 'url'   =>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($query->code),
                 "title" =>$query->code,

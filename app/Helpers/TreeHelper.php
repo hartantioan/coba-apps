@@ -253,7 +253,7 @@ class TreeHelper {
                         foreach($query->paymentRequest->paymentRequestDetail as $row_pyr_detail){
                             $data_pyr_tempura=[
                                 'properties'=> [
-                                    ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
+                                    ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->pay_date],
                                     ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
                                 ],
                                 "key" => $row_pyr_detail->paymentRequest->code,
@@ -360,7 +360,7 @@ class TreeHelper {
                                 "name"  => $row_bill_detail->outgoingPayment->code,
                                 
                                 'properties'=> [
-                                    ['name'=> "Tanggal: ".date('d/m/Y',strtotime($row_bill_detail->outgoingPayment->post_date))],
+                                    ['name'=> "Tanggal: ".date('d/m/Y',strtotime($row_bill_detail->outgoingPayment->pay_date))],
                                     ['name'=> "Nominal: Rp".number_format($row_bill_detail->outgoingPayment->grandtotal,2,',','.')]
                                 ],
                                 'url'   =>request()->root()."/admin/finance/outgoing_payment?code=".CustomHelper::encrypt($row_bill_detail->outgoingPayment->code),
@@ -647,7 +647,7 @@ class TreeHelper {
                                 foreach($row_pi->purchaseDownPayment->hasPaymentRequestDetail as $row_pyr_detail){
                                     $data_pyr_tempura=[
                                         'properties'=> [
-                                            ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
+                                            ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->pay_date],
                                             ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
                                         ],
                                         "key" => $row_pyr_detail->paymentRequest->code,
@@ -745,7 +745,7 @@ class TreeHelper {
                         foreach($query_invoice->realPaymentRequestDetail as $row_pyr_detail){
                             $data_pyr_tempura=[
                                 'properties'=> [
-                                    ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
+                                    ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->pay_date],
                                     ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
                                 ],
                                 "key" => $row_pyr_detail->paymentRequest->code,
@@ -849,7 +849,7 @@ class TreeHelper {
                     if($query_pyr->outgoingPayment()->exists()){
                         $outgoing_payment = [
                             'properties'=> [
-                                ['name'=> "Tanggal :".$query_pyr->outgoingPayment->post_date],
+                                ['name'=> "Tanggal :".$query_pyr->outgoingPayment->pay_date],
                                 ['name'=> "Nominal :".formatNominal($query_pyr->outgoingPayment).number_format($query_pyr->outgoingPayment->grandtotal,2,',','.')]
                             ],
                             "key" => $query_pyr->outgoingPayment->code,
@@ -874,7 +874,7 @@ class TreeHelper {
                         
                         $data_pyr_tempura=[
                             'properties'=> [
-                                ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
+                                ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->pay_date],
                                 ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
                             ],
                             "key" => $row_pyr_detail->paymentRequest->code,
@@ -1010,7 +1010,8 @@ class TreeHelper {
                             'key'   => $query_pyrc->paymentRequest->code,
                             "name"  => $query_pyrc->paymentRequest->code,
                             'properties'=> [
-                                ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query_pyrc->paymentRequest->post_date))],
+                                ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query_pyrc->paymentRequest->pay_date))],
+                                ['name'=> "Nominal :".formatNominal($query_pyrc->paymentRequest).number_format($query_pyrc->paymentRequest->grandtotal,2,',','.')]
                             ],
                             'url'   =>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($query_pyrc->paymentRequest->code),
                             "title" =>$query_pyrc->paymentRequest->code,
@@ -1251,7 +1252,7 @@ class TreeHelper {
                                 "name"=>$row_pyr_detail->paymentRequest->code,
                                 "key" => $row_pyr_detail->paymentRequest->code,
                                 'properties'=> [
-                                    ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
+                                    ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->pay_date],
                                     ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')],
                                     ],
                                 'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),           
@@ -1608,7 +1609,7 @@ class TreeHelper {
                                 }
                                 $data_pyr_tempura=[
                                     'properties'=> [
-                                        ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
+                                        ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->pay_date],
                                         ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
                                     ],
                                     "key" => $row_pyr_detail->paymentRequest->code . $x,
@@ -1683,7 +1684,7 @@ class TreeHelper {
                         foreach($query_fr->hasPaymentRequestDetail as $row_pyr_detail){
                             $data_pyr_tempura=[
                                 'properties'=> [
-                                    ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
+                                    ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->pay_date],
                                     ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
                                 ],
                                 "key" => $row_pyr_detail->paymentRequest->code,

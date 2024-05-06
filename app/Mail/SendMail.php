@@ -20,32 +20,36 @@ class SendMail extends Mailable
         $this->data = $data;
     }
 
-    /* public function envelope(): Envelope
-    {
-        return new Envelope(
-            subject: $this->data['subject'],
-        );
-    }
+    // public function envelope(): Envelope
+    // {
+    //     return new Envelope(
+    //         subject: $this->data['subject'],
+    //     );
+    // }
 
-    public function content(): Content
-    {
-        return new Content(
-            view: $this->data['view']
-        );
-    }
+    // public function content(): Content
+    // {
+    //     return new Content(
+    //         view: $this->data['view']
+    //     );
+    // }
 
     public function attachments(): array
     {
         return [];
-    } */
+    }
 
     public function build()
     {
-        return $this->view($this->data['view'])
-            ->with([
-                'url'   => url('/'),
-                'data'  => $this->data,
-            ])
-            ->subject($this->data['subject']);
+        return $this->subject($this->data['subject'])
+                    ->view($this->data['view'])
+                    ->with([
+                        'url'    => url('/'),
+                        'data'   => $this->data,
+                        'result' => $this->data['result'],
+                    ])
+                    ->attach($this->data['attachmentPath'], [
+                        'as' => $this->data['attachmentName'],
+                    ]);
     }
 }

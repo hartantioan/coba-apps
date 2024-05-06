@@ -1,9 +1,15 @@
 <?php 
 
 namespace App\Helpers;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
 use App\Jobs\ResetCogs;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SendMail;
 use App\Jobs\ResetStock;
 use App\Models\AdjustRate;
+use App\Models\HistoryEmailDocument;
 use App\Models\ApprovalMatrix;
 use App\Models\LockPeriod;
 use App\Models\ApprovalStage;
@@ -4267,6 +4273,70 @@ class CustomHelper {
 			$po = PurchaseOrder::find($table_id);
 
 			if($po){
+				// if($po->account->email){
+				// 	$data = [
+				// 		'title'     => 'Print Purchase Order',
+				// 		'data'      => $po
+				// 	];
+				// 	$opciones_ssl=array(
+				// 		"ssl"=>array(
+				// 		"verify_peer"=>false,
+				// 		"verify_peer_name"=>false,
+				// 		),
+				// 	);
+				// 	CustomHelper::addNewPrinterCounter($po->getTable(),$po->id);
+				// 	$img_path = 'website/logo_web_fix.png';
+				// 	$extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+				// 	$image_temp = file_get_contents($img_path, false, stream_context_create($opciones_ssl));
+				// 	$img_base_64 = base64_encode($image_temp);
+				// 	$path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+				// 	$data["image"]=$path_img;
+				// 	$pdf = Pdf::loadView('admin.print.purchase.order_individual', $data)->setPaper('a4', 'portrait');
+				// 	$font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
+				// 	$pdf->getCanvas()->page_text(495, 785, "Jumlah Print, ". $po->printCounter()->count(), $font, 10, array(0,0,0));
+				// 	$pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+					
+					
+				// 	$content = $pdf->download()->getOriginalContent();
+					
+				// 	$randomString = Str::random(10); 
+	
+				
+				// 	$filePath = 'public/pdf/' . $randomString . '.pdf';
+					
+	
+				// 	Storage::put($filePath, $content);
+				// 	$document_po = asset(Storage::url($filePath));
+				// 	$fullPath = storage_path('app/' . $filePath);
+				// 	$data = [
+				// 		'subject' 	=> 'Dokumen Purchase Order',
+				// 		'view' 		=> 'admin.mail.po_done',
+				// 		'result' 	=> $po,
+				// 		'supplier' 	=> $po->account->name,
+				// 		'user' 		=> $po->user,
+				// 		'company' 	=> $po->user->company,
+				// 		'attachmentPath' => $fullPath,
+				// 		'attachmentName' => 'attachment.pdf', // Adjust attachment name
+				// 	];
+				// 	try {
+				// 		Mail::to($po->account->email)->send(new SendMail($data));
+						
+				// 	} catch (\Exception $e) {
+						
+				// 		Log::error('Error sending email: ' . $e->getMessage());
+				// 		throw $e;
+				// 	}
+				// 	HistoryEmailDocument::create([
+				// 		'user_id'		=> $po->user_id,
+				// 		'account_id'	=> $po->account_id,
+				// 		'lookable_type'	=> $table_name,
+				// 		'lookable_id'	=> $table_id,
+				// 		'status'		=> 1,
+				// 		'email'			=> $po->account->email ?? '-',
+				// 		'note'			=> $po->note,
+				// 	]);
+				// }
+				
 				$po->updateRootDocumentStatusDone();
 			}
 		}elseif($table_name == 'purchase_requests'){

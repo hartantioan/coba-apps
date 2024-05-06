@@ -197,12 +197,23 @@ class LedgerController extends Controller
         $beginning_total = 0;
         $no = 2;
 
-        $balance_debit  = $coa->journalDebit()->whereHas('journal',function($query)use($request){
+        $balance_debit = 0;
+        $balance_credit = 0;
+
+        $datadebitbefore  = $coa->journalDebit()->whereHas('journal',function($query)use($request){
             $query->whereDate('post_date','<',$request->start_date);
-        })->sum('nominal');
-        $balance_credit  = $coa->journalCredit()->whereHas('journal',function($query)use($request){
+        })->get();
+        $datacreditbefore  = $coa->journalCredit()->whereHas('journal',function($query)use($request){
             $query->whereDate('post_date','<',$request->start_date);
-        })->sum('nominal');
+        })->get();
+
+        foreach($datadebitbefore as $row){
+            $balance_debit += round($row->nominal,2);
+        }
+
+        foreach($datacreditbefore as $row){
+            $balance_credit += round($row->nominal,2);
+        }
 
         $balance = $balance_debit - $balance_credit;
 

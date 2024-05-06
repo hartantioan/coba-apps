@@ -29,35 +29,36 @@ class ExportStockMovement implements FromView,ShouldAutoSize
             $query_data = ItemCogs::whereIn('id', function ($query){            
                 $query->selectRaw('MAX(id)')
                     ->from('item_cogs')
-                    ->where('date', '<', $this->finish_date)
+                    ->where('date', '<=', $this->finish_date)
                     ->groupBy('item_id');
             })
             ->where(function($query) {
                 $query->whereHas('item',function($query){
-                    $query->whereIn('status',['1','2']);
+                    $query->where('status',1);
                 });
-                if($this->finish_date) {
-                    $query->whereDate('date','<', $this->finish_date);
+
+               if($this->finish_date) {
+                    $query->whereDate('date','<=', $this->finish_date);
                 }
                 if($this->item) {
-                    $query->whereHas('item',function($query) {
+                    $query->whereHas('item',function($query){
                         $query->where('id',$this->item);
                     });
                 }
                 if($this->plant != 'all'){
-                    $query->whereHas('place',function($query) {
+                    $query->whereHas('place',function($query){
                         $query->where('id',$this->plant);
                     });
                 }
                 if($this->warehouse != 'all'){
-                    $query->whereHas('warehouse',function($query) {
+                    $query->whereHas('warehouse',function($query){
                         $query->where('id',$this->warehouse);
                     });
                 }
     
                 if($this->group){
                    
-                    $query->whereHas('item',function($query) {
+                    $query->whereHas('item',function($query){
                         $query->whereIn('item_group_id', $this->group);
                     });
                 }

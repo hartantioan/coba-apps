@@ -253,6 +253,7 @@ class CustomHelper {
 		}
 
 		/* ResetCogs::dispatch($date,$place_id,$item_id); */
+		ResetCogs::dispatch($date,$company_id,$place_id,$item_id,$area_id,$shading);
 	}
 
 	public static function sendCogs2($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null, $area_id = null, $shading = null){

@@ -2891,6 +2891,9 @@
             $('#wtax_convert').text(
                 (wtax_convert >= 0 ? '' : '-') + formatRupiahIni(wtax_convert.toFixed(2).toString().replace('.',','))
             );
+            $('#rounding_convert').text(
+                (rounding_convert >= 0 ? '' : '-') + formatRupiahIni(rounding_convert.toFixed(2).toString().replace('.',','))
+            );
             $('#balance').text(
                 (balance >= 0 ? '' : '-') + formatRupiahIni(balance.toFixed(2).toString().replace('.',','))
             );

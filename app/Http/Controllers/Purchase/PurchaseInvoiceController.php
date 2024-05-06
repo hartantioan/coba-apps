@@ -561,7 +561,7 @@ class PurchaseInvoiceController extends Controller
                 $currency_rate = $datagr->latestCurrencyRate();
                 foreach($datagr->goodReceiptDetail as $rowdetail){
                     if($rowdetail->balanceTotalInvoice() > 0){
-                        $price = round($rowdetail->total / $rowdetail->qty,2);
+                        $price = round($rowdetail->total / $rowdetail->qty,5);
                         $details[] = [
                             'type'          => 'good_receipt_details',
                             'id'            => $rowdetail->id,
@@ -1704,6 +1704,7 @@ class PurchaseInvoiceController extends Controller
                 'qty_returned'  => 0,
                 'qty_balance'   => CustomHelper::formatConditionalQty($row->qty),
                 'price'         => number_format($row->price,2,',','.'),
+                'price_raw'     => number_format($row->price,5,',','.'),
                 'buy_unit'      => $row->getUnitCode(),
                 'rawcode'       => $row->getHeaderCode(),
                 'post_date'     => $row->getPostDate(),

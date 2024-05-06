@@ -187,6 +187,7 @@
                                                         <th rowspan="2">Status</th>
                                                         <th rowspan="2">By</th>
                                                         <th rowspan="2">Kas/Bank Keluar</th>
+                                                        <th rowspan="2">Tgl.OP</th>
                                                         <th rowspan="2">Action</th>
                                                     </tr>
                                                     <tr>
@@ -2428,6 +2429,7 @@
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'cash_bank_out', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'op_paydate', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',
@@ -3806,7 +3808,7 @@
         var end_date = $('#finish_date').val();
         var modedata = '{{ $modedata }}';
 
-        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&company=" + company + "&type_pay=" + type_pay + "&supplier=" + supplier + "&account=" + account + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata;
+        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&company=" + company + "&account=" + account + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata;
        
     }
 </script>

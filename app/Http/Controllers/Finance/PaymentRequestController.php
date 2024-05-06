@@ -346,6 +346,7 @@ class PaymentRequestController extends Controller
                     ),
                     $val->balance == 0 ? 'Terbayar' : ($val->status == '2' && !$val->outgoingPayment()->exists() ?
                     '<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small" data-popup="tooltip" title="Bayar" onclick="cashBankOut(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">screen_share</i></button>' : ($val->outgoingPayment()->exists() ? $val->outgoingPayment->code : $val->statusRaw() )),
+                    $val->outgoingPayment()->exists() ? date('d/m/Y',strtotime($val->outgoingPayment->pay_date)) : '-',
                     '
                     '.$btn_jurnal.'
                         

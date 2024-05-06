@@ -70,12 +70,23 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
             } else {
                 $periode = "";
             }
-            $balance_debit  = $row->journalDebit()->whereHas('journal',function($query){
+            $balance_debit = 0;
+            $balance_credit = 0;
+
+            $datadebitbefore  = $row->journalDebit()->whereHas('journal',function($query){
                 $query->whereDate('post_date','<',$this->start_date);
-            })->sum('nominal');
-            $balance_credit  = $row->journalCredit()->whereHas('journal',function($query){
+            })->get();
+            $datacreditbefore  = $row->journalCredit()->whereHas('journal',function($query){
                 $query->whereDate('post_date','<',$this->start_date);
-            })->sum('nominal');
+            })->get();
+
+            foreach($datadebitbefore as $rowbefore){
+                $balance_debit += round($rowbefore->nominal,2);
+            }
+
+            foreach($datacreditbefore as $rowbefore){
+                $balance_credit += round($rowbefore->nominal,2);
+            }
 
             $balance = $balance_debit - $balance_credit;
 

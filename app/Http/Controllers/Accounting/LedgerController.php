@@ -83,6 +83,9 @@ class LedgerController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
+
+                $balance_debit = 0;
+                $balance_credit = 0;
 				
                 if($request->start_date && $request->finish_date) {
                     $periode = "DATE(post_date) >= '$request->start_date' AND DATE(post_date) <= '$request->finish_date'";
@@ -93,12 +96,20 @@ class LedgerController extends Controller
                 } else {
                     $periode = "";
                 }
-                $balance_debit  = $val->journalDebit()->whereHas('journal',function($query)use($request){
+                $datadebitbefore  = $val->journalDebit()->whereHas('journal',function($query)use($request){
                     $query->whereDate('post_date','<',$request->start_date);
-                })->sum('nominal');
-                $balance_credit  = $val->journalCredit()->whereHas('journal',function($query)use($request){
+                })->get();
+                $datacreditbefore  = $val->journalCredit()->whereHas('journal',function($query)use($request){
                     $query->whereDate('post_date','<',$request->start_date);
-                })->sum('nominal');
+                })->get();
+
+                foreach($datadebitbefore as $row){
+                    $balance_debit += round($row->nominal,2);
+                }
+
+                foreach($datacreditbefore as $row){
+                    $balance_credit += round($row->nominal,2);
+                }
 
                 $balance = $balance_debit - $balance_credit;
                 $total_debit = 0;
@@ -186,12 +197,23 @@ class LedgerController extends Controller
         $beginning_total = 0;
         $no = 2;
 
-        $balance_debit  = $coa->journalDebit()->whereHas('journal',function($query)use($request){
+        $balance_debit = 0;
+        $balance_credit = 0;
+
+        $datadebitbefore  = $coa->journalDebit()->whereHas('journal',function($query)use($request){
             $query->whereDate('post_date','<',$request->start_date);
-        })->sum('nominal');
-        $balance_credit  = $coa->journalCredit()->whereHas('journal',function($query)use($request){
+        })->get();
+        $datacreditbefore  = $coa->journalCredit()->whereHas('journal',function($query)use($request){
             $query->whereDate('post_date','<',$request->start_date);
-        })->sum('nominal');
+        })->get();
+
+        foreach($datadebitbefore as $row){
+            $balance_debit += round($row->nominal,2);
+        }
+
+        foreach($datacreditbefore as $row){
+            $balance_credit += round($row->nominal,2);
+        }
 
         $balance = $balance_debit - $balance_credit;
 

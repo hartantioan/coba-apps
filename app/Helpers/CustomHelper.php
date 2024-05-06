@@ -253,6 +253,7 @@ class CustomHelper {
 		}
 
 		/* ResetCogs::dispatch($date,$place_id,$item_id); */
+		ResetCogs::dispatch($date,$company_id,$place_id,$item_id,$area_id,$shading);
 	}
 
 	public static function sendCogs2($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null, $area_id = null, $shading = null){
@@ -1626,7 +1627,7 @@ class CustomHelper {
 			}
 
 			foreach($op->paymentRequest->paymentRequestCost as $row){
-				if($row->nominal_debit_fc > 0){
+				if($row->nominal_debit_fc > 0 || $row->nominal_debit_fc < 0){
 					if($row->cost_distribution_id){
 						$total = $row->nominal_debit_fc;
 						$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
@@ -1674,7 +1675,7 @@ class CustomHelper {
 					}
 				}
 
-				if($row->nominal_credit_fc > 0){
+				if($row->nominal_credit_fc > 0 || $row->nominal_credit_fc < 0){
 					if($row->cost_distribution_id){
 						$total = $row->nominal_credit_fc;
 						$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
@@ -4035,7 +4036,7 @@ class CustomHelper {
 		}elseif($table_name == 'production_issue_receives'){
 			$pir = ProductionIssueReceive::find($table_id);
 			
-			$total = 0;
+			/* $total = 0;
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
@@ -4146,7 +4147,11 @@ class CustomHelper {
 						'nominal'		=> $row->total,
 					]);
 				}
-			}
+			} */
+
+			$pir->update([
+				'status'	=> '3'
+			]);
 		}elseif($table_name == 'adjust_rates'){
 			$ar = AdjustRate::find($table_id);
 

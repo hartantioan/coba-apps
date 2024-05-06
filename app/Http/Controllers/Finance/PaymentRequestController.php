@@ -771,6 +771,7 @@ class PaymentRequestController extends Controller
                     $name_account = '';
                     $no_account = '';
                     $bank_account = '';
+                    $raw_due_date = '';
                     if($data){
                         if(!$data->used()->exists() && $data->balance > 0){
                             foreach($data->purchaseInvoiceDetail as $rowinvoice){
@@ -778,6 +779,7 @@ class PaymentRequestController extends Controller
                                     $name_account = $rowinvoice->fundRequestDetail->fundRequest->name_account;
                                     $no_account = $rowinvoice->fundRequestDetail->fundRequest->no_account;
                                     $bank_account = $rowinvoice->fundRequestDetail->fundRequest->bank_account;
+                                    $raw_due_date = $rowinvoice->fundRequestDetail->fundRequest->required_date;
                                 }
                             }
                             CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Payment Request');
@@ -814,7 +816,7 @@ class PaymentRequestController extends Controller
                                 'list_details'  => [],
                                 'document_status' => '',
                                 'is_reimburse'  => '',
-                                'raw_due_date'  => '',
+                                'raw_due_date'  => $raw_due_date,
                             ];
                         }
                     }

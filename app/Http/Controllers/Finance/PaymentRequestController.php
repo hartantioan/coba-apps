@@ -768,8 +768,18 @@ class PaymentRequestController extends Controller
                 }elseif($row == 'purchase_invoices'){
                     $data = null;
                     $data = PurchaseInvoice::find(intval($request->arr_id[$key]));
+                    $name_account = '';
+                    $no_account = '';
+                    $bank_account = '';
                     if($data){
                         if(!$data->used()->exists() && $data->balance > 0){
+                            foreach($data->purchaseInvoiceDetail as $rowinvoice){
+                                if($rowinvoice->fundRequestDetail()->exists()){
+                                    $name_account = $rowinvoice->fundRequestDetail->fundRequest->name_account;
+                                    $no_account = $rowinvoice->fundRequestDetail->fundRequest->no_account;
+                                    $bank_account = $rowinvoice->fundRequestDetail->fundRequest->bank_account;
+                                }
+                            }
                             CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Payment Request');
                             $coa = Coa::where('code','200.01.03.01.01')->where('company_id',$data->company_id)->first();
                             $total = $data->balancePaymentRequest();
@@ -794,9 +804,9 @@ class PaymentRequestController extends Controller
                                 'currency_rate' => number_format($data->currency_rate,2,',','.'),
                                 'currency_code' => $data->currency->symbol,
                                 'note'          => $data->note ? $data->note : '',
-                                'name_account'  => '',
-                                'no_account'    => '',
-                                'bank_account'  => '',
+                                'name_account'  => $name_account,
+                                'no_account'    => $no_account,
+                                'bank_account'  => $bank_account,
                                 'place_id'      => '',
                                 'department_id' => '',
                                 'account_code'  => $data->account->employee_no,

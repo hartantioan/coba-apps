@@ -137,6 +137,8 @@
                                                         <th>No.PROD</th>
                                                         <th>No.Jadwal</th>
                                                         <th>Shift</th>
+                                                        <th>Waktu Mulai Produksi</th>
+                                                        <th>Waktu Selesai Produksi</th>
                                                         <th>Line</th>
                                                         <th>Group</th>
                                                         <th>Plant</th>
@@ -232,6 +234,14 @@
                                     <div class="input-field col m3 s12 step4">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                         <label class="active" for="post_date">Tgl. Post</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step4">
+                                        <input id="start_process_time" name="start_process_time" type="datetime-local" placeholder="Tgl. Mulai Produksi">
+                                        <label class="active" for="start_process_time">Tgl. Mulai Produksi</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step4">
+                                        <input id="end_process_time" name="end_process_time" type="datetime-local" placeholder="Tgl. Selesai Produksi">
+                                        <label class="active" for="end_process_time">Tgl. Selesai Produksi</label>
                                     </div>
                                     <div class="file-field input-field col m3 s12 step5">
                                         <div class="btn">
@@ -1487,6 +1497,8 @@
                 { name: 'production_order_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'production_schedule_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'shift', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'start_process_time', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'end_process_time', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'line', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'group', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'plant_id', searchable: false, orderable: false, className: 'center-align' },
@@ -1725,7 +1737,17 @@
                 $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#code').val(response.code);
                 $('#post_date').val(response.post_date);
+                $('#place_id').val(response.place_id).formSelect();
+                $('#line_id').val(response.line_id).formSelect();
+                $('#machine_id').val(response.machine_id).formSelect(); 
+                $('#shift_id').empty().append(`
+                    <option value="` + response.shift_id + `">` + response.shift_name + `</option>
+                `);
+                $('#group').val(response.group);
                 $('#company_id').val(response.company_id).formSelect();
+                $('#start_process_time').val(response.start_process_time);
+                $('#end_process_time').val(response.end_process_time);
+                $('#note').val(response.note);
                 $('#production_order_id').empty().append(`
                     <option value="` + response.production_order_id + `">` + response.production_order_code + `</option>
                 `);
@@ -1742,24 +1764,29 @@
                     let optionStock = `<select class="browser-default" id="arr_item_stock_id` + count + `" name="arr_item_stock_id[]">`;
                     if(val.list_stock.length > 0){
                         $.each(val.list_stock, function(i, valkuy) {
-                            optionStock += `<option value="` + valkuy.id + `" ` + (val.item_stock_id == valkuy.id ? 'selected' : '') + ` data-qty="` + valkuy.qty_production_raw + `">` + valkuy.warehouse + ` - ` + valkuy.qty_production + `</option>`;
+                            optionStock += `<option value="` + valkuy.id + `" data-qty="` + valkuy.qty_raw + `">` + valkuy.warehouse + ` - ` + valkuy.qty + `</option>`;
                         });
                     }else{
-                        optionStock += `<option value="0">--Maaf, item ini tidak memiliki stock--</option>`;
+                        optionStock += `<option value="0" data-qty="0,000">--Maaf, item ini tidak memiliki stock--</option>`;
                     }
                     optionStock += `</select>`;
                     $('#body-item-issue').append(`
-                        <tr class="row_item_issue" data-id="` + response.production_order_id + `">
-                            <input type="hidden" name="arr_type[]" value="` + val.type + `">
+                        <tr class="row_item_issue" data-id="` + val.id + `">
+                            <input type="hidden" name="arr_type[]" value="1">
                             <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
                             <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
-                            <input type="hidden" name="arr_production_detail_id[]" value="` + val.id + `">
-                            <input type="hidden" name="arr_bom_detail_id[]" value="` + val.bom_detail_id + `">
-                            <input type="hidden" name="arr_nominal[]" data-standard="` + val.nominal_standard + `" value="` + val.nominal + `">
-                            <input type="hidden" name="arr_total[]" data-standard="` + val.total_standard + `" value="` + val.total + `">
-                            <input type="hidden" name="arr_shading[]" value="-">
-                            <input type="hidden" name="arr_batch[]" value="-">
-                            ` + (val.lookable_type == 'coas' ? `<input name="arr_qty[]" type="hidden" value="0">` : '') + `
+                            <input type="hidden" name="arr_production_order_id[]" value="` + val.id + `">
+                            <input type="hidden" name="arr_bom_id[]" value="` + (val.bom_id ? val.bom_id : '0' ) + `">
+                            <input type="hidden" name="arr_qty_bom[]" value="` + (val.bom_id ? val.qty_bom : '0,000') + `">
+                            <input type="hidden" name="arr_nominal_bom[]" value="` + (val.bom_id ? val.nominal_bom : '0,00') + `">
+                            <input type="hidden" name="arr_total_bom[]" value="` + (val.bom_id ? val.total_bom : '0,00') + `">
+                            <input type="hidden" name="arr_place[]" value="0">
+                            <input type="hidden" name="arr_line[]" value="0">
+                            <input type="hidden" name="arr_warehouse[]" value="0">
+                            <input type="hidden" name="arr_area[]" value="0">
+                            <input type="hidden" name="arr_shading[]" value="">
+                            <input type="hidden" name="arr_batch[]" value="">
+                            <input type="hidden" name="arr_is_fg[]" value="0">
                             <td class="center-align">
                                 ` + no_issue + `
                             </td>
@@ -1767,69 +1794,113 @@
                                 ` + val.lookable_code + ` - ` + val.lookable_name + `
                             </td>
                             <td class="right-align">
-                                ` + val.qty_standard + `
+                                ` + val.qty_planned + `
                             </td>
                             <td class="center">
-                                ` + (val.lookable_type == 'items' ? `<input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100%;" id="rowQty`+ count +`" required>` : '-') + `
+                                <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);checkQty();countRow('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required>
                             </td>
-                            <td class="center">
+                            <td class="center" id="arr_unit` + count + `">
                                 ` + val.lookable_unit + `
                             </td>
                             <td class="center">
+                                <input name="arr_nominal[]" class="browser-default" type="text" value="` + val.nominal + `" onkeyup="formatRupiahNominal(this);countRow('` + count + `');" style="text-align:right;" id="arr_nominal` + count + `" ` + (val.lookable_type == 'items' ? 'readonly' : '') + `>
+                            </td>
+                            <td class="center">
+                                <input name="arr_total[]" type="text" value="` + val.total + `" onkeyup="formatRupiahNominal(this);" style="text-align:right;" id="arr_total` + count + `" readonly>
+                            </td>
+                            <td class="center" id="arr_stock` + count + `">
                                 ` + optionStock + `
+                            </td>
+                            <td class="center">
+                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-issue" href="javascript:void(0);">
+                                    <i class="material-icons">delete</i>
+                                </a>
                             </td>
                         </tr>
                     `);
+                    if(val.item_stock_id){
+                        $('#arr_item_stock_id' + count).val(val.item_stock_id);
+                    }
                     no_issue++;
                 });
 
                 var count = makeid(10);
+
+                let datalist = `<datalist id="list-shading` + count + `">`;
+                if(response.arr_shading.length > 0){
+                    $.each(response.arr_shading, function(i, valkuy) {
+                        datalist += `<option value="` + valkuy.code + `">` + valkuy.code + `</option>`;
+                    });
+                }
+                datalist += `</datalist>`;
+                
                 $('#body-item-receive').append(`
                     <tr class="row_item_receive" data-id="` + $('#production_order_id').val() + `">
                         <input type="hidden" name="arr_type[]" value="2">
                         <input type="hidden" name="arr_lookable_type[]" value="items">
-                        <input type="hidden" name="arr_lookable_id[]" value="` + response.item_receive_id + `">
-                        <input type="hidden" name="arr_production_detail_id[]" value="">
-                        <input type="hidden" name="arr_bom_detail_id[]" value="">
-                        <input type="hidden" name="arr_nominal[]" data-standard="0,00" value="0,00">
-                        <input type="hidden" name="arr_total[]" data-standard="0,00" value="0,00">                                
+                        <input type="hidden" name="arr_lookable_id[]" value="` + response.item_id + `">
+                        <input type="hidden" name="arr_production_order_id[]" value="` + response.production_order_id + `">
+                        <input type="hidden" name="arr_bom_id[]" value="` + response.bom_id + `">
+                        <input type="hidden" name="arr_qty_bom[]" value="` + response.qty_bom + `">
+                        <input type="hidden" name="arr_nominal_bom[]" value="0,00">
+                        <input type="hidden" name="arr_total_bom[]" value="0,00">
+                        <input type="hidden" name="arr_nominal[]" value="0,00">
+                        <input type="hidden" name="arr_total[]" value="0,00">
+                        <input type="hidden" name="arr_place[]" value="` + response.place_id + `">
+                        <input type="hidden" name="arr_line[]" value="` + response.line_id + `">
+                        <input type="hidden" name="arr_warehouse[]" value="` + response.warehouse_id + `">
+                        <input type="hidden" name="arr_is_fg[]" value="` + response.is_fg + `">
+                        <input type="hidden" name="arr_item_stock_id[]" value="0">
                         <td class="center-align">
                             ` + no_receive + `
                         </td>
                         <td>
-                            ` + response.item_receive_code + ` - ` + response.item_receive_name + `
+                            ` + response.item_code + ` - ` + response.item_name + `
                         </td>
                         <td class="right-align">
-                            ` + response.item_receive_qty + `
+                            ` + response.qty_planned + `
                         </td>
                         <td class="center">
                             <div class="input-field col s10">
-                                <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + response.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100%;margin: 0 0 0 0 !important;height:1.25rem !important;font-size:0.9rem !important;" id="rowQty`+ count +`" data-id="` + count + `" data-production="` + response.production_convert + `" data-sell="` + response.sell_convert + `" data-pallet="` + response.pallet_convert + `" data-qtystandard="` + response.item_receive_qty + `" required>
-                                <div class="form-control-feedback" id="production-unit` + count + `" style="right:-30px;top:-10px;">` + response.item_receive_unit_production + `</div>
+                                <input class="browser-default" name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + response.qty + `" onkeyup="formatRupiah(this);checkQty();" style="text-align:right;min-width:100% !important;" id="rowQty`+ count +`" data-id="` + count + `" required>
                             </div>
                         </td>
-                        <td class="right-align">
-                            <b id="uom-unit` + count + `">-</b>&nbsp;<b>` + response.item_receive_unit_uom + `</b>
+                        <td class="center-align">
+                            ` + response.unit + `
                         </td>
-                        <td class="right-align">
-                            <b id="sell-unit` + count + `">-</b>&nbsp;<b>` + response.item_receive_unit_sell + `</b>
+                        <td class="center-align">
+                            ` + response.place_name + `
                         </td>
-                        <td class="right-align">
-                            <b id="pallet-unit` + count + `">-</b>&nbsp;<b>` + response.item_receive_unit_pallet + `</b>
+                        <td class="center-align">
+                            ` + response.line_code + `
+                        </td>
+                        <td class="center-align">
+                            ` + response.warehouse_name + `
+                        </td>
+                        <td>
+                            ` + (response.is_fg ? `<select class="browser-default" id="arr_area` + count + `" name="arr_area[]">
+                                <option value="0">--Kosong--</option>
+                                @foreach ($area as $rowarea)
+                                    <option value="{{ $rowarea->id }}">{{ $rowarea->name }}</option>
+                                @endforeach
+                            </select>` : `<select class="browser-default" id="arr_area` + count + `" name="arr_area[]">
+                                <option value="0">--Kosong--</option>
+                            </select>`) + `
                         </td>
                         <td class="center">
-                            <input name="arr_shading[]" class="browser-default" type="text" placeholder="Kode Shading..." style="width:100%;" value="` + response.shading + `" required>
+                            <input list="list-shading` + count + `" name="arr_shading[]" class="browser-default" id="arr_shading` + count + `" type="text" placeholder="Kode Shading..." style="width:100%;" required ` + (response.is_fg ? '' : 'readonly') + ` value="` + response.shading + `">
+                            ` + datalist + `
                         </td>
                         <td class="center">
-                            <input name="arr_batch[]" class="browser-default" type="text" placeholder="Nomor batch..." style="width:100%;" value="` + response.batch_no + `" required>
+                            <input name="arr_batch[]" class="browser-default" type="text" placeholder="Nomor batch..." style="width:100%;" required value="` + response.batch_no + `">
                         </td>
                     </tr>
                 `);
-                no_receive++;
-                $('#rowQty' + count).trigger('keyup');
-                $('#output-shift').empty().text(response.shift);
-                $('#output-group').empty().text(response.group);
-                $('#output-line').empty().text(response.line);
+
+                if(response.area_id){
+                    $('#arr_area' + count).val(response.area_id);
+                }
+
                 M.updateTextFields();
                 $('.modal-content').scrollTop(0);
             },
@@ -2115,13 +2186,13 @@
                 }else{
                     $('#modal6').modal('open');
                     $('#title_data').append(``+data.title+``);
-                    $('#code_data').append(data.code);
+                    $('#code_data').append(data.message.code);
                     $('#body-journal-table').append(data.tbody);
                     $('#user_jurnal').append(`Pengguna : `+data.user);
-                    $('#note_jurnal').append(`Keterangan : `+data.note);
+                    $('#note_jurnal').append(`Keterangan : `+data.message.note);
                     $('#ref_jurnal').append(`Referensi : `+data.reference);
                     $('#company_jurnal').append(`Perusahaan : `+data.company);
-                    $('#post_date_jurnal').append(`Tanggal : `+data.post_date);
+                    $('#post_date_jurnal').append(`Tanggal : `+data.message.post_date);
                 }
             }
         });

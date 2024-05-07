@@ -177,6 +177,8 @@ class ProductionIssueReceiveController extends Controller
                     $val->productionOrder->code,
                     $val->productionOrder->productionSchedule->code,
                     $val->shift->code.' - '.$val->shift->name,
+                    date('d/m/Y H:i',strtotime($val->start_process_time)),
+                    date('d/m/Y H:i',strtotime($val->end_process_time)),
                     $val->line->code,
                     $val->group,
                     $val->place->code,
@@ -240,6 +242,8 @@ class ProductionIssueReceiveController extends Controller
             'machine_id'                => 'required',
             'post_date'		            => 'required',
             'production_order_id'       => 'required',
+            'start_process_time'        => 'required',
+            'end_process_time'          => 'required',
         ], [
             'code_place_id.required'            => 'Plant Tidak boleh kosong',
             'code.required' 	                => 'Kode tidak boleh kosong.',
@@ -251,6 +255,8 @@ class ProductionIssueReceiveController extends Controller
             'machine_id'                        => 'Mesin tidak boleh kosong.',
             'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
             'production_order_id.required'      => 'Order Produksi tidak boleh kosong.',
+            'start_process_time.required'       => 'Waktu mulai produksi tidak boleh kosong.',
+            'end_process_time.required'         => 'Waktu selesai produksi tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {
@@ -311,6 +317,8 @@ class ProductionIssueReceiveController extends Controller
                         $query->line_id = $request->line_id;
                         $query->machine_id = $request->machine_id;
                         $query->post_date = $request->post_date;
+                        $query->start_process_time = $request->start_process_time;
+                        $query->end_process_time = $request->end_process_time;
                         $query->document = $document;
                         $query->note = $request->note;
                         $query->status = '1';
@@ -349,6 +357,8 @@ class ProductionIssueReceiveController extends Controller
                         'line_id'                   => $request->line_id,
                         'machine_id'                => $request->machine_id,
                         'post_date'                 => $request->post_date,
+                        'start_process_time'        => $request->start_process_time,
+                        'end_process_time'          => $request->end_process_time,
                         'document'                  => $request->file('file') ? $request->file('file')->store('public/production_issue_receives') : NULL,
                         'note'                      => $request->note,
                         'status'                    => '1',
@@ -401,6 +411,9 @@ class ProductionIssueReceiveController extends Controller
                                     $total = str_replace(',','.',str_replace('.','',$request->arr_total[$key]));
                                 }
                             }
+                        }
+                        if($row == '2'){
+                            $qty_planned = $query->productionOrder->productionScheduleDetail->qty;
                         }
                         ProductionIssueReceiveDetail::create([
                             'production_issue_receive_id'   => $query->id,
@@ -464,23 +477,26 @@ class ProductionIssueReceiveController extends Controller
 
         foreach($po->productionIssueReceiveDetail()->where('type','1')->get() as $row){
             $detail_issue[] = [
-                'id'                    => $row->production_order_detail_id,
-                'bom_detail_id'         => $row->productionOrderDetail->bom_detail_id,
+                'id'                    => $row->production_order_id,
+                'bom_id'                => $row->bom_id ?? '',
                 'lookable_type'         => $row->lookable_type,
                 'lookable_id'           => $row->lookable_id,
                 'lookable_code'         => $row->lookable->code,
                 'lookable_name'         => $row->lookable->name,
-                'lookable_unit'         => $row->item()->exists() ? $row->item->productionUnit->code : '-',
-                'list_stock'            => $row->item()->exists() ? $row->item->currentStockPerPlace($po->productionOrder->productionSchedule->place_id) : [],
+                'lookable_unit'         => $row->lookable->uomUnit->code,
+                'list_stock'            => $row->item()->exists() ? $row->lookable->currentStockPerPlace($po->place_id) : [],
                 'qty'                   => CustomHelper::formatConditionalQty($row->qty),
-                'nominal'               => number_format($row->nominal,2,',','.'),
-                'total'                 => number_format($row->total,2,',','.'),
-                'qty_standard'          => CustomHelper::formatConditionalQty($row->productionOrderDetail->qty),
-                'nominal_standard'      => number_format($row->productionOrderDetail->nominal,2,',','.'),
-                'total_standard'        => number_format($row->productionOrderDetail->total,2,',','.'),
+                'nominal'               => $row->lookable_type == 'resources' ? number_format($row->nominal,2,',','.') : '0,00',
+                'total'                 => $row->lookable_type == 'resources' ? number_format($row->total,2,',','.') : '0,00',
+                'qty_planned'           => CustomHelper::formatConditionalQty($row->qty_planned),
+                'nominal_planned'       => number_format($row->nominal_planned,2,',','.'),
+                'total_planned'         => number_format($row->total_planned,2,',','.'),
+                'qty_bom'               => CustomHelper::formatConditionalQty($row->qty_bom),
+                'nominal_bom'           => number_format($row->nominal_bom,2,',','.'),
+                'total_bom'             => number_format($row->total_bom,2,',','.'),
                 'item_stock_id'         => $row->from_item_stock_id,
-                'shading'               => $row->shading,
-                'batch_no'              => $row->batch_no,
+                'shading'               => $row->shading ?? '',
+                'batch_no'              => $row->batch_no ?? '',
                 'type'                  => $row->type,
             ];
         }
@@ -489,24 +505,29 @@ class ProductionIssueReceiveController extends Controller
 
         $po['code_place_id'] = substr($po->code,7,2);
         $po['production_order_code'] = $po->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($po->productionOrder->post_date)).' - Plant : '.$po->productionOrder->productionSchedule->place->code;
-        $po['item_receive_id']                  = $po->productionOrder->productionScheduleDetail->item_id;
-        $po['item_receive_code']                = $po->productionOrder->productionScheduleDetail->item->code;
-        $po['item_receive_name']                = $po->productionOrder->productionScheduleDetail->item->name;
-        $po['item_receive_unit_production']     = $po->productionOrder->productionScheduleDetail->item->productionUnit->code;
-        $po['item_receive_unit_uom']            = $po->productionOrder->productionScheduleDetail->item->uomUnit->code;
-        $po['item_receive_unit_sell']           = $po->productionOrder->productionScheduleDetail->item->sellUnit->code;
-        $po['item_receive_unit_pallet']         = $po->productionOrder->productionScheduleDetail->item->palletUnit->code;
-        $po['item_receive_qty']                 = CustomHelper::formatConditionalQty($po->productionOrder->productionScheduleDetail->qty);
+        $po['table']                            = $po->productionOrder->getTable();
+        $po['po_code']                          = $po->productionOrder->code;
+        $po['item_id']                          = $detailReceive->lookable_id;
+        $po['item_code']                        = $detailReceive->lookable->code;
+        $po['item_name']                        = $detailReceive->lookable->name;
+        $po['unit']                             = $detailReceive->lookable->uomUnit->code;
         $po['qty']                              = CustomHelper::formatConditionalQty($detailReceive->qty);
-        $po['production_convert']               = $po->productionOrder->productionScheduleDetail->item->production_convert;
-        $po['sell_convert']                     = $po->productionOrder->productionScheduleDetail->item->sell_convert;
-        $po['pallet_convert']                   = $po->productionOrder->productionScheduleDetail->item->pallet_convert;
+        $po['qty_planned']                      = CustomHelper::formatConditionalQty($detailReceive->productionOrder->productionScheduleDetail->qty);
+        $po['qty_bom']                          = CustomHelper::formatConditionalQty($po->productionOrder->productionScheduleDetail->bom->qty_output);
         $po['detail_issue']                     = $detail_issue;
-        $po['shift']                            = date('d/m/Y',strtotime($po->productionOrder->productionScheduleDetail->production_date)).' - '.$po->productionOrder->productionScheduleDetail->shift->code.' - '.$po->productionOrder->productionScheduleDetail->shift->name;
-        $po['group']                            = $po->productionOrder->productionScheduleDetail->group;
-        $po['line']                             = $po->productionOrder->productionScheduleDetail->line->code;
-        $po['shading']                          = $detailReceive->shading;
-        $po['batch_no']                         = $detailReceive->batch_no;
+        $po['bom_id']                           = $detailReceive->bom_id;
+        $po['shift_name']                       = $po->shift->code.' - '.$po->shift->name;
+        $po['line_code']                        = $detailReceive->line->code;
+        $po['warehouse_name']                   = $detailReceive->warehouse->name;
+        $po['warehouse_id']                     = $detailReceive->warehouse_id;
+        $po['place_id']                         = $detailReceive->place_id;
+        $po['area_id']                          = $detailReceive->area_id ?? '';
+        $po['line_id']                          = $detailReceive->line_id;
+        $po['place_name']                       = $detailReceive->place->code;
+        $po['shading']                          = $detailReceive->shading ?? '';
+        $po['batch_no']                         = $detailReceive->batch_no ?? '';
+        $po['arr_shading']                      = $detailReceive->lookable->arrShading();
+        $po['is_fg']                            = $detailReceive->lookable->is_sales_item ?? '';
         
 		return response()->json($po);
     }
@@ -689,10 +710,10 @@ class ProductionIssueReceiveController extends Controller
             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
             $data["image"]=$path_img;
              
-            $pdf = Pdf::loadView('admin.print.production.issue_receive_individual', $data)->setPaper('a5', 'landscape');
+            $pdf = Pdf::loadView('admin.print.production.issue_receive_individual', $data)->setPaper('a4', 'portrait');
     
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+            $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             
             $content = $pdf->download()->getOriginalContent();
             
@@ -717,6 +738,12 @@ class ProductionIssueReceiveController extends Controller
         $query = ProductionIssueReceive::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
+            if(!CustomHelper::checkLockAcc($query->post_date)){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
+                ]);
+            }
             if(in_array($query->status,['4','5'])){
                 $response = [
                     'status'  => 500,
@@ -735,19 +762,19 @@ class ProductionIssueReceiveController extends Controller
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
 
-                foreach($query->productionIssueReceiveDetail()->whereNotNull('production_order_detail_id')->get() as $row){
-                    $row->productionOrderDetail->update([
-                        'qty_real'      => NULL,
-                        'nominal_real'  => NULL,
-                        'total_real'    => NULL,
-                    ]);
-                }
-
                 $query->productionOrder->update([
-                    'actual_item_cost'      => NULL,
-                    'actual_resource_cost'  => NULL,
-                    'total_product_cost'    => NULL,
-                    'completed_qty'         => NULL,
+                    'standard_item_cost'        => 0,
+                    'standard_resource_cost'    => 0,
+                    'standard_product_cost'     => 0,
+                    'actual_item_cost'          => 0,
+                    'actual_resource_cost'      => 0,
+                    'total_product_cost'        => 0,
+                    'planned_qty'               => 0,
+                    'completed_qty'             => 0,
+                    'rejected_qty'              => 0,
+                    'total_production_time'     => 0,
+                    'total_additional_time'     => 0,
+                    'total_run_time'            => 0,
                 ]);
     
                 activity()
@@ -883,12 +910,12 @@ class ProductionIssueReceiveController extends Controller
                     $img_base_64 = base64_encode($image_temp);
                     $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                     $data["image"]=$path_img;
-                    $pdf = Pdf::loadView('admin.print.production.issue_receive_individual', $data)->setPaper('a5', 'landscape');
+                    $pdf = Pdf::loadView('admin.print.production.issue_receive_individual', $data)->setPaper('a4', 'portrait');
                     $pdf->render();
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                    $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
-                    $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                    $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(495, 740, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                     $content = $pdf->download()->getOriginalContent();
                     $temp_pdf[]=$content;
                 }
@@ -979,12 +1006,12 @@ class ProductionIssueReceiveController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.production.issue_receive_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.production.issue_receive_individual', $data)->setPaper('a4', 'portrait');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                            $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(495, 740, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
                            
@@ -1054,12 +1081,12 @@ class ProductionIssueReceiveController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.production.issue_receive_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.production.issue_receive_individual', $data)->setPaper('a4', 'portrait');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                            $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(495, 740, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
                            
@@ -1947,7 +1974,7 @@ class ProductionIssueReceiveController extends Controller
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_konversi, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_kredit_konversi, 2, ',', '.') . '</td>
             </tr>';
-            $response["tbody"] = $string; 
+            $response["tbody"] = $string;
         }else{
             $response = [
                 'status'  => 500,

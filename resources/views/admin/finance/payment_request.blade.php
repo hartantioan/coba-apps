@@ -187,6 +187,7 @@
                                                         <th rowspan="2">Status</th>
                                                         <th rowspan="2">By</th>
                                                         <th rowspan="2">Kas/Bank Keluar</th>
+                                                        <th rowspan="2">Tgl.Bayar OP</th>
                                                         <th rowspan="2">Action</th>
                                                     </tr>
                                                     <tr>
@@ -2425,9 +2426,10 @@
                 { name: 'account_name', className: '' },
                 { name: 'note', className: '' },
                 { name: 'is_reimburse', className: 'center-align' },
-              { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'cash_bank_out', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'date_cash_bank_out', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',

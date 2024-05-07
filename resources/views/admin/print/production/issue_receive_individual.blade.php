@@ -193,7 +193,7 @@
                 <div class="card-content invoice-print-area">
                     <table border="0" width="100%" class="tbl-info">
                         <tr>
-                            <td width="40%" class="left-align" style="vertical-align: top;">
+                            <td width="40%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
                                         <td width="34%">
@@ -230,50 +230,28 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            Production Order
+                                            Plant & Gudang
                                         </td>
                                         <td>
                                             :
                                         </td>
                                         <td>
-                                            {{ $data->productionOrder->code }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Plant
-                                        </td>
-                                        <td>
-                                            :
-                                        </td>
-                                        <td>
-                                            {{ $data->place->code }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Line
-                                        </td>
-                                        <td>
-                                            :
-                                        </td>
-                                        <td>
-                                            {{ $data->line->code }}
+                                            {{ $data->productionOrder->productionSchedule->place->code.' - '.$data->productionOrder->warehouse->name }}
                                         </td>
                                     </tr>
                                 </table>
                             </td>
-                            <td width="40%" class="left-align" style="vertical-align: top;">
+                            <td width="40%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
                                         <td width="34%">
-                                            Mesin
+                                            Area
                                         </td>
                                         <td width="1%">
                                             :
                                         </td>
                                         <td width="65%">
-                                            {{ $data->machine->name }}
+                                            {{ $data->productionOrder->area()->exists() ? $data->productionOrder->area->name : '-' }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -284,29 +262,18 @@
                                             :
                                         </td>
                                         <td width="65%">
-                                            {{ $data->shift->code.' - '.$data->shift->name }}
+                                            {{ date('d/m/Y',strtotime($data->productionOrder->productionScheduleDetail->production_date)).' - '.$data->productionOrder->productionScheduleDetail->shift->code.' - '.$data->productionOrder->productionScheduleDetail->shift->name }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="34%">
-                                            Mulai Proses
+                                        <td>
+                                            Line
                                         </td>
                                         <td width="1%">
                                             :
                                         </td>
-                                        <td width="65%">
-                                            {{ date('d/m/Y H:i',strtotime($data->start_process_time)) }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="34%">
-                                            Selesai Proses
-                                        </td>
-                                        <td width="1%">
-                                            :
-                                        </td>
-                                        <td width="65%">
-                                            {{ date('d/m/Y H:i',strtotime($data->end_process_time)) }}
+                                        <td>
+                                            {{ $data->productionOrder->productionScheduleDetail->line->code }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -317,7 +284,7 @@
                                             :
                                         </td>
                                         <td>
-                                            {{ $data->group }}
+                                            {{ $data->productionOrder->productionScheduleDetail->group }}
                                         </td>
                                     </tr>
                                 </table>
@@ -344,33 +311,25 @@
                     <table class="bordered" border="1" width="100%" class="table-data-item" style="border-collapse:collapse">
                         <thead>
                             <tr>
-                                <th align="center" colspan="10" style="font-size:16px !important;">Daftar Item/Coa Issue (Terpakai)</th>
+                                <th align="center" colspan="6" style="font-size:16px !important;">Daftar Item/Coa Issue (Terpakai)</th>
                             </tr>
                             <tr>
                                 <th align="center">No.</th>
-                                <th align="center">Item/Resource</th>
+                                <th align="center">Item/Coa</th>
                                 <th align="center">Qty Planned</th>
                                 <th align="center">Qty Real</th>
-                                <th align="center">Nominal Planned</th>
-                                <th align="center">Nominal Real</th>
-                                <th align="center">Total Planned</th>
-                                <th align="center">Total Real</th>
-                                <th align="center">Satuan UoM</th>
+                                <th align="center">Satuan Produksi</th>
                                 <th align="center">Plant & Gudang</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($data->productionIssueReceiveDetail()->where('type','1')->get() as $key => $row)
                                 <tr>
-                                    <td align="center">{{ ($key+1) }}</td>
-                                    <td>{{ $row->lookable->code.' - '.$row->lookable->name }}</td>
-                                    <td align="right">{{ CustomHelper::formatConditionalQty($row->qty_planned) }}</td>
-                                    <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
-                                    <td align="right">{{ number_format($row->nominal_planned,2,',','.') }}</td>
-                                    <td align="right">{{ number_format($row->nominal,2,',','.') }}</td>
-                                    <td align="right">{{ number_format($row->total_planned,2,',','.') }}</td>
-                                    <td align="right">{{ number_format($row->total,2,',','.') }}</td>
-                                    <td align="center">{{ $row->lookable->uomUnit->code }}</td>
+                                    <td align="center">{{ $key+1 }}.</td>
+                                    <td>{{ $row->item()->exists() ? $row->item->code.' - '.$row->item->name : $row->coa->code.' - '.$row->coa->name }}</td>
+                                    <td align="right">{{ $row->item()->exists() ? CustomHelper::formatConditionalQty($row->productionOrderDetail->qty) : '-' }}</td>
+                                    <td align="right">{{ $row->item()->exists() ? CustomHelper::formatConditionalQty($row->qty) : '-' }}</td>
+                                    <td align="center">{{ $row->item()->exists() ? $row->item->productionUnit->code : '-' }}</td>
                                     <td>{{ $row->item()->exists() ? $row->itemStock->fullName() : '-' }}</td>
                                 </tr>
                             @endforeach
@@ -378,38 +337,36 @@
                     </table>
                 </div>
 
-                <div class="invoice-product-details" style="margin-top:10px;">
+                <div class="invoice-product-details">
                     <table class="bordered" border="1" width="100%" class="table-data-item" style="border-collapse:collapse">
                         <thead>
                             <tr>
-                                <th align="center" colspan="10" style="font-size:16px !important;">Daftar Item Receive (Diterima)</th>
+                                <th align="center" colspan="9" style="font-size:16px !important;">Daftar Item Receive (Diterima)</th>
                             </tr>
                             <tr>
-                                <th align="center">No.</th>
-                                <th align="center">Item</th>
-                                <th align="center">Qty Planned (Prod.)</th>
-                                <th align="center">Qty Real (Prod.)</th>
-                                <th align="center">Shading</th>
-                                <th align="center">Batch</th>
-                                <th align="center">Plant</th>
-                                <th align="center">Line</th>
-                                <th align="center">Gudang</th>
-                                <th align="center">Area</th>
+                                <th align="center" width="5%">No.</th>
+                                <th align="center" width="15%">Item/Coa</th>
+                                <th align="center" width="10%">Qty Planned (Prod.)</th>
+                                <th align="center" width="10%">Qty Real (Prod.)</th>
+                                <th align="center" width="10%">Qty UoM</th>
+                                <th align="center" width="10%">Qty Jual</th>
+                                <th align="center" width="10%">Qty Pallet</th>
+                                <th align="center" width="15%">Shading</th>
+                                <th align="center" width="15%">Batch</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($data->productionIssueReceiveDetail()->where('type','2')->get() as $key => $row)
                                 <tr>
-                                    <td align="center">{{ ($key+1) }}</td>
-                                    <td>{{ $row->lookable->code.' - '.$row->lookable->name }}</td>
-                                    <td align="right">{{ CustomHelper::formatConditionalQty($row->productionOrder->productionScheduleDetail->qty).' '.$row->lookable->uomUnit->code }}</td>
-                                    <td align="right">{{ CustomHelper::formatConditionalQty($row->qty).' '.$row->lookable->uomUnit->code }}</td>
+                                    <td align="center">{{ $key+1 }}</td>
+                                    <td>{{ $row->item->code.' - '.$row->item->name }}</td>
+                                    <td align="right">{{ CustomHelper::formatConditionalQty($data->productionOrder->productionScheduleDetail->qty).' '.$row->item->productionUnit->code }}</td>
+                                    <td align="right">{{ CustomHelper::formatConditionalQty($row->qty).' '.$row->item->productionUnit->code }}</td>
+                                    <td align="right">{{ CustomHelper::formatConditionalQty($row->qty * $row->item->production_convert).' '.$row->item->uomUnit->code }}</td>
+                                    <td align="right">{{ CustomHelper::formatConditionalQty(($row->qty * $row->item->production_convert) / $row->item->sell_convert).' '.$row->item->sellUnit->code }}</td>
+                                    <td align="right">{{ CustomHelper::formatConditionalQty((($row->qty * $row->item->production_convert) / $row->item->sell_convert) / $row->item->pallet_convert).' '.$row->item->palletUnit->code }}</td>
                                     <td align="center">{{ $row->shading }}</td>
                                     <td align="center">{{ $row->batch_no }}</td>
-                                    <td align="center">{{ $row->place->code }}</td>
-                                    <td align="center">{{ $row->line->code }}</td>
-                                    <td align="center">{{ $row->warehouse->name }}</td>
-                                    <td align="center">{{ $row->area()->exists() ? $row->area->name : '-' }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

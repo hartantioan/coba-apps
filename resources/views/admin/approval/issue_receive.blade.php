@@ -147,7 +147,7 @@
         <div class="divider mb-1 mt-1"></div>
         <!-- invoice address and contact -->
         <div class="row">
-            <div class="col s6 row mt-2">
+            <div class="col s4 row mt-2">
                 <div class="col s12 center-align">
                     INFO UTAMA
                 </div>
@@ -161,7 +161,7 @@
                     Plant
                 </div>
                 <div class="col s8">
-                    {{ $data->place->code }}
+                    {{ $data->productionOrder->productionSchedule->place->code.' - '.$data->productionOrder->warehouse->name.($data->productionOrder->area()->exists() ? ' - '.$data->productionOrder->area->name : '') }}
                 </div>
                 <div class="col s4">
                     No.PROD
@@ -175,52 +175,45 @@
                 <div class="col s8">
                     {{ $data->productionOrder->productionSchedule->code }}
                 </div>
+            </div>
+            <div class="col s4 row mt-2">
+                <div class="col s12 center-align">
+                    JADWAL
+                </div>
+                <div class="col s4">
+                    Tgl.
+                </div>
+                <div class="col s8">
+                    {{ date('d/m/Y',strtotime($data->productionOrder->productionScheduleDetail->production_date)) }}
+                </div>
                 <div class="col s4">
                     Shift
                 </div>
                 <div class="col s8">
-                    {{ $data->shift->code.' - '.$data->shift->name }}
-                </div>
-            </div>
-            <div class="col s6 row mt-2">
-                <div class="col s12 center-align">
-                    LAIN-LAIN
-                </div>
-                <div class="col s4">
-                    Mulai Proses
-                </div>
-                <div class="col s8">
-                    {{ date('d/m/Y H:i',strtotime($data->start_process_time)) }}
-                </div>
-                <div class="col s4">
-                    Selesai Proses
-                </div>
-                <div class="col s8">
-                    {{ date('d/m/Y H:i',strtotime($data->end_process_time)) }}
+                    {{ $data->productionOrder->productionScheduleDetail->shift->code.' - '.$data->productionOrder->productionScheduleDetail->shift->name }}
                 </div>
                 <div class="col s4">
                     Line
                 </div>
                 <div class="col s8">
-                    {{ $data->line->code }}
+                    {{ $data->productionOrder->productionScheduleDetail->line->code }}
                 </div>
                 <div class="col s4">
                     Grup
                 </div>
                 <div class="col s8">
-                    {{ $data->group }}
+                    {{ $data->productionOrder->productionScheduleDetail->group }}
+                </div>
+            </div>
+            <div class="col s4 row mt-2">
+                <div class="col s12 center-align">
+                    LAIN-LAIN
                 </div>
                 <div class="col s4">
                     Tgl.Post
                 </div>
                 <div class="col s8">
                     {{ date('d/m/Y',strtotime($data->post_date)) }}
-                </div>
-                <div class="col s4">
-                    Keterangan
-                </div>
-                <div class="col s8">
-                    {{ $data->note }}
                 </div>
             </div>
         </div>
@@ -229,33 +222,25 @@
             <table class="bordered">
                 <thead>
                     <tr>
-                        <th colspan="10" class="center-align">Daftar Coa/Item Issue (Terpakai)</th>
+                        <th colspan="6" class="center-align">Daftar Coa/Item Issue (Terpakai)</th>
                     </tr>
                     <tr>
                         <th class="center">No.</th>
-                        <th class="center">Item/Resource</th>
+                        <th class="center">Item/Coa</th>
                         <th class="center">Qty Planned</th>
                         <th class="center">Qty Real</th>
-                        <th class="center">Nominal Planned</th>
-                        <th class="center">Nominal Real</th>
-                        <th class="center">Total Planned</th>
-                        <th class="center">Total Real</th>
-                        <th class="center">Satuan UoM</th>
+                        <th class="center">Satuan Produksi</th>
                         <th class="center">Plant & Gudang</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($data->productionIssueReceiveDetail()->where('type','1')->get() as $key => $row)
                         <tr>
-                            <td class="center-align">{{ ($key+1) }}</td>
-                            <td>{{ $row->lookable->code.' - '.$row->lookable->name }}</td>
-                            <td class="right-align">{{ CustomHelper::formatConditionalQty($row->qty_planned) }}</td>
-                            <td class="right-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
-                            <td class="right-align">{{ number_format($row->nominal_planned,2,',','.') }}</td>
-                            <td class="right-align">{{ number_format($row->nominal,2,',','.') }}</td>
-                            <td class="right-align">{{ number_format($row->total_planned,2,',','.') }}</td>
-                            <td class="right-align">{{ number_format($row->total,2,',','.') }}</td>
-                            <td class="center-align">{{ $row->lookable->uomUnit->code }}</td>
+                            <td class="center-align">{{ $key+1 }}.</td>
+                            <td>{{ $row->item()->exists() ? $row->item->code.' - '.$row->item->name : $row->coa->code.' - '.$row->coa->name }}</td>
+                            <td class="right-align">{{ $row->item()->exists() ? CustomHelper::formatConditionalQty($row->productionOrderDetail->qty) : '-' }}</td>
+                            <td class="right-align">{{ $row->item()->exists() ? CustomHelper::formatConditionalQty($row->qty) : '-' }}</td>
+                            <td class="center-align">{{ $row->item()->exists() ? $row->item->productionUnit->code : '-' }}</td>
                             <td>{{ $row->item()->exists() ? $row->itemStock->fullName() : '-' }}</td>
                         </tr>
                     @endforeach
@@ -267,34 +252,32 @@
             <table class="bordered">
                 <thead>
                     <tr>
-                        <th colspan="10" class="center-align">Daftar Item Receive (Diterima)</th>
+                        <th colspan="9" class="center-align">Daftar Item Receive (Diterima)</th>
                     </tr>
                     <tr>
-                        <th class="center">No.</th>
-                        <th class="center">Item</th>
-                        <th class="center">Qty Planned (Prod.)</th>
-                        <th class="center">Qty Real (Prod.)</th>
-                        <th class="center">Shading</th>
-                        <th class="center">Batch</th>
-                        <th class="center">Plant</th>
-                        <th class="center">Line</th>
-                        <th class="center">Gudang</th>
-                        <th class="center">Area</th>
+                        <th class="center-align" width="5%">No.</th>
+                        <th class="center-align" width="15%">Item/Coa</th>
+                        <th class="center-align" width="10%">Qty Planned (Prod.)</th>
+                        <th class="center-align" width="10%">Qty Real (Prod.)</th>
+                        <th class="center-align" width="10%">Qty UoM</th>
+                        <th class="center-align" width="10%">Qty Jual</th>
+                        <th class="center-align" width="10%">Qty Pallet</th>
+                        <th class="center-align" width="15%">Shading</th>
+                        <th class="center-align" width="15%">Batch</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($data->productionIssueReceiveDetail()->where('type','2')->get() as $key => $row)
                         <tr>
-                            <td class="center-align">{{ ($key+1) }}</td>
-                            <td>{{ $row->lookable->code.' - '.$row->lookable->name }}</td>
-                            <td class="right-align">{{ CustomHelper::formatConditionalQty($row->productionOrder->productionScheduleDetail->qty).' '.$row->lookable->uomUnit->code }}</td>
-                            <td class="right-align">{{ CustomHelper::formatConditionalQty($row->qty).' '.$row->lookable->uomUnit->code }}</td>
+                            <td class="center-align">{{ $key+1 }}</td>
+                            <td>{{ $row->item->code.' - '.$row->item->name }}</td>
+                            <td class="right-align">{{ CustomHelper::formatConditionalQty($data->productionOrder->productionScheduleDetail->qty).' '.$row->item->productionUnit->code }}</td>
+                            <td class="right-align">{{ CustomHelper::formatConditionalQty($row->qty).' '.$row->item->productionUnit->code }}</td>
+                            <td class="right-align">{{ CustomHelper::formatConditionalQty($row->qty * $row->item->production_convert).' '.$row->item->uomUnit->code }}</td>
+                            <td class="right-align">{{ CustomHelper::formatConditionalQty(($row->qty * $row->item->production_convert) / $row->item->sell_convert).' '.$row->item->sellUnit->code }}</td>
+                            <td class="right-align">{{ CustomHelper::formatConditionalQty((($row->qty * $row->item->production_convert) / $row->item->sell_convert) / $row->item->pallet_convert).' '.$row->item->palletUnit->code }}</td>
                             <td class="center-align">{{ $row->shading }}</td>
                             <td class="center-align">{{ $row->batch_no }}</td>
-                            <td class="center-align">{{ $row->place->code }}</td>
-                            <td class="center-align">{{ $row->line->code }}</td>
-                            <td class="center-align">{{ $row->warehouse->name }}</td>
-                            <td class="center-align">{{ $row->area()->exists() ? $row->area->name : '-' }}</td>
                         </tr>
                     @endforeach
                 </tbody>

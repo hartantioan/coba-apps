@@ -950,13 +950,6 @@ class GoodIssueController extends Controller
             }
         }
 
-        if(!CustomHelper::checkLockAcc($query->post_date)){
-            return response()->json([
-                'status'  => 500,
-                'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
-            ]);
-        }
-
         if($approved && !$revised){
             return response()->json([
                 'status'  => 500,
@@ -988,7 +981,7 @@ class GoodIssueController extends Controller
             CustomHelper::removeJournal('good_issues',$query->id);
             CustomHelper::removeCogs('good_issues',$query->id);
 
-            /* $query->goodIssueDetail()->delete(); */
+            $query->goodIssueDetail()->delete();
 
             CustomHelper::removeApproval('good_issues',$query->id);
 

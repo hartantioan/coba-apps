@@ -730,16 +730,6 @@
                     element : document.querySelector('.stepbspersonal'),
                     intro : 'Isi dokumen ini dengan close bill personal yang berkaitan.' 
                 },
-                // {
-                //     title : 'PPN',
-                //     element : document.querySelector('.step11'),
-                //     intro : 'Disini pengguna dapat memilih berapa ppn yang akan dikenakan pada down payment disini dan dapat memilih tidak terdapat ppn jika memang tidak ada ppn.'
-                // },
-                // {
-                //     title : 'Termasuk PPN',
-                //     element : document.querySelector('.step12'),
-                //     intro : 'Disini user dapat memilih apakah down payment ini sudah / belum termasuk dalam hitungan ppn.'
-                // },
                 {
                     title : 'Detail Tutup BS Personal & OP',
                     element : document.querySelector('.stepdetailtutupbs'),

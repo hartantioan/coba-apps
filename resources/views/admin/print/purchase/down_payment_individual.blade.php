@@ -187,7 +187,7 @@
                         <h3 class="indigo-text">Purchase Down Payment</h3>
                     </td>
                     <td width="33%" align="center">
-                        <h3>Untuk Payment Request</h3>
+                       
                     </td>
                     <td width="33%">
                         <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%;right:0;">
@@ -428,8 +428,8 @@
                 </div>
             </div>
         </main>
-        <div class="last-header"></div>
-        <header>
+        {{-- <div class="last-header"></div> --}}
+        {{-- <header>
             <table border="0" width="100%" style="font-size:1em" class="tb-header">
                 <tr>
                     <td width="33%">
@@ -531,7 +531,7 @@
                             
                         </tr>
                     </table>
-                    <!-- product details table-->
+                 
                     
                     @if(count($data->purchaseDownPaymentDetail) > 0)
                     <h6 class="center mt-3">Referensi Order Pembelian</h6>
@@ -591,7 +591,7 @@
                             @endif
                         </div>
                     @endif
-                    <!-- invoice subtotal -->
+                  
                     <div class="invoice-subtotal break-row">
                         <div class="row">
                         <div class="column1">
@@ -603,9 +603,9 @@
                                         <div class="mt-3">
                                             Catatan : {{ $data->note }}
                                         </div>
-                                        {{-- <div class="preserveLines" style="text-align:left !important;">
+                                        <div class="preserveLines" style="text-align:left !important;">
                                             {{ $data->note_external }}
-                                        </div> --}}
+                                        </div>
                                         Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords(strtolower($data->currency->document_text)) }}
                                     </td>
                                     
@@ -679,6 +679,6 @@
                     
                 </div>
             </div>
-        </main>
+        </main> --}}
     </body>
 </html>

@@ -60,8 +60,6 @@ class ExportPurchaseInvoiceTransactionPage implements FromCollection, WithTitle,
         'PPN',
         'PPh',
         'Grandtotal',
-        'Downpayment',
-        'Balance',
     ];
 
     public function collection()
@@ -154,8 +152,6 @@ class ExportPurchaseInvoiceTransactionPage implements FromCollection, WithTitle,
                 'tax'               => number_format($row->tax,2,',','.'),
                 'wtax'              => number_format($row->wtax,2,',','.'),
                 'grandtotal'        => number_format($row->grandtotal,2,',','.'),
-                'downpayment'       => number_format($row->downpayment,2,',','.'),
-                'balance'           => number_format($row->balance,2,',','.'),
             ];
             
         }

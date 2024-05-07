@@ -26,6 +26,8 @@ class ProductionIssueReceive extends Model
         'line_id',
         'machine_id',
         'post_date',
+        'start_process_time',
+        'end_process_time',
         'document',
         'note',
         'status',

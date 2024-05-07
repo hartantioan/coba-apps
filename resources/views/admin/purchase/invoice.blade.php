@@ -4214,15 +4214,16 @@
                     element : document.querySelector('.stepconversion'),
                     intro : ' Nomor Invoice terkait yang berasal dari vendor atau supplier(harap diisi jika ada)' 
                 },
-                {
-                    title : 'File Lampiran',
-                    element : document.querySelector('.step17'),
-                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
-                },
+                
                 {
                     title : 'Scan Barcode',
                     element : document.querySelector('.step18'),
                     intro : 'Digunakan untuk memasukan inputan detail ke form dengan menggunakan alat scanner barcode' 
+                },
+                {
+                    title : 'File Lampiran',
+                    element : document.querySelector('.step17'),
+                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
                 },
                 {
                     title : 'Detail Goods Receipt PO / Landed Cost / Purchase Order Jasa / Coa',

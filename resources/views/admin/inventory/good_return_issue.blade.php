@@ -232,7 +232,7 @@
                         <fieldset class="step6">
                             <legend>2. Good Issue / Barang Keluar</legend>
                             <div class="row">
-                                <div class="input-field col m5 step9">
+                                <div class="input-field col m5 ">
                                     <select class="browser-default" id="good_issue_id" name="good_issue_id"></select>
                                     <label class="active" for="good_issue_id">Daftar Good Issue / Barang Keluar</label>
                                 </div>

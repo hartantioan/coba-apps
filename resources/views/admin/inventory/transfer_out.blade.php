@@ -207,7 +207,7 @@
                                 <label class="active" for="post_date">Tgl. Post</label>
                             </div>
                             <div class="col m12 s12 l12"></div>
-                            <div class="col m4 s12 ">
+                            <div class="col m4 s12 stepfile">
                                 <label class="">Bukti Upload</label>
                                 <br>
                                 <input type="file" name="file" id="fileInput" accept="image/*" style="display: none;">
@@ -1809,7 +1809,11 @@
                     element : document.querySelector('.step4'),
                     intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
                 },
-
+                {
+                    title : 'File Lampiran',
+                    element : document.querySelector('.stepfile'),
+                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
+                },
                 {
                     title : 'Gudang  / Plant Awal',
                     element : document.querySelector('.step5'),

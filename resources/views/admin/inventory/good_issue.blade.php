@@ -210,7 +210,7 @@
                                     <label class="active" for="post_date">Tgl. Post</label>
                                 </div>
                                 <div class="col m12 s12 l12"></div>
-                                <div class="col m4 s12 step8">
+                                <div class="col m4 s12 stepfile">
                                     <label class="">Bukti Upload</label>
                                     <br>
                                     <input type="file" name="file" id="fileInput" accept="image/*" style="display: none;">
@@ -232,7 +232,7 @@
                         <fieldset class="step6">
                             <legend>2. Good Issue Request / Req. Barang Keluar (Jika Ada)</legend>
                             <div class="row">
-                                <div class="input-field col m5 step9">
+                                <div class="input-field col m5 ">
                                     <select class="browser-default" id="good_issue_request_id" name="good_issue_request_id"></select>
                                     <label class="active" for="good_issue_request_id">Daftar Good Issue Request</label>
                                 </div>
@@ -2335,7 +2335,7 @@
                 },
                 {
                     title : 'File Lampiran',
-                    element : document.querySelector('.step5'),
+                    element : document.querySelector('.stepfile'),
                     intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
                 },
                 {

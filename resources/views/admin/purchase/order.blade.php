@@ -315,7 +315,7 @@
                                 <input id="payment_term" name="payment_term" type="number" value="0" min="0" step="1" onchange="addDays();">
                                 <label class="active" for="payment_term">Termin Pembayaran (hari)</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 stepreceive">
                                 <input id="received_date" name="received_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Terima" value="{{ date('Y-m-d') }}" onchange="addDays();">
                                 <label class="active" for="received_date">Tgl. Terima (Opsional)</label>
                             </div>
@@ -3240,6 +3240,11 @@
                     title : 'Termin Pembayaran',
                     element : document.querySelector('.step10'),
                     intro : 'Berapa hari termin pembayaran sejak dokumen diterima. Otomatis terisi, ketika anda memilih supplier dan tipe pembayaran Credit.' 
+                },
+                {
+                    title : 'Tgl. Terima',
+                    element : document.querySelector('.stepreceive'),
+                    intro : 'Tanggal untuk menentukan tanggal terima dari order.' 
                 },
                 {
                     title : 'Mata Uang',

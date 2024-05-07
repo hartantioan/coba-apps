@@ -187,7 +187,6 @@
                                                         <th rowspan="2">Status</th>
                                                         <th rowspan="2">By</th>
                                                         <th rowspan="2">Kas/Bank Keluar</th>
-                                                        <th rowspan="2">Tgl.OP</th>
                                                         <th rowspan="2">Action</th>
                                                     </tr>
                                                     <tr>
@@ -308,7 +307,7 @@
                                     </select>
                                     <label class="" for="is_reimburse">Apakah Reimburse?</label>
                                 </div>
-                                <div class="col m4 s12 step8">
+                                <div class="col m4 s12 stepfile">
                                     <label class="">Bukti Upload</label>
                                     <br>
                                     <input type="file" name="file" id="fileInput" accept="image/*" style="display: none;">
@@ -356,9 +355,9 @@
                         <fieldset style="min-width: 100%;">
                             <legend>2. Daftar Dokumen Terpakai</legend>
                             <div class="row">
-                                <div class="col m12 s12">
+                                <div class="col m12 s12 step18">
                                     <ul class="collapsible">
-                                        <li class="active step18" id="main-tab">
+                                        <li class="active " id="main-tab">
                                             <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">library_books</i>BS Karyawan / AP DP / AP Invoice / AR Memo Terpakai</div>
                                             <div class="collapsible-body" style="display:block;">
                                                 <div class="mt-2 mb-2" style="overflow:scroll;width:100% !important;">
@@ -2071,11 +2070,10 @@
                                         $('#note').val(val.remark);
                                         if(val.is_reimburse){
                                             $('#is_reimburse').val(val.is_reimburse).formSelect();
-                                            /* if(val.raw_due_date){
+                                            if(val.raw_due_date){
                                                 $('#pay_date').val(val.raw_due_date);
-                                            } */
+                                            }
                                         }
-                                        $('#pay_date').val(val.raw_due_date);
                                     }
                                 });
                                 
@@ -2427,10 +2425,9 @@
                 { name: 'account_name', className: '' },
                 { name: 'note', className: '' },
                 { name: 'is_reimburse', className: 'center-align' },
-                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+              { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'cash_bank_out', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'op_paydate', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',
@@ -3618,11 +3615,7 @@
                     element : document.querySelector('.step9'),
                     intro : 'Tanggal pembayaran form ditentukan.' 
                 },
-                {
-                    title : 'File Lampiran',
-                    element : document.querySelector('.step10'),
-                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
-                },
+                
                 {
                     title : 'Mata Uang',
                     element : document.querySelector('.step11'),
@@ -3637,6 +3630,11 @@
                     title : 'Reimburse',
                     element : document.querySelector('.step13'),
                     intro : 'Pilih Ya jika Payment Request ini adalah klaim reimburse karyawan dan memunculkan no rekening seluruh pegawai. Sebaliknya pilih Tidak, jika payment request bukan reimburse dan daftar rekening yang muncul adalah rekening milih Partner Bisnis terpilih.'
+                },
+                {
+                    title : 'File Lampiran',
+                    element : document.querySelector('.stepfile'),
+                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
                 },
                 {
                     title : 'Pilih Partner Bisnis Rekening',
@@ -3670,17 +3668,17 @@
                 },
                 {
                     title : 'Keterangan',
-                    element : document.querySelector('.step20'),
+                    element : document.querySelector('.step21'),
                     intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
                 },
                 {
                     title : 'Rincian Biaya',
-                    element : document.querySelector('.step21'),
+                    element : document.querySelector('.step22'),
                     intro : 'Disini rincian biaya bisa dimasukkan sesuai dokumen yang ada. Fitur ini juga mengakomodir PPN dan PPh.' 
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step22'),
+                    element : document.querySelector('.step23'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]
@@ -3809,7 +3807,7 @@
         var end_date = $('#finish_date').val();
         var modedata = '{{ $modedata }}';
 
-        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&company=" + company + "&account=" + account + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata;
+        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&company=" + company + "&type_pay=" + type_pay + "&supplier=" + supplier + "&account=" + account + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata;
        
     }
 </script>

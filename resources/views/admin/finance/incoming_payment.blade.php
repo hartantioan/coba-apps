@@ -245,7 +245,7 @@
                                     <label class="active" for="post_date">Tgl. Posting</label>
                                 </div>
             
-                                <div class="input-field col m6 s12 step9">
+                                <div class="input-field col m6 s12 stepcurrency">
                                     <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
                                         @foreach ($currency as $row)
                                             <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
@@ -253,11 +253,11 @@
                                     </select>
                                     <label class="" for="currency_id">Mata Uang</label>
                                 </div>
-                                <div class="input-field col m3 s12 step10">
+                                <div class="input-field col m3 s12 stepconversion">
                                     <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                                     <label class="active" for="currency_rate">Konversi</label>
                                 </div>
-                                <div class="col m4 s12 step8">
+                                <div class="col m4 s12 stepfile">
                                     <label class="">Bukti Upload</label>
                                     <br>
                                     <input type="file" name="file" id="fileInput" accept="image/*" style="display: none;">
@@ -277,7 +277,7 @@
                             </div>
                         </fieldset>
                     </div>
-                    <div class="col s12">
+                    <div class="col s12 stepdokumentterpakai">
                         <fieldset>
                             <legend>2. Daftar Dokumen Terpakai</legend>
                             <div class="row">
@@ -287,7 +287,7 @@
                             </div>
                         </fieldset>
                     </div>
-                    <div class="col s12">
+                    <div class="col s12 stepdetaildokumen">
                         <fieldset>
                             <legend>3. Detail Dokumen dan Nominal</legend>
                             <div class="row">
@@ -2380,29 +2380,28 @@
                     intro : 'Tanggal transfer / masuk uang.' 
                 },
                 {
-                    title : 'Tgl. Posting',
-                    element : document.querySelector('.step7'),
-                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
-                },
-                
-                {
-                    title : 'File Lampiran',
-                    element : document.querySelector('.step8'),
-                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
-                },
-                {
                     title : 'Mata Uang',
-                    element : document.querySelector('.step9'),
+                    element : document.querySelector('.stepcurrency'),
                     intro : 'Mata uang, silahkan pilih mata uang lain, untuk mata uang asing.' 
                 },
                 {
                     title : 'Konversi',
-                    element : document.querySelector('.step10'),
+                    element : document.querySelector('.stepconversion'),
                     intro : 'Nilai konversi rupiah pada saat dokumen dibuat. Nilai konversi secara otomatis diisi ketika form tambah baru dibuka pertama kali dan data diambil dari situs exchangerate.host. Pastikan kode mata uang benar di master data agar nilai konversi tidak error.'
                 },
                 {
+                    title : 'File Lampiran',
+                    element : document.querySelector('.stepfile'),
+                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
+                },
+                {
+                    title : 'Dokumen Terpakai',
+                    element : document.querySelector('.stepdokumentterpakai'),
+                    intro : 'List dokumen terpakai.' 
+                },
+                {
                     title : 'Detail AR Invoice / AR Down Payment / BS.Karyawan / Coa',
-                    element : document.querySelector('.step12'),
+                    element : document.querySelector('.stepdetaildokumen'),
                     intro : 'Berisikan list dari data yang digunakan dalam form.' 
                 },
                 {

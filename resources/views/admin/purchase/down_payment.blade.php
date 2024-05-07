@@ -409,7 +409,7 @@
     </div>
     <div class="modal-footer">
         <button class="btn waves-effect waves-light purple mr-1 btn-panduan" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
-        <button class="btn waves-effect waves-light step15 mr-1 step18" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+        <button class="btn waves-effect waves-light mr-1 step18" onclick="save();">Simpan <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -2335,11 +2335,7 @@
                     element : document.querySelector('.step14'),
                     intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
                 },
-                {
-                    title : 'Keterangan Eksternal',
-                    element : document.querySelector('.step15'),
-                    intro : 'Keterangan tambahan yang hanya muncul pada saat dokumen dicetak.' 
-                },
+
                 {
                     title : 'Checklist lampiran',
                     element : document.querySelector('.step16'),

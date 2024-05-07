@@ -19,9 +19,11 @@ use App\Models\Place;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
 use App\Models\Area;
+use App\Models\Bom;
 use App\Models\BomDetail;
 use App\Models\Item;
 use App\Models\ItemCogs;
+use App\Models\ItemStock;
 use App\Models\Line;
 use App\Models\Machine;
 use App\Models\ProductionOrder;
@@ -85,6 +87,7 @@ class ProductionIssueReceiveController extends Controller
             'user_id',
             'company_id',
             'post_date',
+            'note',
         ];
 
         $start  = $request->start;
@@ -99,6 +102,7 @@ class ProductionIssueReceiveController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
+                            ->orWhere('note','like',"%$search%")
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
@@ -130,6 +134,7 @@ class ProductionIssueReceiveController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
+                            ->orWhere('note','like',"%$search%")
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
@@ -168,14 +173,14 @@ class ProductionIssueReceiveController extends Controller
                     $val->user->name,
                     $val->company->name,
                     date('d/m/Y',strtotime($val->post_date)),
+                    $val->note,
                     $val->productionOrder->code,
                     $val->productionOrder->productionSchedule->code,
-                    date('d/m/Y',strtotime($val->productionOrder->productionScheduleDetail->production_date)).' - '.$val->productionOrder->productionScheduleDetail->shift->code.' - '.$val->productionOrder->productionScheduleDetail->shift->name,
-                    $val->productionOrder->productionScheduleDetail->line->code,
-                    $val->productionOrder->productionScheduleDetail->group,
-                    $val->productionOrder->productionSchedule->place->code,
-                    $val->productionOrder->warehouse->name,
-                    $val->productionOrder->area()->exists() ? $val->productionOrder->area->name : '-',
+                    $val->shift->code.' - '.$val->shift->name,
+                    $val->line->code,
+                    $val->group,
+                    $val->place->code,
+                    $val->machine->name,
                       $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->status(),
                     (
@@ -223,54 +228,29 @@ class ProductionIssueReceiveController extends Controller
     }
 
     public function create(Request $request){
-        
+
         $validation = Validator::make($request->all(), [
             'code'                      => 'required',
-            /* 'code'			            => $request->temp ? ['required', Rule::unique('production_issue_receives', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:production_issue_receives,code',
-             */'code_place_id'             => 'required',
+            'code_place_id'             => 'required',
             'company_id'			    => 'required',
+            'place_id'                  => 'required',
+            'shift_id'                  => 'required',
+            'group'                     => 'required',
+            'line_id'                   => 'required',
+            'machine_id'                => 'required',
             'post_date'		            => 'required',
             'production_order_id'       => 'required',
-            'arr_type'                  => 'required|array',
-            'arr_lookable_type'         => 'required|array',
-            'arr_lookable_id'           => 'required|array',
-            'arr_production_detail_id'  => 'required|array',
-            'arr_bom_detail_id'         => 'required|array',
-            'arr_nominal'               => 'required|array',
-            'arr_total'                 => 'required|array',
-            'arr_shading'               => 'required|array',
-            'arr_qty'                   => 'required|array',
-            'arr_batch'                 => 'required|array',
         ], [
             'code_place_id.required'            => 'Plant Tidak boleh kosong',
             'code.required' 	                => 'Kode tidak boleh kosong.',
-            /* 'code.string'                       => 'Kode harus dalam bentuk string.',
-            'code.min'                          => 'Kode harus minimal 18 karakter.',
-            'code.unique'                       => 'Kode telah dipakai',
-            'code_place_id.required' 			=> 'Kode plant tidak boleh kosong.', */
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
+            'place_id'                          => 'Plant tidak boleh kosong.',
+            'shift_id'                          => 'Shift tidak boleh kosong.',
+            'group'                             => 'Grup tidak boleh kosong.',
+            'line_id'                           => 'Line tidak boleh kosong.',
+            'machine_id'                        => 'Mesin tidak boleh kosong.',
             'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
             'production_order_id.required'      => 'Order Produksi tidak boleh kosong.',
-            'arr_type.required'                 => 'Tipe tidak boleh kosong.',
-            'arr_type.array'                    => 'Tipe harus array.',
-            'arr_lookable_type.required'        => 'Coa/item tidak boleh kosong.',
-            'arr_lookable_type.array'           => 'Coa/item harus array.',
-            'arr_lookable_id.required'          => 'Coa/item tidak boleh kosong.',
-            'arr_lookable_id.array'             => 'Coa/item harus array.',
-            'arr_production_detail_id.required' => 'Detail produk tidak boleh kosong.',
-            'arr_production_detail_id.array'    => 'Detail produk harus array.',
-            'arr_bom_detail_id.required'        => 'Bom tidak boleh kosong.',
-            'arr_bom_detail_id.array'           => 'Bom harus array.',
-            'arr_nominal.required'              => 'Qty/harga tidak boleh kosong.',
-            'arr_nominal.array'                 => 'Qty/harga harus array.',
-            'arr_total.required'                => 'Total tidak boleh kosong.',
-            'arr_total.array'                   => 'Total harus array.',
-            'arr_shading.required'              => 'Shading tidak boleh kosong.',
-            'arr_shading.array'                 => 'Shading harus array.',
-            'arr_batch.required'                => 'No batch tidak boleh kosong.',
-            'arr_batch.array'                   => 'No batch harus array.',
-            'arr_qty.required'                  => 'Qty tidak boleh kosong.',
-            'arr_qty.array'                     => 'Qty harus array.',
         ]);
 
         if($validation->fails()) {
@@ -325,8 +305,14 @@ class ProductionIssueReceiveController extends Controller
                         $query->code = $request->code;
                         $query->company_id = $request->company_id;
                         $query->production_order_id = $request->production_order_id;
+                        $query->place_id = $request->place_id;
+                        $query->shift_id = $request->shift_id;
+                        $query->group = $request->group;
+                        $query->line_id = $request->line_id;
+                        $query->machine_id = $request->machine_id;
                         $query->post_date = $request->post_date;
                         $query->document = $document;
+                        $query->note = $request->note;
                         $query->status = '1';
 
                         $query->save();
@@ -357,8 +343,14 @@ class ProductionIssueReceiveController extends Controller
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $request->company_id,
                         'production_order_id'       => $request->production_order_id,
+                        'place_id'                  => $request->place_id,
+                        'shift_id'                  => $request->shift_id,
+                        'group'                     => $request->group,
+                        'line_id'                   => $request->line_id,
+                        'machine_id'                => $request->machine_id,
                         'post_date'                 => $request->post_date,
                         'document'                  => $request->file('file') ? $request->file('file')->store('public/production_issue_receives') : NULL,
+                        'note'                      => $request->note,
                         'status'                    => '1',
                     ]);
 
@@ -370,75 +362,76 @@ class ProductionIssueReceiveController extends Controller
 			
 			if($query) {
 
-                DB::beginTransaction();
-                try {
-                    $totalActualItemCost = 0;
-                    $totalActualResourceCost = 0;
-                    $totalProductCost = 0;
-                    $totalCompletedQty = 0;
+                /* DB::beginTransaction();
+                try { */
                     foreach($request->arr_type as $key => $row){
-                        if($row == '2'){
-                            $totalCompletedQty += str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
-                        }
-                        $bomId = 0;
-                        if($request->arr_bom_detail_id[$key]){
-                            $bomDetail = BomDetail::find(intval($request->arr_bom_detail_id[$key]));
-                            if($bomDetail){
-                                $bomId = $bomDetail->bom_id;
-                            }
-                        }
-                        $priceStockItem = 0;
-                        $totalStockItem = 0;
-                        if($row == '1' && $request->arr_lookable_type[$key] == 'items'){
-                            $item = Item::find(intval($request->arr_lookable_id[$key]));
-                            if($item){
-                                $priceStockItem = $item->priceNowProduction($query->productionOrder->productionSchedule->place_id,$query->post_date);
-                                $totalStockItem = $priceStockItem * str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
-                                $totalActualItemCost += $totalStockItem;
-                            }
-                        }
-                        if($row == '1' && $request->arr_lookable_type[$key] == 'coas'){
-                            $totalActualResourceCost += str_replace(',','.',str_replace('.','',$request->arr_total[$key]));
-                        }
-                        if($request->arr_production_detail_id[$key]){
-                            $pod = ProductionOrderDetail::find(intval($request->arr_production_detail_id[$key]));
-                            if($pod){
-                                $pod->update([
-                                    'qty_real'      => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                                    'nominal_real'  => $priceStockItem > 0 ? $totalStockItem : str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
-                                    'total_real'    => $priceStockItem > 0 ? $totalStockItem : str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
-                                ]);
+                        $qty_planned = 0;
+                        $nominal_planned = 0;
+                        $total_planned = 0;
+                        $nominal = 0;
+                        $total = 0;
+                        if($row == '1'){
+                            if($request->arr_bom_id[$key] !== '0'){
+                                $bobot = round($query->productionOrder->productionScheduleDetail->qty / $query->productionOrder->productionScheduleDetail->bom->qty_output,2);
+                                $qty_planned = $bobot * str_replace(',','.',str_replace('.','',$request->arr_qty_bom[$key]));
+                                if($request->arr_lookable_type[$key] == 'items'){
+                                    $item = Item::find($request->arr_lookable_id[$key]);
+                                    if($item){
+                                        $itemstock = ItemStock::find($request->arr_item_stock_id[$key]);
+                                        $nominal_planned = $itemstock->priceDate($query->post_date);
+                                        $nominal = $nominal_planned;
+                                        $total_planned = round($nominal_planned * $qty_planned,2);
+                                        $total = round(str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) * $nominal,2);
+                                    }
+                                }elseif($request->arr_lookable_type[$key] == 'resources'){
+                                    $nominal_planned = $bobot * str_replace(',','.',str_replace('.','',$request->arr_nominal_bom[$key]));
+                                    $total_planned = $bobot * str_replace(',','.',str_replace('.','',$request->arr_total_bom[$key]));
+                                    $nominal = str_replace(',','.',str_replace('.','',$request->arr_nominal[$key]));
+                                    $total = str_replace(',','.',str_replace('.','',$request->arr_total[$key]));
+                                }
+                            }else{
+                                if($request->arr_lookable_type[$key] == 'items'){
+                                    $item = Item::find($request->arr_lookable_id[$key]);
+                                    if($item){
+                                        $nominal = $item->itemStock->priceDate($query->post_date);
+                                        $total = round(str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) * $nominal,2);
+                                    }
+                                }elseif($request->arr_lookable_type[$key] == 'resources'){
+                                    $nominal = str_replace(',','.',str_replace('.','',$request->arr_nominal[$key]));
+                                    $total = str_replace(',','.',str_replace('.','',$request->arr_total[$key]));
+                                }
                             }
                         }
                         ProductionIssueReceiveDetail::create([
                             'production_issue_receive_id'   => $query->id,
-                            'production_order_detail_id'    => $request->arr_production_detail_id[$key] ? $request->arr_production_detail_id[$key] : NULL,
+                            'production_order_id'           => $request->arr_production_order_id[$key] ?? NULL,
                             'lookable_type'                 => $request->arr_lookable_type[$key],
                             'lookable_id'                   => $request->arr_lookable_id[$key],
-                            'shading'                       => $request->arr_shading[$key] ? $request->arr_shading[$key] : NULL,
-                            'bom_id'                        => $bomId > 0 ? $bomId : NULL,
+                            'shading'                       => $request->arr_shading[$key] == '0' ? NULL : $request->arr_shading[$key],
+                            'bom_id'                        => $request->arr_bom_id[$key] == '0' ? NULL : $request->arr_bom_id[$key],
                             'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                            'nominal'                       => $priceStockItem > 0 ? round($priceStockItem,2) : str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
-                            'total'                         => $totalStockItem > 0 ? round($totalStockItem,2) : str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
+                            'nominal'                       => $nominal,
+                            'total'                         => $total,
+                            'qty_bom'                       => str_replace(',','.',str_replace('.','',$request->arr_qty_bom[$key])),
+                            'nominal_bom'                   => str_replace(',','.',str_replace('.','',$request->arr_nominal_bom[$key])),
+                            'total_bom'                     => str_replace(',','.',str_replace('.','',$request->arr_total_bom[$key])),
+                            'qty_planned'                   => $qty_planned,
+                            'nominal_planned'               => $nominal_planned,
+                            'total_planned'                 => $total_planned,
                             'type'                          => $row,
-                            'from_item_stock_id'            => $request->arr_item_stock_id[$key] ? $request->arr_item_stock_id[$key] : NULL,
-                            'batch_no'                      => $request->arr_batch[$key],
+                            'from_item_stock_id'            => $request->arr_item_stock_id[$key] == '0' ? NULL : $request->arr_item_stock_id[$key],
+                            'batch_no'                      => $request->arr_batch[$key] ?? NULL,
+                            'place_id'                      => $request->arr_place[$key] == '0' ? NULL : $request->arr_place[$key],
+                            'line_id'                       => $request->arr_line[$key] == '0' ? NULL : $request->arr_line[$key],
+                            'warehouse_id'                  => $request->arr_warehouse[$key] == '0' ? NULL : $request->arr_warehouse[$key],
+                            'area_id'                       => $request->arr_area[$key] == '0' ? NULL : $request->arr_area[$key],
                         ]);
                     }
 
-                    $totalProductCost = $totalActualItemCost + $totalActualResourceCost;
-
-                    $query->productionOrder->update([
-                        'actual_item_cost'      => $totalActualItemCost,
-                        'actual_resource_cost'  => $totalActualResourceCost,
-                        'total_product_cost'    => $totalProductCost,
-                        'completed_qty'         => $totalCompletedQty,
-                    ]);
-
-                    DB::commit();
+                    /* DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
-                }
+                } */
 
                 CustomHelper::sendApproval($query->getTable(),$query->id,'Issue Receive No. '.$query->code);
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Issue Receive No. '.$query->code,'Pengajuan Issue Receive No. '.$query->code,session('bo_id'));
@@ -542,28 +535,36 @@ class ProductionIssueReceiveController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;" class="bordered" id="table-detail-row">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="12" style="font-size:20px !important;">Daftar Item/Coa Issue (Terpakai)</th>
+                                <th class="center-align" colspan="12" style="font-size:20px !important;">Daftar Item/Resource Issue (Terpakai)</th>
                             </tr>
                             <tr>
                                 <th class="center">No.</th>
-                                <th class="center">Item/Coa</th>
+                                <th class="center">Item/Resource</th>
                                 <th class="center">Qty Planned</th>
                                 <th class="center">Qty Real</th>
-                                <th class="center">Satuan Produksi</th>
+                                <th class="center">Nominal Planned</th>
+                                <th class="center">Nominal Real</th>
+                                <th class="center">Total Planned</th>
+                                <th class="center">Total Real</th>
+                                <th class="center">Satuan UoM</th>
                                 <th class="center">Plant & Gudang</th>
                             </tr>
                         </thead><tbody>';
         $totalqtyplanned=0;
         $totalqtyreal=0;
         foreach($data->productionIssueReceiveDetail()->where('type','1')->get() as $key => $row){
-            $totalqtyplanned+=$row->productionOrderDetail->qty;
+            $totalqtyplanned+=$row->qty_planned;
             $totalqtyreal+=$row->qty;
             $string .= '<tr>
                 <td class="center-align">'.($key+1).'.</td>
-                <td>'.($row->item()->exists() ? $row->item->code.' - '.$row->item->name : $row->coa->code.' - '.$row->coa->name).'</td>
-                <td class="right-align">'.($row->item()->exists() ? CustomHelper::formatConditionalQty($row->productionOrderDetail->qty) : '-').'</td>
-                <td class="right-align">'.($row->item()->exists() ? CustomHelper::formatConditionalQty($row->qty) : '-').'</td>
-                <td class="center-align">'.($row->item()->exists() ? $row->item->productionUnit->code : '-').'</td>
+                <td>'.$row->lookable->code.' - '.$row->lookable->name.'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty_planned).'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
+                <td class="right-align">'.number_format($row->nominal_planned,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->total_planned,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->total,2,',','.').'</td>
+                <td class="center-align">'.$row->lookable->uomUnit->code.'</td>
                 <td>'.($row->item()->exists() ? $row->itemStock->fullName() : '-').'</td>
             </tr>';
         }
@@ -571,37 +572,40 @@ class ProductionIssueReceiveController extends Controller
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2"> Total </td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqtyplanned, 3, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqtyreal, 3, ',', '.') . '</td>
+                <td colspan="7"></td>
             </tr>  
         ';
         $string .= '</tbody></table></div><div class="col s12 mt-3"><table style="min-width:100%;" class="bordered" id="table-detail-row">
             <thead>
                 <tr>
-                    <th class="center-align" colspan="9" style="font-size:20px !important;">Item Receive (Diterima)</th>
+                    <th class="center-align" colspan="10" style="font-size:20px !important;">Item Receive (Diterima)</th>
                 </tr>
                 <tr>
-                    <th class="center" width="5%">No.</th>
-                    <th class="center" width="15%">Item/Coa</th>
-                    <th class="center" width="10%">Qty Planned (Prod.)</th>
-                    <th class="center" width="10%">Qty Real (Prod.)</th>
-                    <th class="center" width="10%">Qty UoM</th>
-                    <th class="center" width="10%">Qty Jual</th>
-                    <th class="center" width="10%">Qty Pallet</th>
-                    <th class="center" width="15%">Shading</th>
-                    <th class="center" width="15%">Batch</th>
+                    <th class="center">No.</th>
+                    <th class="center">Item</th>
+                    <th class="center">Qty Planned (Prod.)</th>
+                    <th class="center">Qty Real (Prod.)</th>
+                    <th class="center">Shading</th>
+                    <th class="center">Batch</th>
+                    <th class="center">Plant</th>
+                    <th class="center">Line</th>
+                    <th class="center">Gudang</th>
+                    <th class="center">Area</th>
                 </tr>
             </thead><tbody>';
 
         foreach($data->productionIssueReceiveDetail()->where('type','2')->get() as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key+1).'.</td>
-                <td>'.$row->item->code.' - '.$row->item->name.'</td>
-                <td class="right-align">'.CustomHelper::formatConditionalQty($data->productionOrder->productionScheduleDetail->qty).' '.$row->item->productionUnit->code.'</td>
-                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).' '.$row->item->productionUnit->code.'</td>
-                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty * $row->item->production_convert).' '.$row->item->uomUnit->code.'</td>
-                <td class="right-align">'.CustomHelper::formatConditionalQty(($row->qty * $row->item->production_convert) / $row->item->sell_convert).' '.$row->item->sellUnit->code.'</td>
-                <td class="right-align">'.CustomHelper::formatConditionalQty((($row->qty * $row->item->production_convert) / $row->item->sell_convert) / $row->item->pallet_convert).' '.$row->item->palletUnit->code.'</td>
+                <td>'.$row->lookable->code.' - '.$row->lookable->name.'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->productionOrder->productionScheduleDetail->qty).' '.$row->lookable->uomUnit->code.'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).' '.$row->lookable->uomUnit->code.'</td>
                 <td class="center-align">'.$row->shading.'</td>
                 <td class="center-align">'.$row->batch_no.'</td>
+                <td class="center-align">'.$row->place->code.'</td>
+                <td class="center-align">'.$row->line->code.'</td>
+                <td class="center-align">'.$row->warehouse->name.'</td>
+                <td class="center-align">'.($row->area()->exists() ? $row->area->name : '-').'</td>
             </tr>';
         }
 

@@ -3818,6 +3818,9 @@ class Select2Controller extends Controller {
                     'qty_planned'       => CustomHelper::formatConditionalQty($qty_planned),
                     'nominal_planned'   => number_format($row->nominal,2,',','.'),
                     'total_planned'     => number_format($row->nominal * $qty_planned,2,',','.'),
+                    'qty_bom'           => CustomHelper::formatConditionalQty($row->qty),
+                    'nominal_bom'       => number_format($row->nominal,2,',','.'),
+                    'total_bom'         => number_format($row->total,2,',','.'),
                     'description'       => $row->description ?? '',
                     'type'              => $row->type(),
                     'list_stock'        => $row->lookable_type == 'items' ? $row->item->currentStockPerPlace($row->bom->place_id) : [],
@@ -3845,8 +3848,11 @@ class Select2Controller extends Controller {
                 'warehouse_id'                  => $d->productionScheduleDetail->warehouse_id,
                 'warehouse_name'                => $d->productionScheduleDetail->warehouse->name,
                 'bom_id'                        => $d->productionScheduleDetail->bom_id,
+                'qty_bom_output'                => CustomHelper::formatConditionalQty($d->productionScheduleDetail->bom->qty_output),
                 'is_fg'                         => $d->productionScheduleDetail->item->is_sales_item ?? '',
                 'bom_detail'                    => $bomdetail,
+                'shift_id'                      => $d->productionScheduleDetail->shift_id,
+                'shift_name'                    => $d->productionScheduleDetail->shift->code.' - '.$d->productionScheduleDetail->shift->name .'|'. $d->productionScheduleDetail->shift->time_in.' - '.$d->productionScheduleDetail->shift->time_out
             ];
         }
 

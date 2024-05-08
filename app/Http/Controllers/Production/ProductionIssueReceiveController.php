@@ -501,33 +501,42 @@ class ProductionIssueReceiveController extends Controller
             ];
         }
 
-        $detailReceive = $po->productionIssueReceiveDetail()->where('type','2')->first();
+        $detail_receive = [];
+
+        /* $detailReceive = $po->productionIssueReceiveDetail()->where('type','2')->first(); */
+
+        foreach($po->productionIssueReceiveDetail()->where('type','2')->get() as $row){
+            $detail_receive[] = [
+                'item_id'                               => $row->lookable_id,
+                'item_code'                             => $row->lookable->code,
+                'item_name'                             => $row->lookable->name,
+                'unit'                                  => $row->lookable->uomUnit->code,
+                'qty'                                   => CustomHelper::formatConditionalQty($row->qty),
+                'qty_planned'                           => CustomHelper::formatConditionalQty($row->productionOrder->productionScheduleDetail->qty),
+                'qty_bom'                               => CustomHelper::formatConditionalQty($po->productionOrder->productionScheduleDetail->bom->qty_output),
+                'bom_id'                                => $row->bom_id ?? '',
+                'line_code'                             => $row->line->code,
+                'warehouse_name'                        => $row->warehouse->name,
+                'warehouse_id'                          => $row->warehouse_id,
+                'place_id'                              => $row->place_id,
+                'area_id'                               => $row->area_id ?? '',
+                'line_id'                               => $row->line_id,
+                'place_name'                            => $row->place->code,
+                'shading'                               => $row->shading ?? '',
+                'batch_no'                              => $row->batch_no ?? '',
+                'arr_shading'                           => $row->lookable->arrShading(),
+                'is_fg'                                 => $row->lookable->is_sales_item ?? '',
+                'list_warehouse'                        => $row->lookable->warehouseList(),
+            ];
+        }
 
         $po['code_place_id'] = substr($po->code,7,2);
         $po['production_order_code'] = $po->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($po->productionOrder->post_date)).' - Plant : '.$po->productionOrder->productionSchedule->place->code;
         $po['table']                            = $po->productionOrder->getTable();
         $po['po_code']                          = $po->productionOrder->code;
-        $po['item_id']                          = $detailReceive->lookable_id;
-        $po['item_code']                        = $detailReceive->lookable->code;
-        $po['item_name']                        = $detailReceive->lookable->name;
-        $po['unit']                             = $detailReceive->lookable->uomUnit->code;
-        $po['qty']                              = CustomHelper::formatConditionalQty($detailReceive->qty);
-        $po['qty_planned']                      = CustomHelper::formatConditionalQty($detailReceive->productionOrder->productionScheduleDetail->qty);
-        $po['qty_bom']                          = CustomHelper::formatConditionalQty($po->productionOrder->productionScheduleDetail->bom->qty_output);
         $po['detail_issue']                     = $detail_issue;
-        $po['bom_id']                           = $detailReceive->bom_id;
+        $po['detail_receive']                   = $detail_receive;
         $po['shift_name']                       = $po->shift->code.' - '.$po->shift->name;
-        $po['line_code']                        = $detailReceive->line->code;
-        $po['warehouse_name']                   = $detailReceive->warehouse->name;
-        $po['warehouse_id']                     = $detailReceive->warehouse_id;
-        $po['place_id']                         = $detailReceive->place_id;
-        $po['area_id']                          = $detailReceive->area_id ?? '';
-        $po['line_id']                          = $detailReceive->line_id;
-        $po['place_name']                       = $detailReceive->place->code;
-        $po['shading']                          = $detailReceive->shading ?? '';
-        $po['batch_no']                         = $detailReceive->batch_no ?? '';
-        $po['arr_shading']                      = $detailReceive->lookable->arrShading();
-        $po['is_fg']                            = $detailReceive->lookable->is_sales_item ?? '';
         
 		return response()->json($po);
     }
@@ -616,21 +625,36 @@ class ProductionIssueReceiveController extends Controller
             </thead><tbody>';
 
         foreach($data->productionIssueReceiveDetail()->where('type','2')->get() as $key => $row){
-            $string .= '<tr>
-                <td class="center-align">'.($key+1).'.</td>
-                <td>'.$row->lookable->code.' - '.$row->lookable->name.'</td>
-                <td class="right-align">'.CustomHelper::formatConditionalQty($row->productionOrder->productionScheduleDetail->qty).' '.$row->lookable->uomUnit->code.'</td>
-                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).' '.$row->lookable->uomUnit->code.'</td>
-                <td class="center-align">'.$row->shading.'</td>
-                <td class="center-align">'.$row->batch_no.'</td>
-                <td class="center-align">'.$row->place->code.'</td>
-                <td class="center-align">'.$row->line->code.'</td>
-                <td class="center-align">'.$row->warehouse->name.'</td>
-                <td class="center-align">'.($row->area()->exists() ? $row->area->name : '-').'</td>
-            </tr>';
+            if($row->bom_id){
+                $string .= '<tr>
+                    <td class="center-align">'.($key+1).'.</td>
+                    <td>'.$row->lookable->code.' - '.$row->lookable->name.'</td>
+                    <td class="right-align">'.CustomHelper::formatConditionalQty($row->productionOrder->productionScheduleDetail->qty).' '.$row->lookable->uomUnit->code.'</td>
+                    <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).' '.$row->lookable->uomUnit->code.'</td>
+                    <td class="center-align">'.$row->shading.'</td>
+                    <td class="center-align">'.$row->batch_no.'</td>
+                    <td class="center-align">'.$row->place->code.'</td>
+                    <td class="center-align">'.$row->line->code.'</td>
+                    <td class="center-align">'.$row->warehouse->name.'</td>
+                    <td class="center-align">'.($row->area()->exists() ? $row->area->name : '-').'</td>
+                </tr>';
+            }else{
+                $string .= '<tr class="red darken-1 white-text">
+                    <td class="center-align">'.($key+1).'.</td>
+                    <td>'.$row->lookable->code.' - '.$row->lookable->name.'</td>
+                    <td class="right-align">-</td>
+                    <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).' '.$row->lookable->uomUnit->code.'</td>
+                    <td class="center-align">'.$row->shading.'</td>
+                    <td class="center-align">'.$row->batch_no.'</td>
+                    <td class="center-align">'.$row->place->code.'</td>
+                    <td class="center-align">'.$row->line->code.'</td>
+                    <td class="center-align">'.$row->warehouse->name.'</td>
+                    <td class="center-align">'.($row->area()->exists() ? $row->area->name : '-').'</td>
+                </tr>';
+            }
         }
 
-        $string .= '</tbody></table></div>';
+        $string .= '</tbody></table><span class="red-text">*Baris item warna merah adalah ITEM REJECT.</span></div>';
 
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">
                         <thead>

@@ -399,21 +399,37 @@
                         </thead>
                         <tbody>
                             @foreach($data->productionIssueReceiveDetail()->where('type','2')->get() as $key => $row)
-                                <tr>
-                                    <td align="center">{{ ($key+1) }}</td>
-                                    <td>{{ $row->lookable->code.' - '.$row->lookable->name }}</td>
-                                    <td align="right">{{ CustomHelper::formatConditionalQty($row->productionOrder->productionScheduleDetail->qty).' '.$row->lookable->uomUnit->code }}</td>
-                                    <td align="right">{{ CustomHelper::formatConditionalQty($row->qty).' '.$row->lookable->uomUnit->code }}</td>
-                                    <td align="center">{{ $row->shading }}</td>
-                                    <td align="center">{{ $row->batch_no }}</td>
-                                    <td align="center">{{ $row->place->code }}</td>
-                                    <td align="center">{{ $row->line->code }}</td>
-                                    <td align="center">{{ $row->warehouse->name }}</td>
-                                    <td align="center">{{ $row->area()->exists() ? $row->area->name : '-' }}</td>
-                                </tr>
+                                @if($row->bom_id)
+                                    <tr>
+                                        <td align="center">{{ ($key+1) }}</td>
+                                        <td>{{ $row->lookable->code.' - '.$row->lookable->name }}</td>
+                                        <td align="right">{{ CustomHelper::formatConditionalQty($row->productionOrder->productionScheduleDetail->qty).' '.$row->lookable->uomUnit->code }}</td>
+                                        <td align="right">{{ CustomHelper::formatConditionalQty($row->qty).' '.$row->lookable->uomUnit->code }}</td>
+                                        <td align="center">{{ $row->shading }}</td>
+                                        <td align="center">{{ $row->batch_no }}</td>
+                                        <td align="center">{{ $row->place->code }}</td>
+                                        <td align="center">{{ $row->line->code }}</td>
+                                        <td align="center">{{ $row->warehouse->name }}</td>
+                                        <td align="center">{{ $row->area()->exists() ? $row->area->name : '-' }}</td>
+                                    </tr>
+                                @else
+                                    <tr style="background-color:red;color:white;">
+                                        <td align="center">{{ ($key+1) }}</td>
+                                        <td>{{ $row->lookable->code.' - '.$row->lookable->name }}</td>
+                                        <td align="right">-</td>
+                                        <td align="right">{{ CustomHelper::formatConditionalQty($row->qty).' '.$row->lookable->uomUnit->code }}</td>
+                                        <td align="center">{{ $row->shading }}</td>
+                                        <td align="center">{{ $row->batch_no }}</td>
+                                        <td align="center">{{ $row->place->code }}</td>
+                                        <td align="center">{{ $row->line->code }}</td>
+                                        <td align="center">{{ $row->warehouse->name }}</td>
+                                        <td align="center">{{ $row->area()->exists() ? $row->area->name : '-' }}</td>
+                                    </tr>
+                                @endif
                             @endforeach
                         </tbody>
                     </table>
+                    <span style="color:red;font-size:9px;">*Baris item warna merah adalah ITEM REJECT.</span>
                 </div>
                 
                 <!-- invoice subtotal -->

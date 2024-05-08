@@ -4054,61 +4054,63 @@ class CustomHelper {
 			]);
 
 			foreach($pir->productionIssueReceiveDetail()->where('type','2')->get() as $row){
-				$total = 0;
+				if($row->bom_id){
+					$total = 0;
 
-				foreach($pir->productionIssueReceiveDetail()->where('type','1')->get() as $rowcost){
-					$total += $rowcost->total;
-				}
-
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $row->lookable->itemGroup->coa_id,
-					'place_id'		=> $row->place_id,
-					'line_id'		=> $row->line_id,
-					'machine_id'	=> $row->productionIssueReceive->machine_id,
-					'warehouse_id'	=> $row->warehouse_id,
-					'type'			=> '1',
-					'nominal'		=> $total,
-					'nominal_fc'	=> $total,
-				]);
-
-				$shade = NULL;
-
-				if($row->shading){
-					$shading = ItemShading::where('item_id',$row->lookable_id)->where('code',$row->shading)->first();
-					if(!$shading){
-						$shade = ItemShading::create([
-							'item_id'	=> $row->lookable_id,
-							'code'		=> $row->shading,
-						]);
-					}else{
-						$shade = $shading;
+					foreach($pir->productionIssueReceiveDetail()->where('type','1')->get() as $rowcost){
+						$total += $rowcost->total;
 					}
+
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->lookable->itemGroup->coa_id,
+						'place_id'		=> $row->place_id,
+						'line_id'		=> $row->line_id,
+						'machine_id'	=> $row->productionIssueReceive->machine_id,
+						'warehouse_id'	=> $row->warehouse_id,
+						'type'			=> '1',
+						'nominal'		=> $total,
+						'nominal_fc'	=> $total,
+					]);
+
+					$shade = NULL;
+
+					if($row->shading){
+						$shading = ItemShading::where('item_id',$row->lookable_id)->where('code',$row->shading)->first();
+						if(!$shading){
+							$shade = ItemShading::create([
+								'item_id'	=> $row->lookable_id,
+								'code'		=> $row->shading,
+							]);
+						}else{
+							$shade = $shading;
+						}
+					}
+
+					self::sendCogs($table_name,
+						$pir->id,
+						$pir->company_id,
+						$row->place_id,
+						$row->warehouse_id,
+						$row->lookable_id,
+						$row->qty,
+						$total,
+						'IN',
+						$pir->post_date,
+						$row->area_id,
+						$shade ? $shade->id : NULL,
+					);
+
+					self::sendStock(
+						$row->place_id,
+						$row->warehouse_id,
+						$row->lookable_id,
+						$row->qty,
+						'IN',
+						$row->area_id,
+						$shade ? $shade->id : NULL,
+					);
 				}
-
-				self::sendCogs($table_name,
-					$pir->id,
-					$pir->company_id,
-					$row->place_id,
-					$row->warehouse_id,
-					$row->lookable_id,
-					$row->qty,
-					$total,
-					'IN',
-					$pir->post_date,
-					$row->area_id,
-					$shade ? $shade->id : NULL,
-				);
-
-				self::sendStock(
-					$row->place_id,
-					$row->warehouse_id,
-					$row->lookable_id,
-					$row->qty,
-					'IN',
-					$row->area_id,
-					$shade ? $shade->id : NULL,
-				);
 			}
 
 			foreach($pir->productionIssueReceiveDetail()->where('type','1')->get() as $row){

@@ -287,7 +287,7 @@
                         </div>
                         <div class="input-field col s12 m3">
                             <input id="limit_credit" name="limit_credit" type="text" value="0" placeholder="Limit Kredit" onkeyup="formatRupiah(this)">
-                            <label class="active" for="limit_credit">Limit Kredit Supplier / BS Karyawan</label>
+                            <label class="active" for="limit_credit">Limit Kredit</label>
                         </div>
                         <div class="input-field col s12 m3 other_inputs" style="display:none;">
                             <input id="top" name="top" type="number" min="0" step="1" value="0">

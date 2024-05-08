@@ -340,6 +340,15 @@
                                                             </td>
                                                         </tr>
                                                     </tbody>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <th colspan="11">
+                                                                <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addReject();" href="javascript:void(0);">
+                                                                    <i class="material-icons left">add</i> Tambah Reject
+                                                                </a>
+                                                            </th>
+                                                        </tr>
+                                                    </tfoot>
                                                 </table>
                                             </p>
                                         </div>

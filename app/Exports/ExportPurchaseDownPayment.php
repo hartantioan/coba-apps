@@ -47,6 +47,9 @@ class ExportPurchaseDownPayment implements FromCollection, WithTitle, WithHeadin
         'Diskon',
         'Total',
         'Based On',
+        'No.PREQ',
+        'No.OPYM',
+        'Tgl.Bayar',
     ];
 
     public function collection()
@@ -89,7 +92,10 @@ class ExportPurchaseDownPayment implements FromCollection, WithTitle, WithHeadin
                 'subtotal'          => number_format($row->subtotal,2,',','.'),
                 'discount'          => number_format($row->discount,2,',','.'),
                 'total'             => number_format($row->total,2,',','.'),
-                'based_on'          => $row->getReference(),
+                'based_on'          => $row->getReference($row->code),
+                'preq'              => $row->listPaymentRequest(),
+                'opym'              => $row->listOutgoingPayment(),
+                'tgl_bayar'         => $row->listPayDate(),
             ];
         }
 

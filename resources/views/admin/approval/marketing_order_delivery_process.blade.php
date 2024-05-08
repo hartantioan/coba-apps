@@ -249,7 +249,7 @@
                         <td class="center-align">{{ $row->item->code.' - '.$row->item->name }}</td>
                         <td class="">{{ $row->itemStock->place->name.' - '.$row->itemStock->warehouse->name }}</td>
                         <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
-                        <td class="center-align">{{ $row->item->sellUnit->code }}</td>
+                        <td class="center-align">{{ $row->marketingOrderDetail->itemUnit->unit->code }}</td>
                         <td class="center-align"></td>
                     </tr>
                     <tr>

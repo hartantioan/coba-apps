@@ -100,6 +100,34 @@ class PurchaseDownPayment extends Model
         }   
     }
 
+    public function listOutgoingPayment(){
+        $list = [];
+        foreach($this->hasPaymentRequestDetail()->get() as $rowpayment){
+            if($rowpayment->paymentRequest->outgoingPayment()->exists()){
+                $list[] = $rowpayment->paymentRequest->outgoingPayment->code;
+            }
+        }
+        if(count($list) > 0){
+            return implode(', ',$list);
+        }else{
+            return '-';
+        }   
+    }
+
+    public function listPayDate(){
+        $list = [];
+        foreach($this->hasPaymentRequestDetail()->get() as $rowpayment){
+            if($rowpayment->paymentRequest->outgoingPayment()->exists()){
+                $list[] = $rowpayment->paymentRequest->outgoingPayment->pay_date;
+            }
+        }
+        if(count($list) > 0){
+            return implode(', ',$list);
+        }else{
+            return '-';
+        }   
+    }
+
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }

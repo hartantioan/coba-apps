@@ -12,7 +12,10 @@
             <th class="center-align">Total FC</th>
             <th class="center-align">Sisa RP</th>
             <th class="center-align">Sisa FC</th>
-            <th class="center-align">Based On</th>   
+            <th class="center-align">Based On</th>
+            <th class="center-align">No.PREQ</th>
+            <th class="center-align">No.OPYM</th>
+            <th class="center-align">Tgl.Bayar</th>
         </tr>
     </thead>
     <tbody>
@@ -30,11 +33,14 @@
                 <td class="right-align">{{ $row['balance'] }}</td>
                 <td class="right-align">{{ $row['balance_fc'] }}</td>
                 <td class="right-align">{{ $row['references'] }}</td>
+                <td>{{ $row['preq_code'] }}</td>
+                <td>{{ $row['opym_code'] }}</td>
+                <td>{{ $row['pay_date'] }}</td>
             </tr>
         @endforeach
         @if(count($data) == 0)
             <tr>
-                <td colspan="12" align="center">
+                <td colspan="15" align="center">
                     Data tidak ditemukan
                 </td>
             </tr>

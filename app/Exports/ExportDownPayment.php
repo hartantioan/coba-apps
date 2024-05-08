@@ -89,6 +89,7 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                 $balance = $row_invoice->grandtotal - $row_invoice->total_used - $row_invoice->total_memo;
                 $currency_rate = $row_invoice->currency_rate_adjust > 0 ? $row_invoice->currency_rate_adjust : $row_invoice->currency_rate;
                 if($balance > 0){
+                    $pdp = PurchaseDownPayment::where('code',$row_invoice->code)->first();
                     $array_filter[] = [
                         'code'          => $row_invoice->code,
                         'supplier_code' => $row_invoice->account_code,
@@ -113,6 +114,9 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                         'delete_note'   => $row_invoice->delete_note,
                         'delete_date'   => date('d/m/Y',strtotime($row_invoice->deleted_at)),
                         'references'    => PurchaseDownPayment::getReference($row_invoice->code),
+                        'preq_code'     => $pdp->listPaymentRequest(),
+                        'opym_code'     => $pdp->listOutgoingPayment(),
+                        'pay_date'      => $pdp->listPayDate(),
                     ];
                     $totalbalance += round($balance * $currency_rate,2);
                 }

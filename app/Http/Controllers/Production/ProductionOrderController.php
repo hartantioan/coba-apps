@@ -205,7 +205,8 @@ class ProductionOrderController extends Controller
                         )
                     ),
                     '
-                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat blue accent-2 white-text btn-small" data-popup="tooltip" title="Tutup & Hitung Varian" onclick="calculate(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">developer_mode</i></button>
+                        <!-- <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button> -->
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
@@ -233,14 +234,14 @@ class ProductionOrderController extends Controller
     public function create(Request $request){
         
         $validation = Validator::make($request->all(), [
-            'code'                      => 'required',
-            'code_place_id'             => 'required',
+            'code'                          => 'required',
+            'code_place_id'                 => 'required',
             'company_id'			        => 'required',
             'post_date'		                => 'required',
             'production_schedule_id'        => 'required',
             'production_schedule_detail_id' => 'required',
         ], [
-            'code_place_id.required'            => 'Plant Tidak boleh kosong',
+            'code_place_id.required'                    => 'Plant Tidak boleh kosong',
             'code.required' 	                        => 'Kode tidak boleh kosong.',
             'company_id.required' 			            => 'Perusahaan tidak boleh kosong.',
             'post_date.required' 			            => 'Tanggal posting tidak boleh kosong.',

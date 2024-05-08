@@ -270,6 +270,47 @@
     </div>
 </div>
 
+<div id="modal6" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;">
+    <div class="modal-content" style="overflow:auto !important;">
+        <div class="row">
+            <div class="col s12">
+                <h4>Tutup & Hitung Varian {{ $title }}</h4>
+                <form class="row" id="form_data_calculate" onsubmit="return false;">
+                    <div class="col s12">
+                        <div id="validation_alert" style="display:none;"></div>
+                    </div>
+                    <div class="col s12">
+                        <div class="row">
+                            <div class="col s12">
+                                <fieldset>
+                                    <legend>1. Informasi Utama</legend>
+                                    
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s12">
+                                <fieldset>
+                                    <legend>2. Detail Item</legend>
+                                    
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s12 mt-3">
+                                <button class="btn waves-effect waves-light right submit step10" onclick="saveCalculate();">Simpan <i class="material-icons right">send</i></button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Tutup</a>
+    </div>
+</div>
+
 <div id="modal2" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
@@ -511,6 +552,19 @@
             }
         });
 
+        $('#modal6').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) {
+
+            },
+            onCloseEnd: function(modal, trigger){
+                
+            }
+        });
+
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
@@ -569,6 +623,10 @@
             }
         });
     });
+
+    function calculate(id){
+        $('#modal6').modal('open');
+    }
 
     function makeTreeOrg(data,link){
         var $ = go.GraphObject.make;

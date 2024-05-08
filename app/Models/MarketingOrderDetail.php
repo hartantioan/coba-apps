@@ -61,6 +61,12 @@ class MarketingOrderDetail extends Model
         });
     }
 
+    public function marketingOrderPlanDetail(){
+        return $this->hasMany('App\Models\MarketingOrderPlanDetail','marketing_order_detail_id','id')->whereHas('marketingOrderPlan',function($query){
+            $query->whereIn('status',['1','2','3']);
+        });
+    }
+
     public function balanceQtyMod(){
         $qty = $this->qty;
 

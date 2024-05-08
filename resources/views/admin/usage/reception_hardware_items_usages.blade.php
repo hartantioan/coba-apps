@@ -91,6 +91,7 @@
                                                         <th>Tanggal</th>
                                                         <th>Tanggal Penyerahan</th>
                                                         <th>Keterangan Penyerahan</th>
+                                                        <th>User(Bersangkutan)</th>
                                                         <th>Tanggal Pengembalian</th>
                                                         <th>Keterangan Pengembalian</th>
                                                         <th>Status</th>
@@ -547,6 +548,7 @@
                 { name: 'hardware_item_id', className: 'center-align' },
                 { name: 'lokasi', className: 'center-align' },
                 { name: 'info', className: 'center-align' },
+                { name: 'date', className: 'center-align' },
                 { name: 'date', className: 'center-align' },
                 { name: 'date', className: 'center-align' },
                 { name: 'date', className: 'center-align' },

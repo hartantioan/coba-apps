@@ -37,6 +37,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ExportProductionIssueReceiveTransactionPage;
 class ProductionIssueReceiveController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
@@ -2039,5 +2041,13 @@ class ProductionIssueReceiveController extends Controller
 
             return response()->json($response);
         }
+    }
+    public function exportFromTransactionPage(Request $request){
+        $search= $request->search? $request->search : '';
+        $status = $request->status? $request->status : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $start_date = $request->start_date? $request->start_date : '';
+      
+		return Excel::download(new ExportProductionIssueReceiveTransactionPage($search,$status,$end_date,$start_date), 'production_schedule'.uniqid().'.xlsx');
     }
 }

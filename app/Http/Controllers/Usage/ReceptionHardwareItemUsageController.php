@@ -75,7 +75,7 @@ class ReceptionHardwareItemUsageController extends Controller
                 $lastInsertedData->status_item = '2';
                 $lastInsertedData->return_date = $request->date;
                 $lastInsertedData->user_return = session('bo_id');
-                $lastInsertedData->return_note = $request->note;
+                $lastInsertedData->return_note = "Dikembalikan ke gudang dengan barcode";
                 $lastInsertedData->save();
 
                 if($lastInsertedData){
@@ -254,6 +254,7 @@ class ReceptionHardwareItemUsageController extends Controller
                     date('d/m/Y',strtotime($val->date)),
                     date('d/m/Y',strtotime($val->reception_date)),
                     $val->info,
+                    $val->account->name,
                     date('d/m/Y',strtotime( $val->return_date)),
                     $val->return_note,
                     $val->status(),
@@ -345,7 +346,7 @@ class ReceptionHardwareItemUsageController extends Controller
                     $query_item->status_item = '2';
                     $query_item->return_date = $request->date;
                     $query_item->user_return = session('bo_id');
-                    $query_item->return_note = $request->note;
+                    $query_item->return_note = $request->info;
                     $query_item->save();
                     DB::commit();
                 }catch(\Exception $e){

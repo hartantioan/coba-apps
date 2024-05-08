@@ -26,6 +26,8 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ExportProductionScheduleTransactionPage;
 use Illuminate\Support\Facades\Date;
 
 class ProductionScheduleController extends Controller
@@ -1887,4 +1889,16 @@ class ProductionScheduleController extends Controller
             return response()->json($response);
         }
     }
+
+    
+    public function exportFromTransactionPage(Request $request){
+        $search= $request->search? $request->search : '';
+        $status = $request->status? $request->status : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $start_date = $request->start_date? $request->start_date : '';
+      
+		return Excel::download(new ExportProductionScheduleTransactionPage($search,$status,$end_date,$start_date), 'production_schedule'.uniqid().'.xlsx');
+    }
+
+
 }

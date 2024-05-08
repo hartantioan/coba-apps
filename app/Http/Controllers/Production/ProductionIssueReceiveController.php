@@ -781,6 +781,11 @@ class ProductionIssueReceiveController extends Controller
                     'message' => 'Data telah digunakan pada form lainnya.'
                 ];
             }else{
+                if(in_array($query->status,['2','3'])){
+                    CustomHelper::removeJournal($query->getTable(),$query->id);
+                    CustomHelper::removeCogs($query->getTable(),$query->id);
+                }
+
                 $query->update([
                     'status'    => '5',
                     'void_id'   => session('bo_id'),
@@ -811,10 +816,6 @@ class ProductionIssueReceiveController extends Controller
     
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Issue Receive No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval($query->getTable(),$query->id);
-                if(in_array($query->status,['2','3'])){
-                    CustomHelper::removeJournal($query->getTable(),$query->id);
-                    CustomHelper::removeCogs($query->getTable(),$query->id);
-                }
 
                 $response = [
                     'status'  => 200,

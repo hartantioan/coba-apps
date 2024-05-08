@@ -456,22 +456,22 @@ class MarketingOrderDeliveryProcess extends Model
                 $row->place_id,
                 $row->warehouse_id,
                 $row->item_id,
-                $row->qty * $row->item->sell_convert,
+                $row->qty * $row->marketingOrderDetail->qty_conversion,
                 $hpp,
                 'OUT',
                 $modp->post_date,
                 $row->area_id,
-                NULL,
+                $row->itemStock->item_shading_id,
             );
 
             CustomHelper::sendStock(
                 $row->place_id,
                 $row->warehouse_id,
                 $row->item_id,
-                $row->qty * $row->item->sell_convert,
+                $row->qty * $row->marketingOrderDetail->qty_conversion,
                 'OUT',
                 $row->area_id,
-                NULL,
+                $row->itemStock->item_shading_id,
             );
         }
     }

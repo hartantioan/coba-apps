@@ -316,6 +316,7 @@
                                     <th>Item</th>
                                     <th>Qty</th>
                                     <th>Satuan</th>
+                                    <th>Shading</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -325,10 +326,11 @@
                                     <td>{{ $row->item->code }}</td>
                                     <td>{{ $row->item->name }}</td>
                                     <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
-                                    <td align="center">{{ $row->item->sellUnit->code }}</td>
+                                    <td align="center">{{ $row->marketingOrderDetail->itemUnit->unit->code }}</td>
+                                    <td align="center">{{ $row->itemStock->itemShading()->exists() ? $row->itemStock->itemShading->code : '-' }}</td>
                                 </tr>
                                 <tr>
-                                    <td colspan="5">Keterangan: {{ $row->note }}</td>
+                                    <td colspan="6">Keterangan: {{ $row->note }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>

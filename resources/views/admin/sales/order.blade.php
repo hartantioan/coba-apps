@@ -1497,7 +1497,7 @@
                     <input name="arr_qty[]" class="browser-default" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;width:100px;" id="rowQty`+ count +`">
                 </td>
                 <td class="center">
-                    <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]">
+                    <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" onchange="countRow('` + count + `');">
                         <option value="">--Silahkan pilih item--</option>
                     </select>
                 </td>
@@ -2140,7 +2140,7 @@
                                     <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;width:100px;" id="rowQty`+ count +`">
                                 </td>
                                 <td class="center">
-                                    <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>
+                                    <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" onchange="countRow('` + count + `');"></select>
                                 </td>
                                 <td class="center">
                                     <input list="tempPrice` + count + `" name="arr_price[]" class="browser-default" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
@@ -2199,7 +2199,7 @@
                         });
                         $.each(val.list_stock, function(i, value) {
                             $('#arr_item_stock' + count).append(`
-                                <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-qtycom="` + value.qty_commited + `" data-warehouse="` + value.warehouse + `" data-p="` + value.place_id + `" data-w="` + value.warehouse_id + `" data-a="`+ value.area_id +`">` + value.warehouse + ` - ` + value.qty + `</option>
+                                <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-qtycom="` + value.qty_commited + `" data-warehouse="` + value.warehouse + `" data-p="` + value.place_id + `" data-w="` + value.warehouse_id + `" data-a="`+ value.area_id +`" data-aname="` + value.area + `">` + value.warehouse + ` - ` + value.qty + `</option>
                             `);
                         });
                         $('#arr_item_stock' + count).val(val.item_stock_id).formSelect();
@@ -2226,9 +2226,8 @@
                             $('#arr_unit' + count).append(`
                                 <option value="` + value.id + `" data-conversion="` + value.conversion + `">` + value.code + `</option>
                             `);
-                        }).then(function(){
-                            $('#arr_unit' + count).val(val.item_unit_id);
                         });
+                        $('#arr_unit' + count).val(val.item_unit_id);
                     });
                 }
                 
@@ -2374,12 +2373,12 @@
             disc2 = parseFloat($('#rowDisc2' + id).val().replaceAll(".", "").replaceAll(",",".")), 
             disc3 = parseFloat($('#rowDisc3' + id).val().replaceAll(".", "").replaceAll(",","."));
 
-        qty = qty * conversion;
+        qtylimit = (qtylimit / conversion).toFixed(3);
 
         if(qtylimit > 0){
             if(qty > qtylimit){
                 qty = qtylimit;
-                $('#rowQty' + id).val(formatRupiahIni(qty.toFixed(3).toString().replace('.',',')));
+                $('#rowQty' + id).val(formatRupiahIni(parseFloat(qty).toFixed(3).toString().replace('.',',')));
             }
         }
         

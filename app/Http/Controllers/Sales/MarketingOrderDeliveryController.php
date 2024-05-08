@@ -291,10 +291,10 @@ class MarketingOrderDeliveryController extends Controller
                         'warehouse_id'  => $row->warehouse_id,
                         'warehouse_name'=> $row->warehouse->name,
                         'area_id'       => $row->area_id,
-                        'area_name'     => $row->area->name,
+                        'area_name'     => $row->area()->exists() ? $row->area->name : '-',
                         'list_stock'    => $row->item->currentStockSales($this->dataplaces,$this->datawarehouses),
                         'qty'           => CustomHelper::formatConditionalQty($row->balanceQtyMod()),
-                        'unit'          => $row->item->sellUnit->code,
+                        'unit'          => $row->itemUnit->unit->code,
                         'note'          => $row->note,
                         'item_stock_id' => $row->item_stock_id ? $row->item_stock_id : '',
                     ];
@@ -389,18 +389,16 @@ class MarketingOrderDeliveryController extends Controller
 
             if($request->arr_qty){
                 foreach($request->arr_qty as $key => $row){
+                    $datamodi = MarketingOrderDetail::find($request->arr_modi[$key]);
                     if(floatval(str_replace(',','.',str_replace('.','',$row))) == 0){
                         $passedZero = false;
                     }
                     $item_stock = ItemStock::find($request->arr_item_stock[$key]);
-                    $qtysell = round(($item_stock->qty / $item_stock->item->sell_convert) - $item_stock->totalQtyUnapproved(),3);
+                    $qtysell = round(($item_stock->qty / $datamodi->qty_conversion) - $item_stock->totalQtyUnapproved(),3);
 
                     if(floatval(str_replace(',','.',str_replace('.','',$row))) > $qtysell){
                         $passedQty = false;
                     }
-
-                    $datamodi = MarketingOrderDetail::find($request->arr_modi[$key]);
-
                     $rowtotal = $datamodi->realPriceAfterGlobalDiscount() * str_replace(',','.',str_replace('.','',$row));
                     $rowtax = 0;
                     if($datamodi->tax_id > 0){
@@ -618,7 +616,7 @@ class MarketingOrderDeliveryController extends Controller
                 'item_id'               => $row->item_id,
                 'item_name'             => $row->item->code.' - '.$row->item->name,
                 'qty'                   => CustomHelper::formatConditionalQty($row->qty),
-                'unit'                  => $row->item->sellUnit->code,
+                'unit'                  => $row->marketingOrderDetail->itemUnit->unit->code,
                 'note'                  => $row->note,
                 'item_stock_id'         => $row->item_stock_id,
                 'item_stock_name'       => $row->itemStock->place->code.' - '.$row->itemStock->warehouse->code,
@@ -674,14 +672,14 @@ class MarketingOrderDeliveryController extends Controller
                 <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
                 <td class="center-align">'.$row->itemStock->place->name.' - '.$row->itemStock->warehouse->name.' - '.$row->itemStock->area->name.'</td>
                 <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
-                <td class="center-align">'.$row->item->sellUnit->code.'</td>
+                <td class="center-align">'.$row->marketingOrderDetail->itemUnit->unit->code.'</td>
                 <td class="">'.$row->note.'</td>
             </tr>';
             
         }
         $string .= '<tr>
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="4"> Total </td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqty, 3, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . CustomHelper::formatConditionalQty($totalqty) . '</td>
             </tr>  
         ';
         

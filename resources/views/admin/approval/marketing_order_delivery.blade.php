@@ -234,7 +234,7 @@
                         <td class="center-align">{{ $row->item->code.' - '.$row->item->name }}</td>
                         <td class="">{{ $row->itemStock->place->name.' - '.$row->itemStock->warehouse->name.' - '.$row->itemStock->area->name }}</td>
                         <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
-                        <td class="center-align">{{ $row->item->sellUnit->code }}</td>
+                        <td class="center-align">{{ $row->marketingOrderDetail->itemUnit->unit->code }}</td>
                     </tr>
                     <tr>
                         <td colspan="5">Keterangan: {{ $row->note }}</td>

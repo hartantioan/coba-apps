@@ -188,7 +188,7 @@
                     <!-- header section -->
                     <table border="0" width="100%">
                         <tr>
-                            <td width="30%" class="left-align">
+                            <td width="50%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
                                         <td width="40%">
@@ -226,16 +226,12 @@
                                             {{ $data->type() }}
                                         </td>
                                     </tr>
-                                </table>
-                            </td>
-                            <td width="25%" class="left-align">
-                                <table border="0" width="100%">
                                     <tr>
-                                        <td width="50%">
+                                        <td width="40%">
                                             Tipe Pengiriman
                                         </td>
                                         <td width="1%">:</td>
-                                        <td width="50%">
+                                        <td width="60%">
                                             {{ $data->deliveryType() }}
                                         </td>
                                     </tr>
@@ -248,6 +244,10 @@
                                             {{ $data->sender->name }}
                                         </td>
                                     </tr>
+                                </table>
+                            </td>
+                            <td width="50%" class="left-align">
+                                <table border="0" width="100%">
                                     <tr>
                                         <td>
                                             Tgl.Kirim
@@ -266,16 +266,12 @@
                                             {{ number_format($data->percent_dp,2,',','.') }}
                                         </td>
                                     </tr>
-                                </table>
-                            </td>
-                            <td width="45%" class="left-align">
-                                <table border="0" width="100%">
                                     <tr>
-                                        <td width="30%">
+                                        <td width="40%">
                                             Tipe Transport
                                         </td>
                                         <td width="1%">:</td>
-                                        <td width="70%">
+                                        <td width="60%">
                                             {{ $data->transportation->name }}
                                         </td>
                                     </tr>
@@ -289,11 +285,11 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="30%">
+                                        <td width="40%">
                                             Outlet
                                         </td>
                                         <td width="1%">:</td>
-                                        <td width="70%">
+                                        <td width="60%">
                                             {{ $data->outlet->name }}
                                         </td>
                                     </tr>

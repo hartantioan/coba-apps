@@ -279,7 +279,7 @@ class Item extends Model
             $qtyUnapproved = $detail->totalQtyUnapproved();
             $arrData[] = [
                 'id'            => $detail->id,
-                'warehouse'     => $detail->place->code.' - '.$detail->warehouse->name,
+                'warehouse'     => $detail->place->code.' - '.$detail->warehouse->name.' - '.($detail->area()->exists() ? $detail->area->name : '').' - '.($detail->itemShading()->exists() ? $detail->itemShading->code : ''),
                 'warehouse_id'  => $detail->warehouse_id,
                 'area'          => $detail->area()->exists() ? $detail->area->name : '',
                 'area_id'       => $detail->area_id ? $detail->area_id : '',

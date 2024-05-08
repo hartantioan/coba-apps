@@ -235,15 +235,6 @@
                                             {{ $data->account->address }}
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td>
-                                            Telepon
-                                        </td>
-                                        <td width="1%">:</td>
-                                        <td>
-                                            {{ $data->account->phone.' / '.$data->account->office_no }}
-                                        </td>
-                                    </tr>
                                 </table>
                             </td>
                             <td width="50%" class="left-align">
@@ -275,6 +266,15 @@
                                             {{ $data->marketingOrder->destination_address.', '.ucwords(strtolower($data->marketingOrder->subdistrict->name.' - '.$data->marketingOrder->city->name.' - '.$data->marketingOrder->province->name)) }}
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td>
+                                            Telepon
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td>
+                                            {{ $data->account->phone.' / '.$data->account->office_no }}
+                                        </td>
+                                    </tr>
                                 </table>
                             </td>
                         </tr>
@@ -298,7 +298,7 @@
                                     <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                                     <td>{{ $row->itemStock->place->name.' - '.$row->itemStock->warehouse->name.' - '.$row->itemStock->area->name }}</td>
                                     <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
-                                    <td align="center">{{ $row->item->sellUnit->code }}</td>
+                                    <td align="center">{{ $row->marketingOrderDetail->itemUnit->unit->code }}</td>
                                 </tr>
                                 <tr>
                                     <td colspan="5">Keterangan: {{ $row->note }}</td>

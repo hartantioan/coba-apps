@@ -78,7 +78,7 @@ class MarketingOrderDeliveryDetail extends Model
     }
 
     public function getHpp(){
-        $total = round($this->itemStock->priceDate($this->marketingOrderDelivery->post_date) * $this->qty * $this->item->sell_convert,2);
+        $total = round($this->itemStock->priceDate($this->marketingOrderDelivery->post_date) * $this->qty * $this->marketingOrderDetail->qty_conversion,2);
         return $total;
     }
 

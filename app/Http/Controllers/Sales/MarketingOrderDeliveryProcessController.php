@@ -321,7 +321,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                         'place_name'    => $row->place->code,
                         'warehouse_name'=> $row->warehouse->name,
                         'qty'           => CustomHelper::formatConditionalQty($row->qty),
-                        'unit'          => $row->item->sellUnit->code,
+                        'unit'          => $row->marketingOrderDetail->itemUnit->unit->code,
                         'note'          => $row->note,
                     ];
                 }
@@ -630,7 +630,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
                 <td class="center-align">'.$row->itemStock->place->name.' - '.$row->itemStock->warehouse->name.'</td>
                 <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
-                <td class="center-align">'.$row->item->sellUnit->code.'</td>
+                <td class="center-align">'.$row->marketingOrderDetail->itemUnit->unit->code.'</td>
                 <td class="">'.$row->note.'</td>
             </tr>';
         }
@@ -1125,7 +1125,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 'place_name'    => $row->place->code,
                 'warehouse_name'=> $row->warehouse->name,
                 'qty'           => CustomHelper::formatConditionalQty($row->qty),
-                'unit'          => $row->item->sellUnit->code,
+                'unit'          => $row->marketingOrderDetail->itemUnit->unit->code,
                 'note'          => $row->note,
             ];
         }

@@ -34,7 +34,7 @@ class ExportStockMovement implements FromView,ShouldAutoSize
             })
             ->where(function($query) {
                 $query->whereHas('item',function($query){
-                    $query->where('status',1);
+                    $query->whereIn('status',['1','2']);
                 });
 
                if($this->finish_date) {

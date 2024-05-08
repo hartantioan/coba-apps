@@ -59,7 +59,7 @@ class StockMovementController extends Controller
             })
             ->where(function($query) use ( $request) {
                 $query->whereHas('item',function($query){
-                    $query->where('status',1);
+                    $query->whereIn('status',['1','2']);
                 });
 
                if($request->finish_date) {

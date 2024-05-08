@@ -65,7 +65,7 @@ class ResetCogs implements ShouldQueue
 						$qty_final = $old_data->qty_final - $row->qty_out;
 					}
 
-					$price_final = $total_final / $qty_final;
+					$price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
 					
 					$row->update([
 						'price_final'	=> $price_final,

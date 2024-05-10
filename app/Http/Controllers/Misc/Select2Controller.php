@@ -2311,6 +2311,27 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function itemStockByPlaceItem(Request $request)
+    {
+        $response   = [];
+        $search     = $request->search;
+        $place      = $request->place_id;
+        $item       = $request->item_id;
+        $data = ItemStock::where('item_id',$item)
+                    ->where('place_id',$place)
+                    ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'    => $d->id,
+                'text' 	=> $d->place->code.' - '.$d->warehouse->code.' - '.($d->area()->exists() ? $d->area->name : '').' Qty. '.number_format($d->qty).' '.$d->item->uomUnit->code.' / Shading : '.(d->itemShading()->exists() ? $d->itemShading->code : '-'),
+                'qty'   => $d->qty,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function itemOnlyStock(Request $request)
     {
         $response   = [];

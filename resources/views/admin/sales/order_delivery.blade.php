@@ -740,7 +740,7 @@ document.addEventListener('focusin', function (event) {
                                     </tr>
                                     <tr class="btn_stock" data-id="` + response.id + `">
                                         <td>
-                                            <a class="waves-effect waves-light blue btn-small" onclick="addSource('` + count + `',` + response.id + `);" href="javascript:void(0);">
+                                            <a class="waves-effect waves-light blue btn-small" onclick="addSource('` + count + `',` + response.id + `,` + val.place_id + `,` + val.item_id + `);" href="javascript:void(0);">
                                                 <i class="material-icons left">add</i> Tambah Asal Item
                                             </a>
                                         </td>
@@ -748,7 +748,7 @@ document.addEventListener('focusin', function (event) {
                                             <table class="bordered" id="table-detail-source` + count + `">
                                                 <thead>
                                                     <tr>
-                                                        <th>Asal Plant & Gudang</th>
+                                                        <th>Asal Plant, Gudang, Area, Shading</th>
                                                         <th>Qty Akan Dikirim</th>
                                                         <th>Hapus</th>
                                                     </tr>
@@ -809,7 +809,7 @@ document.addEventListener('focusin', function (event) {
         }
     }
 
-    function addSource(id,mod){
+    function addSource(id,mod,place,item){
         var count = makeid(10);
         if($('#empty-detail-source' + id).length > 0){
             $('#empty-detail-source' + id).remove();
@@ -823,17 +823,49 @@ document.addEventListener('focusin', function (event) {
                 <td>
                     <input name="arr_qty_source[]" class="browser-default" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `','` + id + `')" data-qty="0,000" style="text-align:right;width:100%;" id="rowQtySource`+ count +`">
                 </td>
-                <td>
-                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-source" onclick="removeRow('` + id + `')" href="javascript:void(0);">
+                <td class="center-align">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-source" data-id="` + id + `" onclick="removeRow(this,'` + id + `')" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
                     </a>
                 </td>
             </tr>
         `);
+        $('#arr_item_stock' + count).select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/item_stock_by_place_item") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        place_id : place,
+                        item_id : item,
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
     }
 
-    function removeRow(id){
-        alert($('#body-detail-source' + id).children().length);
+    function removeRow(element,id){
+        $(element).closest('tr').remove();
+        if($('#body-detail-source' + id).children().length == 0){
+            $('#body-detail-source' + id).append(`
+                <tr id="empty-detail-source` + id + `">
+                    <td class="center-align" colspan="3">Data sumber belum ditambahkan.</td>
+                </tr>
+            `);
+        }
     }
     
     function printMultiSelect(){

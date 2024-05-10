@@ -2086,6 +2086,7 @@ class CustomHelper {
 			}
 
 			$query->update([
+				'status'		=> '3',
 				'currency_rate'	=> $currency_rate,
 				'currency_id'	=> $currency_id,
 			]);

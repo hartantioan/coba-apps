@@ -323,6 +323,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('item_for_hardware_item', [Select2Controller::class, 'itemForHardware']);
                 Route::get('inventory_transfer_out', [Select2Controller::class, 'inventoryTransferOut']);
                 Route::get('item_stock', [Select2Controller::class, 'itemStock']);
+                Route::get('item_stock_by_place_item', [Select2Controller::class, 'itemStockByPlaceItem']);
                 Route::get('item_only_stock', [Select2Controller::class, 'itemOnlyStock']);
                 Route::get('item_stock_material_request', [Select2Controller::class, 'itemStockMaterialRequest']);
                 Route::get('department', [Select2Controller::class, 'department']);

@@ -180,7 +180,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <h5 class="indigo-text">Kas / Bank Masuk</h5>
+                                <h3 class="indigo-text">Kas / Bank Masuk</h3>
                             </td>
                         </tr>
                                 
@@ -297,7 +297,7 @@
                             <tbody>
                                 @foreach($data->incomingPaymentDetail as $key => $row)
                                 <tr>
-                                    <td>{{ $row->lookable->code }}</td>
+                                    <td>{{ $row->lookable->code }} - {{$row->lookable->name}}</td>
                                     <td>{{ $row->type() }}</td>
                                     <td>{{ ($row->cost_distribution_id ? $row->costDistribution->code : '-') }}</td>
                                     <td>{{ $row->note }}</td>

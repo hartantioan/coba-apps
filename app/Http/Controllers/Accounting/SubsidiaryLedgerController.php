@@ -96,12 +96,13 @@ class SubsidiaryLedgerController extends Controller
             $collect = collect($arrData)->sortBy('post_date');
             $balance = $row->getBalanceFromDate($date_start);
             $html .= '<tr style="font-weight:800;">
-                            <td width="200px">'.$row->code.'</td>
-                            <td width="200px">'.$row->name.'</td>
-                            <td colspan="7"></td>
-                            <td class="right-align">'.number_format($balance,2,',','.').'</td>
-                            <td colspan="11"></td>
-                        </tr>';
+                        <td width="200px">' . $row->code . '</td>
+                        <td width="200px">' . $row->name . '</td>
+                        <td colspan="7"></td>
+                        <td class="right-align">' . ($balance != 0 ? number_format($balance, 2, ',', '.') : '-') . '</td>
+                        <td colspan="11"></td>
+                    </tr>';
+        
             if(count($collect) > 0){
                 foreach($collect as $key => $detail){
                     $additional_ref = '';
@@ -112,26 +113,27 @@ class SubsidiaryLedgerController extends Controller
                     $currencySymbol = $detail['data']->journal->currency()->exists() ? $detail['data']->journal->currency->symbol : '';
                     $nominalCurrency = $detail['data']->journal->currency()->exists() ? ($detail['data']->journal->currency->type == '1' ? '' : '1') : '';
                     $html .= '<tr>
-                                <td>'.$detail['data']->coa->code.'</td>
-                                <td>'.$detail['data']->coa->name.'</td>
-                                <td>'.date('d/m/Y',strtotime($detail['data']->journal->post_date)).'</td>
-                                <td>'.$detail['data']->journal->code.'</td>
-                                <td>'.($detail['data']->journal->lookable_id ? $detail['data']->journal->lookable->code : '-').'</td>
-                                <td class="right-align">'.($detail['data']->type == '1' ? ($nominalCurrency ? $currencySymbol.number_format($detail['data']->nominal_fc,2,',','.') : '-') : '-').'</td>
-                                <td class="right-align">'.($detail['data']->type == '2' ? ($nominalCurrency ? $currencySymbol.number_format($detail['data']->nominal_fc,2,',','.') : '-') : '-').'</td>
-                                <td class="right-align">'.($detail['data']->type == '1' ? number_format($detail['data']->nominal,2,',','.') : '-').'</td>
-                                <td class="right-align">'.($detail['data']->type == '2' ? number_format($detail['data']->nominal,2,',','.') : '-').'</td>
-                                <td class="right-align">'.number_format($balance,2,',','.').'</td>
-                                <td>'.$detail['data']->journal->note.'</td>
-                                <td>'.$detail['data']->note.$additional_ref.'</td>
-                                <td>'.$detail['data']->note2.'</td>
-                                <td>'.($detail['data']->place()->exists() ? $detail['data']->place->code : '-').'</td>
-                                <td>'.($detail['data']->warehouse()->exists() ? $detail['data']->warehouse->name : '-').'</td>
-                                <td>'.($detail['data']->line()->exists() ? $detail['data']->line->code : '-').'</td>
-                                <td>'.($detail['data']->machine()->exists() ? $detail['data']->machine->code : '-').'</td>
-                                <td>'.($detail['data']->department()->exists() ? $detail['data']->department->name : '-').'</td>
-                                <td>'.($detail['data']->project()->exists() ? $detail['data']->project->code : '-').'</td>
-                            </tr>';
+                        <td>' . $detail['data']->coa->code . '</td>
+                        <td>' . $detail['data']->coa->name . '</td>
+                        <td>' . date('d/m/Y', strtotime($detail['data']->journal->post_date)) . '</td>
+                        <td>' . $detail['data']->journal->code . '</td>
+                        <td>' . ($detail['data']->journal->lookable_id ? $detail['data']->journal->lookable->code : '-') . '</td>
+                        <td class="right-align">' . ($detail['data']->type == '1' && $detail['data']->nominal_fc != 0 ? ($nominalCurrency ? $currencySymbol . number_format($detail['data']->nominal_fc, 2, ',', '.') : '-') : '-') . '</td>
+                        <td class="right-align">' . ($detail['data']->type == '2' && $detail['data']->nominal_fc != 0 ? ($nominalCurrency ? $currencySymbol . number_format($detail['data']->nominal_fc, 2, ',', '.') : '-') : '-') . '</td>
+                        <td class="right-align">' . ($detail['data']->type == '1' && $detail['data']->nominal != 0 ? number_format($detail['data']->nominal, 2, ',', '.') : '-') . '</td>
+                        <td class="right-align">' . ($detail['data']->type == '2' && $detail['data']->nominal != 0 ? number_format($detail['data']->nominal, 2, ',', '.') : '-') . '</td>
+                        <td class="right-align">' . ($balance != 0 ? number_format($balance, 2, ',', '.') : '-') . '</td>
+                        <td>' . $detail['data']->journal->note . '</td>
+                        <td>' . $detail['data']->note . $additional_ref . '</td>
+                        <td>' . $detail['data']->note2 . '</td>
+                        <td>' . ($detail['data']->place()->exists() ? $detail['data']->place->code : '-') . '</td>
+                        <td>' . ($detail['data']->warehouse()->exists() ? $detail['data']->warehouse->name : '-') . '</td>
+                        <td>' . ($detail['data']->line()->exists() ? $detail['data']->line->code : '-') . '</td>
+                        <td>' . ($detail['data']->machine()->exists() ? $detail['data']->machine->code : '-') . '</td>
+                        <td>' . ($detail['data']->department()->exists() ? $detail['data']->department->name : '-') . '</td>
+                        <td>' . ($detail['data']->project()->exists() ? $detail['data']->project->code : '-') . '</td>
+                    </tr>';
+
                 }
             }
         }

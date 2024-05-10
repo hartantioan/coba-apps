@@ -262,12 +262,12 @@
                                     <legend>3. Produk Detail</legend>
                                     <div class="col m12 s12" style="overflow:auto;width:100% !important;" id="table-item">
                                         <p class="mt-2 mb-2">
-                                            <table class="bordered" style="width:1500px;" id="table-detail">
+                                            <table class="bordered" id="table-detail">
                                                 <thead>
                                                     <tr>
+                                                        <th class="center">No.</th>
                                                         <th class="center">Item</th>
                                                         <th class="center">Stock</th>
-                                                        <th class="center">Plant & Gudang (dari SO)</th>
                                                         <th class="center">Qty Pesanan</th>
                                                         <th class="center">Satuan</th>
                                                         <th class="center">Keterangan</th>
@@ -603,7 +603,7 @@ document.addEventListener('focusin', function (event) {
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="last-row-item">
-                        <td colspan="19">
+                        <td colspan="7">
                             Silahkan tambahkan baris ...
                         </td>
                     </tr>
@@ -703,6 +703,9 @@ document.addEventListener('focusin', function (event) {
                                     <i class="material-icons close data-used" onclick="removeUsedData('` + response.id + `')">close</i>
                                 </div>
                             `);
+
+                            let no = 1;
+
                             $.each(response.details, function(i, val) {
                                 var count = makeid(10);
                                 
@@ -711,16 +714,14 @@ document.addEventListener('focusin', function (event) {
                                         <input type="hidden" name="arr_modi[]" id="arr_modi` + count + `" value="` + val.id + `">
                                         <input type="hidden" name="arr_item[]" id="arr_item` + count + `" value="` + val.item_id + `">
                                         <input type="hidden" name="arr_place[]" id="arr_place` + count + `" value="` + val.place_id + `">
-                                        <input type="hidden" name="arr_warehouse[]" id="arr_warehouse` + count + `" value="` + val.warehouse_id + `">
-                                        <input type="hidden" name="arr_area[]" id="arr_area` + count + `" value="` + val.area_id + `">
+                                        <td rowspan="2" id="row-main` + count + `">
+                                            ` + no + `
+                                        </td>
                                         <td>
                                             ` + val.item_name + `
                                         </td>
-                                        <td>
-                                            <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]" style="width:100% !important;" onchange="getPlaceWarehouse(this,'` + count + `');"></select>
-                                        </td>
-                                        <td id="arr_warehouse_name` + count + `">
-                                            ` + val.place_name + ` - ` + val.warehouse_name + ` - ` + val.area_name + `
+                                        <td id="arr_stock` + count + `" class="right-align">
+                                            ` + val.qty_stock + `
                                         </td>
                                         <td>
                                             <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="` + val.qty + `" style="text-align:right;width:100%;" id="rowQty`+ count +`">
@@ -737,9 +738,32 @@ document.addEventListener('focusin', function (event) {
                                             </a>
                                         </td>
                                     </tr>
+                                    <tr class="btn_stock" data-id="` + response.id + `">
+                                        <td>
+                                            <a class="waves-effect waves-light blue btn-small" onclick="addSource('` + count + `',` + response.id + `);" href="javascript:void(0);">
+                                                <i class="material-icons left">add</i> Tambah Asal Item
+                                            </a>
+                                        </td>
+                                        <td colspan="5">
+                                            <table class="bordered" id="table-detail-source` + count + `">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Asal Plant & Gudang</th>
+                                                        <th>Qty Akan Dikirim</th>
+                                                        <th>Hapus</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="body-detail-source` + count + `">
+                                                    <tr id="empty-detail-source` + count + `">
+                                                        <td class="center-align" colspan="3">Data sumber belum ditambahkan.</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
                                 `);
                                 
-                                if(val.list_stock.length > 0){
+                                /* if(val.list_stock.length > 0){
                                     $('#arr_item_stock' + count).append(`
                                         <option value="">--Silahkan pilih stok--</option>
                                     `);
@@ -754,7 +778,7 @@ document.addEventListener('focusin', function (event) {
                                     $('#arr_item_stock' + count).append(`
                                         <option value="" disabled selected>--Data stok tidak ditemukan--</option>
                                     `);
-                                }
+                                } */
                             });
                         }
                     }
@@ -783,6 +807,33 @@ document.addEventListener('focusin', function (event) {
             $('#info-district').text('-');
             $('#info-subdistrict').text('-');
         }
+    }
+
+    function addSource(id,mod){
+        var count = makeid(10);
+        if($('#empty-detail-source' + id).length > 0){
+            $('#empty-detail-source' + id).remove();
+        }
+        $('#body-detail-source' + id).append(`
+            <tr>
+                <input type="hidden" name="arr_stock_id[]" value="` + mod + `">
+                <td>
+                    <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="getStock('` + count + `')"></select>
+                </td>
+                <td>
+                    <input name="arr_qty_source[]" class="browser-default" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `','` + id + `')" data-qty="0,000" style="text-align:right;width:100%;" id="rowQtySource`+ count +`">
+                </td>
+                <td>
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-source" onclick="removeRow('` + id + `')" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
+            </tr>
+        `);
+    }
+
+    function removeRow(id){
+        alert($('#body-detail-source' + id).children().length);
     }
     
     function printMultiSelect(){

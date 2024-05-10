@@ -34,10 +34,7 @@ class MarketingOrderDetail extends Model
         'tax',
         'grandtotal',
         'note',
-        'item_stock_id',
         'place_id',
-        'warehouse_id',
-        'area_id',
     ];
 
     public function isIncludeTax(){
@@ -86,24 +83,12 @@ class MarketingOrderDetail extends Model
         return $this->belongsTo('App\Models\ItemUnit','item_unit_id','id')->withTrashed();
     }
 
-    public function itemStock(){
-        return $this->belongsTo('App\Models\ItemStock','item_stock_id','id');
-    }
-
     public function place(){
         return $this->belongsTo('App\Models\Place','place_id','id')->withTrashed();
     }
 
     public function taxId(){
         return $this->belongsTo('App\Models\Tax','tax_id','id')->withTrashed();
-    }
-
-    public function warehouse(){
-        return $this->belongsTo('App\Models\Warehouse','warehouse_id','id')->withTrashed();
-    }
-
-    public function area(){
-        return $this->belongsTo('App\Models\Area','area_id','id')->withTrashed();
     }
 
     public function realPriceAfterGlobalDiscount(){

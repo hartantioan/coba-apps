@@ -405,13 +405,10 @@ class MarketingOrderController extends Controller
             'percent_dp'                => 'required',
             'sales_id'                  => 'required',
             'arr_place'                 => 'required|array',
-            'arr_area'                  => 'required|array',
-            'arr_warehouse'             => 'required|array',
             'arr_tax_nominal'           => 'required|array',
             'arr_grandtotal'            => 'required|array',
             'arr_item'                  => 'required|array',
             'arr_unit'                  => 'required|array',
-            'arr_item_stock'            => 'required|array',
             'arr_qty'                   => 'required|array',
             'arr_price'                 => 'required|array',
             'arr_margin'                => 'required|array',
@@ -462,10 +459,6 @@ class MarketingOrderController extends Controller
             'sales_id.required'                 => 'Sales tidak boleh kosong',
             'arr_place.required'                => 'Plant tidak boleh kosong.',
             'arr_place.array'                   => 'Plant harus array.',
-            'arr_area.required'                 => 'Area tidak boleh kosong.',
-            'arr_area.array'                    => 'Area harus array.',
-            'arr_warehouse.required'            => 'Gudang tidak boleh kosong.',
-            'arr_warehouse.array'               => 'Gudang harus array.',
             'arr_tax_nominal.required'          => 'Tax nominal tidak boleh kosong.',
             'arr_tax_nominal.array'             => 'Tax nominal harus array.',
             'arr_grandtotal.required'           => 'Grantotal baris tidak boleh kosong.',
@@ -474,8 +467,6 @@ class MarketingOrderController extends Controller
             'arr_item.array'                    => 'item baris harus array.',
             'arr_unit.required'                 => 'Satuan tidak boleh kosong.',
             'arr_unit.array'                    => 'Satuan harus array.',
-            'arr_item_stock.required'           => 'Stok item tidak boleh kosong.',
-            'arr_item_stock.array'              => 'Stok item harus array.',
             'arr_qty.required'                  => 'Baris qty tidak boleh kosong.',
             'arr_qty.array'                     => 'Baris qty harus array.',
             'arr_price.required'                => 'Baris harga tidak boleh kosong.',
@@ -721,10 +712,7 @@ class MarketingOrderController extends Controller
                             'tax'                           => $request->arr_tax_nominal[$key],
                             'grandtotal'                    => $request->arr_grandtotal[$key],
                             'note'                          => $request->arr_note[$key] ?? NULL,
-                            'item_stock_id'                 => $request->arr_item_stock[$key] ?? NULL,
                             'place_id'                      => $request->arr_place[$key],
-                            'warehouse_id'                  => $request->arr_warehouse[$key],
-                            'area_id'                       => $request->arr_area[$key] ?? NULL,
                         ]);
                     }
 
@@ -802,18 +790,12 @@ class MarketingOrderController extends Controller
                 'tax'                   => $row->tax,
                 'grandtotal'            => $row->grandtotal,
                 'note'                  => $row->note,
-                'item_stock_id'         => $row->item_stock_id,
-                'item_stock_name'       => $row->itemStock->place->code.' - '.$row->itemStock->warehouse->code,
-                'item_stock_qty'        => CustomHelper::formatConditionalQty($row->itemStock->qty),
-                'list_stock'            => $row->item->currentStockSales($this->dataplaces,$this->datawarehouses),
                 'place_id'              => $row->place_id,
-                'warehouse_id'          => $row->warehouse_id,
-                'area_id'               => $row->area_id,
-                'area_name'             => $row->area()->exists() ? $row->area->name : '',
-                'list_warehouse'        => $row->item->warehouseList(),
                 'item_unit_id'          => $row->item_unit_id,
                 'sell_units'            => $row->item->arrSellUnits(),
                 'uom'                   => $row->item->uomUnit->code,
+                'qty_now'               => CustomHelper::formatConditionalQty($row->item->getStockPlace($row->place_id)),
+                'qty_commited'          => '0,000'
             ];
         }
 
@@ -865,7 +847,7 @@ class MarketingOrderController extends Controller
                                 <th class="center-align">Discount 2 (%)</th>
                                 <th class="center-align">Discount 3 (Rp)</th>
                                 <th class="center-align">Keterangan</th>
-                                <th class="center-align">Ambil dari</th>
+                                <th class="center-align">Plant</th>
                                 <th class="center-align">Biaya lain2</th>
                                 <th class="center-align">Harga Final</th>
                                 <th class="center-align">Total</th>
@@ -900,7 +882,7 @@ class MarketingOrderController extends Controller
                 <td class="center-align">'.number_format($row->percent_discount_2,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->discount_3,2,',','.').'</td>
                 <td class="">'.$row->note.'</td>
-                <td class="center-align">'.$row->place->code.' - '.$row->warehouse->name.' - '.($row->area()->exists() ? $row->area->name : '').'</td>
+                <td class="center-align">'.$row->place->code.'</td>
                 <td class="right-align">'.number_format($row->other_fee,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->price_after_discount,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->total,2,',','.').'</td>

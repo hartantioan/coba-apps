@@ -451,10 +451,7 @@
                                                 <thead>
                                                     <tr>
                                                         <th class="center">Item</th>
-                                                        <th class="center">Stock</th>
                                                         <th class="center">Plant</th>
-                                                        <th class="center">Gudang</th>
-                                                        <th class="center">Area</th>
                                                         <th class="center">Qty Skrg</th>
                                                         <th class="center">Qty Sementara</th>
                                                         <th class="center">Satuan UoM</th>
@@ -482,7 +479,7 @@
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td colspan="22">
+                                                        <td colspan="19">
                                                             Silahkan tambahkan baris ...
                                                         </td>
                                                     </tr>
@@ -809,7 +806,7 @@
                 if($('.row_item').length == 0 && $('#last-row-item').length == 0){
                     $('#body-item').append(`
                         <tr id="last-row-item">
-                            <td colspan="22">
+                            <td colspan="19">
                                 Silahkan tambahkan baris ...
                             </td>
                         </tr>
@@ -882,7 +879,7 @@
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="last-row-item">
-                        <td colspan="22">
+                        <td colspan="19">
                             Silahkan tambahkan baris ...
                         </td>
                     </tr>
@@ -1341,20 +1338,10 @@
         $('#tempPrice' + nil).empty();
         $("#arr_warehouse" + nil).empty();
         if($("#arr_item" + nil).val()){
-            $('#arr_item_stock' + nil).empty();
-            if($("#arr_item" + nil).select2('data')[0].stock_list.length > 0){
-                $.each($("#arr_item" + nil).select2('data')[0].stock_list, function(i, value) {
-                    $('#arr_item_stock' + nil).append(`
-                        <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-qtycom="` + value.qty_commited + `" data-warehouse="` + value.warehouse + `" data-p="` + value.place_id + `" data-w="` + value.warehouse_id + `" data-a="` + value.area_id + `" data-aname="` + value.area + `">` + value.warehouse + ` - ` + value.qty + `</option>
-                    `);
-                });
-            }else{
-                $('#arr_item_stock' + nil).append(`
-                    <option value="" disabled selected>--Data stok tidak ditemukan--</option>
-                `);
-            }
 
             $('#arr_uom_unit' + nil).empty().append($("#arr_item" + nil).select2('data')[0].uom);
+            $('#arr_qty_now' + nil).empty().append($("#arr_item" + nil).select2('data')[0].stock_now);
+            $('#arr_qty_temporary' + nil).empty().append($("#arr_item" + nil).select2('data')[0].stock_com);
 
             $('#arr_unit' + nil).empty();
 
@@ -1408,10 +1395,9 @@
                 }
             }
         }else{
-            $('#arr_item_stock' + nil).empty().append(`
-                <option value="">--Silahkan pilih item--</option>
-            `);
             $('#arr_uom_unit' + nil).empty().append(`-`);
+            $('#arr_qty_now' + nil).empty().append(`-`);
+            $('#arr_qty_temporary' + nil).empty().append(`-`);
             $('#arr_unit' + nil).empty().append(`
                 <option value="">--Silahkan pilih item--</option>
             `);
@@ -1425,37 +1411,6 @@
             $("#rowDisc3" + nil).val('0');
             $("#arr_final_price" + nil).val('0,00');
         }
-        $('#arr_item_stock' + nil).trigger('change');
-    }
-
-    function getPlaceWarehouse(element,nil){
-        if($(element).val()){
-            $('#arr_place' + nil).val($(element).find(':selected').data('p'));
-            $('#arr_warehouse' + nil).val($(element).find(':selected').data('w'));
-            $('#arr_area' + nil).empty();
-            if($(element).find(':selected').data('a')){
-                $('#arr_area' + nil).append(`
-                    <option value="` + $(element).find(':selected').data('a') + `">` + $(element).find(':selected').data('aname') + `</option>
-                `);
-            }else{
-                $('#arr_area' + nil).append(`
-                    <option value="">--Kosong--</option>
-                `);
-            }
-            $("#arr_qty_now" + nil).text($(element).find(':selected').data('qty'));
-            let balance = formatRupiahIni((parseFloat($(element).find(':selected').data('qty').toString().replaceAll(".", "").replaceAll(",",".")) - parseFloat($(element).find(':selected').data('qtycom').toString().replaceAll(".", "").replaceAll(",","."))).toFixed(3).toString().replace('.',','));
-            $("#rowQty" + nil).attr('data-qty',balance);
-            $("#arr_qty_temporary" + nil).text(balance);
-        }else{
-            $('#arr_place' + nil).val($("#arr_place" + nil + " option:first").val());
-            $('#arr_warehouse' + nil).val($("#arr_warehouse" + nil + " option:first").val());
-            $('#arr_area' + nil).empty().append(`
-                <option value="">--Silahkan pilih item--</option>
-            `);
-            $("#arr_qty_now" + nil).text('0,000');
-            $("#arr_qty_temporary" + nil).text('0,000');
-            $("#rowQty" + nil).attr('data-qty','0');
-        }
     }
 
     function addItem(){
@@ -1468,26 +1423,11 @@
                 <td>
                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                 </td>
-                <td>
-                    <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]" style="width:200px !important;" onchange="getPlaceWarehouse(this,'` + count + `');">
-                        <option value="">--Silahkan pilih item--</option>
-                    </select>
-                </td>
                 <td class="center-align">
                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                         @foreach ($place as $rowplace)
                             <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                         @endforeach
-                    </select>
-                </td>
-                <td class="center-align">
-                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                        <option value="">--Silahkan pilih item--</option>
-                    </select>    
-                </td>
-                <td class="center-align">
-                    <select class="browser-default" id="arr_area` + count + `" name="arr_area[]">
-                        <option value="">--Silahkan pilih item--</option>
                     </select>
                 </td>
                 <td class="right-align" id="arr_qty_now` + count + `">0,000</td>
@@ -1843,12 +1783,9 @@
                 var formData = new FormData($('#form_data')[0]), passed = true;
 
                 formData.delete("arr_place[]");
-                formData.delete("arr_area[]");
-                formData.delete("arr_warehouse[]");
                 formData.delete("arr_tax_nominal[]");
                 formData.delete("arr_grandtotal[]");
                 formData.delete("arr_item[]");
-                formData.delete("arr_item_stock[]");
                 formData.delete("arr_unit[]");
                 formData.delete("arr_qty[]");
                 formData.delete("arr_price[]");
@@ -1866,12 +1803,9 @@
                 if($('select[name^="arr_place[]"]').length > 0){
                     $('select[name^="arr_place[]"]').each(function(index){
                         formData.append('arr_place[]',$(this).val());
-                        formData.append('arr_area[]',($('select[name^="arr_area[]"]').eq(index).val() ? $('select[name^="arr_area[]"]').eq(index).val() : ''));
-                        formData.append('arr_warehouse[]',$('select[name^="arr_warehouse"]').eq(index).val());
                         formData.append('arr_tax_nominal[]',$('input[name^="arr_tax_nominal"]').eq(index).val());
                         formData.append('arr_grandtotal[]',$('input[name^="arr_grandtotal"]').eq(index).val());
                         formData.append('arr_item[]',$('select[name^="arr_item"]').eq(index).val());
-                        formData.append('arr_item_stock[]',($('select[name^="arr_item_stock"]').eq(index).val() ? $('select[name^="arr_item_stock"]').eq(index).val() : '' ));
                         formData.append('arr_unit[]',($('select[name^="arr_unit[]"]').eq(index).val() ? $('select[name^="arr_unit[]"]').eq(index).val() : '' ));
                         formData.append('arr_qty[]',$('input[name^="arr_qty"]').eq(index).val());
                         formData.append('arr_price[]',$('input[name^="arr_price"]').eq(index).val());
@@ -1890,9 +1824,6 @@
                             passed = false;
                         }
                         if(!$(this).val()){
-                            passed = false;
-                        }
-                        if(!$('select[name^="arr_warehouse"]').eq(index).val()){
                             passed = false;
                         }
                         if(!$('select[name^="arr_unit"]').eq(index).val()){
@@ -1985,7 +1916,7 @@
                 }else{
                     swal({
                         title: 'Ups!',
-                        text: 'Item / stok / plant / gudang / satuan tidak boleh kosong.',
+                        text: 'Item / stok / plant / satuan tidak boleh kosong.',
                         icon: 'warning'
                     });
                 }
@@ -2115,11 +2046,6 @@
                                 <td>
                                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                                 </td>
-                                <td>
-                                    <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]" style="width:200px !important;" onchange="getPlaceWarehouse(this,'` + count + `');">
-                                        <option value="">--Silahkan pilih item--</option>
-                                    </select>
-                                </td>
                                 <td class="center-align">
                                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                                         @foreach ($place as $rowplace)
@@ -2127,14 +2053,8 @@
                                         @endforeach
                                     </select>
                                 </td>
-                                <td class="center-align">
-                                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>    
-                                </td>
-                                <td class="center-align">
-                                    <select class="browser-default" id="arr_area` + count + `" name="arr_area[]"></select>    
-                                </td>
-                                <td class="right-align" id="arr_qty_now` + count + `">` + val.item_stock_qty + `</td>
-                                <td class="right-align" id="arr_qty_temporary` + count + `">` + val.item_stock_qty + `</td>
+                                <td class="right-align" id="arr_qty_now` + count + `">` + val.qty_now + `</td>
+                                <td class="right-align" id="arr_qty_temporary` + count + `">` + val.qty_commited + `</td>
                                 <td class="center-align" id="arr_uom_unit` + count + `">` + val.uom + `</td>
                                 <td>
                                     <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;width:100px;" id="rowQty`+ count +`">
@@ -2192,28 +2112,7 @@
                                 </td>
                             </tr>
                         `);
-                        $.each(val.list_warehouse, function(i, value) {
-                            $('#arr_warehouse' + count).append(`
-                                <option value="` + value.id + `" ` + (value.id == val.warehouse_id ? 'selected' : '') + `>` + value.name + `</option>
-                            `);
-                        });
-                        $.each(val.list_stock, function(i, value) {
-                            $('#arr_item_stock' + count).append(`
-                                <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-qtycom="` + value.qty_commited + `" data-warehouse="` + value.warehouse + `" data-p="` + value.place_id + `" data-w="` + value.warehouse_id + `" data-a="`+ value.area_id +`" data-aname="` + value.area + `">` + value.warehouse + ` - ` + value.qty + `</option>
-                            `);
-                        });
-                        $('#arr_item_stock' + count).val(val.item_stock_id).formSelect();
                         $('#arr_place' + count).val(val.place_id);
-                        if(val.area_id){
-                            $('#arr_area' + count).append(`
-                                <option value="` + val.area_id + `">` + val.area_name + `</option>
-                            `);
-                        }else{
-                            $('#arr_area' + count).append(`
-                            <option value="">--Kosong--</option>
-                            `);
-                        }
-                        
                         $("#arr_tax" + count + " option[data-id='" + val.tax_id + "']").prop("selected",true);
                         if(val.is_include_tax){
                             $('#arr_is_include_tax' + count).prop( "checked", true);
@@ -2769,26 +2668,26 @@
                                 var count = makeid(10);
                                 $('#body-item').append(`
                                     <tr class="row_item">
-                                        <input type="hidden" name="arr_place[]" id="arr_place` + count + `" value="` + val.place_id + `">
-                                        <input type="hidden" name="arr_warehouse[]" id="arr_warehouse` + count + `" value="` + val.warehouse_id + `">
                                         <input type="hidden" name="arr_tax_nominal[]" id="arr_tax_nominal` + count + `" value="` + val.tax + `">
                                         <input type="hidden" name="arr_grandtotal[]" id="arr_grandtotal` + count + `" value="` + val.grandtotal + `">
                                         <td>
                                             <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                                         </td>
-                                        <td>
-                                            <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]" style="width:200px !important;" onchange="getPlaceWarehouse(this,'` + count + `');">
-                                                <option value="">--Silahkan pilih item--</option>
+                                        <td class="center-align">
+                                            <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                                                @foreach ($place as $rowplace)
+                                                    <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                                @endforeach
                                             </select>
                                         </td>
-                                        <td class="center-align" id="arr_warehouse_name` + count + `">` + val.item_stock_name + `</td>
                                         <td class="right-align" id="arr_qty_now` + count + `">` + val.item_stock_qty + `</td>
                                         <td class="right-align" id="arr_qty_temporary` + count + `">` + val.item_stock_qty + `</td>
+                                        <td class="center-align" id="arr_uom_unit` + count + `">` + val.uom + `</td>
                                         <td>
                                             <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;width:100px;" id="rowQty`+ count +`">
                                         </td>
                                         <td class="center">
-                                            <span id="arr_unit` + count + `">` + val.unit + `</span>
+                                            <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" onchange="countRow('` + count + `');"></select>
                                         </td>
                                         <td class="center">
                                             <input list="tempPrice` + count + `" name="arr_price[]" class="browser-default" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
@@ -2840,12 +2739,7 @@
                                         </td>
                                     </tr>
                                 `);
-                                $.each(val.list_stock, function(i, value) {
-                                    $('#arr_item_stock' + count).append(`
-                                        <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-qtycom="` + value.qty_commited + `" data-warehouse="` + value.warehouse + `" data-p="` + value.place_id + `" data-w="` + value.warehouse_id + `">` + value.warehouse + ` - ` + value.qty + `</option>
-                                    `);
-                                });
-                                $('#arr_item_stock' + count).val(val.item_stock_id).formSelect();
+                                $('#arr_place' + count).val(val.place_id);
                                 $("#arr_tax" + count + " option[data-id='" + val.tax_id + "']").prop("selected",true);
                                 if(val.is_include_tax){
                                     $('#arr_is_include_tax' + count).prop( "checked", true);
@@ -2854,6 +2748,12 @@
                                     <option value="` + val.item_id + `">` + val.item_name + `</option>
                                 `);
                                 select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
+                                $.each(val.sell_units, function(i, value) {
+                                    $('#arr_unit' + count).append(`
+                                        <option value="` + value.id + `" data-conversion="` + value.conversion + `">` + value.code + `</option>
+                                    `);
+                                });
+                                $('#arr_unit' + count).val(val.item_unit_id);
                             });
                         }
                         

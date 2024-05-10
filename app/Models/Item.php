@@ -512,6 +512,12 @@ class Item extends Model
         return $total;
     }
 
+    public function getStockArrayPlace($arr){
+        $total = $this->itemStock()->whereIn('place_id',$arr)->sum('qty');
+
+        return $total;
+    }
+
     public function getStockWarehouse($warehouse_id){
         $total = $this->itemStock()->where('warehouse_id',$warehouse_id)->sum('qty');
 

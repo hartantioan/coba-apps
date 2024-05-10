@@ -288,15 +288,10 @@ class MarketingOrderDeliveryController extends Controller
                         'item_name'     => $row->item->code.' - '.$row->item->name,
                         'place_id'      => $row->place_id,
                         'place_name'    => $row->place->code,
-                        'warehouse_id'  => $row->warehouse_id,
-                        'warehouse_name'=> $row->warehouse->name,
-                        'area_id'       => $row->area_id,
-                        'area_name'     => $row->area()->exists() ? $row->area->name : '-',
-                        'list_stock'    => $row->item->currentStockSales($this->dataplaces,$this->datawarehouses),
+                        'qty_stock'     => CustomHelper::formatConditionalQty(round($row->item->getStockPlace($row->place_id) / $row->qty_conversion,3)),
                         'qty'           => CustomHelper::formatConditionalQty($row->balanceQtyMod()),
                         'unit'          => $row->itemUnit->unit->code,
                         'note'          => $row->note,
-                        'item_stock_id' => $row->item_stock_id ? $row->item_stock_id : '',
                     ];
                 }
 

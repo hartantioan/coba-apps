@@ -738,11 +738,12 @@ class Select2Controller extends Controller {
                 'name'              => $d->name,
                 'uom'               => $d->uomUnit->code,
                 'old_prices'        => $d->oldSalePrices($this->dataplaces),
-                'stock_list'        => $d->currentStockSales($this->dataplaces,$this->datawarehouses),
                 'list_warehouse'    => $d->warehouseList(),
                 'list_outletprice'  => $d->listOutletPrice(),
                 'list_area'         => Area::where('status','1')->get(),
                 'sell_units'        => $d->arrSellUnits(),
+                'stock_now'         => CustomHelper::formatConditionalQty($d->getStockArrayPlace($this->dataplaces)),
+                'stock_com'         => '0,000',
             ];
         }
 

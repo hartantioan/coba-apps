@@ -2324,8 +2324,8 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'    => $d->id,
-                'text' 	=> $d->place->code.' - '.$d->warehouse->code.' - '.($d->area()->exists() ? $d->area->name : '').' Qty. '.number_format($d->qty).' '.$d->item->uomUnit->code.' / Shading : '.(d->itemShading()->exists() ? $d->itemShading->code : '-'),
-                'qty'   => $d->qty,
+                'text' 	=> $d->place->code.' &#9830; Gudang : '.$d->warehouse->name.' &#9830; Area : '.($d->area()->exists() ? $d->area->name : '-').' &#9830; Qty. '.CustomHelper::formatConditionalQty($d->qty).' '.$d->item->uomUnit->code.' &#9830; Shading : '.($d->itemShading()->exists() ? $d->itemShading->code : '-'),
+                'qty'   => CustomHelper::formatConditionalQty($d->qty),
             ];
         }
 

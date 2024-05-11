@@ -821,7 +821,7 @@ document.addEventListener('focusin', function (event) {
                     <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="getStock('` + count + `')"></select>
                 </td>
                 <td>
-                    <input name="arr_qty_source[]" class="browser-default" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `','` + id + `')" data-qty="0,000" style="text-align:right;width:100%;" id="rowQtySource`+ count +`">
+                    <input name="arr_qty_source[]" class="browser-default" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);countRowStock('` + count + `')" data-qty="0,000" style="text-align:right;width:100%;" id="rowQtySource`+ count +`">
                 </td>
                 <td class="center-align">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-source" data-id="` + id + `" onclick="removeRow(this,'` + id + `')" href="javascript:void(0);">
@@ -853,8 +853,32 @@ document.addEventListener('focusin', function (event) {
                         results: data.items
                     }
                 }
-            }
+            },
+            escapeMarkup: function (text) { return text; },
         });
+    }
+
+    function getStock(id){
+        if($('#arr_item_stock' + id).val()){
+            let datastock = $('#arr_item_stock' + id).select2('data')[0];
+            $('#rowQtySource' + id).data('qty',datastock.qty);
+            $('#rowQtySource' + id).val(datastock.qty);
+        }else{
+            $('#rowQtySource' + id).data('qty','0,000');
+            $('#rowQtySource' + id).val('0,000');
+        }
+    }
+
+    function countRowStock(id){
+        var qty = parseFloat($('#rowQtySource' + id).val().replaceAll(".", "").replaceAll(",",".")), 
+            qtylimit = parseFloat($('#rowQtySource' + id).data('qty').toString().replaceAll(".", "").replaceAll(",","."));
+
+        if(qtylimit > 0){
+            if(qty > qtylimit){
+                qty = qtylimit;
+                $('#rowQtySource' + id).val(formatRupiahIni(qty.toFixed(3).toString().replace('.',',')));
+            }
+        }
     }
 
     function removeRow(element,id){
@@ -1399,8 +1423,6 @@ document.addEventListener('focusin', function (event) {
                 formData.delete("arr_modi[]");
                 formData.delete("arr_item[]");
                 formData.delete("arr_place[]");
-                formData.delete("arr_warehouse[]");
-                formData.delete("arr_area[]");
                 formData.delete("arr_item_stock[]");
                 formData.delete("arr_qty[]");
                 formData.delete("arr_note[]");
@@ -1410,15 +1432,9 @@ document.addEventListener('focusin', function (event) {
                         formData.append('arr_modi[]',$(this).val());
                         formData.append('arr_item[]',$('input[name^="arr_item"]').eq(index).val());
                         formData.append('arr_place[]',$('input[name^="arr_place"]').eq(index).val());
-                        formData.append('arr_warehouse[]',$('input[name^="arr_warehouse"]').eq(index).val());
-                        formData.append('arr_area[]',$('input[name^="arr_area[]"]').eq(index).val());
-                        formData.append('arr_item_stock[]',$('select[name^="arr_item_stock"]').eq(index).val());
                         formData.append('arr_qty[]',$('input[name^="arr_qty"]').eq(index).val());
                         formData.append('arr_note[]',$('input[name^="arr_note[]"]').eq(index).val());
                         if(!$('input[name^="arr_modi"]').eq(index).val()){
-                            passed = false;
-                        }
-                        if(!$('select[name^="arr_item_stock"]').eq(index).val()){
                             passed = false;
                         }
                     });
@@ -1426,6 +1442,14 @@ document.addEventListener('focusin', function (event) {
                     passed = false;
                 }
 
+                if($('input[name^="arr_stock_id[]"]').length > 0){
+                    $('input[name^="arr_stock_id[]"]').each(function(index){
+                        if(!$('select[name^="arr_item_stock"]').eq(index).val()){
+                            passed = false;
+                        }
+                    });
+                }
+                
                 if(passed == true){
                     var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');

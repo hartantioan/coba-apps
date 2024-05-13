@@ -2327,7 +2327,11 @@ class CustomHelper {
 					'currency_rate'	=> $lc->currency_rate,
 				]);
 
+				$totalitem = 0;
+				$totalcost = 0;
+
 				foreach($lc->landedCostDetail as $rowdetail){
+					$totalitem += $rowdetail->nominal * $lc->currency_rate;
 
 					$itemdata = ItemCogs::where('place_id',$rowdetail->place_id)->where('item_id',$rowdetail->item_id)->orderByDesc('date')->orderByDesc('id')->first();
 					if($itemdata){
@@ -2379,6 +2383,7 @@ class CustomHelper {
 				}
 
 				foreach($lc->landedCostFeeDetail as $rowdetail){
+					$totalcost += $rowdetail->total * $lc->currency_rate;
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $rowdetail->landedCostFee->coa_id,
@@ -2387,6 +2392,19 @@ class CustomHelper {
 						'nominal'		=> $rowdetail->total * $lc->currency_rate,
 						'nominal_fc'	=> $lc->currency->type == '1' ? $rowdetail->total * $lc->currency_rate : $rowdetail->total,
 						'note'			=> $rowdetail->landedCostFee->name,
+					]);
+				}
+
+				$balance = $totalitem - $totalcost;
+				if($balance < 0 || $balance > 0){
+					$coarounding = Coa::where('code','700.01.01.01.05')->where('company_id',$lc->company_id)->first();
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coarounding->id,
+						'account_id'	=> $coarounding->bp_journal ? $account_id : NULL,
+						'type'			=> $balance < 0 ? '1' : '2',
+						'nominal'		=> abs($balance),
+						'nominal_fc'	=> abs($balance),
 					]);
 				}
 			}

@@ -314,7 +314,7 @@
                                     @if($row->item()->exists())
                                         <tr>
                                             <td align="center" rowspan="3">{{ ($key + 1) }}</td>
-                                            <td align="left">{{ $row->item->code.' - '.$row->item->name }}</td>
+                                            <td align="left">{{ $row->item->code.' - '.$row->item->name.' - '.$row->item->other_name }}</td>
                                             <td align="center">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                                             <td align="center">{{ $row->itemUnit()->exists() ? $row->itemUnit->unit->code : '-' }}</td>
                                             <td align="right">{{ number_format($row->price,2,',','.') }}</td>

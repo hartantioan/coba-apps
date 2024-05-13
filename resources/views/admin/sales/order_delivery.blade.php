@@ -740,7 +740,7 @@ document.addEventListener('focusin', function (event) {
                                     </tr>
                                     <tr class="btn_stock" data-id="` + response.id + `">
                                         <td>
-                                            <a class="waves-effect waves-light blue btn-small" onclick="addSource('` + count + `',` + response.id + `,` + val.place_id + `,` + val.item_id + `);" href="javascript:void(0);">
+                                            <a class="waves-effect waves-light blue btn-small" onclick="addSource('` + count + `',` + response.id + `,` + val.place_id + `,` + val.item_id + `,'` + val.qty_conversion + `');" href="javascript:void(0);">
                                                 <i class="material-icons left">add</i> Tambah Asal Item
                                             </a>
                                         </td>
@@ -749,7 +749,7 @@ document.addEventListener('focusin', function (event) {
                                                 <thead>
                                                     <tr>
                                                         <th>Asal Plant, Gudang, Area, Shading</th>
-                                                        <th>Qty Akan Dikirim</th>
+                                                        <th>Qty Akan Dikirim (satuan jual)</th>
                                                         <th>Hapus</th>
                                                     </tr>
                                                 </thead>
@@ -809,7 +809,7 @@ document.addEventListener('focusin', function (event) {
         }
     }
 
-    function addSource(id,mod,place,item){
+    function addSource(id,mod,place,item,conversion){
         var count = makeid(10);
         if($('#empty-detail-source' + id).length > 0){
             $('#empty-detail-source' + id).remove();
@@ -817,6 +817,7 @@ document.addEventListener('focusin', function (event) {
         $('#body-detail-source' + id).append(`
             <tr>
                 <input type="hidden" name="arr_stock_id[]" value="` + mod + `">
+                <input type="hidden" name="arr_stock_conversion[]" id="arr_stock_conversion` + count + `" value="` + conversion + `">
                 <td>
                     <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="getStock('` + count + `')"></select>
                 </td>
@@ -860,9 +861,10 @@ document.addEventListener('focusin', function (event) {
 
     function getStock(id){
         if($('#arr_item_stock' + id).val()){
-            let datastock = $('#arr_item_stock' + id).select2('data')[0];
-            $('#rowQtySource' + id).data('qty',datastock.qty);
-            $('#rowQtySource' + id).val(datastock.qty);
+            let datastock = $('#arr_item_stock' + id).select2('data')[0], conversion = parseFloat($('#arr_stock_conversion' + id).val().replaceAll(".", "").replaceAll(",","."));
+            let qty = parseFloat(datastock.qty.toString().replaceAll(".", "").replaceAll(",",".")) / conversion;
+            $('#rowQtySource' + id).data('qty',formatRupiahIni(qty.toFixed(3).toString().replace('.',',')));
+            $('#rowQtySource' + id).val(formatRupiahIni(qty.toFixed(3).toString().replace('.',',')));
         }else{
             $('#rowQtySource' + id).data('qty','0,000');
             $('#rowQtySource' + id).val('0,000');
@@ -1444,7 +1446,11 @@ document.addEventListener('focusin', function (event) {
 
                 if($('input[name^="arr_stock_id[]"]').length > 0){
                     $('input[name^="arr_stock_id[]"]').each(function(index){
-                        if(!$('select[name^="arr_item_stock"]').eq(index).val()){
+                        formData.append('arr_item_stock[]',$('select[name^="arr_item_stock[]"]').eq(index).val());
+                        if(!$('select[name^="arr_item_stock[]"]').eq(index).val()){
+                            passed = false;
+                        }
+                        if(!$('input[name^="arr_qty_source[]"]').eq(index).val() || $('input[name^="arr_qty_source[]"]').eq(index).val() == '0'){
                             passed = false;
                         }
                     });
@@ -1532,7 +1538,7 @@ document.addEventListener('focusin', function (event) {
                 }else{
                     swal({
                         title: 'Ups!',
-                        text: 'Item / Stok tidak boleh kosong.',
+                        text: 'Item / Stok / Qty tidak boleh kosong.',
                         icon: 'warning'
                     });
                 }

@@ -25,6 +25,8 @@ use App\Models\Place;
 use App\Models\Tax;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
+use App\Models\Item;
+use App\Models\MarketingOrderDeliveryStock;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -292,6 +294,7 @@ class MarketingOrderDeliveryController extends Controller
                         'qty'           => CustomHelper::formatConditionalQty($row->balanceQtyMod()),
                         'unit'          => $row->itemUnit->unit->code,
                         'note'          => $row->note,
+                        'qty_conversion'=> CustomHelper::formatConditionalQty($row->qty_conversion),
                     ];
                 }
 
@@ -328,8 +331,6 @@ class MarketingOrderDeliveryController extends Controller
             'arr_item'                  => 'required|array',
             'arr_item_stock'            => 'required|array',
             'arr_place'                 => 'required|array',
-            'arr_warehouse'             => 'required|array',
-            'arr_area'                  => 'required|array',
             'arr_qty'                   => 'required|array',
         ], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
@@ -352,11 +353,7 @@ class MarketingOrderDeliveryController extends Controller
             'arr_qty.array'                     => 'Baris qty harus array.',
             'arr_place.required'                => 'Baris plant tidak boleh kosong.',
             'arr_place.array'                   => 'Baris plant harus array.',
-            'arr_warehouse.required'            => 'Baris gudang tidak boleh kosong.',
-            'arr_warehouse.array'               => 'Baris gudang harus array.',
-            'arr_area.required'                 => 'Baris area tidak boleh kosong.',
-            'arr_area.array'                    => 'Baris area harus array.',
-        ]);
+       ]);
 
         if($validation->fails()) {
             $response = [
@@ -382,18 +379,28 @@ class MarketingOrderDeliveryController extends Controller
             $tax = 0;
             $grandtotal = 0;
 
-            if($request->arr_qty){
-                foreach($request->arr_qty as $key => $row){
-                    $datamodi = MarketingOrderDetail::find($request->arr_modi[$key]);
-                    if(floatval(str_replace(',','.',str_replace('.','',$row))) == 0){
-                        $passedZero = false;
+            if($request->arr_modi){
+                foreach($request->arr_modi as $key => $row){
+                    $qtysell = floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key])));
+                    $qtystock = 0;
+                    foreach($request->arr_stock_id as $key2 => $rowstock){
+                        if($rowstock == $row){
+                            $qtystock += floatval(str_replace(',','.',str_replace('.','',$request->arr_qty_source[$key2])));
+                        }
                     }
-                    $item_stock = ItemStock::find($request->arr_item_stock[$key]);
-                    $qtysell = round(($item_stock->qty / $datamodi->qty_conversion) - $item_stock->totalQtyUnapproved(),3);
-
-                    if(floatval(str_replace(',','.',str_replace('.','',$row))) > $qtysell){
+                    if($qtystock < $qtysell){
                         $passedQty = false;
                     }
+                }
+
+                if(!$passedQty){
+                    $errorMessage[] = 'Salah satu item memiliki qty kurang dari stok saat ini.';
+                }
+            }
+
+            if($request->arr_qty){
+                foreach($request->arr_qty as $key => $row){
+                    $datamodi = MarketingOrderDetail::find($request->arr_modi[$key]);                    
                     $rowtotal = $datamodi->realPriceAfterGlobalDiscount() * str_replace(',','.',str_replace('.','',$row));
                     $rowtax = 0;
                     if($datamodi->tax_id > 0){
@@ -428,10 +435,6 @@ class MarketingOrderDeliveryController extends Controller
                 }
 
                 $errorMessage = [];
-
-                if(!$passedZero){
-                    $errorMessage[] = 'Qty tidak boleh 0.';
-                }
 
                 if(!$passedQty){
                     $errorMessage[] = 'Salah satu item memiliki qty kurang dari stok saat ini.';
@@ -555,9 +558,17 @@ class MarketingOrderDeliveryController extends Controller
                             'note'                          => $request->arr_note[$key],
                             'item_stock_id'                 => $request->arr_item_stock[$key],
                             'place_id'                      => $request->arr_place[$key],
-                            'warehouse_id'                  => $request->arr_warehouse[$key],
-                            'area_id'                       => $request->arr_area[$key],
                         ]);
+                        foreach($request->arr_stock_id as $key2 => $rowstock){
+                            if($rowstock == $row){
+                                $querydetail2 = MarketingOrderDeliveryStock::create([
+                                    'marketing_order_delivery_detail_id'    => $querydetail->id,
+                                    'marketing_order_detail_id'             => $row,
+                                    'item_stock_id'                         => $request->arr_item_stock[$key2],
+                                    'qty'                                   => str_replace(',','.',str_replace('.','',$request->arr_qty_source[$key2])),
+                                ]);
+                            }
+                        }
                     }
 
                     DB::commit();

@@ -276,7 +276,8 @@ class Item extends Model
 
         $data = ItemStock::where('item_id',$this->id)->whereIn('place_id',$dataplaces)->whereIn('warehouse_id',$datawarehouses)->get();
         foreach($data as $detail){
-            $qtyUnapproved = $detail->totalQtyUnapproved();
+            /* $qtyUnapproved = $detail->totalQtyUnapproved(); */
+            $qtyUnapproved = 0;
             $arrData[] = [
                 'id'            => $detail->id,
                 'warehouse'     => $detail->place->code.' - '.$detail->warehouse->name.' - '.($detail->area()->exists() ? $detail->area->name : '').' - '.($detail->itemShading()->exists() ? $detail->itemShading->code : ''),

@@ -2384,7 +2384,7 @@
 
                                             $('#arr_percent_tax' + count).val(val.percent_tax);
                                             $('#arr_percent_wtax' + count).val(val.percent_wtax);
-                                            $('#arr_include_tax' + count).val(val.include_tax);
+                                            /* $('#arr_include_tax' + count).val(val.include_tax); */
 
                                             $('#top').val(val.top);
 

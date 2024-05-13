@@ -30,4 +30,8 @@ class MarketingOrderDeliveryStock extends Model
     {
         return $this->belongsTo('App\Models\MarketingOrderDeliveryDetail', 'marketing_order_delivery_detail_id', 'id')->withTrashed();
     }
+
+    public function itemStock(){
+        return $this->belongsTo('App\Models\ItemStock','item_stock_id','id');
+    }
 }

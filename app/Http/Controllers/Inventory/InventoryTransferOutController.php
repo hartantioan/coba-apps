@@ -703,7 +703,7 @@ class InventoryTransferOutController extends Controller
             }
         }else{
             $string .= '<tr>
-                <td class="center-align" colspan="4">Approval tidak ditemukan.</td>
+                <td class="center-align" colspan="5">Approval tidak ditemukan.</td>
             </tr>';
         }
 

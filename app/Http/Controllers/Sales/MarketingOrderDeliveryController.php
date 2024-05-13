@@ -556,7 +556,6 @@ class MarketingOrderDeliveryController extends Controller
                             'item_id'                       => $request->arr_item[$key],
                             'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'note'                          => $request->arr_note[$key],
-                            'item_stock_id'                 => $request->arr_item_stock[$key],
                             'place_id'                      => $request->arr_place[$key],
                         ]);
                         foreach($request->arr_stock_id as $key2 => $rowstock){
@@ -653,7 +652,7 @@ class MarketingOrderDeliveryController extends Controller
             $doneUser = $data->done_id ? $data->doneUser->employee_no . '-' . $data->doneUser->name : 'Sistem';
            $x .= '<span style="color: blue;">|| Tanggal Done: ' . $data->done_date .  ' || Done User: ' . $doneUser.'</span>';
         }
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.$x.'</div><div class="col s12"><table style="min-width:100%;">
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.$x.'</div><div class="col s12"><table style="min-width:100%;" class="bordered">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="17">Daftar Item</th>
@@ -662,7 +661,6 @@ class MarketingOrderDeliveryController extends Controller
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Referensi</th>
                                 <th class="center-align">Item</th>
-                                <th class="center-align">Ambil Dari</th>
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
                                 <th class="center-align">Keterangan</th>
@@ -673,25 +671,52 @@ class MarketingOrderDeliveryController extends Controller
         foreach($data->marketingOrderDeliveryDetail as $key => $row){
             $totalqty+=$row->qty;
             $string .= '<tr>
-                <td class="center-align">'.($key + 1).'</td>
+                <td class="center-align" rowspan="2">'.($key + 1).'</td>
                 <td class="center-align">'.$row->marketingOrderDetail->marketingOrder->code.'</td>
                 <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
-                <td class="center-align">'.$row->itemStock->place->name.' - '.$row->itemStock->warehouse->name.' - '.$row->itemStock->area->name.'</td>
                 <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->marketingOrderDetail->itemUnit->unit->code.'</td>
                 <td class="">'.$row->note.'</td>
             </tr>';
             
+            $string .= '
+                <tr>
+                    <td class="center-align">Ambil Item dari : </td>
+                    <td><table class="bordered" id="table-detail-source` + count + `">
+                    <thead>
+                        <tr>
+                            <th class="center-align">Asal Plant - Gudang - Area - Shading</th>
+                            <th class="center-align">Qty Kirim</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+                        
+            foreach($row->marketingOrderDeliveryStock as $rowdetail){
+                $string .= '<tr>
+                    <td>'.$rowdetail->itemStock->place->code.' - '.$rowdetail->itemStock->warehouse->name.' - '.($rowdetail->itemStock->area()->exists() ? $rowdetail->itemStock->area->name : '').' - '.($rowdetail->itemStock->itemShading()->exists() ? $rowdetail->itemStock->itemShading->code : '').'</td>
+                    <td class="right-align">'.CustomHelper::formatConditionalQty($rowdetail->qty).'</td>
+
+                </tr>';
+            }
+                    
+            $string .= '</tbody>
+                    </table>
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            ';
         }
         $string .= '<tr>
-                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="4"> Total </td>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="3"> Total </td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . CustomHelper::formatConditionalQty($totalqty) . '</td>
             </tr>  
         ';
         
         $string .= '</tbody></table></div>';
 
-        $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">
+        $string .= '<div class="col s12 mt-2"><table style="min-width:100%;" class="bordered">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="5">Approval</th>
@@ -736,7 +761,7 @@ class MarketingOrderDeliveryController extends Controller
             }
         }else{
             $string .= '<tr>
-                <td class="center-align" colspan="4">Approval tidak ditemukan.</td>
+                <td class="center-align" colspan="5">Approval tidak ditemukan.</td>
             </tr>';
         }
 

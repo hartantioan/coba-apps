@@ -2468,7 +2468,7 @@
 
                                 /* start count */
 
-                                /* countAll(); */
+                                countAll();
 
                                 /* end count */
                             },

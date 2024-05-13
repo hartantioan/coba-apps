@@ -300,29 +300,30 @@ class HardwareItemController extends Controller
                 ];
                 $temp_reception[]=$temp_data_rec;
     
-                $query_return = ReceptionHardwareItemsUsage::where('hardware_item_id', $request->id)->where('return_date','!=',null)->get();
-    
-                foreach($query_return as $return){
-                   
-                    $temp_data=[
-                        'post_date' => $return->return_date,
-                        'code'      => $return->code,
-                        'date'      => $return->date,
-                        'user'      => $return->user->name ?? '',
-                        'info'      => $return->info,
-                        'action'    =>'Pengembalian'
-                    ];
-                    $temp_return[]=$temp_data;
-                }
+                
                 $title='History Usage '.$reception->hardwareItem->item->name;
                 // ...
+            }
+            $query_return = ReceptionHardwareItemsUsage::where('hardware_item_id', $request->id)->where('return_date','!=',null)->get();
+    
+            foreach($query_return as $return){
+                
+                $temp_data=[
+                    'post_date' => $return->return_date,
+                    'code'      => $return->code,
+                    'date'      => $return->date,
+                    'user'      => $return->user->name ?? '',
+                    'info'      => $return->info,
+                    'action'    =>'Pengembalian'
+                ];
+                $temp_return[]=$temp_data;
             }
             $combined = array_merge($temp_return, $temp_reception);
     
             usort($combined, function($a, $b) {
                 return strtotime($a['post_date']) - strtotime($b['post_date']);
             });
-    
+            
             $string = '';
             $string1 = '';
             foreach ($combined as $key => $row) {

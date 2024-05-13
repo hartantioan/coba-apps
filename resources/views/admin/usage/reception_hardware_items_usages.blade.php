@@ -355,6 +355,8 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
+                $('#hardware_item_id').empty();
+                $('#user_id').empty();
                 $('#temp').val('');
                 M.updateTextFields();
             }
@@ -371,7 +373,7 @@
                 M.updateTextFields();
             },
             onCloseEnd: function(modal, trigger){
-                $('#hardware_item_id').empty();
+               
                 M.updateTextFields();
             }
         });
@@ -422,6 +424,7 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data2')[0].reset();
+                $('#user_id1').empty();
                 $('#temp').val('');
                 M.updateTextFields();
             }

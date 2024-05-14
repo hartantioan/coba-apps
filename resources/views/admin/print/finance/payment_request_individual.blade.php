@@ -344,7 +344,7 @@
                                     <td align="center">{{ $row->type() }}</td>
                                     <td align="center">{{ $row->purchaseInvoice() ? date('d/m/Y',strtotime($row->lookable->due_date)) : '-' }}</td>
                                     <td>{{ $row->note }}</td>
-                                    <td align="right">{{ $data->currency->symbol.number_format($row->nominal,2,',','.') }}</td>
+                                    <td align="right" style="font-family: Arial, Helvetica, sans-serif">{{ $data->currency->symbol.number_format($row->nominal,2,',','.') }}</td>
                                 </tr>
                                 @php
                                     $total += $row->nominal;
@@ -385,8 +385,8 @@
                                     <td align="center">{{ ($row->machine()->exists() ? $row->machine->name : '-') }}</td>
                                     <td align="center">{{ ($row->division()->exists() ? $row->division->name : '-') }}</td>
                                     <td align="center">{{ ($row->project()->exists() ? $row->project->name : '-') }}</td>
-                                    <td align="right">{{ $data->currency->symbol.number_format($row->nominal_debit_fc,2,',','.') }}</td>
-                                    <td align="right">{{ $data->currency->symbol.number_format($row->nominal_credit_fc,2,',','.') }}</td>
+                                    <td align="right" style="font-family: Arial, Helvetica, sans-serif">{{ $data->currency->symbol.number_format($row->nominal_debit_fc,2,',','.') }}</td>
+                                    <td align="right" style="font-family: Arial, Helvetica, sans-serif">{{ $data->currency->symbol.number_format($row->nominal_credit_fc,2,',','.') }}</td>
                                 </tr>
                                 <tr>
                                     <td colspan="9">Ket.1 : {{ $row->note }}</td>
@@ -401,8 +401,8 @@
                                 @endforeach
                                 <tr>
                                     <td colspan="7" align="right">TOTAL</td>
-                                    <td align="right">{{ $data->currency->symbol.number_format($total_debit,2,',','.') }}</td>
-                                    <td align="right">{{ $data->currency->symbol.number_format($total_credit,2,',','.') }}</td>
+                                    <td align="right" style="font-family: Arial, Helvetica, sans-serif">{{ $data->currency->symbol.number_format($total_debit,2,',','.') }}</td>
+                                    <td align="right" style="font-family: Arial, Helvetica, sans-serif">{{ $data->currency->symbol.number_format($total_credit,2,',','.') }}</td>
                                 </tr>
                             </tbody>                  
                         </table>
@@ -413,7 +413,7 @@
                             <div class="column1">
                                 <table style="width:100%" class="table-bot">
                                     <tr class="break-row">
-                                        <td>
+                                        <td style="font-family: Arial, Helvetica, sans-serif">
                                             <div class="mt-3">
                                                 Catatan : {{ $data->note }}
                                             </div>
@@ -429,27 +429,27 @@
                                 <table style="border-collapse:collapse;text-align:right" width="74%" class="table-bot">
                                     <tr class="break-row">
                                         <td class="right-align">Total</td>
-                                        <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->symbol.number_format($data->total,2,',','.') }}</td>
+                                        <td class="right-align" style="border:0.6px solid black;font-family: Arial, Helvetica, sans-serif">{{ $data->currency->symbol.number_format($data->total,2,',','.') }}</td>
                                     </tr>
                                     <tr class="break-row">
                                         <td class="right-align">Pembulatan</td>
-                                        <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->symbol.number_format($data->rounding,2,',','.') }}</td>
+                                        <td class="right-align" style="border:0.6px solid black;font-family: Arial, Helvetica, sans-serif">{{ $data->currency->symbol.number_format($data->rounding,2,',','.') }}</td>
                                     </tr>
                                     <tr class="break-row">
                                         <td class="right-align">Admin</td>
-                                        <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->symbol.number_format($data->admin,2,',','.') }}</td>
+                                        <td class="right-align" style="border:0.6px solid black;font-family: Arial, Helvetica, sans-serif">{{ $data->currency->symbol.number_format($data->admin,2,',','.') }}</td>
                                     </tr class="break-row">
                                     <tr>
                                         <td class="right-align">Grandtotal</td>
-                                        <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->symbol.number_format($data->grandtotal,2,',','.') }}</td>
+                                        <td class="right-align" style="border:0.6px solid black;font-family: Arial, Helvetica, sans-serif">{{ $data->currency->symbol.number_format($data->grandtotal,2,',','.') }}</td>
                                     </tr class="break-row">
                                     <tr>
                                         <td class="right-align">Bayar (Piutang)</td>
-                                        <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->symbol.number_format($data->payment,2,',','.') }}</td>
+                                        <td class="right-align" style="border:0.6px solid black;font-family: Arial, Helvetica, sans-serif">{{ $data->currency->symbol.number_format($data->payment,2,',','.') }}</td>
                                     </tr class="break-row">
                                     <tr>
                                         <td class="right-align">Sisa</td>
-                                        <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->symbol.number_format($data->balance,2,',','.') }}</td>
+                                        <td class="right-align" style="border:0.6px solid black;font-family: Arial, Helvetica, sans-serif">{{ $data->currency->symbol.number_format($data->balance,2,',','.') }}</td>
                                     </tr class="break-row">                              
                                 </table>
                             </div>

@@ -1597,27 +1597,25 @@ document.addEventListener('focusin', function (event) {
                     $('.row_item').each(function(){
                         $(this).remove();
                     });
-
+                    let no = 1;
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
                         $('#body-item').append(`
-                            <tr class="row_item" data-id="` + response.id + `">
+                            <tr class="row_item" data-id="` + val.mo + `">
                                 <input type="hidden" name="arr_modi[]" id="arr_modi` + count + `" value="` + val.id + `">
                                 <input type="hidden" name="arr_item[]" id="arr_item` + count + `" value="` + val.item_id + `">
                                 <input type="hidden" name="arr_place[]" id="arr_place` + count + `" value="` + val.place_id + `">
-                                <input type="hidden" name="arr_warehouse[]" id="arr_warehouse` + count + `" value="` + val.warehouse_id + `">
-                                <input type="hidden" name="arr_area[]" id="arr_area` + count + `" value="` + val.area_id + `">
+                                <td rowspan="2" id="row-main` + count + `">
+                                    ` + no + `
+                                </td>
                                 <td>
                                     ` + val.item_name + `
                                 </td>
-                                <td>
-                                    <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]" style="width:100% !important;" onchange="getPlaceWarehouse(this,'` + count + `');"></select>
-                                </td>
-                                <td id="arr_warehouse_name` + count + `">
-                                    ` + val.place_name + ` - ` + val.warehouse_name + ` - ` + val.area_name + `
+                                <td id="arr_stock` + count + `" class="right-align">
+                                    ` + val.stock + `
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="` + val.qty + `" style="text-align:right;width:100%;" id="rowQty`+ count +`">
+                                    <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="` + val.qty_original + `" style="text-align:right;width:100%;" id="rowQty`+ count +`">
                                 </td>
                                 <td class="center">
                                     <span id="arr_unit` + count + `">` + val.unit + `</span>
@@ -1631,15 +1629,82 @@ document.addEventListener('focusin', function (event) {
                                     </a>
                                 </td>
                             </tr>
+                            <tr class="btn_stock" data-id="` + val.mo + `">
+                                <td>
+                                    <a class="waves-effect waves-light blue btn-small" onclick="addSource('` + count + `',` + val.mo + `,` + val.place_id + `,` + val.item_id + `,'` + val.conversion + `');" href="javascript:void(0);">
+                                        <i class="material-icons left">add</i> Tambah Asal Item
+                                    </a>
+                                </td>
+                                <td colspan="5">
+                                    <table class="bordered" id="table-detail-source` + count + `">
+                                        <thead>
+                                            <tr>
+                                                <th>Asal Plant, Gudang, Area, Shading</th>
+                                                <th>Qty Akan Dikirim (satuan jual)</th>
+                                                <th>Hapus</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="body-detail-source` + count + `">
+                                            <tr id="empty-detail-source` + count + `">
+                                                <td class="center-align" colspan="3">Data sumber belum ditambahkan.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
                         `);
 
-                        $.each(val.list_stock, function(i, value) {
-                            $('#arr_item_stock' + count).append(`
-                                <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-warehouse="` + value.warehouse + `" data-p="` + value.place_id + `" data-w="` + value.warehouse_id + `" data-a="` + value.area_id + `" data-aname="` + value.area + `">` + value.warehouse + ` - ` + value.qty + `</option>
+                        $.each(val.detail_stock, function(j, value) {
+                            var count2 = makeid(10);
+                            if($('#empty-detail-source' + count).length > 0){
+                                $('#empty-detail-source' + count).remove();
+                            }
+                            $('#body-detail-source' + count).append(`
+                                <tr>
+                                    <input type="hidden" name="arr_stock_id[]" value="` + mod + `">
+                                    <input type="hidden" name="arr_stock_conversion[]" id="arr_stock_conversion` + count2 + `" value="` + conversion + `">
+                                    <td>
+                                        <select class="browser-default" id="arr_item_stock` + count2 + `" name="arr_item_stock[]" onchange="getStock('` + count2 + `')"></select>
+                                    </td>
+                                    <td>
+                                        <input name="arr_qty_source[]" class="browser-default" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);countRowStock('` + count2 + `')" data-qty="0,000" style="text-align:right;width:100%;" id="rowQtySource`+ count2 +`">
+                                    </td>
+                                    <td class="center-align">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-source" data-id="` + count2 + `" onclick="removeRow(this,'` + count2 + `')" href="javascript:void(0);">
+                                            <i class="material-icons">delete</i>
+                                        </a>
+                                    </td>
+                                </tr>
                             `);
+                            $('#arr_item_stock' + count2).select2({
+                                placeholder: '-- Kosong --',
+                                minimumInputLength: 1,
+                                allowClear: true,
+                                cache: true,
+                                width: 'resolve',
+                                dropdownParent: $('body').parent(),
+                                ajax: {
+                                    url: '{{ url("admin/select2/item_stock_by_place_item") }}',
+                                    type: 'GET',
+                                    dataType: 'JSON',
+                                    data: function(params) {
+                                        return {
+                                            search: params.term,
+                                            place_id : val.place_id,
+                                            item_id : vl.item_id,
+                                        };
+                                    },
+                                    processResults: function(data) {
+                                        return {
+                                            results: data.items
+                                        }
+                                    }
+                                },
+                                escapeMarkup: function (text) { return text; },
+                            });
                         });
 
-                        $('#arr_item_stock' + count).val(val.item_stock_id);
+                        no++;
                     });
                 }
                 

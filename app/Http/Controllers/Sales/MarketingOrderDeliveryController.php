@@ -616,24 +616,32 @@ class MarketingOrderDeliveryController extends Controller
         $arr = [];
         
         foreach($po->marketingOrderDeliveryDetail as $row){
+            $arrstock = [];
+
+            foreach($row->marketingOrderDeliveryStock as $rowstock){
+                $arrstock[] = [
+                    'item_stock_id'     => $rowstock->item_stock_id,
+                    'item_stock_name'   => $rowstock->itemStock->place->code.' &#9830; Gudang : '.$rowstock->itemStock->warehouse->name.' &#9830; Area : '.($rowstock->itemStock->area()->exists() ? $rowstock->itemStock->area->name : '-').' &#9830; Qty. '.CustomHelper::formatConditionalQty($rowstock->itemStock->qty).' '.$rowstock->itemStock->item->uomUnit->code.' &#9830; Shading : '.($rowstock->itemStock->itemShading()->exists() ? $rowstock->itemStock->itemShading->code : '-'),
+                    'qty'               => CustomHelper::formatConditionalQty($rowstock->qty),
+                    'qty_stock'         => CustomHelper::formatConditionalQty(($rowstock->itemStock->qty / $row->marketingOrderDetail->qty_conversion)),
+                ];
+            }
+
             $arr[] = [
+                'mo'                    => $row->marketingOrderDetail->marketing_order_id,
                 'id'                    => $row->marketing_order_detail_id,
                 'item_id'               => $row->item_id,
                 'item_name'             => $row->item->code.' - '.$row->item->name,
                 'qty'                   => CustomHelper::formatConditionalQty($row->qty),
+                'qty_original'          => CustomHelper::formatConditionalQty($row->marketingOrderDetail->qty),
                 'unit'                  => $row->marketingOrderDetail->itemUnit->unit->code,
                 'note'                  => $row->note,
-                'item_stock_id'         => $row->item_stock_id,
-                'item_stock_name'       => $row->itemStock->place->code.' - '.$row->itemStock->warehouse->code,
-                'item_stock_qty'        => CustomHelper::formatConditionalQty($row->itemStock->qty),
-                'list_stock'            => $row->item->currentStockSales($this->dataplaces,$this->datawarehouses),
                 'place_id'              => $row->place_id,
-                'warehouse_id'          => $row->warehouse_id,
-                'area_id'               => $row->area_id,
-                'place_name'            => $row->place->code,
-                'warehouse_name'        => $row->warehouse->name,
-                'area_name'             => $row->area->name,
+                'conversion'            => $row->marketingOrderDetail->qty_conversion,
+                'detail_stock'          => $arrstock,
+                'stock'                 => CustomHelper::formatConditionalQty(round($row->item->getStockPlace($row->place_id) / $row->marketingOrderDetail->qty_conversion,3)),
             ];
+            
         }
 
         $po['details'] = $arr;
@@ -810,11 +818,11 @@ class MarketingOrderDeliveryController extends Controller
             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
             $data["image"]=$path_img;
              
-            $pdf = Pdf::loadView('admin.print.sales.order_delivery_individual', $data)->setPaper('a5', 'landscape');
+            $pdf = Pdf::loadView('admin.print.sales.order_delivery_individual', $data)->setPaper('a4', 'portrait');
             // $pdf->render();
     
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+            $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             
             $content = $pdf->download()->getOriginalContent();
             
@@ -866,12 +874,12 @@ class MarketingOrderDeliveryController extends Controller
                     $img_base_64 = base64_encode($image_temp);
                     $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                     $data["image"]=$path_img;
-                    $pdf = Pdf::loadView('admin.print.sales.order_delivery_individual', $data)->setPaper('a5', 'landscape');
+                    $pdf = Pdf::loadView('admin.print.sales.order_delivery_individual', $data)->setPaper('a4', 'portrait');
                     $pdf->render();
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                    $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
-                    $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                    $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(495, 740, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                     $content = $pdf->download()->getOriginalContent();
                     $temp_pdf[]=$content;
                 }
@@ -964,12 +972,12 @@ class MarketingOrderDeliveryController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.sales.order_delivery_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.sales.order_delivery_individual', $data)->setPaper('a4', 'portrait');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                            $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(495, 740, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
                            
@@ -1039,12 +1047,12 @@ class MarketingOrderDeliveryController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.sales.order_delivery_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.sales.order_delivery_individual', $data)->setPaper('a4', 'portrait');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                            $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(495, 740, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
                            

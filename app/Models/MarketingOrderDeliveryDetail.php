@@ -61,16 +61,7 @@ class MarketingOrderDeliveryDetail extends Model
     public function place(){
         return $this->belongsTo('App\Models\Place','place_id','id')->withTrashed();
     }
-
-    public function getHpp(){
-        $total = round($this->itemStock->priceDate($this->marketingOrderDelivery->post_date) * $this->qty * $this->marketingOrderDetail->qty_conversion,2);
-        return $total;
-    }
-
-    public function getPriceHpp(){
-        return $this->itemStock->priceDate($this->marketingOrderDelivery->post_date);
-    }
-
+    
     public function marketingOrderReturnDetail()
     {
         return $this->hasMany('App\Models\MarketingOrderReturnDetail')->whereHas('marketingOrderReturn',function($query){

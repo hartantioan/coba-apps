@@ -34,4 +34,13 @@ class MarketingOrderDeliveryStock extends Model
     public function itemStock(){
         return $this->belongsTo('App\Models\ItemStock','item_stock_id','id');
     }
+
+    public function getHpp(){
+        $total = round($this->itemStock->priceDate($this->marketingOrderDelivery->post_date) * $this->qty * $this->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,2);
+        return $total;
+    }
+
+    public function getPriceHpp(){
+        return $this->itemStock->priceDate($this->marketingOrderDelivery->post_date);
+    }
 }

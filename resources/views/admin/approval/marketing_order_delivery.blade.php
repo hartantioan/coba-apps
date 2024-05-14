@@ -222,7 +222,6 @@
                     <tr>
                         <th class="center-align">No.</th>
                         <th class="center-align">Item</th>
-                        <th class="center-align">Stok</th>
                         <th class="center-align">Qty</th>
                         <th class="center-align">Satuan</th>
                     </tr>
@@ -232,12 +231,11 @@
                     <tr>
                         <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
                         <td class="center-align">{{ $row->item->code.' - '.$row->item->name }}</td>
-                        <td class="">{{ $row->itemStock->place->name.' - '.$row->itemStock->warehouse->name.' - '.$row->itemStock->area->name }}</td>
                         <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                         <td class="center-align">{{ $row->marketingOrderDetail->itemUnit->unit->code }}</td>
                     </tr>
                     <tr>
-                        <td colspan="5">Keterangan: {{ $row->note }}</td>
+                        <td colspan="4">Keterangan: {{ $row->note }}</td>
                     </tr>
                     @endforeach
                     <tr>

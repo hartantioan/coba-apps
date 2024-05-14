@@ -3378,7 +3378,7 @@ class CustomHelper {
 
 		}elseif($table_name == 'marketing_order_memos'){
 
-			$mom = MarketingOrderMemo::find($table_id);
+			/* $mom = MarketingOrderMemo::find($table_id);
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
@@ -3536,7 +3536,7 @@ class CustomHelper {
 				]);
 
 				CustomHelper::removeCountLimitCredit($mom->account_id,$mom->grandtotal);
-			}
+			} */
 			
 		}elseif($table_name == 'purchase_invoices'){
 			self::removeJournal($table_name,$table_id);

@@ -425,54 +425,56 @@ class MarketingOrderDeliveryProcess extends Model
 
         foreach($modp->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
 
-            $hpp = $row->getHpp();
+            foreach($row->marketingOrderDeliveryStock as $rowstock){
+                $hpp = $rowstock->getHpp();
 
-            JournalDetail::create([
-                'journal_id'	=> $query->id,
-                'account_id'	=> $coabdp->bp_journal ? $modp->marketingOrderDelivery->marketingOrder->account_id : NULL,
-                'coa_id'		=> $coabdp->id,
-                'place_id'		=> $row->place_id,
-                'item_id'		=> $row->item_id,
-                'warehouse_id'	=> $row->warehouse_id,
-                'type'			=> '1',
-                'nominal'		=> $hpp,
-                'note'          => 'Item dikirimkan / keluar dari gudang.'
-            ]);
+                JournalDetail::create([
+                    'journal_id'	=> $query->id,
+                    'account_id'	=> $coabdp->bp_journal ? $modp->marketingOrderDelivery->marketingOrder->account_id : NULL,
+                    'coa_id'		=> $coabdp->id,
+                    'place_id'		=> $rowstock->itemStock->place_id,
+                    'item_id'		=> $rowstock->itemStock->item_id,
+                    'warehouse_id'	=> $rowstock->itemStock->warehouse_id,
+                    'type'			=> '1',
+                    'nominal'		=> $hpp,
+                    'note'          => 'Item dikirimkan / keluar dari gudang.'
+                ]);
 
-            JournalDetail::create([
-                'journal_id'	=> $query->id,
-                'coa_id'		=> $row->itemStock->item->itemGroup->coa_id,
-                'place_id'		=> $row->place_id,
-                'item_id'		=> $row->item_id,
-                'warehouse_id'	=> $row->warehouse_id,
-                'type'			=> '2',
-                'nominal'		=> $hpp,
-                'note'          => 'Item dikirimkan / keluar dari gudang.'
-            ]);
+                JournalDetail::create([
+                    'journal_id'	=> $query->id,
+                    'coa_id'		=> $row->itemStock->item->itemGroup->coa_id,
+                    'place_id'		=> $rowstock->itemStock->place_id,
+                    'item_id'		=> $rowstock->itemStock->item_id,
+                    'warehouse_id'	=> $rowstock->itemStock->warehouse_id,
+                    'type'			=> '2',
+                    'nominal'		=> $hpp,
+                    'note'          => 'Item dikirimkan / keluar dari gudang.'
+                ]);
 
-            CustomHelper::sendCogs('marketing_order_delivery_processes',
-                $modp->id,
-                $row->place->company_id,
-                $row->place_id,
-                $row->warehouse_id,
-                $row->item_id,
-                $row->qty * $row->marketingOrderDetail->qty_conversion,
-                $hpp,
-                'OUT',
-                $modp->post_date,
-                $row->area_id,
-                $row->itemStock->item_shading_id,
-            );
+                CustomHelper::sendCogs('marketing_order_delivery_processes',
+                    $modp->id,
+                    $rowstock->itemStock->place->company_id,
+                    $rowstock->itemStock->place_id,
+                    $rowstock->itemStock->warehouse_id,
+                    $rowstock->itemStock->item_id,
+                    $rowstock->qty * $row->marketingOrderDetail->qty_conversion,
+                    $hpp,
+                    'OUT',
+                    $modp->post_date,
+                    $rowstock->itemStock->area_id,
+                    $rowstock->itemStock->item_shading_id,
+                );
 
-            CustomHelper::sendStock(
-                $row->place_id,
-                $row->warehouse_id,
-                $row->item_id,
-                $row->qty * $row->marketingOrderDetail->qty_conversion,
-                'OUT',
-                $row->area_id,
-                $row->itemStock->item_shading_id,
-            );
+                CustomHelper::sendStock(
+                    $rowstock->itemStock->place_id,
+                    $rowstock->itemStock->warehouse_id,
+                    $rowstock->itemStock->item_id,
+                    $rowstock->qty * $row->marketingOrderDetail->qty_conversion,
+                    'OUT',
+                    $rowstock->itemStock->area_id,
+                    $rowstock->itemStock->item_shading_id,
+                );
+            }
         }
     }
 
@@ -495,31 +497,33 @@ class MarketingOrderDeliveryProcess extends Model
 
         foreach($modp->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
 
-            $hpp = $row->getHpp();
+            foreach($row->marketingOrderDeliveryStock as $rowstock){
+                $hpp = $rowstock->getHpp();
 
-            JournalDetail::create([
-                'journal_id'	=> $query->id,
-                'account_id'	=> $coahpp->bp_journal ? $modp->marketingOrderDelivery->marketingOrder->account_id : NULL,
-                'coa_id'		=> $coahpp->id,
-                'place_id'		=> $row->place_id,
-                'item_id'		=> $row->item_id,
-                'warehouse_id'	=> $row->warehouse_id,
-                'type'			=> '1',
-                'nominal'		=> $hpp,
-                'note'          => 'Dokumen Surat Jalan telah kembali ke admin penagihan.'
-            ]);
+                JournalDetail::create([
+                    'journal_id'	=> $query->id,
+                    'account_id'	=> $coahpp->bp_journal ? $modp->marketingOrderDelivery->marketingOrder->account_id : NULL,
+                    'coa_id'		=> $coahpp->id,
+                    'place_id'		=> $rowstock->itemStock->place_id,
+                    'item_id'		=> $rowstock->itemStock->item_id,
+                    'warehouse_id'	=> $rowstock->itemStock->warehouse_id,
+                    'type'			=> '1',
+                    'nominal'		=> $hpp,
+                    'note'          => 'Dokumen Surat Jalan telah kembali ke admin penagihan.'
+                ]);
 
-            JournalDetail::create([
-                'journal_id'	=> $query->id,
-                'account_id'	=> $coabdp->bp_journal ? $modp->marketingOrderDelivery->marketingOrder->account_id : NULL,
-                'coa_id'		=> $coabdp->id,
-                'place_id'		=> $row->place_id,
-                'item_id'		=> $row->item_id,
-                'warehouse_id'	=> $row->warehouse_id,
-                'type'			=> '2',
-                'nominal'		=> $hpp,
-                'note'          => 'Dokumen Surat Jalan telah kembali ke admin penagihan.'
-            ]);
+                JournalDetail::create([
+                    'journal_id'	=> $query->id,
+                    'account_id'	=> $coabdp->bp_journal ? $modp->marketingOrderDelivery->marketingOrder->account_id : NULL,
+                    'coa_id'		=> $coabdp->id,
+                    'place_id'		=> $rowstock->itemStock->place_id,
+                    'item_id'		=> $rowstock->itemStock->item_id,
+                    'warehouse_id'	=> $rowstock->itemStock->warehouse_id,
+                    'type'			=> '2',
+                    'nominal'		=> $hpp,
+                    'note'          => 'Dokumen Surat Jalan telah kembali ke admin penagihan.'
+                ]);
+            }
         }
     }
 

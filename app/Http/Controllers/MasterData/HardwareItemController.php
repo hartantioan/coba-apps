@@ -292,7 +292,7 @@ class HardwareItemController extends Controller
                 $temp_data_rec=[
                     'image'     => $reception->user()->exists() ?  $reception->user->profilePicture(): '',
                     'code'      => $reception->code,
-                    'date'      => $reception->date,
+                    'date'      => $reception->reception_date,
                     'post_date' => $reception->reception_date,
                     'user'      => $reception->user->name ?? '',
                     'info'      => $reception->info,
@@ -311,7 +311,7 @@ class HardwareItemController extends Controller
                 $temp_data=[
                     'post_date' => $return->return_date,
                     'code'      => $return->code,
-                    'date'      => $return->date,
+                    'date'      => $return->return_date,
                     'user'      => $return->user->name ?? '',
                     'info'      => $return->info,
                     'action'    =>'Pengembalian'

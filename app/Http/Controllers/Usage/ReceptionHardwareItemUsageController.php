@@ -255,7 +255,7 @@ class ReceptionHardwareItemUsageController extends Controller
                     date('d/m/Y',strtotime($val->reception_date)),
                     $val->info,
                     $val->account->name,
-                    $val->return_date ? date('d/m/Y', strtotime($val->return_date)) : '-',
+                    $val->return_date ? date('d/m/Y', strtotime($val->return_date)) : ' ',
                     $val->return_note,
                     $val->status(),
                     $button

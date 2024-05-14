@@ -313,7 +313,7 @@ class HardwareItemController extends Controller
                     'code'      => $return->code,
                     'date'      => $return->return_date,
                     'user'      => $return->user->name ?? '',
-                    'info'      => $return->info,
+                    'info'      => $return->return_note,
                     'action'    =>'Pengembalian'
                 ];
                 $temp_return[]=$temp_data;

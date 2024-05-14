@@ -2,6 +2,7 @@
     <thead>
         <tr align="center">
             <th>No</th>
+            <th>NIK</th>
             <th>Pengguna</th>
             <th>Code</th>
             <th>Perusahaan</th>
@@ -37,6 +38,7 @@
             @foreach($row->goodScaleDetail as $key1 => $rowdetail)
             <tr align="center">
                 <td>{{ $no }}</td>
+                <td>{{ $row->user->employee_no }}</td>
                 <td>{{ $row->user->name }}</td>
                 <td>{{ $row->code }}</td>
                 <td>{{ $row->company->name }}</td>

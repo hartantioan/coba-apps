@@ -13,6 +13,7 @@
             <th>Doner</th>
             <th>Tgl. Done</th>
             <th>Ket. Done</th>
+            <th>NIK</th>
             <th>Pengguna</th>
             <th>Tgl. Posting</th>
             <th>Keterangan</th>
@@ -53,6 +54,7 @@
                     <td>{{($rowdetail->materialRequest->status == 3 && is_null($rowdetail->materialRequest->done_id)) ? 'sistem' : (($rowdetail->materialRequest->status == 3 && !is_null($rowdetail->materialRequest->done_id)) ? $rowdetail->materialRequest->doneUser->name : null)}}</td>
                     <td>{{$rowdetail->materialRequest->doneUser()->exists() ? $rowdetail->materialRequest->done_date}} </td> 
                     <td>{{ $rowdetail->materialRequest->doneUser()->exists() ? $rowdetail->materialRequest->done_note }}</td> 
+                    <td>{{ $rowdetail->materialRequest->user->employee_no }}</td>
                     <td>{{ $rowdetail->materialRequest->user->name }}</td>
                     <td>{{ date('d/m/Y',strtotime($rowdetail->materialRequest->post_date)) }}</td>
                     <td>{{ $rowdetail->materialRequest->note }}</td>

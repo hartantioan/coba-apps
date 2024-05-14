@@ -10,6 +10,7 @@
             <th>Deleter</th>
             <th>Tgl. Delete</th>
             <th>Ket. Delete</th>
+            <th>NIK</th>
             <th>Pengguna</th>
             <th>Tgl. Posting</th>
             <th>Nama Supplier</th>
@@ -48,6 +49,7 @@
                 <td>{{ $row->deleteUser()->exists() ? $row->deleteUser->name : '' }}</td>
                 <td>{{ $row->deleteUser()->exists() ? date('d/m/Y',strtotime($row->deleted_at)) : '' }}</td>
                 <td>{{ $row->deleteUser()->exists() ? $row->delete_note : '' }}</td>
+                <td>{{ $row->user->employee_no }}</td>
                 <td>{{ $row->user->name }}</td>
                 <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                 <td>{{ $row->account->name }}</td>

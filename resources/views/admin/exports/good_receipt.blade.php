@@ -10,6 +10,7 @@
             <th>Voider</th>
             <th>Tgl. Void</th>
             <th>Ket. Void</th>
+            <th>NIK</th>
             <th>Pengguna</th>
             <th>Nama Supplier</th>
             <th>Tgl. Terima</th>
@@ -52,6 +53,7 @@
                 <td>{{ $row->voidUser()->exists() ? $row->voidUser->name : '' }}</td>
                 <td>{{ $row->voidUser()->exists() ? date('d/m/Y',strtotime($row->void_date)) : '' }}</td>
                 <td>{{ $row->voidUser()->exists() ? $row->void_note : '' }}</td>
+                <td>{{ $row->user->employee_no }}</td>
                 <td>{{ $row->user->name }}</td>
                 <td>{{ $row->account->name }}</td>
                 <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>

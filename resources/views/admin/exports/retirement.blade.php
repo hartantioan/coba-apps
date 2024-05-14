@@ -3,6 +3,7 @@
         <tr align="center">
             <th>No</th>
             <th>No.Dokumen</th>
+            <th>NIK</th>
             <th>Pengguna</th>
             <th>Perusahaan</th>
             <th>Mata Uang</th>
@@ -34,6 +35,7 @@
             <tr align="center" style="background-color:#d6d5d5;">
                 <td>{{ $no }}</td>
                 <td>{{ $row->code }}</td>
+                <td>{{ $row->user->employee_no }}</td>
                 <td>{{ $row->user->name }}</td>
                 <td>{{ $row->company->name }}</td>
                 <td>{{ $row->currency->code }}</td>

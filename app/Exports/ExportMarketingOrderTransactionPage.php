@@ -37,6 +37,7 @@ class ExportMarketingOrderTransactionPage implements FromCollection, WithTitle, 
         'No',
         'No. MO',
         'Status',
+        'NIK',
         'Petugas',
         'Voider',
         'Tgl.Void',
@@ -179,6 +180,7 @@ class ExportMarketingOrderTransactionPage implements FromCollection, WithTitle, 
                 'no'                => ($key + 1),
                 'code'              => $row->code,
                 'status'            => $row->statusRaw(),
+                'nik'               => $row->user->employee_no,
                 'user'              => $row->user->name,
                 'voider'            => $row->voidUser()->exists() ? $row->voidUser->name : '',
                 'void_date'         => $row->voidUser()->exists() ? $row->void_date : '',
@@ -232,7 +234,7 @@ class ExportMarketingOrderTransactionPage implements FromCollection, WithTitle, 
 
     public function title(): string
     {
-        return 'Rekap Purchase Order';
+        return 'Marketing Order';
     }
 
     public function headings() : array

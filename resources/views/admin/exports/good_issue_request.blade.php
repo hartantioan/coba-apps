@@ -10,6 +10,7 @@
             <th>Deleter</th>
             <th>Tgl. Delete</th>
             <th>Ket. Delete</th>
+            <th>NIK</th>
             <th>Pengguna</th>
             <th>Tgl. Posting</th>
             <th>Keterangan</th>
@@ -47,6 +48,7 @@
                     <td>{{ $rowdetail->goodIssueRequest->deleteUser()->exists() ? $rowdetail->goodIssueRequest->deleteUser->name : '' }}</td>
                     <td>{{ $rowdetail->goodIssueRequest->deleteUser()->exists() ? date('d/m/Y',strtotime($rowdetail->goodIssueRequest->deleted_at)) : '' }}</td>
                     <td>{{ $rowdetail->goodIssueRequest->deleteUser()->exists() ? $rowdetail->goodIssueRequest->delete_note : '' }}</td>
+                    <td>{{ $rowdetail->goodIssueRequest->user->employee_no }}</td>
                     <td>{{ $rowdetail->goodIssueRequest->user->name }}</td>
                     <td>{{ date('d/m/Y',strtotime($rowdetail->goodIssueRequest->post_date)) }}</td>
                     <td>{{ $rowdetail->goodIssueRequest->note }}</td>

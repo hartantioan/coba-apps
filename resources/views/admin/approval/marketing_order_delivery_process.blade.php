@@ -236,7 +236,6 @@
                     <tr>
                         <th class="center-align">No.</th>
                         <th class="center-align">Item</th>
-                        <th class="center-align">Stok</th>
                         <th class="center-align">Qty</th>
                         <th class="center-align">Satuan</th>
                         <th class="center-align">Kondisi</th>
@@ -247,13 +246,33 @@
                     <tr>
                         <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
                         <td class="center-align">{{ $row->item->code.' - '.$row->item->name }}</td>
-                        <td class="">{{ $row->itemStock->place->name.' - '.$row->itemStock->warehouse->name }}</td>
                         <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                         <td class="center-align">{{ $row->marketingOrderDetail->itemUnit->unit->code }}</td>
                         <td class="center-align"></td>
                     </tr>
                     <tr>
-                        <td colspan="6">Keterangan: {{ $row->note }}</td>
+                        <td colspan="5">Keterangan: {{ $row->note }}</td>
+                    </tr>
+                    <tr>
+                        <td class="center-align">Ambil Item dari : </td>
+                        <td colspan="4">
+                            <table class="bordered" id="table-detail-source">
+                                <thead>
+                                    <tr>
+                                        <th class="center-align">Asal Plant - Gudang - Area - Shading</th>
+                                        <th class="center-align">Qty Kirim</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($row->marketingOrderDeliveryStock as $rowdetail)
+                                        <tr>
+                                            <td>{{ $rowdetail->itemStock->place->code.' - '.$rowdetail->itemStock->warehouse->name.' - '.($rowdetail->itemStock->area()->exists() ? $rowdetail->itemStock->area->name : '').' - '.($rowdetail->itemStock->itemShading()->exists() ? $rowdetail->itemStock->itemShading->code : '') }}</td>
+                                            <td class="right-align">{{ CustomHelper::formatConditionalQty($rowdetail->qty) }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </td>
                     </tr>
                     @endforeach
                     <tr>

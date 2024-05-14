@@ -417,7 +417,7 @@ class MarketingOrderDeliveryProcess extends Model
             'lookable_type'	=> 'marketing_order_delivery_processes',
             'lookable_id'	=> $modp->id,
             'post_date'		=> $modp->post_date,
-            'note'			=> $modp->code,
+            'note'			=> $modp->note_internal.' - '.$modp->note_external,
             'status'		=> '3'
         ]);
         
@@ -437,17 +437,19 @@ class MarketingOrderDeliveryProcess extends Model
                     'warehouse_id'	=> $rowstock->itemStock->warehouse_id,
                     'type'			=> '1',
                     'nominal'		=> $hpp,
+                    'nominal_fc'    => $hpp,
                     'note'          => 'Item dikirimkan / keluar dari gudang.'
                 ]);
 
                 JournalDetail::create([
                     'journal_id'	=> $query->id,
-                    'coa_id'		=> $row->itemStock->item->itemGroup->coa_id,
+                    'coa_id'		=> $rowstock->itemStock->item->itemGroup->coa_id,
                     'place_id'		=> $rowstock->itemStock->place_id,
                     'item_id'		=> $rowstock->itemStock->item_id,
                     'warehouse_id'	=> $rowstock->itemStock->warehouse_id,
                     'type'			=> '2',
                     'nominal'		=> $hpp,
+                    'nominal_fc'    => $hpp,
                     'note'          => 'Item dikirimkan / keluar dari gudang.'
                 ]);
 
@@ -488,7 +490,7 @@ class MarketingOrderDeliveryProcess extends Model
             'lookable_type'	=> 'marketing_order_delivery_processes',
             'lookable_id'	=> $modp->id,
             'post_date'		=> $modp->return_date,
-            'note'			=> $modp->code,
+            'note'			=> $modp->note_internal.' - '.$modp->note_external,
             'status'		=> '3'
         ]);
         
@@ -509,6 +511,7 @@ class MarketingOrderDeliveryProcess extends Model
                     'warehouse_id'	=> $rowstock->itemStock->warehouse_id,
                     'type'			=> '1',
                     'nominal'		=> $hpp,
+                    'nominal_fc'	=> $hpp,
                     'note'          => 'Dokumen Surat Jalan telah kembali ke admin penagihan.'
                 ]);
 
@@ -521,6 +524,7 @@ class MarketingOrderDeliveryProcess extends Model
                     'warehouse_id'	=> $rowstock->itemStock->warehouse_id,
                     'type'			=> '2',
                     'nominal'		=> $hpp,
+                    'nominal_fc'	=> $hpp,
                     'note'          => 'Dokumen Surat Jalan telah kembali ke admin penagihan.'
                 ]);
             }

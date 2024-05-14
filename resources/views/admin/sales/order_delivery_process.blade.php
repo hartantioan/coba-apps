@@ -308,7 +308,7 @@
                                                 <thead>
                                                     <tr>
                                                         <th class="center">Item</th>
-                                                        <th class="center">Dari Plant</th>
+                                                        <th class="center">Barang dari</th>
                                                         <th class="center">Qty Pesanan</th>
                                                         <th class="center">Satuan</th>
                                                         <th class="center">Keterangan</th>
@@ -502,47 +502,8 @@
             </div>
         </div>
         <div class="divider mb-1 mt-2"></div>
-        <div class="row">
-            <div class="col" id="user_jurnal">
-            </div>
-            <div class="col" id="post_date_jurnal">
-            </div>
-            <div class="col" id="note_jurnal">
-            </div>
-            <div class="col" id="ref_jurnal">
-            </div>
-            <div class="col" id="company_jurnal">
-            </div>
-        </div>
-        <div class="row mt-2">
-            <table class="bordered Highlight striped" style="zoom:0.7;">
-                <thead>
-                        <tr>
-                            <th class="center-align" rowspan="2">No</th>
-                            <th class="center-align" rowspan="2">Coa</th>
-                            <th class="center-align" rowspan="2">Partner Bisnis</th>
-                            <th class="center-align" rowspan="2">Plant</th>
-                            <th class="center-align" rowspan="2">Line</th>
-                            <th class="center-align" rowspan="2">Mesin</th>
-                            <th class="center-align" rowspan="2">Divisi</th>
-                            <th class="center-align" rowspan="2">Gudang</th>
-                            <th class="center-align" rowspan="2">Proyek</th>
-                            <th class="center-align" rowspan="2">Ket.1</th>
-                            <th class="center-align" rowspan="2">Ket.2</th>
-                            <th class="center-align" colspan="2">Mata Uang Asli</th>
-                            <th class="center-align" colspan="2">Mata Uang Konversi</th>
-                        </tr>
-                        <tr>
-                            <th class="center-align">Debit</th>
-                            <th class="center-align">Kredit</th>
-                            <th class="center-align">Debit</th>
-                            <th class="center-align">Kredit</th>
-                        </tr>
-                    
-                </thead>
-                <tbody id="body-journal-table">
-                </tbody>
-            </table>
+        <div id="journal-content">
+
         </div>
     </div>
     <div class="modal-footer">
@@ -990,14 +951,7 @@ document.addEventListener('focusin', function (event) {
             onOpenEnd: function(modal, trigger) { 
             },
             onCloseEnd: function(modal, trigger){
-                $('#title_data').empty();
-                $('#code_data').empty();             
-                $('#body-journal-table').empty();
-                $('#user_jurnal').empty();
-                $('#note_jurnal').empty();
-                $('#ref_jurnal').empty();
-                $('#company_jurnal').empty();
-                $('#post_date_jurnal').empty();
+                $('#journal-content').empty();
             }
         });
 
@@ -1069,6 +1023,14 @@ document.addEventListener('focusin', function (event) {
                             `);
                             $.each(response.details, function(i, val) {
                                 var count = makeid(10);
+
+                                let stock = '<ol>';
+
+                                $.each(val.stocks, function(i, value){
+                                    stock += '<li>' + value.stock_name + ' Qty : ' + value.qty + '</li>';
+                                });
+
+                                stock += '</ol>';
                                 
                                 $('#body-item').append(`
                                     <tr class="row_item" data-id="` + response.id + `">
@@ -1076,7 +1038,7 @@ document.addEventListener('focusin', function (event) {
                                             ` + val.item_name + `
                                         </td>
                                         <td id="arr_warehouse_name` + count + `">
-                                            ` + val.place_name + ` - ` + val.warehouse_name + `
+                                            ` + stock + `
                                         </td>
                                         <td class="center-align">
                                             ` + val.qty + `
@@ -1883,10 +1845,10 @@ document.addEventListener('focusin', function (event) {
                     beforeSend: function() {
                         $('#validation_alert').hide();
                         $('#validation_alert').html('');
-                        loadingOpen('.modal-content');
+                        loadingOpen('#modal1');
                     },
                     success: function(response) {
-                        loadingClose('.modal-content');
+                        loadingClose('#modal1');
                         $('input').css('border', 'none');
                         $('input').css('border-bottom', '0.5px solid black');
                         if(response.status == 200) {
@@ -1931,7 +1893,7 @@ document.addEventListener('focusin', function (event) {
                     },
                     error: function() {
                         $('.modal-content').scrollTop(0);
-                        loadingClose('.modal-content');
+                        loadingClose('#modal1');
                         swal({
                             title: 'Ups!',
                             text: 'Check your internet connection.',
@@ -2018,13 +1980,22 @@ document.addEventListener('focusin', function (event) {
 
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
+
+                        let stock = '<ol>';
+
+                        $.each(val.stocks, function(i, value){
+                            stock += '<li>' + value.stock_name + ' Qty : ' + value.qty + '</li>';
+                        });
+
+                        stock += '</ol>';
+
                         $('#body-item').append(`
                             <tr class="row_item" data-id="` + response.id + `">
                                 <td>
                                     ` + val.item_name + `
                                 </td>
                                 <td id="arr_warehouse_name` + count + `">
-                                    ` + val.place_name + ` - ` + val.warehouse_name + `
+                                    ` + stock + `
                                 </td>
                                 <td class="center-align">
                                     ` + val.qty + `
@@ -2303,14 +2274,10 @@ document.addEventListener('focusin', function (event) {
                     });
                 }else{
                     $('#modal6').modal('open');
-                    $('#title_data').append(``+data.title+``);
-                    $('#code_data').append(data.code);
-                    $('#body-journal-table').append(data.tbody);
-                    $('#user_jurnal').append(`Pengguna : `+data.user);
-                    $('#note_jurnal').append(`Keterangan : `+data.note);
-                    $('#ref_jurnal').append(`Referensi : `+data.reference);
-                    $('#company_jurnal').append(`Perusahaan : `+data.company);
-                    $('#post_date_jurnal').append(`Tanggal : `+data.post_date);
+                    $('#journal-content').empty();
+                    $.each(data.data, function(i, val) {
+                        $('#journal-content').append(val);
+                    });
                 }
             }
         });

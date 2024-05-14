@@ -325,11 +325,10 @@ class MarketingOrderDeliveryProcessController extends Controller
                     }
                     $details[] = [
                         'item_name'     => $row->item->code.' - '.$row->item->name,
-                        'place_name'    => $row->place->code,
-                        'warehouse_name'=> $row->warehouse->name,
                         'qty'           => CustomHelper::formatConditionalQty($row->qty),
                         'unit'          => $row->marketingOrderDetail->itemUnit->unit->code,
                         'note'          => $row->note,
+                        'stocks'        => $stocks,
                     ];
                 }
 
@@ -613,7 +612,7 @@ class MarketingOrderDeliveryProcessController extends Controller
             $doneUser = $data->done_id ? $data->doneUser->employee_no . '-' . $data->doneUser->name : 'Sistem';
            $x .= '<span style="color: blue;">|| Tanggal Done: ' . $data->done_date .  ' || Done User: ' . $doneUser.'</span>';
         }
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.$x.'</div><div class="col s12"><table style="min-width:100%;">
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.$x.'</div><div class="col s12"><table class="bordered" style="min-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="17">Daftar Item</th>
@@ -622,7 +621,6 @@ class MarketingOrderDeliveryProcessController extends Controller
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Referensi</th>
                                 <th class="center-align">Item</th>
-                                <th class="center-align">Ambil Dari</th>
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
                                 <th class="center-align">Keterangan</th>
@@ -632,17 +630,42 @@ class MarketingOrderDeliveryProcessController extends Controller
         foreach($data->marketingOrderDelivery->marketingOrderDeliveryDetail as $key => $row){
             $totalqty+=$row->qty;
             $string .= '<tr>
-                <td class="center-align">'.($key + 1).'</td>
+                <td class="center-align" rowspan="2">'.($key + 1).'</td>
                 <td class="center-align">'.$row->marketingOrderDetail->marketingOrder->code.'</td>
                 <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
-                <td class="center-align">'.$row->itemStock->place->name.' - '.$row->itemStock->warehouse->name.'</td>
                 <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->marketingOrderDetail->itemUnit->unit->code.'</td>
                 <td class="">'.$row->note.'</td>
             </tr>';
+
+            $string .= '
+                <tr>
+                    <td class="center-align">Ambil Item dari : </td>
+                    <td colspan="5"><table class="bordered" id="table-detail-source">
+                    <thead>
+                        <tr>
+                            <th class="center-align">Asal Plant - Gudang - Area - Shading</th>
+                            <th class="center-align">Qty Kirim</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+                        
+            foreach($row->marketingOrderDeliveryStock as $rowdetail){
+                $string .= '<tr>
+                    <td>'.$rowdetail->itemStock->place->code.' - '.$rowdetail->itemStock->warehouse->name.' - '.($rowdetail->itemStock->area()->exists() ? $rowdetail->itemStock->area->name : '').' - '.($rowdetail->itemStock->itemShading()->exists() ? $rowdetail->itemStock->itemShading->code : '').'</td>
+                    <td class="right-align">'.CustomHelper::formatConditionalQty($rowdetail->qty).'</td>
+
+                </tr>';
+            }
+                    
+            $string .= '</tbody>
+                    </table>
+                    </td>
+                </tr>
+            ';
         }
         $string .= '<tr>
-                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="4"> Total </td>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="3"> Total </td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqty, 3, ',', '.') . '</td>
             </tr>  
         ';
@@ -1018,71 +1041,91 @@ class MarketingOrderDeliveryProcessController extends Controller
         $total_kredit_konversi = 0;
         $query = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($id))->first();
         if($query->journal()->exists()){
-            $response = [
-                'title'     => 'Journal',
-                'status'    => 200,
-                'message'   => $query->journal,
-                'user'      => $query->user->name,
-                'reference' => $query->code,
-                'company'   => $query->company()->exists() ? $query->company->name : '-',
-                'code'      => $query->journal->code,
-                'note'      => $query->note,
-                'post_date' => date('d/m/Y',strtotime($query->post_date)),
-            ];
-            $string='';
-            $no = 1;
-
-            $data = [];
-
+            $main = [];
             foreach($query->journal as $rowmain){
+
+                $string='<div class="row">
+                            <div class="col" id="user_jurnal">
+                            '.$query->user->name.'
+                            </div>
+                            <div class="col" id="post_date_jurnal">
+                            '.date('d/m/Y',strtotime($query->post_date)).'
+                            </div>
+                            <div class="col" id="note_jurnal">
+                            '.$query->note.'
+                            </div>
+                            <div class="col" id="ref_jurnal">
+                            '.$query->code.'
+                            </div>
+                            <div class="col" id="company_jurnal">
+                            '.$query->company->name.'
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <table class="bordered Highlight striped" style="zoom:0.7;">
+                                <thead>
+                                        <tr>
+                                            <th class="center-align" rowspan="2">No</th>
+                                            <th class="center-align" rowspan="2">Coa</th>
+                                            <th class="center-align" rowspan="2">Partner Bisnis</th>
+                                            <th class="center-align" rowspan="2">Plant</th>
+                                            <th class="center-align" rowspan="2">Line</th>
+                                            <th class="center-align" rowspan="2">Mesin</th>
+                                            <th class="center-align" rowspan="2">Divisi</th>
+                                            <th class="center-align" rowspan="2">Gudang</th>
+                                            <th class="center-align" rowspan="2">Proyek</th>
+                                            <th class="center-align" rowspan="2">Ket.1</th>
+                                            <th class="center-align" rowspan="2">Ket.2</th>
+                                            <th class="center-align" colspan="2">Mata Uang Asli</th>
+                                            <th class="center-align" colspan="2">Mata Uang Konversi</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="center-align">Debit</th>
+                                            <th class="center-align">Kredit</th>
+                                            <th class="center-align">Debit</th>
+                                            <th class="center-align">Kredit</th>
+                                        </tr>
+                                    
+                                </thead>
+                                <tbody>';
+
                 foreach($rowmain->journalDetail()->where(function($query){
                     $query->whereHas('coa',function($query){
                         $query->orderBy('code');
                     })
                     ->orderBy('type');
                 })->get() as $key => $row){
-
-                    $arr = [
-                        'no'        => $no,
-                        'code'      => $row->coa->code,
-                        'codename'  => $row->coa->code.' - '.$row->coa->name,
-                        'company'   => $row->coa->company->name,
-                        'account'   => $row->account_id ? $row->account->name : '-',
-                        'place'     => $row->place_id ? $row->place->code : '-',
-                        'line'      => $row->line_id ? $row->line->name : '-',
-                        'machine'   => $row->machine_id ? $row->machine->name : '-',
-                        'department'=> $row->department_id ? $row->department->name : '-',
-                        'warehouse' => $row->warehouse_id ? $row->warehouse->name : '-',
-                        'type'      => $row->type,
-                        'debit'     => $row->type == '1' ? number_format($row->nominal,2,',','.') : '',
-                        'credit'    => $row->type == '2' ? number_format($row->nominal,2,',','.') : '',
-                    ];
-
-                    $data[] = $arr;
-
-                    $no++;
+                    $string .= '<tr>
+                        <td class="center-align">'.($key + 1).'</td>
+                        <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
+                        <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
+                        <td class="center-align">'.($row->place_id ? $row->place->code : '-').'</td>
+                        <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
+                        <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
+                        <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
+                        <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
+                        <td class="center-align">'.($row->project_id ? $row->project->name : '-').'</td>
+                        <td class="center-align">'.($row->note ? $row->note : '').'</td>
+                        <td class="center-align">'.($row->note2 ? $row->note2 : '').'</td>
+                        <td class="right-align">'.($row->type == '1' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
+                        <td class="right-align">'.($row->type == '2' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
+                        <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
+                        <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
+                    </tr>';
                 }
+
+                $string .= '</tbody>
+                        </table>
+                    </div>';
+
+                $main[] = $string;
             }
 
-            $collection = collect($data)->sortBy('code')->sortBy('type')->values()->all();
-
-            foreach($collection as $row){
-                $string .= '<tr>
-                    <td class="center-align">'.$row['no'].'</td>
-                    <td>'.$row['codename'].'</td>
-                    <td class="center-align">'.$row['company'].'</td>
-                    <td class="center-align">'.$row['account'].'</td>
-                    <td class="center-align">'.$row['place'].'</td>
-                    <td class="center-align">'.$row['line'].'</td>
-                    <td class="center-align">'.$row['machine'].'</td>
-                    <td class="center-align">'.$row['department'].'</td>
-                    <td class="center-align">'.$row['warehouse'].'</td>
-                    <td class="right-align">'.$row['debit'].'</td>
-                    <td class="right-align">'.$row['credit'].'</td>
-                </tr>';
-            }
-
-            $response["tbody"] = $string;
+            $response = [
+                'status'    => 200,
+                'message'   => 'Data berhasil dimuat.',
+                'data'      => $main
+            ]; 
         }else{
             $response = [
                 'status'  => 500,
@@ -1127,13 +1170,20 @@ class MarketingOrderDeliveryProcessController extends Controller
         $po['drivers'] = $drivers;
         
         foreach($po->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+            $stocks = [];
+            foreach($row->marketingOrderDeliveryStock as $rowdetail){
+                $stocks[] = [
+                    'stock_name'    => $rowdetail->itemStock->place->code.' - '.$rowdetail->itemStock->warehouse->name.' - '.($rowdetail->itemStock->area()->exists() ? $rowdetail->itemStock->area->name : '').' - '.($rowdetail->itemStock->itemShading()->exists() ? $rowdetail->itemStock->itemShading->code : ''),
+                    'qty'           => CustomHelper::formatConditionalQty($rowdetail->qty),
+                ];
+            }
             $arr[] = [
                 'item_name'     => $row->item->code.' - '.$row->item->name,
                 'place_name'    => $row->place->code,
-                'warehouse_name'=> $row->warehouse->name,
                 'qty'           => CustomHelper::formatConditionalQty($row->qty),
                 'unit'          => $row->marketingOrderDetail->itemUnit->unit->code,
                 'note'          => $row->note,
+                'stocks'        => $stocks,
             ];
         }
 

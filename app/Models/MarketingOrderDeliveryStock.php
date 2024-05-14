@@ -19,6 +19,7 @@ class MarketingOrderDeliveryStock extends Model
         'marketing_order_detail_id',
         'item_stock_id',
         'qty',
+        'cogs',
     ];
 
     public function marketingOrderDetail()

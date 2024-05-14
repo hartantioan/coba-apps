@@ -617,9 +617,9 @@
                                 <div class="col m4 s12">
                                     <label class="">Bukti Upload</label>
                                     <br>
-                                    <input type="file" name="file" id="fileInput" accept="image/*" style="display: none;">
+                                    <input type="file" name="document" id="fileInput" accept="image/*" style="display: none;">
                                     <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
-                                        Drop image here or <a href="#" id="uploadLink">upload</a>
+                                        Drop image here or <a href="javascript:void(0);" id="uploadLink">upload</a>
                                         <br>
                                         
                                     </div>
@@ -1539,10 +1539,10 @@ document.addEventListener('focusin', function (event) {
                     beforeSend: function() {
                         $('#validation_alert_return').hide();
                         $('#validation_alert_return').html('');
-                        loadingOpen('.modal-content');
+                        loadingOpen('#modal7');
                     },
                     success: function(response) {
-                        loadingClose('.modal-content');
+                        loadingClose('#modal7');
                         if(response.status == 200) {
                             $('#form_data_return')[0].reset();
                             M.toast({
@@ -1584,7 +1584,7 @@ document.addEventListener('focusin', function (event) {
                     },
                     error: function() {
                         $('.modal-content').scrollTop(0);
-                        loadingClose('.modal-content');
+                        loadingClose('#modal7');
                         swal({
                             title: 'Ups!',
                             text: 'Check your internet connection.',

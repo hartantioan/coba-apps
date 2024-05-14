@@ -3291,6 +3291,7 @@ class CustomHelper {
 						'item_id'		=> $row->lookable->item_id,
 						'type'			=> '2',
 						'nominal'		=> $rowtotal,
+						'nominal_fc'	=> $rowtotal,
 					]);
 				}
 
@@ -3305,6 +3306,7 @@ class CustomHelper {
 						'account_id'	=> $coarounding->bp_journal ? $account_id : NULL,
 						'type'			=> $rowrounding > 0 ? '2' : '1',
 						'nominal'		=> $rowrounding,
+						'nominal_fc'	=> $rowrounding,
 					]);
 				}
 
@@ -3335,6 +3337,7 @@ class CustomHelper {
 						'account_id'	=> $coauangmuka->bp_journal ? $account_id : NULL,
 						'type'			=> '1',
 						'nominal'		=> $rowtotal,
+						'nominal_fc'	=> $rowtotal,
 					]);
 				}
 
@@ -3356,6 +3359,7 @@ class CustomHelper {
 					'account_id'	=> $coapiutang->bp_journal ? $moi->account_id : NULL,
 					'type'			=> '1',
 					'nominal'		=> $balance,
+					'nominal_fc'	=> $balance,
 				]);
 			}
 
@@ -3366,6 +3370,7 @@ class CustomHelper {
 					'account_id'	=> $coa_sale_id->bp_journal ? $moi->account_id : NULL,
 					'type'			=> '2',
 					'nominal'		=> $tax,
+					'nominal_fc'	=> $tax,
 					'note'			=> 'No Seri Pajak : '.$moi->tax_no,
 				]);
 			}

@@ -587,7 +587,7 @@ class MarketingOrderInvoiceController extends Controller
                 <td class="center-align">'.$row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code.'</td>
                 <td class="center-align">'.$row->lookable->item->name.'</td>
                 <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
-                <td class="center-align">'.$row->lookable->item->sellUnit->code.'</td>
+                <td class="center-align">'.$row->lookable->marketingOrderDetail->itemUnit->unit->code.'</td>
                 <td class="">'.$row->note_internal.' - '.$row->note_external.'</td>
                 <td class="right-align">'.number_format($row->total,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->tax,2,',','.').'</td>

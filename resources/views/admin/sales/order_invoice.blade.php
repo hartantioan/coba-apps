@@ -268,7 +268,7 @@
                                         <br>
                                         <input type="file" name="file" id="fileInput" accept="image/*" style="display: none;">
                                         <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
-                                            Drop image here or <a href="#" id="uploadLink">upload</a>
+                                            Drop image here or <a href="javascript:void(0);" id="uploadLink">upload</a>
                                             <br>
                                             
                                         </div>
@@ -312,7 +312,7 @@
                                                 <thead>
                                                     <tr>
                                                         <th class="center">Surat Jalan</th>
-                                                        <th class="center">Item & Asal</th>
+                                                        <th class="center">Item</th>
                                                         <th class="center">Qty Terkirim</th>
                                                         <th class="center">Qty Retur</th>
                                                         <th class="center">Qty Sisa</th>
@@ -1861,10 +1861,10 @@
                             beforeSend: function() {
                                 $('#validation_alert').hide();
                                 $('#validation_alert').html('');
-                                loadingOpen('.modal-content');
+                                loadingOpen('#modal1');
                             },
                             success: function(response) {
-                                loadingClose('.modal-content');
+                                loadingClose('#modal1');
                                 if(response.status == 200) {
                                     success();
                                     M.toast({
@@ -1908,7 +1908,7 @@
                             },
                             error: function() {
                                 $('.modal-content').scrollTop(0);
-                                loadingClose('.modal-content');
+                                loadingClose('#modal1');
                                 swal({
                                     title: 'Ups!',
                                     text: 'Check your internet connection.',

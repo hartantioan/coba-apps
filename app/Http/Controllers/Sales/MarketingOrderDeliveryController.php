@@ -364,6 +364,7 @@ class MarketingOrderDeliveryController extends Controller
 
             $passedZero = true;
             $passedQty = true;
+            $passedSentMore = true;
             $passedCreditLimit = true;
             $totalLimitCredit = 0;
             $totalSent = 0;
@@ -379,6 +380,8 @@ class MarketingOrderDeliveryController extends Controller
             $tax = 0;
             $grandtotal = 0;
 
+            $errorMessage = [];
+
             if($request->arr_modi){
                 foreach($request->arr_modi as $key => $row){
                     $qtysell = floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key])));
@@ -391,10 +394,17 @@ class MarketingOrderDeliveryController extends Controller
                     if($qtystock < $qtysell){
                         $passedQty = false;
                     }
+                    if($qtystock > $qtysell){
+                        $passedSentMore = false;
+                    }
                 }
 
                 if(!$passedQty){
-                    $errorMessage[] = 'Salah satu item memiliki qty kurang dari stok saat ini.';
+                    $errorMessage[] = 'Salah satu / lebih item memiliki qty kurang dari stok saat ini.';
+                }
+
+                if(!$passedSentMore){
+                    $errorMessage[] = 'Salah satu / lebih item memiliki qty kirim lebih besar dari pesanan.';
                 }
             }
 
@@ -433,19 +443,13 @@ class MarketingOrderDeliveryController extends Controller
                 if($balanceLimitDp < 0){
                     $passedCreditLimit = false;
                 }
+            }
 
-                $errorMessage = [];
-
-                if(!$passedQty){
-                    $errorMessage[] = 'Salah satu item memiliki qty kurang dari stok saat ini.';
-                }
-
-                if(count($errorMessage) > 0){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => implode(', ',$errorMessage)
-                    ]);
-                }
+            if(count($errorMessage) > 0){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => implode(', ',$errorMessage)
+                ]);
             }
 
             if(!$passedCreditLimit){

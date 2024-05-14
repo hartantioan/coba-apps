@@ -336,7 +336,9 @@ class MarketingOrderDeliveryProcess extends Model
 
                 if($passedDp){
                     $balance = $total_after_tax - $downpayment;
-                    $code = MarketingOrderInvoice::generateCode('SINV-'.date('y',strtotime($query->return_date)).substr($query->code,7,2));
+                    $menu = Menu::where('table_name','marketing_order_invoices')->first();
+                    $prefixCode = $menu->document_code;
+                    $code = MarketingOrderInvoice::generateCode($prefixCode.date('y',strtotime($query->return_date)).substr($query->code,7,2));
                     $dueDate = date('Y-m-d', strtotime($query->return_date. ' + '.$query->marketingOrderDelivery->marketingOrder->account->top.' days'));
                     $querymoi = MarketingOrderInvoice::create([
                         'code'			                => $code,
@@ -476,6 +478,10 @@ class MarketingOrderDeliveryProcess extends Model
                     $rowstock->itemStock->area_id,
                     $rowstock->itemStock->item_shading_id,
                 );
+
+                $rowstock->update([
+                    'cogs'  => $hpp
+                ]);
             }
         }
     }
@@ -500,7 +506,7 @@ class MarketingOrderDeliveryProcess extends Model
         foreach($modp->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
 
             foreach($row->marketingOrderDeliveryStock as $rowstock){
-                $hpp = $rowstock->getHpp();
+                $hpp = $rowstock->cogs;
 
                 JournalDetail::create([
                     'journal_id'	=> $query->id,

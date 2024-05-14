@@ -2319,6 +2319,7 @@ class Select2Controller extends Controller {
         $item       = $request->item_id;
         $data = ItemStock::where('item_id',$item)
                     ->where('place_id',$place)
+                    ->where('qty','>',0)
                     ->get();
 
         foreach($data as $d) {
@@ -2729,7 +2730,7 @@ class Select2Controller extends Controller {
                     $arrDetail[] = [
                         'id'                => $row->id,
                         'item_id'           => $row->item_id,
-                        'item_name'         => $row->item->code.' - '.$row->item->name.' - '.$row->itemStock->place->code.' - '.$row->itemStock->warehouse->name.' - '.$row->itemStock->area->name,
+                        'item_name'         => $row->item->code.' - '.$row->item->name,
                         'item_warehouse'    => $row->item->warehouseList(),
                         'unit'              => $row->marketingOrderDetail->itemUnit->unit->code,
                         'code'              => $d->code,

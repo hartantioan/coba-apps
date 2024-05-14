@@ -248,7 +248,7 @@
                                 <br>
                                 <input type="file" name="file" id="fileInput" accept="image/*" style="display: none;">
                                 <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
-                                    Drop image here or <a href="#" id="uploadLink">upload</a>
+                                    Drop image here or <a href="javascript:void(0);" id="uploadLink">upload</a>
                                     <br>
                                     
                                 </div>

@@ -1661,13 +1661,13 @@ document.addEventListener('focusin', function (event) {
                             }
                             $('#body-detail-source' + count).append(`
                                 <tr>
-                                    <input type="hidden" name="arr_stock_id[]" value="` + mod + `">
-                                    <input type="hidden" name="arr_stock_conversion[]" id="arr_stock_conversion` + count2 + `" value="` + conversion + `">
+                                    <input type="hidden" name="arr_stock_id[]" value="` + val.id + `">
+                                    <input type="hidden" name="arr_stock_conversion[]" id="arr_stock_conversion` + count2 + `" value="` + val.conversion + `">
                                     <td>
                                         <select class="browser-default" id="arr_item_stock` + count2 + `" name="arr_item_stock[]" onchange="getStock('` + count2 + `')"></select>
                                     </td>
                                     <td>
-                                        <input name="arr_qty_source[]" class="browser-default" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);countRowStock('` + count2 + `')" data-qty="0,000" style="text-align:right;width:100%;" id="rowQtySource`+ count2 +`">
+                                        <input name="arr_qty_source[]" class="browser-default" type="text" value="` + value.qty + `" onkeyup="formatRupiahNoMinus(this);countRowStock('` + count2 + `')" data-qty="` + value.qty_stock + `" style="text-align:right;width:100%;" id="rowQtySource`+ count2 +`">
                                     </td>
                                     <td class="center-align">
                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-source" data-id="` + count2 + `" onclick="removeRow(this,'` + count2 + `')" href="javascript:void(0);">
@@ -1675,6 +1675,9 @@ document.addEventListener('focusin', function (event) {
                                         </a>
                                     </td>
                                 </tr>
+                            `);
+                            $('#arr_item_stock' + count2).append(`
+                                <option value="` + value.item_stock_id + `">` + value.item_stock_name + `</option>
                             `);
                             $('#arr_item_stock' + count2).select2({
                                 placeholder: '-- Kosong --',

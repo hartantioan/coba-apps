@@ -316,6 +316,13 @@ class MarketingOrderDeliveryProcessController extends Controller
                 $drivers = [];
 
                 foreach($data->marketingOrderDeliveryDetail as $row){
+                    $stocks = [];
+                    foreach($row->marketingOrderDeliveryStock as $rowdetail){
+                        $stocks[] = [
+                            'stock_name'    => $rowdetail->itemStock->place->code.' - '.$rowdetail->itemStock->warehouse->name.' - '.($rowdetail->itemStock->area()->exists() ? $rowdetail->itemStock->area->name : '').' - '.($rowdetail->itemStock->itemShading()->exists() ? $rowdetail->itemStock->itemShading->code : ''),
+                            'qty'           => CustomHelper::formatConditionalQty($rowdetail->qty),
+                        ];
+                    }
                     $details[] = [
                         'item_name'     => $row->item->code.' - '.$row->item->name,
                         'place_name'    => $row->place->code,

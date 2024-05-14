@@ -229,13 +229,33 @@
                 <tbody>
                     @foreach($data->marketingOrderDeliveryDetail as $key => $row)
                     <tr>
-                        <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
+                        <td class="center-align" rowspan="3">{{ ($key + 1) }}</td>
                         <td class="center-align">{{ $row->item->code.' - '.$row->item->name }}</td>
                         <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                         <td class="center-align">{{ $row->marketingOrderDetail->itemUnit->unit->code }}</td>
                     </tr>
                     <tr>
                         <td colspan="4">Keterangan: {{ $row->note }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <table class="striped">
+                                <thead>
+                                    <tr>
+                                        <th class="center-align">Asal Plant - Gudang - Area - Shading</th>
+                                        <th class="center-align">Qty Kirim</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($row->marketingOrderDeliveryStock as $rowdetail)
+                                        <tr>
+                                            <td>{{ $rowdetail->itemStock->place->code.' - '.$rowdetail->itemStock->warehouse->name.' - '.($rowdetail->itemStock->area()->exists() ? $rowdetail->itemStock->area->name : '').' - '.($rowdetail->itemStock->itemShading()->exists() ? $rowdetail->itemStock->itemShading->code : '') }}</td>
+                                            <td class="right-align">{{ CustomHelper::formatConditionalQty($rowdetail->qty) }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </td>
                     </tr>
                     @endforeach
                     <tr>

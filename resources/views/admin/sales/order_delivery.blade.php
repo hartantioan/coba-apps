@@ -862,7 +862,7 @@ document.addEventListener('focusin', function (event) {
     function getStock(id){
         if($('#arr_item_stock' + id).val()){
             let datastock = $('#arr_item_stock' + id).select2('data')[0], conversion = parseFloat($('#arr_stock_conversion' + id).val().replaceAll(".", "").replaceAll(",","."));
-            let qty = parseFloat(datastock.qty.toString().replaceAll(".", "").replaceAll(",",".")) / conversion;
+            let qty = parseFloat(datastock.qty.replaceAll(".", "").replaceAll(",",".")) / conversion;
             $('#rowQtySource' + id).data('qty',formatRupiahIni(qty.toFixed(3).toString().replace('.',',')));
             $('#rowQtySource' + id).val(formatRupiahIni(qty.toFixed(3).toString().replace('.',',')));
         }else{
@@ -1694,7 +1694,7 @@ document.addEventListener('focusin', function (event) {
                                         return {
                                             search: params.term,
                                             place_id : val.place_id,
-                                            item_id : vl.item_id,
+                                            item_id : val.item_id,
                                         };
                                     },
                                     processResults: function(data) {

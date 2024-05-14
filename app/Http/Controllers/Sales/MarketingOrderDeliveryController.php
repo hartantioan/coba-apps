@@ -489,7 +489,7 @@ class MarketingOrderDeliveryController extends Controller
                             'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                    if(in_array($query->status,['1','6'])){
+                    if(in_array($query->status,['1','2','6'])){
 
                         $query->user_id = session('bo_id');
                         $query->code = $request->code;
@@ -500,11 +500,13 @@ class MarketingOrderDeliveryController extends Controller
                         $query->delivery_date = $request->delivery_date;
                         $query->note_internal = $request->note_internal;
                         $query->note_external = $request->note_external;
+                        $query->send_status = NULL;
                         $query->status = '1';
 
                         $query->save();
                         
                         foreach($query->marketingOrderDeliveryDetail as $row){
+                            $row->marketingOrderDeliveryStock()->delete();
                             $row->delete();
                         }
 
@@ -637,7 +639,7 @@ class MarketingOrderDeliveryController extends Controller
                 'unit'                  => $row->marketingOrderDetail->itemUnit->unit->code,
                 'note'                  => $row->note,
                 'place_id'              => $row->place_id,
-                'conversion'            => $row->marketingOrderDetail->qty_conversion,
+                'conversion'            => CustomHelper::formatConditionalQty($row->marketingOrderDetail->qty_conversion),
                 'detail_stock'          => $arrstock,
                 'stock'                 => CustomHelper::formatConditionalQty(round($row->item->getStockPlace($row->place_id) / $row->marketingOrderDetail->qty_conversion,3)),
             ];
@@ -690,7 +692,7 @@ class MarketingOrderDeliveryController extends Controller
             $string .= '
                 <tr>
                     <td class="center-align">Ambil Item dari : </td>
-                    <td><table class="bordered" id="table-detail-source` + count + `">
+                    <td><table class="bordered" id="table-detail-source">
                     <thead>
                         <tr>
                             <th class="center-align">Asal Plant - Gudang - Area - Shading</th>

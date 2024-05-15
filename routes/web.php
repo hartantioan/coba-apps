@@ -18,6 +18,7 @@ use App\Http\Controllers\HR\ShiftRequestController;
 use App\Http\Controllers\HR\RevisionAttendanceHRDController;
 use App\Http\Controllers\Inventory\DeadStockController;
 use App\Http\Controllers\Inventory\GoodScaleController;
+use App\Http\Controllers\Inventory\QualityControlController;
 
 use App\Http\Controllers\Inventory\InventoryReportController;
 use App\Http\Controllers\Inventory\StockInRupiahController;
@@ -1682,6 +1683,11 @@ Route::prefix('admin')->group(function () {
                     Route::post('void_status', [GoodScaleController::class, 'voidStatus'])->middleware('operation.access:good_scale,void');
                     Route::post('destroy', [GoodScaleController::class, 'destroy'])->middleware('operation.access:good_scale,delete');
                     Route::get('export_from_page',[GoodScaleController::class, 'exportFromTransactionPage']);
+                });
+
+                Route::prefix('quality_control')->middleware(['operation.access:quality_control,view','lockacc'])->group(function () {
+                    Route::get('/',[QualityControlController::class, 'index']);
+                    Route::get('datatable',[QualityControlController::class, 'datatable']);
                 });
 
                 Route::prefix('good_receipt_po')->middleware(['operation.access:good_receipt_po,view','lockacc'])->group(function () {

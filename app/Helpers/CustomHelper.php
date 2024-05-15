@@ -3459,7 +3459,7 @@ class CustomHelper {
 					}
 
 					if($mom->type == '2'){
-						$hpp = $row->lookable->lookable->getPriceHpp() * $row->qty * $row->lookable->lookable->item->sell_convert;
+						$hpp = $row->lookable->lookable->getPriceHpp() * $row->qty;
 
 						JournalDetail::create([
 							'journal_id'	=> $query->id,

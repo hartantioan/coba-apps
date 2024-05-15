@@ -161,7 +161,9 @@
                                                         <th>Dokumen</th>
                                                         <th>Foto Masuk</th>
                                                         <th>Foto Keluar</th>
-                                                        <th>Status</th>
+                                                        <th>Status Dokumen</th>
+                                                        <th>Status QC</th>
+                                                        <th>Catatan QC</th>
                                                         <th>By</th>
                                                         <th>Operasi</th>
                                                     </tr>
@@ -1061,7 +1063,9 @@
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'image_in', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'image_out', searchable: false, orderable: false, className: 'center-align' },
-              { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'status_qc', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'note_qc', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
             ],

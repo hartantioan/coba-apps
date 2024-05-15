@@ -34,6 +34,8 @@ class GoodScale extends Model
         'image_out',
         'note',
         'status',
+        'status_qc',
+        'note_qc',
         'void_id',
         'void_note',
         'void_date',
@@ -182,6 +184,16 @@ class GoodScale extends Model
         };
 
         return $status;
+    }
+
+    public function statusQc(){
+        $status_qc = match ($this->status_qc) {
+          '1' => 'Disetujui',
+          '2' => 'Ditolak',
+          default => 'Menunggu',
+        };
+
+        return $status_qc;
     }
 
     public function statusRaw(){

@@ -194,6 +194,24 @@ class FundRequest extends Model
         });
     }
 
+    public function listPersonalCloseBill(){
+        $arr = [];
+        foreach($this->personalCloseBillDetail as $row){
+            $arr[] = $row->personalCloseBill->code;
+        }
+        return implode(', ',$arr);
+    }
+
+    public function listCloseBill(){
+        $arr = [];
+        foreach($this->personalCloseBillDetail as $row){
+            foreach($row->personalCloseBill->closeBillDetail as $rowcb){
+                $arr[] = $rowcb->closeBill->code;
+            }
+        }
+        return implode(', ',$arr);
+    }
+
     public function arrayOutgoingPayment(){
         $arr = [];
         foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){

@@ -13,7 +13,9 @@
             <th class="center-align">Grandtotal</th>
             <th class="center-align">Diterima</th>
             <th class="center-align">Dipakai</th>
-            <th class="center-align">Sisa</th>   
+            <th class="center-align">Sisa</th>
+            <th class="center-align">Ref.Tutup BS Personal</th>
+            <th class="center-align">Ref.Tutup BS</th>
         </tr>
     </thead>
     <tbody>
@@ -32,11 +34,13 @@
                 <td class="right-align">{{ $row['received'] }}</td>
                 <td class="right-align">{{ $row['used'] }}</td>
                 <td class="right-align">{{ $row['balance'] }}</td>
+                <td class="right-align">{{ $row['personal_cb'] }}</td>
+                <td class="right-align">{{ $row['cb'] }}</td>
             </tr>
         @endforeach
         @if(count($data) == 0)
             <tr>
-                <td colspan="13" align="center">
+                <td colspan="15" align="center">
                     Data tidak ditemukan
                 </td>
             </tr>
@@ -47,6 +51,7 @@
         <tr>
             <td colspan="12">Total</td>
             <td align="right">{{ $totalall }}</td>
+            <td colspan="2">Total</td>
         </tr>
     </tfoot>
 </table>

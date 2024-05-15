@@ -51,6 +51,8 @@ class ExportEmployeeReceivable implements FromView , WithEvents
                     'received'      => $totalReceivable,
                     'used'          => $totalReceivableUsed,
                     'balance'       => $totalReceivableBalance,
+                    'personal_cb'   => $row->listPersonalCloseBill(),
+                    'cb'            => $row->listCloseBill(),
                 ];
                 $totalbalance += $totalReceivableBalance;
             }

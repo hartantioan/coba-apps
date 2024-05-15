@@ -193,6 +193,8 @@ class GoodScaleController extends Controller
                     $val->image_in ? '<a href="'.$val->imageIn().'" target="_blank"><i class="material-icons">camera_front</i></a>' : '<i class="material-icons">hourglass_empty</i>',
                     $val->image_out ? '<a href="'.$val->imageOut().'" target="_blank"><i class="material-icons">camera_rear</i></a>' : '<i class="material-icons">hourglass_empty</i>',
                     $val->status(),
+                    $val->statusQc(),
+                    $val->note_qc,
                     (
                         ($val->status == 3 && is_null($val->done_id)) ? 'SYSTEM' :
                         (

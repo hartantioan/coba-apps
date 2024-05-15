@@ -259,6 +259,7 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
+                $('#parent_id').val('').trigger('change');
                 $('#coa_id').val('').trigger('change');
                 M.updateTextFields();
             }

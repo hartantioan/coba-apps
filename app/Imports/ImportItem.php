@@ -51,6 +51,7 @@ class ImportItem implements OnEachRow, WithHeadingRow, WithBatchInserts,WithMult
                     'is_sales_item' => $row['is_sales_item'],
                     'is_purchase_item' => $row['is_purchase'],
                     'is_service' => $row['is_service'],
+                    'is_quality_check' => $row['is_quality_check'],
                     'note' => $row['note'],
                     'min_stock' => $row['min_stock'],
                     'max_stock' => $row['max_stock'],

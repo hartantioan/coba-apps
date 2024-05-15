@@ -785,7 +785,7 @@
             }
         });
 
-        select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/business_partner") }}');
+        select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/customer") }}');
 
         $('#marketing_order_delivery_process_id').select2({
             placeholder: '-- Kosong --',

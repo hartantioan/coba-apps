@@ -39,6 +39,7 @@ class Item extends Model
         'min_stock',
         'max_stock',
         'status',
+        'is_quality_check',
         'type_id',
         'size_id',
         'variety_id',
@@ -142,6 +143,15 @@ class Item extends Model
         };
 
         return $status;
+    }
+
+    public function qualityCheck(){
+        $check = match ($this->is_quality_check) {
+          '1' => 'Ya',
+          default => 'Tidak',
+        };
+
+        return $check;
     }
 
     public function currentCogs($dataplaces){

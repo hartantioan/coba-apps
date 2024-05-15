@@ -396,6 +396,17 @@
                             </div>
                             <div class="input-field col s12 m4">
                                 <div class="switch mb-1">
+                                    <label for="status">Pengecekan QC</label>
+                                    <label class="right">
+                                        Tidak
+                                        <input checked type="checkbox" id="is_quality_check" name="is_quality_check" value="1">
+                                        <span class="lever"></span>
+                                        Ya
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="input-field col s12 m4">
+                                <div class="switch mb-1">
                                     <label for="status">Status</label>
                                     <label class="right">
                                         Non-Active
@@ -1498,6 +1509,12 @@
                     $('#is_inventory_item').prop( "checked", true);
                 }else{
                     $('#is_inventory_item').prop( "checked", false);
+                }
+
+                if(response.is_quality_check == '1'){
+                    $('#is_quality_check').prop( "checked", true);
+                }else{
+                    $('#is_quality_check').prop( "checked", false);
                 }
 
                 if(response.is_sales_item == '1'){

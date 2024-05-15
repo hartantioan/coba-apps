@@ -42,6 +42,6 @@ class MarketingOrderDeliveryStock extends Model
     }
 
     public function getPriceHpp(){
-        return $this->itemStock->priceDate($this->marketingOrderDeliveryDetail->marketingOrderDelivery->post_date);
+        return ($this->cogs / ($this->qty * $this->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion));
     }
 }

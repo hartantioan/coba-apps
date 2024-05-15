@@ -216,7 +216,6 @@
                                     <th>Item</th>
                                     <th>NO.MOD</th>
                                     <th>NO.SJ</th>
-                                    <th>Palet</th>
                                     <th>Qty</th>
                                     <th>Satuan</th>
                                     <th>Harga</th>
@@ -232,16 +231,15 @@
                                     <td align="">{{ $row->lookable->item->name }}</td>
                                     <td align="">{{ $row->lookable->marketingOrderDelivery->code }}</td>
                                     <td align="">{{ $row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code }}</td>
-                                    <td align="right">{{ CustomHelper::formatConditionalQty($row->qty / $row->lookable->item->pallet_convert) }}</td>
                                     <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
-                                    <td align="center">{{ $row->lookable->item->sellUnit->code }}</td>
+                                    <td align="center">{{ $row->lookable->marketingOrderDetail->itemUnit->unit->code }}</td>
                                     <td align="right">{{ number_format($row->price,2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->total,2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->tax,2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->grandtotal,2,',','.') }}</td>
                                 </tr>
                                 <tr>
-                                    <td colspan="11">Keterangan: {{ $row->note }}</td>
+                                    <td colspan="10">Keterangan: {{ $row->note }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>

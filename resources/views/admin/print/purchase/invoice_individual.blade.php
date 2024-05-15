@@ -397,31 +397,31 @@
                         <table style="border-collapse:collapse;text-align: right; padding-right:6%;" width="100%">
                             <tr>
                                 <td class="right-align" style="padding-right:15px" >Total</td>
-                                <td class="right-align" style="border:0.6px solid black;padding-left:20px;" width="31.5%">{{ number_format($data->total,2,',','.') }}</td>
+                                <td class="right-align" style="border:0.6px solid black;padding-left:20px;" width="31.5%">{{ $data->currency->code.'.'.number_format($data->total,2,',','.') }}</td>
                             </tr class="break-row">
                             <tr class="break-row">
                                 <td class="right-align" style="padding-right:15px">PPN</td>
-                                <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->tax,2,',','.') }}</td>
+                                <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->code.'.'.number_format($data->tax,2,',','.') }}</td>
                             </tr>
                             <tr class="break-row">
                                 <td class="right-align" style="padding-right:15px">PPh</td>
-                                <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->wtax,2,',','.') }}</td>
+                                <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->code.'.'.number_format($data->wtax,2,',','.') }}</td>
                             </tr>
                             <tr class="break-row">
                                 <td class="right-align" style="padding-right:15px">Pembulatan</td>
-                                <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->rounding,2,',','.') }}</td>
+                                <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->code.'.'.number_format($data->rounding,2,',','.') }}</td>
                             </tr>
                             <tr class="break-row">
                                 <td class="right-align" style="padding-right:15px">Grandtotal</td>
-                                <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->grandtotal,2,',','.') }}</td>
+                                <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->code.'.'.number_format($data->grandtotal,2,',','.') }}</td>
                             </tr>
                             <tr class="break-row">
                                 <td class="right-align" style="padding-right:15px">Downpayment</td>
-                                <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->downpayment,2,',','.') }}</td>
+                                <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->code.'.'.number_format($data->downpayment,2,',','.') }}</td>
                             </tr>
                             <tr class="break-row">
                                 <td class="right-align" style="padding-right:15px">Sisa Tagihan</td>
-                                <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->balance,2,',','.') }}</td>
+                                <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->code.'.'.number_format($data->balance,2,',','.') }}</td>
                             </tr>
                         </table>
                     </div>

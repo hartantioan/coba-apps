@@ -23,7 +23,12 @@ class PrintHelper {
         $img_base_64 = base64_encode($image_temp);
         $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
         $data["image"]=$path_img;
-
+        $e_banking = 'website/payment_request_e_banking.jpeg';
+        $extencion_banking = pathinfo($e_banking, PATHINFO_EXTENSION);
+        $image_temp_banking = file_get_contents($e_banking);
+        $img_base_64_banking = base64_encode($image_temp_banking);
+        $path_img_banking = 'data:image/' . $extencion_banking . ';base64,' . $img_base_64_banking;
+        $data["e_banking"]=$path_img_banking;
         $pdf = Pdf::loadView($blade, $data)->setPaper($size, $orientation);
 
         return $pdf;

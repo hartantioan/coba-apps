@@ -261,6 +261,7 @@
                 $('#temp').val('');
                 $('#parent_id').val('').trigger('change');
                 $('#coa_id').val('').trigger('change');
+                $('#warehouse_id').val('').trigger('change');
                 M.updateTextFields();
             }
         });

@@ -28,7 +28,7 @@ class ItemGroupController extends Controller
         $data = [
             'title'     => 'Grup Item',
             'content'   => 'admin.master_data.item_group',
-            'parent'    => ItemGroup::where('status','1')->get(),
+            'parent'    => ItemGroup::where('status','1')->whereHas('childSub')->get(),
             /* 'coa'       => Coa::where('status', '1')->oldest('code')->get() */
             'coa'       => Coa::where('status', '1')->where('level',5)->oldest('code')->get(),
             'warehouse' => Warehouse::where('status','1')->get(),

@@ -1,5 +1,6 @@
 @php
     use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
     use Carbon\Carbon;
 @endphp
 <!doctype html>

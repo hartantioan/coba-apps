@@ -45,6 +45,7 @@ use App\Models\Currency;
 use App\Models\Menu;
 use App\Models\PurchaseDownPaymentDetail;
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 use App\Exports\ExportPurchaseDownPayment;
 use App\Exports\ExportDownPaymentTransactionPage;
 use App\Models\ChecklistDocumentList;
@@ -1235,19 +1236,8 @@ class PurchaseDownPaymentController extends Controller
                 $pr = PurchaseDownPayment::where('code',$row)->first();
                 
                 if($pr){
-                    $data = [
-                        'title'     => 'Print A/P Invoice',
-                        'data'      => $pr
-                    ];
-                    CustomHelper::addNewPrinterCounter($pr->getTable(),$pr->id);
-                    $img_path = 'website/logo_web_fix.png';
-                    $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
-                    $image_temp = file_get_contents($img_path);
-                    $img_base_64 = base64_encode($image_temp);
-                    $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
-                    $data["image"]=$path_img;
-                    $pdf = Pdf::loadView('admin.print.purchase.down_payment_individual', $data)->setPaper('a4', 'portrait');
-                    $pdf->render();
+                    
+                    $pdf = PrintHelper::print($pr,'AP Down Payment','a4','portrait','admin.print.purchase.down_payment_individual');
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                     $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
                     $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -1266,20 +1256,11 @@ class PurchaseDownPaymentController extends Controller
             $result = $merger->merge();
 
 
-            $randomString = Str::random(10); 
-
-         
-                    $filePath = 'public/pdf/' . $randomString . '.pdf';
-                    
-
-                    Storage::put($filePath, $result);
-                    
-                    $document_po = asset(Storage::url($filePath));
-                    $var_link=$document_po;
+            $document_po = PrintHelper::savePrint($result);
 
             $response =[
                 'status'=>200,
-                'message'  =>$var_link
+                'message'  =>$document_po
             ];
         }
         
@@ -1293,27 +1274,7 @@ class PurchaseDownPaymentController extends Controller
         $currentDateTime = Date::now();
         $formattedDate = $currentDateTime->format('d/m/Y H:i:s');       
         if($pr){
-            $data = [
-                'title'     => 'Print Purchase Downpayment',
-                'data'      => $pr
-            ];
-
-            $opciones_ssl=array(
-                "ssl"=>array(
-                "verify_peer"=>false,
-                "verify_peer_name"=>false,
-                ),
-            );
-            CustomHelper::addNewPrinterCounter($pr->getTable(),$pr->id);
-            $img_path = 'website/logo_web_fix.png';
-            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
-            $image_temp = file_get_contents($img_path, false, stream_context_create($opciones_ssl));
-            $img_base_64 = base64_encode($image_temp);
-            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
-            $data["image"]=$path_img;
-             
-            $pdf = Pdf::loadView('admin.print.purchase.down_payment_individual', $data)->setPaper('a4', 'portrait');
-            $pdf->render();
+            $pdf = PrintHelper::print($pr,'AP Down Payment','a4','portrait','admin.print.purchase.down_payment_individual');
     
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -1321,16 +1282,7 @@ class PurchaseDownPaymentController extends Controller
             
             $content = $pdf->download()->getOriginalContent();
             
-            $randomString = Str::random(10); 
-
-         
-            $filePath = 'public/pdf/' . $randomString . '.pdf';
-            
-
-            Storage::put($filePath, $content);
-            
-            $document_po = asset(Storage::url($filePath));
-            $var_link=$document_po;
+            $document_po = PrintHelper::savePrint($content);     $var_link=$document_po;
     
     
             return $document_po;
@@ -1386,19 +1338,7 @@ class PurchaseDownPaymentController extends Controller
                         $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
                         $query = PurchaseDownPayment::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
-                            $data = [
-                                'title'     => 'Print Purchase DownPayment',
-                                    'data'      => $query
-                            ];
-                            CustomHelper::addNewPrinterCounter($query->getTable(),$query->id);
-                            $img_path = 'website/logo_web_fix.png';
-                            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
-                            $image_temp = file_get_contents($img_path);
-                            $img_base_64 = base64_encode($image_temp);
-                            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
-                            $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.purchase.down_payment_individual', $data)->setPaper('a4', 'portrait');
-                            $pdf->render();
+                            $pdf = PrintHelper::print($query,'AP Down Payment','a4','portrait','admin.print.purchase.down_payment_individual');
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -1417,20 +1357,11 @@ class PurchaseDownPaymentController extends Controller
                     $result = $merger->merge();
 
 
-                    $randomString = Str::random(10); 
-
-         
-                    $filePath = 'public/pdf/' . $randomString . '.pdf';
-                    
-
-                    Storage::put($filePath, $result);
-                    
-                    $document_po = asset(Storage::url($filePath));
-                    $var_link=$document_po;
+                    $document_po = PrintHelper::savePrint($result);
         
                     $response =[
                         'status'=>200,
-                        'message'  =>$var_link
+                        'message'  =>$document_po
                     ];
                 } 
 
@@ -1464,19 +1395,7 @@ class PurchaseDownPaymentController extends Controller
                         $etNumbersArray = explode(',', $request->tabledata);
                         $query = PurchaseDownPayment::where('code', 'LIKE', '%'.$etNumbersArray[$code-1])->first();
                         if($query){
-                            $data = [
-                                'title'     => 'Print Purchase DownPayment',
-                                    'data'      => $query
-                            ];
-                            CustomHelper::addNewPrinterCounter($query->getTable(),$query->id);
-                            $img_path = 'website/logo_web_fix.png';
-                            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
-                            $image_temp = file_get_contents($img_path);
-                            $img_base_64 = base64_encode($image_temp);
-                            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
-                            $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.purchase.down_payment_individual', $data)->setPaper('a4', 'portrait');
-                            $pdf->render();
+                            $pdf = PrintHelper::print($query,'AP Down Payment','a4','portrait','admin.print.purchase.down_payment_individual');
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -1495,20 +1414,11 @@ class PurchaseDownPaymentController extends Controller
                     $result = $merger->merge();
     
     
-                    $randomString = Str::random(10); 
-
-         
-                    $filePath = 'public/pdf/' . $randomString . '.pdf';
-                    
-
-                    Storage::put($filePath, $result);
-                    
-                    $document_po = asset(Storage::url($filePath));
-                    $var_link=$document_po;
+                    $document_po = PrintHelper::savePrint($result);
         
                     $response =[
                         'status'=>200,
-                        'message'  =>$var_link
+                        'message'  =>$document_po
                     ];
                 }
             }

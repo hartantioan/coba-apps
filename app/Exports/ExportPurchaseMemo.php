@@ -12,6 +12,7 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 class ExportPurchaseMemo implements FromCollection, WithTitle, WithHeadings, ShouldAutoSize
 {
     /**

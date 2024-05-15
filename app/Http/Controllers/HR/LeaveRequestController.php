@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\HR;
 use Illuminate\Support\Facades\Validator;
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\EmployeeLeaveQuotas;

@@ -46,6 +46,7 @@ use App\Models\PurchaseDownPaymentDetail;
 use App\Models\Currency;
 use App\Models\ItemCogs;
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 use App\Exports\ExportPaymentRequest;
 use App\Models\Place;
 use App\Models\User;
@@ -1748,25 +1749,8 @@ class PaymentRequestController extends Controller
                 $pr = PaymentRequest::where('code',$row)->first();
                 
                 if($pr){
-                    $data = [
-                        'title'     => 'Payment Request',
-                        'data'      => $pr
-                    ];
-                    CustomHelper::addNewPrinterCounter($pr->getTable(),$pr->id);
-                    $img_path = 'website/logo_web_fix.png';
-                    $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
-                    $image_temp = file_get_contents($img_path);
-                    $img_base_64 = base64_encode($image_temp);
-                    $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
-                    $data["image"]=$path_img;
-                    $e_banking = 'website/payment_request_e_banking.jpeg';
-                    $extencion_banking = pathinfo($e_banking, PATHINFO_EXTENSION);
-                    $image_temp_banking = file_get_contents($e_banking);
-                    $img_base_64_banking = base64_encode($image_temp_banking);
-                    $path_img_banking = 'data:image/' . $extencion_banking . ';base64,' . $img_base_64_banking;
-                    $data["e_banking"]=$path_img_banking;
-                    $pdf = Pdf::loadView('admin.print.finance.payment_request_individual', $data)->setPaper('a4', 'portrait');
-                    $pdf->render();
+                    
+                    $pdf = PrintHelper::print($pr,'Payment Requestt','A4','portrait','admin.print.finance.payment_request_individual');
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                     $pdf->getCanvas()->page_text(495, 785, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
                     $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -1785,20 +1769,11 @@ class PaymentRequestController extends Controller
             $result = $merger->merge();
 
 
-            $randomString = Str::random(10); 
-
-         
-                    $filePath = 'public/pdf/' . $randomString . '.pdf';
-                    
-
-                    Storage::put($filePath, $result);
-                    
-                    $document_po = asset(Storage::url($filePath));
-                    $var_link=$document_po;
+            $document_po = PrintHelper::savePrint($result);
 
             $response =[
                 'status'=>200,
-                'message'  =>$var_link
+                'message'  =>$document_po
             ];
         }
         
@@ -1854,25 +1829,7 @@ class PaymentRequestController extends Controller
                         $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
                         $query = PaymentRequest::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
-                            $data = [
-                                'title'     => 'Payment Request',
-                                    'data'      => $query
-                            ];
-                            CustomHelper::addNewPrinterCounter($query->getTable(),$query->id);
-                            $img_path = 'website/logo_web_fix.png';
-                            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
-                            $image_temp = file_get_contents($img_path);
-                            $img_base_64 = base64_encode($image_temp);
-                            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
-                            $data["image"]=$path_img;
-                            $e_banking = 'website/payment_request_e_banking.jpeg';
-                            $extencion_banking = pathinfo($e_banking, PATHINFO_EXTENSION);
-                            $image_temp_banking = file_get_contents($e_banking);
-                            $img_base_64_banking = base64_encode($image_temp_banking);
-                            $path_img_banking = 'data:image/' . $extencion_banking . ';base64,' . $img_base_64_banking;
-                            $data["e_banking"]=$path_img_banking;
-                            $pdf = Pdf::loadView('admin.print.finance.payment_request_individual', $data)->setPaper('a4', 'portrait');
-                            $pdf->render();
+                            $pdf = PrintHelper::print($query,'Payment Requestt','A4','portrait','admin.print.finance.payment_request_individual');
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(495, 785, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
                             $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -1891,20 +1848,11 @@ class PaymentRequestController extends Controller
                     $result = $merger->merge();
 
 
-                    $randomString = Str::random(10); 
-
-         
-                    $filePath = 'public/pdf/' . $randomString . '.pdf';
-                    
-
-                    Storage::put($filePath, $result);
-                    
-                    $document_po = asset(Storage::url($filePath));
-                    $var_link=$document_po;
+                    $document_po = PrintHelper::savePrint($result);
         
                     $response =[
                         'status'=>200,
-                        'message'  =>$var_link
+                        'message'  =>$document_po
                     ];
                 } 
 
@@ -1938,25 +1886,7 @@ class PaymentRequestController extends Controller
                         $etNumbersArray = explode(',', $request->tabledata);
                         $query = PaymentRequest::where('code', 'LIKE', '%'.$etNumbersArray[$code-1])->first();
                         if($query){
-                            $data = [
-                                'title'     => 'Payment Request',
-                                    'data'      => $query
-                            ];
-                            CustomHelper::addNewPrinterCounter($query->getTable(),$query->id);
-                            $img_path = 'website/logo_web_fix.png';
-                            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
-                            $image_temp = file_get_contents($img_path);
-                            $img_base_64 = base64_encode($image_temp);
-                            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
-                            $data["image"]=$path_img;
-                            $e_banking = 'website/payment_request_e_banking.jpeg';
-                            $extencion_banking = pathinfo($e_banking, PATHINFO_EXTENSION);
-                            $image_temp_banking = file_get_contents($e_banking);
-                            $img_base_64_banking = base64_encode($image_temp_banking);
-                            $path_img_banking = 'data:image/' . $extencion_banking . ';base64,' . $img_base_64_banking;
-                            $data["e_banking"]=$path_img_banking;
-                            $pdf = Pdf::loadView('admin.print.finance.payment_request_individual', $data)->setPaper('a4', 'portrait');
-                            $pdf->render();
+                            $pdf = PrintHelper::print($query,'Payment Requestt','A4','portrait','admin.print.finance.payment_request_individual');
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(495, 785, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
                             $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -1977,20 +1907,11 @@ class PaymentRequestController extends Controller
                     $result = $merger->merge();
     
     
-                    $randomString = Str::random(10); 
-
-         
-                    $filePath = 'public/pdf/' . $randomString . '.pdf';
-                    
-
-                    Storage::put($filePath, $result);
-                    
-                    $document_po = asset(Storage::url($filePath));
-                    $var_link=$document_po;
+                    $document_po = PrintHelper::savePrint($result);
         
                     $response =[
                         'status'=>200,
-                        'message'  =>$var_link
+                        'message'  =>$document_po
                     ];
                 }
             }
@@ -2005,35 +1926,7 @@ class PaymentRequestController extends Controller
         $formattedDate = $currentDateTime->format('d/m/Y H:i:s');        
         if($pr){
 
-            $data = [
-                'title'     => 'Payment Request',
-                'data'      => $pr
-            ];
-
-            $opciones_ssl=array(
-                "ssl"=>array(
-                "verify_peer"=>false,
-                "verify_peer_name"=>false,
-                ),
-            );
-            CustomHelper::addNewPrinterCounter($pr->getTable(),$pr->id);
-            $img_path = 'website/logo_web_fix.png';
-            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
-            $image_temp = file_get_contents($img_path, false, stream_context_create($opciones_ssl));
-            $img_base_64 = base64_encode($image_temp);
-            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
-            $data["image"]=$path_img;
-
-            $e_banking = 'website/payment_request_e_banking.jpeg';
-            $extencion_banking = pathinfo($e_banking, PATHINFO_EXTENSION);
-            $image_temp_banking = file_get_contents($e_banking);
-            $img_base_64_banking = base64_encode($image_temp_banking);
-            $path_img_banking = 'data:image/' . $extencion_banking . ';base64,' . $img_base_64_banking;
-            $data["e_banking"]=$path_img_banking;
-             
-            $pdf = Pdf::loadView('admin.print.finance.payment_request_individual', $data)->setPaper('a4', 'portrait');
-            $pdf->render();
-    
+            $pdf = PrintHelper::print($pr,'Payment Requestt','A4','portrait','admin.print.finance.payment_request_individual');
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(495, 785, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
             $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -2041,16 +1934,7 @@ class PaymentRequestController extends Controller
             
             $content = $pdf->download()->getOriginalContent();
             
-            $randomString = Str::random(10); 
-
-         
-            $filePath = 'public/pdf/' . $randomString . '.pdf';
-            
-
-            Storage::put($filePath, $content);
-            
-            $document_po = asset(Storage::url($filePath));
-            $var_link=$document_po;
+            $document_po = PrintHelper::savePrint($content);     $var_link=$document_po;
     
     
             return $document_po;

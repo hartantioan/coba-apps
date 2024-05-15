@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Setting;
 
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 use App\Models\ApprovalTemplateMenu;
 use App\Models\Journal;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;

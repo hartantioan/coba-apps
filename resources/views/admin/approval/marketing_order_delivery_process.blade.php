@@ -1,5 +1,6 @@
 @php
     use App\Helpers\CustomHelper;
+
 @endphp
 <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/app-invoice.css') }}">
 <style>

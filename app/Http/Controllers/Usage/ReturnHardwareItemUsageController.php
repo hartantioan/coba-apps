@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use App\Helpers\PrintHelper;
 class ReturnHardwareItemUsageController extends Controller
 {
     public function index()
@@ -134,16 +135,7 @@ class ReturnHardwareItemUsageController extends Controller
 
             $pdf = Pdf::loadView('admin.print.usage.return_hardware', $data)->setPaper('a4', 'portrait');
             $content = $pdf->download()->getOriginalContent();
-            $randomString = Str::random(10); 
-
-         
-            $filePath = 'public/pdf/' . $randomString . '.pdf';
-            
-
-            Storage::put($filePath, $content);
-            
-            $document_po = asset(Storage::url($filePath));
-            $var_link=$document_po;
+            $document_po = PrintHelper::savePrint($content);     $var_link=$document_po;
 
             return $document_po;
         }else{

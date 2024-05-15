@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
+use App\Helpers\PrintHelper;
 class HardwareItemController extends Controller
 {
     protected $dataplaces;
@@ -497,16 +498,7 @@ class HardwareItemController extends Controller
 
             $pdf = Pdf::loadView('admin.print.usage.hardware_item_barcode', $data);
             $content = $pdf->download()->getOriginalContent();
-            $randomString = Str::random(10); 
-
-         
-            $filePath = 'public/pdf/' . $randomString . '.pdf';
-            
-
-            Storage::put($filePath, $content);
-            
-            $document_po = asset(Storage::url($filePath));
-            $var_link=$document_po;
+            $document_po = PrintHelper::savePrint($content);     $var_link=$document_po;
 
             return $document_po;
         }else{

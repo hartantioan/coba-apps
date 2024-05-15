@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Accounting;
 
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Coa;
 use App\Models\Company;

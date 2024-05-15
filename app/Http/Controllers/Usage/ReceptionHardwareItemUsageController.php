@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use App\Helpers\PrintHelper;
 class ReceptionHardwareItemUsageController extends Controller
 {
     public function index(Request $request)
@@ -254,7 +255,7 @@ class ReceptionHardwareItemUsageController extends Controller
                     date('d/m/Y',strtotime($val->date)),
                     date('d/m/Y',strtotime($val->reception_date)),
                     $val->info,
-                    $val->account->name,
+                    $val->account->name ?? '',
                     $val->return_date ? date('d/m/Y', strtotime($val->return_date)) : ' ',
                     $val->return_note,
                     $val->status(),
@@ -489,16 +490,7 @@ class ReceptionHardwareItemUsageController extends Controller
             $pdf = Pdf::loadView('admin.print.usage.reception_hardware', $data)->setPaper('a4', 'portrait');
   
             $content = $pdf->download()->getOriginalContent();
-            $randomString = Str::random(10); 
-
-         
-            $filePath = 'public/pdf/' . $randomString . '.pdf';
-            
-
-            Storage::put($filePath, $content);
-            
-            $document_po = asset(Storage::url($filePath));
-            $var_link=$document_po;
+            $document_po = PrintHelper::savePrint($content);     $var_link=$document_po;
 
             return $document_po;
         }else{
@@ -528,16 +520,7 @@ class ReceptionHardwareItemUsageController extends Controller
 
            
             $content = $pdf->download()->getOriginalContent();
-            $randomString = Str::random(10); 
-
-         
-            $filePath = 'public/pdf/' . $randomString . '.pdf';
-            
-
-            Storage::put($filePath, $content);
-            
-            $document_po = asset(Storage::url($filePath));
-            $var_link=$document_po;
+            $document_po = PrintHelper::savePrint($content);     $var_link=$document_po;
 
             return $document_po;
         }else{

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;

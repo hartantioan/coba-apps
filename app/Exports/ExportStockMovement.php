@@ -8,6 +8,7 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 class ExportStockMovement implements FromView,ShouldAutoSize
 {
     protected $plant, $item, $warehouse, $start_date, $finish_date,$type,$group;

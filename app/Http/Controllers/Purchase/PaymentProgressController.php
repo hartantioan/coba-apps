@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 use App\Models\User;
 use App\Models\Menu;
 use App\Models\ItemGroup;

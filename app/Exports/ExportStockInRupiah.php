@@ -7,6 +7,7 @@ use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 class ExportStockInRupiah implements FromView,ShouldAutoSize
 {
     /**

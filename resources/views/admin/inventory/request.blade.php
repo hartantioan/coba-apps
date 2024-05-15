@@ -812,6 +812,7 @@
                                 'type': 'INVOICE',
                                 'url': response.message
                             }) */
+                            console.log(response.message);
                             M.toast({
                                 html: response.message
                             });

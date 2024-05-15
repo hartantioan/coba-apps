@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Inventory;
 
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 use App\Http\Controllers\Controller;
 use App\Models\ItemStock;
 use App\Models\Place;

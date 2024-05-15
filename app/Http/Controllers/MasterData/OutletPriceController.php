@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\MasterData;
 use App\Helpers\CustomHelper;
-use App\Helpers\PrintHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use Illuminate\Http\Request;
@@ -13,7 +12,6 @@ use App\Models\Outlet;
 use App\Models\OutletPrice;
 use App\Models\OutletPriceDetail;
 use Illuminate\Support\Facades\DB;
-
 
 class OutletPriceController extends Controller
 {

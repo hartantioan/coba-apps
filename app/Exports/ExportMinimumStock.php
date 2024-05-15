@@ -9,7 +9,6 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use App\Helpers\CustomHelper;
-use App\Helpers\PrintHelper;
 
 class ExportMinimumStock implements FromView,ShouldAutoSize
 {

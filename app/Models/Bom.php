@@ -7,7 +7,6 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use App\Helpers\CustomHelper;
-use App\Helpers\PrintHelper;
 
 class Bom extends Model
 {

@@ -25,7 +25,6 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportCoa;
 use Illuminate\Database\Eloquent\Builder;
 use App\Helpers\CustomHelper;
-use App\Helpers\PrintHelper;
 use App\Models\GoodIssueRequestDetail;
 use App\Models\ProductionScheduleDetail;
 

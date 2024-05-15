@@ -4,7 +4,6 @@ namespace App\Http\Controllers\MasterData;
 
 use App\Exports\ExportPeriod;
 use App\Helpers\CustomHelper;
-use App\Helpers\PrintHelper;
 use App\Http\Controllers\Controller;
 use App\Models\AttendanceDailyReports;
 use App\Models\AttendanceMonthlyReport;

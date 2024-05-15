@@ -21,7 +21,6 @@ use Illuminate\Support\Str;
 use App\Models\Place;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
-use App\Helpers\PrintHelper;
 use App\Models\User;
 use App\Models\Menu;
 use Illuminate\Support\Facades\Validator;
@@ -655,9 +654,7 @@ class MarketingOrderReceiptController extends Controller
              
             $pdf = Pdf::loadView('admin.print.sales.order_receipt_individual', $data)->setPaper('a4', 'portrait');
             $pdf->render();
-            $pdf = PrintHelper::print($pr,'Kwitansi','a4','portrait','admin.print.sales.order_receipt_individual');
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-           
             $pdf->getCanvas()->page_text(495, 785, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
             $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             $pdf->getCanvas()->page_text(422, 810, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
@@ -677,7 +674,16 @@ class MarketingOrderReceiptController extends Controller
 
             $result = $merger->merge();
 
-              $document_po = PrintHelper::savePrint($result);
+            $randomString = Str::random(10); 
+
+         
+            $filePath = 'public/pdf/' . $randomString . '.pdf';
+            
+
+            Storage::put($filePath, $result);
+            
+            $document_po = asset(Storage::url($filePath));
+            $var_link=$document_po;
     
             return $document_po;
         }else{
@@ -744,11 +750,20 @@ class MarketingOrderReceiptController extends Controller
 
             $result = $merger->merge();
 
-            $document_po = PrintHelper::savePrint($result);
+            $randomString = Str::random(10); 
+
+         
+                    $filePath = 'public/pdf/' . $randomString . '.pdf';
+                    
+
+                    Storage::put($filePath, $result);
+                    
+                    $document_po = asset(Storage::url($filePath));
+                    $var_link=$document_po;
 
             $response =[
                 'status'=>200,
-                'message'  =>$document_po
+                'message'  =>$var_link
             ];
         }
         
@@ -840,11 +855,20 @@ class MarketingOrderReceiptController extends Controller
 
                     $result = $merger->merge();
 
-                    $document_po = PrintHelper::savePrint($result);
+                    $randomString = Str::random(10); 
+
+         
+                    $filePath = 'public/pdf/' . $randomString . '.pdf';
+                    
+
+                    Storage::put($filePath, $result);
+                    
+                    $document_po = asset(Storage::url($filePath));
+                    $var_link=$document_po;
         
                     $response =[
                         'status'=>200,
-                        'message'  =>$document_po
+                        'message'  =>$var_link
                     ];
                 } 
 
@@ -915,11 +939,20 @@ class MarketingOrderReceiptController extends Controller
     
                     $result = $merger->merge();
 
-                    $document_po = PrintHelper::savePrint($result);
+                    $randomString = Str::random(10); 
+
+         
+                    $filePath = 'public/pdf/' . $randomString . '.pdf';
+                    
+
+                    Storage::put($filePath, $result);
+                    
+                    $document_po = asset(Storage::url($filePath));
+                    $var_link=$document_po;
         
                     $response =[
                         'status'=>200,
-                        'message'  =>$document_po
+                        'message'  =>$var_link
                     ];
                 }
             }

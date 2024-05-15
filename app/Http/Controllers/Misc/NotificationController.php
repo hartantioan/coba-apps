@@ -15,7 +15,6 @@ use App\Models\ApprovalMatrix;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use App\Helpers\CustomHelper;
-use App\Helpers\PrintHelper;
 
 class NotificationController extends Controller
 {

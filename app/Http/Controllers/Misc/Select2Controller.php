@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Misc;
 
 use App\Helpers\CustomHelper;
-use App\Helpers\PrintHelper;
 use App\Models\ApprovalStage;
 use App\Models\Area;
 use App\Models\AttendancePeriod;

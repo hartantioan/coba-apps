@@ -18,7 +18,6 @@ class ExportSalaryReportDailyPayment implements  FromView,ShouldAutoSize,WithTit
     /**
     * @return \Illuminate\Support\Collection
     */
-    protected $period_id;
     public function __construct(string $period_id)
     {
         $this->period_id = $period_id ? $period_id : '';

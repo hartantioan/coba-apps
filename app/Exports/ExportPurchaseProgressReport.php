@@ -8,7 +8,6 @@ use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use App\Helpers\CustomHelper;
-use App\Helpers\PrintHelper;
 
 class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
 {

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Setting;
 
 use App\Exports\ExportApprovalTemplate;
 use App\Helpers\CustomHelper;
-use App\Helpers\PrintHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Menu;
 use Illuminate\Support\Str;

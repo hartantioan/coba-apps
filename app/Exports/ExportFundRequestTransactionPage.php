@@ -10,7 +10,6 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use App\Helpers\CustomHelper;
-use App\Helpers\PrintHelper;
 
 class ExportFundRequestTransactionPage implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell,ShouldAutoSize
 {

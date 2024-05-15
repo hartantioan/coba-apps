@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\HR;
 use Illuminate\Support\Str;
 use App\Helpers\CustomHelper;
-use App\Helpers\PrintHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Department;
 use App\Models\EmployeeTransfer;
@@ -511,11 +510,20 @@ class EmployeeTransferController extends Controller
             $result = $merger->merge();
 
 
-            $document_po = PrintHelper::savePrint($result);
+            $randomString = Str::random(10); 
+
+         
+                    $filePath = 'public/pdf/' . $randomString . '.pdf';
+                    
+
+                    Storage::put($filePath, $result);
+                    
+                    $document_po = asset(Storage::url($filePath));
+                    $var_link=$document_po;
 
             $response =[
                 'status'=>200,
-                'message'  =>$document_po
+                'message'  =>$var_link
             ];
         }
         
@@ -603,7 +611,16 @@ class EmployeeTransferController extends Controller
                     $result = $merger->merge();
 
 
-                    $document_po = PrintHelper::savePrint($result);
+                    $randomString = Str::random(10); 
+
+         
+                    $filePath = 'public/pdf/' . $randomString . '.pdf';
+                    
+
+                    Storage::put($filePath, $result);
+                    
+                    $document_po = asset(Storage::url($filePath));
+                    $var_link=$document_po;
                 } 
 
             }
@@ -669,11 +686,20 @@ class EmployeeTransferController extends Controller
                     $result = $merger->merge();
     
     
-                    $document_po = PrintHelper::savePrint($result);
+                    $randomString = Str::random(10); 
+
+         
+                    $filePath = 'public/pdf/' . $randomString . '.pdf';
+                    
+
+                    Storage::put($filePath, $result);
+                    
+                    $document_po = asset(Storage::url($filePath));
+                    $var_link=$document_po;
         
                     $response =[
                         'status'=>200,
-                        'message'  =>$document_po
+                        'message'  =>$var_link
                     ];
                 }
             }

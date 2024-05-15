@@ -18,7 +18,7 @@ use App\Models\AssetGroup;
 use App\Models\Coa;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Helpers\PrintHelper;
+
 class AssetGroupController extends Controller
 {
     public function index()
@@ -291,11 +291,20 @@ class AssetGroupController extends Controller
             $content = $pdf->download()->getOriginalContent();
 
 
-            $document_po = PrintHelper::savePrint($content);     $var_link=$document_po;
+            $randomString = Str::random(10); 
+
+         
+            $filePath = 'public/pdf/' . $randomString . '.pdf';
+            
+
+            Storage::put($filePath, $content);
+            
+            $document_po = asset(Storage::url($filePath));
+            $var_link=$document_po;
 
             $response =[
                 'status'=>200,
-                'message'  =>$document_po
+                'message'  =>$var_link
             ];
         }
         

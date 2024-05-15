@@ -7,7 +7,6 @@ use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Illuminate\View\View;
 use App\Helpers\CustomHelper;
-use App\Helpers\PrintHelper;
 class ExportItemStockLocation implements FromView,ShouldAutoSize
 {
     /**

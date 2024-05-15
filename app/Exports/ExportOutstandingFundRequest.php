@@ -7,7 +7,6 @@ use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use App\Helpers\CustomHelper;
-use App\Helpers\PrintHelper;
 class ExportOutstandingFundRequest implements FromView,ShouldAutoSize
 {
     public function view(): View

@@ -10,7 +10,6 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Illuminate\Support\Collection;
 use App\Helpers\CustomHelper;
-use App\Helpers\PrintHelper;
 use App\Models\MarketingOrder;
 
 class ExportMarketingOrderTransactionPage implements FromCollection, WithTitle, WithHeadings, ShouldAutoSize

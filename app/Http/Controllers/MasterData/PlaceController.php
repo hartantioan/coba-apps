@@ -20,7 +20,6 @@ use App\Exports\ExportPlace;
 use App\Models\Company;
 use App\Models\Region;
 use App\Helpers\CustomHelper;
-use App\Helpers\PrintHelper;
 
 class PlaceController extends Controller
 {
@@ -336,7 +335,7 @@ class PlaceController extends Controller
 
             $response =[
                 'status'=>200,
-                'message'  =>$document_po
+                'message'  =>$var_link
             ];
         }
         

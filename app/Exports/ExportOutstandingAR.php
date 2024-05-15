@@ -10,7 +10,6 @@ use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
 use App\Helpers\CustomHelper;
-use App\Helpers\PrintHelper;
 class ExportOutstandingAR implements FromView , WithEvents
 {
     protected $date;

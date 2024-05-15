@@ -13,7 +13,7 @@ class ExportShift implements FromCollection, WithTitle, WithHeadings, WithCustom
     /**
     * @return \Illuminate\Support\Collection
     */
-    protected $status,$search;
+
     public function __construct(string $search, string $status)
     {
         $this->search = $search ? $search : '';

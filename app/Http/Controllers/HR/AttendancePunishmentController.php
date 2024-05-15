@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\HR;
 
 use App\Helpers\CustomHelper;
-use App\Helpers\PrintHelper;
 use App\Http\Controllers\Controller;
 use App\Models\AttendancePunishment;
 use App\Models\User;

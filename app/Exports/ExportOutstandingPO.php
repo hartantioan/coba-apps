@@ -8,7 +8,6 @@ use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use App\Models\PurchaseOrderDetail;
 use App\Helpers\CustomHelper;
-use App\Helpers\PrintHelper;
 class ExportOutstandingPO implements FromView,ShouldAutoSize
 {
     /**

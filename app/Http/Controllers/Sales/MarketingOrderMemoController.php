@@ -21,7 +21,6 @@ use App\Models\Place;
 use App\Models\Menu;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
-use App\Helpers\PrintHelper;
 use App\Models\Tax;
 use App\Models\TaxSeries;
 use App\Models\User;
@@ -654,14 +653,43 @@ class MarketingOrderMemoController extends Controller
         $pr = MarketingOrderMemo::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
-            
-            $pdf = PrintHelper::print($pr,'AR Memo','a5','landscape','admin.print.sales.order_memo_individual');
+            $data = [
+                'title'     => 'AR Memo',
+                'data'      => $pr
+            ];
+
+            $opciones_ssl=array(
+                "ssl"=>array(
+                "verify_peer"=>false,
+                "verify_peer_name"=>false,
+                ),
+            );
+            CustomHelper::addNewPrinterCounter($pr->getTable(),$pr->id);
+            $img_path = 'website/logo_web_fix.png';
+            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+            $image_temp = file_get_contents($img_path, false, stream_context_create($opciones_ssl));
+            $img_base_64 = base64_encode($image_temp);
+            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+            $data["image"]=$path_img;
+             
+            $pdf = Pdf::loadView('admin.print.sales.order_memo_individual', $data)->setPaper('a5', 'landscape');
+            // $pdf->render();
+    
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             
             $content = $pdf->download()->getOriginalContent();
             
-            $document_po = PrintHelper::savePrint($content);     $var_link=$document_po;
+            $randomString = Str::random(10); 
+
+         
+            $filePath = 'public/pdf/' . $randomString . '.pdf';
+            
+
+            Storage::put($filePath, $content);
+            
+            $document_po = asset(Storage::url($filePath));
+            $var_link=$document_po;
     
             return $document_po;
         }else{
@@ -689,7 +717,19 @@ class MarketingOrderMemoController extends Controller
                 $pr = MarketingOrderMemo::where('code',$row)->first();
                 
                 if($pr){
-                    $pdf = PrintHelper::print($pr,'AR Memo','a5','landscape','admin.print.sales.order_memo_individual');
+                    $data = [
+                        'title'     => 'AR Memo',
+                        'data'      => $pr,
+                    ];
+                    CustomHelper::addNewPrinterCounter($pr->getTable(),$pr->id);
+                    $img_path = 'website/logo_web_fix.png';
+                    $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+                    $image_temp = file_get_contents($img_path);
+                    $img_base_64 = base64_encode($image_temp);
+                    $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+                    $data["image"]=$path_img;
+                    $pdf = Pdf::loadView('admin.print.sales.order_memo_individual', $data)->setPaper('a5', 'landscape');
+                    $pdf->render();
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                     $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
                     $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -707,11 +747,20 @@ class MarketingOrderMemoController extends Controller
 
             $result = $merger->merge();
 
-            $document_po = PrintHelper::savePrint($result);
+            $randomString = Str::random(10); 
+
+         
+                    $filePath = 'public/pdf/' . $randomString . '.pdf';
+                    
+
+                    Storage::put($filePath, $result);
+                    
+                    $document_po = asset(Storage::url($filePath));
+                    $var_link=$document_po;
 
             $response =[
                 'status'=>200,
-                'message'  =>$document_po
+                'message'  =>$var_link
             ];
         }
         
@@ -766,7 +815,19 @@ class MarketingOrderMemoController extends Controller
                         $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
                         $query = MarketingOrderMemo::where('code', 'LIKE', '%'.$x)->first();
                         if($query){
-                            $pdf = PrintHelper::print($query,'AR Memo','a5','landscape','admin.print.sales.order_memo_individual');
+                            $data = [
+                                'title'     => 'AR Memo',
+                                    'data'      => $query
+                            ];
+                            CustomHelper::addNewPrinterCounter($query->getTable(),$query->id);
+                            $img_path = 'website/logo_web_fix.png';
+                            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+                            $image_temp = file_get_contents($img_path);
+                            $img_base_64 = base64_encode($image_temp);
+                            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+                            $data["image"]=$path_img;
+                            $pdf = Pdf::loadView('admin.print.sales.order_memo_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -783,11 +844,20 @@ class MarketingOrderMemoController extends Controller
 
                     $result = $merger->merge();
 
-                    $document_po = PrintHelper::savePrint($result);
+                    $randomString = Str::random(10); 
+
+         
+                    $filePath = 'public/pdf/' . $randomString . '.pdf';
+                    
+
+                    Storage::put($filePath, $result);
+                    
+                    $document_po = asset(Storage::url($filePath));
+                    $var_link=$document_po;
         
                     $response =[
                         'status'=>200,
-                        'message'  =>$document_po
+                        'message'  =>$var_link
                     ];
                 } 
 
@@ -820,7 +890,19 @@ class MarketingOrderMemoController extends Controller
                     foreach($merged as $code){
                         $query = MarketingOrderMemo::where('code', 'LIKE', '%'.$code)->first();
                         if($query){
-                            $pdf = PrintHelper::print($query,'AR Memo','a5','landscape','admin.print.sales.order_memo_individual');
+                            $data = [
+                                'title'     => 'Print Pengembalian DO',
+                                    'data'      => $query
+                            ];
+                            CustomHelper::addNewPrinterCounter($query->getTable(),$query->id);
+                            $img_path = 'website/logo_web_fix.png';
+                            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+                            $image_temp = file_get_contents($img_path);
+                            $img_base_64 = base64_encode($image_temp);
+                            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+                            $data["image"]=$path_img;
+                            $pdf = Pdf::loadView('admin.print.sales.order_memo_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -837,11 +919,20 @@ class MarketingOrderMemoController extends Controller
     
                     $result = $merger->merge();
 
-                    $document_po = PrintHelper::savePrint($result);
+                    $randomString = Str::random(10); 
+
+         
+                    $filePath = 'public/pdf/' . $randomString . '.pdf';
+                    
+
+                    Storage::put($filePath, $result);
+                    
+                    $document_po = asset(Storage::url($filePath));
+                    $var_link=$document_po;
         
                     $response =[
                         'status'=>200,
-                        'message'  =>$document_po
+                        'message'  =>$var_link
                     ];
                 }
             }

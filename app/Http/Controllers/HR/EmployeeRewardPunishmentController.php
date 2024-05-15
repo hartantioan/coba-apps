@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\EmployeeRewardPunishmentDetail;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
-use App\Helpers\PrintHelper;
 use App\Models\EmployeeRewardPunishment;
 use App\Models\Menu;
 use App\Models\Place;

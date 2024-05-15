@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\MasterData;
 use App\Helpers\CustomHelper;
-use App\Helpers\PrintHelper;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -341,11 +340,20 @@ class EquipmentController extends Controller
             $content = $pdf->download()->getOriginalContent();
 
 
-            $document_po = PrintHelper::savePrint($content);     $var_link=$document_po;
+            $randomString = Str::random(10); 
+
+         
+            $filePath = 'public/pdf/' . $randomString . '.pdf';
+            
+
+            Storage::put($filePath, $content);
+            
+            $document_po = asset(Storage::url($filePath));
+            $var_link=$document_po;
 
             $response =[
                 'status'=>200,
-                'message'  =>$document_po
+                'message'  =>$var_link
             ];
         }
         

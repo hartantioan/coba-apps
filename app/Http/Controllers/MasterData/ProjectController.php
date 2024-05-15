@@ -262,7 +262,7 @@ class ProjectController extends Controller
 
             $response =[
                 'status'=>200,
-                'message'  =>$document_po
+                'message'  =>$var_link
             ];
         }
         

@@ -13,6 +13,7 @@ class AccessDevice extends Model
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
+        'code',
         'user_id',
         'user_agent',
         'is_mobile',

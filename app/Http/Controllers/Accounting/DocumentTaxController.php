@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Accounting;
 use App\Exports\ExportDocumentTax;
 use App\Exports\ExportDocumentTaxTable;
 use App\Helpers\CustomHelper;
-use App\Helpers\PrintHelper;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;

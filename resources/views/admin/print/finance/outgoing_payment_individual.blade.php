@@ -317,11 +317,11 @@
                                 </tr>
                                 <tr>
                                     <th class="center-align" style="font-weight: !important;font-size:1em !important">{{ $data->paymentRequest->code }}</th>
-                                    <th class="right-align" style="font-weight: !important;font-size:1em !important">{{ $data->currency->symbol.number_format($data->total,2,',','.') }}</th>
-                                    <th class="right-align" style="font-weight: !important;font-size:1em !important">{{ $data->currency->symbol.number_format($data->rounding,2,',','.') }}</th>
-                                    <th class="right-align" style="font-weight: !important;font-size:1em !important">{{ $data->currency->symbol.number_format($data->admin,2,',','.') }}</th>
-                                    <th class="right-align" style="font-weight: !important;font-size:1em !important">{{ $data->currency->symbol.number_format($data->payment,2,',','.') }}</th>
-                                    <th class="right-align" style="font-weight:normal !important;font-size:1em !important">{{ $data->currency->symbol.number_format($data->balance,2,',','.') }}</th>
+                                    <th class="right-align" style="font-weight: !important;font-size:1em !important">{{ $data->currency->code.'.'.number_format($data->total,2,',','.') }}</th>
+                                    <th class="right-align" style="font-weight: !important;font-size:1em !important">{{ $data->currency->code.'.'.number_format($data->rounding,2,',','.') }}</th>
+                                    <th class="right-align" style="font-weight: !important;font-size:1em !important">{{ $data->currency->code.'.'.number_format($data->admin,2,',','.') }}</th>
+                                    <th class="right-align" style="font-weight: !important;font-size:1em !important">{{ $data->currency->code.'.'.number_format($data->payment,2,',','.') }}</th>
+                                    <th class="right-align" style="font-weight:normal !important;font-size:1em !important">{{ $data->currency->code.'.'.number_format($data->balance,2,',','.') }}</th>
                                     <th class="right-align" style="font-weight:normal !important;font-size:1em !important">{{ 'Rp'.number_format($data->balance * $data->currency_rate,2,',','.') }}</th>
                                 </tr>
                             </thead>

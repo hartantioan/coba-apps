@@ -8,6 +8,7 @@ use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 class ExportOutstandingGoodIssueRequest implements FromView,ShouldAutoSize
 {
     

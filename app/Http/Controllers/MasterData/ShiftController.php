@@ -20,6 +20,7 @@ use App\Models\Department;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportShift;
+use App\Helpers\PrintHelper;
 use Maatwebsite\Excel\Validators\ValidationException;
 
 class ShiftController extends Controller
@@ -349,20 +350,11 @@ class ShiftController extends Controller
             $content = $pdf->download()->getOriginalContent();
 
 
-            $randomString = Str::random(10); 
-
-         
-            $filePath = 'public/pdf/' . $randomString . '.pdf';
-            
-
-            Storage::put($filePath, $content);
-            
-            $document_po = asset(Storage::url($filePath));
-            $var_link=$document_po;
+            $document_po = PrintHelper::savePrint($content);     $var_link=$document_po;
 
             $response =[
                 'status'=>200,
-                'message'  =>$var_link
+                'message'  =>$document_po
             ];
         }
         

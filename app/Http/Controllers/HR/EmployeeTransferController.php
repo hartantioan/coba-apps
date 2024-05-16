@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\HR;
 use Illuminate\Support\Str;
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Department;
 use App\Models\EmployeeTransfer;
@@ -510,20 +511,11 @@ class EmployeeTransferController extends Controller
             $result = $merger->merge();
 
 
-            $randomString = Str::random(10); 
-
-         
-                    $filePath = 'public/pdf/' . $randomString . '.pdf';
-                    
-
-                    Storage::put($filePath, $result);
-                    
-                    $document_po = asset(Storage::url($filePath));
-                    $var_link=$document_po;
+            $document_po = PrintHelper::savePrint($result);
 
             $response =[
                 'status'=>200,
-                'message'  =>$var_link
+                'message'  =>$document_po
             ];
         }
         
@@ -611,16 +603,7 @@ class EmployeeTransferController extends Controller
                     $result = $merger->merge();
 
 
-                    $randomString = Str::random(10); 
-
-         
-                    $filePath = 'public/pdf/' . $randomString . '.pdf';
-                    
-
-                    Storage::put($filePath, $result);
-                    
-                    $document_po = asset(Storage::url($filePath));
-                    $var_link=$document_po;
+                    $document_po = PrintHelper::savePrint($result);
                 } 
 
             }
@@ -686,20 +669,11 @@ class EmployeeTransferController extends Controller
                     $result = $merger->merge();
     
     
-                    $randomString = Str::random(10); 
-
-         
-                    $filePath = 'public/pdf/' . $randomString . '.pdf';
-                    
-
-                    Storage::put($filePath, $result);
-                    
-                    $document_po = asset(Storage::url($filePath));
-                    $var_link=$document_po;
+                    $document_po = PrintHelper::savePrint($result);
         
                     $response =[
                         'status'=>200,
-                        'message'  =>$var_link
+                        'message'  =>$document_po
                     ];
                 }
             }

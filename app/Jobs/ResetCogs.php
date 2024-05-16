@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 use App\Models\GoodIssue;
 use App\Models\GoodReceipt;
 use App\Models\GoodReceive;

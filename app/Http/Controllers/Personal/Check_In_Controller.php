@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Personal;
 
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Attendances;
 use App\Models\User;

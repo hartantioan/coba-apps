@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportRetirement;
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 use App\Models\Menu;
 
 class LockPeriodController extends Controller

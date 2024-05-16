@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\MasterData;
 
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 use App\Http\Controllers\Controller;
 use App\Models\AttendanceMachine;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
+
 class AttendanceMachineController extends Controller
 {
     public function index()
@@ -250,20 +252,11 @@ class AttendanceMachineController extends Controller
             $content = $pdf->download()->getOriginalContent();
 
 
-            $randomString = Str::random(10); 
-
-         
-            $filePath = 'public/pdf/' . $randomString . '.pdf';
-            
-
-            Storage::put($filePath, $content);
-            
-            $document_po = asset(Storage::url($filePath));
-            $var_link=$document_po;
+            $document_po = PrintHelper::savePrint($content);     $var_link=$document_po;
 
             $response =[
                 'status'=>200,
-                'message'  =>$var_link
+                'message'  =>$document_po
             ];
         }
         

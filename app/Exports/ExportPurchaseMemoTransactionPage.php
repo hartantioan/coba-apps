@@ -9,6 +9,7 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 
 class ExportPurchaseMemoTransactionPage implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell, ShouldAutoSize
 {

@@ -1,5 +1,6 @@
 @php
     use App\Helpers\CustomHelper;
+
 @endphp
 @foreach($data as $data)
 <!DOCTYPE html>

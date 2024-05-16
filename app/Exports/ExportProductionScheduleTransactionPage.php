@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 use App\Models\ProductionSchedule;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithTitle;

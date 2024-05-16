@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Inventory;
 
 use App\Exports\ExportStockInQty;
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Item;
 use App\Models\ItemStock;

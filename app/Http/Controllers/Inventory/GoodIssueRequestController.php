@@ -47,6 +47,7 @@ use App\Models\User;
 use App\Helpers\TreeHelper;
 use App\Models\Place;
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 use App\Models\Department;
 use App\Models\Division;
 use App\Models\ItemUnit;
@@ -463,19 +464,7 @@ class GoodIssueRequestController extends Controller
                 $pr = GoodIssueRequest::where('code',$row)->first();
                 
                 if($pr){
-                    $data = [
-                        'title'     => 'Good Issue Request',
-                        'data'      => $pr
-                    ];
-                    CustomHelper::addNewPrinterCounter($pr->getTable(),$pr->id);
-                    $img_path = 'website/logo_web_fix.png';
-                    $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
-                    $image_temp = file_get_contents($img_path);
-                    $img_base_64 = base64_encode($image_temp);
-                    $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
-                    $data["image"]=$path_img;
-                    $pdf = Pdf::loadView('admin.print.inventory.good_issue_request_individual', $data)->setPaper('a5', 'landscape');
-                    $pdf->render();
+                    $pdf = PrintHelper::print($pr,'Good Issue Request','a5','landscape','admin.print.inventory.good_issue_request_individual');
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                     $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
                     $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -492,20 +481,11 @@ class GoodIssueRequestController extends Controller
 
             $result = $merger->merge();
 
-            $randomString = Str::random(10); 
-
-         
-                    $filePath = 'public/pdf/' . $randomString . '.pdf';
-                    
-
-                    Storage::put($filePath, $result);
-                    
-                    $document_po = asset(Storage::url($filePath));
-                    $var_link=$document_po;
+            $document_po = PrintHelper::savePrint($result);
 
             $response =[
                 'status'=>200,
-                'message'  =>$var_link
+                'message'  =>$document_po
             ];
         }
         
@@ -929,27 +909,7 @@ class GoodIssueRequestController extends Controller
         $pr = GoodIssueRequest::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
-            $data = [
-                'title'     => 'Good Issue Request',
-                'data'      => $pr
-            ];
-
-            $opciones_ssl=array(
-                "ssl"=>array(
-                "verify_peer"=>false,
-                "verify_peer_name"=>false,
-                ),
-            );
-            CustomHelper::addNewPrinterCounter($pr->getTable(),$pr->id);
-            $img_path = 'website/logo_web_fix.png';
-            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
-            $image_temp = file_get_contents($img_path, false, stream_context_create($opciones_ssl));
-            $img_base_64 = base64_encode($image_temp);
-            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
-            $data["image"]=$path_img;
-             
-            $pdf = Pdf::loadView('admin.print.inventory.good_issue_request_individual', $data)->setPaper('a5', 'landscape');
-            $pdf->render();
+            $pdf = PrintHelper::print($pr,'Good Issue Request','a5','landscape','admin.print.inventory.good_issue_request_individual');
     
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -957,16 +917,7 @@ class GoodIssueRequestController extends Controller
             
             $content = $pdf->download()->getOriginalContent();
             
-            $randomString = Str::random(10); 
-
-         
-            $filePath = 'public/pdf/' . $randomString . '.pdf';
-            
-
-            Storage::put($filePath, $content);
-            
-            $document_po = asset(Storage::url($filePath));
-            $var_link=$document_po;
+            $document_po = PrintHelper::savePrint($content);     $var_link=$document_po;
     
     
             return $document_po;
@@ -1023,19 +974,7 @@ class GoodIssueRequestController extends Controller
                         $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
                         $query = GoodIssueRequest::where('code', 'LIKE', '%'.$x)->first();
                         if($query){
-                            $data = [
-                                'title'     => 'Good Issue Request',
-                                    'data'      => $query
-                            ];
-                            CustomHelper::addNewPrinterCounter($query->getTable(),$query->id);
-                            $img_path = 'website/logo_web_fix.png';
-                            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
-                            $image_temp = file_get_contents($img_path);
-                            $img_base_64 = base64_encode($image_temp);
-                            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
-                            $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.inventory.good_issue_request_individual', $data)->setPaper('a5', 'landscape');
-                            $pdf->render();
+                            $pdf = PrintHelper::print($query,'Good Issue Request','a5','landscape','admin.print.inventory.good_issue_request_individual');
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -1050,20 +989,11 @@ class GoodIssueRequestController extends Controller
                         $merger->addRaw($pdfContent);
                     }
                     $result = $merger->merge();
-                    $randomString = Str::random(10); 
-
-         
-                    $filePath = 'public/pdf/' . $randomString . '.pdf';
-                    
-
-                    Storage::put($filePath, $result);
-                    
-                    $document_po = asset(Storage::url($filePath));
-                    $var_link=$document_po;
+                    $document_po = PrintHelper::savePrint($result);
         
                     $response =[
                         'status'=>200,
-                        'message'  =>$var_link
+                        'message'  =>$document_po
                     ];
                 } 
 
@@ -1096,19 +1026,7 @@ class GoodIssueRequestController extends Controller
                     foreach($merged as $code){
                         $query = GoodIssueRequest::where('code', 'LIKE', '%'.$merged)->first();
                         if($query){
-                            $data = [
-                                'title'     => 'Good Issue Request',
-                                    'data'      => $query
-                            ];
-                            CustomHelper::addNewPrinterCounter($query->getTable(),$query->id);
-                            $img_path = 'website/logo_web_fix.png';
-                            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
-                            $image_temp = file_get_contents($img_path);
-                            $img_base_64 = base64_encode($image_temp);
-                            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
-                            $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.inventory.good_issue_request_individual', $data)->setPaper('a5', 'landscape');
-                            $pdf->render();
+                            $pdf = PrintHelper::print($query,'Good Issue Request','a5','landscape','admin.print.inventory.good_issue_request_individual');
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -1127,20 +1045,11 @@ class GoodIssueRequestController extends Controller
                     $result = $merger->merge();
     
     
-                    $randomString = Str::random(10); 
-
-         
-                    $filePath = 'public/pdf/' . $randomString . '.pdf';
-                    
-
-                    Storage::put($filePath, $result);
-                    
-                    $document_po = asset(Storage::url($filePath));
-                    $var_link=$document_po;
+                    $document_po = PrintHelper::savePrint($result);
         
                     $response =[
                         'status'=>200,
-                        'message'  =>$var_link
+                        'message'  =>$document_po
                     ];
                 }
             }

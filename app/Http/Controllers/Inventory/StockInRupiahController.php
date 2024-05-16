@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 
 class StockInRupiahController extends Controller
 {

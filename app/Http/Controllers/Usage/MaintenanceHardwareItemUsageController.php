@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Usage;
 
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 use App\Http\Controllers\Controller;
 use App\Models\AttachmentMaintenanceHardwareItemsUsage;
 use App\Models\AttachmentRequestRepairHardwareItemsUsage;

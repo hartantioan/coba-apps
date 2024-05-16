@@ -11,6 +11,7 @@ use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 
 class MarketingOrderOutstandingController extends Controller
 {

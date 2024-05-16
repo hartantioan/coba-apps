@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Setting;
 
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 use App\Http\Controllers\Controller;
 use App\Models\ChangeLog;
 use Illuminate\Http\Request;

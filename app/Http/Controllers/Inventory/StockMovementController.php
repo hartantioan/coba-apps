@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Mockery\Undefined;
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 class StockMovementController extends Controller
 {
     protected $dataplaces,$dataplacecode, $datawarehouses;

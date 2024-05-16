@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 use App\Mail\SendMail;
 use Detection\MobileDetect;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;

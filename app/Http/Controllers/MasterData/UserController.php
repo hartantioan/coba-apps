@@ -35,6 +35,7 @@ use App\Models\Region;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportUser;
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 use App\Imports\ImportUser;
 use App\Models\NonStaffCompany;
 
@@ -1281,20 +1282,11 @@ class UserController extends Controller
             $content = $pdf->download()->getOriginalContent();
 
 
-            $randomString = Str::random(10); 
-
-         
-            $filePath = 'public/pdf/' . $randomString . '.pdf';
-            
-
-            Storage::put($filePath, $content);
-            
-            $document_po = asset(Storage::url($filePath));
-            $var_link=$document_po;
+            $document_po = PrintHelper::savePrint($content);     $var_link=$document_po;
 
             $response =[
                 'status'=>200,
-                'message'  =>$var_link
+                'message'  =>$document_po
             ];
         }
         

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
 use App\Models\Company;
 use App\Models\Group;
 use App\Models\Place;

@@ -228,7 +228,14 @@
     });
     $(function() {
         loadDataTable();
-        
+        $('#body-item').on('click', '.delete-data-item', function() {
+            $(this).closest('tr').remove();
+           
+        });
+        $('#body-user').on('click', '.delete-data-item', function() {
+            $(this).closest('tr').remove();
+           
+        });
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {

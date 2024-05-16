@@ -396,4 +396,109 @@
 
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
+
+    function inspect(id){
+        $.ajax({
+            url: '{{ Request::url() }}/inspect',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+                $('#modal1').modal('open');
+                $('#temp').val(id);
+                $('#code_place_id').val(response.code_place_id).formSelect();
+                $('#code').val(response.code);
+                $('#note').val(response.note);
+                $('#delivery_no').val(response.delivery_no);
+                $('#vehicle_no').val(response.vehicle_no);
+                $('#driver').val(response.driver);
+                $('#post_date').val(response.post_date);
+                $('#company_id').val(response.company_id).formSelect();
+                $('#place_id').val(response.place_id).formSelect();
+                $('#account_id').empty().append(`
+                    <option value="` + response.account_id + `">` + response.account_name + `</option>
+                `);
+                if(response.document){
+                    const baseUrl = 'http://127.0.0.1:8000/storage/';
+                    const filePath = response.document.replace('public/', '');
+                    const fileUrl = baseUrl + filePath;
+                    displayFile(fileUrl);
+                }
+                if(response.details.length > 0){
+                    $('.row_item').each(function(){
+                        $(this).remove();
+                    });
+
+                    $.each(response.details, function(i, val) {
+                        var count = makeid(10);
+                        
+                        $('#last-row-item').before(`
+                            <tr class="row_item" data-po="` + response.id + `">
+                                <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
+                                <td>
+                                    ` + val.item_name + `
+                                </td>
+                                <td class="right-align">
+                                    ` + val.qty_po + `
+                                </td>
+                                <td class="center-align">
+                                    <input name="arr_qty_in[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_in + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_in` + count + `" data-id="` + count + `" readonly>
+                                </td>
+                                <td class="center-align">
+                                    <input name="arr_qty_out[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_out + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_out` + count + `" data-id="` + count + `" readonly>
+                                </td>
+                                <td class="right-align">
+                                    <span id="qtyBalance` + count + `">` + val.qty_balance + `</span>
+                                </td>
+                                <td class="center">
+                                    <select class="browser-default" id="arr_satuan` + count + `" name="arr_satuan[]" required>
+                                        <option value="">--Silahkan pilih item--</option>    
+                                    </select>
+                                </td>
+                                <td>
+                                    <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan 1..." style="width:100%;" value="` + val.note + `">
+                                </td>
+                                <td>
+                                    <input name="arr_note2[]" class="browser-default" type="text" placeholder="Keterangan 2..." style="width:100%;" value="` + val.note2 + `">
+                                </td>
+                                <td class="center">
+                                    <span>` + val.place_name + `</span>
+                                </td>
+                                <td class="center">
+                                    <span>` + val.warehouse_name + `</span>
+                                </td>
+                                <td class="center">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                }
+                
+                $('.modal-content').scrollTop(0);
+                $('#note').focus();
+                M.updateTextFields();
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#main');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
 </script>

@@ -211,4 +211,37 @@ class QualityControlController extends Controller
 
         return response()->json($response);
     }
+
+    public function inspect(Request $request){
+        $data = GoodScale::where('code',CustomHelper::decrypt($request->id))->first();
+        $data['account_name'] = $data->account->employee_no.' - '.$data->account->name;
+        $data['code_place_id'] = substr($data->code,7,2);
+
+        $details = [];
+        foreach($data->goodScaleDetail as $row){
+            $details[] = [
+                'id'                        => $row->id,
+                'purchase_order_detail_id'  => $row->purchase_order_detail_id,
+                'item_id'                   => $row->item_id,
+                'item_name'                 => $row->item->code.' - '.$row->item->name,
+                'qty_po'                    => $row->purchase_order_detail_id ? CustomHelper::formatConditionalQty($row->purchaseOrderDetail->qty) : '-',
+                'qty_in'                    => CustomHelper::formatConditionalQty($row->qty_in),
+                'qty_out'                   => CustomHelper::formatConditionalQty($row->qty_out),
+                'qty_balance'               => CustomHelper::formatConditionalQty($row->qty_balance),
+                'item_unit_id'              => $row->item_unit_id,
+                'place_id'                  => $row->place_id,
+                'place_name'                => $row->place->code,
+                'warehouse_id'              => $row->warehouse_id,
+                'warehouse_name'            => $row->warehouse->name,
+                'list_warehouse'            => $row->item->warehouseList(),
+                'note'                      => $row->note,
+                'note2'                     => $row->note2,
+                'buy_units'                 => $row->item->arrBuyUnits(),
+            ];
+        }
+
+        $data['details'] = $details;
+
+        return response()->json($data);
+    }
 }

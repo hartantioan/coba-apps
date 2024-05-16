@@ -39,6 +39,14 @@
         outline: 2px solid green !important; /* Adjust the color and style as needed */
         border-radius: 5px !important;
     }
+
+    .input-field label.active {
+        color:black;
+    }
+
+    label {
+        color: black;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -396,17 +404,6 @@
                             </div>
                             <div class="input-field col s12 m4">
                                 <div class="switch mb-1">
-                                    <label for="status">Pengecekan QC</label>
-                                    <label class="right">
-                                        Tidak
-                                        <input checked type="checkbox" id="is_quality_check" name="is_quality_check" value="1">
-                                        <span class="lever"></span>
-                                        Ya
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="input-field col s12 m4">
-                                <div class="switch mb-1">
                                     <label for="status">Status</label>
                                     <label class="right">
                                         Non-Active
@@ -545,6 +542,45 @@
                                     @endforeach
                                 </tbody>
                             </table>
+                            <div class="row">
+                                <div class="input-field col s12 m12">
+                                    <div class="switch mb-1">
+                                        <label for="status">Pengecekan QC</label>
+                                        <label class="right">
+                                            Tidak
+                                            <input type="checkbox" id="is_quality_check" name="is_quality_check" value="1" onclick="showQcParameter();">
+                                            <span class="lever"></span>
+                                            Ya
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col s12 hide" id="quality_parameters">
+                                    <table class="bordered">
+                                        <thead>
+                                            <tr>
+                                                <th class="center">Nama/Keterangan</th>
+                                                <th class="center">Satuan</th>
+                                                <th class="center">Mengurangi Qty?</th>
+                                                <th class="center">Hapus</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="body-parameter">
+                                            <tr id="empty-parameter">
+                                                <td colspan="4" class="center">Silahkan tambahkan parameter</td>
+                                            </tr>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th colspan="4" class="center">
+                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addParameter();" href="javascript:void(0);">
+                                                        <i class="material-icons left">add</i> Tambah
+                                                    </a>
+                                                </th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                         <div class="input-field col s12 m8" id="item-sale-show" style="display:none;">
                             <div class="card-alert card green">
@@ -920,6 +956,42 @@
         });
     });
 
+    function showQcParameter(){
+        if($('#is_quality_check').is(':checked')){
+            $('#quality_parameters').removeClass('hide');
+        }else{
+            $('#quality_parameters').addClass('hide');
+            $('.row_parameter').remove();
+        }
+    }
+
+    function addParameter(){
+        if($('#empty-parameter').length > 0){
+            $('#empty-parameter').remove();
+        }
+        $('#body-parameter').append(`
+            <tr class="row_parameter">
+                <td>
+                    <input name="arr_name_parameter[]" type="text">
+                </td>
+                <td>
+                    <input name="arr_unit_parameter[]" type="text">
+                </td>
+                <td class="center-align">
+                    <label>
+                        <input type="checkbox" name="arr_is_affect_qty[]" value="1">
+                        <span>&nbsp;</span>
+                    </label>
+                </td>
+                <td class="center-align">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-parameter" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
+            </tr>
+        `);
+    }
+
     function addUnit(){
         if($('#empty-unit').length > 0){
             $('#empty-unit').remove();
@@ -1253,6 +1325,7 @@
         var formData = new FormData($('#form_data')[0]), passed = true, passedSameUnit = true;
 
         formData.delete("arr_sell_unit[]");
+        formData.delete("arr_is_affect_qty[]");
         formData.delete("arr_buy_unit[]");
         formData.delete("arr_default");
 
@@ -1280,6 +1353,9 @@
         });
         $('input[name^="arr_default"]').each(function(index){
             formData.append('arr_default[]',($(this).is(':checked') ? $(this).val() : ''));
+        });
+        $('input[name^="arr_is_affect_qty[]"]').each(function(index){
+            formData.append('arr_is_affect_qty[]',($(this).is(':checked') ? $(this).val() : ''));
         });
         
         if(passedSameUnit){

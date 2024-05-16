@@ -1697,6 +1697,7 @@ Route::prefix('admin')->group(function () {
                 Route::prefix('quality_control')->middleware(['operation.access:quality_control,view','lockacc'])->group(function () {
                     Route::get('/',[QualityControlController::class, 'index']);
                     Route::get('datatable',[QualityControlController::class, 'datatable']);
+                    Route::post('inspect', [QualityControlController::class, 'inspect']);
                 });
 
                 Route::prefix('good_receipt_po')->middleware(['operation.access:good_receipt_po,view','lockacc'])->group(function () {

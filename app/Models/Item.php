@@ -356,6 +356,11 @@ class Item extends Model
         return $this->hasMany('App\Models\ItemBuffer','item_id','id');
     }
 
+    public function itemQcParameter()
+    {
+        return $this->hasMany('App\Models\ItemQcParameter','item_id','id');
+    }
+
     public function benchmarkPrice()
     {
         return $this->hasMany('App\Models\BenchmarkPrice','item_id','id')->where('status','1');

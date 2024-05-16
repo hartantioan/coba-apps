@@ -560,11 +560,11 @@ class FundRequestController extends Controller
                         'data'      => $pr
                     ];
                     
-                    $pdf = PrintHelper::print($pr,'Fund Request','a5','landscape','admin.print.finance.fund_request_individual');
+                    $pdf = PrintHelper::print($pr,'Fund Request','a4','portrait','admin.print.finance.fund_request_individual');
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                    $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
-                    $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                    $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(495, 740, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                     $content = $pdf->download()->getOriginalContent();
                     $temp_pdf[]=$content;
                 }
@@ -639,11 +639,11 @@ class FundRequestController extends Controller
                         $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
                         $query = FundRequest::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
-                            $pdf = PrintHelper::print($query,'Fund Request','a5','landscape','admin.print.finance.fund_request_individual');
+                            $pdf = PrintHelper::print($query,'Fund Request','a4','portrait','admin.print.finance.fund_request_individual');
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                            $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(495, 740, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
                            
@@ -698,11 +698,11 @@ class FundRequestController extends Controller
                                 'title'     => 'Fund Request',
                                     'data'      => $query
                             ];
-                            $pdf = PrintHelper::print($query,'Fund Request','a5','landscape','admin.print.finance.fund_request_individual');
+                            $pdf = PrintHelper::print($query,'Fund Request','a4','portrait','admin.print.finance.fund_request_individual');
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                            $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(495, 740, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
                            
@@ -738,7 +738,7 @@ class FundRequestController extends Controller
         $formattedDate = $currentDateTime->format('d/m/Y H:i:s');        
         if($pr){
 
-            $pdf = PrintHelper::print($pr,'Fund Request','a5','landscape','admin.print.finance.fund_request_individual');
+            $pdf = PrintHelper::print($pr,'Fund Request','a4','portrait','admin.print.finance.fund_request_individual');
     
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(495, 760, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
@@ -754,8 +754,8 @@ class FundRequestController extends Controller
             $pdfjail->render();
 
             $font = $pdfjail->getFontMetrics()->get_font("helvetica", "bold");
-            $pdfjail->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-            $pdfjail->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+            $pdfjail->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+            $pdfjail->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
             
             $contentjail = $pdfjail->download()->getOriginalContent();
 

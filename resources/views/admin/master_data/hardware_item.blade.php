@@ -171,7 +171,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Edit {{ $title }}</h4>
+                <h4>Tambah Edit {{ $title }}</h4>
                 <form class="row" id="form_data_edit" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert_edit" style="display:none;"></div>
@@ -328,7 +328,7 @@
 </div>
 
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
-    <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
+    <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modalEdit">
         <i class="material-icons">add</i>
     </a>
 </div>
@@ -417,9 +417,13 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data_edit')[0].reset();
                 $('#temp').val('');
+                $('#item_id_edit').empty();
+                $('#item_group_id_edit').empty();
                 M.updateTextFields();
             }
         });
+        select2ServerSide('#item_id_edit', '{{ url("admin/select2/item_for_hardware_item") }}');
+        select2ServerSide('#item_group_id_edit', '{{ url("admin/select2/hardware_item_group") }}');
         select2ServerSide('#item_id', '{{ url("admin/select2/item_for_hardware_item") }}');
         select2ServerSide('#item_group_id', '{{ url("admin/select2/hardware_item_group") }}');
     });

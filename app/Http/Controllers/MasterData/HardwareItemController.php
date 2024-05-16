@@ -167,7 +167,23 @@ class HardwareItemController extends Controller
                 }catch(\Exception $e){
                     DB::rollback();
                 }
-			}
+			}else{
+                DB::beginTransaction();
+                
+                $query = HardwareItem::create([
+                    'code'                      => $request->code,
+                    'item_id'			        => $request->item_id_edit,
+                    'user_id'			        => session('bo_id'),
+                    'hardware_item_group_id'    => $request->item_group_id_edit,
+                    'detail1'			        => $request->detail1_edit,
+                    'detail2'			        => $request->detail2_edit,
+                    'status'                    => $request->status ? $request->status : '2',
+                ]);
+                
+                    
+
+                DB::commit();
+            }
 			
 			if($query) {
                 

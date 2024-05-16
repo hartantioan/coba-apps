@@ -174,22 +174,28 @@
                 <h4>Tambah Edit {{ $title }}</h4>
                 <form class="row" id="form_data_edit" onsubmit="return false;">
                     <div class="col s12">
-                        <div id="validation_alert_edit" style="display:none;"></div>
+                        <div id="validation_alert_edit"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s12 m6">
+                        {{-- <div class="input-field col s12 m6">
                             <select class="browser-default" id="item_id_edit" name="item_id_edit">&nbsp;</select>
                             <label class="active" for="item_id_edit">Pilih Item dari inventory</label>
+                        </div> --}}
+                        <div class="input-field col s12 m6">
+                          
+                            <input id="code" name="code" type="text" placeholder="Kode">
+                            <label class="active" for="code">Kode</label>
+                        </div>
+                        <div class="input-field col s12 m6">
+                            <input type="hidden" id="temp" name="temp">
+                            <input id="item" name="item" type="text" placeholder="Nama Item">
+                            <label class="active" for="item">Item</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <select class="browser-default" id="item_group_id_edit" name="item_group_id_edit" onchange="getDepartment()">&nbsp;</select>
                             <label class="active" for="item_group_id_edit">Group Departement</label>
                         </div>
-                        <div class="input-field col s12 m6">
-                            <input type="hidden" id="temp" name="temp">
-                            <input id="code" name="code" type="text" placeholder="Kode">
-                            <label class="active" for="code">Kode</label>
-                        </div>
+                        
                         <div class="input-field col s12 m6">
                             <input id="detail1_edit" name="detail1_edit" type="text" placeholder="Keterangan">
                             <label class="active" for="detail1_edit">Detail 1</label>
@@ -616,13 +622,13 @@
         success: function(response) {
             loadingClose('.modal-content');
             if(response.status == 200) {
-                $('#modaledit').modal('close');
+                $('#modalEdit').modal('close');
                 loadDataTable();
                 M.toast({
                     html: response.message
                 });
             } else if(response.status == 422) {
-                $('#validation_alert_Edit').show();
+                $('#validation_alert_edit').show();
                 $('.modal-content').scrollTop(0);
                 
                 swal({
@@ -686,10 +692,8 @@
                 $('#modalEdit').modal('open');
                 $('#temp').val(id);
                 $('#code').val(response.code);
-                $('#item_id_edit').val(response.name);
-                $('#item_id_edit').append(`
-                    <option value="` + response.item.id + `">`+response.item.name+`</option>
-                `);
+                $('#item').val(response.item);
+                
                 $('#item_group_id_edit').append(`
                     <option value="` + response.group_item.id + `">` + response.group_item.code+`-`+response.group_item.name+`</option>
                 `);

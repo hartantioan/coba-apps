@@ -17,6 +17,7 @@ class HardwareItem extends Model
     protected $fillable = [
         'code',
         'item_id',
+        'item',
         'user_id',
         'hardware_item_group_id',
         'detail1',
@@ -40,7 +41,7 @@ class HardwareItem extends Model
         return $status;
     }
 
-    public function item(){
+    public function items(){
         return $this->belongsTo('App\Models\Item', 'item_id', 'id')->withTrashed();
     }
 

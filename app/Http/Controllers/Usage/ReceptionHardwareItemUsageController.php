@@ -35,7 +35,7 @@ class ReceptionHardwareItemUsageController extends Controller
                     ->get();
         $item_ready=[];
         foreach ($InStorage as $item) {
-            $itemName = $item->item->name;
+            $itemName = $item->item;
          
             $itemData = [
                 'item_id' => $item->id,
@@ -310,7 +310,7 @@ class ReceptionHardwareItemUsageController extends Controller
     }
     public function showItem(Request $request){
         $reception = HardwareItem::find($request->id);
-        $reception['name']=$reception->item->name;
+        $reception['name']=$reception->item;
 		return response()->json($reception);
     }
 

@@ -44,7 +44,7 @@ class HardwareItemController extends Controller
     public function datatable(Request $request){
         $column = [
             'code',
-            'item_id',
+            'item',
             'user_id',
             'hardware_item_group_id',
             'detail1',
@@ -63,7 +63,7 @@ class HardwareItemController extends Controller
         $query_data = HardwareItem::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
-                        $query->orWhere('name', 'like', "%$search%")
+                        $query->orWhere('item', 'like', "%$search%")
                             ->orWhere('detail1', 'like', "%$search%")
                             ->orWhere('detail2', 'like', "%$search%");
                     });
@@ -81,7 +81,7 @@ class HardwareItemController extends Controller
         $total_filtered = HardwareItem::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
-                        $query->orWhere('name', 'like', "%$search%")
+                        $query->orWhere('item', 'like', "%$search%")
                             ->orWhere('detail1', 'like', "%$search%")
                             ->orWhere('detail2', 'like', "%$search%");
                     });
@@ -101,7 +101,7 @@ class HardwareItemController extends Controller
                 $response['data'][] = [
                     $nomor,
                     $val->code,
-                    $val->item->name,
+                    $val->item,
                     $val->hardwareItemGroup->code.' - '.$val->hardwareItemGroup->name,
                     $val->detail1,
                     $val->detail2,
@@ -135,14 +135,14 @@ class HardwareItemController extends Controller
 
     public function Edit(Request $request){
         $validation = Validator::make($request->all(), [
-            'item_id_edit'               => 'required',
+            'item'                       => 'required',
             'item_group_id_edit'         => 'required',
             'detail1_edit'               => 'required',
             'code'                       =>  $request->temp ? ['required', Rule::unique('hardware_items', 'code')->ignore($request->temp)] : 'required|unique:hardware_items,code',
         ], [
             'code.required' 	    => 'Kode tidak boleh kosong.',
             'code.unique'           => 'Kode telah terpakai.',
-            'item_id_edit.required'          => 'Harap pilih Item.',
+            'item.required'          => 'Harap Isi Item.',
             'detail1_edit.required'      => 'Harap isi detail item',
             'item_group_id_edit.required'    => 'Harap pilih Group item Asset.',
         ]);
@@ -154,10 +154,11 @@ class HardwareItemController extends Controller
         } else {
 			if($request->temp){
                 DB::beginTransaction();
+                info($request->temp);
                 try {
                     $query = HardwareItem::find($request->temp);
                     $query->code            = $request->code;
-                    $query->item_id	        = $request->item_id_edit;
+                    $query->item	        = $request->item;
                     $query->hardware_item_group_id	        = $request->item_group_id_edit;
                     $query->detail1	        = $request->detail1_edit;
                     $query->detail2	        = $request->detail2_edit;
@@ -172,7 +173,7 @@ class HardwareItemController extends Controller
                 
                 $query = HardwareItem::create([
                     'code'                      => $request->code,
-                    'item_id'			        => $request->item_id_edit,
+                    'item'			            => $request->item,
                     'user_id'			        => session('bo_id'),
                     'hardware_item_group_id'    => $request->item_group_id_edit,
                     'detail1'			        => $request->detail1_edit,
@@ -289,7 +290,7 @@ class HardwareItemController extends Controller
 
     public function show(Request $request){
         $hardwareItem = HardwareItem::find($request->id);
-        $hardwareItem['item']=$hardwareItem->item;
+        // $hardwareItem['item']=$hardwareItem->item;
         $hardwareItem['user']=$hardwareItem->user;
         $hardwareItem['group_item']=$hardwareItem->hardwareItemGroup;
 
@@ -318,7 +319,7 @@ class HardwareItemController extends Controller
                 $temp_reception[]=$temp_data_rec;
     
                 
-                $title='History Usage '.$reception->hardwareItem->item->name;
+                $title='History Usage '.$reception->hardwareItem->item;
                 // ...
             }
             $query_return = ReceptionHardwareItemsUsage::where('hardware_item_id', $request->id)->where('return_date','!=',null)->get();

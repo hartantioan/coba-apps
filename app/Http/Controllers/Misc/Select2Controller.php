@@ -1712,10 +1712,8 @@ class Select2Controller extends Controller {
         $search   = $request->search;
         $excludedIds = ReceptionHardwareItemsUsage::pluck('hardware_item_id')->toArray();
         $data = HardwareItem::where(function ($query) use ($search) {
-                    $query->orWhere('code', 'like', "%$search%");
-                })
-                ->whereHas('item', function ($query) use ($search) {
-                    $query->where('name', 'like', "%$search%");
+                    $query->orWhere('code', 'like', "%$search%")
+                    ->orWhere('item', 'like', "%$search%");
                 })
                 ->where('status', '1')
                 ->whereHas('receptionHardwareItemsUsage')
@@ -1728,7 +1726,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code.'-'.$d->item->name,
+                'text' 			=> $d->code.' - '.$d->item,
                 'detail1' 	    => $d->detail1,
                 'detail2' 	    => $d->detail2,
             ];

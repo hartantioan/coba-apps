@@ -95,6 +95,7 @@ use App\Http\Controllers\MasterData\BenchmarkPriceController;
 use App\Http\Controllers\MasterData\CostDistributionController;
 use App\Http\Controllers\MasterData\DeliveryCostController;
 use App\Http\Controllers\MasterData\UserDateController;
+use App\Http\Controllers\MasterData\UserItemController;
 use App\Http\Controllers\MasterData\LandedCostFeeController;
 use App\Http\Controllers\MasterData\BottomPriceController;
 use App\Http\Controllers\MasterData\PalletController;
@@ -1122,6 +1123,14 @@ Route::prefix('admin')->group(function () {
                         Route::post('destroy', [UserDateController::class, 'destroy'])->middleware('operation.access:user_date,delete');
                     });
 
+                    Route::prefix('user_item')->middleware('operation.access:user_item,view')->group(function () {
+                        Route::get('/',[UserItemController::class, 'index']);
+                        Route::get('datatable',[UserItemController::class, 'datatable']);
+                        Route::post('show', [UserItemController::class, 'show']);
+                        Route::get('row_detail',[UserItemController::class, 'rowDetail']);
+                        Route::post('create',[UserItemController::class, 'create'])->middleware('operation.access:user_item,update');
+                        Route::post('destroy', [UserItemController::class, 'destroy'])->middleware('operation.access:user_item,delete');
+                    });
                     
 
                     Route::prefix('attendance_machine')->middleware('operation.access:attendance_machine,view')->group(function () {

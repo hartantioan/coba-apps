@@ -345,7 +345,7 @@
                                     <td align="center">{{ $row->type() }}</td>
                                     <td align="center">{{ $row->purchaseInvoice() ? date('d/m/Y',strtotime($row->lookable->due_date)) : '-' }}</td>
                                     <td>{{ $row->note }}</td>
-                                    <td align="right" style="font-family: Arial, Helvetica, sans-serif">{{ $data->currency->symbol.number_format($row->nominal,2,',','.') }}</td>
+                                    <td align="right" style="font-family: Arial, Helvetica, sans-serif">{{ $data->currency->code.number_format($row->nominal,2,',','.') }}</td>
                                 </tr>
                                 @php
                                     $total += $row->nominal;
@@ -386,8 +386,8 @@
                                     <td align="center">{{ ($row->machine()->exists() ? $row->machine->name : '-') }}</td>
                                     <td align="center">{{ ($row->division()->exists() ? $row->division->name : '-') }}</td>
                                     <td align="center">{{ ($row->project()->exists() ? $row->project->name : '-') }}</td>
-                                    <td align="right" style="font-family: Arial, Helvetica, sans-serif">{{ $data->currency->symbol.number_format($row->nominal_debit_fc,2,',','.') }}</td>
-                                    <td align="right" style="font-family: Arial, Helvetica, sans-serif">{{ $data->currency->symbol.number_format($row->nominal_credit_fc,2,',','.') }}</td>
+                                    <td align="right" style="font-family: Arial, Helvetica, sans-serif">{{ $data->currency->code.number_format($row->nominal_debit_fc,2,',','.') }}</td>
+                                    <td align="right" style="font-family: Arial, Helvetica, sans-serif">{{ $data->currency->code.number_format($row->nominal_credit_fc,2,',','.') }}</td>
                                 </tr>
                                 <tr>
                                     <td colspan="9">Ket.1 : {{ $row->note }}</td>

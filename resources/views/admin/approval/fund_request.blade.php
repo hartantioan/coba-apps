@@ -259,24 +259,24 @@
                     <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                     <td class="center-align">{{ $row->unit->code }}</td>
                     <td class="right-align">{{ number_format($row->price,2,',','.') }}</td>
-                    <td class="right-align">{{ $data->currency->symbol.number_format($row->total,2,',','.') }}</td>
+                    <td class="right-align">{{ $data->currency->code.number_format($row->total,2,',','.') }}</td>
                 </tr>
                 @endforeach
                 <tr>
                     <td colspan="4" class="right-align">Total</td>
-                    <td class="right-align">{{ $data->currency->symbol.number_format($data->total,2,',','.') }}</td>
+                    <td class="right-align">{{ $data->currency->code.number_format($data->total,2,',','.') }}</td>
                 </tr>
                 <tr>
                     <td colspan="4" class="right-align">PPN</td>
-                    <td class="right-align">{{ $data->currency->symbol.number_format($data->tax,2,',','.') }}</td>
+                    <td class="right-align">{{ $data->currency->code.number_format($data->tax,2,',','.') }}</td>
                 </tr>
                 <tr>
                     <td colspan="4" class="right-align">PPh</td>
-                    <td class="right-align">{{ $data->currency->symbol.number_format($data->wtax,2,',','.') }}</td>
+                    <td class="right-align">{{ $data->currency->code.number_format($data->wtax,2,',','.') }}</td>
                 </tr>
                 <tr>
                     <td colspan="4" class="right-align">Grandtotal</td>
-                    <td class="right-align">{{ $data->currency->symbol.number_format($data->grandtotal,2,',','.') }}</td>
+                    <td class="right-align">{{ $data->currency->code.number_format($data->grandtotal,2,',','.') }}</td>
                 </tr>
             </tbody>
         </table>

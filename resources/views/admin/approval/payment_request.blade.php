@@ -284,7 +284,7 @@
                         <td>{{ $row->getCode() }}</td>
                         <td class="center-align">{{ $row->type() }}</td>
                         <td>{{ $row->note }}</td>
-                        <td class="right-align">{{ $data->currency->symbol.number_format($row->nominal,2,',','.') }}</td>
+                        <td class="right-align">{{ $data->currency->code.number_format($row->nominal,2,',','.') }}</td>
                     </tr>
                     @php
                         $total += $row->nominal;
@@ -292,19 +292,19 @@
                     @endforeach
                     <tr>
                         <td colspan="3" class="right-align">Total</td>
-                        <td class="right-align">{{ $data->currency->symbol.number_format($data->total,2,',','.') }}</td>
+                        <td class="right-align">{{ $data->currency->code.number_format($data->total,2,',','.') }}</td>
                     </tr>
                     <tr>
                         <td colspan="3" class="right-align">Pembulatan</td>
-                        <td class="right-align">{{ $data->currency->symbol.number_format($data->rounding,2,',','.') }}</td>
+                        <td class="right-align">{{ $data->currency->code.number_format($data->rounding,2,',','.') }}</td>
                     </tr>
                     <tr>
                         <td colspan="3" class="right-align">Admin</td>
-                        <td class="right-align">{{ $data->currency->symbol.number_format($data->admin,2,',','.') }}</td>
+                        <td class="right-align">{{ $data->currency->code.number_format($data->admin,2,',','.') }}</td>
                     </tr>
                     <tr>
                         <td colspan="3" class="right-align">Grandtotal</td>
-                        <td class="right-align">{{ $data->currency->symbol.number_format($data->grandtotal,2,',','.') }}</td>
+                        <td class="right-align">{{ $data->currency->code.number_format($data->grandtotal,2,',','.') }}</td>
                     </tr>
                 </tbody>
                 <tfoot>

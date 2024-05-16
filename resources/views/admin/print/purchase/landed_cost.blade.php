@@ -160,7 +160,7 @@
                             <td>{{ $row->company->name }}</td>
                             <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                             <td>{{ $row->reference }}</td>
-                            <td>{{ $row->currency->symbol }}</td>
+                            <td>{{ $row->currency->code }}</td>
                             <td>{{ $row->currency_rate }}</td>
                             <td>{{ $row->note }}</td>
                             <td><a href="{{ $row->attachment() }}">File</a></td>

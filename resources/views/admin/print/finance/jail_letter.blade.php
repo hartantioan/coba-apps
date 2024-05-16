@@ -228,7 +228,7 @@
                                             Sebesar
                                         </td>
                                         <td>
-                                            : {{ strtoupper($data->currency->symbol.' '.number_format($data->grandtotal,2,',','.')) }}
+                                            : {{ strtoupper($data->currency->code.' '.number_format($data->grandtotal,2,',','.')) }}
                                         </td>
                                     </tr>
                                     <tr>

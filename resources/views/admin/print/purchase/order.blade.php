@@ -155,7 +155,7 @@
 									<td>{{ number_format($row->percent_tax,2,',','.') }}</td>
 									<td>{{ $row->paymentType() }}</td>
 									<td>{{ $row->payment_term }}</td>
-									<td>{{ $row->currency->symbol }}</td>
+									<td>{{ $row->currency->code }}</td>
 									<td>{{ $row->currency_rate }}</td>
 									<td>{{ $row->note }}</td>
 									<td>{!! $row->statusRaw() !!}</td>

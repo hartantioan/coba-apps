@@ -121,7 +121,7 @@
 								<td>{{ date('d/m/Y',strtotime($row->due_date)) }}</td>
 								<td><a href="{{ $row->attachment() }}">File</a></td>
 								<td>{{ $row->type() }}</td>
-								<td>{{ $row->currency->symbol }}</td>
+								<td>{{ $row->currency->code }}</td>
 								<td>{{ $row->currency_rate }}</td>
 								<td>{{ $row->note }}</td>
 								<td>{!! $row->statusRaw() !!}</td>

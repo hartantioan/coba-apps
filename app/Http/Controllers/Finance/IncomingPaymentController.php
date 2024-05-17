@@ -1162,11 +1162,11 @@ class IncomingPaymentController extends Controller
                         $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
                         $query = IncomingPayment::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
-                            $pdf = PrintHelper::print($query,'Incoming Payment','a5','landscape','admin.print.finance.incoming_payment_individual');
+                            $pdf = PrintHelper::print($query,'Incoming Payment','a4','portrait','admin.print.finance.incoming_payment_individual');
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                            $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(495, 740, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
                            
@@ -1219,11 +1219,11 @@ class IncomingPaymentController extends Controller
                         $etNumbersArray = explode(',', $request->tabledata);
                         $query = IncomingPayment::where('code', 'LIKE', '%'.$etNumbersArray[$code-1])->first();
                         if($query){
-                            $pdf = PrintHelper::print($query,'Incoming Payment','a5','landscape','admin.print.finance.incoming_payment_individual');
+                            $pdf = PrintHelper::print($query,'Incoming Payment','a4','portrait','admin.print.finance.incoming_payment_individual');
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                            $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(495, 740, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
                            
@@ -1272,11 +1272,11 @@ class IncomingPaymentController extends Controller
                 $pr = IncomingPayment::where('code',$row)->first();
                 
                 if($pr){
-                    $pdf = PrintHelper::print($pr,'Incoming Payment','a5','landscape','admin.print.finance.incoming_payment_individual');
+                    $pdf = PrintHelper::print($pr,'Incoming Payment','a4','portrait','admin.print.finance.incoming_payment_individual');
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                    $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
-                    $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                    $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(495, 740, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                     $content = $pdf->download()->getOriginalContent();
                     $temp_pdf[]=$content;
                 }
@@ -1307,7 +1307,7 @@ class IncomingPaymentController extends Controller
         $currentDateTime = Date::now();
         $formattedDate = $currentDateTime->format('d/m/Y H:i:s');        
         if($pr){
-            $pdf = PrintHelper::print($pr,'Incoming Payment','a5','landscape','admin.print.finance.incoming_payment_individual');
+            $pdf = PrintHelper::print($pr,'Incoming Payment','a4','portrait','admin.print.finance.incoming_payment_individual');
     
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));

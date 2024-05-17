@@ -649,7 +649,7 @@ class GoodScaleController extends Controller
         if($weight){
             $nominal = number_format($weight->nominal,3,',','.');
         }else{
-            $nominal = '0,000';
+            $nominal = '500';
         }
 
         return response()->json($nominal);

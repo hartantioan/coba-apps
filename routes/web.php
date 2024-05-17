@@ -1698,6 +1698,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('/',[QualityControlController::class, 'index']);
                     Route::get('datatable',[QualityControlController::class, 'datatable']);
                     Route::post('inspect', [QualityControlController::class, 'inspect']);
+                    Route::post('remove_used_data', [QualityControlController::class, 'removeUsedData']);
                 });
 
                 Route::prefix('good_receipt_po')->middleware(['operation.access:good_receipt_po,view','lockacc'])->group(function () {

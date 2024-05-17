@@ -60,11 +60,7 @@ class QualityControlController extends Controller
             'code',
             'user_id',
             'account_id',
-            'company_id',
             'post_date',
-            'delivery_no',
-            'vehicle_no',
-            'driver',
             'note',
         ];
 
@@ -81,9 +77,6 @@ class QualityControlController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
-                            ->orWhere('delivery_no', 'like', "%$search%")
-                            ->orWhere('vehicle_no', 'like', "%$search%")
-                            ->orWhere('driver', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('goodScaleDetail',function($query) use($search, $request){
                                 $query->whereHas('item',function($query) use($search, $request){
@@ -121,9 +114,6 @@ class QualityControlController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
-                            ->orWhere('delivery_no', 'like', "%$search%")
-                            ->orWhere('vehicle_no', 'like', "%$search%")
-                            ->orWhere('driver', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('goodScaleDetail',function($query) use($search, $request){
                                 $query->whereHas('item',function($query) use($search, $request){
@@ -163,15 +153,9 @@ class QualityControlController extends Controller
                     $val->referencePO(),
                     $val->user->name,
                     $val->account->name,
-                    $val->company->name,
                     date('d/m/Y',strtotime($val->post_date)),
-                    $val->delivery_no,
-                    $val->vehicle_no,
-                    $val->driver,
                     $val->note,
-                      $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
-                    $val->image_in ? '<a href="'.$val->imageIn().'" target="_blank"><i class="material-icons">camera_front</i></a>' : '<i class="material-icons">hourglass_empty</i>',
-                    $val->image_out ? '<a href="'.$val->imageOut().'" target="_blank"><i class="material-icons">camera_rear</i></a>' : '<i class="material-icons">hourglass_empty</i>',
+                    $val->image_qc ? '<a href="'.$val->imageQc().'" target="_blank"><i class="material-icons">camera_rear</i></a>' : '<i class="material-icons">hourglass_empty</i>',
                     $val->status(),
                     $val->statusQc(),
                     $val->note_qc,
@@ -214,34 +198,54 @@ class QualityControlController extends Controller
 
     public function inspect(Request $request){
         $data = GoodScale::where('code',CustomHelper::decrypt($request->id))->first();
-        $data['account_name'] = $data->account->employee_no.' - '.$data->account->name;
-        $data['code_place_id'] = substr($data->code,7,2);
 
-        $details = [];
-        foreach($data->goodScaleDetail as $row){
-            $details[] = [
-                'id'                        => $row->id,
-                'purchase_order_detail_id'  => $row->purchase_order_detail_id,
-                'item_id'                   => $row->item_id,
-                'item_name'                 => $row->item->code.' - '.$row->item->name,
-                'qty_po'                    => $row->purchase_order_detail_id ? CustomHelper::formatConditionalQty($row->purchaseOrderDetail->qty) : '-',
-                'qty_in'                    => CustomHelper::formatConditionalQty($row->qty_in),
-                'qty_out'                   => CustomHelper::formatConditionalQty($row->qty_out),
-                'qty_balance'               => CustomHelper::formatConditionalQty($row->qty_balance),
-                'item_unit_id'              => $row->item_unit_id,
-                'place_id'                  => $row->place_id,
-                'place_name'                => $row->place->code,
-                'warehouse_id'              => $row->warehouse_id,
-                'warehouse_name'            => $row->warehouse->name,
-                'list_warehouse'            => $row->item->warehouseList(),
-                'note'                      => $row->note,
-                'note2'                     => $row->note2,
-                'buy_units'                 => $row->item->arrBuyUnits(),
-            ];
+        if($data->used()->exists()){
+            return response()->json([
+                'status'    => 500,
+                'message'   => 'Ups. Maaf, Data sedang dipakai oleh pengguna lainnya.'
+            ]);
+        }else{
+            CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Quality Control');
+
+            $data['account_name'] = $data->account->employee_no.' - '.$data->account->name;
+            $data['post_date'] = date('d/m/Y',strtotime($data->post_date));
+
+            $details = [];
+            foreach($data->goodScaleDetail as $row){
+                $parameter = [];
+
+                foreach($row->item->itemQcParameter as $rowparam){
+                    $parameter[] = [
+                        'name'          => $rowparam->name,
+                        'unit'          => $rowparam->unit,
+                        'is_affect_qty' => $rowparam->is_affect_qty ?? '',
+                    ];
+                }
+
+                $details[] = [
+                    'id'                        => $row->id,
+                    'item_name'                 => $row->item->code.' - '.$row->item->name,
+                    'qty_po'                    => $row->purchase_order_detail_id ? CustomHelper::formatConditionalQty($row->purchaseOrderDetail->qty) : '-',
+                    'qty_in'                    => CustomHelper::formatConditionalQty($row->qty_in),
+                    'unit'                      => $row->itemUnit->unit->code,
+                    'place_name'                => $row->place->code,
+                    'warehouse_name'            => $row->warehouse->name,
+                    'note'                      => $row->note,
+                    'parameters'                => $parameter,    
+                ];
+            }
+
+            $data['details'] = $details;
+
+            return response()->json($data);
         }
+    }
 
-        $data['details'] = $details;
-
-        return response()->json($data);
+    public function removeUsedData(Request $request){
+        CustomHelper::removeUsedData('good_scales',$request->id);
+        return response()->json([
+            'status'    => 200,
+            'message'   => ''
+        ]);
     }
 }

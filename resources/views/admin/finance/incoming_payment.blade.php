@@ -288,14 +288,14 @@
                         </fieldset>
                     </div>
                     <div class="col s12 stepdetaildokumen">
-                        <fieldset>
+                        <fieldset style="min-width: 100%;">
                             <legend>3. Detail Dokumen dan Nominal</legend>
                             <div class="row">
                                 <div class="col m12 s12 step12">
                                     <p class="mt-2 mb-2">
                                         <h6>Detail AR Invoice / AR Down Payment / AR Memo / BS.Karyawan / Coa</h6>
-                                        <div style="overflow:auto;">
-                                            <table class="bordered" style="max-width:1650px !important;" id="table-detail">
+                                        <div style="overflow:scroll;width:100% !important;">
+                                            <table class="bordered" style="min-width:2000px !important;" id="table-detail">
                                                 <thead>
                                                     <tr>
                                                         <th class="center">Referensi</th>
@@ -305,13 +305,13 @@
                                                         <th class="center">Pembulatan</th>
                                                         <th class="center">Total</th>
                                                         <th class="center">Dist.Biaya</th>
-                                                        <th class="center">Keterangan</th>
+                                                        <th class="center" width="500">Keterangan</th>
                                                         <th class="center">Hapus</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-detail">
                                                     <tr id="last-row-detail">
-                                                        <td colspan="9" class="center">
+                                                        <td colspan="9">
                                                             <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                                 <i class="material-icons left">add</i> Tambah Baris
                                                             </a>

@@ -33,6 +33,7 @@ class GoodScale extends Model
         'document',
         'image_in',
         'image_out',
+        'image_qc',
         'note',
         'status',
         'status_qc',
@@ -140,6 +141,17 @@ class GoodScale extends Model
     {
         if($this->image_out !== NULL && Storage::exists($this->image_out)) {
             $image = asset(Storage::url($this->image_out));
+        } else {
+            $image = asset('website/empty.png');
+        }
+
+        return $image;
+    }
+
+    public function imageQc() 
+    {
+        if($this->image_qc !== NULL && Storage::exists($this->image_qc)) {
+            $image = asset(Storage::url($this->image_qc));
         } else {
             $image = asset('website/empty.png');
         }

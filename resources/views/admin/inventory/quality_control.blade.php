@@ -152,15 +152,9 @@
                                                         <th>Ref.PO</th>
                                                         <th>Pengguna</th>
                                                         <th>Supplier</th>
-                                                        <th>Perusahaan</th>
                                                         <th>Tanggal</th>
-                                                        <th>No.SJ</th>
-                                                        <th>No.Kendaraan</th>
-                                                        <th>Supir</th>
                                                         <th>Keterangan</th>
-                                                        <th>Dokumen</th>
-                                                        <th>Foto Masuk</th>
-                                                        <th>Foto Keluar</th>
+                                                        <th>Foto QC</th>
                                                         <th>Status Dokumen</th>
                                                         <th>Status QC</th>
                                                         <th>Catatan QC</th>
@@ -194,6 +188,76 @@
                     </div>
                     <div class="col s12">
                         <div class="row">
+                            <input type="hidden" id="temp" name="temp">
+                            <div class="input-field col m3 s12">
+                                <div id="code" class="mt-2">
+
+                                </div>
+                                <label class="active" for="code">Status QC</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <div id="post_date" class="mt-2">
+
+                                </div>
+                                <label class="active" for="post_date">Tgl.Post</label>
+                            </div>
+                            <div class="input-field col m6 s12">
+                                <div id="account_id" class="mt-2">
+
+                                </div>
+                                <label class="active" for="account_id">Partner Bisnis</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <select class="form-control" id="status_qc" name="status_qc">
+                                    <option value="">Menunggu</option>
+                                    <option value="1">Disetujui</option>
+                                    <option value="2">Ditolak</option>
+                                </select>
+                                <label class="" for="status_qc">Status QC</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
+                                <label class="active" for="note">Keterangan</label>
+                            </div>
+                            <div class="col m6 s12 step6">
+                                <label class="">Bukti Upload</label>
+                                <br>
+                                <input type="file" name="file" id="fileInput" accept="image/*" style="display: none;">
+                                <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
+                                    Drop image here or <a href="javascript:void(0);" id="uploadLink">upload</a>
+                                    <br>
+                                    
+                                </div>
+                                <a class="waves-effect waves-light cyan btn-small" style="margin-top: 0.5em;margin-left:0.2em" id="clearButton" href="javascript:void(0);">
+                                   Clear
+                                </a>
+                            </div>
+                            <div class="col m4 s12">
+                                <div id="fileName"></div>
+                                <img src="" alt="Preview" id="imagePreview" style="display: none;">
+                            </div>
+                            <div class="col m12 s12">
+                                <h6><b>Timbangan Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
+                            </div>
+                            <div class="col m12 s12">
+                                <p class="mt-2 mb-2">
+                                    <h4>Detail Produk</h4>
+                                    <div style="overflow:auto;">
+                                        <table class="bordered" id="table-detail">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center">Item</th>
+                                                    <th class="center">Qty</th>
+                                                    <th class="center">Satuan</th>
+                                                    <th class="center">Plant</th>
+                                                    <th class="center">Gudang</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="body-item"></tbody>
+                                        </table>
+                                    </div>
+                                </p>
+                            </div>
                             <div class="col s12 mt-3">
                                 <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
@@ -221,12 +285,6 @@
     </div>
 </div>
 
-<div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
-    <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
-        <i class="material-icons">add</i>
-    </a>
-</div>
-
 <div style="bottom: 50px; right: 80px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-amber-amber gradient-shadow modal-trigger tooltipped"  data-position="top" data-tooltip="Range Printing" href="#modal5">
         <i class="material-icons">view_comfy</i>
@@ -236,7 +294,131 @@
 <!-- END: Page Main-->
 <script src="{{ url('app-assets/js/custom/timbangan.js') }}"></script>
 <script>
+    const dropZone = document.getElementById('dropZone');
+    const uploadLink = document.getElementById('uploadLink');
+    const fileInput = document.getElementById('fileInput');
+    const imagePreview = document.getElementById('imagePreview');
+    const clearButton = document.getElementById('clearButton');
+    const fileNameDiv = document.getElementById('fileName');
+    dropZone.addEventListener('click', () => {
+        fileInput.click();
+    });
 
+    fileInput.addEventListener('change', (e) => {
+        handleFile(e.target.files[0]);
+    });
+
+    function dragOverHandler(event) {
+        event.preventDefault();
+        dropZone.style.backgroundColor = '#f0f0f0';
+    }
+
+    function dropHandler(event) {
+        event.preventDefault();
+        dropZone.style.backgroundColor = '#fff';
+
+        handleFile(event.dataTransfer.files[0]);
+    }
+
+    function handleFile(file) {
+        if (file) {
+        const reader = new FileReader();
+        const fileType = file.type.split('/')[0]; 
+        const maxSize = 10 * 1024 * 1024;
+        if (file.size > maxSize) {
+            alert('File size exceeds the maximum limit of 10 MB.');
+            return;
+        }
+
+        reader.onload = () => {
+           
+            fileNameDiv.textContent = 'File uploaded: ' + file.name;
+
+            if (fileType === 'image') {
+                
+                imagePreview.src = reader.result;
+                imagePreview.style.display = 'inline-block';
+                clearButton.style.display = 'inline-block'; 
+            } else {
+               
+                imagePreview.style.display = 'none';
+               
+            }
+        };
+
+        reader.readAsDataURL(file);
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+
+       
+        fileInput.files = dataTransfer.files;
+         
+        }
+    }
+    
+    clearButton.addEventListener('click', () => {
+        imagePreview.src = ''; 
+        imagePreview.style.display = 'none';
+        fileInput.value = ''; 
+        fileNameDiv.textContent = '';
+    });
+
+    document.addEventListener('paste', (event) => {
+        const items = event.clipboardData.items;
+        if (items) {
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') !== -1) {
+                    const file = items[i].getAsFile();
+                    handleFile(file);
+                    break;
+                }
+            }
+        }
+    });
+
+    function displayFile(fileLink) {
+        const fileType = getFileType(fileLink);
+       
+        fileNameDiv.textContent = 'File uploaded: ' + getFileName(fileLink);
+
+        if (fileType === 'image') {
+        
+            imagePreview.src = fileLink;
+            imagePreview.style.display = 'inline-block';
+          
+        } else {
+         
+            imagePreview.style.display = 'none';
+           
+            
+            const fileExtension = getFileExtension(fileLink);
+            if (fileExtension === 'pdf' || fileExtension === 'xlsx' || fileExtension === 'docx') {
+               
+                const downloadLink = document.createElement('a');
+                downloadLink.href = fileLink;
+                downloadLink.download = getFileName(fileLink);
+                downloadLink.textContent = 'Download ' + fileExtension.toUpperCase();
+                fileNameDiv.appendChild(downloadLink);
+            }
+        }
+    }
+
+    function getFileType(fileLink) {
+        const fileExtension = getFileExtension(fileLink);
+        if (fileExtension === 'jpg' || fileExtension === 'jpeg' || fileExtension === 'png' || fileExtension === 'gif') {
+            return 'image';
+        } else {
+            return 'other';
+        }
+    }
+
+    function getFileExtension(fileLink) {
+        return fileLink.split('.').pop().toLowerCase();
+    }
+
+    function getFileName(fileLink) {
+        return fileLink.split('/').pop();
+    }
     document.addEventListener('focusin', function (event) {
         const select2Container = event.target.closest('.modal-content .select2');
         const activeSelect2 = document.querySelector('.modal-content .select2.tab-active');
@@ -294,6 +476,12 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
+                $('#code,#post_date,#account_id').text('');
+                clearButton.click();
+                if($('.data-used').length > 0){
+                    $('.data-used').trigger('click');
+                }
+                $('#body-item').empty();
             }
         });
     });
@@ -347,15 +535,9 @@
                 { name: 'other', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'name', className: 'center-align' },
                 { name: 'account_id', className: 'center-align' },
-                { name: 'company_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
-                { name: 'delivery_no', className: 'center-align' },
-                { name: 'vehicle_no', className: 'center-align' },
-                { name: 'driver', className: 'center-align' },
                 { name: 'note', className: '' },
-                { name: 'document', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'image_in', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'image_out', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'image_qc', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status_qc', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'note_qc', searchable: false, orderable: false, className: 'center-align' },
@@ -397,6 +579,33 @@
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
 
+    function removeUsedData(id){
+        $.ajax({
+            url: '{{ Request::url() }}/remove_used_data',
+            type: 'POST',
+            dataType: 'JSON',
+            data: { 
+                id : id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                
+            },
+            success: function(response) {
+                $('.row_item[data-id="' + id + '"]').remove();
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
     function inspect(id){
         $.ajax({
             url: '{{ Request::url() }}/inspect',
@@ -413,82 +622,73 @@
             },
             success: function(response) {
                 loadingClose('#main');
-                $('#modal1').modal('open');
-                $('#temp').val(id);
-                $('#code_place_id').val(response.code_place_id).formSelect();
-                $('#code').val(response.code);
-                $('#note').val(response.note);
-                $('#delivery_no').val(response.delivery_no);
-                $('#vehicle_no').val(response.vehicle_no);
-                $('#driver').val(response.driver);
-                $('#post_date').val(response.post_date);
-                $('#company_id').val(response.company_id).formSelect();
-                $('#place_id').val(response.place_id).formSelect();
-                $('#account_id').empty().append(`
-                    <option value="` + response.account_id + `">` + response.account_name + `</option>
-                `);
-                if(response.document){
-                    const baseUrl = 'http://127.0.0.1:8000/storage/';
-                    const filePath = response.document.replace('public/', '');
-                    const fileUrl = baseUrl + filePath;
-                    displayFile(fileUrl);
-                }
-                if(response.details.length > 0){
-                    $('.row_item').each(function(){
-                        $(this).remove();
+                if(response.status == '500'){
+                    M.toast({
+                        html: response.message
                     });
-
-                    $.each(response.details, function(i, val) {
-                        var count = makeid(10);
-                        
-                        $('#last-row-item').before(`
-                            <tr class="row_item" data-po="` + response.id + `">
-                                <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
-                                <td>
-                                    ` + val.item_name + `
-                                </td>
-                                <td class="right-align">
-                                    ` + val.qty_po + `
-                                </td>
-                                <td class="center-align">
-                                    <input name="arr_qty_in[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_in + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_in` + count + `" data-id="` + count + `" readonly>
-                                </td>
-                                <td class="center-align">
-                                    <input name="arr_qty_out[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_out + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_out` + count + `" data-id="` + count + `" readonly>
-                                </td>
-                                <td class="right-align">
-                                    <span id="qtyBalance` + count + `">` + val.qty_balance + `</span>
-                                </td>
-                                <td class="center">
-                                    <select class="browser-default" id="arr_satuan` + count + `" name="arr_satuan[]" required>
-                                        <option value="">--Silahkan pilih item--</option>    
-                                    </select>
-                                </td>
-                                <td>
-                                    <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan 1..." style="width:100%;" value="` + val.note + `">
-                                </td>
-                                <td>
-                                    <input name="arr_note2[]" class="browser-default" type="text" placeholder="Keterangan 2..." style="width:100%;" value="` + val.note2 + `">
-                                </td>
-                                <td class="center">
-                                    <span>` + val.place_name + `</span>
-                                </td>
-                                <td class="center">
-                                    <span>` + val.warehouse_name + `</span>
-                                </td>
-                                <td class="center">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                                        <i class="material-icons">delete</i>
-                                    </a>
-                                </td>
-                            </tr>
-                        `);
-                    });
+                }else{
+                    $('#modal1').modal('open');
+                    $('#temp').val(id);
+                    $('#code').text(response.code);
+                    $('#post_date').text(response.post_date);
+                    $('#account_id').text(response.account_name);
+                    $('#list-used-data').append(`
+                        <div class="chip purple darken-4 gradient-shadow white-text">
+                            ` + response.code + `
+                            <i class="material-icons close data-used" onclick="removeUsedData('` + response.id + `')">close</i>
+                        </div>
+                    `);
+                    if(response.document){
+                        const baseUrl = 'http://127.0.0.1:8000/storage/';
+                        const filePath = response.document.replace('public/', '');
+                        const fileUrl = baseUrl + filePath;
+                        displayFile(fileUrl);
+                    }
+                    if(response.details.length > 0){
+                        $.each(response.details, function(i, val) {
+                            var count = makeid(10);
+                            let parameter = '<table class="bordered"><tr><th>Parameter</th><th>Nilai</th><th>Satuan</th></tr>';
+                            $.each(val.parameters, function(i, value) {
+                                parameter += `<tr>
+                                    <input type="hidden" name="arr_parameter_detail[]" value="` + val.id + `">
+                                    <td><input type="text" name="arr_parameter_name[]" value="` + value.name + `" readonly></td>
+                                    <td><input type="text" onkeyup="formatRupiahNoMinus(this);" name="arr_parameter_nominal[]" value=""></td>
+                                    <td><input type="text" name="arr_parameter_unit[]" value="` + value.unit + `" readonly></td>
+                                </tr>`;
+                            });
+                            parameter += '</table>';
+                            $('#body-item').append(`
+                                <tr class="row_item" data-id="` + response.id + `">
+                                    <input type="hidden" name="arr_detail[]" value="` + val.id + `">
+                                    <td>
+                                        ` + val.item_name + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.qty_in + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.unit + `
+                                    </td>
+                                    <td class="center">
+                                        <span>` + val.place_name + `</span>
+                                    </td>
+                                    <td class="center">
+                                        <span>` + val.warehouse_name + `</span>
+                                    </td>
+                                </tr>
+                                <tr class="row_item" data-id="` + response.id + `">
+                                    <td colspan="5">
+                                        Hasil inspeksi : 
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }
+                    
+                    $('.modal-content').scrollTop(0);
+                    $('#note').focus();
+                    M.updateTextFields();
                 }
-                
-                $('.modal-content').scrollTop(0);
-                $('#note').focus();
-                M.updateTextFields();
             },
             error: function() {
                 $('.modal-content').scrollTop(0);

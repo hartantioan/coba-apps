@@ -542,6 +542,11 @@
                                     @endforeach
                                 </tbody>
                             </table>
+                            <br>
+                            <hr>
+                            <div class="center mt-3">
+                                <h6>Isi jika ada pengecekan QC</h6>
+                            </div>
                             <div class="row">
                                 <div class="input-field col s12 m12">
                                     <div class="switch mb-1">
@@ -881,6 +886,12 @@
                 $("#item_group_id").val($("#item_group_id option:first").val()).trigger('change');
                 $('#temp').val('');
                 $('#code,#name,#other_name').prop('readonly',false);
+                $('#body-parameter').empty().append(`
+                    <tr id="empty-parameter">
+                        <td colspan="4" class="center">Silahkan tambahkan parameter</td>
+                    </tr>
+                `);
+                $('#quality_parameters').addClass('hide');
             }
         });
 
@@ -950,6 +961,17 @@
                 $('#body-unit').append(`
                     <tr id="empty-unit">
                         <td colspan="6" class="center">Silahkan tambahkan satuan konversi</td>
+                    </tr>
+                `);
+            }
+        });
+
+        $('#body-parameter').on('click', '.delete-data-parameter', function() {
+            $(this).closest('tr').remove();
+            if($('.row_parameter').length == 0){
+                $('#body-parameter').append(`
+                    <tr id="empty-parameter">
+                        <td colspan="4" class="center">Silahkan tambahkan parameter</td>
                     </tr>
                 `);
             }
@@ -1716,6 +1738,36 @@
                             width: '100%',
                         });
                         $('#arr_unit' + count).val(val.unit_id).trigger('change');
+                    });
+                }
+
+                if(response.parameters.length > 0){
+                    $('#quality_parameters').removeClass('hide');
+
+                    $('#body-parameter').empty();
+
+                    $.each(response.parameters, function(i, val) {
+                        $('#body-parameter').append(`
+                            <tr class="row_parameter">
+                                <td>
+                                    <input name="arr_name_parameter[]" type="text" value="` + val.name + `">
+                                </td>
+                                <td>
+                                    <input name="arr_unit_parameter[]" type="text" value="` + val.unit + `">
+                                </td>
+                                <td class="center-align">
+                                    <label>
+                                        <input ` + (val.is_affect_qty ? 'checked' : '') + ` type="checkbox" name="arr_is_affect_qty[]" value="1">
+                                        <span>&nbsp;</span>
+                                    </label>
+                                </td>
+                                <td class="center-align">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-parameter" href="javascript:void(0);">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        `);
                     });
                 }
 
